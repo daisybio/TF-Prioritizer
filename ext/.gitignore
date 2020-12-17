@@ -1,1 +1,11 @@
-/weka-3-9-4
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!weka.jar
+!commons-cli-1.4.jar
+# etc...
+
+# ...even if they are in subdirectories
+!*/

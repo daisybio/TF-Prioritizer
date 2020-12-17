@@ -1,5 +1,3 @@
-
-
 public class COM2POSE
 {
 
