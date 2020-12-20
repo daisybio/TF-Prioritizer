@@ -5,6 +5,7 @@
 !.gitignore
 !weka.jar
 !commons-cli-1.4.jar
+!TEPIC.zip
 # etc...
 
 # ...even if they are in subdirectories
