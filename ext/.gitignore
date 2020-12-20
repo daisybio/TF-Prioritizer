@@ -6,6 +6,7 @@
 !weka.jar
 !commons-cli-1.4.jar
 !TEPIC.zip
+!run_deseq2.R
 # etc...
 
 # ...even if they are in subdirectories
