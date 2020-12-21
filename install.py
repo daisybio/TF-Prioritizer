@@ -22,4 +22,4 @@ print("                       COM2POSE                     ")
 print("                  Installation Script               ")
 print("**************************************************")
 
-extract_all_zips_in_folder("ext/TEPIC/TEPIC.zip")
+extract_all_zips_in_folder("ext/TEPIC")
