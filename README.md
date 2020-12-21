@@ -30,9 +30,9 @@ After having installed the external dependencies, execute the script `install.py
 ```sh
 python install.py
 ```
-## 5. Usage of GenEpiSeeker
+## 5. Usage of COM2POSE
 
-After using `install.py` GenEpiSeeker is ready for usage. 
+After using `install.py` COM2POSE is ready for usage. 
 Execution:
 ```sh
 java jar com2pose.jar -c <com2pose-config> -w <working-directory> -p <path-com2pose> [-l]
