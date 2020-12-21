@@ -5,7 +5,9 @@ This repository is under developement.
 ## 1. About COM2POSE
 
 
-This java wrappers give you a full analysis of nfcore ChIP-seq peak data and nfcore RNA-seq count data. It performs DESeq2, TEPIC and DYNAMITE including all  preprocessing and postprocessing steps necessary to transform the data. It also gives you plots for deep analysis of the data. 
+This java wrappers give you a full analysis of nfcore ChIP-seq peak data and nfcore RNA-seq count data. It performs DESeq2, TEPIC and DYNAMITE including all  preprocessing and postprocessing steps necessary to transform the data. It also gives you plots for deep analysis of the data. The general workflow is sketched in the image below:
+
+![alt text](https://github.com/biomedbigdata/COM2POSE/blob/master/COM2POSE_framework.png)
 
 ## 2. License and Citing
 
