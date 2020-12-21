@@ -59,7 +59,7 @@ java jar com2pose.jar -c <com2pose-config> -w <working-directory> -p <path-com2p
                   |                +-- Sample n
                   +--gene counts annotation file
 ```
-
+Please do not have any other folders or files in ROOT_RNA_SEQ. This could cause trouble with the COM2POSE framework.
 ### nfcore ChIP-seq data
 ```
                                                                  +-- Sample 1
@@ -78,6 +78,5 @@ java jar com2pose.jar -c <com2pose-config> -w <working-directory> -p <path-com2p
                                     |                            +-- Sample 1
                                     +-- Histone Modification n --+-- ...
                                                                  +-- Sample n
-
-
 ```
+Please do not have any other folders or files in ROOT_CHIP_SEQ. This could cause trouble with the COM2POSE framework.
