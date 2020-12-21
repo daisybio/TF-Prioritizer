@@ -45,3 +45,39 @@ java jar com2pose.jar -c <com2pose-config> -w <working-directory> -p <path-com2p
 
 ### Optional options: 
 - `--write-log-file` : If this flag is set no log file will be writting to com2pose working directory
+
+## 6. Input Directory formats
+
+### nfcore RNA-seq data
+```
+                                   +-- Sample 1
+                  +--Timepoint 1 --+--  ...
+                  |                +-- Sample n
+----ROOT_RNA_SEQ--+--  ...
+                  |                +-- Sample 1
+                  +--Timepoint n --+--  ...
+                  |                +-- Sample n
+                  +--gene counts annotation file
+```
+
+### nfcore ChIP-seq data
+```
+                                                                 +-- Sample 1
+                   +--Timepoint 1 --+-- Histone Modification 1 --+-- ...
+                   |                |                            +-- Sample n
+                   |                +--  ...
+                   |                |                            +-- Sample 1
+                   |                +-- Histone Modification n --+-- ...
+                   |                                             +-- Sample n
+----ROOT_CHIP_SEQ--+--  ...
+                   |
+                   |                                              +-- Sample 1
+                   +--Timepoint n --+-- Histone Modification 1 --+-- ...
+                                    |                            +-- Sample n
+                                    +--  ...
+                                    |                            +-- Sample 1
+                                    +-- Histone Modification n --+-- ...
+                                                                 +-- Sample n
+
+
+```
