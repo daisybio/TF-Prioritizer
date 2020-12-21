@@ -178,15 +178,10 @@ public class COM2POSE_lib
                                 String message = child.getErrorStream().toString();
                                 throw new Exception(message);
                         }
-
-
-                        System.out.println("X");
-
                     }
                 }
             }
         }
-
         logger.logLine("Finished TEPIC.sh");
     }
 
