@@ -6,13 +6,11 @@ public class Options_intern
      * COM2POSE OPTIONS intern
      */
     public String config_data_path="";
-
-    /*
-    ########################
-    ##COM2POSE parameters###
-    ########################*/
-    //#[REQ]: working directory where COM2POSE can create, remove and edit files
     public String com2pose_working_directory="";
+    public String path_to_COM2POSE = "";
+
+    public boolean write_to_logfile = true;
+
     /*
     ######################
     ##DESeq2 parameters###

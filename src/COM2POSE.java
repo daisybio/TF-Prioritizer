@@ -9,7 +9,7 @@ import java.io.IOException;
 public class COM2POSE
 {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         Options_intern options_intern= new Options_intern();
         parseArguments(args, options_intern);
 
@@ -41,41 +41,16 @@ public class COM2POSE
         opt_cfg_file.setRequired(true);
         options.addOption(opt_cfg_file);
 
-        /**
-         * required options
+        Option opt_working_dir = new Option("w","working-directory",true,"[REQ]: working directory where COM2POSE can create, remove and edit files");
+        opt_working_dir.setRequired(true);
+        options.addOption(opt_working_dir);
 
-        Option opt_input_dir_peaks = new Option("i", "input-dir-peaks", true, "[REQ] input path to directory with ChIP-seq peak data.");
-        opt_input_dir_peaks.setRequired(true);
-        options.addOption(opt_input_dir_peaks);
+        Option opt_path_to_COM2POSE = new Option("p","path-com2pose",true, "[REQ]: filepath to COM2POSE folder");
+        opt_path_to_COM2POSE.setRequired(true);
+        options.addOption(opt_path_to_COM2POSE);
 
-        Option opt_reference_genome = new Option("g", "input-reference-genome", true, "[REQ] filepath to reference genome");
-        opt_reference_genome.setRequired(true);
-        options.addOption(opt_reference_genome);
-
-        Option opt_gene_annotation = new Option("a", "input-gene-annotation", true, "[REQ] filepath to gene annotation file");
-        opt_gene_annotation.setRequired(true);
-        options.addOption(opt_gene_annotation);
-
-        Option opt_output_directory = new Option("o", "output-directory", true, "[REQ] directory for output files");
-        opt_output_directory.setRequired(true);
-        options.addOption(opt_output_directory);
-
-        /**
-         * optional options
-
-
-        Option opt_window = new Option("w", "window-size", true, "[OPT] Size of the sliding window, default = 50000");
-        options.addOption(opt_window);
-
-        Option opt_cores = new Option("c","cores",true, "[OPT] how many cores should be used for parallelization, default = 1");
-        options.addOption(opt_cores);
-
-        /**
-         * FLAGS
-
-        Option opt_subdirs = new Option("s","compute-subdirectories",false,"[FLAG] compute all files in subdirectories, default = false");
-        options.addOption(opt_subdirs);
-        */
+        Option opt_write_logfile = new Option("l","write-log-file",false,"[OPT]: if flag is set no logfile will be written, default: logfile will be written");
+        options.addOption(opt_write_logfile);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -86,57 +61,21 @@ public class COM2POSE
         {
             cmd = parser.parse(options, args);
 
-            if(cmd.getOptionValue("com2pose-config")!=null)
+
+            options_intern.config_data_path = cmd.getOptionValue("com2pose-config");
+            options_intern.com2pose_working_directory=cmd.getOptionValue("working-directory");
+            options_intern.path_to_COM2POSE=cmd.getOptionValue("path-com2pose");
+
+
+
+            if(cmd.hasOption("write-log-file"))
             {
-                options_intern.config_data_path = cmd.getOptionValue("com2pose-config");
+                options_intern.write_to_logfile=false;
             }
-            else
-            {
-                System.err.println("COM2POSE config data must be set");
-                System.exit(1);
-            }
-
-            /*
-            //set intern options
-            options_intern.input_dir_peaks = cmd.getOptionValue("input-dir-peaks");
-            options_intern.input_reference_genome = cmd.getOptionValue("input-reference-genome");
-            options_intern.output_dir = cmd.getOptionValue("output-directory");
-            options_intern.gene_annotation = cmd.getOptionValue("input-gene-annotation");
-
-            if(cmd.getOptionValue("window-size")!=null)
-            {
-                try {
-                    options_intern.window = Integer.parseInt(cmd.getOptionValue("window-size"));
-                }catch (Exception e)
-                {
-                    e.printStackTrace();
-                    System.out.println("-w\t--window-size is not an Integer");
-                    System.exit(1);
-                }
-            }
-
-            if(cmd.getOptionValue("cores")!=null)
-            {
-                try{
-                    options_intern.cores = Integer.parseInt(cmd.getOptionValue("cores"));
-                }catch (Exception e)
-                {
-                    e.printStackTrace();
-                    System.out.println("-c\t--cores is not an Integer");
-                    System.exit(1);
-                }
-            }
-
-
-            if(cmd.hasOption("compute-subdirectories"))
-            {
-                options_intern.run_all_subdirectories=true;
-
-            }*/
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("-c <com2pose-config>",options);
+            formatter.printHelp("-c <com2pose-config> -w <working-directory> -p <path-com2pose> [-l]",options);
             //formatter.printHelp("-i <input-dir-peaks> -g <input-reference-genome> -a <input-gene-annotation> -o <output-directory> [-w <window-size] [-c <cores>] [-s]", options);
             System.exit(1);
         }
