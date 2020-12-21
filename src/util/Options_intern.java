@@ -29,7 +29,7 @@ public class Options_intern
     public String tepic_input_directory="";
     //#[REQ]:fasta files (in RefSeq format, without \"chr\" prefix)
     public String tepic_input_ref_genome="";
-    //#[REQ]: path to position specific energymatrix used for TRAP (different matrices can be found in ~/COM2POSE/ext/TEPIC/TEPIC/PWMs/2.1)
+    //#[REQ]: path to position specific energy matrix used for TRAP (different matrices can be found in ~/COM2POSE/ext/TEPIC/TEPIC/PWMs/2.1)
     public String tepic_path_pwms="";
     //#[OPT]: number of cores
     public int tepic_cores=1;
@@ -76,7 +76,7 @@ public class Options_intern
     //#[OPT]: parameter to be set if only peak features should be computed (default FALSE)
     public boolean tepic_only_peak_features=false;
     //#[OPT]: set (T)ranscripts (P)er (M)illion cutoff, default: TPM filter not active
-    public int tepic_tpm_cutoff=-1;
+    public double tepic_tpm_cutoff=-1;
     //#[OPT]: path to input file ensg to gene symbol file, required for TPM filter
     public String tepic_ensg_symbol="";
    /*######################
@@ -84,24 +84,4 @@ public class Options_intern
      ######################*/
 
 
-
-    /**
-     * TEPIC OPTIONS
-
-    public String input_dir_peaks = "";
-    public String input_reference_genome = "";
-    public String output_dir = "";
-    public String gene_annotation = "";
-
-    /**
-     * OPTIONAL OPTIONS TEPIC
-
-    public int window = 50000;
-    public int cores = 1;
-
-    /**
-     * FLAGS TEPIC
-
-    public boolean run_all_subdirectories = false;
-     */
 }

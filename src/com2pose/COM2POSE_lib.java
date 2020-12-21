@@ -9,6 +9,8 @@ public class COM2POSE_lib
     Options_intern options_intern;
     Logger logger;
 
+    //HashMap<String,HashMap<String,HashSet<String>>> tepic_groups_histoneModifications_samples = new HashMap<>();
+
     public COM2POSE_lib(Options_intern options_intern) throws IOException {
         this.options_intern = options_intern;
 
@@ -19,6 +21,173 @@ public class COM2POSE_lib
         logger.logLine("#########################################");
         logger.logLine("Working directory set to: " + options_intern.com2pose_working_directory);
         logger.logLine("COM2POSE path set to: "+ options_intern.path_to_COM2POSE);
+    }
+
+    public void run_tepic() throws Exception {
+        logger.logLine("Start TEPIC.sh");
+
+        String command = "bash";
+        String tepic_path = " " + options_intern.path_to_COM2POSE+File.separator+"ext"+File.separator+"TEPIC"+File.separator+"TEPIC"+File.separator+"Code"+File.separator+"TEPIC.sh";
+        command += tepic_path;
+        command += " -g "+ options_intern.tepic_input_ref_genome;
+        command += " -p "+ options_intern.tepic_path_pwms;
+
+
+        String command_tail = "";
+        if(options_intern.tepic_cores>1)
+        {
+            command_tail += " -c "+ options_intern.tepic_cores;
+        }
+        if(!options_intern.tepic_bed_chr_sign.equals(""))
+        {
+            command_tail += " -d "+ options_intern.tepic_bed_chr_sign;
+        }
+        if(options_intern.tepic_column_bedfile!=-1)
+        {
+            command_tail += " -n "+options_intern.tepic_column_bedfile;
+        }
+        if(!options_intern.tepic_gene_annot.equals(""))
+        {
+            command_tail += " -a " + options_intern.tepic_gene_annot;
+        }
+        if(options_intern.tepic_window_size!=50000)
+        {
+            command_tail += " -w " + options_intern.tepic_window_size;
+
+        }
+        if(!options_intern.tepic_onlyDNasePeaks.equals(""))
+        {
+            command_tail += " -f " + options_intern.tepic_onlyDNasePeaks;
+        }
+        if(options_intern.tepic_exponential_decay)
+        {
+            command_tail += " -e TRUE";
+        }
+        if(options_intern.tepic_not_norm_peak_length)
+        {
+            command_tail += " -l TRUE";
+        }
+        if(options_intern.tepic_not_generated)
+        {
+            command_tail += " -u TRUE";
+        }
+        if(options_intern.tepic_original_decay)
+        {
+            command_tail += " -x TRUE";
+        }
+        if(!options_intern.tepic_psems_length.equals(""))
+        {
+            command_tail += " -m "+ options_intern.tepic_psems_length;
+        }
+        if(options_intern.tepic_entire_gene_body)
+        {
+            command_tail += " -y TRUE";
+        }
+        if(options_intern.tepic_zipped)
+        {
+            command_tail += " -z TRUE";
+        }
+        if(!options_intern.tepic_2bit.equals(""))
+        {
+            command_tail += " -r " + options_intern.tepic_2bit;
+        }
+        if(options_intern.tepic_pvalue!=0.05)
+        {
+            command_tail += " -v " + options_intern.tepic_pvalue;
+
+        }
+        if(options_intern.tepic_minutes_per_chr!=3)
+        {
+            command_tail += " -i " + options_intern.tepic_minutes_per_chr;
+        }
+        if(options_intern.tepic_chr_prefix)
+        {
+            command_tail += " -j TRUE";
+        }
+        if(options_intern.tepic_transcript_based)
+        {
+            command_tail += " -t TRUE";
+        }
+        if(!options_intern.tepic_loop_list.equals(""))
+        {
+            command_tail += " -h " + options_intern.tepic_loop_list;
+        }
+        if(options_intern.tepic_loop_windows!=5000)
+        {
+            command_tail += " -s " + options_intern.tepic_loop_windows;
+        }
+        if(options_intern.tepic_only_peak_features)
+        {
+            command_tail+= " -q TRUE";
+        }
+        if(options_intern.tepic_tpm_cutoff>0)
+        {
+            command_tail += " -T " + options_intern.tepic_tpm_cutoff;
+            command_tail += " -E " + options_intern.tepic_ensg_symbol;
+            command_tail += " -A " + options_intern.deseq2_input_gene_id;
+        }
+
+        File output_TEPIC = new File(options_intern.com2pose_working_directory+File.separator+"TEPIC_output_raw");
+        output_TEPIC.mkdir();
+
+
+        File folder = new File(options_intern.tepic_input_directory);
+        for(File dirGroup :folder.listFiles())
+        {
+            if(dirGroup.isDirectory())
+            {
+                File output_TEPIC_group = new File(output_TEPIC.getAbsolutePath()+File.separator+dirGroup.getName());
+                output_TEPIC_group.mkdir();
+
+                logger.logLine("[TEPIC] Start group "+ dirGroup.getName());
+                for(File dirHM : dirGroup.listFiles())
+                {
+                    File output_TEPIC_group_hm = new File(output_TEPIC_group.getAbsolutePath()+File.separator+dirHM.getName());
+                    output_TEPIC_group_hm.mkdir();
+
+                    logger.logLine("[TEPIC] Start histone modification: "+ dirHM.getName());
+                    for(File sample : dirHM.listFiles())
+                    {
+                        logger.logLine("[TEPIC] Start sample " + sample.getName());
+
+                        File output_sample = new File(output_TEPIC_group_hm.getAbsolutePath()+File.separator+sample.getName());
+                        output_sample.mkdir();
+
+                        String command_sample = new String(command);
+
+                        String output_dir_combined = output_sample.getAbsolutePath()+File.separator+output_sample.getName();
+
+                        command_sample += " -b " + sample.getAbsolutePath();
+                        command_sample += " -o " + output_dir_combined;
+
+                        String command_tail_sample = new String(command_tail);
+                        if(options_intern.tepic_tpm_cutoff>0)
+                        {
+                            String n_dir = options_intern.com2pose_working_directory+File.separator+"DESeq2_preprocessing"+File.separator+"single"+File.separator+dirGroup.getName()+"_meanCounts.txt";
+                            command_tail_sample += " -G " + n_dir;
+                        }
+
+                        String command_execute = command_sample + command_tail_sample;
+                        logger.logLine("[TEPIC] execute TEPIC with command line: " + command_execute);
+                        Process child = Runtime.getRuntime().exec(command_execute);
+                        int code = child.waitFor();
+                        switch (code){
+                            case 0:
+                                break;
+                            case 1:
+                                String message = child.getErrorStream().toString();
+                                throw new Exception(message);
+                        }
+
+
+                        System.out.println("X");
+
+                    }
+                }
+            }
+        }
+
+        logger.logLine("Finished TEPIC.sh");
     }
 
     /**
@@ -142,6 +311,8 @@ public class COM2POSE_lib
         {
             if(fileDir.isDirectory())
             {
+                HashMap<Integer,Integer> mean_line_counts = new HashMap<>();
+                int count_samples = 0;
                 File group = new File(output_inter_steps_single.getAbsolutePath()+File.separator+fileDir.getName());
                 group.mkdir();
 
@@ -162,15 +333,43 @@ public class COM2POSE_lib
                     {
                         bw.write(row_ensg_name.get(count)+"\t"+line);
                         bw.newLine();
+                        int count_line = Integer.parseInt(line);
+                        if(mean_line_counts.containsKey(count))
+                        {
+                            int z = mean_line_counts.get(count);
+                            z+= count_line;
+                            mean_line_counts.put(count,z);
+                        }
+                        else
+                        {
+                            mean_line_counts.put(count,count_line);
+                        }
                         count++;
                     }
                     if(count!=count_ensg_lines)
                     {
                         logger.logLine("Error in nfcore RNA-seq data: File "+ sample.getName()+ " has not the same number of rows as in File "+ ensg_names.getName());
+                        System.exit(1);
                     }
                     br.close();
                     bw.close();
+
+                    count_samples++;
                 }
+
+                BufferedWriter bw_means = new BufferedWriter(new FileWriter(new File(output_inter_steps_single.getAbsolutePath()+File.separator+group.getName()+"_meanCounts.txt")));
+                bw_means.write(group.getName()+"_MEANS");
+                bw_means.newLine();
+                for(int i = 0; i < count_ensg_lines; i++)
+                {
+                    int mean_count = mean_line_counts.get(i)/count_samples;
+                    bw_means.write(""+mean_count);
+                    bw_means.newLine();
+
+                }
+                bw_means.close();
+
+
             }
         }
         //CREATE ALL COMBINED FILES
@@ -481,7 +680,7 @@ public class COM2POSE_lib
                     options_intern.tepic_only_peak_features=Boolean.parseBoolean(split[1]);
                     break;
                 case "tepic_tpm_cutoff":
-                    options_intern.tepic_tpm_cutoff=Integer.parseInt(split[1]);
+                    options_intern.tepic_tpm_cutoff=Double.parseDouble(split[1]);
                     break;
                 case "tepic_ensg_symbol":
                     options_intern.tepic_ensg_symbol=split[1].substring(1,split[1].length()-1);
@@ -494,9 +693,195 @@ public class COM2POSE_lib
         }
         br.close();
 
+        boolean all_set = checkOptions();
+        logger.logLine("Check config file parameters for validity");
+        if(!all_set)
+        {
+            logger.logLine("Not all REQuired options set. Please set them in config file");
+            logger.logLine("Aborting COM2POSE");
+            System.exit(1);
+        }
+        else
+        {
+            logger.logLine("Parameters in config file valid");
+        }
+
         logger.logLine("Reading config file finished - no errors detected");
 
 
+    }
+
+
+    private boolean checkOptions() throws IOException {
+
+        boolean all_set = true;
+
+        /**
+         * DESEQ2 options
+         */
+
+        if(options_intern.deseq2_input_directory.equals(""))
+        {
+            logger.logLine("[DESEQ2] input directory is not given");
+            all_set=false;
+        }
+        else
+        {
+            File f = new File(options_intern.deseq2_input_directory);
+            if(!f.exists())
+            {
+                logger.logLine("[DESEQ2] input path does not exist!");
+                all_set=false;
+            }
+        }
+
+        if(options_intern.deseq2_input_gene_id.equals(""))
+        {
+            logger.logLine("[DESEQ2] gene ID file from nfcore RNA-seq is not given");
+            all_set=false;
+        }
+        else
+        {
+            File f = new File(options_intern.deseq2_input_gene_id);
+            if(!f.exists())
+            {
+                logger.logLine("[DESEQ2] gene ID file from nfcore RNA-seq path does not exist!");
+                all_set=false;
+            }
+        }
+
+
+        /**
+         * TEPIC options
+         */
+        if(options_intern.tepic_input_ref_genome.equals(""))
+        {
+            logger.logLine("[TEPIC] Reference genome path is not given");
+            all_set=false;
+        }
+        else
+        {
+            File f = new File(options_intern.tepic_input_ref_genome);
+            if(!f.exists())
+            {
+                logger.logLine("[TEPIC] Reference genome path does not exist!");
+                all_set=false;
+            }
+        }
+        if(options_intern.tepic_input_directory.equals(""))
+        {
+            logger.logLine("[TEPIC] nfcore ChIP-seq data directory is not given");
+            all_set=false;
+        }
+        else
+        {
+            File f = new File(options_intern.tepic_input_directory);
+            if(!f.exists())
+            {
+                logger.logLine("[TEPIC] nfcore ChIP-seq data path does not exist!");
+                all_set=false;
+            }
+        }
+
+        if(options_intern.tepic_path_pwms.equals(""))
+        {
+            logger.logLine("[TEPIC] position specific energy matrix directory is not given");
+            all_set=false;
+        }
+        else
+        {
+            File f = new File(options_intern.tepic_path_pwms);
+            if(!f.exists())
+            {
+                logger.logLine("[TEPIC] position specific energy matrix path does not exist!");
+                all_set=false;
+            }
+        }
+
+        if(options_intern.tepic_tpm_cutoff>0)
+        {
+            //check for gene annotation
+            if(options_intern.tepic_gene_annot.equals(""))
+            {
+                logger.logLine("[TEPIC] TPM cutoff set, but no annotation file is given");
+                all_set=false;
+            }
+            else
+            {
+                File f = new File(options_intern.tepic_gene_annot);
+                if(!f.exists())
+                {
+                    logger.logLine("[TEPIC] TPM cutoff set and gene annotation file path does not exist!");
+                    all_set=false;
+                }
+            }
+
+            //check for map ensg symbol
+            if(options_intern.tepic_ensg_symbol.equals(""))
+            {
+                logger.logLine("[TEPIC] TPM cutoff set, but no map of ENSG to Gene Symbol is given!");
+            }
+            else
+            {
+                File f = new File(options_intern.tepic_ensg_symbol);
+                if(!f.exists())
+                {
+                    logger.logLine("[TEPIC] TPM cutoff set and map of ENSG to Gene Symbol file path does not exist!");
+                    all_set=false;
+                }
+            }
+        }
+
+        if(!options_intern.tepic_background_seq.equals("") && !options_intern.tepic_2bit.equals(""))
+        {
+            logger.logLine("[TEPIC] parameters: tepic_background_seq and tepic_2bit are mutually exclusive");
+            all_set=false;
+        }
+
+        if(options_intern.tepic_column_bedfile!=-1 && !options_intern.tepic_bed_chr_sign.equals(""))
+        {
+            logger.logLine("[TEPIC] parameters: tepic_column_bedfile and tepic_bed_chr_sign are mutually exclusive");
+            all_set=false;
+        }
+
+        if(!options_intern.tepic_bed_chr_sign.equals(""))
+        {
+            File f = new File(options_intern.tepic_bed_chr_sign);
+            if(!f.exists())
+            {
+                logger.logLine("[TEPIC] tepic_bed_chr_sign file path does not exists!");
+                all_set=false;
+            }
+        }
+
+        if(!options_intern.tepic_psems_length.equals(""))
+        {
+            File f = new File(options_intern.tepic_psems_length);
+            if(!f.exists())
+            {
+                logger.logLine("[TEPIC] tepic_psems_length file path does not exists!");
+                all_set=false;
+            }
+        }
+
+        if(!options_intern.tepic_loop_list.equals(""))
+        {
+            File f = new File(options_intern.tepic_loop_list);
+            if(!f.exists())
+            {
+                logger.logLine("[TEPIC] tepic_loop_list file path does not exists!");
+                all_set=false;
+            }
+        }
+
+
+
+        /**
+         * DYNAMITE OPTIONS
+         */
+
+
+        return all_set;
     }
 
 

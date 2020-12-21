@@ -14,13 +14,15 @@ public class COM2POSE
         parseArguments(args, options_intern);
 
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
+        com2pose_lib.read_config_file();
 
         //DESeq2
-        com2pose_lib.read_config_file();
-        com2pose_lib.create_DESeq2_scripts();
-        com2pose_lib.run_and_postprocess_DESeq2();
+        //com2pose_lib.create_DESeq2_scripts();
+        //com2pose_lib.run_and_postprocess_DESeq2();
 
         //TEPIC
+        com2pose_lib.run_tepic();
+
 
         //DYNAMITE
 
