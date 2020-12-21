@@ -37,7 +37,7 @@ java jar com2pose.jar -c <com2pose-config> -w <working-directory> -p <path-com2p
 ```
 
 ### Required options: 
-- `--com2pose-config` : The config file explained later in this documentation. It contains all parameters for DESeq2, TEPIC and DYNAMITE. Template available in /COM2POSE/config_templates/com2pose_template.cfg. [REQ] options must be set.
+- `--com2pose-config` : It contains all parameters for DESeq2, TEPIC and DYNAMITE. Template available in /COM2POSE/config_templates/com2pose_template.cfg. [REQ] options must be set.
 - `--working-directory` : Working directory where COM2POSE can create, remove and edit files.
 - `--path-com2pose` : Filepath to COM2POSE folder.
 
