@@ -2,7 +2,7 @@
 
 This repository is under developement.
 
-## 1. About GenEpiSeeker
+## 1. About COM2POSE
 
 
 This java wrappers give you a full analysis of nfcore ChIP-seq peak data and nfcore RNA-seq count data. It performs following tools including preprocessing and postprocessing. It also gives you plots for deep analysis of the data. 
