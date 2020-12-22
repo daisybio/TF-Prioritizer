@@ -11,7 +11,7 @@ This java wrapper gives you a full analysis of nfcore ChIP-seq peak data and nfc
 
 ## 2. License and Citing
 
-GenEpiSeeker is distributed under the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html).
+COM2POSE is distributed under the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 ## 3. Dependencies
 
@@ -25,7 +25,7 @@ Before using COM2POSE please install following software:
 
 ## 4. Installation under Unix
 
-After having installed the external dependencies, execute the script `install.py` for installing GenEpiSeeker:
+After having installed the external dependencies, execute the script `install.py` for installing COM2POSE:
 
 ```sh
 python install.py
@@ -50,33 +50,37 @@ java jar com2pose.jar -c <com2pose-config> -w <working-directory> -p <path-com2p
 
 ### nfcore RNA-seq data
 ```
-                                   +-- Sample 1
-                  +--Timepoint 1 --+--  ...
-                  |                +-- Sample n
+                                    +-- sample 1
+                  +-- timepoint 1 --+--  ...
+                  |                 +-- sample n
 ----ROOT_RNA_SEQ--+--  ...
-                  |                +-- Sample 1
-                  +--Timepoint n --+--  ...
-                  |                +-- Sample n
-                  +--gene counts annotation file
+                  |                 +-- sample 1
+                  +-- timepoint n --+--  ...
+                  |                 +-- sample n
+                  +-- gene counts annotation file
 ```
 Please do not have any other folders or files in ROOT_RNA_SEQ. This could cause trouble with the COM2POSE framework.
+Important notice: the timepoint names of ROOT_RNA_SEQ and ROOT_CHIP_SEQ must be exactly similar. 
+
 ### nfcore ChIP-seq data
 ```
-                                                                 +-- Sample 1
-                   +--Timepoint 1 --+-- Histone Modification 1 --+-- ...
-                   |                |                            +-- Sample n
-                   |                +--  ...
-                   |                |                            +-- Sample 1
-                   |                +-- Histone Modification n --+-- ...
-                   |                                             +-- Sample n
+                                                                  +-- sample 1
+                   +-- timepoint 1 --+-- histone modification 1 --+-- ...
+                   |                 |                            +-- sample n
+                   |                 +--  ...
+                   |                 |                            +-- sample 1
+                   |                 +-- histone modification n --+-- ...
+                   |                                              +-- sample n
 ----ROOT_CHIP_SEQ--+--  ...
                    |
-                   |                                             +-- Sample 1
-                   +--Timepoint n --+-- Histone Modification 1 --+-- ...
-                                    |                            +-- Sample n
-                                    +--  ...
-                                    |                            +-- Sample 1
-                                    +-- Histone Modification n --+-- ...
-                                                                 +-- Sample n
+                   |                                              +-- sample 1
+                   +-- timepoint n --+-- histone modification 1 --+-- ...
+                                     |                            +-- sample n
+                                     +--  ...
+                                     |                            +-- sample 1
+                                     +-- histone modification n --+-- ...
+                                                                  +-- sample n
 ```
 Please do not have any other folders or files in ROOT_CHIP_SEQ. This could cause trouble with the COM2POSE framework.
+Important notice: the timepoint names of ROOT_RNA_SEQ and ROOT_CHIP_SEQ must be exactly similar. 
+Important notice: the histone modification names in ROOT_CHIP_SEQ must be exactly similar between the different timepoints.
