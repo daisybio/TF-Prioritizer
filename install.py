@@ -22,5 +22,4 @@ print("                       COM2POSE                     ")
 print("                  Installation Script               ")
 print("**************************************************")
 
-extract_all_zips_in_folder("ext/TEPIC")
 subprocess.check_call(['Rscript', 'ext/TEPIC/TEPIC/Code/installRpackages.R'], shell=False)

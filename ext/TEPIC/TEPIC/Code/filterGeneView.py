@@ -78,9 +78,11 @@ def check_tfs(tfs,ensg_counts,total_sample_number,gene_symbol_lengths,ensg_sym_m
 def main():
 	#Checking Affinity
 	infile=open(sys.argv[1],"r")
-	output=open(sys.argv[1].replace(".txt","_Filtered.txt"),"w")
+	outfile_1=sys.argv[1].replace(".txt","_Filtered.txt")
+	output=open(outfile_1,"w")
 	#Copy header line
-	output.write(infile.readline())
+	header=infile.readline()
+	output.write(header)
 	#Check individual lines
 	for l in infile:
 		if (isValidAffinity(l.split())):
@@ -134,11 +136,12 @@ def main():
 				ensg_name=ensg_name.split(".")
 				gene_symbol_lengths[ensg_name[0]]=diff
 		infile_gtf.close()
-		infile_tpm=open(sys.argv[1].replace(".txt","_Filtered.txt"),"r")
+		infile_tpm=open(outfile_1,"r")
 		tfs=infile_tpm.readline()
 		tfs_splitted=tfs.split()
 		valid_columns=check_tfs(tfs_splitted,ensg_counts,total_sample_number,gene_symbol_lengths,ensg_sym_map,float(sys.argv[3]))
-		output_tpm = open(sys.argv[1].replace(".txt", "_Filtered_TPM.txt"), "w")
+		outfile_2=outfile_1.replace(".txt","_TPM.txt")
+		output_tpm = open(outfile_2, "w")
 		header=""
 		c=0
 		for i in valid_columns:

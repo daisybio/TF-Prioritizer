@@ -1,5 +1,7 @@
 package util;
 
+import java.io.File;
+
 public class Options_intern
 {
     /**
@@ -10,6 +12,34 @@ public class Options_intern
     public String path_to_COM2POSE = "";
 
     public boolean write_to_logfile = true;
+
+    /**
+     * COM2POSE private options - cannot be set from the outside
+     */
+    public String folder_name_deseq2_preprocessing = "DESeq2_preprocessing";
+    public String folder_name_deseq2_preprocessing_single = "single";
+    public String folder_name_deseq2_preprocessing_combined = "combined";
+    public String folder_name_deseq2_output_raw = "DESeq2_output_raw";
+    public String folder_name_deseq2_output = "DESeq2_output";
+    public String folder_name_deseq2_R_scripts = "DESeq2_R_scripts";
+    public String folder_name_tepic_output_raw = "TEPIC_output_raw";
+    public String folder_name_tepic_postprocessing = "TEPIC_postprocessing";
+    public String folder_name_tepic_postprocessing_input = "input";
+    public String folder_name_tepic_postprocessing_output = "output";
+    public String folder_name_tepic_postprocessing_output_mean_affinities= "MeanAffinities";
+    public String folder_name_tepic_postprocessing_output_ratios = "Ratios";
+
+    public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
+    public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
+    public String file_suffix_tepic_postprocessing_output_mean_affinities ="Mean_Affinities_";
+    public String file_suffix_tepic_postprocessing_output_ratios ="Ratio_Affinities_";
+
+
+    public String directory_for_tepic_scripts = "ext"+ File.separator+"TEPIC"+File.separator+"TEPIC";
+    public String directory_for_tepic_scripts_code = directory_for_tepic_scripts+File.separator+"Code";
+    public String directory_for_tepic_scripts_code_tepic_sh = directory_for_tepic_scripts_code + File.separator+"TEPIC.sh";
+    public String directory_for_tepic_DYNAMITE = directory_for_tepic_scripts+File.separator+"MachineLearningPipelines"+File.separator+"DYNAMITE"+File.separator+"Scripts";
+
 
     /*
     ######################

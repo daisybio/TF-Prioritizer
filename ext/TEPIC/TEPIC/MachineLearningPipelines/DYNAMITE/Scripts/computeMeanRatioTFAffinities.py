@@ -61,14 +61,26 @@ def main():
 	headers=[]
 	if((args.peakFeatures[0].upper()=="TRUE") | (args.peakFeatures[0].upper()=="T")):
 		if (args.scaled[0]=="True"):
-			suffix="Three_Peak_Based_Features_Affinity_Gene_View_Filtered.txt"
+			if(args.tpmFilter[0]=="True"):
+				suffix="Three_Peak_Based_Features_Affinity_Gene_View_Filtered_TPM.txt"
+			else:
+				suffix="Three_Peak_Based_Features_Affinity_Gene_View_Filtered.txt"
 		else:
-			suffix="Peak_Features_Affinity_Gene_View_Filtered.txt"
+			if (args.tpmFilter[0]=="True"):
+				suffix = "Peak_Features_Affinity_Gene_View_Filtered_TPM.txt"
+			else:
+				suffix="Peak_Features_Affinity_Gene_View_Filtered.txt"
 	else:
 		if (args.scaled[0]=="True"):
-			suffix="Signal_Feature_Affinity_Gene_View_Filtered.txt"
+			if (args.tpmFilter[0]=="True"):
+				suffix = "Signal_Feature_Affinity_Gene_View_Filtered_TPM.txt"
+			else:
+				suffix="Signal_Feature_Affinity_Gene_View_Filtered.txt"
 		else:
-			suffix="Affinity_Gene_View_Filtered.txt"
+			if (args.tpmFilter[0]=="True"):
+				suffix = "Affinity_Gene_View_Filtered_TPM.txt"
+			else:
+				suffix="Affinity_Gene_View_Filtered.txt"
 	for group1file in os.listdir(args.group1[0]):
 		if (suffix in group1file):
 			print("Processing file: "+group1file)
@@ -111,7 +123,7 @@ def main():
 			outfile2.write(computeMeanAffinities(affinityDictG2,geneID,counterG2))
 		outfile2.close()
 	else:
-		print("Error,processed files do not contain data for the same TFs")
+		print("Error, processed files do not contain data for the same TFs")
 
 	print("Processing Means of group 1")
 	infile1=open(args.ogroup1[0],"r")

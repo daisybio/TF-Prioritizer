@@ -9,8 +9,6 @@ public class COM2POSE_lib
     Options_intern options_intern;
     Logger logger;
 
-    //HashMap<String,HashMap<String,HashSet<String>>> tepic_groups_histoneModifications_samples = new HashMap<>();
-
     public COM2POSE_lib(Options_intern options_intern) throws IOException {
         this.options_intern = options_intern;
 
@@ -27,15 +25,354 @@ public class COM2POSE_lib
     /**
      * postprocesses the TEPIC output (checks for TPM filter and copies files into a structure where preprocessing of DYNAMITE can happen
      */
-    public void postprocess_tepic_output()
-    {
+    public void postprocess_tepic_output() throws Exception {
+        logger.logLine("Start postprocessing of TEPIC output");
+
         HashMap<String,HashMap<String,HashSet<String>>> groups_to_compare = checkGroupsTEPIC();
+
+        String suffix="";
 
         if(options_intern.tepic_tpm_cutoff>0)
         {
-            //filter
+            suffix="_Gene_View_Filtered_TPM.txt";
+        }
+        else
+        {
+            suffix="_Gene_View_Filtered.txt";
         }
 
+        File folder_postprocessing = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing);
+        folder_postprocessing.mkdir();
+
+        File folder_pp_input = new File(folder_postprocessing.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_input);
+        folder_pp_input.mkdir();
+
+        File folder_pp_output = new File(folder_postprocessing.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+        folder_pp_output.mkdir();
+
+        HashSet<String> available_hms = new HashSet<>();
+
+        //generate input structure and copy files
+        for(String s : groups_to_compare.keySet())
+        {
+            File f_input_tp_folders = new File(folder_pp_input.getAbsolutePath()+File.separator+s);
+            f_input_tp_folders.mkdir();
+            HashMap<String,HashSet<String>> hm = groups_to_compare.get(s);
+            for(String ss: hm.keySet())
+            {
+                available_hms.add(ss);
+                File f_input_hm_folders = new File(f_input_tp_folders.getAbsolutePath()+File.separator+ss);
+                f_input_hm_folders.mkdir();
+
+                //move coresponding sample outputs to these folders
+                File f_input_samples = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw+File.separator+s+File.separator+ss);
+
+                for(File fileDir : f_input_samples.listFiles())
+                {
+                    if (fileDir.isDirectory()) {
+                        for (File fileDir2 : fileDir.listFiles())
+                        {
+                            if (!fileDir2.isDirectory()) {
+                                String name = fileDir2.getName();
+                                if (name.matches(".*" + suffix))
+                                {
+                                    //COPY!!
+                                    String command = "cp -u " + fileDir2.getAbsolutePath() + " " + folder_pp_input.getAbsolutePath() + File.separator + s + File.separator + ss;
+                                    Process child = Runtime.getRuntime().exec(command);
+                                    logger.logLine("[TEPIC] Copy files: " + command);
+                                    int code = child.waitFor();
+                                    switch (code){
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            String message = child.getErrorStream().toString();
+                                            throw new Exception(message);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //generate output structure
+        //HMs
+        HashMap<String,File> pp_output_hms_files = new HashMap<>();
+        for(String s: available_hms)
+        {
+            File f = new File(folder_pp_output.getAbsolutePath()+File.separator+s);
+            f.mkdir();
+            pp_output_hms_files.put(s,f);
+        }
+
+        //identify groups to compute mean ratios
+        //group1_vs_group2
+        HashMap<String,File> pp_output_clashedGroups = new HashMap<>();
+        HashSet<String> already_checked_groups = new HashSet<>();
+        for(String s: groups_to_compare.keySet())
+        {
+            for(String ss: groups_to_compare.keySet())
+            {
+                if(s.equals(ss))
+                {
+                    continue;
+                }
+                String key1 = s+"_"+ss;
+                String key2 = ss+"_"+s;
+                if(already_checked_groups.contains(key1) || already_checked_groups.contains(key2))
+                {
+                    continue;
+                }
+                already_checked_groups.add(key1);
+
+                HashMap<String,HashSet<String>> group1_hms = groups_to_compare.get(s);
+                HashMap<String,HashSet<String>> group2_hms = groups_to_compare.get(ss);
+
+                for(String k: group1_hms.keySet())
+                {
+                    if(group2_hms.containsKey(k))
+                    {
+                        File f = new File(pp_output_hms_files.get(k).getAbsolutePath()+File.separator+key1);
+                        f.mkdir();
+                    }
+                }
+            }
+        }
+
+        //prepare command line for all (computeMeanRatioTFAffinities.py
+        String command_base = "python " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"computeMeanRatioTFAffinities.py";
+
+        for(File fileDir : folder_pp_output.listFiles())
+        {
+            if(fileDir.isDirectory())
+            {
+                for(File fileDir2 : fileDir.listFiles())
+                {
+                    if(fileDir2.isDirectory())
+                    {
+                        String current_HM = fileDir.getName();
+                        String current_group_clash = fileDir2.getName();
+                        String[] group_clash_split = current_group_clash.split("_");
+
+                        String group1 = group_clash_split[0];
+                        String group2 = group_clash_split[1];
+
+                        String group1_input_dir ="";
+                        String group2_input_dir="";
+                        //if TPM filter was used we need to postprocess the TPM files. otherwise it will not work!
+                        if(options_intern.tepic_tpm_cutoff>0)
+                        {
+                            logger.logLine("[TEPIC] TPM filter > 0, start postprocessing of TPM filtered scores");
+                            File output_post_group1 = new File(folder_pp_output+File.separator+current_HM+File.separator+current_group_clash+File.separator+group1);
+                            output_post_group1.mkdir();
+                            File output_post_group2 = new File(folder_pp_output+File.separator+current_HM+File.separator+current_group_clash+File.separator+group2);
+                            output_post_group2.mkdir();
+
+                            //build intersect and write new files with filter
+
+                            File folder_group1 = new File(folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM);
+                            File folder_group2 = new File(folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM);
+
+                            File[] samples_group1 = folder_group1.listFiles();
+                            File[] samples_group2 = folder_group2.listFiles();
+
+                            ArrayList<Boolean> write_group1 = new ArrayList<>();
+                            ArrayList<Boolean> write_group2 = new ArrayList<>();
+
+                            ArrayList<String> header_group1;
+                            ArrayList<String> header_group2;
+                            HashSet<String> header_group1_set;
+                            HashSet<String> header_group2_set;
+
+                            BufferedReader br_group1_check = new BufferedReader(new FileReader(samples_group1[0]));
+                            String line_group1_check =br_group1_check.readLine();
+                            header_group1=new ArrayList<>(Arrays.asList(line_group1_check.split("\t")));
+                            header_group1_set=new HashSet<>(Arrays.asList(line_group1_check.split("\t")));
+                            br_group1_check.close();
+
+                            BufferedReader br_group2_check = new BufferedReader(new FileReader(samples_group2[0]));
+                            String line_group2_check =br_group2_check.readLine();
+                            header_group2=new ArrayList<>(Arrays.asList(line_group2_check.split("\t")));
+                            header_group2_set=new HashSet<>(Arrays.asList(line_group2_check.split("\t")));
+                            br_group2_check.close();
+
+                            for(int i = 0; i < header_group1.size();i++)
+                            {
+                                if(header_group2_set.contains(header_group1.get(i)))
+                                {
+                                    write_group1.add(true);
+                                }
+                                else
+                                {
+                                    write_group1.add(false);
+                                }
+                            }
+                            for(int i = 0; i < header_group2.size(); i++)
+                            {
+                                if(header_group1_set.contains(header_group2.get(i)))
+                                {
+                                    write_group2.add(true);
+                                }
+                                else
+                                {
+                                    write_group2.add(false);
+                                }
+                            }
+
+                            for(File f:folder_group1.listFiles())
+                            {
+                                BufferedReader br_group1 = new BufferedReader(new FileReader(f));
+                                BufferedWriter bw_group1 = new BufferedWriter(new FileWriter(new File(output_post_group1.getAbsolutePath()+File.separator+f.getName())));
+
+                                String line_group1 = "";
+                                while((line_group1=br_group1.readLine())!=null)
+                                {
+                                    String[] split_line_group1 = line_group1.split("\t");
+                                    StringBuilder sb = new StringBuilder();
+
+                                    for(int i = 0; i < split_line_group1.length;i++)
+                                    {
+                                        if(write_group1.get(i))
+                                        {
+                                            if(i>0)
+                                            {
+                                                sb.append("\t");
+                                                sb.append(split_line_group1[i]);
+                                            }
+                                            else
+                                            {
+                                                sb.append(split_line_group1[i]);
+                                            }
+                                        }
+                                    }
+                                    bw_group1.write(sb.toString());
+                                    bw_group1.newLine();
+                                }
+                                bw_group1.close();
+                                br_group1.close();
+                            }
+
+
+                            for(File f:folder_group2.listFiles())
+                            {
+                                BufferedReader br_group2 = new BufferedReader(new FileReader(f));
+                                BufferedWriter bw_group2 = new BufferedWriter(new FileWriter(new File(output_post_group2.getAbsolutePath()+File.separator+f.getName())));
+
+                                String line_group2 = "";
+                                while((line_group2=br_group2.readLine())!=null)
+                                {
+                                    String[] split_line_group2 = line_group2.split("\t");
+                                    StringBuilder sb = new StringBuilder();
+
+                                    for(int i = 0; i < split_line_group2.length;i++)
+                                    {
+                                        if(write_group2.get(i))
+                                        {
+                                            if(i>0)
+                                            {
+                                                sb.append("\t");
+                                                sb.append(split_line_group2[i]);
+                                            }
+                                            else
+                                            {
+                                                sb.append(split_line_group2[i]);
+                                            }
+                                        }
+                                    }
+                                    bw_group2.write(sb.toString());
+                                    bw_group2.newLine();
+                                }
+                                bw_group2.close();
+                                br_group2.close();
+                            }
+                            logger.logLine("[TEPIC] TPM filter > 0, end postprocessing of TPM filtered scores");
+
+                            //set to postprocessed TMP filtered data
+                            group1_input_dir=output_post_group1.getAbsolutePath();
+                            group2_input_dir=output_post_group2.getAbsolutePath();
+                        }
+                        else
+                        {
+                            group1_input_dir = folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM;
+                            group2_input_dir = folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM;
+                        }
+
+
+                        File output_mean_affinities = new File(folder_pp_output+File.separator+current_HM+File.separator+current_group_clash+File.separator+options_intern.folder_name_tepic_postprocessing_output_mean_affinities);
+                        output_mean_affinities.mkdir();
+                        File output_ratios = new File(folder_pp_output+File.separator+current_HM+File.separator+current_group_clash+File.separator+options_intern.folder_name_tepic_postprocessing_output_ratios);
+                        output_ratios.mkdir();
+
+                        File output_mean_affinities_group1 = new File(output_mean_affinities.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_postprocessing_output_mean_affinities+group1+".txt");
+                        File output_mean_affinities_group2 = new File(output_mean_affinities.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_postprocessing_output_mean_affinities+group2+".txt");
+                        File output_ratios_group1_group2 = new File(output_ratios.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_postprocessing_output_ratios+group1+"_"+group2+".txt");
+
+                        HashSet<File> files_to_create = new HashSet<>();
+                        files_to_create.add(output_mean_affinities_group1);
+                        files_to_create.add(output_mean_affinities_group2);
+                        files_to_create.add(output_ratios_group1_group2);
+
+                        for(File f: files_to_create)
+                        {
+                            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+                            bw.write("");
+                            bw.close();
+                        }
+
+
+                        String command_edited = new String(command_base);
+
+                        command_edited+= " " + group1_input_dir+File.separator;
+                        command_edited+= " " + group2_input_dir+File.separator;
+                        command_edited+= " " + output_mean_affinities_group1.getAbsolutePath();
+                        command_edited+= " " + output_mean_affinities_group2.getAbsolutePath();
+                        command_edited+= " " + output_ratios_group1_group2.getAbsolutePath();
+
+                        String command_tail = "";
+
+                        if(options_intern.tepic_original_decay)
+                        {
+                            command_tail += " True";
+                        }
+                        else
+                        {
+                            command_tail += " False";
+                        }
+                        if(options_intern.tepic_not_generated)
+                        {
+                            command_tail += " True";
+                        }
+                        else
+                        {
+                            command_tail+= " False";
+                        }
+                        if(options_intern.tepic_tpm_cutoff>0)
+                        {
+                            command_tail+= " True";
+                        }
+                        else
+                        {
+                            command_tail+= " False";
+                        }
+
+                        command_edited += command_tail;
+
+                        logger.logLine("[TEPIC] execute computeMeanRatioTFAffinities.py with command line: " + command_edited);
+                        Process child = Runtime.getRuntime().exec(command_edited);
+                        int code = child.waitFor();
+                        switch (code){
+                            case 0:
+                                break;
+                            case 1:
+                                String message = child.getErrorStream().toString();
+                                throw new Exception(message);
+                        }
+                    }
+                }
+            }
+        }
+        logger.logLine("Finished postprocessing of TEPIC output");
     }
 
 
@@ -48,7 +385,7 @@ public class COM2POSE_lib
         logger.logLine("Start TEPIC.sh");
 
         String command = "bash";
-        String tepic_path = " " + options_intern.path_to_COM2POSE+File.separator+"ext"+File.separator+"TEPIC"+File.separator+"TEPIC"+File.separator+"Code"+File.separator+"TEPIC.sh";
+        String tepic_path = " " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_scripts_code_tepic_sh;
         command += tepic_path;
         command += " -g "+ options_intern.tepic_input_ref_genome;
         command += " -p "+ options_intern.tepic_path_pwms;
@@ -148,7 +485,7 @@ public class COM2POSE_lib
             command_tail += " -A " + options_intern.deseq2_input_gene_id;
         }
 
-        File output_TEPIC = new File(options_intern.com2pose_working_directory+File.separator+"TEPIC_output_raw");
+        File output_TEPIC = new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_tepic_output_raw);
         output_TEPIC.mkdir();
 
 
@@ -184,7 +521,7 @@ public class COM2POSE_lib
                         String command_tail_sample = new String(command_tail);
                         if(options_intern.tepic_tpm_cutoff>0)
                         {
-                            String n_dir = options_intern.com2pose_working_directory+File.separator+"DESeq2_preprocessing"+File.separator+"single"+File.separator+dirGroup.getName()+"_meanCounts.txt";
+                            String n_dir = options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+dirGroup.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts;
                             command_tail_sample += " -G " + n_dir;
                         }
 
@@ -213,7 +550,7 @@ public class COM2POSE_lib
 
         logger.logLine("Start running DESeq2 RScripts");
 
-        File folder = new File(options_intern.com2pose_working_directory+File.separator+"DESeq2_R_scripts");
+        File folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_R_scripts);
 
         for (File dir:folder.listFiles())
         {
@@ -237,8 +574,8 @@ public class COM2POSE_lib
         logger.logLine("Start postprocessing DESeq2 data for input to DYNAMITE");
 
 
-        File folder_results = new File(options_intern.com2pose_working_directory+File.separator+"DESeq2_output_raw");
-        File output_file = new File(options_intern.com2pose_working_directory+File.separator+"DESeq2_output");
+        File folder_results = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_output_raw);
+        File output_file = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_output);
         output_file.mkdir();
 
         for(File res:folder_results.listFiles())
@@ -247,7 +584,7 @@ public class COM2POSE_lib
             {
                 String name_res = res.getName();
                 String[] split_name_res = name_res.split("_");
-                String name_out = split_name_res[0]+"_"+split_name_res[1]+"_DYNAMITE.tsv";
+                String name_out = split_name_res[0]+"_"+split_name_res[1]+options_intern.file_suffix_deseq2_output_DYNAMITE;
 
                 BufferedReader br = new BufferedReader(new FileReader(res));
                 BufferedWriter bw = new BufferedWriter(new FileWriter(output_file.getAbsolutePath()+File.separator+name_out));
@@ -306,7 +643,7 @@ public class COM2POSE_lib
         }
         br_ensg_per_line.close();
 
-        File output_intermediate_steps = new File(options_intern.com2pose_working_directory+File.separator+"DESeq2_preprocessing");
+        File output_intermediate_steps = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing);
         if(output_intermediate_steps.exists())
         {
             logger.logLine("Working directory was already used - please us another one or empty this one completely");
@@ -314,9 +651,9 @@ public class COM2POSE_lib
             //System.exit(1);
         }
         output_intermediate_steps.mkdir();
-        File output_inter_steps_combined=new File(options_intern.com2pose_working_directory+File.separator+"DESeq2_preprocessing"+File.separator+"combined");
+        File output_inter_steps_combined=new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_combined);
         output_inter_steps_combined.mkdir();
-        File output_inter_steps_single=new File(options_intern.com2pose_working_directory+File.separator+"DESeq2_preprocessing"+File.separator+"single");
+        File output_inter_steps_single=new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single);
         output_inter_steps_single.mkdir();
         File folder = new File(options_intern.deseq2_input_directory);
 
@@ -373,7 +710,7 @@ public class COM2POSE_lib
                     count_samples++;
                 }
 
-                BufferedWriter bw_means = new BufferedWriter(new FileWriter(new File(output_inter_steps_single.getAbsolutePath()+File.separator+group.getName()+"_meanCounts.txt")));
+                BufferedWriter bw_means = new BufferedWriter(new FileWriter(new File(output_inter_steps_single.getAbsolutePath()+File.separator+group.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts)));
                 bw_means.write(group.getName()+"_MEANS");
                 bw_means.newLine();
                 for(int i = 0; i < count_ensg_lines; i++)
@@ -566,7 +903,7 @@ public class COM2POSE_lib
                     sb.append("dds <- dds[keep,]\n");
                 }
 
-                File output_deseq2 = new File(options_intern.com2pose_working_directory+File.separator+"DESeq2_output_raw");
+                File output_deseq2 = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_output_raw);
                 output_deseq2.mkdir();
 
                 sb.append("output_path = \"");

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Code/TEPIC.sh" beforeDir="false" afterPath="$PROJECT_DIR$/Code/TEPIC.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Code/filterGeneView.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code/filterGeneView.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../install.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../../install.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../src/util/Options_intern.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/util/Options_intern.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,9 +19,10 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
   </component>
   <component name="ProjectId" id="1lQ3EDUiovZIgkDEFM7ya7xIfsI" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -40,6 +41,28 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager" selected="Python.filterGeneView">
+    <configuration name="computeMeanRatioTFAffinities" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="TEPIC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python3.8" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts/computeMeanRatioTFAffinities.py" />
+      <option name="PARAMETERS" value="$USER_HOME$/data/COM2POSE/COM2POSE_working_dir/TEPIC_postprocessing/input/p13/H3K27ac/ $USER_HOME$/data/COM2POSE/COM2POSE_working_dir/TEPIC_postprocessing/input/L1/H3K27ac/ $USER_HOME$/data/COM2POSE/COM2POSE_working_dir/TEPIC_postprocessing/output/H3K27ac/p13_L1/MeanAffinities/Mean_Affinities_p13.txt $USER_HOME$/data/COM2POSE/COM2POSE_working_dir/TEPIC_postprocessing/output/H3K27ac/p13_L1/MeanAffinities/Mean_Affinities_L1.txt $USER_HOME$/data/COM2POSE/COM2POSE_working_dir/TEPIC_postprocessing/output/H3K27ac/p13_L1/Ratios/Ratio_Affinities_p13_L1.txt False False False" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="filterGeneView" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -54,7 +77,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Code/filterGeneView.py" />
-      <option name="PARAMETERS" value="$USER_HOME$/kevins_data/output/WT_L10_H3K27ac_R3_peaks_broadPeak_TEPIC_12_18_20_15_25_54_905867025_Decay_Peak_Features_Affinity_Gene_View.txt $USER_HOME$/Dropbox/UNI/Promotion_Projekte/PhD_work/B_Documents/KevinsBachelorThesis/02_Analysis/DESeq2/count_files/L10/L10_WT3-count.txt 1 $USER_HOME$/Dropbox/UNI/Promotion_Projekte/PhD_work/B_Documents/KevinsBachelorThesis/02_Analysis/DESeq2/count_files/Gene_id.txt $USER_HOME$/Dropbox/UNI/Promotion_Projekte/PhD_work/First_step/lothars_comments/desq2_genemapping.txt $USER_HOME$/kevins_data/pwd/gencode.vM25.annotation.gtf" />
+      <option name="PARAMETERS" value="$USER_HOME$/data/COM2POSE/COM2POSE_working_dir/TEPIC_output_raw/L1/H3K27ac/WT_L1_H3K27ac_R1_peaks.narrowPeak/WT_L1_H3K27ac_R1_peaks.narrowPeak_TEPIC_12_21_20_17_42_27_096841459_Decay_Peak_Features_Affinity_Gene_View.txt $USER_HOME$/Dropbox/UNI/Promotion_Projekte/PhD_work/B_Documents/KevinsBachelorThesis/02_Analysis/DESeq2/count_files/L10/L10_WT3-count.txt 1 $USER_HOME$/Dropbox/UNI/Promotion_Projekte/PhD_work/B_Documents/KevinsBachelorThesis/02_Analysis/DESeq2/count_files/Gene_id.txt $USER_HOME$/Dropbox/UNI/Promotion_Projekte/PhD_work/First_step/lothars_comments/desq2_genemapping.txt $USER_HOME$/kevins_data/pwd/gencode.vM25.annotation.gtf" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -120,6 +143,7 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.computeMeanRatioTFAffinities" />
       <item itemvalue="Python.filterGeneView" />
       <item itemvalue="Python.findBackground" />
       <item itemvalue="Python.filterTPM" />
@@ -150,6 +174,8 @@
       <workItem from="1608293842458" duration="6123000" />
       <workItem from="1608447984513" duration="11590000" />
       <workItem from="1608461122626" duration="2120000" />
+      <workItem from="1608621993400" duration="961000" />
+      <workItem from="1608625864757" duration="5764000" />
     </task>
     <servers />
   </component>
@@ -170,6 +196,23 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts/computeMeanRatioTFAffinities.py</url>
+          <line>39</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Code/filterGeneView.py</url>
+          <line>138</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Code/filterGeneView.py</url>
+          <line>84</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -180,6 +223,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/TEPIC$filterGeneView.coverage" NAME="filterGeneView Coverage Results" MODIFIED="1608458692965" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
+    <SUITE FILE_PATH="coverage/TEPIC$filterGeneView.coverage" NAME="filterGeneView Coverage Results" MODIFIED="1608646521776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
+    <SUITE FILE_PATH="coverage/TEPIC$computeMeanRatioTFAffinities.coverage" NAME="computeMeanRatioTFAffinities Coverage Results" MODIFIED="1608642904723" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts" />
   </component>
 </project>
