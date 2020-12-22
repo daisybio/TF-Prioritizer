@@ -8,6 +8,15 @@
 !TEPIC.zip
 !run_deseq2.R
 !/TEPIC/TEPIC/*
+!/TEPIC/TEPIC/*/*
+!/TEPIC/TEPIC/*/*/*
+!/TEPIC/TEPIC/*/*/*/*
+!/TEPIC/TEPIC/*/*/*/*/*
+!/TEPIC/TEPIC/*/*/*/*/*/*
+!/TEPIC/TEPIC/*/*/*/*/*/*/*
+!/TEPIC/TEPIC/*/*/*/*/*/*/*/*
+!/TEPIC/TEPIC/*/*/*/*/*/*/*/*/*
+!/TEPIC/TEPIC/*/*/*/*/*/*/*/*/*/*
 # etc...
 
 # ...even if they are in subdirectories
