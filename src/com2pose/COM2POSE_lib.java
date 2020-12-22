@@ -23,6 +23,27 @@ public class COM2POSE_lib
         logger.logLine("COM2POSE path set to: "+ options_intern.path_to_COM2POSE);
     }
 
+
+    /**
+     * postprocesses the TEPIC output (checks for TPM filter and copies files into a structure where preprocessing of DYNAMITE can happen
+     */
+    public void postprocess_tepic_output()
+    {
+        HashMap<String,HashMap<String,HashSet<String>>> groups_to_compare = checkGroupsTEPIC();
+
+        if(options_intern.tepic_tpm_cutoff>0)
+        {
+            //filter
+        }
+
+    }
+
+
+
+    /**
+     * creates the TEPIC command lines and runs all samples of all histone modification and all timepoints
+     * @throws Exception
+     */
     public void run_tepic() throws Exception {
         logger.logLine("Start TEPIC.sh");
 
@@ -879,7 +900,40 @@ public class COM2POSE_lib
         return all_set;
     }
 
+    private HashMap<String, HashMap<String, HashSet<String>>> checkGroupsTEPIC()
+    {
+        HashMap<String, HashMap<String, HashSet<String>>> groups = new HashMap<>();
 
+        File folder = new File(options_intern.com2pose_working_directory+File.separator+"TEPIC_output_raw");
+
+        for(File fileDir : folder.listFiles())
+        {
+            if(fileDir.isDirectory())
+            {
+                HashMap<String,HashSet<String>> n_timepoint = new HashMap<>();
+                String n_tp_name = fileDir.getName();
+                for(File fileDir2 : fileDir.listFiles())
+                {
+                    String n_hm_name="";
+                    HashSet<String> n_hm = new HashSet<>();
+                    n_hm_name= fileDir2.getName();
+
+                    for(File fileDir3 : fileDir2.listFiles())
+                    {
+                        //samples
+                        if(fileDir3.isDirectory())
+                        {
+                            n_hm.add(fileDir3.getName());
+                        }
+                    }
+                    n_timepoint.put(n_hm_name,n_hm);
+
+                }
+                groups.put(n_tp_name,n_timepoint);
+            }
+        }
+        return groups;
+    }
 
 
 }
