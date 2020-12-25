@@ -21,6 +21,118 @@ public class COM2POSE_lib
         logger.logLine("COM2POSE path set to: "+ options_intern.path_to_COM2POSE);
     }
 
+    public void run_DYNAMITE() throws IOException {
+        logger.logLine("[DYNAMITE] start running DYNAMITE with parameters: ");
+
+        logger.logLine("[DYNAMITE] finished running DYNAMITE");
+    }
+
+    public void preprocess_dynamite() throws Exception {
+
+        logger.logLine("[DYNAMITE]: start preprocessing data for DYNAMITE");
+
+        File folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+
+        File folder_output_pre = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_output_preprocessing_DYNAMITE);
+        folder_output_pre.mkdir();
+
+        File folder_output = new File(folder_output_pre.getAbsolutePath()+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_integrateData);
+        folder_output.mkdir();
+
+        for(File fileDirHM : folder.listFiles())
+        {
+            if(fileDirHM.isDirectory())
+            {
+                File folder_output_hm = new File(folder_output.getAbsolutePath()+File.separator+fileDirHM.getName());
+                folder_output_hm.mkdir();
+
+                for(File fileDirGroups : fileDirHM.listFiles())
+                {
+                    if(fileDirGroups.isDirectory())
+                    {
+                        File folder_output_group = new File(folder_output_hm.getAbsolutePath()+ File.separator + fileDirGroups.getName());
+                        folder_output_group.mkdir();
+
+                        String[] groups_splitted = fileDirGroups.getName().split("_");
+                        String groupname1 = groups_splitted[0];
+                        String groupname2 = groups_splitted[1];
+
+                        File input_ratios = new File(fileDirGroups.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_output_ratios+File.separator+options_intern.file_suffix_tepic_postprocessing_output_ratios+fileDirGroups.getName()+".txt");
+                        File input_diff_gene_expr = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_output+File.separator+fileDirGroups.getName()+options_intern.file_suffix_deseq2_output_DYNAMITE);
+
+                        String command = "python " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"integrateData.py";
+                        command += " "+ input_ratios.getAbsolutePath();
+                        command += " " + input_diff_gene_expr.getAbsolutePath();
+                        command += " " + folder_output_group.getAbsolutePath()+File.separator+options_intern.file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff;
+                        if(options_intern.dynamite_preprocessing_integrate_data_geneIDs!=0)
+                        {
+                            command += " " + options_intern.dynamite_preprocessing_integrate_data_geneIDs;
+                        }
+                        if(options_intern.dynamite_preprocessing_integrate_data_log2fc!=1)
+                        {
+                            command += " " + options_intern.dynamite_preprocessing_integrate_data_log2fc;
+                        }
+                        if(!options_intern.dynamite_preprocessing_integrate_data_consider_geneFile.equals(""))
+                        {
+                            command += " " + options_intern.dynamite_preprocessing_integrate_data_consider_geneFile;
+                        }
+
+                        logger.logLine("[DYNAMITE] " + fileDirGroups.getName()+" preprocessing integrateData.py: " + command);
+                        Process child = Runtime.getRuntime().exec(command);
+                        int code = child.waitFor();
+                        switch (code){
+                            case 0:
+                                break;
+                            case 1:
+                                String message = child.getErrorStream().toString();
+                                throw new Exception(message);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        File folder_output_classification = new File(folder_output_pre+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_prepareClass);
+        folder_output_classification.mkdir();
+
+        for(File fileDirHM:folder_output.listFiles())
+        {
+            if(fileDirHM.isDirectory())
+            {
+                File folder_output_classificationHM = new File(folder_output_classification.getAbsolutePath()+File.separator+fileDirHM.getName());
+                folder_output_classificationHM.mkdir();
+
+                for(File fileDirGroup:fileDirHM.listFiles())
+                {
+                    if(fileDirGroup.isDirectory())
+                    {
+                        File folder_output_classificationHM_Group= new File(folder_output_classificationHM.getAbsolutePath()+File.separator+fileDirGroup.getName());
+                        folder_output_classificationHM_Group.mkdir();
+
+                        String command = "Rscript "+ options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"prepareForClassificiation.R";
+                        command += " " + fileDirGroup.getAbsolutePath()+File.separator+options_intern.file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff;
+                        command += " " + folder_output_classificationHM_Group.getAbsolutePath()+File.separator+options_intern.file_suffix_output_preprocessing_DYNAMITE_prepClass;
+                        logger.logLine("[DYNAMITE] " + fileDirGroup.getName()+" preprocessing prepareForClassification.R: " + command);
+                        Process child = Runtime.getRuntime().exec(command);
+                        int code = child.waitFor();
+                        switch (code){
+                            case 0:
+                                break;
+                            case 1:
+                                String message = child.getErrorStream().toString();
+                                throw new Exception(message);
+                        }
+
+                    }
+                }
+
+            }
+        }
+
+        logger.logLine("[DYNAMITE]: finished preprocessing data for DYNAMITE");
+
+    }
 
     /**
      * postprocesses the TEPIC output (checks for TPM filter and copies files into a structure where preprocessing of DYNAMITE can happen
@@ -1038,6 +1150,15 @@ public class COM2POSE_lib
                 case "tepic_ensg_symbol":
                     options_intern.tepic_ensg_symbol=split[1].substring(1,split[1].length()-1);
                     break;
+                case "dynamite_preprocessing_integrate_data_geneIDs":
+                    options_intern.dynamite_preprocessing_integrate_data_geneIDs=Integer.parseInt(split[1]);
+                    break;
+                case "dynamite_preprocessing_integrate_data_log2fc":
+                    options_intern.dynamite_preprocessing_integrate_data_log2fc=Integer.parseInt(split[1]);
+                    break;
+                case "dynamite_preprocessing_integrate_data_consider_geneFile":
+                    options_intern.dynamite_preprocessing_integrate_data_consider_geneFile=split[1].substring(1,split[1].length()-1);
+                    break;
                 default:
                     logger.logLine("Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
                     logger.logLine("Do not delete unused parameters in config data!");
@@ -1232,6 +1353,16 @@ public class COM2POSE_lib
         /**
          * DYNAMITE OPTIONS
          */
+
+        if(!options_intern.dynamite_preprocessing_integrate_data_consider_geneFile.equals(""))
+        {
+            File f = new File(options_intern.dynamite_preprocessing_integrate_data_consider_geneFile);
+            if(!f.exists())
+            {
+                logger.logLine("[DYNAMITE] preprocessing consider genes file for integrateData.py does not exist!");
+                all_set=false;
+            }
+        }
 
 
         return all_set;

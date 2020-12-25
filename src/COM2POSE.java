@@ -22,7 +22,9 @@ public class COM2POSE
 
         //TEPIC
         //com2pose_lib.run_tepic();
-        com2pose_lib.postprocess_tepic_output();
+        //com2pose_lib.postprocess_tepic_output();
+        //com2pose_lib.preprocess_dynamite();
+        com2pose_lib.run_DYNAMITE();
 
 
         //DYNAMITE

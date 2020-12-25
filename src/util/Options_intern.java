@@ -29,10 +29,16 @@ public class Options_intern
     public String folder_name_tepic_postprocessing_output_mean_affinities= "MeanAffinities";
     public String folder_name_tepic_postprocessing_output_ratios = "Ratios";
 
+    public String folder_output_preprocessing_DYNAMITE = "DYNAMITE_preprocessing";
+    public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
+    public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
+
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_postprocessing_output_mean_affinities ="Mean_Affinities_";
     public String file_suffix_tepic_postprocessing_output_ratios ="Ratio_Affinities_";
+    public String file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff= "Integrated_Data_Log2_Quotient.txt";
+    public String file_suffix_output_preprocessing_DYNAMITE_prepClass ="Integrated_Data_For_Classification.txt";
 
 
     public String directory_for_tepic_scripts = "ext"+ File.separator+"TEPIC"+File.separator+"TEPIC";
@@ -109,9 +115,15 @@ public class Options_intern
     public double tepic_tpm_cutoff=-1;
     //#[OPT]: path to input file ensg to gene symbol file, required for TPM filter
     public String tepic_ensg_symbol="";
+
    /*######################
      ##DYNAMITE parameters#
      ######################*/
-
+    //#[OPT] ##DO NOT SET IF FULL PIPELINE IS RUN: Position of the gene IDs in the expression file",default=0
+    public int dynamite_preprocessing_integrate_data_geneIDs=0;
+    //#[OPT] ##DO NOT SET IF FULL PIPELINE IS RUN: Position of the gene expression estimate in the expression file, default=1"
+    public int dynamite_preprocessing_integrate_data_log2fc=1;
+    //#[OPT] File containing gene IDs that should be considered
+    public String dynamite_preprocessing_integrate_data_consider_geneFile="";
 
 }
