@@ -28,10 +28,11 @@ public class Options_intern
     public String folder_name_tepic_postprocessing_output = "output";
     public String folder_name_tepic_postprocessing_output_mean_affinities= "MeanAffinities";
     public String folder_name_tepic_postprocessing_output_ratios = "Ratios";
-
     public String folder_output_preprocessing_DYNAMITE = "DYNAMITE_preprocessing";
     public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
     public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
+    public String folder_out_put_DYNAMITE = "DYNAMITE_output";
+
 
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
@@ -119,11 +120,31 @@ public class Options_intern
    /*######################
      ##DYNAMITE parameters#
      ######################*/
+   //####preprocessing####
     //#[OPT] ##DO NOT SET IF FULL PIPELINE IS RUN: Position of the gene IDs in the expression file",default=0
     public int dynamite_preprocessing_integrate_data_geneIDs=0;
     //#[OPT] ##DO NOT SET IF FULL PIPELINE IS RUN: Position of the gene expression estimate in the expression file, default=1"
     public int dynamite_preprocessing_integrate_data_log2fc=1;
     //#[OPT] File containing gene IDs that should be considered
     public String dynamite_preprocessing_integrate_data_consider_geneFile="";
+    //####DYNAMITE####
+    // #[REQ]: Name of the response variable (e.g. Expression)
+    public String dynamite_out_var="";
+    //#[OPT]: Number of the cores to use (1 as default)
+    public int dynamite_cores=1;
+    //#[OPT]: Alpha parameter stepsize (0.1 as default)
+    public double dynamite_alpha=0.1;
+    //#[OPT]:Size of test data (0.2 as default)
+    public double dynamite_testsize=0.2;
+    //#[OPT]: Number of outer folds for model validation (3 as default)
+    public int dynamite_Ofolds=3;
+    //#[OPT]: Number of inner cross validation folds (6 as default)
+    public int dynamite_Ifolds=6;
+    //#[OPT]: Flag indicating whether the data should be balanced through downsampling (default TRUE)
+    public boolean dynamite_balanced=true;
+    //#[OPT]: Flag indicating whether performance measures should be computed (default TRUE)
+    public boolean dynamite_performance=true;
+    //#[OPT]: Flag indicating whether a model should be learned on randomised data (default FALSE)
+    public boolean dynamite_randomise=false;
 
 }

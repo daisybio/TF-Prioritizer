@@ -21,8 +21,62 @@ public class COM2POSE_lib
         logger.logLine("COM2POSE path set to: "+ options_intern.path_to_COM2POSE);
     }
 
-    public void run_DYNAMITE() throws IOException {
+    public void run_DYNAMITE() throws Exception {
         logger.logLine("[DYNAMITE] start running DYNAMITE with parameters: ");
+
+        String command_base = "Rscript " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"DYNAMITE.R";
+
+        File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_output_preprocessing_DYNAMITE+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_prepareClass);
+        File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_put_DYNAMITE);
+        folder_output.mkdir();
+
+        for(File fileDirHM : folder_input.listFiles())
+        {
+            if(fileDirHM.isDirectory())
+            {
+                File folder_outputHM = new File(folder_output.getAbsolutePath()+File.separator+fileDirHM.getName());
+                folder_outputHM.mkdir();
+
+                for(File fileDirHM_Group : fileDirHM.listFiles())
+                {
+                    if(fileDirHM_Group.isDirectory())
+                    {
+                        File folder_outputHM_Group = new File(folder_outputHM.getAbsolutePath()+File.separator+fileDirHM_Group.getName());
+                        folder_outputHM_Group.mkdir();
+
+                        String input_dir = fileDirHM_Group.getAbsolutePath()+File.separator;
+                        String output_dir = folder_outputHM_Group.getAbsolutePath()+File.separator;
+
+                        String command_edited = new String(command_base);
+                        command_edited += " --dataDir="+input_dir;
+                        command_edited += " --outDir="+output_dir;
+                        command_edited += " --out_var="+options_intern.dynamite_out_var;
+                        command_edited += " --Ofolds="+options_intern.dynamite_Ofolds;
+                        command_edited += " --Ifolds="+options_intern.dynamite_Ifolds;
+                        command_edited += " --performance="+options_intern.dynamite_performance;
+                        command_edited += " --alpha="+options_intern.dynamite_alpha;
+                        command_edited += " --cores="+options_intern.dynamite_cores;
+                        if(options_intern.dynamite_randomise)
+                        {
+                            command_edited += " --randomise="+options_intern.dynamite_randomise;
+                        }
+
+                        logger.logLine("[DYNAMITE] "+ fileDirHM.getName()+":"+ fileDirHM_Group.getName()+" DYNAMITE.R: " + command_edited);
+                        logger.logLine("[DYNAMITE] ... waiting ...");
+                        Process child = Runtime.getRuntime().exec(command_edited);
+                        int code = child.waitFor();
+                        switch (code){
+                            case 0:
+                                break;
+                            case 1:
+                                String message = child.getErrorStream().toString();
+                                throw new Exception(message);
+                        }
+
+                    }
+                }
+            }
+        }
 
         logger.logLine("[DYNAMITE] finished running DYNAMITE");
     }
@@ -1158,6 +1212,33 @@ public class COM2POSE_lib
                     break;
                 case "dynamite_preprocessing_integrate_data_consider_geneFile":
                     options_intern.dynamite_preprocessing_integrate_data_consider_geneFile=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "dynamite_out_var":
+                    options_intern.dynamite_out_var=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "dynamite_cores":
+                    options_intern.dynamite_cores=Integer.parseInt(split[1]);
+                    break;
+                case "dynamite_alpha":
+                    options_intern.dynamite_alpha=Double.parseDouble(split[1]);
+                    break;
+                case "dynamite_testsize":
+                    options_intern.dynamite_testsize=Double.parseDouble(split[1]);
+                    break;
+                case "dynamite_Ofolds":
+                    options_intern.dynamite_Ofolds=Integer.parseInt(split[1]);
+                    break;
+                case "dynamite_Ifolds":
+                    options_intern.dynamite_Ifolds=Integer.parseInt(split[1]);
+                    break;
+                case "dynamite_balanced":
+                    options_intern.dynamite_balanced=Boolean.parseBoolean(split[1]);
+                    break;
+                case "dynamite_performance":
+                    options_intern.dynamite_performance=Boolean.parseBoolean(split[1]);
+                    break;
+                case "dynamite_randomise":
+                    options_intern.dynamite_randomise=Boolean.parseBoolean(split[1]);
                     break;
                 default:
                     logger.logLine("Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
