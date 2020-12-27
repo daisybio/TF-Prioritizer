@@ -49,8 +49,8 @@ public class COM2POSE_lib
                     sb.append("import matplotlib.pyplot as plt\n");
                     sb.append("sns.set_context(\"notebook\")\n");
                     sb.append("color = \"#A6CEE3\"\n");
-                    sb.append("plt.figure(figsize=(26, 20))\n");
                     sb.append("sns.set_context(\"talk\")\n");
+                    sb.append("sns.set_style(\"whitegrid\")\n");
 
                     HashSet<String> th_group_differentpoints = new HashSet<>();
                     HashSet<String> th_group_samepoints = new HashSet<>();
@@ -70,7 +70,7 @@ public class COM2POSE_lib
                         {
                             th_group_samepoints.add(fileDirHM_Group.getName());
                         }
-
+                        sb.append("plt.figure(figsize=(26, 20))\n");
                         sb.append("#create barplot for group: ");
                         sb.append(fileDirHM.getName());
                         sb.append("-");
@@ -137,7 +137,9 @@ public class COM2POSE_lib
                         sb.append("plt.savefig(f\"");
                         sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+fileDirHM_Group.getName()+"_threshold_"+d+".png");
                         sb.append("\")\n");
+                        sb.append("plt.clf()\n");
                     }
+                    sb.append("plt.figure(figsize=(26, 20))\n");
                     sb.append("# Heatmap different stages\n");
                     //sb.append("plt.figure(figsize = (16,8))\n");
                     sb.append("join_df_stages = pd.concat([");
@@ -159,6 +161,9 @@ public class COM2POSE_lib
                     sb.append("plot = sns.heatmap(join_df_stages.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
                     sb.append("plt.savefig(\"");
                     sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_different_stages.png\")\n");
+
+                    sb.append("plt.clf()\n");
+                    sb.append("plt.figure(figsize=(26, 20))\n");
 
                     sb.append("# Heatmap same stages\n");
                     sb.append("join_df_same = pd.concat([");
@@ -202,8 +207,7 @@ public class COM2POSE_lib
             }
         }
         logger.logLine("[PLOTS] end creating / running python scripts for plots");
-
-            }
+    }
 
     /**
      * run DYNAMITE.R
