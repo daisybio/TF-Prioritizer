@@ -1,6 +1,9 @@
 package util;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Options_intern
 {
@@ -16,6 +19,7 @@ public class Options_intern
     /**
      * COM2POSE private options - cannot be set from the outside
      */
+    //TODO: when all functionality is implemented number the outputs in the correct order so it is not confusing anymore!
     public String folder_name_deseq2_preprocessing = "DESeq2_preprocessing";
     public String folder_name_deseq2_preprocessing_single = "single";
     public String folder_name_deseq2_preprocessing_combined = "combined";
@@ -32,6 +36,7 @@ public class Options_intern
     public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
     public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
     public String folder_out_put_DYNAMITE = "DYNAMITE_output";
+    public String folder_plots = "PLOTS_output";
 
 
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
@@ -40,6 +45,7 @@ public class Options_intern
     public String file_suffix_tepic_postprocessing_output_ratios ="Ratio_Affinities_";
     public String file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff= "Integrated_Data_Log2_Quotient.txt";
     public String file_suffix_output_preprocessing_DYNAMITE_prepClass ="Integrated_Data_For_Classification.txt";
+    public String file_suffix_dynamite_output_to_be_plotted = "Regression_Coefficients_Entire_Data_Set_Integrated_Data_For_Classification.txt";
 
 
     public String directory_for_tepic_scripts = "ext"+ File.separator+"TEPIC"+File.separator+"TEPIC";
@@ -146,5 +152,14 @@ public class Options_intern
     public boolean dynamite_performance=true;
     //#[OPT]: Flag indicating whether a model should be learned on randomised data (default FALSE)
     public boolean dynamite_randomise=false;
+
+    /*######################
+    ####PLOT parameters###
+    ######################*/
+    //#[OPT]: thresholds for coefficent plot and overall plots, for each threshold it creates a plot for each timepoint and an overall plot for each HistoneMod
+    //#e.g. 0.1 means it creates a plot of the coefficient range ([-1;1]), it uses all TFs of [-1,-0.1] and [0.1,1]
+    //#default: 0.1;0.2;0.3;0.4;0.5;0.6
+    public List<Double> plot_th_coefficient= new ArrayList<Double>(Arrays.asList(new Double[]{0.1, 0.2, 0.3, 0.4, 0.5, 0.6}));
+
 
 }

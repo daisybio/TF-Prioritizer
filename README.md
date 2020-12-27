@@ -20,7 +20,8 @@ Before using COM2POSE please install following software:
 - [R](https://cran.r-project.org/bin/windows/base/) version 3.8 or higher.
 - [DESeq2 R package](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) to make the programm smoother it is recommend to install DESeq2 beforehand.
 - [bedtools](https://github.com/arq5x/bedtools2) Installation instructions for bedtools can be found [here](https://bedtools.readthedocs.io/en/latest/content/installation.html). Please make sure to add the bedtools installation to your PATH.
-- Python (minimum version of 2.7).
+- Python (minimum version of 2.7 with path to python and version 3.8 with path to python3).
+- Python packages: pandas, seaborn, matplotlib.pyplot in path python3
 - C++ compiler A C++ compiler supporting openmp to use the parallel implementation of TRAP.
 
 ## 4. Installation under Unix

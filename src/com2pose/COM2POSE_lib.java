@@ -21,6 +21,193 @@ public class COM2POSE_lib
         logger.logLine("COM2POSE path set to: "+ options_intern.path_to_COM2POSE);
     }
 
+    /**
+     * creates python Scripts for all timepoints of all histone modifications, it also creates an overview plot of all different group clashes (e.g. P_L but not L1_L10) for a set threshold plots
+     */
+    public void create_tp_plots() throws Exception {
+
+        logger.logLine("[PLOTS] start creating / running python scripts for plots");
+
+        File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_put_DYNAMITE);
+        File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_plots);
+        folder_output.mkdir();
+
+        for(File fileDirHM:folder_input.listFiles())
+        {
+            if(fileDirHM.isDirectory())
+            {
+                File folder_outputHM = new File(folder_output.getAbsolutePath()+File.separator+fileDirHM.getName());
+                folder_outputHM.mkdir();
+                for(double d: options_intern.plot_th_coefficient)
+                {
+                    File out_th = new File(folder_outputHM.getAbsolutePath()+File.separator+d);
+                    out_th.mkdir();
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("import pandas as pd\n");
+                    sb.append("import seaborn as sns\n");
+                    sb.append("import matplotlib.pyplot as plt\n");
+                    sb.append("sns.set_context(\"notebook\")\n");
+                    sb.append("color = \"#A6CEE3\"\n");
+                    sb.append("plt.figure(figsize=(26, 20))\n");
+                    sb.append("sns.set_context(\"talk\")\n");
+
+                    HashSet<String> th_group_differentpoints = new HashSet<>();
+                    HashSet<String> th_group_samepoints = new HashSet<>();
+
+                    for(File fileDirHM_Group : fileDirHM.listFiles())
+                    {
+
+                        String[] group_split = fileDirHM_Group.getName().split("_");
+                        String groupname1 = group_split[0];
+                        String groupname2 = group_split[1];
+
+                        if(groupname1.charAt(0)!=groupname2.charAt(0))
+                        {
+                            th_group_differentpoints.add(fileDirHM_Group.getName());
+                        }
+                        else
+                        {
+                            th_group_samepoints.add(fileDirHM_Group.getName());
+                        }
+
+                        sb.append("#create barplot for group: ");
+                        sb.append(fileDirHM.getName());
+                        sb.append("-");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("\n");
+                        sb.append("#Read data\n");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("=pd.read_table('");
+                        sb.append(fileDirHM_Group.getAbsolutePath()+File.separator+options_intern.file_suffix_dynamite_output_to_be_plotted);
+                        sb.append("').sort_values(['value'], ascending=False)\n");
+                        sb.append("# Remove suffix\n");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("['TF'] = ");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("['TF'].str.split('_', expand=True)[0]\n");
+                        sb.append("# Sort and filter\n");
+                        sb.append(fileDirHM_Group.getName()+"_temp1");
+                        sb.append(" = ");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("[");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("['value'] > ");
+                        sb.append(d);
+                        sb.append("].set_index('TF')\n");
+                        sb.append(fileDirHM_Group.getName()+"_temp2");
+                        sb.append(" = ");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("[");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("['value'] < -");
+                        sb.append(d);
+                        sb.append("].set_index('TF')\n");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append(" = ");
+                        sb.append("pd.concat([");
+                        sb.append(fileDirHM_Group.getName()+"_temp1, ");
+                        sb.append(fileDirHM_Group.getName()+"_temp2],axis=0)\n");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append(".columns = ['");
+                        sb.append(fileDirHM.getName());
+                        sb.append(": ");
+                        sb.append(groupname1);
+                        sb.append(" VS ");
+                        sb.append(groupname2);
+                        sb.append("']\n");
+                        sb.append("# Bar Plot\n");
+                        sb.append("time = '");
+                        sb.append(fileDirHM.getName());
+                        sb.append(": ");
+                        sb.append(groupname1);
+                        sb.append(" VS ");
+                        sb.append(groupname2);
+                        sb.append("'\n");
+                        sb.append("ax = sns.barplot(x= ");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append(".index, y=time, data=");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append(", color=color)\n");
+                        sb.append("ax.set_title(time)\n");
+                        sb.append("ax.set_ylabel('Normalized feature value')\n");
+                        sb.append("ax.set_xlabel('')\n");
+                        sb.append("plt.xticks(rotation=90)\n");
+                        sb.append("plt.tight_layout()\n");
+                        sb.append("plt.savefig(f\"");
+                        sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+fileDirHM_Group.getName()+"_threshold_"+d+".png");
+                        sb.append("\")\n");
+                    }
+                    sb.append("# Heatmap different stages\n");
+                    //sb.append("plt.figure(figsize = (16,8))\n");
+                    sb.append("join_df_stages = pd.concat([");
+                    int c = 0;
+                    for(String s : th_group_differentpoints)
+                    {
+                        if(c==0)
+                        {
+                            sb.append(s);
+                        }
+                        else
+                        {
+                            sb.append(", ");
+                            sb.append(s);
+                        }
+                        c++;
+                    }
+                    sb.append("], axis=1)\n");
+                    sb.append("plot = sns.heatmap(join_df_stages.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
+                    sb.append("plt.savefig(\"");
+                    sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_different_stages.png\")\n");
+
+                    sb.append("# Heatmap same stages\n");
+                    sb.append("join_df_same = pd.concat([");
+                    c = 0;
+                    for(String s : th_group_samepoints)
+                    {
+                        if(c==0)
+                        {
+                            sb.append(s);
+                        }
+                        else
+                        {
+                            sb.append(", ");
+                            sb.append(s);
+                        }
+                        c++;
+                    }
+                    sb.append("], axis=1)\n");
+                    sb.append("plot = sns.heatmap(join_df_same.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
+                    sb.append("plt.savefig(\"");
+                    sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.png\")\n");
+
+
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(new File(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+d+".py")));
+                    bw.write(sb.toString());
+                    bw.close();
+
+                    String command = "python3 " + out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+d+".py";
+
+                    logger.logLine("[PLOTS] run plot: " + command);
+                    Process child = Runtime.getRuntime().exec(command);
+                    int code = child.waitFor();
+                    switch (code) {
+                        case 0:
+                            break;
+                        case 1:
+                            String message = child.getErrorStream().toString();
+                            throw new Exception(message);
+                    }
+                }
+            }
+        }
+        logger.logLine("[PLOTS] end creating / running python scripts for plots");
+
+            }
+
+    /**
+     * run DYNAMITE.R
+     */
     public void run_DYNAMITE() throws Exception {
         logger.logLine("[DYNAMITE] start running DYNAMITE with parameters: ");
 
@@ -81,6 +268,9 @@ public class COM2POSE_lib
         logger.logLine("[DYNAMITE] finished running DYNAMITE");
     }
 
+    /**
+     * run integrateData.py and prepareForClassification.R
+     */
     public void preprocess_dynamite() throws Exception {
 
         logger.logLine("[DYNAMITE]: start preprocessing data for DYNAMITE");
@@ -1240,6 +1430,14 @@ public class COM2POSE_lib
                 case "dynamite_randomise":
                     options_intern.dynamite_randomise=Boolean.parseBoolean(split[1]);
                     break;
+                case "plot_th_coefficient":
+                    String[] split_coefficient_ths = split[1].split(";");
+                    options_intern.plot_th_coefficient.clear();
+                    for(String s: split_coefficient_ths)
+                    {
+                        options_intern.plot_th_coefficient.add(Double.parseDouble(s));
+                    }
+                    break;
                 default:
                     logger.logLine("Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
                     logger.logLine("Do not delete unused parameters in config data!");
@@ -1265,7 +1463,6 @@ public class COM2POSE_lib
 
 
     }
-
 
     private boolean checkOptions() throws IOException {
 
@@ -1443,6 +1640,16 @@ public class COM2POSE_lib
                 logger.logLine("[DYNAMITE] preprocessing consider genes file for integrateData.py does not exist!");
                 all_set=false;
             }
+        }
+
+        /**
+         * PLOT OPTIONS
+         */
+
+        if(options_intern.plot_th_coefficient.isEmpty())
+        {
+            logger.logLine("[PLOTS] plot th coefficients is empty, please use at least one coefficient.");
+            all_set=false;
         }
 
 

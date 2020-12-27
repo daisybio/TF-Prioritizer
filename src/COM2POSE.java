@@ -24,7 +24,8 @@ public class COM2POSE
         //com2pose_lib.run_tepic();
         //com2pose_lib.postprocess_tepic_output();
         //com2pose_lib.preprocess_dynamite();
-        com2pose_lib.run_DYNAMITE();
+        //com2pose_lib.run_DYNAMITE();
+        com2pose_lib.create_tp_plots();
 
 
         //DYNAMITE
