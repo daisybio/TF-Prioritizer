@@ -20,23 +20,23 @@ public class Options_intern
      * COM2POSE private options - cannot be set from the outside
      */
     //TODO: when all functionality is implemented number the outputs in the correct order so it is not confusing anymore!
-    public String folder_name_deseq2_preprocessing = "DESeq2_preprocessing";
+    public String folder_name_deseq2_preprocessing = "01_DESeq2_preprocessing";
     public String folder_name_deseq2_preprocessing_single = "single";
     public String folder_name_deseq2_preprocessing_combined = "combined";
-    public String folder_name_deseq2_output_raw = "DESeq2_output_raw";
-    public String folder_name_deseq2_output = "DESeq2_output";
-    public String folder_name_deseq2_R_scripts = "DESeq2_R_scripts";
-    public String folder_name_tepic_output_raw = "TEPIC_output_raw";
-    public String folder_name_tepic_postprocessing = "TEPIC_postprocessing";
+    public String folder_name_deseq2_output_raw = "02_DESeq2_output_raw";
+    public String folder_name_deseq2_R_scripts = "03_DESeq2_R_scripts";
+    public String folder_name_deseq2_output = "04_DESeq2_output";
+    public String folder_name_tepic_output_raw = "05_TEPIC_output_raw";
+    public String folder_name_tepic_postprocessing = "06_TEPIC_postprocessing";
     public String folder_name_tepic_postprocessing_input = "input";
     public String folder_name_tepic_postprocessing_output = "output";
     public String folder_name_tepic_postprocessing_output_mean_affinities= "MeanAffinities";
     public String folder_name_tepic_postprocessing_output_ratios = "Ratios";
-    public String folder_output_preprocessing_DYNAMITE = "DYNAMITE_preprocessing";
+    public String folder_output_preprocessing_DYNAMITE = "07_DYNAMITE_preprocessing";
     public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
     public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
-    public String folder_out_put_DYNAMITE = "DYNAMITE_output";
-    public String folder_plots = "PLOTS_output";
+    public String folder_out_put_DYNAMITE = "08_DYNAMITE_output";
+    public String folder_plots = "09_PLOTS_output";
 
 
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";

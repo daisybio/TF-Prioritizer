@@ -116,32 +116,56 @@ public class COM2POSE_lib
                         sb.append(" VS ");
                         sb.append(groupname2);
                         sb.append("']\n");
-                        sb.append("# Bar Plot\n");
-                        sb.append("time = '");
+                        sb.append("if('Peak' in ");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append(".index):\n");
+                        sb.append("    ");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append("=pd.DataFrame.drop(");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append(",index='Peak')\n");
+                        sb.append("if not ");
+                        sb.append(fileDirHM_Group.getName());
+                        sb.append(".empty:");
+                        sb.append("    # Bar Plot\n");
+                        sb.append("    time = '");
                         sb.append(fileDirHM.getName());
                         sb.append(": ");
                         sb.append(groupname1);
                         sb.append(" VS ");
                         sb.append(groupname2);
                         sb.append("'\n");
-                        sb.append("ax = sns.barplot(x= ");
+                        sb.append("    ax = sns.barplot(x= ");
                         sb.append(fileDirHM_Group.getName());
                         sb.append(".index, y=time, data=");
                         sb.append(fileDirHM_Group.getName());
                         sb.append(", color=color)\n");
-                        sb.append("ax.set_title(time)\n");
-                        sb.append("ax.set_ylabel('Normalized feature value')\n");
-                        sb.append("ax.set_xlabel('')\n");
-                        sb.append("plt.xticks(rotation=90)\n");
-                        sb.append("plt.tight_layout()\n");
-                        sb.append("plt.savefig(f\"");
+                        sb.append("    ax.set_title(time)\n");
+                        sb.append("    ax.set_ylabel('Normalized feature value')\n");
+                        sb.append("    ax.set_xlabel('')\n");
+                        sb.append("    plt.xticks(rotation=90)\n");
+                        sb.append("    plt.tight_layout()\n");
+                        sb.append("    plt.savefig(f\"");
                         sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+fileDirHM_Group.getName()+"_threshold_"+d+".png");
                         sb.append("\")\n");
-                        sb.append("plt.clf()\n");
+                        sb.append("    plt.clf()\n");
                     }
                     sb.append("plt.figure(figsize=(26, 20))\n");
                     sb.append("# Heatmap different stages\n");
-                    //sb.append("plt.figure(figsize = (16,8))\n");
+                    //Clear Peak values
+
+                    for(String s: th_group_differentpoints)
+                    {
+                        sb.append("if('Peak' in ");
+                        sb.append(s);
+                        sb.append(".index):\n");
+                        sb.append("    ");
+                        sb.append(s);
+                        sb.append("=pd.DataFrame.drop(");
+                        sb.append(s);
+                        sb.append(",index='Peak')\n");
+                    }
+
                     sb.append("join_df_stages = pd.concat([");
                     int c = 0;
                     for(String s : th_group_differentpoints)
@@ -158,14 +182,30 @@ public class COM2POSE_lib
                         c++;
                     }
                     sb.append("], axis=1)\n");
-                    sb.append("plot = sns.heatmap(join_df_stages.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
-                    sb.append("plt.savefig(\"");
+
+                    sb.append("if not ");
+                    sb.append("join_df_stages");
+                    sb.append(".empty:\n");
+
+                    sb.append("    plot = sns.heatmap(join_df_stages.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
+                    sb.append("    plt.savefig(\"");
                     sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_different_stages.png\")\n");
 
-                    sb.append("plt.clf()\n");
+                    sb.append("    plt.clf()\n");
                     sb.append("plt.figure(figsize=(26, 20))\n");
 
                     sb.append("# Heatmap same stages\n");
+                    for(String s: th_group_samepoints)
+                    {
+                        sb.append("if('Peak' in ");
+                        sb.append(s);
+                        sb.append(".index):\n");
+                        sb.append("    ");
+                        sb.append(s);
+                        sb.append("=pd.DataFrame.drop(");
+                        sb.append(s);
+                        sb.append(",index='Peak')\n");
+                    }
                     sb.append("join_df_same = pd.concat([");
                     c = 0;
                     for(String s : th_group_samepoints)
@@ -182,8 +222,13 @@ public class COM2POSE_lib
                         c++;
                     }
                     sb.append("], axis=1)\n");
-                    sb.append("plot = sns.heatmap(join_df_same.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
-                    sb.append("plt.savefig(\"");
+
+                    sb.append("if not ");
+                    sb.append("join_df_same");
+                    sb.append(".empty:\n");
+
+                    sb.append("    plot = sns.heatmap(join_df_same.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
+                    sb.append("    plt.savefig(\"");
                     sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.png\")\n");
 
 
@@ -325,7 +370,7 @@ public class COM2POSE_lib
                             command += " " + options_intern.dynamite_preprocessing_integrate_data_consider_geneFile;
                         }
 
-                        logger.logLine("[DYNAMITE] " + fileDirGroups.getName()+" preprocessing integrateData.py: " + command);
+                        logger.logLine("[DYNAMITE] " +fileDirHM.getName()+":"+ fileDirGroups.getName()+" preprocessing integrateData.py: " + command);
                         Process child = Runtime.getRuntime().exec(command);
                         int code = child.waitFor();
                         switch (code){
@@ -734,7 +779,6 @@ public class COM2POSE_lib
         }
         logger.logLine("Finished postprocessing of TEPIC output");
     }
-
 
 
     /**
@@ -1160,7 +1204,7 @@ public class COM2POSE_lib
         logger.logLine("Started creating RScripts for running DESeq2");
 
         //CREATE RScripts for every folder in here
-        File r_scripts = new File(options_intern.com2pose_working_directory+File.separator+"DESeq2_R_scripts");
+        File r_scripts = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_R_scripts);
         r_scripts.mkdir();
         for(File dir : output_inter_steps_combined.listFiles())
         {
@@ -1664,7 +1708,7 @@ public class COM2POSE_lib
     {
         HashMap<String, HashMap<String, HashSet<String>>> groups = new HashMap<>();
 
-        File folder = new File(options_intern.com2pose_working_directory+File.separator+"TEPIC_output_raw");
+        File folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw);
 
         for(File fileDir : folder.listFiles())
         {

@@ -13,27 +13,24 @@ public class COM2POSE
         Options_intern options_intern= new Options_intern();
         parseArguments(args, options_intern);
 
+        //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file();
 
         //DESeq2
-        //com2pose_lib.create_DESeq2_scripts();
-        //com2pose_lib.run_and_postprocess_DESeq2();
+        com2pose_lib.create_DESeq2_scripts();
+        com2pose_lib.run_and_postprocess_DESeq2();
 
         //TEPIC
-        //com2pose_lib.run_tepic();
-        //com2pose_lib.postprocess_tepic_output();
-        //com2pose_lib.preprocess_dynamite();
-        //com2pose_lib.run_DYNAMITE();
-        com2pose_lib.create_tp_plots();
-
+        com2pose_lib.run_tepic();
+        com2pose_lib.postprocess_tepic_output();
 
         //DYNAMITE
+        com2pose_lib.preprocess_dynamite();
+        com2pose_lib.run_DYNAMITE();
 
-        //CREATE PLOTS
-
-
-
+        //PLOTS
+        com2pose_lib.create_tp_plots();
 
 
         System.out.println("X");
