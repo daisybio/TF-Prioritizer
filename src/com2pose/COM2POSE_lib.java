@@ -962,7 +962,7 @@ public class COM2POSE_lib
             {
                 String command = "Rscript " + dir.getAbsolutePath();
                 Process child = Runtime.getRuntime().exec(command);
-                logger.logLine("[DESEQ2] Running script " + dir.getName());
+                logger.logLine("[DESEQ2] Running script " + dir.getName()+": " + command);
                 int code = child.waitFor();
                 switch (code){
                     case 0:
