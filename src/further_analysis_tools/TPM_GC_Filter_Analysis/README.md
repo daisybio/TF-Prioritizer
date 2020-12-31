@@ -36,7 +36,7 @@ java jar TPM_GC_Filter_analysis.jar -r <root-run-directories> -t <TF-list>
                           +-- run n --+-- com2pose_template.cfg
                           |           +-- [command_line.txt]
                           |
-                          +-- [output_TPM_GC_Filter_Analysis]
+                          +-- [A1_TPM_GC_FILTER_ANALYSIS]
                           +-- TF_list.txt
 ```
 ATTENTION: if output_TPM_GC_Filter_Analysis is already generated the tool probably overwrites existing plots.
