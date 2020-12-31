@@ -22,7 +22,7 @@ java jar TPM_GC_Filter_analysis.jar -r <root-run-directories> -t <TF-list> [-l] 
 ```
 
 ### Required Options
-- `--working-directory` : The directory where all runs of COM2POSE are inside.
+- `--root-run-directories` : The directory where all runs of COM2POSE are inside.
 - `--TF-list` : The directory where all runs of COM2POSE are inside.
 
 ### Optional Options
