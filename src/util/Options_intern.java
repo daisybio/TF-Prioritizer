@@ -172,6 +172,8 @@ public class Options_intern
     public String tpm_gc_filter_analysis_working_dir = "";
     //[REQ]: TF-list file directory
     public String tpm_gc_filter_analysis_tf_list = "";
+    //[OPT]: count zeros in means
+    public boolean tpm_gc_filter_analysis_count_zeros=true;
 
     //dir_names
     public String tpm_gc_filter_analysis_folder_directory_name = "A1_TPM_GC_FILTER_ANALYSIS";

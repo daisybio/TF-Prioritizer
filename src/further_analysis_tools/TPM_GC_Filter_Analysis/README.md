@@ -18,12 +18,17 @@ No further installation is needed. Look at COM2POSE README.md
 
 ## 5. Usage of the tool
 ```sh
-java jar TPM_GC_Filter_analysis.jar -r <root-run-directories> -t <TF-list>
+java jar TPM_GC_Filter_analysis.jar -r <root-run-directories> -t <TF-list> [-l] [-c]
 ```
 
 ### Required Options
 - `--working-directory` : The directory where all runs of COM2POSE are inside.
 - `--TF-list` : The directory where all runs of COM2POSE are inside.
+
+### Optional Options
+- `--write-log-file` : if flag is set no logfile will be written, default: logfile will be written
+- `--count-zeros` : if flag is set TFs with a score of 0 will not be counted for means, default: TFs with zeros are counted
+
 
 ## 6. Input formats
 ### working-directory

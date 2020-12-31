@@ -208,7 +208,11 @@ public class TPM_GC_Filter_Analysis  {
                                     try
                                     {
                                         tf_group_hm_file_score.get(split_tf[0].toUpperCase()).get(fileDir_HM_Group.getName()).get(com2pose.options_intern.com2pose_working_directory).put(fileDir_HM.getName(),Double.parseDouble(split[1]));
-                                        mean_count++;
+
+                                        if(options_intern.tpm_gc_filter_analysis_count_zeros)
+                                        {
+                                            mean_count++;
+                                        }
                                         double score = Double.parseDouble(split[1]);
                                         if(score<0)
                                         {
@@ -224,6 +228,10 @@ public class TPM_GC_Filter_Analysis  {
                                         e.printStackTrace();
                                     }
                                 }
+                            }
+                            if(mean_count==0)
+                            {
+                                mean_count++;
                             }
                             mean_sum_pos/=mean_count;
                             mean_sum_neg/=mean_count;
@@ -379,6 +387,9 @@ public class TPM_GC_Filter_Analysis  {
         Option opt_write_logfile = new Option("l","write-log-file",false,"[OPT]: if flag is set no logfile will be written, default: logfile will be written");
         options.addOption(opt_write_logfile);
 
+        Option opt_count_zeros = new Option("c","count-zeros",false,"[OPT]: if flag is set TFs with a score of 0 will not be counted for means, default: TFs with zeros are counted");
+        options.addOption(opt_count_zeros);
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd;
@@ -396,12 +407,17 @@ public class TPM_GC_Filter_Analysis  {
                 options_intern.write_to_logfile=false;
             }
 
+            if(cmd.hasOption("count-zeros"))
+            {
+                options_intern.tpm_gc_filter_analysis_count_zeros=false;
+            }
+
 
 
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("-r <root-run-directories> -t <TF-list> [-l]",options);
+            formatter.printHelp("-r <root-run-directories> -t <TF-list> [-l] [-c]",options);
             System.exit(1);
         }
 
