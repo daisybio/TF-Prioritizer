@@ -6,9 +6,25 @@ import java.util.*;
 
 public class COM2POSE_lib
 {
-    Options_intern options_intern;
+    public Options_intern options_intern;
     Logger logger;
 
+    /**
+     * constructor for analysis programms, you cannot run the pipeline here
+     * @param options_intern
+     * @param logger
+     */
+    public COM2POSE_lib(Options_intern options_intern, Logger logger)
+    {
+        this.options_intern = options_intern;
+        this.logger=logger;
+    }
+
+    /**
+     * constructor for the pipeline
+     * @param options_intern
+     * @throws IOException
+     */
     public COM2POSE_lib(Options_intern options_intern) throws IOException {
         this.options_intern = options_intern;
 
@@ -1334,8 +1350,9 @@ public class COM2POSE_lib
 
     /**
      * read config file
+     * @param check_options should options be checked for validity? Should be true if pipeline is run, should be false if analyse programms are run
      */
-    public void read_config_file() throws IOException {
+    public void read_config_file(boolean check_options) throws IOException {
 
         logger.logLine("Start reading config file at "+ options_intern.config_data_path);
 
@@ -1494,18 +1511,22 @@ public class COM2POSE_lib
         }
         br.close();
 
-        boolean all_set = checkOptions();
-        logger.logLine("Check config file parameters for validity");
-        if(!all_set)
+        if(check_options)
         {
-            logger.logLine("Not all REQuired options set. Please set them in config file");
-            logger.logLine("Aborting COM2POSE");
-            System.exit(1);
+            boolean all_set = checkOptions();
+            logger.logLine("Check config file parameters for validity");
+            if(!all_set)
+            {
+                logger.logLine("Not all REQuired options set. Please set them in config file");
+                logger.logLine("Aborting COM2POSE");
+                System.exit(1);
+            }
+            else
+            {
+                logger.logLine("Parameters in config file valid");
+            }
         }
-        else
-        {
-            logger.logLine("Parameters in config file valid");
-        }
+
 
         logger.logLine("Reading config file finished - no errors detected");
 

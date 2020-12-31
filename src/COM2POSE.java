@@ -15,7 +15,7 @@ public class COM2POSE
 
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
-        com2pose_lib.read_config_file();
+        com2pose_lib.read_config_file(true);
 
         //DESeq2
         com2pose_lib.create_DESeq2_scripts();

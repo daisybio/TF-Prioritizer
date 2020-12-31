@@ -19,7 +19,9 @@ public class Options_intern
     /**
      * COM2POSE private options - cannot be set from the outside
      */
-    //TODO: when all functionality is implemented number the outputs in the correct order so it is not confusing anymore!
+
+    public String folder_name_usual_working_dir_name = "working_dir";
+
     public String folder_name_deseq2_preprocessing = "01_DESeq2_preprocessing";
     public String folder_name_deseq2_preprocessing_single = "single";
     public String folder_name_deseq2_preprocessing_combined = "combined";
@@ -160,6 +162,25 @@ public class Options_intern
     //#e.g. 0.1 means it creates a plot of the coefficient range ([-1;1]), it uses all TFs of [-1,-0.1] and [0.1,1]
     //#default: 0.1;0.2;0.3;0.4;0.5;0.6
     public List<Double> plot_th_coefficient= new ArrayList<Double>(Arrays.asList(new Double[]{0.1, 0.2, 0.3, 0.4, 0.5, 0.6}));
+
+
+    /*##################################
+    ####after run analysis parameters###
+    ####################################*/
+    //these parameters are only used in ~/COM2POSE/src/further_analysis_tools/TPM_GC_Filter_Analysis
+    //[REQ]: root-run-directories where all runs are in different folder including a working_dir folder in each folder
+    public String tpm_gc_filter_analysis_working_dir = "";
+    //[REQ]: TF-list file directory
+    public String tpm_gc_filter_analysis_tf_list = "";
+
+    //dir_names
+    public String tpm_gc_filter_analysis_folder_directory_name = "A1_TPM_GC_FILTER_ANALYSIS";
+    public String tpm_gc_filter_analysis_folder_directory_name_data = "01_DATA";
+    public String tpm_gc_filter_analysis_folder_directory_name_RScripts = "02_RScripts";
+    public String tpm_gc_filter_analysis_folder_directory_name_plots = "03_PLOTS";
+
+    public String tpm_gc_filter_analysis_suffix_data = "data.txt";
+
 
 
 }
