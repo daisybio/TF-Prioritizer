@@ -1,4 +1,5 @@
 package com2pose;
+import util.ENSG_ranges_binary_trees;
 import util.Logger;
 import util.Options_intern;
 import java.io.*;
@@ -7,7 +8,7 @@ import java.util.*;
 public class COM2POSE_lib
 {
     public Options_intern options_intern;
-    Logger logger;
+    public Logger logger;
 
     /**
      * constructor for analysis programms, you cannot run the pipeline here
@@ -332,9 +333,9 @@ public class COM2POSE_lib
 
         logger.logLine("[DYNAMITE] finished running DYNAMITE");
     }
-
     /**
      * run integrateData.py and prepareForClassification.R
+     * TODO: check before prepareForClassification for TGen consensus!
      */
     public void preprocess_dynamite() throws Exception {
 
@@ -441,6 +442,565 @@ public class COM2POSE_lib
 
         logger.logLine("[DYNAMITE]: finished preprocessing data for DYNAMITE");
 
+    }
+
+    public void integrate_tgen() throws IOException {
+        logger.logLine("[TGENE] Integrate TGene data into TEPIC data");
+
+
+        logger.logLine("[TGENE] Finished integrating TGene data into TEPIC data");
+
+    }
+
+    public void merge_tgen() throws IOException {
+        logger.logLine("[TGENE] Postprocessing: Merge TGene results");
+
+        File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output);
+        File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_merged);
+        folder_output.mkdir();
+
+        for(File fileDirTP : folder_input.listFiles())
+        {
+            if(fileDirTP.isDirectory())
+            {
+                File output_tp = new File(folder_output.getAbsolutePath()+File.separator+fileDirTP.getName());
+                output_tp.mkdir();
+
+                for(File fileDirTP_HM : fileDirTP.listFiles())
+                {
+                    if(fileDirTP_HM.isDirectory())
+                    {
+                        File output_tp_hm = new File(output_tp.getAbsolutePath()+File.separator+fileDirTP_HM.getName());
+                        output_tp_hm.mkdir();
+
+                        String name_output = fileDirTP_HM.getName() + "_"+ fileDirTP.getName();
+
+
+                        HashMap<String,ArrayList<ENSG_ranges_binary_trees>> tfs_to_regions = new HashMap<>();
+
+                        for(File fileDirTP_HM_Samples:fileDirTP_HM.listFiles())
+                        {
+                            if(fileDirTP_HM_Samples.isDirectory())
+                            {
+                                File input_data = new File(fileDirTP_HM_Samples.getAbsolutePath()+File.separator+options_intern.file_suffix_tgen_output);
+
+                                BufferedReader br = new BufferedReader(new FileReader(input_data));
+                                String line = br.readLine();
+                                while((line=br.readLine())!=null)
+                                {
+                                    if(line.startsWith("#") || line.equals(""))
+                                    {
+                                        continue;
+                                    }
+
+                                    String[] split = line.split("\t");
+
+                                    ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                                    iu.ensgs.add(split[1]);
+
+                                    String[] split_chr = split[6].split(":");
+                                    String[] split_borders = split_chr[1].split("-");
+
+                                    iu.chromosome = split_chr[0];
+                                    iu.left_border=Integer.parseInt(split_borders[0]);
+                                    iu.right_border=Integer.parseInt(split_borders[1]);
+
+                                    if(tfs_to_regions.containsKey(split_chr[0]))
+                                    {
+                                        ArrayList<ENSG_ranges_binary_trees> x = tfs_to_regions.get(split_chr[0]);
+                                        x.add(iu);
+                                        tfs_to_regions.put(split_chr[0],x);
+
+                                    }
+                                    else
+                                    {
+                                        ArrayList<ENSG_ranges_binary_trees> x = new ArrayList<>();
+                                        x.add(iu);
+                                        tfs_to_regions.put(split_chr[0],x);
+                                    }
+                                }
+                            }
+                        }
+
+                        for(String chr: tfs_to_regions.keySet())
+                        {
+                            Collections.sort(tfs_to_regions.get(chr));
+                        }
+
+                        for(String chr: tfs_to_regions.keySet())
+                        {
+                            ArrayList<ENSG_ranges_binary_trees> tf_reg = tfs_to_regions.get(chr);
+
+                            ArrayList<ENSG_ranges_binary_trees> tf_temp = new ArrayList<>();
+                            for(int i = 1; i < tf_reg.size(); i++)
+                            {
+                                //delete all duplicates
+                                ENSG_ranges_binary_trees iu_before = tf_reg.get(i-1);
+                                ENSG_ranges_binary_trees iu_now = tf_reg.get(i);
+
+                                if(iu_before.isTheSame(iu_now))
+                                {
+                                    int temp_i = i+1;
+                                    boolean same = true;
+                                    int count_same = 0;
+                                    while(temp_i < tf_reg.size()&&same)
+                                    {
+                                        same=false;
+
+                                        ENSG_ranges_binary_trees iu_follow = tf_reg.get(temp_i);
+
+                                        if(iu_follow.isTheSame(iu_before))
+                                        {
+                                            same=true;
+                                            count_same++;
+                                        }
+
+                                        temp_i++;
+                                    }
+                                    i=temp_i+1;
+
+
+                                    tf_temp.add(iu_before);
+                                }
+                                else
+                                {
+                                    tf_temp.add(iu_before);
+                                }
+                            }
+                            tfs_to_regions.put(chr,tf_temp);
+                        }
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output_tp_hm.getAbsolutePath()+File.separator+name_output+".txt")));
+                        bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG");
+                        bw.newLine();
+                        for(String chr: tfs_to_regions.keySet())
+                        {
+                            ArrayList<ENSG_ranges_binary_trees> tf_reg = tfs_to_regions.get(chr);
+                            for(ENSG_ranges_binary_trees iu : tf_reg)
+                            {
+                                bw.write(iu.toString());
+                                bw.newLine();
+                            }
+
+                        }
+                        bw.close();
+                    }
+                }
+            }
+        }
+        logger.logLine("[TGENE] Finished merging TGene results");
+    }
+
+    /**
+     * run tgene for all samples
+     */
+    public void run_tgen() throws Exception {
+        logger.logLine("[TGENE] Run TGene");
+
+        String command_base =options_intern.path_tgen+File.separator +"bin"+File.separator+"tgene";
+
+        File output_tgen = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output);
+        output_tgen.mkdir();
+
+        File folder = new File(options_intern.tepic_input_directory);
+        for(File fileDirTP: folder.listFiles())
+        {
+            if(fileDirTP.isDirectory())
+            {
+                File output_tgen_tp = new File(output_tgen.getAbsolutePath()+File.separator+fileDirTP.getName());
+                output_tgen_tp.mkdir();
+
+                for(File fileDirTP_HM : fileDirTP.listFiles())
+                {
+                    if(fileDirTP_HM.isDirectory())
+                    {
+                        File output_tgen_tp_hm = new File(output_tgen_tp.getAbsolutePath()+File.separator+fileDirTP_HM.getName());
+                        output_tgen_tp_hm.mkdir();
+
+                        for(File fileDir_data : fileDirTP_HM.listFiles())
+                        {
+                            if(!fileDir_data.isDirectory())
+                            {
+                                String[] name_split = fileDir_data.getName().split("\\.");
+
+                                File output_tgen_tp_hm_sample = new File(output_tgen_tp_hm+File.separator+name_split[0]);
+                                output_tgen_tp_hm_sample.mkdir();
+
+                                String command_execute = new String(command_base);
+                                command_execute += " " + fileDir_data.getAbsolutePath();
+
+                                File gtf_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_preprocessing+File.separator+options_intern.folder_name_tgen_preprocessing_gtf);
+                                File gtf = new File("");
+
+                                for(File gtf_dirDir : gtf_dir.listFiles())
+                                {
+                                    if(gtf_dirDir.getName().matches(".*"+options_intern.file_suffix_tgen_preprocess_gtf))
+                                    {
+                                        gtf=gtf_dirDir;
+                                        break;
+                                    }
+                                }
+
+                                if(gtf.getName().equals(""))
+                                {
+                                    logger.logLine("[TGENE] could not find preprocessed GTF.");
+                                    System.exit(1);
+                                }
+
+                                command_execute += " " + gtf.getAbsolutePath();
+
+                                command_execute += " -oc " + output_tgen_tp_hm_sample;
+
+                                if(options_intern.tgen_no_closest_locus)
+                                {
+                                    command_execute += " --no-closest-locus";
+                                }
+                                if(options_intern.tgen_no_closest_tss)
+                                {
+                                    command_execute += " --no-closest-tss";
+                                }
+
+                                command_execute+= " --max-link-distances " + options_intern.tgen_max_link_distances;
+                                command_execute+= " --max-pvalue " + options_intern.tgen_pvalue;
+
+                                //now execute TGENE:
+                                logger.logLine("[TGENE] execute TGENE with command line: " + command_execute);
+                                Process child = Runtime.getRuntime().exec(command_execute);
+                                int code = child.waitFor();
+                                switch (code){
+                                    case 0:
+                                        break;
+                                    case 1:
+                                        String message = child.getErrorStream().toString();
+                                        logger.logLine("[TGENE] please check chromosome names in peak file and gtf file - they need to be named the same!");
+                                        throw new Exception(message);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        logger.logLine("[TGENE] Finished TGene");
+    }
+
+    /**
+     * preprocess data for tgen run
+     */
+    public void preprocess_tgen() throws IOException {
+        logger.logLine("[TGENE] Consensus approach with TGen is used. Preprocessing ...");
+
+        //create necessary folders for preprocessing
+        File f_TGEN = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen);
+        f_TGEN.mkdir();
+        File f_TGEN_preprocess = new File(f_TGEN.getAbsolutePath()+File.separator+options_intern.folder_name_tgen_preprocessing);
+        f_TGEN_preprocess.mkdir();
+        File f_TGEN_preprocess_gtf = new File(f_TGEN_preprocess.getAbsolutePath()+File.separator+options_intern.folder_name_tgen_preprocessing_gtf);
+        f_TGEN_preprocess_gtf.mkdir();
+        File f_TGEN_preprocess_binary_trees = new File(f_TGEN_preprocess.getAbsolutePath()+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees);
+        f_TGEN_preprocess_binary_trees.mkdir();
+        File f_TGEN_preprocess_binary_trees_unmerged = new File(f_TGEN_preprocess_binary_trees.getAbsolutePath()+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees_unmerged);
+        f_TGEN_preprocess_binary_trees_unmerged.mkdir();
+        File f_TGEN_preprocess_binary_trees_merged = new File(f_TGEN_preprocess_binary_trees.getAbsolutePath()+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees_merged);
+        f_TGEN_preprocess_binary_trees_merged.mkdir();
+        File f_TGEN_preprocess_binary_trees_sorted = new File(f_TGEN_preprocess_binary_trees.getAbsolutePath()+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees_sorted);
+        f_TGEN_preprocess_binary_trees_sorted.mkdir();
+
+
+        logger.logLine("[TGENE] Preprocessing GTF.");
+        //restructure GTF for TGEN -> only transcript data positions are allowed
+
+        String[] gtf_name_split_dir= options_intern.tepic_gene_annot.split(File.separator);
+        String[] gtf_name_split = gtf_name_split_dir[gtf_name_split_dir.length-1].split("\\.");
+        String gtf_name = "";
+        for(int i = 0; i < gtf_name_split.length-1; i++)
+        {
+            if(i>0)
+            {
+                gtf_name+=".";
+                gtf_name+=gtf_name_split[i];
+            }
+            else
+            {
+                gtf_name+=gtf_name_split[i];
+
+            }
+        }
+
+        BufferedReader br_gtf_transcripts = new BufferedReader(new FileReader(new File(options_intern.tepic_gene_annot)));
+        BufferedWriter bw_gtf_transcripts = new BufferedWriter(new FileWriter(new File(f_TGEN_preprocess_gtf.getAbsolutePath()+File.separator+gtf_name+options_intern.file_suffix_tgen_preprocess_gtf)));
+
+        String line_gtf_transcripts = "";
+        while((line_gtf_transcripts= br_gtf_transcripts.readLine())!=null)
+        {
+            if(line_gtf_transcripts.startsWith("#"))
+            {
+                continue;
+            }
+            String[] split = line_gtf_transcripts.split("\t");
+            if(split[2].equals("transcript"))
+            {
+                if(split[0].matches(".*M.*"))
+                {
+                    String line = options_intern.tgen_mt_writing;
+                    for(int i = 1; i < split.length;i++)
+                    {
+                        line+="\t"+split[i];
+                    }
+                    bw_gtf_transcripts.write(line);
+                    bw_gtf_transcripts.newLine();
+                }
+                else
+                {
+                    if(split[0].matches("chr.*"))
+                    {
+                        bw_gtf_transcripts.write(line_gtf_transcripts.substring(3));
+                        bw_gtf_transcripts.newLine();
+                    }
+                    else
+                    {
+                        bw_gtf_transcripts.write(line_gtf_transcripts);
+                        bw_gtf_transcripts.newLine();
+                    }
+                }
+            }
+
+        }
+        bw_gtf_transcripts.close();
+        br_gtf_transcripts.close();
+
+        logger.logLine("[TGENE] Preprocessing Binary Trees for position to Gen Mapping.");
+
+        BufferedReader br_gtf_bin_tree = new BufferedReader(new FileReader(new File(options_intern.tepic_gene_annot)));
+        BufferedWriter bw_gtf_bin_tree=new BufferedWriter(new FileWriter(new File(f_TGEN_preprocess_binary_trees_unmerged.getAbsolutePath()+File.separator+"test"+".txt")));
+
+        String current_chr="";
+        int count = 0;
+
+        String line_gtf_bin_tree = "";
+        while((line_gtf_bin_tree= br_gtf_bin_tree.readLine())!=null)
+        {
+            if(line_gtf_bin_tree.startsWith("#"))
+            {
+                continue;
+            }
+            String[] split = line_gtf_bin_tree.split("\t");
+            if(split[2].equals("transcript"))
+            {
+                String[] split_line = split[8].split(";");
+
+                String chr = split[0];
+
+                if(!current_chr.equals(chr))
+                {
+                    bw_gtf_bin_tree.close();
+                    count=0;
+                    bw_gtf_bin_tree=new BufferedWriter(new FileWriter(new File(f_TGEN_preprocess_binary_trees_unmerged.getAbsolutePath()+File.separator+chr+".txt")));
+                    bw_gtf_bin_tree.write("#\tPOS_START\tPOS_END\tENSG\n");
+                    current_chr=chr;
+                }
+
+                String ensg = "";
+                String start_pos = split[3];
+                String end_pos = split[4];
+
+                for(int i = 0; i < split_line.length; i++)
+                {
+                    if(split_line[i].startsWith("gene_id"))
+                    {
+                        String[] split_x = split_line[i].split("\"");
+                        ensg=split_x[1].substring(0,split_x[1].length()).split("\\.")[0];
+                        break;
+                    }
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(count);
+                sb.append("\t");
+                sb.append(start_pos);
+                sb.append("\t");
+                sb.append(end_pos);
+                sb.append("\t");
+                sb.append(ensg);
+
+                bw_gtf_bin_tree.write(sb.toString());
+                bw_gtf_bin_tree.newLine();
+
+                count++;
+            }
+
+        }
+        bw_gtf_bin_tree.close();
+        br_gtf_bin_tree.close();
+
+        //binary tree merge overlappings
+
+        ArrayList<ENSG_ranges_binary_trees> unmerged_intervalls = new ArrayList<>();
+
+        for(File fileDir: f_TGEN_preprocess_binary_trees_unmerged.listFiles())
+        {
+            if(!fileDir.isDirectory()&&!fileDir.getName().equals("test.txt"))
+            {
+                BufferedReader br = new BufferedReader(new FileReader(fileDir));
+                String line = br.readLine();
+                while((line=br.readLine())!=null)
+                {
+                    String[] split = line.split("\t");
+
+                    ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                    iu.number=Integer.parseInt(split[0]);
+                    iu.left_border=Integer.parseInt(split[1]);
+                    iu.right_border=Integer.parseInt(split[2]);
+                    iu.ensgs.add(split[3]);
+
+                    unmerged_intervalls.add(iu);
+                }
+                br.close();
+
+                Collections.sort(unmerged_intervalls);
+
+                ArrayList<ENSG_ranges_binary_trees> unmerged_intervalls_temp_list = new ArrayList<>();
+                //merge intervalls with same ENSG list!
+                int count_same_ENSG = 0;
+                boolean last_one_merged=false;
+                for(int i = 1; i < unmerged_intervalls.size();i++)
+                {
+                    ENSG_ranges_binary_trees iu_before = unmerged_intervalls.get(i-1);
+                    ENSG_ranges_binary_trees iu_now = unmerged_intervalls.get(i);
+
+                    HashSet<String> ensgs_before = iu_before.ensgs;
+                    HashSet<String> ensgs_now = iu_now.ensgs;
+
+                    boolean all_in = true;
+
+                    for(String s: ensgs_before)
+                    {
+                        if(!ensgs_now.contains(s))
+                        {
+                            all_in=false;
+                        }
+                    }
+                    for(String s: ensgs_now)
+                    {
+                        if(!ensgs_before.contains(s))
+                        {
+                            all_in=false;
+                        }
+                    }
+
+                    if(all_in)
+                    {
+                        //now merge!
+
+                        //look for further intervalls with same ensg
+                        boolean found_furthers = true;
+                        int counter_further = 0;
+                        int temp_i = i;
+                        while(found_furthers && temp_i < unmerged_intervalls.size())
+                        {
+                            found_furthers=false;
+
+                            HashSet<String> ensgs_further = unmerged_intervalls.get(temp_i).ensgs;
+
+
+                            boolean all_in_further = true;
+
+                            for(String s: ensgs_further)
+                            {
+                                if(!ensgs_before.contains(s))
+                                {
+                                    all_in_further=false;
+                                }
+                            }
+
+                            for(String s: ensgs_before)
+                            {
+                                if(!ensgs_further.contains(s))
+                                {
+                                    all_in_further=false;
+                                }
+                            }
+
+                            if(all_in_further)
+                            {
+                                found_furthers=true;
+                                iu_now=unmerged_intervalls.get(temp_i);
+                            }
+                            else
+                            {
+                                found_furthers=false;
+                                break;
+                            }
+
+                            if(all_in_further&&temp_i==unmerged_intervalls.size()-1)
+                            {
+                                last_one_merged=true;
+                            }
+
+
+                            counter_further++;
+                            temp_i++;
+                        }
+                        i+=counter_further+1;
+
+
+                        ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                        iu.number=count_same_ENSG;
+                        iu.ensgs = new HashSet<>(ensgs_before);
+                        iu.left_border=iu_before.left_border;
+                        iu.right_border=iu_now.right_border;
+
+                        unmerged_intervalls_temp_list.add(iu);
+
+                        count_same_ENSG++;
+                    }
+                    else
+                    {
+                        iu_before.number=count_same_ENSG;
+                        unmerged_intervalls_temp_list.add(iu_before);
+                        count_same_ENSG++;
+                    }
+                }
+
+                if(!last_one_merged)
+                {
+                    ENSG_ranges_binary_trees iu = unmerged_intervalls.get(unmerged_intervalls.size()-1);
+                    iu.number=unmerged_intervalls_temp_list.size();
+                    unmerged_intervalls_temp_list.add(iu);
+                }
+
+                unmerged_intervalls.clear();
+                unmerged_intervalls = new ArrayList<>(unmerged_intervalls_temp_list);
+                unmerged_intervalls_temp_list.clear();
+
+                //re calculate borders
+
+                unmerged_intervalls.get(0).left_border=0;
+
+                Collections.sort(unmerged_intervalls);
+
+                BufferedWriter bw = new BufferedWriter(new FileWriter(new File(f_TGEN_preprocess_binary_trees_merged+File.separator+fileDir.getName())));
+                bw.write("#\tPOS_START\tPOS_END\tENSG\n");
+                for(int i = 1; i < unmerged_intervalls.size(); i++)
+                {
+                    ENSG_ranges_binary_trees iu = unmerged_intervalls.get(i);
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(iu.number);
+                    sb.append("\t");
+                    sb.append(iu.left_border);
+                    sb.append("\t");
+                    sb.append(iu.right_border);
+                    sb.append("\t");
+                    sb.append(iu.ensgs_to_String());
+
+                    bw.write(sb.toString());
+                    bw.newLine();
+
+                }
+                bw.close();
+            }
+        }
+
+        logger.logLine("[TGENE] Finished preprocessing.");
     }
 
     /**
@@ -795,7 +1355,6 @@ public class COM2POSE_lib
         }
         logger.logLine("Finished postprocessing of TEPIC output");
     }
-
 
     /**
      * creates the TEPIC command lines and runs all samples of all histone modification and all timepoints
@@ -1459,6 +2018,21 @@ public class COM2POSE_lib
                 case "tepic_ensg_symbol":
                     options_intern.tepic_ensg_symbol=split[1].substring(1,split[1].length()-1);
                     break;
+                case "tgen_no_closest_locus":
+                    options_intern.tgen_no_closest_locus=Boolean.parseBoolean(split[1]);
+                    break;
+                case "tgen_no_closest_tss":
+                    options_intern.tgen_no_closest_tss=Boolean.parseBoolean(split[1]);
+                    break;
+                case "tgen_max_link_distances":
+                    options_intern.tgen_max_link_distances=Integer.parseInt(split[1]);
+                    break;
+                case "tgen_pvalue":
+                    options_intern.tgen_pvalue=Double.parseDouble(split[1]);
+                    break;
+                case "tgen_mt_writing":
+                    options_intern.tgen_mt_writing=split[1].substring(1,split[1].length()-1);
+                    break;
                 case "dynamite_preprocessing_integrate_data_geneIDs":
                     options_intern.dynamite_preprocessing_integrate_data_geneIDs=Integer.parseInt(split[1]);
                     break;
@@ -1589,6 +2163,22 @@ public class COM2POSE_lib
                 all_set=false;
             }
         }
+
+        if(options_intern.tepic_gene_annot.equals(""))
+        {
+            logger.logLine("[TEPIC] Gene annotation path is not given");
+            all_set=false;
+        }
+        else
+        {
+            File f = new File(options_intern.tepic_gene_annot);
+            if(!f.exists())
+            {
+                logger.logLine("[TEPIC] Gene annotation path does not exist!");
+                all_set=false;
+            }
+        }
+
         if(options_intern.tepic_input_directory.equals(""))
         {
             logger.logLine("[TEPIC] nfcore ChIP-seq data directory is not given");
@@ -1695,7 +2285,24 @@ public class COM2POSE_lib
             }
         }
 
+        /**
+         * TGEN options
+         */
+        if(!options_intern.path_tgen.equals(""))
+        {
+            File file_tgen = new File(options_intern.path_tgen);
+            if(!file_tgen.exists() || !file_tgen.isDirectory())
+            {
+                logger.logLine("[TGENE] TGen file directory does not exist or is not a directory!");
+                System.exit(1);
+            }
 
+            if(options_intern.tgen_mt_writing.equals(""))
+            {
+                logger.logLine("Please specify spelling of Mitochondrial DNA, e.g. M or MT (default: MT)");
+                System.exit(1);
+            }
+        }
 
         /**
          * DYNAMITE OPTIONS
@@ -1759,6 +2366,5 @@ public class COM2POSE_lib
         }
         return groups;
     }
-
 
 }

@@ -4,6 +4,7 @@ import org.apache.commons.cli.*;
 
 import util.Options_intern;
 
+import java.io.File;
 import java.io.IOException;
 
 public class COM2POSE
@@ -18,19 +19,29 @@ public class COM2POSE
         com2pose_lib.read_config_file(true);
 
         //DESeq2
-        com2pose_lib.create_DESeq2_scripts();
-        com2pose_lib.run_and_postprocess_DESeq2();
+        //com2pose_lib.create_DESeq2_scripts();
+        //com2pose_lib.run_and_postprocess_DESeq2();
 
         //TEPIC
-        com2pose_lib.run_tepic();
-        com2pose_lib.postprocess_tepic_output();
+        //com2pose_lib.run_tepic();
+        //com2pose_lib.postprocess_tepic_output();
+
+        //TGen
+        if(!options_intern.path_tgen.equals(""))
+        {
+            //com2pose_lib.preprocess_tgen();
+            //com2pose_lib.run_tgen();
+            //com2pose_lib.merge_tgen();
+            com2pose_lib.integrate_tgen();
+        }
+
 
         //DYNAMITE
-        com2pose_lib.preprocess_dynamite();
-        com2pose_lib.run_DYNAMITE();
+        //com2pose_lib.preprocess_dynamite();
+        //com2pose_lib.run_DYNAMITE();
 
         //PLOTS
-        com2pose_lib.create_tp_plots();
+        //com2pose_lib.create_tp_plots();
 
 
         System.out.println("X");
@@ -52,8 +63,12 @@ public class COM2POSE
         opt_path_to_COM2POSE.setRequired(true);
         options.addOption(opt_path_to_COM2POSE);
 
+        Option opt_tgen = new Option("t","tgen-dir", true, "[OPT]: use a consensus approach of TGen and TEPIC, provide directory to MEME suite installation folder here");
+        options.addOption(opt_tgen);
+
         Option opt_write_logfile = new Option("l","write-log-file",false,"[OPT]: if flag is set no logfile will be written, default: logfile will be written");
         options.addOption(opt_write_logfile);
+
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -69,7 +84,10 @@ public class COM2POSE
             options_intern.com2pose_working_directory=cmd.getOptionValue("working-directory");
             options_intern.path_to_COM2POSE=cmd.getOptionValue("path-com2pose");
 
-
+            if(cmd.hasOption("tgen-dir"))
+            {
+                options_intern.path_tgen=cmd.getOptionValue("tgen-dir");
+            }
 
             if(cmd.hasOption("write-log-file"))
             {
@@ -78,8 +96,7 @@ public class COM2POSE
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("-c <com2pose-config> -w <working-directory> -p <path-com2pose> [-l]",options);
-            //formatter.printHelp("-i <input-dir-peaks> -g <input-reference-genome> -a <input-gene-annotation> -o <output-directory> [-w <window-size] [-c <cores>] [-s]", options);
+            formatter.printHelp("-c <com2pose-config> -w <working-directory> -p <path-com2pose> [-t <tgen-dir>] [-l]",options);
             System.exit(1);
         }
     }

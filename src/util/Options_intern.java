@@ -14,6 +14,8 @@ public class Options_intern
     public String com2pose_working_directory="";
     public String path_to_COM2POSE = "";
 
+    public String path_tgen = "";
+
     public boolean write_to_logfile = true;
 
     /**
@@ -34,6 +36,15 @@ public class Options_intern
     public String folder_name_tepic_postprocessing_output = "output";
     public String folder_name_tepic_postprocessing_output_mean_affinities= "MeanAffinities";
     public String folder_name_tepic_postprocessing_output_ratios = "Ratios";
+    public String folder_name_tgen = "06_TGENE";
+    public String folder_name_tgen_preprocessing = "01_preprocessing";
+    public String folder_name_tgen_preprocessing_gtf = "01_GTF";
+    public String folder_name_tgen_preprocessing_binary_trees = "02_BINARY_TREES";
+    public String folder_name_tgen_preprocessing_binary_trees_unmerged = "unmerged";
+    public String folder_name_tgen_preprocessing_binary_trees_merged = "merged";
+    public String folder_name_tgen_preprocessing_binary_trees_sorted = "sorted";
+    public String folder_name_tgen_output = "02_output";
+    public String folder_name_tgen_merged = "03_merged";
     public String folder_output_preprocessing_DYNAMITE = "07_DYNAMITE_preprocessing";
     public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
     public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
@@ -45,6 +56,8 @@ public class Options_intern
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_postprocessing_output_mean_affinities ="Mean_Affinities_";
     public String file_suffix_tepic_postprocessing_output_ratios ="Ratio_Affinities_";
+    public String file_suffix_tgen_preprocess_gtf = "_transcripts_only.gtf";
+    public String file_suffix_tgen_output = "links.tsv";
     public String file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff= "Integrated_Data_Log2_Quotient.txt";
     public String file_suffix_output_preprocessing_DYNAMITE_prepClass ="Integrated_Data_For_Classification.txt";
     public String file_suffix_dynamite_output_to_be_plotted = "Regression_Coefficients_Entire_Data_Set_Integrated_Data_For_Classification.txt";
@@ -125,7 +138,21 @@ public class Options_intern
     //#[OPT]: path to input file ensg to gene symbol file, required for TPM filter
     public String tepic_ensg_symbol="";
 
-   /*######################
+    /*######################
+    ####TGEN parameters###
+    ######################*/
+    //#[OPT]: if no locus is found within window size, the nearest locus is used, default:true
+    public boolean tgen_no_closest_locus=true;
+    //#[OPT]: if no tss is found within window size, the nearest locus is used, default:true
+    public boolean tgen_no_closest_tss=true;
+    //#[OPT]: window size of tgen
+    public int tgen_max_link_distances=50000;
+    //#[OPT]: max pvalue, which is accepted
+    public double tgen_pvalue=0.05;
+    //#[OPT]: if TGENE consensus is used please specify the writing of the Mitochondrial DNA chromosome in Peak Files, default: MT
+    public String tgen_mt_writing="MT";
+
+    /*######################
      ##DYNAMITE parameters#
      ######################*/
    //####preprocessing####
