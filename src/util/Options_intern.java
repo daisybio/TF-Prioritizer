@@ -45,8 +45,10 @@ public class Options_intern
     public String folder_name_tgen_preprocessing_binary_trees_sorted = "sorted";
     public String folder_name_tgen_output = "02_output";
     public String folder_name_tgen_merged = "03_merged";
+    public String folder_name_tgen_groups = "04_groups";
     public String folder_output_preprocessing_DYNAMITE = "07_DYNAMITE_preprocessing";
     public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
+    public String folder_output_preprocessing_DYNAMITE_integrateData_integrate_TGENE = "integrated_TGENE";
     public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
     public String folder_out_put_DYNAMITE = "08_DYNAMITE_output";
     public String folder_plots = "09_PLOTS_output";
@@ -58,6 +60,7 @@ public class Options_intern
     public String file_suffix_tepic_postprocessing_output_ratios ="Ratio_Affinities_";
     public String file_suffix_tgen_preprocess_gtf = "_transcripts_only.gtf";
     public String file_suffix_tgen_output = "links.tsv";
+    public String file_suffic_tgen_output_groups = "tgene_merged_groups.txt";
     public String file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff= "Integrated_Data_Log2_Quotient.txt";
     public String file_suffix_output_preprocessing_DYNAMITE_prepClass ="Integrated_Data_For_Classification.txt";
     public String file_suffix_dynamite_output_to_be_plotted = "Regression_Coefficients_Entire_Data_Set_Integrated_Data_For_Classification.txt";
@@ -141,6 +144,8 @@ public class Options_intern
     /*######################
     ####TGEN parameters###
     ######################*/
+    //#[REQ]: value for consus approach (e.g. 0.5 = 50:50 TGene:TEPIC, 0.4 = 40:60 TGene:TEPIC), default: 0.5
+    public double tgen_consensus=0.5;
     //#[OPT]: if no locus is found within window size, the nearest locus is used, default:true
     public boolean tgen_no_closest_locus=true;
     //#[OPT]: if no tss is found within window size, the nearest locus is used, default:true

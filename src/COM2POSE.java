@@ -32,12 +32,13 @@ public class COM2POSE
             //com2pose_lib.preprocess_tgen();
             //com2pose_lib.run_tgen();
             //com2pose_lib.merge_tgen();
-            com2pose_lib.integrate_tgen();
+            //com2pose_lib.create_tgen_groups();
+
         }
 
 
         //DYNAMITE
-        //com2pose_lib.preprocess_dynamite();
+        com2pose_lib.preprocess_dynamite();
         //com2pose_lib.run_DYNAMITE();
 
         //PLOTS

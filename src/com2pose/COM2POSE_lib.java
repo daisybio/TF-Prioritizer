@@ -1,8 +1,8 @@
 package com2pose;
-import util.ENSG_ranges_binary_trees;
-import util.Logger;
-import util.Options_intern;
+import util.*;
+
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class COM2POSE_lib
@@ -279,7 +279,17 @@ public class COM2POSE_lib
 
         String command_base = "Rscript " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"DYNAMITE.R";
 
-        File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_output_preprocessing_DYNAMITE+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_prepareClass);
+        File folder_input;
+
+        if(options_intern.path_tgen.equals(""))
+        {
+            folder_input=new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_output_preprocessing_DYNAMITE+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_prepareClass);
+        }
+        else
+        {
+            folder_input=new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_output_preprocessing_DYNAMITE+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_integrateData_integrate_TGENE);
+        }
+
         File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_put_DYNAMITE);
         folder_output.mkdir();
 
@@ -335,7 +345,6 @@ public class COM2POSE_lib
     }
     /**
      * run integrateData.py and prepareForClassification.R
-     * TODO: check before prepareForClassification for TGen consensus!
      */
     public void preprocess_dynamite() throws Exception {
 
@@ -403,6 +412,13 @@ public class COM2POSE_lib
             }
         }
 
+        if(!options_intern.path_tgen.equals(""))
+        {
+            folder_output = new File(folder_output_pre.getAbsolutePath()+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_integrateData_integrate_TGENE);
+            folder_output.mkdir();
+            integrate_tgen(folder_output);
+        }
+
         File folder_output_classification = new File(folder_output_pre+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_prepareClass);
         folder_output_classification.mkdir();
 
@@ -444,14 +460,228 @@ public class COM2POSE_lib
 
     }
 
-    public void integrate_tgen() throws IOException {
-        logger.logLine("[TGENE] Integrate TGene data into TEPIC data");
+    /**
+     * creates TGENE group clash so it can be merged into TEPIC
+     */
+    public void create_tgen_groups() throws IOException {
+        logger.logLine("[TGENE] Create TGene groupe data");
+
+        File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_merged);
+        File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_groups);
+        folder_output.mkdir();
+
+        //create necessary folder structure -> TEMPLATE: postprocess TEPIC
+        File folder_tepic_postprocess = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+        for(File firDir:folder_tepic_postprocess.listFiles())
+        {
+            if(firDir.isDirectory())
+            {
+                File folder_output_hm = new File(folder_output.getAbsolutePath()+File.separator+firDir.getName());
+                folder_output_hm.mkdir();
+                for(File fileDirHM: firDir.listFiles())
+                {
+                    if(fileDirHM.isDirectory())
+                    {
+                        File folder_output_HM_group= new File(folder_output_hm.getAbsolutePath()+File.separator+fileDirHM.getName());
+                        folder_output_HM_group.mkdir();
+                    }
+                }
+            }
+        }
+
+        //based on structure build necessary files
+        for(File folderDirHM:folder_output.listFiles())
+        {
+            if(folderDirHM.isDirectory())
+            {
+                String hm = folderDirHM.getName();
+                for(File folderDirHM_Group : folderDirHM.listFiles())
+                {
+
+                    if(folderDirHM_Group.isDirectory())
+                    {
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folderDirHM_Group.getAbsolutePath()+File.separator+options_intern.file_suffic_tgen_output_groups)));
+                        bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSGS");
+                        bw.newLine();
+
+                        String[] split_name = folderDirHM_Group.getName().split("_");
+                        String group1 = split_name[0];
+                        String group2 = split_name[1];
+
+                        File input_group1 = new File(folder_input.getAbsolutePath()+File.separator+group1+File.separator+hm+File.separator+hm+"_"+group1+".txt");
+                        File input_group2 = new File(folder_input.getAbsolutePath()+File.separator+group2+File.separator+hm+File.separator+hm+"_"+group2+".txt");
+
+                        HashMap<String,ArrayList<ENSG_ranges_binary_trees>> chr_unmerged_ius = new HashMap<>();
+
+                        BufferedReader br_group1 = new BufferedReader(new FileReader(input_group1));
+                        String line_group1 = br_group1.readLine();
+                        while((line_group1=br_group1.readLine())!=null)
+                        {
+                            String[] split_group1 = line_group1.split("\t");
+                            String chr = split_group1[0];
+                            int left_border = Integer.parseInt(split_group1[1]);
+                            int right_border = Integer.parseInt(split_group1[2]);
+                            String ensg = split_group1[3].toUpperCase();
+
+                            ArrayList<ENSG_ranges_binary_trees> current_arr_chr;
+                            if(chr_unmerged_ius.containsKey(chr))
+                            {
+                                current_arr_chr = chr_unmerged_ius.get(chr);
+                            }
+                            else
+                            {
+                                current_arr_chr = new ArrayList<>();
+                            }
+
+                            ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                            iu.chromosome=chr;
+                            iu.ensgs.add(ensg);
+                            iu.left_border=left_border;
+                            iu.right_border=right_border;
+
+                            current_arr_chr.add(iu);
+                            chr_unmerged_ius.put(chr,current_arr_chr);
+                        }
+                        br_group1.close();
+
+                        BufferedReader br_group2 = new BufferedReader(new FileReader(input_group2));
+                        String line_group2 = br_group2.readLine();
+                        while((line_group2=br_group2.readLine())!=null)
+                        {
+                            String[] split_group2 = line_group2.split("\t");
+                            String chr = split_group2[0];
+                            int left_border = Integer.parseInt(split_group2[1]);
+                            int right_border = Integer.parseInt(split_group2[2]);
+                            String ensg = split_group2[3].toUpperCase();
+
+                            ArrayList<ENSG_ranges_binary_trees> current_arr_chr;
+                            if(chr_unmerged_ius.containsKey(chr))
+                            {
+                                current_arr_chr = chr_unmerged_ius.get(chr);
+                            }
+                            else
+                            {
+                                current_arr_chr = new ArrayList<>();
+                            }
+
+                            ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                            iu.chromosome=chr;
+                            iu.ensgs.add(ensg);
+                            iu.left_border=left_border;
+                            iu.right_border=right_border;
+
+                            current_arr_chr.add(iu);
+                            chr_unmerged_ius.put(chr,current_arr_chr);
+                        }
+                        br_group2.close();
+
+                        //sort all arrays
+                        for(String s : chr_unmerged_ius.keySet())
+                        {
+                            ArrayList<ENSG_ranges_binary_trees> x = chr_unmerged_ius.get(s);
+                            Collections.sort(x);
+                            chr_unmerged_ius.put(s,x);
+                        }
 
 
-        logger.logLine("[TGENE] Finished integrating TGene data into TEPIC data");
+                        //remove duplicates or integrate ensgs if in overlap
+                        for(String chr:chr_unmerged_ius.keySet())
+                        {
+                            ArrayList<ENSG_ranges_binary_trees> unmerged = chr_unmerged_ius.get(chr);
 
+                            ArrayList<ENSG_ranges_binary_trees> unmerged_temp = new ArrayList<>();
+
+                            for(int i = 1; i < unmerged.size();i++)
+                            {
+                                ENSG_ranges_binary_trees iu_before = unmerged.get(i-1);
+                                ENSG_ranges_binary_trees iu_after = unmerged.get(i);
+
+                                if(iu_before.isTheSame(iu_after))
+                                {
+                                    unmerged_temp.add(iu_before);
+                                    i++;
+                                }
+                                else
+                                {
+                                    unmerged_temp.add(iu_before);
+                                }
+                            }
+
+                            unmerged = new ArrayList<>(unmerged_temp);
+                            unmerged_temp.clear();
+
+                            //check for same_ranges but not same ENSGs and merge them
+                            for(int i = 1; i < unmerged.size();i++)
+                            {
+                                ENSG_ranges_binary_trees iu_before = unmerged.get(i-1);
+                                ENSG_ranges_binary_trees iu_after = unmerged.get(i);
+
+                                if(iu_before.isSameRange(iu_after))
+                                {
+                                    for(String s : iu_after.ensgs)
+                                    {
+                                        iu_before.ensgs.add(s);
+                                    }
+                                    unmerged_temp.add(iu_before);
+
+                                    i++;
+                                }
+                                else
+                                {
+                                    unmerged_temp.add(iu_before);
+                                }
+                            }
+
+                            unmerged=new ArrayList<>(unmerged_temp);
+                            unmerged_temp.clear();
+
+                            /*
+                            boolean something_changed = true;
+                            while(something_changed)
+                            {
+                                something_changed=false;
+                                //check for overlaps and if so join them
+                                for(int i = 1; i < unmerged.size();i++)
+                                {
+                                    ENSG_ranges_binary_trees iu_before = unmerged.get(i - 1);
+                                    ENSG_ranges_binary_trees iu_after = unmerged.get(i);
+
+                                    if(iu_before.isOverLap(iu_after))
+                                    {
+                                        iu_before.right_border=iu_after.right_border;
+                                        for(String s : iu_after.ensgs)
+                                        {
+                                            iu_before.ensgs.add(s);
+                                        }
+                                        something_changed=true;
+                                        i++;
+                                    }
+                                    else
+                                    {
+                                        unmerged_temp.add(iu_before);
+                                    }
+                                }
+                                unmerged=new ArrayList<>(unmerged_temp);
+                                unmerged_temp.clear();
+                            }*/
+
+                            for(int i = 0; i < unmerged.size(); i++)
+                            {
+                                bw.write(unmerged.get(i).toString());
+                                bw.newLine();
+                            }
+                        }
+                        bw.close();
+                    }
+                }
+            }
+        }
+        logger.logLine("[TGENE] Finished creating TGene group data");
     }
 
+    /**
+     * merge different samples of one timepoint of TGENE
+     */
     public void merge_tgen() throws IOException {
         logger.logLine("[TGENE] Postprocessing: Merge TGene results");
 
@@ -704,7 +934,6 @@ public class COM2POSE_lib
         f_TGEN_preprocess_binary_trees_merged.mkdir();
         File f_TGEN_preprocess_binary_trees_sorted = new File(f_TGEN_preprocess_binary_trees.getAbsolutePath()+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees_sorted);
         f_TGEN_preprocess_binary_trees_sorted.mkdir();
-
 
         logger.logLine("[TGENE] Preprocessing GTF.");
         //restructure GTF for TGEN -> only transcript data positions are allowed
@@ -999,6 +1228,69 @@ public class COM2POSE_lib
                 bw.close();
             }
         }
+
+        //sort for binary tree implementation
+
+        logger.logLine("[TGENE] Preparing chromosomes for binary search.");
+
+        for(File fileDir: f_TGEN_preprocess_binary_trees_merged.listFiles())
+        {
+            if(!fileDir.isDirectory())
+            {
+
+                ArrayList<ENSG_ranges_binary_trees> regions = new ArrayList<>();
+
+                BufferedReader br = new BufferedReader(new FileReader(fileDir));
+                String header = br.readLine();
+                String line = "";
+
+                while((line= br.readLine())!=null)
+                {
+                    String[] split = line.split("\t");
+                    ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                    iu.number = Integer.parseInt(split[0]);
+                    iu.left_border = Integer.parseInt(split[1]);
+                    iu.right_border = Integer.parseInt(split[2]);
+                    iu.ensgs.addAll(Arrays.asList(split[3].split(";")));
+
+                    regions.add(iu);
+                }
+                br.close();
+
+                ArrayList<ENSG_ranges_binary_trees> newly_ordered = new ArrayList<>();
+
+                ENSG_ranges_binary_trees median = regions.get(regions.size()/2);
+                newly_ordered.add(median);
+
+                ArrayList<ENSG_ranges_binary_trees> region_left=new ArrayList<>();
+                for(int i = 0; i < regions.size()/2; i++)
+                {
+                    region_left.add(regions.get(i));
+                }
+
+                ArrayList<ENSG_ranges_binary_trees> region_right=new ArrayList<>();
+                for(int i = regions.size()/2+1; i < regions.size(); i++)
+                {
+                    region_right.add(regions.get(i));
+                }
+
+                newly_ordered = recursive_split(region_left,newly_ordered);
+                newly_ordered = recursive_split(region_right,newly_ordered);
+
+                BufferedWriter bw = new BufferedWriter(new FileWriter(f_TGEN_preprocess_binary_trees_sorted.getAbsolutePath()+File.separator+fileDir.getName()));
+                bw.write(header);
+                bw.newLine();
+
+                for(int i = 0; i < newly_ordered.size();i++)
+                {
+                    bw.write(newly_ordered.get(i).toString_binary());
+                    bw.newLine();
+                }
+
+                bw.close();
+            }
+        }
+
 
         logger.logLine("[TGENE] Finished preprocessing.");
     }
@@ -2018,6 +2310,9 @@ public class COM2POSE_lib
                 case "tepic_ensg_symbol":
                     options_intern.tepic_ensg_symbol=split[1].substring(1,split[1].length()-1);
                     break;
+                case "tgen_consensus":
+                    options_intern.tgen_consensus=Double.parseDouble(split[1]);
+                    break;
                 case "tgen_no_closest_locus":
                     options_intern.tgen_no_closest_locus=Boolean.parseBoolean(split[1]);
                     break;
@@ -2293,14 +2588,28 @@ public class COM2POSE_lib
             File file_tgen = new File(options_intern.path_tgen);
             if(!file_tgen.exists() || !file_tgen.isDirectory())
             {
-                logger.logLine("[TGENE] TGen file directory does not exist or is not a directory!");
-                System.exit(1);
+                logger.logLine("[TGENE] TGene file directory does not exist or is not a directory!");
+
+                File tgene_dir = new File(options_intern.path_tgen+File.separator+"bin");
+
+                if(!tgene_dir.exists())
+                {
+                    logger.logLine("[TGENE] TGene binary directory cannot be found: " + tgene_dir.getAbsolutePath());
+                    all_set=false;
+                }
+
+                all_set=false;
             }
 
             if(options_intern.tgen_mt_writing.equals(""))
             {
-                logger.logLine("Please specify spelling of Mitochondrial DNA, e.g. M or MT (default: MT)");
-                System.exit(1);
+                logger.logLine("[TGENE] Please specify spelling of Mitochondrial DNA, e.g. M or MT (default: MT)");
+                all_set=false;
+            }
+
+            if(options_intern.tgen_consensus==0.0)
+            {
+                logger.logLine("[TGENE] tgen_consensus must be in range ]0.0,1.0], it cannot be 0.0, if you do not want to use consensus set path_tgen=\"\"");
             }
         }
 
@@ -2365,6 +2674,247 @@ public class COM2POSE_lib
             }
         }
         return groups;
+    }
+
+    /**
+     * TGENE preprocessing - creates binary friendly files of chromosomes
+     */
+    private  ArrayList<ENSG_ranges_binary_trees> recursive_split(ArrayList<ENSG_ranges_binary_trees> region, ArrayList<ENSG_ranges_binary_trees> newly_ordered)
+    {
+        if(region.size()>0)
+        {
+            ENSG_ranges_binary_trees median = region.get(region.size()/2);
+            newly_ordered.add(median);
+
+            ArrayList<ENSG_ranges_binary_trees> region_left=new ArrayList<>();
+            for(int i = 0; i < region.size()/2; i++)
+            {
+                region_left.add(region.get(i));
+            }
+            ArrayList<ENSG_ranges_binary_trees> region_right=new ArrayList<>();
+            for(int i = region.size()/2+1; i < region.size(); i++)
+            {
+                region_right.add(region.get(i));
+            }
+
+            recursive_split(region_left,newly_ordered);
+            recursive_split(region_right,newly_ordered);
+
+        }
+        return newly_ordered;
+    }
+
+    /**
+     * integrates TGene and TEPIC data into one quotient file so DYNAMITE can use it.
+     */
+    private void integrate_tgen(File folder_output) throws IOException {
+        logger.logLine("[TGENE] Integrate TGene data into TEPIC data");
+
+        //create necessary folder structure -> TEMPLATE: postprocess TEPIC
+        File folder_tepic_postprocess = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+        for(File firDir:folder_tepic_postprocess.listFiles())
+        {
+            if(firDir.isDirectory())
+            {
+                File folder_output_hm = new File(folder_output.getAbsolutePath()+File.separator+firDir.getName());
+                folder_output_hm.mkdir();
+                for(File fileDirHM: firDir.listFiles())
+                {
+                    if(fileDirHM.isDirectory())
+                    {
+                        File folder_output_HM_group= new File(folder_output_hm.getAbsolutePath()+File.separator+fileDirHM.getName());
+                        folder_output_HM_group.mkdir();
+                    }
+                }
+            }
+        }
+
+
+        //integrate data between TEPIC and TGENE (modifying quotients)
+        //based on structure build necessary files
+        for(File folderDirHM:folder_output.listFiles())
+        {
+            if (folderDirHM.isDirectory())
+            {
+                String hm = folderDirHM.getName();
+                for (File folderDirHM_Group : folderDirHM.listFiles())
+                {
+
+                    if (folderDirHM_Group.isDirectory())
+                    {
+                        logger.logLine("[TGENE] integrate " + hm +": " + folderDirHM_Group.getName());
+
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folderDirHM_Group.getAbsolutePath() + File.separator + options_intern.file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff)));
+
+                        File input_data_TGENE = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_groups+File.separator+hm+File.separator+folderDirHM_Group.getName()+File.separator+options_intern.file_suffic_tgen_output_groups);
+                        File input_data_TEPIC = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_output_preprocessing_DYNAMITE+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_integrateData+File.separator+hm+File.separator+folderDirHM_Group.getName()+File.separator+options_intern.file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff);
+
+                        File input_map_position_ensg = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_preprocessing+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees_sorted);
+
+                        HashMap<String,ArrayList<ENSG_ranges_binary_trees>> regions = new HashMap<>();
+
+                        HashMap<String, ENSG_binary_tree> chr_binary_tree = new HashMap<>();
+
+                        for(File chr : input_map_position_ensg.listFiles())
+                        {
+                            ArrayList<ENSG_ranges_binary_trees> chr_region_list = new ArrayList<>();
+
+                            BufferedReader br = new BufferedReader(new FileReader(chr));
+                            String line = br.readLine();
+                            while((line=br.readLine())!=null)
+                            {
+                                String[] split = line.split("\t");
+
+                                ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                                iu.chromosome=chr.getName();
+                                iu.number = Integer.parseInt(split[0]);
+                                iu.left_border=Integer.parseInt(split[1]);
+                                iu.right_border=Integer.parseInt(split[2]);
+                                iu.ensgs.addAll(Arrays.asList(split[3].split(";")));
+
+                                chr_region_list.add(iu);
+
+                            }
+                            br.close();
+
+                            regions.put(chr.getName(),chr_region_list);
+                        }
+
+                        for(String chr : regions.keySet())
+                        {
+                            ArrayList<ENSG_ranges_binary_trees> current_regions = regions.get(chr);
+
+                            ENSG_binary_tree_node root = new ENSG_binary_tree_node(current_regions.get(0),current_regions.get(0).number);
+                            ENSG_binary_tree bin_tree = new ENSG_binary_tree(root);
+
+                            for(int i = 1; i < current_regions.size();i++)
+                            {
+                                bin_tree.add(current_regions.get(i).number,current_regions.get(i));
+
+                            }
+
+                            chr_binary_tree.put(chr,bin_tree);
+
+                        }
+
+
+                        System.out.println("X");
+
+
+
+
+                        /*
+                        File input_map_position_ensg = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_preprocessing+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees+File.separator+options_intern.folder_name_tgen_preprocessing_binary_trees_merged);
+                        HashMap<String,ENSG_ranges_binary_trees> ensgTargetGenes_TFs = new HashMap<>();
+
+                        String current_chr = "";
+                        ArrayList<ENSG_ranges_binary_trees> current_chr_mapping = new ArrayList<>();
+
+                        int count_not_founds = 0;
+                        int current_i = 0;
+
+                        BufferedReader br_tgene = new BufferedReader(new FileReader(input_data_TGENE));
+                        String line_tgene = br_tgene.readLine();
+
+                        //TODO: use binary tree search! this is taking way to long!
+
+                        while((line_tgene= br_tgene.readLine())!=null)
+                        {
+                            String split[] = line_tgene.split("\t");
+
+                            String chr = split[0];
+
+                            if(!current_chr.equals(chr))
+                            {
+                                current_i=0;
+                                current_chr_mapping.clear();
+
+                                File input_map_position_ensg_chr = new File(input_map_position_ensg.getAbsolutePath()+File.separator+"chr"+chr+".txt");
+
+                                BufferedReader br_map = new BufferedReader(new FileReader(input_map_position_ensg_chr));
+                                String line_map = br_map.readLine();
+                                while((line_map=br_map.readLine())!=null)
+                                {
+                                    ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                                    String[] split_map = line_map.split("\t");
+
+                                    iu.left_border = Integer.parseInt(split_map[1]);
+                                    iu.right_border = Integer.parseInt(split_map[2]);
+                                    iu.ensgs.addAll(Arrays.asList(split_map[3].split(";"))) ;
+
+                                    current_chr_mapping.add(iu);
+                                }
+                                br_map.close();
+                            }
+
+                            ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
+                            iu.left_border = Integer.parseInt(split[1]);
+                            iu.right_border = Integer.parseInt(split[2]);
+                            iu.ensgs.addAll(Arrays.asList(split[3].split(";"))) ;
+
+                            boolean found_match = false;
+                            if(current_i==0)
+                            {
+                                current_i++;
+                            }
+                            for(int i = current_i-1; i < current_chr_mapping.size();i++)
+                            {
+                                ENSG_ranges_binary_trees iu_current = current_chr_mapping.get(i);
+
+                                if(iu_current.is_match(iu))
+                                {
+                                    String ensg_key = "";
+                                    for(String s: iu_current.ensgs)
+                                    {
+                                        ensg_key=s;
+                                    }
+                                    ensgTargetGenes_TFs.put(ensg_key,iu);
+                                    found_match=true;
+                                    current_i=i;
+                                    break;
+                                }
+                                else
+                                {
+                                    if (i > 0)
+                                    {
+                                        ENSG_ranges_binary_trees o1 = current_chr_mapping.get(i-1);
+
+                                        if(iu.lies_between(o1,iu_current))
+                                        {
+                                            String ensg_key = "";
+                                            for(String s: iu_current.ensgs)
+                                            {
+                                                ensg_key=s;
+                                            }
+                                            ensgTargetGenes_TFs.put(ensg_key,iu);
+                                            found_match=true;
+                                            current_i=i;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if(!found_match)
+                            {
+                                count_not_founds++;
+                            }
+
+
+
+                        }
+
+                        br_tgene.close();
+                        bw.close();*/
+                    }
+                }
+            }
+        }
+
+
+
+
+        logger.logLine("[TGENE] Finished integrating TGene data into TEPIC data");
     }
 
 }
