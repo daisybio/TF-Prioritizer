@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../src/COM2POSE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/COM2POSE.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../src/util/Options_intern.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/util/Options_intern.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../src/util/ENSG_binary_tree.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/util/ENSG_binary_tree.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +39,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Python.filterGeneView">
+  <component name="RunManager" selected="Shell Script.TEPIC.sh">
     <configuration name="computeMeanRatioTFAffinities" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -180,6 +179,7 @@
       <workItem from="1608969134574" duration="626000" />
       <workItem from="1609054007842" duration="866000" />
       <workItem from="1609177369369" duration="21000" />
+      <workItem from="1609836890223" duration="4412000" />
     </task>
     <servers />
   </component>
@@ -205,16 +205,6 @@
           <url>file://$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts/computeMeanRatioTFAffinities.py</url>
           <line>39</line>
           <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Code/filterGeneView.py</url>
-          <line>138</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Code/filterGeneView.py</url>
-          <line>84</line>
-          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
