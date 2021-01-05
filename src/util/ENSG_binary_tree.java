@@ -15,7 +15,7 @@ public class ENSG_binary_tree
     }
 
     public ENSG_ranges_binary_trees containsNode( ENSG_ranges_binary_trees iu) {
-        return containsNodeRecursive(root, iu);
+        return containsNodeRecursive(root, iu, root);
     }
 
     private ENSG_binary_tree_node addRecursive(ENSG_binary_tree_node current, int value,ENSG_ranges_binary_trees iu)
@@ -36,23 +36,25 @@ public class ENSG_binary_tree
         return current;
     }
 
-    private ENSG_ranges_binary_trees containsNodeRecursive(ENSG_binary_tree_node current,ENSG_ranges_binary_trees iu)
+    private ENSG_ranges_binary_trees containsNodeRecursive(ENSG_binary_tree_node current,ENSG_ranges_binary_trees iu,ENSG_binary_tree_node node_before)
     {
         if (current == null) {
-            return null;
+            return node_before.element;
         }
-        if (current.element.left_border <= iu.left_border && current.element.right_border >= iu.right_border && current.element.left_border <= iu.right_border && current.element.right_border <= iu.left_border)
+        if (current.element.left_border <= iu.left_border && current.element.right_border >= iu.right_border && current.element.left_border <= iu.right_border && current.element.right_border >= iu.left_border)
         {
             return current.element;
         }
 
         if(current.element.left_border >= iu.left_border && current.element.left_border >= iu.right_border && current.element.right_border >= iu.right_border && current.element.right_border >= iu.left_border)
         {
-            return containsNodeRecursive(current.left,iu);
+            node_before=current;
+            return containsNodeRecursive(current.left,iu, node_before);
         }
         else
         {
-            return containsNodeRecursive(current.right,iu);
+            node_before=current;
+            return containsNodeRecursive(current.right,iu,node_before);
         }
     }
 }

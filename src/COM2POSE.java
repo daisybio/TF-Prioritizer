@@ -38,11 +38,11 @@ public class COM2POSE
 
 
         //DYNAMITE
-        com2pose_lib.preprocess_dynamite();
-        //com2pose_lib.run_DYNAMITE();
+        //com2pose_lib.preprocess_dynamite();
+        com2pose_lib.run_DYNAMITE();
 
         //PLOTS
-        //com2pose_lib.create_tp_plots();
+        com2pose_lib.create_tp_plots();
 
 
         System.out.println("X");
