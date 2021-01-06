@@ -46,6 +46,7 @@ public class Options_intern
     public String folder_name_tgen_output = "02_output";
     public String folder_name_tgen_merged = "03_merged";
     public String folder_name_tgen_groups = "04_groups";
+    public String folder_name_tgen_integrate = "05_integrate_affinities";
     public String folder_output_preprocessing_DYNAMITE = "07_DYNAMITE_preprocessing";
     public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
     public String folder_output_preprocessing_DYNAMITE_integrateData_integrate_TGENE = "integrated_TGENE";
