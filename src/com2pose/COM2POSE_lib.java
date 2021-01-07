@@ -3093,7 +3093,7 @@ public class COM2POSE_lib
             logger.logLine("Check config file parameters for validity");
             if(!all_set)
             {
-                logger.logLine("Not all REQuired options set. Please set them in config file");
+                logger.logLine("Not all [REQ]uired options set. Please set them in config file");
                 logger.logLine("Aborting COM2POSE");
                 System.exit(1);
             }
@@ -3321,15 +3321,14 @@ public class COM2POSE_lib
             if(!file_tgen.exists() || !file_tgen.isDirectory())
             {
                 logger.logLine("[TGENE] TGene file directory does not exist or is not a directory!");
+                all_set=false;
+            }
 
-                File tgene_dir = new File(options_intern.path_tgen+File.separator+"bin");
+            File tgene_dir = new File(options_intern.path_tgen+File.separator+"bin");
 
-                if(!tgene_dir.exists())
-                {
-                    logger.logLine("[TGENE] TGene binary directory cannot be found: " + tgene_dir.getAbsolutePath());
-                    all_set=false;
-                }
-
+            if(!tgene_dir.exists())
+            {
+                logger.logLine("[TGENE] TGene binary directory cannot be found: " + tgene_dir.getAbsolutePath());
                 all_set=false;
             }
 
