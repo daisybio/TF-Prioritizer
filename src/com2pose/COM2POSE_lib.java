@@ -2635,6 +2635,270 @@ public class COM2POSE_lib
     }
 
     /**
+     * Filter TEPIC input files for blacklisted regions
+     */
+    public void filter_blacklist() throws IOException {
+        File folder_input = new File(options_intern.tepic_input_directory);
+        File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+        File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
+        output_folder_new_input.mkdir();
+
+        //set new folder directory for tepic input and save old one
+        options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+        options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+
+        logger.logLine("[BLACKLIST] Create chromosome binary trees.");
+        //CREATE BINARY TREES
+        HashMap<String,BL_binary_tree> chr_tree = new HashMap<>();
+
+        File input_folder_chr = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions+File.separator+options_intern.folder_name_blacklisted_regions_preprocessing+File.separator+options_intern.folder_name_blacklisted_regions_preprocessing_sorted);
+        for(File fileChr : input_folder_chr.listFiles())
+        {
+            if(fileChr.isFile())
+            {
+                String name= fileChr.getName().split("\\.")[0];
+
+                ArrayList<BL_ranges_binary_tree> region = new ArrayList<>();
+
+                BufferedReader br_chr = new BufferedReader(new FileReader(fileChr));
+                String line_chr = br_chr.readLine();
+                while((line_chr=br_chr.readLine())!=null)
+                {
+                    String[] split = line_chr.split("\t");
+
+                    BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
+                    iu.number=Integer.parseInt(split[0]);
+                    iu.chr = split[1];
+                    iu.left_border = Integer.parseInt(split[2]);
+                    iu.right_border = Integer.parseInt(split[3]);
+                    iu.signal = split[4];
+
+                    region.add(iu);
+                }
+                br_chr.close();
+
+                BL_binary_tree_node root = new BL_binary_tree_node(region.get(0),region.get(0).number);
+                BL_binary_tree tree = new BL_binary_tree(root);
+
+                for(int i = 1; i < region.size(); i++)
+                {
+                    tree.add(region.get(i).number,region.get(i));
+                }
+
+                chr_tree.put(name,tree);
+
+            }
+        }
+
+        logger.logLine("[BLACKLIST] Filter input files for blacklisted regions.");
+        //now filter all files
+        int count_matched = 0;
+
+        for(File fileDirTP : folder_input.listFiles())
+        {
+            if(fileDirTP.isDirectory())
+            {
+                File output_folder_new_input_TP = new File(output_folder_new_input.getAbsolutePath()+File.separator+fileDirTP.getName());
+                output_folder_new_input_TP.mkdir();
+
+                for(File fileDirTP_HM : fileDirTP.listFiles())
+                {
+                    if(fileDirTP_HM.isDirectory())
+                    {
+                        File output_folder_new_input_TP_HM = new File(output_folder_new_input_TP.getAbsolutePath()+File.separator+fileDirTP_HM.getName());
+                        output_folder_new_input_TP_HM.mkdir();
+
+                        for(File filrDirTP_HM_sample : fileDirTP_HM.listFiles())
+                        {
+                            if(filrDirTP_HM_sample.isFile())
+                            {
+                                logger.logLine("[BLACKLIST] Filter: " + fileDirTP.getName() + ": " + fileDirTP_HM.getName() + " - " + filrDirTP_HM_sample.getName());
+                                //FILTER HERE WITH BINARY TREE
+
+                                BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output_folder_new_input_TP_HM.getAbsolutePath()+File.separator+filrDirTP_HM_sample.getName())));
+                                BufferedReader br = new BufferedReader(new FileReader(filrDirTP_HM_sample));
+                                String line ="";
+                                int count_line = 0;
+                                while((line=br.readLine())!=null)
+                                {
+                                    String[] split = line.split("\t");
+
+                                    String chr = split[0];
+                                    if(!chr.matches(".*chr.*"))
+                                    {
+                                        chr="chr"+chr;
+                                    }
+
+                                    BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
+                                    iu.chr = chr;
+                                    iu.left_border = Integer.parseInt(split[1]);
+                                    iu.right_border = Integer.parseInt(split[2]);
+
+                                    if(!chr_tree.containsKey(chr))
+                                    {
+                                        count_line++;
+                                        continue;
+                                    }
+
+                                    BL_binary_tree tree = chr_tree.get(chr);
+                                    if(tree.containsNode(iu) == null)
+                                    {
+                                        bw.write(line);
+                                        bw.newLine();
+                                    }
+                                    else
+                                    {
+                                        count_matched++;
+                                    }
+                                    count_line++;
+                                }
+                                br.close();
+                                bw.close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        logger.logLine("[BLACKLIST] Finished filtering for blacklisted regions.");
+
+    }
+
+    /**
+     * preprocesses the blacklist file for binary search
+     */
+    public void preprocess_blacklist() throws IOException {
+
+        logger.logLine("[BLACKLIST] start preprocessing blacklist");
+
+        File f_blacklist = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+        f_blacklist.mkdir();
+        File f_blacklist_pre = new File(f_blacklist.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_preprocessing);
+        f_blacklist_pre.mkdir();
+        File f_blacklist_pre_chr = new File(f_blacklist_pre.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_preprocessing_perChr);
+        f_blacklist_pre_chr.mkdir();
+
+        BufferedReader br_chr = new BufferedReader(new FileReader(new File(options_intern.black_list_dir)));
+        ArrayList<BL_ranges_binary_tree> chr_ius= new ArrayList<>();
+
+        String line_chr = "";
+        String current_chr = "";
+        BufferedWriter bw_chr = new BufferedWriter(new FileWriter(new File(f_blacklist_pre_chr.getAbsolutePath()+File.separator+"test.txt")));
+        while((line_chr=br_chr.readLine())!=null)
+        {
+            String[] split = line_chr.split("\t");
+
+            String chr = split[0];
+            if(!chr.equals(current_chr))
+            {
+                Collections.sort(chr_ius);
+
+                int i = 0;
+
+                for(BL_ranges_binary_tree iu : chr_ius)
+                {
+                    iu.number=i;
+                    bw_chr.write(iu.toString());
+                    bw_chr.newLine();
+                    i++;
+                }
+
+                chr_ius.clear();
+
+                if(!chr.matches(".*chr.*"))
+                {
+                    chr="chr"+chr;
+                }
+
+                bw_chr.close();
+                bw_chr = new BufferedWriter(new FileWriter(new File(f_blacklist_pre_chr.getAbsolutePath()+File.separator+chr+".txt")));
+                bw_chr.write("#\tCHR\tLEFT_BORDER\tRIGHT_BORDER\tSIGNAL");
+                bw_chr.newLine();
+                current_chr=split[0];
+            }
+
+            BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
+            iu.chr=chr;
+            iu.left_border = Integer.parseInt(split[1]);
+            iu.right_border = Integer.parseInt(split[2]);
+            iu.signal = split[3].replace(' ', '_').toUpperCase();
+
+            if(options_intern.black_list_signals.contains(iu.signal))
+            {
+                chr_ius.add(iu);
+            }
+        }
+
+        Collections.sort(chr_ius);
+
+        int i = 0;
+
+        for(BL_ranges_binary_tree iu : chr_ius)
+        {
+            iu.number=i;
+            bw_chr.write(iu.toString());
+            bw_chr.newLine();
+            i++;
+        }
+
+        bw_chr.close();
+        br_chr.close();
+
+        logger.logLine("[BLACKLIST] prepare chromosomes for binary tree");
+
+        File f_blacklist_pre_sorted = new File(f_blacklist_pre.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_preprocessing_sorted);
+        f_blacklist_pre_sorted.mkdir();
+
+        for(File fileDir : f_blacklist_pre_chr.listFiles())
+        {
+            if(fileDir.isFile() && !fileDir.getName().equals("test.txt"))
+            {
+                ArrayList<BL_ranges_binary_tree> current_ius = new ArrayList<>();
+                String header;
+
+                BufferedReader br_sort = new BufferedReader(new FileReader(fileDir));
+                header= br_sort.readLine();
+                String line_sort ="";
+                while((line_sort=br_sort.readLine())!=null)
+                {
+                    String[] split = line_sort.split("\t");
+
+                    BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
+                    iu.number = Integer.parseInt(split[0]);
+                    iu.chr = split[1];
+                    iu.left_border = Integer.parseInt(split[2]);
+                    iu.right_border = Integer.parseInt(split[3]);
+                    iu.signal=split[4];
+
+                    current_ius.add(iu);
+                }
+                br_sort.close();
+
+                ArrayList<BL_ranges_binary_tree> newly_ordered = new ArrayList<>();
+
+                recursive_split_BL(current_ius,newly_ordered);
+
+                BufferedWriter bw_sort = new BufferedWriter(new FileWriter(f_blacklist_pre_sorted.getAbsolutePath()+File.separator+fileDir.getName()));
+                bw_sort.write(header);
+                bw_sort.newLine();
+
+                for(int j = 0; j < newly_ordered.size(); j++)
+                {
+                    bw_sort.write(newly_ordered.get(j).toString());
+                    bw_sort.newLine();
+                }
+                bw_sort.close();
+            }
+
+        }
+
+
+        logger.logLine("[BLACKLIST] finished preprocessing blacklist");
+
+
+    }
+
+    /**
      * read config file
      * @param check_options should options be checked for validity? Should be true if pipeline is run, should be false if analyse programms are run
      */
@@ -2655,6 +2919,12 @@ public class COM2POSE_lib
 
             switch (split[0])
             {
+                case "black_list_dir":
+                    options_intern.black_list_dir=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "black_list_signals":
+                    options_intern.black_list_signals=new HashSet<>(Arrays.asList(split[1].substring(1,split[1].length()-1).toUpperCase().split(";")));
+                    break;
                 case "deseq2_input_directory":
                     options_intern.deseq2_input_directory=split[1].substring(1,split[1].length()-1);
                     break;
@@ -2843,6 +3113,31 @@ public class COM2POSE_lib
     private boolean checkOptions() throws IOException {
 
         boolean all_set = true;
+
+        /**
+         * black list options
+         */
+
+        if(!options_intern.black_list_dir.equals(""))
+        {
+            File f = new File(options_intern.black_list_dir);
+            if(!f.exists())
+            {
+                logger.logLine("[BLACKLIST] blacklist path does not exist!");
+                all_set=false;
+            }
+            if(f.isDirectory())
+            {
+                logger.logLine("[BLACKLIST] blacklist path is a directory but must be a file");
+                all_set=false;
+            }
+
+            if(options_intern.black_list_signals.isEmpty())
+            {
+                logger.logLine("[BLACKLIST] signals must not be empty");
+                all_set=false;
+            }
+        }
 
         /**
          * DESEQ2 options
@@ -3122,7 +3417,36 @@ public class COM2POSE_lib
     }
 
     /**
-     * TGENE preprocessing - creates binary friendly files of chromosomes
+     * BLACKLIST preprocessing - creates binary tree friendly files of chromosomes
+     */
+    private ArrayList<BL_ranges_binary_tree> recursive_split_BL(ArrayList<BL_ranges_binary_tree> region, ArrayList<BL_ranges_binary_tree> newly_ordered)
+    {
+        if(region.size()>0)
+        {
+            BL_ranges_binary_tree median = region.get(region.size()/2);
+            newly_ordered.add(median);
+
+            ArrayList<BL_ranges_binary_tree> region_left=new ArrayList<>();
+
+            for(int i = 0; i < region.size()/2; i++)
+            {
+                region_left.add(region.get(i));
+            }
+            ArrayList<BL_ranges_binary_tree> region_right=new ArrayList<>();
+            for(int i = region.size()/2+1; i < region.size(); i++)
+            {
+                region_right.add(region.get(i));
+            }
+
+            recursive_split_BL(region_left,newly_ordered);
+            recursive_split_BL(region_right,newly_ordered);
+
+        }
+        return newly_ordered;
+    }
+
+    /**
+     * TGENE preprocessing - creates binary tree friendly files of chromosomes
      */
     private  ArrayList<ENSG_ranges_binary_trees> recursive_split(ArrayList<ENSG_ranges_binary_trees> region, ArrayList<ENSG_ranges_binary_trees> newly_ordered)
     {

@@ -3,6 +3,7 @@ package util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class Options_intern
@@ -24,6 +25,11 @@ public class Options_intern
 
     public String folder_name_usual_working_dir_name = "working_dir";
 
+    public String folder_name_blacklisted_regions = "00_blacklisted_regions";
+    public String folder_name_blacklisted_regions_preprocessing = "01_preprocessing";
+    public String folder_name_blacklisted_regions_preprocessing_perChr = "01_perChr";
+    public String folder_name_blacklisted_regions_preprocessing_sorted = "02_sorted";
+    public String folder_name_blacklisted_regions_new_input = "02_new_input";
     public String folder_name_deseq2_preprocessing = "01_DESeq2_preprocessing";
     public String folder_name_deseq2_preprocessing_single = "single";
     public String folder_name_deseq2_preprocessing_combined = "combined";
@@ -74,6 +80,15 @@ public class Options_intern
 
 
     /*
+    #########################
+    ##blacklist parameters###
+    #########################*/
+    //#[OPT]: if blacklist filter should be used provide path to BED file here (BED files can be found at https://github.com/Boyle-Lab/Blacklist/tree/master/lists
+    public String black_list_dir="";
+    //#[OPT]: which regions should be ignored: Low_Mappability;High_Signal_Region
+    public HashSet<String> black_list_signals= new HashSet<>(Arrays.asList(new String[]{"Low_Mappability".toUpperCase(), "High_Signal_Region".toUpperCase()}));
+
+    /*
     ######################
     ##DESeq2 parameters###
     ######################*/
@@ -89,6 +104,8 @@ public class Options_intern
     ######################*/
     //#[REQ]: PEAK files (like from MACS), directory must be orderd like: Timepoint1 - HistoneModification1 - samples_1,...,sample_n;...;...
     public String tepic_input_directory="";
+    //if black listed regions filter is used the former data link is here
+    public String tepic_input_prev ="";
     //#[REQ]:fasta files (in RefSeq format, without \"chr\" prefix)
     public String tepic_input_ref_genome="";
     //#[REQ]: path to position specific energy matrix used for TRAP (different matrices can be found in ~/COM2POSE/ext/TEPIC/TEPIC/PWMs/2.1)
