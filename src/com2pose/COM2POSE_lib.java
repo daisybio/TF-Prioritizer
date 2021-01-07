@@ -2325,7 +2325,7 @@ public class COM2POSE_lib
 
 
 
-        logger.logLine("Finished Start postprocessing DESeq2 data for input to DYNAMITE");
+        logger.logLine("Finished postprocessing DESeq2 data for input to DYNAMITE");
 
     }
 
@@ -2761,7 +2761,6 @@ public class COM2POSE_lib
             }
         }
         logger.logLine("[BLACKLIST] Finished filtering for blacklisted regions.");
-
     }
 
     /**

@@ -24,6 +24,7 @@ Before using COM2POSE please install following software:
 - Python packages: pandas, seaborn, matplotlib.pyplot in path python3
 - C++ compiler A C++ compiler supporting openmp to use the parallel implementation of TRAP.
 - [MEME suite](http://meme-suite.org/doc/download.html) for consensus approach between TEPIC and TGen
+- [BLACKLIST](https://github.com/Boyle-Lab/Blacklist/tree/master/lists) if you want to use the blacklist filter, download the corresponding list
 
 ## 4. Installation under Unix
 
