@@ -143,10 +143,12 @@ public class Options_intern
     public String tepic_ensg_symbol="";
 
     /*######################
-    ####TGEN parameters###
-    ######################*/
+     ####TGENE parameters###
+     #######################*/
     //#[REQ]: value for consus approach (e.g. 0.5 = 50:50 TGene:TEPIC, 0.4 = 40:60 TGene:TEPIC), default: 0.5
     public double tgen_consensus=0.5;
+    //#[REQ]: can be "INCREASE_TGENE_TFS" (increases TEPIC TF affinities for TFs found in TGENE at target gene) or "DECREASE_NOT_TGENE_TFs (decreases TEPIC TF affinities for TFs not found in TGENE at target gene)".
+    public String tgen_consensus_calc="INCREASE_TGENE_TFS";
     //#[OPT]: if no locus is found within window size, the nearest locus is used, default:true
     public boolean tgen_no_closest_locus=true;
     //#[OPT]: if no tss is found within window size, the nearest locus is used, default:true

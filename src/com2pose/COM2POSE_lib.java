@@ -656,13 +656,21 @@ public class COM2POSE_lib
                                     if(pref_positions.contains(i))
                                     {
                                         double score = Double.parseDouble(split[i]);
-                                        score = score + (score * (1-options_intern.tgen_consensus));
+                                        if(options_intern.tgen_consensus_calc.equals("INCREASE_TGENE_TFS"))
+                                        {
+                                            score = score + (score * (1-options_intern.tgen_consensus));
+
+                                        }
                                         sb.append("\t");
                                         sb.append(score);
                                     }
                                     else
                                     {
-                                        double score = Double.parseDouble(split[i]); //* (1-options_intern.tgen_consensus);
+                                        double score = Double.parseDouble(split[i]);
+                                        if(options_intern.tgen_consensus_calc.equals("DECREASE_NOT_TGENE_TFs"))
+                                        {
+                                            score *= (1-options_intern.tgen_consensus);
+                                        }
                                         sb.append("\t");
                                         sb.append(score);
                                     }
@@ -672,7 +680,11 @@ public class COM2POSE_lib
                             {
                                 for(int i = 1; i < split.length;i++)
                                 {
-                                    double score = Double.parseDouble(split[i]); //* (1-options_intern.tgen_consensus);
+                                    double score = Double.parseDouble(split[i]);
+                                    if(options_intern.tgen_consensus_calc.equals("DECREASE_NOT_TGENE_TFs"))
+                                    {
+                                        score *= (1-options_intern.tgen_consensus);
+                                    }
                                     sb.append("\t");
                                     sb.append(score);
                                 }
@@ -2736,6 +2748,9 @@ public class COM2POSE_lib
                 case "tgen_consensus":
                     options_intern.tgen_consensus=Double.parseDouble(split[1]);
                     break;
+                case "tgen_consensus_calc":
+                    options_intern.tgen_consensus_calc=split[1].substring(1,split[1].length()-1);
+                    break;
                 case "tgen_no_closest_locus":
                     options_intern.tgen_no_closest_locus=Boolean.parseBoolean(split[1]);
                     break;
@@ -3033,6 +3048,13 @@ public class COM2POSE_lib
             if(options_intern.tgen_consensus==0.0)
             {
                 logger.logLine("[TGENE] tgen_consensus must be in range ]0.0,1.0], it cannot be 0.0, if you do not want to use consensus set path_tgen=\"\"");
+                all_set=false;
+            }
+
+            if(options_intern.tgen_consensus_calc.equals(""))
+            {
+                logger.logLine("[TGENE] tgen_consensus_calc must be set.");
+                all_set=false;
             }
         }
 
