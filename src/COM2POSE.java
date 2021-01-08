@@ -1,11 +1,8 @@
 import com2pose.COM2POSE_lib;
 import org.apache.commons.cli.*;
 
-
 import util.Options_intern;
 
-import java.io.File;
-import java.io.IOException;
 
 public class COM2POSE
 {
@@ -17,6 +14,7 @@ public class COM2POSE
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
+
 
         //black listed regions filter
         if(!options_intern.black_list_dir.equals(""))

@@ -596,6 +596,11 @@ public class COM2POSE_lib
 
                             ENSG_ranges_binary_trees ensg_match = tree.containsNode(iu);
 
+                            if(ensg_match == null)
+                            {
+                                continue;
+                            }
+
                             for(String k: ensg_match.ensgs)
                             {
                                 if(ensgTargetGenes_TFs.containsKey(k))

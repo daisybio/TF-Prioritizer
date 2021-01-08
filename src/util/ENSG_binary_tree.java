@@ -39,7 +39,8 @@ public class ENSG_binary_tree
     private ENSG_ranges_binary_trees containsNodeRecursive(ENSG_binary_tree_node current,ENSG_ranges_binary_trees iu,ENSG_binary_tree_node node_before)
     {
         if (current == null) {
-            return node_before.element;
+            //return node_before.element;
+            return null;
         }
         if (current.element.left_border <= iu.left_border && current.element.right_border >= iu.right_border && current.element.left_border <= iu.right_border && current.element.right_border >= iu.left_border)
         {
