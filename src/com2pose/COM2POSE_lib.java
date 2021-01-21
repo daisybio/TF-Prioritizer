@@ -2903,6 +2903,587 @@ public class COM2POSE_lib
     }
 
     /**
+     * preprocess mix histones, search for same peaks and use either the union or the intersection of all
+     */
+    public void mix_histones() throws IOException {
+        File file_root_input = new File(options_intern.tepic_input_directory);
+        File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+        root_mix_working_dir.mkdir();
+
+        File f_sample_mix_preprocess = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix_preprocessing);
+        f_sample_mix_preprocess.mkdir();
+
+        File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+        f_sample_mix_output.mkdir();
+
+        if(options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        logger.logLine("[MIX] Preprocess input data for sample mix - split chromosomes.");
+
+        for(File fileDir:file_root_input.listFiles())
+        {
+            if(fileDir.isDirectory())
+            {
+                String timepoint = fileDir.getName();
+                File file_output_tp = new File(f_sample_mix_preprocess + File.separator + timepoint);
+                file_output_tp.mkdir();
+
+                for(File fileDirHM : fileDir.listFiles())
+                {
+                    if (fileDirHM.isDirectory())
+                    {
+                        File file_output_tp_hm = new File(file_output_tp.getAbsolutePath() + File.separator + fileDirHM.getName());
+                        file_output_tp_hm.mkdir();
+
+                        for(File fileDirHM_sample : fileDirHM.listFiles())
+                        {
+                            if(fileDirHM_sample.isFile())
+                            {
+                                BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file_output_tp_hm.getAbsolutePath()+File.separator+"test.txt")));
+                                BufferedReader br = new BufferedReader(new FileReader(fileDirHM_sample));
+                                String line = "";
+                                String currentChr ="";
+                                while((line=br.readLine())!=null)
+                                {
+                                    String[] split = line.split("\t");
+                                    if(!split[0].equals(currentChr))
+                                    {
+                                        bw.close();
+                                        currentChr=split[0];
+                                        File f_output_chr = new File(file_output_tp_hm.getAbsolutePath()+File.separator+currentChr);
+                                        f_output_chr.mkdir();
+
+                                        bw = new BufferedWriter(new FileWriter(new File(f_output_chr.getAbsolutePath()+File.separator+fileDirHM_sample.getName())));
+                                    }
+                                    bw.write(line);
+                                    bw.newLine();
+                                }
+                                bw.close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        logger.logLine("[MIX] Create unions / intersections of samples");
+
+        for(File fileDir: f_sample_mix_preprocess.listFiles())
+        {
+            if(fileDir.isDirectory())
+            {
+                String timepoint = fileDir.getName();
+                File f_output_union_samples_tp = new File(f_sample_mix_output.getAbsolutePath()+File.separator+timepoint);
+                f_output_union_samples_tp.mkdir();
+
+                for(File fileDirHM : fileDir.listFiles())
+                {
+                    if(fileDirHM.isDirectory())
+                    {
+                        String hm = fileDirHM.getName();
+                        File f_output_union_samples_tp_hm = new File(f_output_union_samples_tp.getAbsolutePath()+File.separator+hm);
+                        f_output_union_samples_tp_hm.mkdir();
+
+                        String file_ending = "";
+
+                        HashMap<String,ArrayList<MIX_Interval>> all_chromosomes = new HashMap();
+                        ArrayList<Integer> chr_alpha = new ArrayList<>();
+                        ArrayList<String> chr_str = new ArrayList<>();
+
+                        for(File fileDirHM_Chr : fileDirHM.listFiles())
+                        {
+                            if(fileDirHM_Chr.isDirectory())
+                            {
+                                String chr = fileDirHM_Chr.getName();
+
+                                ArrayList<MIX_Interval> all_intervals = new ArrayList<>();
+
+                                int sample_number = 0;
+
+                                for(File fileDirHM_Chr_sample : fileDirHM_Chr.listFiles())
+                                {
+                                    if(fileDirHM_Chr_sample.isFile())
+                                    {
+                                        String[] f_ending = fileDirHM_Chr_sample.getName().split("\\.");
+                                        file_ending=f_ending[f_ending.length-1];
+                                        //build array of a union of all peaks
+                                        BufferedReader br = new BufferedReader(new FileReader(fileDirHM_Chr_sample));
+                                        String line = "";
+                                        while((line=br.readLine())!=null)
+                                        {
+                                            String[] split = line.split("\t");
+
+                                            MIX_Interval_Object mio = new MIX_Interval_Object(split[0],Integer.parseInt(split[1]),Integer.parseInt(split[2]),split[3],Integer.parseInt(split[4]),split[5],Double.parseDouble(split[6]),Double.parseDouble(split[7]),Double.parseDouble(split[8]));
+                                            MIX_Interval mi = new MIX_Interval(Integer.parseInt(split[1]),Integer.parseInt(split[2]));
+                                            mi.merged_intervals.add(mio);
+
+                                            all_intervals.add(mi);
+
+                                        }
+                                        br.close();
+                                        sample_number++;
+
+                                        /*
+                                        if(options_intern.mix_option.equals("INTERSECTION"))
+                                        {
+                                            ArrayList<MIX_Interval> intersec_al = new ArrayList<>();
+
+                                            BufferedReader br_intersec = new BufferedReader(new FileReader(fileDirHM_Chr_sample));
+                                            String line_intersec = "";
+                                            while((line_intersec=br_intersec.readLine())!=null)
+                                            {
+                                                String[] split = line_intersec.split("\t");
+
+                                                MIX_Interval_Object mio = new MIX_Interval_Object(split[0],Integer.parseInt(split[1]),Integer.parseInt(split[2]),split[3],Integer.parseInt(split[4]),split[5],Double.parseDouble(split[6]),Double.parseDouble(split[7]),Double.parseDouble(split[8]));
+                                                MIX_Interval mi = new MIX_Interval(Integer.parseInt(split[1]),Integer.parseInt(split[2]));
+                                                mi.merged_intervals.add(mio);
+
+                                                intersec_al.add(mi);
+
+                                            }
+                                            br.close();
+
+
+                                            intersec_vals.put(fileDirHM_Chr_sample.getName(),intersec_al);
+                                        }*/
+
+                                    }
+                                }
+
+                                //intersections sorting!
+                                /*if(options_intern.mix_option.equals("INTERSECTION"))
+                                {
+                                    for(String k: intersec_vals.keySet())
+                                    {
+                                        Collections.sort(intersec_vals.get(k));
+                                    }
+                                }*/
+
+                                //unions sorting
+                                Collections.sort(all_intervals);
+
+                                Stack<MIX_Interval> stack_union = mergeIntervals(all_intervals);
+
+                                ArrayList<MIX_Interval> chr_unions = new ArrayList<>();
+
+                                int min_occurence = 0;
+                                if(options_intern.mix_occurence_intersection==-1)
+                                {
+                                    min_occurence=sample_number;
+                                }
+                                else
+                                {
+                                    if(sample_number<options_intern.mix_occurence_intersection)
+                                    {
+                                        min_occurence=sample_number;
+
+                                    }
+                                    else
+                                    {
+                                        min_occurence=options_intern.mix_occurence_intersection;
+                                    }
+                                }
+
+                                while(!stack_union.isEmpty())
+                                {
+                                    MIX_Interval t = stack_union.pop();
+                                    t.calculate_mean("SAMPLE_LEVEL");
+
+                                    if(options_intern.mix_option.equals("INTERSECTION"))
+                                    {
+                                        if(t.merged_intervals.size()>=min_occurence)
+                                        {
+                                            chr_unions.add(t);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        chr_unions.add(t);
+                                    }
+                                }
+
+                                Collections.sort(chr_unions);
+
+                                all_chromosomes.put(chr,chr_unions);
+
+                                try {
+                                    chr_alpha.add(Integer.parseInt(chr));
+                                }
+                                catch (Exception e)
+                                {
+                                    chr_str.add(chr);
+                                }
+                            }
+                        }
+
+                        Collections.sort(chr_alpha);
+                        Collections.sort(chr_str);
+
+
+                        //print Sample_unions => can be used if not HM_Level is used
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(f_output_union_samples_tp_hm.getAbsolutePath()+File.separator+timepoint+"_"+hm+"."+file_ending));
+
+                        int peak_counter = 1;
+
+                        for(int chr : chr_alpha)
+                        {
+                            ArrayList<MIX_Interval> x = all_chromosomes.get(""+chr);
+                            for(int i = 0; i < x.size();i++)
+                            {
+                                bw.write(x.get(i).meanToString(peak_counter));
+                                bw.newLine();
+                                peak_counter++;
+                            }
+                        }
+
+                        for(String chr: chr_str)
+                        {
+                            ArrayList<MIX_Interval> x = all_chromosomes.get(chr);
+                            for(int i = 0; i < x.size();i++)
+                            {
+                                bw.write(x.get(i).meanToString(peak_counter));
+                                bw.newLine();
+                                peak_counter++;
+                            }
+                        }
+                        bw.close();
+
+
+                    }
+                }
+            }
+        }
+
+        if(options_intern.mix_level.equals("HM_LEVEL"))
+        {
+
+            logger.logLine("[MIX] Preprocess sample unions for HM mix");
+
+            File f_output_preprocessing_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_preprocess_hm_mix);
+            f_output_preprocessing_hm.mkdir();
+
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+
+            logger.logLine("[MIX] Identify possible Timepoints with same Histone Modifications");
+
+            HashMap<String,ArrayList<String>> timepoints_histone_modifications = new HashMap<>();
+            HashMap<String,ArrayList<String>> deleted_tps = new HashMap<>();
+            HashSet<String> available_hms = new HashSet<>();
+
+            //identify possible timepoints
+            for(File fileDir:f_sample_mix_output.listFiles())
+            {
+                if(fileDir.isDirectory())
+                {
+                    String timepoint = fileDir.getName();
+                    ArrayList hm = new ArrayList();
+
+                    for(File fileDirHM : fileDir.listFiles())
+                    {
+                        if(fileDirHM.isDirectory())
+                        {
+                            hm.add(fileDirHM.getName());
+                            available_hms.add(fileDirHM.getName());
+                        }
+                    }
+                    timepoints_histone_modifications.put(timepoint,hm);
+                }
+            }
+
+
+            for(String tp : timepoints_histone_modifications.keySet())
+            {
+                if(timepoints_histone_modifications.get(tp).size()< available_hms.size())
+                {
+                    deleted_tps.put(tp,timepoints_histone_modifications.get(tp));
+                    timepoints_histone_modifications.remove(tp);
+                    continue;
+                }
+
+                boolean all_in = true;
+                for(String hm : available_hms)
+                {
+                    if(!timepoints_histone_modifications.get(tp).contains(hm))
+                    {
+                        all_in=false;
+                    }
+                }
+
+                if(!all_in)
+                {
+                    deleted_tps.put(tp,timepoints_histone_modifications.get(tp));
+                    timepoints_histone_modifications.remove(tp);
+                }
+            }
+
+            StringBuilder sb_found_mixing_tps = new StringBuilder();
+            sb_found_mixing_tps.append("[MIX] Can perform complete mix for HMs (");
+            for(String hm : available_hms)
+            {
+                sb_found_mixing_tps.append(hm);
+                sb_found_mixing_tps.append(" ");
+            }
+            sb_found_mixing_tps.append(") in timepoints (");
+            for(String tp:timepoints_histone_modifications.keySet())
+            {
+                sb_found_mixing_tps.append(tp);
+                sb_found_mixing_tps.append(" ");
+            }
+            sb_found_mixing_tps.append("). Can perform part-mix or no-mix for timepoints (");
+            for(String tp : deleted_tps.keySet())
+            {
+                sb_found_mixing_tps.append(tp);
+                sb_found_mixing_tps.append(" ");
+            }
+            sb_found_mixing_tps.append(").");
+            logger.logLine(sb_found_mixing_tps.toString());
+
+
+            for(File fileDir : f_sample_mix_output.listFiles())
+            {
+                if(fileDir.isDirectory())
+                {
+                    String timepoint = fileDir.getName();
+                    File f_output_hm_prepro = new File(f_output_preprocessing_hm.getAbsolutePath()+File.separator+timepoint);
+                    f_output_hm_prepro.mkdir();
+
+                    for(File fileDirHM : fileDir.listFiles())
+                    {
+                        if(fileDirHM.isDirectory())
+                        {
+                            String hm = fileDirHM.getName();
+                            File f_output_hm_prepro_hm = new File(f_output_hm_prepro.getAbsolutePath()+File.separator+"MIX");
+                            f_output_hm_prepro_hm.mkdir();
+
+                            for(File fileDirHM_samples : fileDirHM.listFiles())
+                            {
+                                if(fileDirHM_samples.isFile())
+                                {
+                                    BufferedWriter bw = new BufferedWriter(new FileWriter(new File(f_output_hm_prepro_hm.getAbsolutePath()+File.separator+"test.txt")));
+                                    BufferedReader br = new BufferedReader(new FileReader(fileDirHM_samples));
+                                    String line = "";
+                                    String currentChr ="";
+                                    while((line=br.readLine())!=null)
+                                    {
+                                        String[] split = line.split("\t");
+                                        if(!split[0].equals(currentChr))
+                                        {
+                                            bw.close();
+                                            currentChr=split[0];
+                                            File f_output_chr = new File(f_output_hm_prepro_hm.getAbsolutePath()+File.separator+currentChr);
+                                            f_output_chr.mkdir();
+
+                                            bw = new BufferedWriter(new FileWriter(new File(f_output_chr.getAbsolutePath()+File.separator+fileDirHM_samples.getName())));
+                                        }
+                                        bw.write(line);
+                                        bw.newLine();
+                                    }
+                                    bw.close();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            logger.logLine("[MIX] Create unions / intersections of HMs");
+
+            for(File fileDir: f_output_preprocessing_hm.listFiles())
+            {
+                if(fileDir.isDirectory())
+                {
+                    String timepoint = fileDir.getName();
+                    File f_output_union_samples_tp = new File(f_output_hm.getAbsolutePath()+File.separator+timepoint);
+                    f_output_union_samples_tp.mkdir();
+
+                    for(File fileDirHM : fileDir.listFiles())
+                    {
+                        if(fileDirHM.isDirectory())
+                        {
+                            String hm = fileDirHM.getName();
+                            File f_output_union_samples_tp_hm = new File(f_output_union_samples_tp.getAbsolutePath()+File.separator+hm);
+                            f_output_union_samples_tp_hm.mkdir();
+
+                            String file_ending = "";
+
+                            HashMap<String,ArrayList<MIX_Interval>> all_chromosomes = new HashMap();
+                            ArrayList<Integer> chr_alpha = new ArrayList<>();
+                            ArrayList<String> chr_str = new ArrayList<>();
+
+                            for(File fileDirHM_Chr : fileDirHM.listFiles())
+                            {
+                                if(fileDirHM_Chr.isDirectory())
+                                {
+                                    String chr = fileDirHM_Chr.getName();
+
+                                    ArrayList<MIX_Interval> all_intervals = new ArrayList<>();
+
+                                    int sample_number = 0;
+
+                                    for(File fileDirHM_Chr_sample : fileDirHM_Chr.listFiles())
+                                    {
+                                        if(fileDirHM_Chr_sample.isFile())
+                                        {
+                                            String[] f_ending = fileDirHM_Chr_sample.getName().split("\\.");
+                                            file_ending=f_ending[f_ending.length-1];
+                                            //build array of a union of all peaks
+                                            BufferedReader br = new BufferedReader(new FileReader(fileDirHM_Chr_sample));
+                                            String line = "";
+                                            while((line=br.readLine())!=null)
+                                            {
+                                                String[] split = line.split("\t");
+
+                                                MIX_Interval_Object mio = new MIX_Interval_Object(split[0],Integer.parseInt(split[1]),Integer.parseInt(split[2]),split[3],Integer.parseInt(split[4]),split[5],Double.parseDouble(split[6]),Double.parseDouble(split[7]),Double.parseDouble(split[8]));
+                                                MIX_Interval mi = new MIX_Interval(Integer.parseInt(split[1]),Integer.parseInt(split[2]));
+                                                mi.merged_intervals.add(mio);
+
+                                                all_intervals.add(mi);
+
+                                            }
+                                            br.close();
+                                            sample_number++;
+
+                                        /*
+                                        if(options_intern.mix_option.equals("INTERSECTION"))
+                                        {
+                                            ArrayList<MIX_Interval> intersec_al = new ArrayList<>();
+
+                                            BufferedReader br_intersec = new BufferedReader(new FileReader(fileDirHM_Chr_sample));
+                                            String line_intersec = "";
+                                            while((line_intersec=br_intersec.readLine())!=null)
+                                            {
+                                                String[] split = line_intersec.split("\t");
+
+                                                MIX_Interval_Object mio = new MIX_Interval_Object(split[0],Integer.parseInt(split[1]),Integer.parseInt(split[2]),split[3],Integer.parseInt(split[4]),split[5],Double.parseDouble(split[6]),Double.parseDouble(split[7]),Double.parseDouble(split[8]));
+                                                MIX_Interval mi = new MIX_Interval(Integer.parseInt(split[1]),Integer.parseInt(split[2]));
+                                                mi.merged_intervals.add(mio);
+
+                                                intersec_al.add(mi);
+
+                                            }
+                                            br.close();
+
+
+                                            intersec_vals.put(fileDirHM_Chr_sample.getName(),intersec_al);
+                                        }*/
+
+                                        }
+                                    }
+
+                                    //intersections sorting!
+                                /*if(options_intern.mix_option.equals("INTERSECTION"))
+                                {
+                                    for(String k: intersec_vals.keySet())
+                                    {
+                                        Collections.sort(intersec_vals.get(k));
+                                    }
+                                }*/
+
+                                    //unions sorting
+                                    Collections.sort(all_intervals);
+
+                                    Stack<MIX_Interval> stack_union = mergeIntervals(all_intervals);
+
+                                    ArrayList<MIX_Interval> chr_unions = new ArrayList<>();
+
+                                    int min_occurence = 0;
+                                    if(options_intern.mix_occurence_intersection==-1)
+                                    {
+                                        min_occurence=sample_number;
+                                    }
+                                    else
+                                    {
+                                        if(sample_number<options_intern.mix_occurence_intersection)
+                                        {
+                                            min_occurence=sample_number;
+
+                                        }
+                                        else
+                                        {
+                                            min_occurence=options_intern.mix_occurence_intersection;
+                                        }
+                                    }
+
+                                    while(!stack_union.isEmpty())
+                                    {
+                                        MIX_Interval t = stack_union.pop();
+                                        t.calculate_mean("HM_LEVEL");
+
+                                        if(options_intern.mix_option.equals("INTERSECTION"))
+                                        {
+                                            if(t.merged_intervals.size()>=min_occurence)
+                                            {
+                                                chr_unions.add(t);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            chr_unions.add(t);
+                                        }
+                                    }
+
+                                    Collections.sort(chr_unions);
+
+                                    all_chromosomes.put(chr,chr_unions);
+
+                                    try {
+                                        chr_alpha.add(Integer.parseInt(chr));
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        chr_str.add(chr);
+                                    }
+                                }
+                            }
+
+                            Collections.sort(chr_alpha);
+                            Collections.sort(chr_str);
+
+
+                            //print Sample_unions => can be used if not HM_Level is used
+                            BufferedWriter bw = new BufferedWriter(new FileWriter(f_output_union_samples_tp_hm.getAbsolutePath()+File.separator+timepoint+"_"+hm+"."+file_ending));
+
+                            int peak_counter = 1;
+
+                            for(int chr : chr_alpha)
+                            {
+                                ArrayList<MIX_Interval> x = all_chromosomes.get(""+chr);
+                                for(int i = 0; i < x.size();i++)
+                                {
+                                    bw.write(x.get(i).meanToString(peak_counter));
+                                    bw.newLine();
+                                    peak_counter++;
+                                }
+                            }
+
+                            for(String chr: chr_str)
+                            {
+                                ArrayList<MIX_Interval> x = all_chromosomes.get(chr);
+                                for(int i = 0; i < x.size();i++)
+                                {
+                                    bw.write(x.get(i).meanToString(peak_counter));
+                                    bw.newLine();
+                                    peak_counter++;
+                                }
+                            }
+                            bw.close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
      * read config file
      * @param check_options should options be checked for validity? Should be true if pipeline is run, should be false if analyse programms are run
      */
@@ -2923,6 +3504,15 @@ public class COM2POSE_lib
 
             switch (split[0])
             {
+                case "mix_level":
+                    options_intern.mix_level=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "mix_option":
+                    options_intern.mix_option=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "mix_occurence_intersection":
+                    options_intern.mix_occurence_intersection=Integer.parseInt(split[1]);
+                    break;
                 case "black_list_dir":
                     options_intern.black_list_dir=split[1].substring(1,split[1].length()-1);
                     break;
@@ -3117,6 +3707,24 @@ public class COM2POSE_lib
     private boolean checkOptions() throws IOException {
 
         boolean all_set = true;
+
+        /**
+         * mix histone options
+         */
+
+        if(!options_intern.mix_level.equals(""))
+        {
+            if(!options_intern.mix_level.equals("HM_LEVEL")&&!options_intern.mix_level.equals("SAMPLE_LEVEL"))
+            {
+                logger.logLine("[MIX]: mix_level parameter must be either HM_LEVEL or SAMPLE_LEVEL");
+                all_set=false;
+            }
+            if(!options_intern.mix_option.equals("UNION")&&!options_intern.mix_option.equals("INTERSECTION"))
+            {
+                logger.logLine("[MIX]: mix_option parameter must be either UNION or INTERSECTION");
+                all_set=false;
+            }
+        }
 
         /**
          * black list options
@@ -3475,5 +4083,44 @@ public class COM2POSE_lib
         }
         return newly_ordered;
     }
+
+    /**
+     * mixes the samples of one folder into one file, based on mix_option (UNION or INTERSECTION)
+     */
+    private static Stack<MIX_Interval> mergeIntervals(ArrayList<MIX_Interval> interval)
+    {
+        Stack<MIX_Interval> stack = new Stack<>();
+
+        if(stack.empty())
+        {
+            stack.push(interval.get(0));
+        }
+
+        for(int i = 1; i < interval.size(); i++)
+        {
+            MIX_Interval top = stack.peek();
+
+            if(top.end < interval.get(i).start)
+            {
+                stack.push(interval.get(i));
+            } else if(top.end < interval.get(i).end)
+            {
+                top.end = interval.get(i).end;
+                top.merged_intervals.addAll(interval.get(i).merged_intervals);
+
+                stack.pop();
+                stack.push(top);
+            }
+            else
+            {
+                top.merged_intervals.addAll(interval.get(i).merged_intervals);
+
+                stack.pop();
+                stack.push(top);
+            }
+        }
+        return stack;
+    }
+
 
 }

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../src/COM2POSE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/COM2POSE.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +29,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/02_TPM_1_GC_50/working_dir/06_TEPIC_postprocessing/output/H3K27ac/p13_L1/Ratios/Ratio_Affinities_p13_L1.txt" />
+    <property name="last_opened_file_path" value="$USER_HOME$/data/GenEpiSeeker/LOAD_SET/LOAD/TGEN/TGenII_ALZHEIMERS_Affy6_GWAS_July2012_QC_rs7412_rs429358_16496.json" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -180,6 +180,9 @@
       <workItem from="1609177369369" duration="21000" />
       <workItem from="1609836890223" duration="4412000" />
       <workItem from="1609920386512" duration="1197000" />
+      <workItem from="1610721048634" duration="940000" />
+      <workItem from="1610955421683" duration="104000" />
+      <workItem from="1610956479452" duration="668000" />
     </task>
     <servers />
   </component>

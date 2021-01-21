@@ -11,9 +11,16 @@ public class COM2POSE
         Options_intern options_intern= new Options_intern();
         parseArguments(args, options_intern);
 
+
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
+
+        //mix histone modifications
+        if(!options_intern.mix_level.equals(""))
+        {
+            com2pose_lib.mix_histones();
+        }
 
 
         //black listed regions filter
@@ -39,9 +46,7 @@ public class COM2POSE
             com2pose_lib.merge_tgen();
             com2pose_lib.create_tgen_groups();
             com2pose_lib.integrate_tgen();
-
         }
-
 
         //DYNAMITE
         com2pose_lib.preprocess_dynamite();

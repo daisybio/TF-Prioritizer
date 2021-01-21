@@ -25,6 +25,11 @@ public class Options_intern
 
     public String folder_name_usual_working_dir_name = "working_dir";
 
+    public String folder_name_mix_option = "00_A_MIX_OPTION";
+    public String folder_name_mix_option_sample_mix_preprocessing = "00_PREPROCESSING_SAMPLE_MIX";
+    public String folder_name_mix_option_sample_mix = "01_SAMPLE_MIX";
+    public String folder_name_mix_option_preprocess_hm_mix = "02_PREPROCESS_HM_MIX";
+    public String folder_name_mix_option_hm_mix = "03_HM_MIX";
     public String folder_name_blacklisted_regions = "00_blacklisted_regions";
     public String folder_name_blacklisted_regions_preprocessing = "01_preprocessing";
     public String folder_name_blacklisted_regions_preprocessing_perChr = "01_perChr";
@@ -78,6 +83,15 @@ public class Options_intern
     public String directory_for_tepic_scripts_code_tepic_sh = directory_for_tepic_scripts_code + File.separator+"TEPIC.sh";
     public String directory_for_tepic_DYNAMITE = directory_for_tepic_scripts+File.separator+"MachineLearningPipelines"+File.separator+"DYNAMITE"+File.separator+"Scripts";
 
+    /*#################################
+      ##PREPROCESSING MIX OPTIONS######
+      #################################*/
+    //#[OPT]: if set a mix of either the Histone Modification Level (HM_LEVEL) or the Sample Level (SAMPLE_LEVEL) will be performed, mix_option is required
+    public String mix_level="";
+    //#[OPT]: set histone marks or samples will be mixed with option: UNION (all peaks of all HMs / samples will be used), INTERSECTION (only peaks, which are in at least 2 HMs / samples will be used)
+    public String mix_option="";
+    //#[OPT]: minimal occurence of peaks in intersection, default 2
+    public int mix_occurence_intersection=2;
 
     /*
     #########################
