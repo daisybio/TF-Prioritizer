@@ -2926,7 +2926,7 @@ public class COM2POSE_lib
     /**
      * preprocess mix histones, search for same peaks and use either the union or the intersection of all
      */
-    public void mix_histones() throws IOException {
+    public void mix_option() throws IOException {
         File file_root_input = new File(options_intern.tepic_input_directory);
         File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
         root_mix_working_dir.mkdir();
@@ -2991,7 +2991,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[MIX] Create unions / intersections of samples");
+        logger.logLine("[MIX] Create "+options_intern.mix_option+" of samples");
 
         for(File fileDir: f_sample_mix_preprocess.listFiles())
         {
@@ -3315,7 +3315,7 @@ public class COM2POSE_lib
                 }
             }
 
-            logger.logLine("[MIX] Create unions / intersections of HMs");
+            logger.logLine("[MIX] Create "+options_intern.mix_option+" of HMs");
 
             for(File fileDir: f_output_preprocessing_hm.listFiles())
             {
