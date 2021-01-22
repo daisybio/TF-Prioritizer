@@ -183,6 +183,16 @@ public class COM2POSE_lib
                         sb.append(",index='Peak')\n");
                     }
 
+                    for(String s: th_group_differentpoints)
+                    {
+                        sb.append(s);
+                        sb.append("=");
+                        sb.append(s);
+                        sb.append("[~");
+                        sb.append(s);
+                        sb.append(".index.duplicated(keep='first')]\n");
+                    }
+
                     sb.append("join_df_stages = pd.concat([");
                     int c = 0;
                     for(String s : th_group_differentpoints)
@@ -223,6 +233,17 @@ public class COM2POSE_lib
                         sb.append(s);
                         sb.append(",index='Peak')\n");
                     }
+
+                    for(String s: th_group_samepoints)
+                    {
+                        sb.append(s);
+                        sb.append("=");
+                        sb.append(s);
+                        sb.append("[~");
+                        sb.append(s);
+                        sb.append(".index.duplicated(keep='first')]\n");
+                    }
+
                     sb.append("join_df_same = pd.concat([");
                     c = 0;
                     for(String s : th_group_samepoints)
