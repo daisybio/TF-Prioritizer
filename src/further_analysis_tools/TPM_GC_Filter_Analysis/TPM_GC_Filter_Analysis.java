@@ -110,7 +110,7 @@ public class TPM_GC_Filter_Analysis  {
 
                         String command = "Rscript "+ file_output;
 
-                        logger.logLine("[Rscript] execute script" + command);
+                        logger.logLine("[Rscript] execute script: " + command);
                         Process child = Runtime.getRuntime().exec(command);
                         int code = child.waitFor();
                         switch (code){

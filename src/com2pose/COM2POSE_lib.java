@@ -1,6 +1,7 @@
 package com2pose;
 import util.*;
 
+import javax.swing.*;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
@@ -39,6 +40,266 @@ public class COM2POSE_lib
     }
 
     /**
+     * analyze joined dataframe data for interesting TFs
+     */
+    public void analyze_plots_data() throws IOException {
+
+        logger.logLine("[PLOT-ANALYSE] Analyse plot data.");
+
+        File input_read_counts = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_symbols);
+        File input_data = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_data_plots);
+
+        File output_analysis_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data);
+        output_analysis_root.mkdir();
+
+        File output_analysis_tp_level = new File(output_analysis_root.getAbsolutePath()+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL);
+        output_analysis_tp_level.mkdir();
+        File output_analysis_hm_level = new File(output_analysis_root.getAbsolutePath()+File.separator+options_intern.folder_out_analysis_data_HM_LEVEL);
+        output_analysis_hm_level.mkdir();
+
+        HashMap<String,HashMap<String,HashMap<String,HashMap<String,Double>>>> cutoff_hm_tf_counts_DIFFERENT = new HashMap<>();
+        HashMap<String,HashMap<String,HashMap<String,HashMap<String,Double>>>> cutoff_hm_tf_counts_SAME = new HashMap<>();
+
+
+        HashMap<String,HashMap<String,Double>> tp_tf_gene_counts = new HashMap<>();
+
+        for(File fileDir:input_read_counts.listFiles())
+        {
+            String tp_name = fileDir.getName().split("\\.")[0];
+            HashMap<String,Double> n_hm = new HashMap<>();
+
+            BufferedReader br = new BufferedReader(new FileReader(fileDir));
+            String line = br.readLine();
+            while((line=br.readLine())!=null)
+            {
+                String[] split = line.split("\t");
+                n_hm.put(split[0].toUpperCase(),Double.parseDouble(split[2]));
+
+            }
+            br.close();
+
+            tp_tf_gene_counts.put(tp_name,n_hm);
+
+        }
+
+        for(File fileDir: input_data.listFiles())
+        {
+            if(fileDir.isDirectory())
+            {
+                String hm = fileDir.getName();
+                File output_hm = new File(output_analysis_tp_level.getAbsolutePath()+File.separator+hm);
+                output_hm.mkdir();
+
+                for(File fileDirHM_th :fileDir.listFiles())
+                {
+                    if(fileDirHM_th.isDirectory())
+                    {
+                        String th_name = fileDirHM_th.getName();
+                        File output_th_tp_level = new File(output_hm.getAbsolutePath()+File.separator+fileDirHM_th.getName());
+                        output_th_tp_level.mkdir();
+
+                        for(File fileDir_HM_th_data : fileDirHM_th.listFiles())
+                        {
+                            if(fileDir_HM_th_data.isFile())
+                            {
+                                String name = fileDir_HM_th_data.getName().split("\\.")[0];
+
+                                HashMap<String,HashMap<String,HashMap<String,Double>>> th;
+                                HashMap<String,HashMap<String,Double>> hm_intern;
+
+                                if(name.matches(".*different.*"))
+                                {
+                                    if(cutoff_hm_tf_counts_DIFFERENT.containsKey(fileDirHM_th.getName()))
+                                    {
+                                        th=cutoff_hm_tf_counts_DIFFERENT.get(fileDirHM_th.getName());
+                                        if(th.containsKey(hm))
+                                        {
+                                            hm_intern=th.get(hm);
+                                        }
+                                        else
+                                        {
+                                            hm_intern=new HashMap<>();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        th=new HashMap<>();
+                                        hm_intern=new HashMap<>();
+                                    }
+                                }
+                                else
+                                {
+                                    if(cutoff_hm_tf_counts_SAME.containsKey(fileDirHM_th.getName()))
+                                    {
+                                        th=cutoff_hm_tf_counts_DIFFERENT.get(fileDirHM_th.getName());
+                                        if(th.containsKey(hm))
+                                        {
+                                            hm_intern=th.get(hm);
+                                        }
+                                        else
+                                        {
+                                            hm_intern=new HashMap<>();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        th=new HashMap<>();
+                                        hm_intern=new HashMap<>();
+                                    }
+                                }
+
+                                BufferedWriter bw = new BufferedWriter(new FileWriter(output_th_tp_level.getAbsolutePath()+File.separator+fileDir_HM_th_data.getName()));
+                                StringBuilder sb = new StringBuilder();
+                                sb.append("TF");
+                                for(String k: tp_tf_gene_counts.keySet())
+                                {
+                                    sb.append("\t");
+                                    sb.append(k);
+                                }
+                                bw.write(sb.toString());
+                                bw.newLine();
+
+                                BufferedReader br = new BufferedReader(new FileReader(fileDir_HM_th_data));
+                                String line = br.readLine();
+                                while((line=br.readLine())!=null)
+                                {
+                                    String[] split = line.split(",");
+
+                                    int count = 0;
+                                    for(String s:split)
+                                    {
+                                        if(!s.equals(""))
+                                        {
+                                            count++;
+                                        }
+
+                                    }
+
+                                    if(count>options_intern.plot_cutoff_tps)
+                                    {
+                                        HashMap<String,Double> tf_gc = new HashMap<>();
+                                        //tf_gc.put(split[0],tp_tf_gene_counts.get(name).get(split[0]));
+                                        StringBuilder sb_intern = new StringBuilder();
+                                        sb_intern.append(split[0]);
+                                        int count_row = 0;
+
+                                        for(String k: tp_tf_gene_counts.keySet())
+                                        {
+                                            if(tp_tf_gene_counts.get(k).containsKey(split[0].toUpperCase()))
+                                            {
+                                                count_row+=tp_tf_gene_counts.get(k).get(split[0].toUpperCase());
+
+                                                tf_gc.put(k,tp_tf_gene_counts.get(k).get(split[0].toUpperCase()));
+                                                sb_intern.append("\t");
+                                                sb_intern.append(tp_tf_gene_counts.get(k).get(split[0].toUpperCase()));
+                                            }
+                                        }
+
+                                        if(count_row>=options_intern.plot_cutoff_gcs)
+                                        {
+                                            hm_intern.put(split[0].toUpperCase(),tf_gc);
+                                            //WRITE
+                                            bw.write(sb_intern.toString());
+                                            bw.newLine();
+                                        }
+                                    }
+                                }
+                                br.close();
+                                bw.close();
+
+                                th.put(hm,hm_intern);
+
+                                //save hashmaps correspondingly
+                                if(name.matches(".*different.*"))
+                                {
+                                    cutoff_hm_tf_counts_DIFFERENT.put(th_name,th);
+                                }
+                                else
+                                {
+                                    cutoff_hm_tf_counts_SAME.put(th_name,th);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for(String k : cutoff_hm_tf_counts_DIFFERENT.keySet())
+        {
+            File f_out = new File(output_analysis_hm_level.getAbsolutePath()+File.separator+k);
+            f_out.mkdir();
+
+            HashMap<String,HashMap<String,HashMap<String,Double>>> available_hms = cutoff_hm_tf_counts_DIFFERENT.get(k);
+
+            ArrayList<HashMap<String,HashMap<String,Double>>> tf_lists = new ArrayList<>();
+
+            for(String kk:available_hms.keySet())
+            {
+                tf_lists.add(available_hms.get(kk));
+            }
+
+            HashMap<String,HashMap<String,Double>> results = new HashMap<>();
+
+            for(int i = 0; i < tf_lists.size();i++)
+            {
+                for(String tf:tf_lists.get(i).keySet())
+                {
+                    int count_hms = 0;
+
+                    for(int j = 0; j < tf_lists.size(); j++)
+                    {
+                        HashMap<String,HashMap<String,Double>> list = tf_lists.get(j);
+                        if(list.containsKey(tf))
+                        {
+                            count_hms++;
+                        }
+                    }
+
+                    if(count_hms>=options_intern.plot_cutoff_hms)
+                    {
+                        results.put(tf,tf_lists.get(i).get(tf));
+                    }
+                }
+            }
+
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f_out.getAbsolutePath()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different));
+            StringBuilder sb = new StringBuilder();
+            ArrayList<String> tp_order = new ArrayList<>();
+            sb.append("TF");
+            for(String tp : tp_tf_gene_counts.keySet())
+            {
+                sb.append("\t");
+                sb.append(tp);
+                tp_order.add(tp);
+            }
+            bw.write(sb.toString());
+            bw.newLine();
+
+            for(String tf : results.keySet())
+            {
+                StringBuilder sb_tf = new StringBuilder();
+                sb_tf.append(tf);
+                HashMap<String,Double> tf_info = results.get(tf);
+
+                for(String order: tp_order)
+                {
+                    sb_tf.append("\t");
+                    sb_tf.append(tf_info.get(order));
+                }
+                bw.write(sb_tf.toString());
+                bw.newLine();
+
+
+            }
+            bw.close();
+        }
+
+        logger.logLine("[PLOT-ANALYSE] Finished analysing plot data.");
+    }
+
+    /**
      * creates python Scripts for all timepoints of all histone modifications, it also creates an overview plot of all different group clashes (e.g. P_L but not L1_L10) for a set threshold plots
      */
     public void create_tp_plots() throws Exception {
@@ -47,6 +308,10 @@ public class COM2POSE_lib
 
         File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_put_DYNAMITE);
         File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_plots);
+
+        File data_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_data_plots);
+        data_output.mkdir();
+
         folder_output.mkdir();
 
         for(File fileDirHM:folder_input.listFiles())
@@ -55,10 +320,17 @@ public class COM2POSE_lib
             {
                 File folder_outputHM = new File(folder_output.getAbsolutePath()+File.separator+fileDirHM.getName());
                 folder_outputHM.mkdir();
+
+                File folder_out_data_HM = new File(data_output.getAbsolutePath()+File.separator+fileDirHM.getName());
+                folder_out_data_HM.mkdir();
+
                 for(double d: options_intern.plot_th_coefficient)
                 {
                     File out_th = new File(folder_outputHM.getAbsolutePath()+File.separator+d);
                     out_th.mkdir();
+
+                    File out_data_th = new File(folder_out_data_HM.getAbsolutePath()+File.separator+d);
+                    out_data_th.mkdir();
 
                     StringBuilder sb = new StringBuilder();
                     sb.append("import pandas as pd\n");
@@ -210,6 +482,12 @@ public class COM2POSE_lib
                     }
                     sb.append("], axis=1)\n");
 
+                    sb.append("join_df_stages.to_csv(r'");
+                    sb.append(out_data_th.getAbsolutePath()+File.separator);
+                    sb.append("all_data_different_stages.csv");
+                    sb.append("',index = True, header = True)");
+                    sb.append("\n");
+
                     sb.append("if not ");
                     sb.append("join_df_stages");
                     sb.append(".empty:\n");
@@ -260,6 +538,12 @@ public class COM2POSE_lib
                         c++;
                     }
                     sb.append("], axis=1)\n");
+
+                    sb.append("join_df_same.to_csv(r'");
+                    sb.append(out_data_th.getAbsolutePath()+File.separator);
+                    sb.append("all_data_same_stages.csv");
+                    sb.append("',index = True, header = True)");
+                    sb.append("\n");
 
                     sb.append("if not ");
                     sb.append("join_df_same");
@@ -2387,7 +2671,24 @@ public class COM2POSE_lib
         output_inter_steps_combined.mkdir();
         File output_inter_steps_single=new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single);
         output_inter_steps_single.mkdir();
+        File output_inter_steps_symbols_ensg_mean_counts = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_symbols);
+        output_inter_steps_symbols_ensg_mean_counts.mkdir();
+
         File folder = new File(options_intern.deseq2_input_directory);
+
+        HashMap<String,String> ensg_symbol = new HashMap<>();
+        BufferedReader br_ensg_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_symbol = br_ensg_symbol.readLine();
+        while((line_ensg_symbol=br_ensg_symbol.readLine())!=null)
+        {
+            String[] split = line_ensg_symbol.split("\t");
+            if(split.length>1)
+            {
+                ensg_symbol.put(split[0],split[1]);
+            }
+        }
+
+        br_ensg_symbol.close();
 
         HashMap<String, HashSet<String>> timepoints_samples= new HashMap<>();
 
@@ -2453,6 +2754,41 @@ public class COM2POSE_lib
 
                 }
                 bw_means.close();
+
+                BufferedReader br_ensg = new BufferedReader(new FileReader(new File(options_intern.deseq2_input_gene_id)));
+                BufferedWriter bw_symbol = new BufferedWriter(new FileWriter(output_inter_steps_symbols_ensg_mean_counts.getAbsolutePath()+File.separator+group.getName()+".csv"));
+                bw_symbol.write("SYMBOL\tENSG\tMEAN_COUNT");
+                bw_symbol.newLine();
+
+                String line = br_ensg.readLine();
+
+                int i = 0;
+                while((line=br_ensg.readLine())!=null)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    int mean_count = mean_line_counts.get(i)/count_samples;
+                    String gene_symbol_name = "NO_SYMBOL";
+
+                    if(ensg_symbol.containsKey(line))
+                    {
+                        gene_symbol_name = ensg_symbol.get(line);
+                    }
+
+                    sb.append(gene_symbol_name);
+                    sb.append("\t");
+                    sb.append(line);
+                    sb.append("\t");
+                    sb.append(mean_count);
+
+
+                    bw_symbol.write(sb.toString());
+                    bw_symbol.newLine();
+                    i++;
+                }
+                br_ensg.close();
+                bw_symbol.close();
+
 
 
             }
@@ -3695,6 +4031,15 @@ public class COM2POSE_lib
                         options_intern.plot_th_coefficient.add(Double.parseDouble(s));
                     }
                     break;
+                case "plot_cutoff_tps":
+                    options_intern.plot_cutoff_tps=Integer.parseInt(split[1]);
+                    break;
+                case "plot_cutoff_hms":
+                    options_intern.plot_cutoff_hms=Integer.parseInt(split[1]);
+                    break;
+                case "plot_cutoff_gcs":
+                    options_intern.plot_cutoff_gcs=Integer.parseInt(split[1]);
+                    break;
                 default:
                     logger.logLine("Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
                     logger.logLine("Do not delete unused parameters in config data!");
@@ -3887,20 +4232,20 @@ public class COM2POSE_lib
                     all_set=false;
                 }
             }
+        }
 
-            //check for map ensg symbol
-            if(options_intern.tepic_ensg_symbol.equals(""))
+        //check for map ensg symbol
+        if(options_intern.tepic_ensg_symbol.equals(""))
+        {
+            logger.logLine("[TEPIC] No map of ENSG to Gene Symbol is given!");
+        }
+        else
+        {
+            File f = new File(options_intern.tepic_ensg_symbol);
+            if(!f.exists())
             {
-                logger.logLine("[TEPIC] TPM cutoff set, but no map of ENSG to Gene Symbol is given!");
-            }
-            else
-            {
-                File f = new File(options_intern.tepic_ensg_symbol);
-                if(!f.exists())
-                {
-                    logger.logLine("[TEPIC] TPM cutoff set and map of ENSG to Gene Symbol file path does not exist!");
-                    all_set=false;
-                }
+                logger.logLine("[TEPIC] Map of ENSG to Gene Symbol file path does not exist!");
+                all_set=false;
             }
         }
 

@@ -38,6 +38,7 @@ public class Options_intern
     public String folder_name_deseq2_preprocessing = "01_DESeq2_preprocessing";
     public String folder_name_deseq2_preprocessing_single = "single";
     public String folder_name_deseq2_preprocessing_combined = "combined";
+    public String folder_name_deseq2_preprocessing_gene_symbols = "symbols_ensg_mean_counts";
     public String folder_name_deseq2_output_raw = "02_DESeq2_output_raw";
     public String folder_name_deseq2_R_scripts = "03_DESeq2_R_scripts";
     public String folder_name_deseq2_output = "04_DESeq2_output";
@@ -63,7 +64,11 @@ public class Options_intern
     public String folder_output_preprocessing_DYNAMITE_integrateData_integrate_TGENE = "integrated_TGENE";
     public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
     public String folder_out_put_DYNAMITE = "08_DYNAMITE_output";
+    public String folder_out_data_plots = "09_PLOTS_DATA";
     public String folder_plots = "09_PLOTS_output";
+    public String folder_out_analysis_data = "09_PLOTS_Z_ANALYSIS";
+    public String folder_out_analysis_data_TP_LEVEL = "01_TP_LEVEL";
+    public String folder_out_analysis_data_HM_LEVEL = "02_HM_LEVEL";
 
 
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
@@ -76,6 +81,8 @@ public class Options_intern
     public String file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff= "Integrated_Data_Log2_Quotient.txt";
     public String file_suffix_output_preprocessing_DYNAMITE_prepClass ="Integrated_Data_For_Classification.txt";
     public String file_suffix_dynamite_output_to_be_plotted = "Regression_Coefficients_Entire_Data_Set_Integrated_Data_For_Classification.txt";
+    public String file_suffix_analysis_plot_data_hm_level_different ="all_data_different.csv";
+    public String file_suffix_analysis_plot_data_hm_level_same ="all_data_same.csv";
 
 
     public String directory_for_tepic_scripts = "ext"+ File.separator+"TEPIC"+File.separator+"TEPIC";
@@ -228,6 +235,12 @@ public class Options_intern
     //#e.g. 0.1 means it creates a plot of the coefficient range ([-1;1]), it uses all TFs of [-1,-0.1] and [0.1,1]
     //#default: 0.1;0.2;0.3;0.4;0.5;0.6
     public List<Double> plot_th_coefficient= new ArrayList<Double>(Arrays.asList(new Double[]{0.1, 0.2, 0.3, 0.4, 0.5, 0.6}));
+    //#[OPT]: in how many TPs should a TF be found, default: 2
+    public int plot_cutoff_tps=2;
+    //#[OPT]: in how many HMs should a TF be found, default: 2
+    public int plot_cutoff_hms=2;
+    //#[OPT]: minimum gene counts, default: 100
+    public int plot_cutoff_gcs=100;
 
 
     /*##################################
