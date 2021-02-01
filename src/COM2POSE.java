@@ -59,7 +59,8 @@ public class COM2POSE
 
         //PLOTS*/
         //com2pose_lib.create_tp_plots();
-        com2pose_lib.analyze_plots_data();
+        //com2pose_lib.analyze_plots_data();
+        com2pose_lib.get_top_k_target_genes_plots();
 
         System.out.println("X");
     }

@@ -69,6 +69,7 @@ public class Options_intern
     public String folder_out_analysis_data = "09_PLOTS_Z_ANALYSIS";
     public String folder_out_analysis_data_TP_LEVEL = "01_TP_LEVEL";
     public String folder_out_analysis_data_HM_LEVEL = "02_HM_LEVEL";
+    public String folder_out_target_genes ="09_PLOTS_Z_TARGET_GENES";
 
 
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
@@ -241,6 +242,8 @@ public class Options_intern
     public int plot_cutoff_hms=2;
     //#[OPT]: minimum gene counts, default: 100
     public int plot_cutoff_gcs=100;
+    //#[OPT]: top k target genes for TFs, default: 30
+    public int plot_top_k_genes=30;
 
 
     /*##################################

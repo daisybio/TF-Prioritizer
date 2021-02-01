@@ -40,6 +40,126 @@ public class COM2POSE_lib
     }
 
     /**
+     * get target genes of tfs
+     */
+    public void get_top_k_target_genes_plots() throws IOException {
+        logger.logLine("[PLOTS-TARGET-GENES] Start fetching top "+options_intern.plot_top_k_genes+" target genes for TFs under thresholds.");
+
+        File f_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_data_plots);
+        File f_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes);
+        f_output.mkdir();
+
+        File f_input_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+
+        HashMap<String,String> ensg_gene_symbol_map = new HashMap<>();
+        BufferedReader br_ensg_gene_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
+        while((line_ensg_gene_symbol=br_ensg_gene_symbol.readLine())!=null)
+        {
+            String[] split = line_ensg_gene_symbol.split("\t");
+            if(split.length>1)
+            {
+                ensg_gene_symbol_map.put(split[0],split[1]);
+            }
+        }
+        br_ensg_gene_symbol.close();
+
+        for(File fileDir:f_input.listFiles())
+        {
+            if(fileDir.isDirectory())
+            {
+                String hm_name = fileDir.getName();
+
+                File f_output_hm = new File(f_output.getAbsolutePath()+File.separator+hm_name);
+                f_output_hm.mkdir();
+
+                for (File fileDir_th : fileDir.listFiles())
+                {
+                    if(fileDir_th.isDirectory())
+                    {
+                        String th = fileDir_th.getName();
+
+                        File f_output_hm_th = new File(f_output_hm.getAbsolutePath()+File.separator+th);
+                        f_output_hm_th.mkdir();
+
+                        for(File fileDir_th_f : fileDir_th.listFiles())
+                        {
+                            if(fileDir_th_f.isFile())
+                            {
+                                String file_name = fileDir_th_f.getName();
+
+                                File f_out_hm_th_file = new File(f_output_hm_th.getAbsolutePath()+File.separator+file_name.split("\\.")[0]);
+                                f_out_hm_th_file.mkdir();
+
+                                BufferedReader br_tf = new BufferedReader(new FileReader(fileDir_th_f));
+                                String line_tf = br_tf.readLine();
+                                String[] split_header = line_tf.split(",");
+                                ArrayList<String> timepoints_in_header = new ArrayList<>();
+                                for(int i = 1; i < split_header.length;i++)
+                                {
+                                    String[] split_inner = split_header[i].split("VS");
+
+                                    String[] split_left_side = split_inner[0].split(":");
+
+                                    timepoints_in_header.add(split_left_side[1].trim());
+                                    timepoints_in_header.add(split_inner[1].trim());
+                                }
+
+                                while((line_tf=br_tf.readLine())!=null)
+                                {
+                                    String[] split = line_tf.split(",",-1);
+
+                                    ArrayList<String> timepoints_identified = new ArrayList<>();
+
+                                    for(int i =1; i < split.length; i++)
+                                    {
+                                        if(!split[i].equals(""))
+                                        {
+                                            timepoints_identified.add(timepoints_in_header.get(i-1));
+                                            timepoints_identified.add(timepoints_in_header.get(i));
+                                        }
+                                    }
+
+                                    HashSet<String> already_done_tps = new HashSet<>();
+
+                                    for(int i = 0; i < timepoints_identified.size(); i+=2)
+                                    {
+                                        if(timepoints_identified.get(i).equals(timepoints_identified.get(i+1)))
+                                        {
+                                            continue;
+                                        }
+
+                                        if(!already_done_tps.contains(timepoints_identified.get(i)))
+                                        {
+                                            File f_input_target_genes_hm_group_clash = new File(f_input_target_genes.getAbsolutePath()+File.separator+hm_name+File.separator+timepoints_identified.get(i)+"_"+timepoints_identified.get(i+1));
+
+                                            write_target_genes_of_tf(f_input_target_genes_hm_group_clash,timepoints_identified.get(i),f_out_hm_th_file,split[0],ensg_gene_symbol_map);
+
+                                            already_done_tps.add(timepoints_identified.get(i));
+                                        }
+
+                                        if(!already_done_tps.contains(timepoints_identified.get(i+1)))
+                                        {
+                                            File f_input_target_genes_hm_group_clash = new File(f_input_target_genes.getAbsolutePath()+File.separator+hm_name+File.separator+timepoints_identified.get(i)+"_"+timepoints_identified.get(i+1));
+
+                                            write_target_genes_of_tf(f_input_target_genes_hm_group_clash,timepoints_identified.get(i+1),f_out_hm_th_file,split[0],ensg_gene_symbol_map);
+
+                                            already_done_tps.add(timepoints_identified.get(i+1));
+                                        }
+                                    }
+                                }
+                                br_tf.close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        logger.logLine("[PLOTS-TARGET-GENES] Finished fetching top "+options_intern.plot_top_k_genes+" target genes for TFs under thresholds.");
+    }
+
+    /**
      * analyze joined dataframe data for interesting TFs
      */
     public void analyze_plots_data() throws IOException {
@@ -163,7 +283,7 @@ public class COM2POSE_lib
                                 String line = br.readLine();
                                 while((line=br.readLine())!=null)
                                 {
-                                    String[] split = line.split(",");
+                                    String[] split = line.split(",",-1);
 
                                     int count = 0;
                                     for(String s:split)
@@ -4040,6 +4160,9 @@ public class COM2POSE_lib
                 case "plot_cutoff_gcs":
                     options_intern.plot_cutoff_gcs=Integer.parseInt(split[1]);
                     break;
+                case "plot_top_k_genes":
+                    options_intern.plot_top_k_genes=Integer.parseInt(split[1]);
+                    break;
                 default:
                     logger.logLine("Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
                     logger.logLine("Do not delete unused parameters in config data!");
@@ -4353,7 +4476,22 @@ public class COM2POSE_lib
             logger.logLine("[PLOTS] plot th coefficients is empty, please use at least one coefficient.");
             all_set=false;
         }
-
+        if(options_intern.plot_cutoff_tps<1)
+        {
+            logger.logLine("[PLOTS] plot_cutoff_tps must be >= 1");
+        }
+        if(options_intern.plot_cutoff_hms<1)
+        {
+            logger.logLine("[PLOTS] plot_cutoff_hms must be >= 1");
+        }
+        if(options_intern.plot_cutoff_gcs<0)
+        {
+            logger.logLine("[PLOTS] plot_cutoff_gcs must be >= 0");
+        }
+        if(options_intern.plot_top_k_genes<1)
+        {
+            logger.logLine("[PLOTS] plot_top_k_genes must be >= 1");
+        }
 
         return all_set;
     }
@@ -4486,6 +4624,88 @@ public class COM2POSE_lib
             }
         }
         return stack;
+    }
+
+    private void write_target_genes_of_tf(File f_input_target_genes_hm_group_clash, String timepoint, File f_out_hm_th_file, String tf, HashMap<String,String>ensg_gene_symbol_map) throws IOException {
+
+        File f_output = new File(f_out_hm_th_file+File.separator+timepoint);
+        f_output.mkdir();
+
+        if(!f_input_target_genes_hm_group_clash.exists())
+        {
+            String[] split = f_input_target_genes_hm_group_clash.getName().split("_");
+
+            String[] split_slashes = f_input_target_genes_hm_group_clash.getAbsolutePath().split(File.separator);
+            String path = "";
+            for(int i = 0; i < split_slashes.length-1;i++)
+            {
+                path += File.separator+split_slashes[i];
+            }
+            path+=File.separator+split[1]+"_"+split[0];
+
+            f_input_target_genes_hm_group_clash = new File(path);
+        }
+
+        File f_input = new File(f_input_target_genes_hm_group_clash.getAbsolutePath()+File.separator+timepoint);
+
+
+
+        for(File fileDir: f_input.listFiles())
+        {
+            if(fileDir.isFile())
+            {
+                BufferedReader br = new BufferedReader(new FileReader(fileDir));
+                String line = br.readLine();
+
+                int interesting_column = -1;
+
+                String[] header = line.split("\t");
+                for(int i = 0; i < header.length;i++)
+                {
+                    if(header[i].toUpperCase().matches(".*"+tf.toUpperCase()+".*"))
+                    {
+                        interesting_column=i;
+                    }
+                }
+
+                if(interesting_column==-1)
+                {
+                    return;
+                }
+
+                ArrayList<Gene_Affinity_Value> all_affinities = new ArrayList<>();
+
+                while((line=br.readLine())!=null)
+                {
+                    String[] split = line.split("\t");
+
+                    Gene_Affinity_Value gav = new Gene_Affinity_Value();
+                    gav.gene_name = split[0];
+                    if(ensg_gene_symbol_map.containsKey(gav.gene_name))
+                    {
+                        gav.gene_symbol=ensg_gene_symbol_map.get(gav.gene_name);
+                    }
+                    gav.affinity_value=Double.parseDouble(split[interesting_column]);
+                    all_affinities.add(gav);
+                }
+                br.close();
+
+                Collections.sort(all_affinities);
+
+                BufferedWriter bw = new BufferedWriter(new FileWriter(new File(f_output.getAbsolutePath()+File.separator+tf+".csv")));
+
+                bw.write("ENSG\tSYMBOL\tAFFINITY");
+                bw.newLine();
+
+                for(int i = 0; i < options_intern.plot_top_k_genes;i++)
+                {
+                    bw.write(all_affinities.get(i).toString());
+                    bw.newLine();
+                }
+
+                bw.close();
+            }
+        }
     }
 
 
