@@ -1,3 +1,5 @@
+//TODO: AUTOMATIC CREATE MAP ENSG -> SYMBOL after DESEQ2 RUN! CURL or something / biomart?
+
 package com2pose;
 import util.*;
 
@@ -775,7 +777,14 @@ public class COM2POSE_lib
         }
         else
         {
-            folder= new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_integrate);
+            if(options_intern.tgen_self_regulatory)
+            {
+                folder= new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_integrate);
+            }
+            else
+            {
+                folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_filter_target_genes);
+            }
         }
 
         File folder_output_pre = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_output_preprocessing_DYNAMITE);
@@ -889,15 +898,16 @@ public class COM2POSE_lib
     }
 
     /**
-     * integrates TGene and TEPIC data into one affinity file so preproccesing DYNAMITE can use it.
+     * integrates self-regulatory TGene TFs into TEPIC data into one affinity file so preproccesing DYNAMITE can use it.
      */
-    public void integrate_tgen() throws IOException {
-        logger.logLine("[TGENE] Integrate TGene data into TEPIC data");
+    public void integrate_self_regulatory_tgen() throws IOException {
+        logger.logLine("[TGENE-SELF-REGULATORY] Integrate self-regulatoring TFs found in TGene data into TEPIC data");
 
         File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_integrate);
         folder_output.mkdir();
         //create necessary folder structure -> TEMPLATE: postprocess TEPIC
-        File folder_tepic_postprocess = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+        File folder_tepic_postprocess = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_filter_target_genes);
+
         for(File firDir:folder_tepic_postprocess.listFiles())
         {
             if(firDir.isDirectory())
@@ -928,7 +938,7 @@ public class COM2POSE_lib
 
                     if (folderDirHM_Group.isDirectory())
                     {
-                        logger.logLine("[TGENE] integrate " + hm +": " + folderDirHM_Group.getName());
+                        logger.logLine("[TGENE-SELF-REGULATORY] integrate self-regulatory TFs " + hm +": " + folderDirHM_Group.getName());
 
                         BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folderDirHM_Group.getAbsolutePath() + File.separator + options_intern.file_suffix_tepic_postprocessing_output_ratios+folderDirHM_Group.getName()+".txt")));
 
@@ -1131,7 +1141,108 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[TGENE] Finished integrating TGene data into TEPIC data");
+        logger.logLine("[TGENE-SELF-REGULATORY] Finished integrating self-regulatory TFs found in TGene data into TEPIC data");
+    }
+
+    /**
+     * filter targetgenes of TEPIC using TGENE output
+     */
+    public void filter_target_genes_tgen() throws IOException {
+        logger.logLine("[TGENE] Start filtering target genes.");
+
+        File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_filter_target_genes);
+        folder_output.mkdir();
+        //create necessary folder structure -> TEMPLATE: postprocess TEPIC
+        File folder_tepic_postprocess = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+        for(File firDir:folder_tepic_postprocess.listFiles())
+        {
+            if(firDir.isDirectory())
+            {
+                File folder_output_hm = new File(folder_output.getAbsolutePath()+File.separator+firDir.getName());
+                folder_output_hm.mkdir();
+                for(File fileDirHM: firDir.listFiles())
+                {
+                    if(fileDirHM.isDirectory())
+                    {
+                        File folder_output_HM_group= new File(folder_output_hm.getAbsolutePath()+File.separator+fileDirHM.getName());
+                        folder_output_HM_group.mkdir();
+                    }
+                }
+            }
+        }
+
+        HashMap<String,String> ensg_gene_symbol_map = new HashMap<>();
+        BufferedReader br_ensg_gene_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
+        while((line_ensg_gene_symbol=br_ensg_gene_symbol.readLine())!=null)
+        {
+            String[] split = line_ensg_gene_symbol.split("\t");
+            if(split.length>1)
+            {
+                ensg_gene_symbol_map.put(split[1].toUpperCase(),split[0]);
+            }
+        }
+        br_ensg_gene_symbol.close();
+
+        for(File folderDirHM:folder_output.listFiles())
+        {
+            if (folderDirHM.isDirectory())
+            {
+                String hm = folderDirHM.getName();
+                for (File folderDirHM_Group : folderDirHM.listFiles())
+                {
+                    if (folderDirHM_Group.isDirectory())
+                    {
+                        String group_name = folderDirHM_Group.getName();
+
+                        logger.logLine("[TGENE] filter target genes " + hm +": " + group_name);
+
+                        File input_data_TGENE = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_groups+File.separator+hm+File.separator+folderDirHM_Group.getName()+File.separator+options_intern.file_suffic_tgen_output_groups);
+                        File input_data_TEPIC = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_output+File.separator+hm+File.separator+folderDirHM_Group.getName()+File.separator+options_intern.folder_name_tepic_postprocessing_output_ratios+File.separator+options_intern.file_suffix_tepic_postprocessing_output_ratios+folderDirHM_Group.getName()+".txt");
+
+                        HashSet<String> available_target_genes = new HashSet<>();
+
+                        BufferedReader br_tgene = new BufferedReader(new FileReader(input_data_TGENE));
+                        String line_tgene = br_tgene.readLine();
+                        while((line_tgene = br_tgene.readLine())!=null)
+                        {
+                            String[] split = line_tgene.split("\t");
+
+                            String[] split_genes = split[3].split(";");
+
+                            for(String s: split_genes)
+                            {
+                                if(ensg_gene_symbol_map.containsKey(s.toUpperCase()))
+                                {
+                                    available_target_genes.add(ensg_gene_symbol_map.get(s.toUpperCase()));
+                                }
+                            }
+                        }
+                        br_tgene.close();
+
+                        BufferedWriter bw_tepic = new BufferedWriter(new FileWriter(folderDirHM_Group.getAbsolutePath()+File.separator+input_data_TEPIC.getName()));
+                        BufferedReader br_tepic = new BufferedReader(new FileReader(input_data_TEPIC));
+                        String line_tepic = br_tepic.readLine();
+                        bw_tepic.write(line_tepic);
+                        bw_tepic.newLine();
+
+                        while((line_tepic=br_tepic.readLine())!=null)
+                        {
+                            String[] split = line_tepic.split("\t");
+                            if(available_target_genes.contains(split[0]))
+                            {
+                                bw_tepic.write(line_tepic);
+                                bw_tepic.newLine();
+                            }
+                        }
+
+                        br_tepic.close();
+                        bw_tepic.close();
+                    }
+                }
+            }
+        }
+        logger.logLine("[TGENE] Finished filtering target genes.");
     }
 
     /**
@@ -4095,6 +4206,9 @@ public class COM2POSE_lib
                 case "tgen_no_closest_locus":
                     options_intern.tgen_no_closest_locus=Boolean.parseBoolean(split[1]);
                     break;
+                case "tgen_self_regulatory":
+                    options_intern.tgen_self_regulatory=Boolean.parseBoolean(split[1]);
+                    break;
                 case "tgen_no_closest_tss":
                     options_intern.tgen_no_closest_tss=Boolean.parseBoolean(split[1]);
                     break;
@@ -4446,10 +4560,13 @@ public class COM2POSE_lib
                 all_set=false;
             }
 
-            if(options_intern.tgen_consensus_calc.equals(""))
+            if(options_intern.tgen_self_regulatory)
             {
-                logger.logLine("[TGENE] tgen_consensus_calc must be set.");
-                all_set=false;
+                if(options_intern.tgen_consensus_calc.equals(""))
+                {
+                    logger.logLine("[TGENE] tgen_consensus_calc must be set.");
+                    all_set=false;
+                }
             }
         }
 

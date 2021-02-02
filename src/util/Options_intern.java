@@ -58,10 +58,10 @@ public class Options_intern
     public String folder_name_tgen_output = "02_output";
     public String folder_name_tgen_merged = "03_merged";
     public String folder_name_tgen_groups = "04_groups";
-    public String folder_name_tgen_integrate = "05_integrate_affinities";
+    public String folder_name_tgen_filter_target_genes = "05_filtered_target_genes";
+    public String folder_name_tgen_integrate = "06_integrate_affinities_self_regulatory";
     public String folder_output_preprocessing_DYNAMITE = "07_DYNAMITE_preprocessing";
     public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
-    public String folder_output_preprocessing_DYNAMITE_integrateData_integrate_TGENE = "integrated_TGENE";
     public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
     public String folder_out_put_DYNAMITE = "08_DYNAMITE_output";
     public String folder_out_data_plots = "09_PLOTS_DATA";
@@ -184,19 +184,21 @@ public class Options_intern
     /*######################
      ####TGENE parameters###
      #######################*/
-    //#[REQ]: value for consus approach (e.g. 0.5 = 50:50 TGene:TEPIC, 0.4 = 40:60 TGene:TEPIC), default: 0.5
-    public double tgen_consensus=0.5;
-    //#[REQ]: can be "INCREASE_TGENE_TFS" (increases TEPIC TF affinities for TFs found in TGENE at target gene) or "DECREASE_NOT_TGENE_TFs (decreases TEPIC TF affinities for TFs not found in TGENE at target gene)".
-    public String tgen_consensus_calc="INCREASE_TGENE_TFS";
-    //#[OPT]: if no locus is found within window size, the nearest locus is used, default:true
-    public boolean tgen_no_closest_locus=true;
-    //#[OPT]: if no tss is found within window size, the nearest locus is used, default:true
-    public boolean tgen_no_closest_tss=true;
-    //#[OPT]: window size of tgen
-    public int tgen_max_link_distances=50000;
-    //#[OPT]: max pvalue, which is accepted
+    //#[OPT]:  if no locus is found within window size, the nearest locus is used, default:false
+    public boolean tgen_no_closest_locus=false;
+    //#[OPT]:  if no tss is found within window size, the nearest locus is used, default:false
+    public boolean tgen_no_closest_tss=false;
+    //#[OPT]:  window size of tgen, default: 500000
+    public int tgen_max_link_distances=500000;
+    //#[OPT]: max pvalue, which is accepted, default 0.05
     public double tgen_pvalue=0.05;
-    //#[OPT]: if TGENE consensus is used please specify the writing of the Mitochondrial DNA chromosome in Peak Files, default: MT
+    //#[REQ]: should self regulatory TFs {OPT-SELF-REG} be increased? default: false
+    public boolean tgen_self_regulatory=false;
+    //#[OPT]: {OPT-SELF-REG} value for consus approach (e.g. 0.5 = 50:50 TGene:TEPIC, 0.4 = 40:60 TGene:TEPIC), default: 0.5
+    public double tgen_consensus=0.5;
+    //#[OPT]: {OPT-SELF-REG} can be "INCREASE_TGENE_TFS" (increases TEPIC TF affinities for TFs found in TGENE at target gene) or "DECREASE_NOT_TGENE_TFs (decreases TEPIC TF affinities for TFs not found in TGENE at target gene)".
+    public String tgen_consensus_calc="INCREASE_TGENE_TFS";
+    //#[OPT]: if {OPT-SELF-REG} TGENE consensus is used please specify the writing of the Mitochondrial DNA chromosome in Peak Files, default: MT
     public String tgen_mt_writing="MT";
 
     /*######################

@@ -16,7 +16,6 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
-        /*
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -33,7 +32,6 @@ public class COM2POSE
 
         //DESeq2
         com2pose_lib.create_DESeq2_scripts();
-
         com2pose_lib.run_and_postprocess_DESeq2();
 
 
@@ -49,7 +47,13 @@ public class COM2POSE
             com2pose_lib.run_tgen();
             com2pose_lib.merge_tgen();
             com2pose_lib.create_tgen_groups();
-            com2pose_lib.integrate_tgen();
+
+            com2pose_lib.filter_target_genes_tgen();
+
+            if(options_intern.tgen_self_regulatory)
+            {
+                com2pose_lib.integrate_self_regulatory_tgen();
+            }
         }
 
         //DYNAMITE
@@ -57,9 +61,9 @@ public class COM2POSE
         com2pose_lib.run_DYNAMITE();
 
 
-        //PLOTS*/
-        //com2pose_lib.create_tp_plots();
-        //com2pose_lib.analyze_plots_data();
+        //PLOTS
+        com2pose_lib.create_tp_plots();
+        com2pose_lib.analyze_plots_data();
         com2pose_lib.get_top_k_target_genes_plots();
 
         System.out.println("X");
