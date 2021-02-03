@@ -69,8 +69,14 @@ public class Options_intern
     public String folder_out_analysis_data = "09_PLOTS_Z_ANALYSIS";
     public String folder_out_analysis_data_TP_LEVEL = "01_TP_LEVEL";
     public String folder_out_analysis_data_HM_LEVEL = "02_HM_LEVEL";
+    public String folder_out_analysis_data_WEBSITE_OVERVIEW = "03_WEBSITE_OVERVIEW";
     public String folder_out_target_genes ="09_PLOTS_Z_TARGET_GENES";
-
+    public String folder_out_website="Z_WEBSITE_OVERVIEW";
+    public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
+    public String folder_out_website_htmls = "HTMLS";
+    public String folder_out_website_htmls_TFs = "TFs";
+    public String folder_out_website_interactive_plots_tps="TIMEPOINTS_CONDITIONS";
+    public String folder_out_website_interactive_plots_overview="OVERVIEW";
 
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
@@ -84,6 +90,7 @@ public class Options_intern
     public String file_suffix_dynamite_output_to_be_plotted = "Regression_Coefficients_Entire_Data_Set_Integrated_Data_For_Classification.txt";
     public String file_suffix_analysis_plot_data_hm_level_different ="all_data_different.csv";
     public String file_suffix_analysis_plot_data_hm_level_same ="all_data_same.csv";
+    public String file_suffix_website_analysis_tf_available = "available_tfs.csv";
 
 
     public String directory_for_tepic_scripts = "ext"+ File.separator+"TEPIC"+File.separator+"TEPIC";
@@ -246,6 +253,13 @@ public class Options_intern
     public int plot_cutoff_gcs=100;
     //#[OPT]: top k target genes for TFs, default: 30
     public int plot_top_k_genes=30;
+
+    /*#########################
+      ####WEBSITE parameters###
+      #########################*/
+    //#[OPT]: list of TFs which you are interested in - is only used to search fast for known TFs in the results, it does not affect results
+    //#e.g. website_interesting_tfs="STAT3;GATA3;NFIB"
+    public HashSet<String> website_interesting_tfs=new HashSet<>();
 
 
     /*##################################

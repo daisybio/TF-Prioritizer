@@ -17,6 +17,9 @@
 !/TEPIC/TEPIC/*/*/*/*/*/*/*/*
 !/TEPIC/TEPIC/*/*/*/*/*/*/*/*/*
 !/TEPIC/TEPIC/*/*/*/*/*/*/*/*/*/*
+!WEBSITE_CSS/*
+!WEBSITE/CSS/*
+!WEBSITE/images/*
 # etc...
 
 # ...even if they are in subdirectories
