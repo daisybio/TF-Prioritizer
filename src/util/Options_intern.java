@@ -70,9 +70,14 @@ public class Options_intern
     public String folder_out_analysis_data_TP_LEVEL = "01_TP_LEVEL";
     public String folder_out_analysis_data_HM_LEVEL = "02_HM_LEVEL";
     public String folder_out_analysis_data_WEBSITE_OVERVIEW = "03_WEBSITE_OVERVIEW";
+    public String folder_out_analysis_data_WEBSITE_NUMBER_TFs = "04_WEBSITE_NUMBER_TFs";
     public String folder_out_target_genes ="09_PLOTS_Z_TARGET_GENES";
     public String folder_out_website="Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
+    public String folder_out_website_basics = "WEBSITE_BASICS";
+    public String folder_out_website_basics_website = "WEBSITE";
+    public String folder_out_website_basics_website_css = "CSS";
+    public String folder_out_website_basics_website_images = "images";
     public String folder_out_website_htmls = "HTMLS";
     public String folder_out_website_htmls_TFs = "TFs";
     public String folder_out_website_interactive_plots_tps="TIMEPOINTS_CONDITIONS";

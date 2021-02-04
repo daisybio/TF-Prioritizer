@@ -14,6 +14,10 @@ public class COM2POSE_lib
     public Options_intern options_intern;
     public Logger logger;
 
+    //only used in create_overview_website()!!
+    ArrayList<File> threshold_folders = new ArrayList<>();
+    boolean threshold_folders_filled = false;
+
     /**
      * constructor for analysis programms, you cannot run the pipeline here
      * @param options_intern
@@ -43,77 +47,44 @@ public class COM2POSE_lib
     }
 
 
-    public void create_overview_website() throws IOException {
+    public void create_overview_website() throws Exception {
         logger.logLine("[WEBSITE] Start creating overview website.");
 
-        File f_website_css = new File(options_intern.path_to_COM2POSE+File.separator+"ext"+File.separator+"WEBSITE"+File.separator+"CSS");
+        File f_website_css = new File(options_intern.path_to_COM2POSE+File.separator+"ext"+File.separator+"WEBSITE");
+
+        File f_move_css = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_basics);
+        f_move_css.mkdir();
+
+        String command = "cp -u -r " + f_website_css.getAbsolutePath() + " " + f_move_css.getAbsolutePath();
+        Process child = Runtime.getRuntime().exec(command);
+        logger.logLine("[WEBSITE] Copy CSS files: " + command);
+        int code = child.waitFor();
+        switch (code) {
+            case 0:
+                break;
+            case 1:
+                String message = child.getErrorStream().toString();
+                throw new Exception(message);
+        }
+
         File f_output_website = new File(options_intern.com2pose_working_directory+ File.separator+options_intern.folder_out_website);
 
         File f_output_website_htmls = new File(f_output_website.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls);
         f_output_website_htmls.mkdir();
 
-        StringBuilder sb_home_front = new StringBuilder();
-        sb_home_front.append("<!DOCTYPE html>\n" +
-                "<html lang=\"en\">\n" +
-                "<title>COM2POSE</title>\n" +
-                "<meta charset=\"UTF-8\">\n" +
-                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
-
-        for(File fileDir:f_website_css.listFiles())
-        {
-            if(fileDir.isFile())
-            {
-                sb_home_front.append("<link rel=\"stylesheet\" href=\"");
-                sb_home_front.append(fileDir.getAbsolutePath());
-                sb_home_front.append("\">\n");
-            }
-        }
-
-        sb_home_front.append("<style>\n" +
-                "body,h1,h2,h3,h4,h5,h6 {font-family: \"Lato\", sans-serif}\n" +
-                ".w3-bar,h1,button {font-family: \"Montserrat\", sans-serif}\n" +
-                ".fa-anchor,.fa-coffee {font-size:200px}\n" +
-                "</style>\n" +
-                "<body>\n" +
-                "  \n" +
-                "<!-- Header -->\n" +
-                "<header class=\"w3-container w3-red w3-center\" style=\"padding:128px 16px\">\n" +
-                "  <h1 class=\"w3-margin w3-jumbo\">COM2POSE: <i>results overview</i></h1>\n" +
-                "  \n" +
-                "    <div class=\"dropdown\">\n" +
-                "  <h2>Please choose a threshold</h2>\n" +
-                "  <button class=\"dropbtn\">Threshold</button>\n" +
-                "  <div class=\"dropdown-content\">\n");
-
-        ArrayList<File> threshold_folders = new ArrayList<>();
-
-        for(Double d: options_intern.plot_th_coefficient)
-        {
-            File f_output_website_htmls_th = new File(f_output_website_htmls.getAbsolutePath()+File.separator+d);
-            f_output_website_htmls_th.mkdir();
-
-            threshold_folders.add(f_output_website_htmls_th);
-
-            sb_home_front.append("<a href=\"");
-            sb_home_front.append(f_output_website_htmls_th.getAbsolutePath()+File.separator+"threshold_"+d+"_overview.html\">Coefficient " + d);
-            sb_home_front.append("</a>\n");
-        }
-
-        sb_home_front.append("  </div>\n" +
-                "</div>\n" +
-                "</header>\n");
 
         String html_tail = "</body>\n" +
                 "</html>";
 
         BufferedWriter bw_home = new BufferedWriter(new FileWriter(f_output_website+File.separator+"HOME.html"));
 
-        bw_home.write(sb_home_front.toString());
+        //bw_home.write(sb_home_front.toString());
+        bw_home.write(get_header_html("HOME"));
+        threshold_folders_filled =true;
 
-        //include tables
         for(Double d: options_intern.plot_th_coefficient)
         {
-            bw_home.append(write_table_html(d));
+            bw_home.append(write_table_html(d,"HOME"));
         }
 
         bw_home.write(html_tail);
@@ -127,12 +98,19 @@ public class COM2POSE_lib
 
             File f_interactive_plots_root = new File(f_output_website.getAbsolutePath()+ File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName());
 
-            StringBuilder sb_threshold = new StringBuilder(sb_home_front);
+            StringBuilder sb_threshold = new StringBuilder(get_header_html("THRESHOLD"));
+            sb_threshold.append(" <script>\n" +
+                    " document.title = \"TH: "+fileDir.getName()+"\";\n" +
+                    " </script>\n");
             sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\"><div class=\"w3-content\"><h1>Current threshold: "+fileDir.getName()+"</h1></div></div>\n");
 
 
+            HashSet<String> total_number_tfs = new HashSet<>();
+
             for(File fileDir_hm : f_interactive_plots_root.listFiles())
             {
+                HashSet<String> total_number_tfs_hm = new HashSet<>();
+
                 possible_hms.add(fileDir_hm.getName());
 
                 sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
@@ -149,12 +127,16 @@ public class COM2POSE_lib
                         "    position: relative;\n" +
                         "    display: block;\n" +
                         "    overflow-x: scroll;\">\n" +
-                        "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"file:"+File.separator+File.separator+File.separator);
-                sb_threshold.append(fileDir_hm.getAbsolutePath()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_different_stages.html");
+                        "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                String relative_path_diff_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_different_stages.html";
+
+                sb_threshold.append(relative_path_diff_th);
                 sb_threshold.append("\" height=\"400\" width=\"1500\" overflow=\"scroll\"></iframe>\n");
                 sb_threshold.append("</div>");
 
                 //gene count table for plot
+
+                HashSet<String> total_numbers_tfs_hm_diff = new HashSet<>();
                 sb_threshold.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
                 sb_threshold.append("<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
                 sb_threshold.append("\t\t<table style=\"width:100%\">\n");
@@ -183,9 +165,14 @@ public class COM2POSE_lib
                             if(f_try.exists())
                             {
                                 sb_threshold.append("<a href='");
-                                sb_threshold.append(f_try.getAbsolutePath());
-                                sb_threshold.append("' target='_blank'><button>"+s.toUpperCase()+"</button>");
+                                //sb_threshold.append(f_try.getAbsolutePath());
+                                sb_threshold.append("TFs"+File.separator+f_try.getName());
+                                sb_threshold.append("' target='_blank'><button class=\"button\">"+s.toUpperCase()+"</button>");
                                 sb_threshold.append("</a>");
+
+                                total_number_tfs.add(s.toUpperCase());
+                                total_number_tfs_hm.add(s.toUpperCase());
+                                total_numbers_tfs_hm_diff.add(s.toUpperCase());
                             }
                             else
                             {
@@ -199,9 +186,13 @@ public class COM2POSE_lib
                     sb_threshold.append("\t\t\t</tr>\n");
 
                 }
+                br_gc_different.close();
 
                 sb_threshold.append("\t\t</table>\n");
 
+                sb_threshold.append("<h5> A total number of "+total_numbers_tfs_hm_diff.size()+" distinct TFs are considered in different time points group </h5>\n");
+
+                HashSet<String> total_numbers_tfs_hm_same = new HashSet<>();
                 sb_threshold.append("\t <h4> Same timepoints / conditions </h4> \n" +
                         "\t  \n" +
                         "<div class=\"container\" style=\"\n" +
@@ -209,10 +200,73 @@ public class COM2POSE_lib
                         "    position: relative;\n" +
                         "    display: block;\n" +
                         "    overflow-x: scroll;\">\n" +
-                        "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"file:"+File.separator+File.separator+File.separator);
-                sb_threshold.append(fileDir_hm.getAbsolutePath()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_same_stages.html");
+                        "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                String relative_path_same_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_same_stages.html";
+                sb_threshold.append(relative_path_same_th);
                 sb_threshold.append("\" height=\"400\" width=\"1500\"></iframe>\n");
                 sb_threshold.append("</div>");
+
+                //gene count table for plot
+                sb_threshold.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
+                sb_threshold.append("<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
+                sb_threshold.append("\t\t<table style=\"width:100%\">\n");
+
+                File f_gene_counts_input_same = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+fileDir_hm.getName()+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_same);
+                BufferedReader br_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
+                String line_gc_same ="";
+                while((line_gc_same=br_gc_same.readLine())!=null)
+                {
+                    String[] split = line_gc_same.split("\t");
+                    sb_threshold.append("\t\t\t<tr>\n");
+
+                    tfs_to_create_pages.add(split[0]);
+
+                    int count = 0;
+                    for(String s: split)
+                    {
+                        sb_threshold.append("\t\t\t\t<th>");
+                        if(count!=0 || s.equals("TF"))
+                        {
+                            sb_threshold.append(s.toUpperCase());
+                        }
+                        else
+                        {
+                            File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
+                            if(f_try.exists())
+                            {
+                                sb_threshold.append("<a href='");
+                                //sb_threshold.append(f_try.getAbsolutePath());
+                                sb_threshold.append("TFs"+File.separator+f_try.getName());
+                                sb_threshold.append("' target='_blank'><button class=\"button\">"+s.toUpperCase()+"</button>");
+                                sb_threshold.append("</a>");
+
+                                total_number_tfs.add(s.toUpperCase());
+                                total_number_tfs_hm.add(s.toUpperCase());
+                                total_numbers_tfs_hm_same.add(s.toUpperCase());
+                            }
+                            else
+                            {
+                                sb_threshold.append(s.toUpperCase());
+                            }
+
+                        }
+                        sb_threshold.append("\t\t\t\t</th>\n");
+                        count++;
+                    }
+                    sb_threshold.append("\t\t\t</tr>\n");
+
+                }
+                br_gc_same.close();
+
+                sb_threshold.append("\t\t</table>\n");
+
+                sb_threshold.append("<h5> A total number of "+total_numbers_tfs_hm_same.size()+" distinct TFs are considered in same time points group. </h5>\n");
+                sb_threshold.append("<h5> A total number of "+total_number_tfs_hm.size()+" distinct TFs are considered in Histone Modification "+fileDir_hm.getName()+ " group. </h5>\n");
+                for(String tf_distinct : total_number_tfs_hm)
+                {
+                    sb_threshold.append("<a href='TFs"+File.separator+tf_distinct+"' target='_blank' <button class=\"button\">"+tf_distinct+"</button></a>");
+                }
+
 
 
 
@@ -224,7 +278,15 @@ public class COM2POSE_lib
                         "  </div>\n" +
                         "</div>\n");
             }
-            sb_threshold.append(write_table_html(Double.parseDouble(fileDir.getName())));
+
+            sb_threshold.append("<div class=\"w3-content\"><h5> A total number of "+total_number_tfs.size()+" distinct TFs are considered in Threshold "+fileDir.getName()+ " group. </h5>\n");
+
+            for(String tf_distinct : total_number_tfs)
+            {
+                sb_threshold.append("<a href='TFs"+File.separator+tf_distinct+"' target='_blank' <button class=\"button\">"+tf_distinct+"</button></a>");
+            }
+
+            sb_threshold.append(write_table_html(Double.parseDouble(fileDir.getName()),"THRESHOLD"));
             sb_threshold.append(html_tail);
 
 
@@ -243,7 +305,10 @@ public class COM2POSE_lib
             for(String tf : tfs_to_create_pages)
             {
                 StringBuilder sb_tf_page = new StringBuilder();
-                sb_tf_page.append(sb_home_front.toString());
+                sb_tf_page.append(get_header_html("TF"));
+                sb_tf_page.append(" <script>\n" +
+                        " document.title = \"TF: "+tf+" TH: "+fileDir.getName()+"\";\n" +
+                        " </script>\n");
 
                 ArrayList<File> files_to_consider = new ArrayList<>();
 
@@ -254,7 +319,7 @@ public class COM2POSE_lib
                 sb_tf_page.append(tf);
                 sb_tf_page.append(" <i>details</i></h1>\n");
                 sb_tf_page.append("<h3>Threshold: "+fileDir.getName()+"</h3>\n");
-                sb_tf_page.append("<h4><i>Click <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+tf+"' target='_blank'><button>"+tf+"</button></a> to go to GeneCards</i></h4>\n");
+                sb_tf_page.append("<h4><i>Click <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+tf+"' target='_blank'><button class=\"button\">"+tf+"</button></a> to go to GeneCards</i></h4>\n");
 
 
 
@@ -327,13 +392,13 @@ public class COM2POSE_lib
                                 "    position: relative;\n" +
                                 "    display: block;\n" +
                                 "    overflow-x: scroll;\">\n" +
-                                "\t  <iframe  id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"file:"+File.separator+File.separator+File.separator);
-                        sb_tf_page.append(fileDir_plot.getAbsolutePath());
+                                "\t  <iframe  id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                        sb_tf_page.append(".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+hm+File.separator+options_intern.folder_out_website_interactive_plots_tps +File.separator+fileDir_plot.getName());
                         sb_tf_page.append("\" height=\"400\" width=\"1500\" overflow=\"scroll\"></iframe>\n");
                         sb_tf_page.append("</div>");
                     }
 
-                    sb_tf_page.append("<h3> Target Genes - top "+options_intern.plot_top_k_genes+":</h3>\n");
+                    sb_tf_page.append("<h3> Target Genes - top (normalised value)"+options_intern.plot_top_k_genes+":</h3>\n");
                     sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>");
 
 
@@ -391,7 +456,7 @@ public class COM2POSE_lib
                                         sb_tf_page.append("\t\t\t\t<th>");
                                         if(i==1&&!xx.equals("SYMBOL"))
                                         {
-                                            sb_tf_page.append("<a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+xx.toUpperCase()+"' target='_blank'><button>"+xx.toUpperCase()+"</button></a>");
+                                            sb_tf_page.append("<a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+xx.toUpperCase()+"' target='_blank'><button class=\"button\">"+xx.toUpperCase()+"</button></a>");
                                         }
                                         else
                                         {
@@ -1052,7 +1117,6 @@ public class COM2POSE_lib
                         sb.append(",x= ");
                         sb.append(fileDirHM_Group.getName());
                         sb.append(".index, y=time)\n");
-                        //sb.append("    fig_fin.update_layout(xaxis=dict(rangeslider=dict(visible=True),type=\"linear\"))\n");
                         sb.append("    fig_fin.write_html(f\"");
                         sb.append(interactive_plots_output_coeff_hm_tps.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+fileDirHM_Group.getName()+"_threshold_"+d+".html\")\n");
                         /*WEBSITE_INTERACTIVE_PLOTS*/
@@ -5344,7 +5408,7 @@ public class COM2POSE_lib
         }
     }
 
-    private String write_table_html(Double d) throws IOException {
+    private String write_table_html(Double d, String level) throws IOException {
 
         File input_dir_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_WEBSITE_OVERVIEW);
         //HashMap<String,File> hm_file = new HashMap<>();
@@ -5392,7 +5456,8 @@ public class COM2POSE_lib
         }
         sb.append("\t\t\t</tr>\n");
 
-        File figures = new File(options_intern.path_to_COM2POSE+File.separator+"ext"+File.separator+"WEBSITE"+File.separator+"images");
+        //File figures = new File(options_intern.path_to_COM2POSE+File.separator+"ext"+File.separator+"WEBSITE"+File.separator+"images");
+
 
         for(String tf : first.keySet())
         {
@@ -5408,13 +5473,30 @@ public class COM2POSE_lib
                 if(current_tf_list.get(tf))
                 {
                     sb.append("\t\t\t\t<th>");
-                    sb.append("<img src=\""+figures.getAbsolutePath()+File.separator+"is_available.png"+"\" style=\"width:50px;height:50px;\"/>");
+                    if(level.equals("HOME"))
+                    {
+                        sb.append("<img src=\""+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"is_available.png"+"\" style=\"width:50px;height:50px;\"/>");
+
+                    }
+                    if(level.equals("THRESHOLD"))
+                    {
+                        sb.append("<img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"is_available.png"+"\" style=\"width:50px;height:50px;\"/>");
+
+                    }
                     sb.append("\t\t\t\t</th>\n");
                 }
                 else
                 {
                     sb.append("\t\t\t\t<th>");
-                    sb.append("<img src=\""+figures.getAbsolutePath()+File.separator+"not_available.png"+"\" style=\"width:50px;height:50px;\"/>");
+                    if(level.equals("HOME"))
+                    {
+                        sb.append("<img src=\""+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"not_available.png"+"\" style=\"width:50px;height:50px;\"/>");
+
+                    }
+                    if(level.equals("THRESHOLD"))
+                    {
+                        sb.append("<img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"not_available.png"+"\" style=\"width:50px;height:50px;\"/>");
+                    }
                     sb.append("\t\t\t\t</th>\n");
                 }
             }
@@ -5425,5 +5507,125 @@ public class COM2POSE_lib
         sb.append("<div>");
 
         return sb.toString();
+    }
+
+    private String get_header_html(String level) {
+
+        File f_website_css = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+ options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css);
+
+        File f_output_website = new File(options_intern.com2pose_working_directory+ File.separator+options_intern.folder_out_website);
+        File f_output_website_htmls = new File(f_output_website.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls);
+
+        StringBuilder sb_home_front = new StringBuilder();
+        sb_home_front.append("<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<title>COM2POSE</title>\n" +
+                "<meta charset=\"UTF-8\">\n" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
+
+        for(File fileDir:f_website_css.listFiles())
+        {
+            if(fileDir.isFile())
+            {
+                sb_home_front.append("<link rel=\"stylesheet\" href=\"");
+                if(level.equals("HOME"))
+                {
+                    sb_home_front.append(options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css+File.separator+fileDir.getName());
+                }
+                if(level.equals("THRESHOLD"))
+                {
+                    sb_home_front.append(".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css+File.separator+fileDir.getName());
+
+                }
+                if(level.equals("TF"))
+                {
+                    sb_home_front.append(".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css+File.separator+fileDir.getName());
+                }
+                sb_home_front.append("\">\n");
+            }
+        }
+
+        String rel_path = "";
+        if(level.equals("HOME"))
+        {
+            rel_path="HOME.html";
+        }
+        if(level.equals("THRESHOLD"))
+        {
+            rel_path=".."+File.separator+".."+File.separator+"HOME.html";
+        }
+        if(level.equals("TF"))
+        {
+            rel_path=".."+File.pathSeparator+".."+File.separator+".."+File.separator+"HOME.html";
+        }
+
+        sb_home_front.append("<style>\n" +
+                "body,h1,h2,h3,h4,h5,h6 {font-family: \"Lato\", sans-serif}\n" +
+                ".w3-bar,h1\n" +
+                //,button {font-family: "Montserrat", sans-serif}
+                ".fa-anchor,.fa-coffee {font-size:200px}\n" +
+                ".button {\n" +
+                "  background-color: #4CAF50; /* Green */\n" +
+                "  border: none;\n" +
+                "  color: white;\n" +
+                "  padding: 14px 31px;\n" +
+                "  text-align: center;\n" +
+                "  text-decoration: none;\n" +
+                "  display: inline-block;\n" +
+                "  font-size: 15px;\n" +
+                "  margin: 4px 2px;\n" +
+                "  cursor: pointer;\n" +
+                "}\n"+
+                "</style>\n" +
+                "<body>\n" +
+                "  \n" +
+                "<!-- Header -->\n" +
+                "<header class=\"w3-container w3-red w3-center\" style=\"padding:128px 16px\">\n" +
+                " <a href='"+rel_path+"' target='_blank'><button class=\"button\">HOME</button></a>\n"+
+                "  <h1 class=\"w3-margin w3-jumbo\">COM2POSE: <i>results overview</i></h1>\n" +
+                "  \n" +
+                "    <div class=\"dropdown\">\n" +
+                "  <h2>Please choose a threshold</h2>\n" +
+                "  <button class=\"dropbtn\">Threshold</button>\n" +
+                "  <div class=\"dropdown-content\">\n");
+
+
+
+        for(Double d: options_intern.plot_th_coefficient)
+        {
+            File f_output_website_htmls_th = new File(f_output_website_htmls.getAbsolutePath()+File.separator+d);
+            f_output_website_htmls_th.mkdir();
+
+            if(!threshold_folders_filled)
+            {
+                threshold_folders.add(f_output_website_htmls_th);
+            }
+
+            String rel_path_2 = "";
+            if(level.equals("HOME"))
+            {
+                rel_path_2=options_intern.folder_out_website_htmls+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
+            }
+            if(level.equals("THRESHOLD"))
+            {
+                rel_path_2=".."+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
+
+            }
+            if(level.equals("TF"))
+            {
+                rel_path_2=".."+File.separator+".."+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
+            }
+
+
+            sb_home_front.append("<a href=\"");
+            sb_home_front.append(rel_path_2+"\" target='_blank'>Coefficient " + d);
+            sb_home_front.append("</a>\n");
+        }
+
+        sb_home_front.append("  </div>\n" +
+                "</div>\n" +
+                "</header>\n");
+
+        return sb_home_front.toString();
     }
 }

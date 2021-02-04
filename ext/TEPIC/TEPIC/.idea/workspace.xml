@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../src/COM2POSE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/COM2POSE.java" afterDir="false" />
-    </list>
+    <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -208,7 +206,7 @@
       <workItem from="1610956479452" duration="668000" />
       <workItem from="1611300515080" duration="1204000" />
       <workItem from="1611835794466" duration="598000" />
-      <workItem from="1612278205214" duration="6024000" />
+      <workItem from="1612278205214" duration="6788000" />
     </task>
     <servers />
   </component>
