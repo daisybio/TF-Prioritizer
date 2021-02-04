@@ -55,6 +55,12 @@ public class COM2POSE_lib
         File f_move_css = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_basics);
         f_move_css.mkdir();
 
+        File f_output_website = new File(options_intern.com2pose_working_directory+ File.separator+options_intern.folder_out_website);
+        f_output_website.mkdir();
+
+        File f_output_website_htmls = new File(f_output_website.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls);
+        f_output_website_htmls.mkdir();
+
         String command = "cp -u -r " + f_website_css.getAbsolutePath() + " " + f_move_css.getAbsolutePath();
         Process child = Runtime.getRuntime().exec(command);
         logger.logLine("[WEBSITE] Copy CSS files: " + command);
@@ -67,424 +73,467 @@ public class COM2POSE_lib
                 throw new Exception(message);
         }
 
-        File f_output_website = new File(options_intern.com2pose_working_directory+ File.separator+options_intern.folder_out_website);
-
-        File f_output_website_htmls = new File(f_output_website.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls);
-        f_output_website_htmls.mkdir();
-
-
-        String html_tail = "</body>\n" +
-                "</html>";
-
-        BufferedWriter bw_home = new BufferedWriter(new FileWriter(f_output_website+File.separator+"HOME.html"));
-
-        //bw_home.write(sb_home_front.toString());
-        bw_home.write(get_header_html("HOME"));
-        threshold_folders_filled =true;
-
-        for(Double d: options_intern.plot_th_coefficient)
+        for(int i_dont_know = 0; i_dont_know < 2; i_dont_know++)
         {
-            bw_home.append(write_table_html(d,"HOME"));
-        }
 
-        bw_home.write(html_tail);
+            String html_tail = "</body>\n" +
+                    "</html>";
 
-        bw_home.close();
+            BufferedWriter bw_home = new BufferedWriter(new FileWriter(f_output_website+File.separator+"HOME.html"));
 
-        for(File fileDir: threshold_folders)
-        {
-            HashSet<String> tfs_to_create_pages = new HashSet<>();
-            HashSet<String> possible_hms = new HashSet<>();
+            //bw_home.write(sb_home_front.toString());
+            bw_home.write(get_header_html("HOME"));
+            threshold_folders_filled =true;
 
-            File f_interactive_plots_root = new File(f_output_website.getAbsolutePath()+ File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName());
-
-            StringBuilder sb_threshold = new StringBuilder(get_header_html("THRESHOLD"));
-            sb_threshold.append(" <script>\n" +
-                    " document.title = \"TH: "+fileDir.getName()+"\";\n" +
-                    " </script>\n");
-            sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\"><div class=\"w3-content\"><h1>Current threshold: "+fileDir.getName()+"</h1></div></div>\n");
-
-
-            HashSet<String> total_number_tfs = new HashSet<>();
-
-            for(File fileDir_hm : f_interactive_plots_root.listFiles())
+            for(Double d: options_intern.plot_th_coefficient)
             {
-                HashSet<String> total_number_tfs_hm = new HashSet<>();
-
-                possible_hms.add(fileDir_hm.getName());
-
-                sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
-                        "  <div class=\"w3-content\">\n" +
-                        "    <div class=\"w3-twothird\">\n" +
-                        "      <h1>");
-                sb_threshold.append(fileDir_hm.getName());
-                sb_threshold.append("</h1>\n" +
-                        "\t  \n" +
-                        "\t <h4> Different timepoints / conditions </h4> \n" +
-                        "\t  \n" +
-                        "<div class=\"container\" style=\"\n" +
-                        "    width: 980px;\n" +
-                        "    position: relative;\n" +
-                        "    display: block;\n" +
-                        "    overflow-x: scroll;\">\n" +
-                        "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
-                String relative_path_diff_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_different_stages.html";
-
-                sb_threshold.append(relative_path_diff_th);
-                sb_threshold.append("\" height=\"400\" width=\"1500\" overflow=\"scroll\"></iframe>\n");
-                sb_threshold.append("</div>");
-
-                //gene count table for plot
-
-                HashSet<String> total_numbers_tfs_hm_diff = new HashSet<>();
-                sb_threshold.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
-                sb_threshold.append("<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
-                sb_threshold.append("\t\t<table style=\"width:100%\">\n");
-
-                File f_gene_counts_input_different = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+fileDir_hm.getName()+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different);
-                BufferedReader br_gc_different = new BufferedReader(new FileReader(f_gene_counts_input_different));
-                String line_gc_different ="";
-                while((line_gc_different=br_gc_different.readLine())!=null)
-                {
-                    String[] split = line_gc_different.split("\t");
-                    sb_threshold.append("\t\t\t<tr>\n");
-
-                    tfs_to_create_pages.add(split[0]);
-
-                    int count = 0;
-                    for(String s: split)
-                    {
-                        sb_threshold.append("\t\t\t\t<th>");
-                        if(count!=0 || s.equals("TF"))
-                        {
-                            sb_threshold.append(s.toUpperCase());
-                        }
-                        else
-                        {
-                            File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
-                            if(f_try.exists())
-                            {
-                                sb_threshold.append("<a href='");
-                                //sb_threshold.append(f_try.getAbsolutePath());
-                                sb_threshold.append("TFs"+File.separator+f_try.getName());
-                                sb_threshold.append("' target='_blank'><button class=\"button\">"+s.toUpperCase()+"</button>");
-                                sb_threshold.append("</a>");
-
-                                total_number_tfs.add(s.toUpperCase());
-                                total_number_tfs_hm.add(s.toUpperCase());
-                                total_numbers_tfs_hm_diff.add(s.toUpperCase());
-                            }
-                            else
-                            {
-                                sb_threshold.append(s.toUpperCase());
-                            }
-
-                        }
-                        sb_threshold.append("\t\t\t\t</th>\n");
-                        count++;
-                    }
-                    sb_threshold.append("\t\t\t</tr>\n");
-
-                }
-                br_gc_different.close();
-
-                sb_threshold.append("\t\t</table>\n");
-
-                sb_threshold.append("<h5> A total number of "+total_numbers_tfs_hm_diff.size()+" distinct TFs are considered in different time points group </h5>\n");
-
-                HashSet<String> total_numbers_tfs_hm_same = new HashSet<>();
-                sb_threshold.append("\t <h4> Same timepoints / conditions </h4> \n" +
-                        "\t  \n" +
-                        "<div class=\"container\" style=\"\n" +
-                        "    width: 980px;\n" +
-                        "    position: relative;\n" +
-                        "    display: block;\n" +
-                        "    overflow-x: scroll;\">\n" +
-                        "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
-                String relative_path_same_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_same_stages.html";
-                sb_threshold.append(relative_path_same_th);
-                sb_threshold.append("\" height=\"400\" width=\"1500\"></iframe>\n");
-                sb_threshold.append("</div>");
-
-                //gene count table for plot
-                sb_threshold.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
-                sb_threshold.append("<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
-                sb_threshold.append("\t\t<table style=\"width:100%\">\n");
-
-                File f_gene_counts_input_same = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+fileDir_hm.getName()+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_same);
-                BufferedReader br_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
-                String line_gc_same ="";
-                while((line_gc_same=br_gc_same.readLine())!=null)
-                {
-                    String[] split = line_gc_same.split("\t");
-                    sb_threshold.append("\t\t\t<tr>\n");
-
-                    tfs_to_create_pages.add(split[0]);
-
-                    int count = 0;
-                    for(String s: split)
-                    {
-                        sb_threshold.append("\t\t\t\t<th>");
-                        if(count!=0 || s.equals("TF"))
-                        {
-                            sb_threshold.append(s.toUpperCase());
-                        }
-                        else
-                        {
-                            File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
-                            if(f_try.exists())
-                            {
-                                sb_threshold.append("<a href='");
-                                //sb_threshold.append(f_try.getAbsolutePath());
-                                sb_threshold.append("TFs"+File.separator+f_try.getName());
-                                sb_threshold.append("' target='_blank'><button class=\"button\">"+s.toUpperCase()+"</button>");
-                                sb_threshold.append("</a>");
-
-                                total_number_tfs.add(s.toUpperCase());
-                                total_number_tfs_hm.add(s.toUpperCase());
-                                total_numbers_tfs_hm_same.add(s.toUpperCase());
-                            }
-                            else
-                            {
-                                sb_threshold.append(s.toUpperCase());
-                            }
-
-                        }
-                        sb_threshold.append("\t\t\t\t</th>\n");
-                        count++;
-                    }
-                    sb_threshold.append("\t\t\t</tr>\n");
-
-                }
-                br_gc_same.close();
-
-                sb_threshold.append("\t\t</table>\n");
-
-                sb_threshold.append("<h5> A total number of "+total_numbers_tfs_hm_same.size()+" distinct TFs are considered in same time points group. </h5>\n");
-                sb_threshold.append("<h5> A total number of "+total_number_tfs_hm.size()+" distinct TFs are considered in Histone Modification "+fileDir_hm.getName()+ " group. </h5>\n");
-                for(String tf_distinct : total_number_tfs_hm)
-                {
-                    sb_threshold.append("<a href='TFs"+File.separator+tf_distinct+"' target='_blank' <button class=\"button\">"+tf_distinct+"</button></a>");
-                }
-
-
-
-
-                sb_threshold.append("    </div>\n" +
-                        "\n" +
-                        "    <div class=\"w3-third w3-center\">\n" +
-                        "      <i class=\"fa fa-anchor w3-padding-64 w3-text-red\"></i>\n" +
-                        "    </div>\n" +
-                        "  </div>\n" +
-                        "</div>\n");
+                bw_home.append(write_table_html(d,"HOME"));
             }
 
-            sb_threshold.append("<div class=\"w3-content\"><h5> A total number of "+total_number_tfs.size()+" distinct TFs are considered in Threshold "+fileDir.getName()+ " group. </h5>\n");
+            bw_home.write(html_tail);
 
-            for(String tf_distinct : total_number_tfs)
+            bw_home.close();
+
+            for(File fileDir: threshold_folders)
             {
-                sb_threshold.append("<a href='TFs"+File.separator+tf_distinct+"' target='_blank' <button class=\"button\">"+tf_distinct+"</button></a>");
-            }
+                HashSet<String> tfs_to_create_pages = new HashSet<>();
+                HashSet<String> possible_hms = new HashSet<>();
 
-            sb_threshold.append(write_table_html(Double.parseDouble(fileDir.getName()),"THRESHOLD"));
-            sb_threshold.append(html_tail);
+                File f_interactive_plots_root = new File(f_output_website.getAbsolutePath()+ File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName());
 
-
-            BufferedWriter bw_thresholds = new BufferedWriter(new FileWriter(fileDir.getAbsolutePath()+File.separator+"threshold_"+fileDir.getName()+"_overview.html"));
-            bw_thresholds.write(sb_threshold.toString());bw_thresholds.close();
-
-            ArrayList<String> poss_hms_list = new ArrayList(possible_hms);
-            ArrayList<String> poss_tfs_list = new ArrayList<>(tfs_to_create_pages);
-
-            File f_output_tf_root = new File(fileDir.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_TFs);
-            f_output_tf_root.mkdir();
-
-            //create TF pages
-            File f_root_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes);
-
-            for(String tf : tfs_to_create_pages)
-            {
-                StringBuilder sb_tf_page = new StringBuilder();
-                sb_tf_page.append(get_header_html("TF"));
-                sb_tf_page.append(" <script>\n" +
-                        " document.title = \"TF: "+tf+" TH: "+fileDir.getName()+"\";\n" +
+                StringBuilder sb_threshold = new StringBuilder(get_header_html("THRESHOLD"));
+                sb_threshold.append(" <script>\n" +
+                        " document.title = \"TH: "+fileDir.getName()+"\";\n" +
                         " </script>\n");
-
-                ArrayList<File> files_to_consider = new ArrayList<>();
-
-                sb_tf_page.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
-                        "  <div class=\"w3-content\">\n" +
-                        "    <div class=\"w3-twothird\">\n" +
-                        "      <h1>Transcription Factor: ");
-                sb_tf_page.append(tf);
-                sb_tf_page.append(" <i>details</i></h1>\n");
-                sb_tf_page.append("<h3>Threshold: "+fileDir.getName()+"</h3>\n");
-                sb_tf_page.append("<h4><i>Click <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+tf+"' target='_blank'><button class=\"button\">"+tf+"</button></a> to go to GeneCards</i></h4>\n");
+                sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\"><div class=\"w3-content\"><h1>Current threshold: "+fileDir.getName()+"</h1></div></div>\n");
 
 
+                HashSet<String> total_number_tfs = new HashSet<>();
 
-                sb_tf_page.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
-                sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
-
-                File f_gene_counts_input_different = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+poss_hms_list.get(0)+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different);
-
-                BufferedReader br_tf_gc = new BufferedReader(new FileReader(f_gene_counts_input_different));
-                String line_tf_gc = br_tf_gc.readLine();
-
-                String[] split_tf_gc = line_tf_gc.split("\t");
-                sb_tf_page.append("\t\t\t<tr>\n");
-                for(String stg : split_tf_gc)
+                for(File fileDir_hm : f_interactive_plots_root.listFiles())
                 {
-                    sb_tf_page.append("\t\t\t\t<th>");
-                    sb_tf_page.append(stg);
-                    sb_tf_page.append("\t\t\t\t</th>\n");
-                }
-                sb_tf_page.append("\t\t\t</tr>\n");
+                    HashSet<String> total_number_tfs_hm = new HashSet<>();
 
-                while((line_tf_gc=br_tf_gc.readLine())!= null)
-                {
+                    possible_hms.add(fileDir_hm.getName());
 
-                    String[] split_tf_gc_inner = line_tf_gc.split("\t");
+                    sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
+                            "  <div class=\"w3-content\">\n" +
+                            "    <div class=\"w3-twothird\">\n" +
+                            "      <h1>");
+                    sb_threshold.append(fileDir_hm.getName());
+                    sb_threshold.append("</h1>\n" +
+                            "\t  \n" +
+                            "\t <h4> Different timepoints / conditions </h4> \n" +
+                            "\t  \n" +
+                            "<div class=\"container\" style=\"\n" +
+                            "    width: 980px;\n" +
+                            "    position: relative;\n" +
+                            "    display: block;\n" +
+                            "    overflow-x: scroll;\">\n" +
+                            "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                    String relative_path_diff_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_different_stages.html";
 
-                    if(split_tf_gc_inner[0].equals(tf))
+                    sb_threshold.append(relative_path_diff_th);
+                    sb_threshold.append("\" height=\"400\" width=\"1500\" overflow=\"scroll\"></iframe>\n");
+                    sb_threshold.append("</div>");
+
+                    //gene count table for plot
+
+                    HashSet<String> total_numbers_tfs_hm_diff = new HashSet<>();
+                    sb_threshold.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
+                    sb_threshold.append("<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
+                    sb_threshold.append("\t\t<table style=\"width:100%\">\n");
+
+                    File f_gene_counts_input_different = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+fileDir_hm.getName()+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different);
+                    BufferedReader br_gc_different = new BufferedReader(new FileReader(f_gene_counts_input_different));
+                    String line_gc_different ="";
+                    while((line_gc_different=br_gc_different.readLine())!=null)
                     {
-                        sb_tf_page.append("\t\t\t<tr>\n");
-                        for(String stg : split_tf_gc_inner)
-                        {
+                        String[] split = line_gc_different.split("\t");
+                        sb_threshold.append("\t\t\t<tr>\n");
 
-                            sb_tf_page.append("\t\t\t\t<th>");
-                            sb_tf_page.append(stg);
-                            sb_tf_page.append("\t\t\t\t</th>\n");
+                        tfs_to_create_pages.add(split[0]);
+
+                        int count = 0;
+                        for(String s: split)
+                        {
+                            sb_threshold.append("\t\t\t\t<th>");
+                            if(count!=0 || s.equals("TF"))
+                            {
+                                sb_threshold.append(s.toUpperCase());
+                            }
+                            else
+                            {
+                                File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
+                                if(f_try.exists())
+                                {
+                                    sb_threshold.append("<a href='");
+                                    //sb_threshold.append(f_try.getAbsolutePath());
+                                    sb_threshold.append("TFs"+File.separator+f_try.getName());
+                                    sb_threshold.append("' target='_blank'><button class=\"button\">"+s.toUpperCase()+"</button>");
+                                    sb_threshold.append("</a>");
+
+                                    total_number_tfs.add(s.toUpperCase());
+                                    total_number_tfs_hm.add(s.toUpperCase());
+                                    total_numbers_tfs_hm_diff.add(s.toUpperCase());
+                                }
+                                else
+                                {
+                                    sb_threshold.append(s.toUpperCase());
+                                }
+
+                            }
+                            sb_threshold.append("\t\t\t\t</th>\n");
+                            count++;
                         }
-                        sb_tf_page.append("\t\t\t</tr>\n");
-                        break;
+                        sb_threshold.append("\t\t\t</tr>\n");
+
                     }
+                    br_gc_different.close();
+
+                    sb_threshold.append("\t\t</table>\n");
+
+                    sb_threshold.append("<h5> A total number of "+total_numbers_tfs_hm_diff.size()+" distinct TFs are considered in different time points group </h5>\n");
+
+                    HashSet<String> total_numbers_tfs_hm_same = new HashSet<>();
+                    sb_threshold.append("\t <h4> Same timepoints / conditions </h4> \n" +
+                            "\t  \n" +
+                            "<div class=\"container\" style=\"\n" +
+                            "    width: 980px;\n" +
+                            "    position: relative;\n" +
+                            "    display: block;\n" +
+                            "    overflow-x: scroll;\">\n" +
+                            "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                    String relative_path_same_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_same_stages.html";
+                    sb_threshold.append(relative_path_same_th);
+                    sb_threshold.append("\" height=\"400\" width=\"1500\"></iframe>\n");
+                    sb_threshold.append("</div>");
+
+                    //gene count table for plot
+                    sb_threshold.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
+                    sb_threshold.append("<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
+                    sb_threshold.append("\t\t<table style=\"width:100%\">\n");
+
+                    File f_gene_counts_input_same = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+fileDir_hm.getName()+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_same);
+                    BufferedReader br_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
+                    String line_gc_same ="";
+                    while((line_gc_same=br_gc_same.readLine())!=null)
+                    {
+                        String[] split = line_gc_same.split("\t");
+                        sb_threshold.append("\t\t\t<tr>\n");
+
+                        tfs_to_create_pages.add(split[0]);
+
+                        int count = 0;
+                        for(String s: split)
+                        {
+                            sb_threshold.append("\t\t\t\t<th>");
+                            if(count!=0 || s.equals("TF"))
+                            {
+                                sb_threshold.append(s.toUpperCase());
+                            }
+                            else
+                            {
+                                File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
+                                if(f_try.exists())
+                                {
+                                    sb_threshold.append("<a href='");
+                                    //sb_threshold.append(f_try.getAbsolutePath());
+                                    sb_threshold.append("TFs"+File.separator+f_try.getName());
+                                    sb_threshold.append("' target='_blank'><button class=\"button\">"+s.toUpperCase()+"</button>");
+                                    sb_threshold.append("</a>");
+
+                                    total_number_tfs.add(s.toUpperCase());
+                                    total_number_tfs_hm.add(s.toUpperCase());
+                                    total_numbers_tfs_hm_same.add(s.toUpperCase());
+                                }
+                                else
+                                {
+                                    sb_threshold.append(s.toUpperCase());
+                                }
+
+                            }
+                            sb_threshold.append("\t\t\t\t</th>\n");
+                            count++;
+                        }
+                        sb_threshold.append("\t\t\t</tr>\n");
+
+                    }
+                    br_gc_same.close();
+
+                    sb_threshold.append("\t\t</table>\n");
+
+                    sb_threshold.append("<h5> A total number of "+total_numbers_tfs_hm_same.size()+" distinct TFs are considered in same time points group. </h5>\n");
+                    sb_threshold.append("<div class='container-buttons'>");
+                    sb_threshold.append("<h5> A total number of "+total_number_tfs_hm.size()+" distinct TFs are considered in Histone Modification "+fileDir_hm.getName()+ " group. </h5>\n");
+                    for(String tf_distinct : total_number_tfs_hm)
+                    {
+                        sb_threshold.append("<a href='TFs"+File.separator+tf_distinct.toUpperCase()+".html' target='_blank' <button class=\"button\">"+tf_distinct.toUpperCase()+"</button></a>");
+                    }
+                    sb_threshold.append("</div>");
+
+
+
+                    sb_threshold.append("    </div>\n" +
+                            "\n" +
+                            "    <div class=\"w3-third w3-center\">\n" +
+                            "      <i class=\"fa fa-anchor w3-padding-64 w3-text-red\"></i>\n" +
+                            "    </div>\n" +
+                            "  </div>\n" +
+                            "</div>\n");
                 }
 
-                sb_tf_page.append("</table>");
+                sb_threshold.append("<div class=\"container-buttons w3-content\"><h5> A total number of "+total_number_tfs.size()+" distinct TFs are considered in Threshold "+fileDir.getName()+ " group. </h5>\n");
 
-                for(String hm: possible_hms)
+                for(String tf_distinct : total_number_tfs)
                 {
+                    sb_threshold.append("<a href='TFs"+File.separator+tf_distinct.toUpperCase()+".html' target='_blank' <button class=\"button\">"+tf_distinct.toUpperCase()+"</button></a>");
+                }
 
-                    File f_interactive_plots = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+hm+File.separator+options_intern.folder_out_website_interactive_plots_tps +File.separator);
+                sb_threshold.append(write_table_html(Double.parseDouble(fileDir.getName()),"THRESHOLD"));
+                sb_threshold.append(html_tail);
+
+
+                BufferedWriter bw_thresholds = new BufferedWriter(new FileWriter(fileDir.getAbsolutePath()+File.separator+"threshold_"+fileDir.getName()+"_overview.html"));
+                bw_thresholds.write(sb_threshold.toString());bw_thresholds.close();
+
+                ArrayList<String> poss_hms_list = new ArrayList(possible_hms);
+                ArrayList<String> poss_tfs_list = new ArrayList<>(tfs_to_create_pages);
+
+                File f_output_tf_root = new File(fileDir.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_TFs);
+                f_output_tf_root.mkdir();
+
+                //create TF pages
+                File f_root_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes);
+
+                for(String tf : tfs_to_create_pages)
+                {
+                    StringBuilder sb_tf_page = new StringBuilder();
+                    sb_tf_page.append(get_header_html("TF"));
+                    sb_tf_page.append(" <script>\n" +
+                            " document.title = \"TF: "+tf.toUpperCase()+" TH: "+fileDir.getName()+"\";\n" +
+                            " </script>\n");
+
+                    ArrayList<File> files_to_consider = new ArrayList<>();
 
                     sb_tf_page.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
                             "  <div class=\"w3-content\">\n" +
                             "    <div class=\"w3-twothird\">\n" +
-                            "      <h1>");
-                    sb_tf_page.append(hm);
-                    sb_tf_page.append("</h1>\n");
+                            "      <h1>Transcription Factor: ");
+                    sb_tf_page.append(tf.toUpperCase());
+                    sb_tf_page.append(" <i>details</i></h1>\n");
+                    sb_tf_page.append("<h3>Threshold: "+fileDir.getName().toUpperCase()+"</h3>\n");
+                    sb_tf_page.append("<h4><i>Click <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+tf.toUpperCase()+"' target='_blank'><button class=\"button\">"+tf.toUpperCase()+"</button></a> to go to GeneCards</i></h4>\n");
 
-                    sb_tf_page.append("<h3> Group plots: </h3>\n");
 
 
+                    sb_tf_page.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
+                    sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
 
-                    for(File fileDir_plot : f_interactive_plots.listFiles())
+                    File f_gene_counts_input_different = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+poss_hms_list.get(0)+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different);
+
+                    BufferedReader br_tf_gc = new BufferedReader(new FileReader(f_gene_counts_input_different));
+                    String line_tf_gc = br_tf_gc.readLine();
+
+                    String[] split_tf_gc = line_tf_gc.split("\t");
+                    sb_tf_page.append("\t\t\t<tr>\n");
+                    for(String stg : split_tf_gc)
                     {
-                        String[] split_dot = fileDir_plot.getName().split("\\.");
-                        String[] split_name = split_dot[0].split("_");
-
-                        sb_tf_page.append("\t  \n" +
-                                "\t <h4>"+split_name[1]+ " VS " + split_name[2] +" </h4> \n" +
-                                "\t  \n" +
-                                "<div class=\"container\" style=\"\n" +
-                                "    width: 980px;\n" +
-                                "    position: relative;\n" +
-                                "    display: block;\n" +
-                                "    overflow-x: scroll;\">\n" +
-                                "\t  <iframe  id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
-                        sb_tf_page.append(".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+hm+File.separator+options_intern.folder_out_website_interactive_plots_tps +File.separator+fileDir_plot.getName());
-                        sb_tf_page.append("\" height=\"400\" width=\"1500\" overflow=\"scroll\"></iframe>\n");
-                        sb_tf_page.append("</div>");
+                        sb_tf_page.append("\t\t\t\t<th>");
+                        sb_tf_page.append(stg);
+                        sb_tf_page.append("\t\t\t\t</th>\n");
                     }
+                    sb_tf_page.append("\t\t\t</tr>\n");
 
-                    sb_tf_page.append("<h3> Target Genes - top (normalised value)"+options_intern.plot_top_k_genes+":</h3>\n");
-                    sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>");
+                    boolean found_writing = false;
 
-
-                    //include target genes
-                    HashSet<String> already_found_tps = new HashSet<>();
-
-                    File f_consider_different = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+"all_data_different");
-                    for(File tps_different : f_consider_different.listFiles())
+                    while((line_tf_gc=br_tf_gc.readLine())!= null)
                     {
-                        if(tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
+
+                        String[] split_tf_gc_inner = line_tf_gc.split("\t");
+
+                        if(split_tf_gc_inner[0].toUpperCase().equals(tf.toUpperCase()))
                         {
-                            files_to_consider.add(tps_different);
-                            already_found_tps.add(tps_different.getName());
-                        }
-                    }
-
-                    File f_consider_same = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+"all_data_same");
-                    for(File tps_different : f_consider_same.listFiles())
-                    {
-                        if(tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
-                        {
-                            files_to_consider.add(tps_different);
-                            already_found_tps.add(tps_different.getName());
-                        }
-                    }
-
-                    for(File f_considered_no_tf : files_to_consider)
-                    {
-                        File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
-                        if(f_considered.exists())
-                        {
-                            sb_tf_page.append("<h4> Point: "+f_considered_no_tf.getName()+" </h4>\n");
-
-                            sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
-
-                            BufferedReader br_point_target_genes = new BufferedReader(new FileReader(f_considered));
-                            String line_point_target_getnes ="";
-                            while((line_point_target_getnes=br_point_target_genes.readLine())!=null)
+                            sb_tf_page.append("\t\t\t<tr>\n");
+                            for(String stg : split_tf_gc_inner)
                             {
-                                String[] split = line_point_target_getnes.split("\t");
+                                sb_tf_page.append("\t\t\t\t<th>");
+                                sb_tf_page.append(stg);
+                                sb_tf_page.append("\t\t\t\t</th>\n");
+                                found_writing=true;
+                            }
+                            sb_tf_page.append("\t\t\t</tr>\n");
+                            break;
+                        }
+                    }
+                    br_tf_gc.close();
 
+                    if(!found_writing)
+                    {
+                        File f_gene_counts_input_same = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+poss_hms_list.get(0)+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_same);
+
+                        BufferedReader br_tf_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
+                        String line_tf_gc_same = br_tf_gc_same.readLine();
+
+                        while((line_tf_gc_same=br_tf_gc_same.readLine())!= null)
+                        {
+
+                            String[] split_tf_gc_inner = line_tf_gc_same.split("\t");
+
+                            if(split_tf_gc_inner[0].toUpperCase().equals(tf.toUpperCase()))
+                            {
                                 sb_tf_page.append("\t\t\t<tr>\n");
-
-                                int i = 0;
-                                for(String xx:split)
+                                for(String stg : split_tf_gc_inner)
                                 {
-                                    if(xx.equals("NOT_AVAILABLE"))
+                                    sb_tf_page.append("\t\t\t\t<th>");
+                                    sb_tf_page.append(stg);
+                                    sb_tf_page.append("\t\t\t\t</th>\n");
+                                }
+                                sb_tf_page.append("\t\t\t</tr>\n");
+                                break;
+                            }
+                        }
+                        br_tf_gc.close();
+
+                    }
+
+                    sb_tf_page.append("</table>");
+
+                    for(String hm: possible_hms)
+                    {
+
+                        File f_interactive_plots = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+hm+File.separator+options_intern.folder_out_website_interactive_plots_tps +File.separator);
+
+                        sb_tf_page.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
+                                "  <div class=\"w3-content\">\n" +
+                                "    <div class=\"w3-twothird\">\n" +
+                                "      <h1>");
+                        sb_tf_page.append(hm);
+                        sb_tf_page.append("</h1>\n");
+
+                        sb_tf_page.append("<h3> Group plots: </h3>\n");
+
+
+
+                        for(File fileDir_plot : f_interactive_plots.listFiles())
+                        {
+                            String[] split_dot = fileDir_plot.getName().split("\\.");
+                            String[] split_name = split_dot[0].split("_");
+
+                            sb_tf_page.append("\t  \n" +
+                                    "\t <h4>"+split_name[1]+ " VS " + split_name[2] +" </h4> \n" +
+                                    "\t  \n" +
+                                    "<div class=\"container\" style=\"\n" +
+                                    "    width: 980px;\n" +
+                                    "    position: relative;\n" +
+                                    "    display: block;\n" +
+                                    "    overflow-x: scroll;\">\n" +
+                                    "\t  <iframe  id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                            sb_tf_page.append(".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+hm+File.separator+options_intern.folder_out_website_interactive_plots_tps +File.separator+fileDir_plot.getName());
+                            sb_tf_page.append("\" height=\"400\" width=\"1500\" overflow=\"scroll\"></iframe>\n");
+                            sb_tf_page.append("</div>");
+                        }
+
+
+
+
+                        //include target genes
+                        HashSet<String> already_found_tps = new HashSet<>();
+
+                        File f_consider_different = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+"all_data_different");
+                        for(File tps_different : f_consider_different.listFiles())
+                        {
+                            if(tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
+                            {
+                                files_to_consider.add(tps_different);
+                                already_found_tps.add(tps_different.getName());
+                            }
+                        }
+
+                        File f_consider_same = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+"all_data_same");
+                        for(File tps_different : f_consider_same.listFiles())
+                        {
+                            if(tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
+                            {
+                                files_to_consider.add(tps_different);
+                                already_found_tps.add(tps_different.getName());
+                            }
+                        }
+                        Boolean anything_to_write = false;
+                        for(File f_considered_no_tf : files_to_consider)
+                        {
+                            File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
+                            if(f_considered.exists())
+                            {
+                                anything_to_write=true;
+                            }
+                        }
+                        if(anything_to_write)
+                        {
+                            sb_tf_page.append("<h3> Target Genes - top "+options_intern.plot_top_k_genes+" (normalised value):</h3>\n");
+                            sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>");
+                        }
+
+                        for(File f_considered_no_tf : files_to_consider)
+                        {
+                            File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
+                            if(f_considered.exists())
+                            {
+                                sb_tf_page.append("<h4> Point: "+f_considered_no_tf.getName()+" </h4>\n");
+
+                                sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
+
+                                BufferedReader br_point_target_genes = new BufferedReader(new FileReader(f_considered));
+                                String line_point_target_getnes ="";
+                                while((line_point_target_getnes=br_point_target_genes.readLine())!=null)
+                                {
+                                    String[] split = line_point_target_getnes.split("\t");
+
+                                    sb_tf_page.append("\t\t\t<tr>\n");
+
+                                    int i = 0;
+                                    for(String xx:split)
                                     {
-                                        sb_tf_page.append("\t\t\t\t<th>");
-                                        sb_tf_page.append("-");
-                                        sb_tf_page.append("\t\t\t\t</th>\n");
-                                    }
-                                    else
-                                    {
-                                        sb_tf_page.append("\t\t\t\t<th>");
-                                        if(i==1&&!xx.equals("SYMBOL"))
+                                        if(xx.equals("NOT_AVAILABLE"))
                                         {
-                                            sb_tf_page.append("<a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+xx.toUpperCase()+"' target='_blank'><button class=\"button\">"+xx.toUpperCase()+"</button></a>");
+                                            sb_tf_page.append("\t\t\t\t<th>");
+                                            sb_tf_page.append("-");
+                                            sb_tf_page.append("\t\t\t\t</th>\n");
                                         }
                                         else
                                         {
-                                            sb_tf_page.append(xx.toUpperCase());
+                                            sb_tf_page.append("\t\t\t\t<th>");
+                                            if(i==1&&!xx.equals("SYMBOL"))
+                                            {
+                                                sb_tf_page.append("<a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+xx.toUpperCase()+"' target='_blank'><button class=\"button\">"+xx.toUpperCase()+"</button></a>");
+                                            }
+                                            else
+                                            {
+                                                sb_tf_page.append(xx.toUpperCase());
+                                            }
+                                            sb_tf_page.append("\t\t\t\t</th>\n");
                                         }
-                                        sb_tf_page.append("\t\t\t\t</th>\n");
+                                        i++;
+
                                     }
-                                    i++;
-
+                                    sb_tf_page.append("\t\t\t</tr>\n");
                                 }
-                                sb_tf_page.append("\t\t\t</tr>\n");
-                            }
-                            br_point_target_genes.close();
+                                br_point_target_genes.close();
 
-                            sb_tf_page.append("\t\t</table>\n");
+                                sb_tf_page.append("\t\t</table>\n");
+                            }
                         }
                     }
+
+
+                    sb_tf_page.append(html_tail);
+                    BufferedWriter bw_tf = new BufferedWriter(new FileWriter(f_output_tf_root.getAbsolutePath()+File.separator+tf.toUpperCase()+".html"));
+                    bw_tf.write(sb_tf_page.toString());
+                    bw_tf.close();
                 }
 
-
-                sb_tf_page.append(html_tail);
-                BufferedWriter bw_tf = new BufferedWriter(new FileWriter(f_output_tf_root.getAbsolutePath()+File.separator+tf+".html"));
-                bw_tf.write(sb_tf_page.toString());
-                bw_tf.close();
             }
-
         }
-
 
         logger.logLine("[WEBSITE] Finished creating overview website.");
     }
@@ -1117,6 +1166,7 @@ public class COM2POSE_lib
                         sb.append(",x= ");
                         sb.append(fileDirHM_Group.getName());
                         sb.append(".index, y=time)\n");
+                        sb.append("    fig_fin.layout.xaxis.dtick=1\n");
                         sb.append("    fig_fin.write_html(f\"");
                         sb.append(interactive_plots_output_coeff_hm_tps.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+fileDirHM_Group.getName()+"_threshold_"+d+".html\")\n");
                         /*WEBSITE_INTERACTIVE_PLOTS*/
@@ -1185,7 +1235,9 @@ public class COM2POSE_lib
                     sb.append("    fig_fin = px.imshow(join_df_stages.transpose())\n");
                     sb.append("    fig_fin.update_layout(plot_bgcolor='rgb(136, 136, 136)')\n");
                     sb.append("    fig_fin.update_xaxes(gridcolor='rgb(136, 136, 136)')\n");
+                    sb.append("    fig_fin.layout.xaxis.dtick=1\n");
                     sb.append("    fig_fin.update_yaxes(gridcolor='rgb(136, 136, 136)')\n");
+                    sb.append("    fig_fin.layout.yaxis.dtick=1\n");
                     sb.append("    fig_fin.write_html(f\"");
                     sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_different_stages.html\")\n");
                     /*WEBSITE_INTERACTIVE_PLOTS*/
@@ -1249,7 +1301,9 @@ public class COM2POSE_lib
                     sb.append("    fig_fin = px.imshow(join_df_same.transpose())\n");
                     sb.append("    fig_fin.update_layout(plot_bgcolor='rgb(136, 136, 136)')\n");
                     sb.append("    fig_fin.update_xaxes(gridcolor='rgb(136, 136, 136)')\n");
+                    sb.append("    fig_fin.layout.xaxis.dtick=1\n");
                     sb.append("    fig_fin.update_yaxes(gridcolor='rgb(136, 136, 136)')\n");
+                    sb.append("    fig_fin.layout.yaxis.dtick=1\n");
                     sb.append("    fig_fin.write_html(f\"");
                     sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.html\")\n");
                     /*WEBSITE_INTERACTIVE_PLOTS*/
@@ -5556,11 +5610,11 @@ public class COM2POSE_lib
         }
         if(level.equals("TF"))
         {
-            rel_path=".."+File.pathSeparator+".."+File.separator+".."+File.separator+"HOME.html";
+            rel_path=".."+File.separator+".."+File.separator+".."+File.separator+"HOME.html";
         }
 
         sb_home_front.append("<style>\n" +
-                "body,h1,h2,h3,h4,h5,h6 {font-family: \"Lato\", sans-serif}\n" +
+                "body,h1,h2,h3,h4,h5,h6 {font-family: \"Lato\", sans-serif, width: \"max-content\"}\n" +
                 ".w3-bar,h1\n" +
                 //,button {font-family: "Montserrat", sans-serif}
                 ".fa-anchor,.fa-coffee {font-size:200px}\n" +
@@ -5575,6 +5629,7 @@ public class COM2POSE_lib
                 "  font-size: 15px;\n" +
                 "  margin: 4px 2px;\n" +
                 "  cursor: pointer;\n" +
+                "  width: 130px;\n" +
                 "}\n"+
                 "</style>\n" +
                 "<body>\n" +
