@@ -94,6 +94,8 @@ public class COM2POSE_lib
 
             bw_home.close();
 
+            HashMap<String,ArrayList<String>> tf_gene_count = new HashMap<>();
+
             for(File fileDir: threshold_folders)
             {
                 HashSet<String> tfs_to_create_pages = new HashSet<>();
@@ -154,9 +156,20 @@ public class COM2POSE_lib
 
                         tfs_to_create_pages.add(split[0]);
 
+                        String tf_key ="";
+                        ArrayList<String> tf_key_set = new ArrayList<>();
+
                         int count = 0;
                         for(String s: split)
                         {
+                            if(count==0)
+                            {
+                                tf_key=s;
+                            }
+                            if(count!=0)
+                            {
+                                tf_key_set.add(s);
+                            }
                             sb_threshold.append("\t\t\t\t<th>");
                             if(count!=0 || s.equals("TF"))
                             {
@@ -186,6 +199,9 @@ public class COM2POSE_lib
                             sb_threshold.append("\t\t\t\t</th>\n");
                             count++;
                         }
+
+                        tf_gene_count.put(tf_key.toUpperCase(),tf_key_set);
+
                         sb_threshold.append("\t\t\t</tr>\n");
 
                     }
@@ -224,9 +240,21 @@ public class COM2POSE_lib
 
                         tfs_to_create_pages.add(split[0]);
 
+                        String tf_key="";
+                        ArrayList<String> tf_key_set = new ArrayList<>();
+
                         int count = 0;
                         for(String s: split)
                         {
+                            if(count==0)
+                            {
+                                tf_key=s;
+                            }
+                            if(count!=0)
+                            {
+                                tf_key_set.add(s);
+                            }
+
                             sb_threshold.append("\t\t\t\t<th>");
                             if(count!=0 || s.equals("TF"))
                             {
@@ -256,6 +284,8 @@ public class COM2POSE_lib
                             sb_threshold.append("\t\t\t\t</th>\n");
                             count++;
                         }
+                        tf_gene_count.put(tf_key.toUpperCase(),tf_key_set);
+
                         sb_threshold.append("\t\t\t</tr>\n");
 
                     }
@@ -308,6 +338,12 @@ public class COM2POSE_lib
 
                 for(String tf : tfs_to_create_pages)
                 {
+                    File f_output_tf_page = new File(f_output_tf_root.getAbsolutePath()+File.separator+tf.toUpperCase()+".html");
+                    if(f_output_tf_page.exists())
+                    {
+                        continue;
+                    }
+
                     StringBuilder sb_tf_page = new StringBuilder();
                     sb_tf_page.append(get_header_html("TF"));
                     sb_tf_page.append(" <script>\n" +
@@ -330,7 +366,25 @@ public class COM2POSE_lib
                     sb_tf_page.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
                     sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
 
-                    File f_gene_counts_input_different = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+poss_hms_list.get(0)+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different);
+                    ArrayList<String> table_header = tf_gene_count.get("TF");
+                    sb_tf_page.append("\t\t\t<tr>\n");
+                    sb_tf_page.append("\t\t\t\t<th>TF</th>\n");
+                    for(String s: table_header)
+                    {
+                        sb_tf_page.append("\t\t\t\t<th>"+s+"</th>\n");
+                    }
+                    sb_tf_page.append("\t\t\t</tr>\n");
+
+                    ArrayList<String> table_header_tf = tf_gene_count.get(tf.toUpperCase());
+                    sb_tf_page.append("\t\t\t<tr>\n");
+                    sb_tf_page.append("\t\t\t\t<th>"+tf.toUpperCase()+"</th>\n");
+                    for(String s: table_header_tf)
+                    {
+                        sb_tf_page.append("\t\t\t\t<th>"+s+"</th>\n");
+                    }
+                    sb_tf_page.append("\t\t\t</tr>\n");
+
+                    /*File f_gene_counts_input_different = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+poss_hms_list.get(0)+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different);
 
                     BufferedReader br_tf_gc = new BufferedReader(new FileReader(f_gene_counts_input_different));
                     String line_tf_gc = br_tf_gc.readLine();
@@ -395,7 +449,7 @@ public class COM2POSE_lib
                         }
                         br_tf_gc.close();
 
-                    }
+                    }*/
 
                     sb_tf_page.append("</table>");
 
@@ -527,7 +581,7 @@ public class COM2POSE_lib
 
 
                     sb_tf_page.append(html_tail);
-                    BufferedWriter bw_tf = new BufferedWriter(new FileWriter(f_output_tf_root.getAbsolutePath()+File.separator+tf.toUpperCase()+".html"));
+                    BufferedWriter bw_tf = new BufferedWriter(new FileWriter(f_output_tf_page));
                     bw_tf.write(sb_tf_page.toString());
                     bw_tf.close();
                 }
