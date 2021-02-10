@@ -103,7 +103,7 @@ public class COM2POSE_lib
                     " </script>\n");
 
             /*
-            sb_parameter.append("<button class=\"button_expandable\" id=\"BUTTON_NAME\" aria-expanded=\"false\" onclick=\"expand_collapse('BUTTON_NAME','TABLE_NAME')\"> FILTER_NAME\n");
+            sb_parameter.append("<button class=\"button_expandable\" id=\"BUTTON_NAME\" aria-expanded=\"false\" ondblclick=\"expand_collapse('BUTTON_NAME','TABLE_NAME')\"> FILTER_NAME\n");
             sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"TABLE_NAME\">\n");
 
             sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
@@ -121,7 +121,7 @@ public class COM2POSE_lib
 
             //mix_option_parameters
             {
-                sb_parameter.append("<button class=\"button_expandable\" id=\"button_preprocessing_mix_options\" aria-expanded=\"false\" onclick=\"expand_collapse('button_preprocessing_mix_options','table_preprocessing_mix_options')\"> Preprocessing Mix Options\n");
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_preprocessing_mix_options\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_preprocessing_mix_options','table_preprocessing_mix_options')\"> Preprocessing Mix Options\n");
                 sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_preprocessing_mix_options\">\n");
 
                 sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
@@ -157,7 +157,7 @@ public class COM2POSE_lib
 
             //blacklist parameters
             {
-                sb_parameter.append("<button class=\"button_expandable\" id=\"button_blacklist_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_blacklist_parameters','table_blacklist_parameters')\"> Blacklist Parameters\n");
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_blacklist_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_blacklist_parameters','table_blacklist_parameters')\"> Blacklist Parameters\n");
                 sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_blacklist_parameters\">\n");
                 sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
 
@@ -186,7 +186,7 @@ public class COM2POSE_lib
 
             //DESeq2 parameters
             {
-                sb_parameter.append("<button class=\"button_expandable\" id=\"button_deseq2_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_deseq2_parameters','table_deseq2_parameters')\"> DESeq2 Parameters\n");
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_deseq2_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_deseq2_parameters','table_deseq2_parameters')\"> DESeq2 Parameters\n");
                 sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_deseq2_parameters\">\n");
 
                 sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
@@ -220,7 +220,7 @@ public class COM2POSE_lib
 
             //TEPIC parameters
             {
-                sb_parameter.append("<button class=\"button_expandable\" id=\"button_tepic_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_tepic_parameters','table_tepic_parameters')\"> TEPIC Parameters\n");
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_tepic_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_tepic_parameters','table_tepic_parameters')\"> TEPIC Parameters\n");
                 sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_tepic_parameters\">\n");
 
                 sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
@@ -410,7 +410,7 @@ public class COM2POSE_lib
             //TGEN parameters
             if(!options_intern.path_tgen.equals(""))
             {
-                sb_parameter.append("<button class=\"button_expandable\" id=\"button_tgen_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_tgen_parameters','table_tgen_parameters')\"> TGene Parameters\n");
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_tgen_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_tgen_parameters','table_tgen_parameters')\"> TGene Parameters\n");
                 sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_tgen_parameters\">\n");
 
                 sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
@@ -477,7 +477,7 @@ public class COM2POSE_lib
 
             //DYNAMITE parameters
             {
-                sb_parameter.append("<button class=\"button_expandable\" id=\"button_dynamite_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_dynamite_parameters','table_dynamite_parameters')\"> DYNAMITE parameters\n");
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_dynamite_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_dynamite_parameters','table_dynamite_parameters')\"> DYNAMITE parameters\n");
                 sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_dynamite_parameters\">\n");
 
                 sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
@@ -555,7 +555,7 @@ public class COM2POSE_lib
 
             //PLOT parameters
             {
-                sb_parameter.append("<button class=\"button_expandable\" id=\"button_plot_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_plot_parameters','table_plot_parameters')\"> PLOT Parameters\n");
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_plot_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_plot_parameters','table_plot_parameters')\"> PLOT Parameters\n");
                 sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_plot_parameters\">\n");
 
                 sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
@@ -605,7 +605,7 @@ public class COM2POSE_lib
 
             //HTML Report PARAMETERS
             {
-                sb_parameter.append("<button class=\"button_expandable\" id=\"button_html_report_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_html_report_parameters','table_html_report_parameters')\"> HTML Report Parameters\n");
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_html_report_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_html_report_parameters','table_html_report_parameters')\"> HTML Report Parameters\n");
                 sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_html_report_parameters\">\n");
 
                 sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
@@ -683,7 +683,7 @@ public class COM2POSE_lib
                             "    width: 100%;\n" +
                             "    position: relative;\n" +
                             "    display: block;\n" +
-                            "    overflow-x: scroll;\">\n" +
+                            "    overflow-x: scroll;overflow-y: scroll;\">\n" +
                             "\t  <iframe id=\"igraph_"+fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_different_stages.html"+"\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
                     String relative_path_diff_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_different_stages.html";
 
@@ -697,7 +697,7 @@ public class COM2POSE_lib
                     //gene count table for plot
 
                     //collapse thing
-                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_diff\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_diff','table_"+fileDir_hm.getName()+"_diff')\"> GeneCounts\n");
+                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_diff\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_diff','table_"+fileDir_hm.getName()+"_diff')\"> GeneCounts\n");
                     //tooltip
                     sb_threshold.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:45px;height:40px;\"/>"+
                             "  <span class=\"tooltiptext\">GeneCount is the unprocessed data counted by nfcore RNA-seq. A TF which is at least expressed with GeneCount 1000 is considered highly expressed and active.</span>\n" +
@@ -787,7 +787,7 @@ public class COM2POSE_lib
                             "    width: 100%;\n" +
                             "    position: relative;\n" +
                             "    display: block;\n" +
-                            "    overflow-x: scroll;\">\n" +
+                            "    overflow-x: scroll;overflow-y: scroll;\">\n" +
                             "\t  <iframe id=\"igraph_"+fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_same_stages.html"+"\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
                     String relative_path_same_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_same_stages.html";
                     sb_threshold.append(relative_path_same_th);
@@ -799,7 +799,7 @@ public class COM2POSE_lib
 
 
                     //collapse thing
-                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_same\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_diff','table_"+fileDir_hm.getName()+"_same')\"> GeneCounts\n");
+                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_same\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_diff','table_"+fileDir_hm.getName()+"_same')\"> GeneCounts\n");
                     //tooltip
                     sb_threshold.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:45px;height:40px;\"/>"+
                             "  <span class=\"tooltiptext\">GeneCount is the unprocessed data counted by nfcore RNA-seq. A TF which is at least expressed with GeneCount 1000 is considered highly expressed and active.</span>\n" +
@@ -883,7 +883,7 @@ public class COM2POSE_lib
                     sb_threshold.append("<h5> A total number of "+total_number_tfs_hm.size()+" distinct TFs are considered in Histone Modification "+fileDir_hm.getName()+ " group. </h5>\n");
 
                     //collapse thing
-                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_distTFs\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_distTFs','table_"+fileDir_hm.getName()+"_distTFs')\">"+fileDir_hm.getName()+": Distinct TFs\n");
+                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_distTFs\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_distTFs','table_"+fileDir_hm.getName()+"_distTFs')\">"+fileDir_hm.getName()+": Distinct TFs\n");
                     //tooltip
                     sb_threshold.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:45px;height:40px;\"/>"+
                             "  <span class=\"tooltiptext\">Distinct TFs in a group are the TFs in the union of different and same conditions.</span>\n" +
@@ -915,7 +915,7 @@ public class COM2POSE_lib
                 sb_threshold.append("<div class=\"container-buttons w3-content\"><h5> A total number of "+total_number_tfs.size()+" distinct TFs are considered in Threshold "+fileDir.getName()+ " group. </h5>\n");
 
                 //collapse thing
-                sb_threshold.append("<button class=\"button_expandable\" id=\"button_distTFs\" aria-expanded=\"false\" onclick=\"expand_collapse('button_distTFs','table_distTFs')\"> Distinct TFs overall\n");
+                sb_threshold.append("<button class=\"button_expandable\" id=\"button_distTFs\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_distTFs','table_distTFs')\"> Distinct TFs overall\n");
                 //tooltip
                 sb_threshold.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:45px;height:40px;\"/>"+
                         "  <span class=\"tooltiptext\">Distinct TFs in a threshold are the TFs in the union of all timepoints and different and same conditions.</span>\n" +
@@ -1084,7 +1084,7 @@ public class COM2POSE_lib
 
                         sb_tf_page.append("<h3> Group plots: </h3>\n");
                         sb_tf_page.append("</div>\n");
-                        sb_tf_page.append("<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_group_plots_"+hm+"\" aria-expanded=\"false\" onclick=\"expand_collapse('button_group_plots_"+hm+"','table_group_plots_"+hm+"')\">"+hm+ " group plots\n");
+                        sb_tf_page.append("<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_group_plots_"+hm+"\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_group_plots_"+hm+"','table_group_plots_"+hm+"')\">"+hm+ " group plots\n");
                         sb_tf_page.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_group_plots_"+hm+"\">\n");
 
                         sb_tf_page.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
@@ -1101,7 +1101,7 @@ public class COM2POSE_lib
                                     "    width: 980px;\n" +
                                     "    position: relative;\n" +
                                     "    display: block;\n" +
-                                    "    overflow-x: scroll;\">\n" +
+                                    "    overflow-x: scroll;overflow-y: scroll;\">\n" +
                                     "\t  <iframe  id=\"igraph_"+fileDir_plot.getName()+"\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
                             sb_tf_page.append(".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+hm+File.separator+options_intern.folder_out_website_interactive_plots_tps +File.separator+fileDir_plot.getName());
                             sb_tf_page.append("\" height=\"400\" width=\"2500\" overflow=\"scroll\"></iframe>\n");
@@ -1165,7 +1165,7 @@ public class COM2POSE_lib
                             File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
                             if(f_considered.exists())
                             {
-                                sb_tf_page.append("<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_"+hm+"_"+f_considered_no_tf.getName()+"\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+hm+"_"+f_considered_no_tf.getName()+"','table_"+hm+"_"+f_considered_no_tf.getName()+"')\">"+hm+": "+f_considered_no_tf.getName()+"\n");
+                                sb_tf_page.append("<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_"+hm+"_"+f_considered_no_tf.getName()+"\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_"+hm+"_"+f_considered_no_tf.getName()+"','table_"+hm+"_"+f_considered_no_tf.getName()+"')\">"+hm+": "+f_considered_no_tf.getName()+"\n");
                                 sb_tf_page.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_"+hm+"_"+f_considered_no_tf.getName()+"\">\n");
 
 
