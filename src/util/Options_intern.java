@@ -140,6 +140,8 @@ public class Options_intern
     public String tepic_input_directory="";
     //if black listed regions filter is used the former data link is here
     public String tepic_input_prev ="";
+    //original tepic input directory
+    public String tepic_input_original = "";
     //#[REQ]:fasta files (in RefSeq format, without \"chr\" prefix)
     public String tepic_input_ref_genome="";
     //#[REQ]: path to position specific energy matrix used for TRAP (different matrices can be found in ~/COM2POSE/ext/TEPIC/TEPIC/PWMs/2.1)

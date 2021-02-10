@@ -43,9 +43,9 @@ public class COM2POSE
         //TGen
         if(!options_intern.path_tgen.equals(""))
         {
-            /*com2pose_lib.preprocess_tgen();
-            com2pose_lib.run_tgen();
-            com2pose_lib.merge_tgen();
+            //com2pose_lib.preprocess_tgen();
+            //com2pose_lib.run_tgen();
+            /*com2pose_lib.merge_tgen();
             com2pose_lib.create_tgen_groups();
 
             com2pose_lib.filter_target_genes_tgen();

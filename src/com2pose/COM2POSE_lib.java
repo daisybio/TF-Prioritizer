@@ -83,6 +83,7 @@ public class COM2POSE_lib
 
             //bw_home.write(sb_home_front.toString());
             bw_home.write(get_header_html("HOME"));
+
             threshold_folders_filled =true;
 
             for(Double d: options_intern.plot_th_coefficient)
@@ -93,6 +94,555 @@ public class COM2POSE_lib
             bw_home.write(html_tail);
 
             bw_home.close();
+
+
+            StringBuilder sb_parameter = new StringBuilder(get_header_html("HOME"));
+
+            sb_parameter.append(" <script>\n" +
+                    " document.title = \"PARAMETERS\";\n" +
+                    " </script>\n");
+
+            /*
+            sb_parameter.append("<button class=\"button_expandable\" id=\"BUTTON_NAME\" aria-expanded=\"false\" onclick=\"expand_collapse('BUTTON_NAME','TABLE_NAME')\"> FILTER_NAME\n");
+            sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"TABLE_NAME\">\n");
+
+            sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+
+            sb_parameter.append("\t\t\t<tr>");
+            sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+            sb_parameter.append("\t\t\t\t<th>Value</th>");
+            sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+            sb_parameter.append("\t\t\t</tr>");
+
+            sb_parameter.append("\t\t</table>");
+            sb_parameter.append("</div>\n</button>\n");
+             */
+
+
+            //mix_option_parameters
+            {
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_preprocessing_mix_options\" aria-expanded=\"false\" onclick=\"expand_collapse('button_preprocessing_mix_options','table_preprocessing_mix_options')\"> Preprocessing Mix Options\n");
+                sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_preprocessing_mix_options\">\n");
+
+                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+                sb_parameter.append("\t\t\t\t<th>Value</th>");
+                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>mix_level</th>");
+                sb_parameter.append("\t\t\t\t<th>" + options_intern.mix_level + "</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: if set a mix of either the Histone Modification Level (HM_LEVEL) or the Sample Level (SAMPLE_LEVEL) will be performed, mix_option is required\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>mix_option</th>");
+                sb_parameter.append("\t\t\t\t<th>" + options_intern.mix_option + "</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: set histone marks or samples will be mixed with option: UNION (all peaks of all HMs will be used), INTERSECTION (only peaks, which are in all HMs will be used)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                if(options_intern.mix_option.equals("INTERSECTION"))
+                {
+                    sb_parameter.append("\t\t\t<tr>");
+                    sb_parameter.append("\t\t\t\t<th>mix_occurence_intersection</th>");
+                    sb_parameter.append("\t\t\t\t<th>"+options_intern.mix_occurence_intersection+"</th>");
+                    sb_parameter.append("\t\t\t\t<th>#[OPT]: minimal occurence of peaks in intersection (only applied if mix_option is set to INTERSECTION), if set to zero it means it must be in all samples /histone modifications available, default 2\n</th>");
+                    sb_parameter.append("\t\t\t</tr>");
+                }
+                sb_parameter.append("\t\t</table>");
+                sb_parameter.append("</div>\n</button>\n");
+            }
+
+            //blacklist parameters
+            {
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_blacklist_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_blacklist_parameters','table_blacklist_parameters')\"> Blacklist Parameters\n");
+                sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_blacklist_parameters\">\n");
+                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+                sb_parameter.append("\t\t\t\t<th>Value</th>");
+                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>black_list_dir</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.black_list_dir+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: if blacklist filter should be used provide path to BED file here (BED files can be found at https://github.com/Boyle-Lab/Blacklist/tree/master/lists)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>black_list_signals</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.black_list_signals.toString()+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: which regions should be ignored: Low_Mappability;High_Signal_Region\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+
+                sb_parameter.append("\t\t</table>");
+                sb_parameter.append("</div>\n</button>\n");
+            }
+
+            //DESeq2 parameters
+            {
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_deseq2_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_deseq2_parameters','table_deseq2_parameters')\"> DESeq2 Parameters\n");
+                sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_deseq2_parameters\">\n");
+
+                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+                sb_parameter.append("\t\t\t\t<th>Value</th>");
+                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>deseq2_input_directory</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.deseq2_input_directory+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]: count files in nfcore RNA-seq format (each line is a count of one gene), directory must be ordered like: TP1 - samples_1,...,samples_n;....\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>deseq2_input_gene_id</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.deseq2_input_gene_id+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]: gene ID file from nfcore RNA-seq (each line names one gene ID (ENSG) - must be same order as deseq2_input_directory files\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>deseq2_count_threshold</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.deseq2_count_threshold+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: minimum count over all samples of two timepoints for DESeq2, default: 0\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+                sb_parameter.append("\t\t</table>");
+                sb_parameter.append("</div>\n</button>\n");
+            }
+
+            //TEPIC parameters
+            {
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_tepic_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_tepic_parameters','table_tepic_parameters')\"> TEPIC Parameters\n");
+                sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_tepic_parameters\">\n");
+
+                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+                sb_parameter.append("\t\t\t\t<th>Value</th>");
+                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_input_directory [ORIGINAL]</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_input_original+"</th>");
+                sb_parameter.append("\t\t\t\t<th></th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                if(!options_intern.tepic_input_prev.equals(""))
+                {
+                    sb_parameter.append("\t\t\t<tr>");
+                    sb_parameter.append("\t\t\t\t<th>tepic_input_directory [LAST FILTER]</th>");
+                    sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_input_directory+"</th>");
+                    sb_parameter.append("\t\t\t\t<th></th>");
+                    sb_parameter.append("\t\t\t</tr>");
+                }
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_input_ref_genome</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_input_ref_genome+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]:fasta files (in RefSeq format, without \\\"chr\\\" prefix)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_path_pwms</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_path_pwms+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]: path to position specific energy matrix used for TRAP (different matrices can be found in ~/COM2POSE/ext/TEPIC/TEPIC/PWMs/2.1)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_cores</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_cores+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: number of cores\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_bed_chr_sign</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_bed_chr_sign+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: bedgraph file containing open chromatin signal, e.g. DNase1-seq, or Histone-Mark signal\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_column_bedfile</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_column_bedfile+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: column in the tepic_input_directory file containing the average per base signal within a peak. If this option is used, the tepic_bed_chr_sign option must not be used\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_gene_annot</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_gene_annot+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]: gene annotation file, required to generate the gene view, required for TPM filter\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_window_size</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_window_size+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: size of the window to be considered to generate gene view (default 50kb)]\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_onlyDNasePeaks</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_onlyDNasePeaks+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: path to annotation file and annotate only DNase peaks that are within a window specified by the tepic_window_size option around all genes contained in the gene annotation file specified by this option\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_exponential_decay</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_exponential_decay+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: indicating whether exponential decay should be used (default TRUE)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_not_norm_peak_length</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_not_norm_peak_length+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: flag to be set if affinities should not be normalised by peak length\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_not_generated</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_not_generated+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: flag to be set if peak features for peak length and peak counts should not be generated\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_original_decay</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_original_decay+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: if tepic_bed_chr_sign or tepic_column_bedfile is used together with this flag, the original (Decay-)Scaling formulation of TEPIC is used to compute gene-TF scores\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_psems_length</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_psems_length+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: path to a tab delimited file containing the length of the used PSEMs\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_entire_gene_body</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_entire_gene_body+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: flag to be set if the entire gene body should be screened for TF binding. The search window is extended by a region half of the size that is specified by the tepic_window_size option upstream of the genes 5' TSS\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_zipped</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_zipped+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: flag indicating that the output of TEPIC should be zipped\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_background_seq</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_background_seq+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: path to a set of background sequences that should be used to compute to generate a binary score for TF binding. Mutually exclusive to the tepic_2bit option\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_2bit</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_2bit+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: path to a 2bit representation of the reference genome, required to generate a binary score for TF binding. The binary score is generated in addition to the standard affinity values. Mutually exclusive to the tepic_background_seq option\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_pvalue</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_pvalue+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: p-value cut off used to determine a cut off to derive a binary score for TF binding (default 0.05)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_minutes_per_chr</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_minutes_per_chr+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: minutes that should be spend at most per chromosome to find matching random regions (default 3)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_chr_prefix</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_chr_prefix+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: flag indicating that the reference genome contains a chr prefix\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_transcript_based</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_transcript_based+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: flag indicating that the annotation should be transcript and not gene based\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_loop_list</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_loop_list+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: loop list file containing chromatin contacts\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_loop_windows</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_loop_windows+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: size of the loop window used around a genes promoter to link chromatin loops to genes (default 5000)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_only_peak_features</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_only_peak_features+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: parameter to be set if only peak features should be computed (default FALSE)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_tpm_cutoff</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_tpm_cutoff+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: set (T)ranscripts (P)er (M)illion cutoff, default: TPM filter not active\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_ensg_symbol</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_ensg_symbol+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]: IF NOT SET MAPPING WILL BE PERFORMED AUTOMATICALLY - path to input file ensg to gene symbol file\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t</table>");
+                sb_parameter.append("</div>\n</button>\n");
+
+            }
+
+            //TGEN parameters
+            if(!options_intern.path_tgen.equals(""))
+            {
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_tgen_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_tgen_parameters','table_tgen_parameters')\"> TGene Parameters\n");
+                sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_tgen_parameters\">\n");
+
+                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+                sb_parameter.append("\t\t\t\t<th>Value</th>");
+                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tgen_no_closest_locus</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tgen_no_closest_locus+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: if no locus is found within window size, the nearest locus is used, default:false, meaning locus is used\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tgen_no_closest_tss</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tgen_no_closest_tss+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: if no tss is found within window size, the nearest locus is used, default:false, meaning locus is used\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tgen_max_link_distances</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tgen_max_link_distances+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: window size of tgen, default: 500000\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tgen_pvalue</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tgen_pvalue+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: max pvalue, which is accepted, default 0.05\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tgen_self_regulatory</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tgen_self_regulatory+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]: should self regulatory TFs {OPT-SELF-REG} be increased? default: false\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+                if(options_intern.tgen_self_regulatory)
+                {
+                    sb_parameter.append("\t\t\t<tr>");
+                    sb_parameter.append("\t\t\t\t<th>tgen_consensus</th>");
+                    sb_parameter.append("\t\t\t\t<th>"+options_intern.tgen_consensus+"</th>");
+                    sb_parameter.append("\t\t\t\t<th>#[OPT]: {OPT-SELF-REG} value for consus approach (e.g. 0.5 = 50:50 TGene:TEPIC, 0.4 = 40:60 TGene:TEPIC), default: 0.5\n</th>");
+                    sb_parameter.append("\t\t\t</tr>");
+
+                    sb_parameter.append("\t\t\t<tr>");
+                    sb_parameter.append("\t\t\t\t<th>tgen_consensus_calc</th>");
+                    sb_parameter.append("\t\t\t\t<th>"+options_intern.tgen_consensus_calc+"</th>");
+                    sb_parameter.append("\t\t\t\t<th>#[OPT]: {OPT-SELF-REG} can be \"INCREASE_TGENE_TFS\" (increases TEPIC TF affinities for TFs found in TGENE at target gene) or \"DECREASE_NOT_TGENE_TFs (decreases TEPIC TF affinities for TFs not found in TGENE at target gene)\".\n</th>");
+                    sb_parameter.append("\t\t\t</tr>");
+
+                    sb_parameter.append("\t\t\t<tr>");
+                    sb_parameter.append("\t\t\t\t<th>tgen_mt_writing</th>");
+                    sb_parameter.append("\t\t\t\t<th>"+options_intern.tgen_mt_writing+"</th>");
+                    sb_parameter.append("\t\t\t\t<th>#[OPT]: {OPT-SELF-REG} if TGENE consensus is used please specify the writing of the Mitochondrial DNA chromosome in Peak Files, default: MT\n</th>");
+                    sb_parameter.append("\t\t\t</tr>");
+
+                }
+                sb_parameter.append("\t\t</table>");
+                sb_parameter.append("</div>\n</button>\n");
+            }
+
+            //DYNAMITE parameters
+            {
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_dynamite_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_dynamite_parameters','table_dynamite_parameters')\"> DYNAMITE parameters\n");
+                sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_dynamite_parameters\">\n");
+
+                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+                sb_parameter.append("\t\t\t\t<th>Value</th>");
+                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_preprocessing_integrate_data_consider_geneFile</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_preprocessing_integrate_data_consider_geneFile+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: File containing gene IDs that should be considered\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_out_var</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_out_var+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]: Name of the response variable default: Expression (in this pipeline)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_cores</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_cores+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: Number of the cores to use (1 as default)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_alpha</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_alpha+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: Alpha parameter stepsize (0.1 as default)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_testsize</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_testsize+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]:Size of test data (0.2 as default)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_Ofolds</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_Ofolds+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: Number of outer folds for model validation (3 as default)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_Ifolds</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_Ifolds+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: Number of inner cross validation folds (6 as default)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_balanced</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_balanced+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: Flag indicating whether the data should be balanced through downsampling (default TRUE)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_performance</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_performance+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: Flag indicating whether performance measures should be computed (default TRUE)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>dynamite_randomise</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.dynamite_randomise+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: Flag indicating whether a model should be learned on randomised data (default FALSE)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t</table>");
+                sb_parameter.append("</div>\n</button>\n");
+
+            }
+
+            //PLOT parameters
+            {
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_plot_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_plot_parameters','table_plot_parameters')\"> PLOT Parameters\n");
+                sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_plot_parameters\">\n");
+
+                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+                sb_parameter.append("\t\t\t\t<th>Value</th>");
+                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>plot_th_coefficient</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.plot_th_coefficient.toString()+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: thresholds for coefficent plot and overall plots, for each threshold it creates a plot for each timepoint and an overall plot for each HistoneMod\n" +
+                        "#e.g. 0.1 means it creates a plot of the coefficient range ([-1;1]), it uses all TFs of [-1,-0.1] and [0.1,1]\n" +
+                        "#default: 0.1;0.2;0.3;0.4;0.5;0.6</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>plot_cutoff_tps</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.plot_cutoff_tps+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: in how many TPs should a TF be found, default: 2\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>plot_cutoff_hms</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.plot_cutoff_hms+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: in how many HMs should a TF be found, default: 2\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>plot_cutoff_gcs</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.plot_cutoff_gcs+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: minimum gene counts, default: 100\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>plot_top_k_genes</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.plot_top_k_genes+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: top k target genes for TFs, default: 30\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t</table>");
+                sb_parameter.append("</div>\n</button>\n");
+
+            }
+
+            //HTML Report PARAMETERS
+            {
+                sb_parameter.append("<button class=\"button_expandable\" id=\"button_html_report_parameters\" aria-expanded=\"false\" onclick=\"expand_collapse('button_html_report_parameters','table_html_report_parameters')\"> HTML Report Parameters\n");
+                sb_parameter.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_html_report_parameters\">\n");
+
+                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
+                sb_parameter.append("\t\t\t\t<th>Value</th>");
+                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>html_report_interesting_tfs</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.website_interesting_tfs+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: list of TFs which you are interested in - is only used to search fast for known TFs in the results, it does not affect results\n" +
+                        "#e.g. website_interesting_tfs=\"STAT3;GATA3;NFIB\"</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t</table>");
+                sb_parameter.append("</div>\n</button>\n");
+            }
+
+
+            /*
+            sb_parameter.append("\t\t\t<tr>");
+            sb_parameter.append("\t\t\t\t<th></th>");
+            sb_parameter.append("\t\t\t\t<th></th>");
+            sb_parameter.append("\t\t\t\t<th></th>");
+            sb_parameter.append("\t\t\t</tr>");
+             */
+
+
+            sb_parameter.append(html_tail);
+
+            BufferedWriter bw_parameter = new BufferedWriter(new FileWriter(new File(f_output_website+File.separator+"PARAMETERS.html")));
+            bw_parameter.write(sb_parameter.toString());
+            bw_parameter.close();
+
 
             HashMap<String,ArrayList<String>> tf_gene_count = new HashMap<>();
 
@@ -107,7 +657,7 @@ public class COM2POSE_lib
                 sb_threshold.append(" <script>\n" +
                         " document.title = \"TH: "+fileDir.getName()+"\";\n" +
                         " </script>\n");
-                sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\"><div class=\"w3-content\"><h1>Current threshold: "+fileDir.getName()+"</h1></div></div>\n");
+                sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\"><div class=\"w3-content\"><h1>Current threshold: "+fileDir.getName()+"</h1></div>\n</div>\n");
 
 
                 HashSet<String> total_number_tfs = new HashSet<>();
@@ -126,25 +676,34 @@ public class COM2POSE_lib
                     sb_threshold.append("</h1>\n" +
                             "\t  \n" +
                             "\t <h4> Different timepoints / conditions </h4> \n" +
-                            "\t  \n" +
-                            "<div class=\"container\" style=\"\n" +
-                            "    width: 980px;\n" +
+                            "\t  \n");
+                    sb_threshold.append("</div>\n");
+                    sb_threshold.append("</div>\n");
+                    sb_threshold.append("<div class=\"container\" style=\"\n" +
+                            "    width: 100%;\n" +
                             "    position: relative;\n" +
                             "    display: block;\n" +
                             "    overflow-x: scroll;\">\n" +
-                            "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                            "\t  <iframe id=\"igraph_"+fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_different_stages.html"+"\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
                     String relative_path_diff_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_different_stages.html";
 
                     sb_threshold.append(relative_path_diff_th);
-                    sb_threshold.append("\" height=\"400\" width=\"1500\" overflow=\"scroll\"></iframe>\n");
-                    sb_threshold.append("</div>");
+                    sb_threshold.append("\" height=\"400\" width=\"2500\" overflow=\"scroll\"></iframe>\n");
+                    sb_threshold.append("</div>\n");
+
+                    sb_threshold.append("    <div class=\"w3-twothird\">\n");
+                    sb_threshold.append("  <div class=\"w3-content\">\n");
 
                     //gene count table for plot
+
+                    //collapse thing
+                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_diff\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_diff','table_"+fileDir_hm.getName()+"_diff')\"> GeneCounts\n");
+                    sb_threshold.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_"+fileDir_hm.getName()+"_diff\">\n");
 
                     HashSet<String> total_numbers_tfs_hm_diff = new HashSet<>();
                     sb_threshold.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
                     sb_threshold.append("<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
-                    sb_threshold.append("\t\t<table style=\"width:100%\">\n");
+                    sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
 
                     File f_gene_counts_input_different = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+fileDir_hm.getName()+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different);
                     BufferedReader br_gc_different = new BufferedReader(new FileReader(f_gene_counts_input_different));
@@ -209,26 +768,40 @@ public class COM2POSE_lib
 
                     sb_threshold.append("\t\t</table>\n");
 
+                    //collapse thing
+                    sb_threshold.append("</div>\n");
+                    sb_threshold.append("</button>\n");
+
                     sb_threshold.append("<h5> A total number of "+total_numbers_tfs_hm_diff.size()+" distinct TFs are considered in different time points group </h5>\n");
 
                     HashSet<String> total_numbers_tfs_hm_same = new HashSet<>();
                     sb_threshold.append("\t <h4> Same timepoints / conditions </h4> \n" +
-                            "\t  \n" +
-                            "<div class=\"container\" style=\"\n" +
-                            "    width: 980px;\n" +
+                            "\t  \n" );
+                    sb_threshold.append("</div>\n");
+                    sb_threshold.append("</div>\n");
+                    sb_threshold.append("<div class=\"container\" style=\"\n" +
+                            "    width: 100%;\n" +
                             "    position: relative;\n" +
                             "    display: block;\n" +
                             "    overflow-x: scroll;\">\n" +
-                            "\t  <iframe id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                            "\t  <iframe id=\"igraph_"+fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_same_stages.html"+"\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
                     String relative_path_same_th = ".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+fileDir_hm.getName()+File.separator+options_intern.folder_out_website_interactive_plots_overview +File.separator+ fileDir_hm.getName()+"_threshold_"+fileDir.getName()+"_same_stages.html";
                     sb_threshold.append(relative_path_same_th);
-                    sb_threshold.append("\" height=\"400\" width=\"1500\"></iframe>\n");
-                    sb_threshold.append("</div>");
+                    sb_threshold.append("\" height=\"400\" width=\"2500\"></iframe>\n");
+                    sb_threshold.append("</div>\n");
+
+                    sb_threshold.append("    <div class=\"w3-twothird\">\n");
+                    sb_threshold.append("  <div class=\"w3-content\">\n");
+
+
+                    //collapse thing
+                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_same\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_diff','table_"+fileDir_hm.getName()+"_same')\"> GeneCounts\n");
+                    sb_threshold.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_"+fileDir_hm.getName()+"_same\">\n");
 
                     //gene count table for plot
                     sb_threshold.append("<h4>Gene Count threshold: "+options_intern.plot_cutoff_gcs+"</h4>");
                     sb_threshold.append("<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
-                    sb_threshold.append("\t\t<table style=\"width:100%\">\n");
+                    sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
 
                     File f_gene_counts_input_same = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+fileDir_hm.getName()+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_same);
                     BufferedReader br_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
@@ -293,34 +866,62 @@ public class COM2POSE_lib
 
                     sb_threshold.append("\t\t</table>\n");
 
+                    //collapse thing
+                    sb_threshold.append("</div>\n");
+                    sb_threshold.append("</button>");
+
                     sb_threshold.append("<h5> A total number of "+total_numbers_tfs_hm_same.size()+" distinct TFs are considered in same time points group. </h5>\n");
-                    sb_threshold.append("<div class='container-buttons'>");
+
                     sb_threshold.append("<h5> A total number of "+total_number_tfs_hm.size()+" distinct TFs are considered in Histone Modification "+fileDir_hm.getName()+ " group. </h5>\n");
+
+                    //collapse thing
+                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_distTFs\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_distTFs','table_"+fileDir_hm.getName()+"_distTFs')\">"+fileDir_hm.getName()+": Distinct TFs\n");
+                    sb_threshold.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_"+fileDir_hm.getName()+"_distTFs\">\n");
+                    sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
                     for(String tf_distinct : total_number_tfs_hm)
                     {
-                        sb_threshold.append("<a href='TFs"+File.separator+tf_distinct.toUpperCase()+".html' target='_blank' <button class=\"button\">"+tf_distinct.toUpperCase()+"</button></a>");
+                        sb_threshold.append("<tr><th><a href='TFs"+File.separator+tf_distinct.toUpperCase()+".html' target='_blank'> <button class=\"button\">"+tf_distinct.toUpperCase()+"</button></a></th></tr>\n");
                     }
-                    sb_threshold.append("</div>");
+                    sb_threshold.append("</table>");
+
+                    //collapse thing
+                    sb_threshold.append("</div>\n");
+                    sb_threshold.append("</button>\n");
 
 
 
                     sb_threshold.append("    </div>\n" +
                             "\n" +
                             "    <div class=\"w3-third w3-center\">\n" +
-                            "      <i class=\"fa fa-anchor w3-padding-64 w3-text-red\"></i>\n" +
-                            "    </div>\n" +
+                            "      <i class=\"fa fa-anchor w3-padding-64 w3-text-red\"></i>\n");
+                    sb_threshold.append("    </div>\n" +
                             "  </div>\n" +
                             "</div>\n");
                 }
 
+
                 sb_threshold.append("<div class=\"container-buttons w3-content\"><h5> A total number of "+total_number_tfs.size()+" distinct TFs are considered in Threshold "+fileDir.getName()+ " group. </h5>\n");
 
+                //collapse thing
+                sb_threshold.append("<button class=\"button_expandable\" id=\"button_distTFs\" aria-expanded=\"false\" onclick=\"expand_collapse('button_distTFs','table_distTFs')\"> Distinct TFs overall\n");
+                sb_threshold.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_distTFs\">\n");
+                sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
                 for(String tf_distinct : total_number_tfs)
                 {
-                    sb_threshold.append("<a href='TFs"+File.separator+tf_distinct.toUpperCase()+".html' target='_blank' <button class=\"button\">"+tf_distinct.toUpperCase()+"</button></a>");
+                    sb_threshold.append("<tr><th><a href='TFs"+File.separator+tf_distinct.toUpperCase()+".html' target='_blank'> <button class=\"button\">"+tf_distinct.toUpperCase()+"</button></a></th></tr>\n");
                 }
+                sb_threshold.append("</table>");
+
+                //collapse thing
+                sb_threshold.append("</div>\n");
+                sb_threshold.append("</button>\n");
 
                 sb_threshold.append(write_table_html(Double.parseDouble(fileDir.getName()),"THRESHOLD"));
+
+                sb_threshold.append("</div>\n");
+                sb_threshold.append("</div>\n");
+                sb_threshold.append("</div>\n");
+
                 sb_threshold.append(html_tail);
 
 
@@ -466,8 +1067,11 @@ public class COM2POSE_lib
                         sb_tf_page.append("</h1>\n");
 
                         sb_tf_page.append("<h3> Group plots: </h3>\n");
+                        sb_tf_page.append("</div>\n");
+                        sb_tf_page.append("<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_group_plots_"+hm+"\" aria-expanded=\"false\" onclick=\"expand_collapse('button_group_plots_"+hm+"','table_group_plots_"+hm+"')\">"+hm+ " group plots\n");
+                        sb_tf_page.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_group_plots_"+hm+"\">\n");
 
-
+                        sb_tf_page.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
 
                         for(File fileDir_plot : f_interactive_plots.listFiles())
                         {
@@ -475,18 +1079,25 @@ public class COM2POSE_lib
                             String[] split_name = split_dot[0].split("_");
 
                             sb_tf_page.append("\t  \n" +
-                                    "\t <h4>"+split_name[1]+ " VS " + split_name[2] +" </h4> \n" +
+                                    "\t <tr><th><h4>"+split_name[1]+ " VS " + split_name[2] +" </h4></th></tr> \n" +
                                     "\t  \n" +
-                                    "<div class=\"container\" style=\"\n" +
+                                    "<tr><th><div class=\"container\" style=\"\n" +
                                     "    width: 980px;\n" +
                                     "    position: relative;\n" +
                                     "    display: block;\n" +
                                     "    overflow-x: scroll;\">\n" +
-                                    "\t  <iframe  id=\"igraph\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
+                                    "\t  <iframe  id=\"igraph_"+fileDir_plot.getName()+"\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
                             sb_tf_page.append(".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName()+File.separator+hm+File.separator+options_intern.folder_out_website_interactive_plots_tps +File.separator+fileDir_plot.getName());
-                            sb_tf_page.append("\" height=\"400\" width=\"1500\" overflow=\"scroll\"></iframe>\n");
-                            sb_tf_page.append("</div>");
+                            sb_tf_page.append("\" height=\"400\" width=\"2500\" overflow=\"scroll\"></iframe>\n");
+                            sb_tf_page.append("</div></th></tr>\n");
                         }
+
+                        sb_tf_page.append("</table>");
+
+
+                        sb_tf_page.append("</div>\n</button>\n");
+
+                        sb_tf_page.append("<div class=\"w3-twothird\">\n");
 
 
 
@@ -1222,7 +1833,7 @@ public class COM2POSE_lib
                         sb.append(".index, y=time)\n");
                         sb.append("    fig_fin.layout.xaxis.dtick=1\n");
                         sb.append("    fig_fin.write_html(f\"");
-                        sb.append(interactive_plots_output_coeff_hm_tps.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+fileDirHM_Group.getName()+"_threshold_"+d+".html\")\n");
+                        sb.append(interactive_plots_output_coeff_hm_tps.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+fileDirHM_Group.getName()+"_threshold_"+d+".html\",include_plotlyjs=\"cdn\")\n");
                         /*WEBSITE_INTERACTIVE_PLOTS*/
 
                     }
@@ -1291,9 +1902,12 @@ public class COM2POSE_lib
                     sb.append("    fig_fin.update_xaxes(gridcolor='rgb(136, 136, 136)')\n");
                     sb.append("    fig_fin.layout.xaxis.dtick=1\n");
                     sb.append("    fig_fin.update_yaxes(gridcolor='rgb(136, 136, 136)')\n");
+                    sb.append("    fig_fin.layout.height=500\n");
+                    sb.append("    fig_fin.layout.width=2500\n");
                     sb.append("    fig_fin.layout.yaxis.dtick=1\n");
+                    //sb.append("    fig_fin.update_layout(legend=dict(xanchor=\"right\", x=-1))\n");
                     sb.append("    fig_fin.write_html(f\"");
-                    sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_different_stages.html\")\n");
+                    sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_different_stages.html\",include_plotlyjs=\"cdn\")\n");
                     /*WEBSITE_INTERACTIVE_PLOTS*/
 
                     sb.append("plt.figure(figsize=(26, 20))\n");
@@ -1357,9 +1971,12 @@ public class COM2POSE_lib
                     sb.append("    fig_fin.update_xaxes(gridcolor='rgb(136, 136, 136)')\n");
                     sb.append("    fig_fin.layout.xaxis.dtick=1\n");
                     sb.append("    fig_fin.update_yaxes(gridcolor='rgb(136, 136, 136)')\n");
+                    sb.append("    fig_fin.layout.height=500\n");
+                    sb.append("    fig_fin.layout.width=2500\n");
+                    //sb.append("    fig_fin.update_layout(legend=dict(yanchor=\"top\", y=0.99, xanchor=\"left\", x=0.01))\n");
                     sb.append("    fig_fin.layout.yaxis.dtick=1\n");
                     sb.append("    fig_fin.write_html(f\"");
-                    sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.html\")\n");
+                    sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.html\",include_plotlyjs=\"cdn\")\n");
                     /*WEBSITE_INTERACTIVE_PLOTS*/
 
 
@@ -4805,6 +5422,7 @@ public class COM2POSE_lib
                     break;
                 case "tepic_input_directory":
                     options_intern.tepic_input_directory=split[1].substring(1,split[1].length()-1);
+                    options_intern.tepic_input_original=split[1].substring(1,split[1].length()-1);
                     break;
                 case "tepic_input_ref_genome":
                     options_intern.tepic_input_ref_genome=split[1].substring(1,split[1].length()-1);
@@ -4967,6 +5585,10 @@ public class COM2POSE_lib
                 case "website_interesting_tfs":
                     String[] split_interesting_tfs = split[1].substring(1,split[1].length()-1).split(";");
                     options_intern.website_interesting_tfs.addAll(Arrays.asList(split_interesting_tfs));
+                    break;
+                case "html_report_interesting_tfs":
+                    String[] split_interesting_tfs_2 = split[1].substring(1,split[1].length()-1).split(";");
+                    options_intern.website_interesting_tfs.addAll(Arrays.asList(split_interesting_tfs_2));
                     break;
                 default:
                     logger.logLine("Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
@@ -5630,6 +6252,26 @@ public class COM2POSE_lib
                 "<title>COM2POSE</title>\n" +
                 "<meta charset=\"UTF-8\">\n" +
                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
+        sb_home_front.append("<head>\n<script>\n" +
+                "  function expand_collapse(id, div_id) {\n" +
+                "  var x = document.getElementById(id).getAttribute(\"aria-expanded\"); \n" +
+                "  if (x == \"true\") \n" +
+                "  {\n" +
+                "  x = \"false\"\n" +
+                "  } else {\n" +
+                "  x = \"true\"\n" +
+                "  }\n" +
+                "  document.getElementById(id).setAttribute(\"aria-expanded\", x);\n" +
+
+                "  var y = document.getElementById(div_id); \n" +
+                "  if (y.style.display === \"none\") \n" +
+                "  {\n" +
+                "  y.style.display = \"block\"\n" +
+                "  } else {\n" +
+                "  y.style.display = \"none\"\n" +
+                "  }\n" +
+                "  }\n" +
+                "</script>\n</head>\n");
 
         for(File fileDir:f_website_css.listFiles())
         {
@@ -5667,8 +6309,9 @@ public class COM2POSE_lib
             rel_path=".."+File.separator+".."+File.separator+".."+File.separator+"HOME.html";
         }
 
+
         sb_home_front.append("<style>\n" +
-                "body,h1,h2,h3,h4,h5,h6 {font-family: \"Lato\", sans-serif, width: \"max-content\"}\n" +
+                "body,h1,h2,h3,h4,h5,h6 {font-family: \"Lato\"; width: \"max-content\";}\n" +
                 ".w3-bar,h1\n" +
                 //,button {font-family: "Montserrat", sans-serif}
                 ".fa-anchor,.fa-coffee {font-size:200px}\n" +
@@ -5690,7 +6333,25 @@ public class COM2POSE_lib
                 "  \n" +
                 "<!-- Header -->\n" +
                 "<header class=\"w3-container w3-red w3-center\" style=\"padding:128px 16px\">\n" +
-                " <a href='"+rel_path+"' target='_blank'><button class=\"button\">HOME</button></a>\n"+
+                " <a href='"+rel_path+"' target='_blank'><button class=\"button\">HOME</button></a>\n");
+
+        String rel_path_parameter = "";
+        if(level.equals("HOME"))
+        {
+            rel_path_parameter="PARAMETERS.html";
+        }
+        if(level.equals("THRESHOLD"))
+        {
+            rel_path_parameter=".."+File.separator+".."+File.separator+"PARAMETERS.html";
+        }
+        if(level.equals("TF"))
+        {
+            rel_path_parameter=".."+File.separator+".."+File.separator+".."+File.separator+"PARAMETERS.html";
+        }
+
+        sb_home_front.append("<a href='"+rel_path_parameter+"' target='_blank'><button class=\"button\" id=\"button_parameters\" > Parameters</button></a>\n");
+
+        sb_home_front.append(
                 "  <h1 class=\"w3-margin w3-jumbo\">COM2POSE: <i>results overview</i></h1>\n" +
                 "  \n" +
                 "    <div class=\"dropdown\">\n" +
@@ -5730,9 +6391,10 @@ public class COM2POSE_lib
             sb_home_front.append(rel_path_2+"\" target='_blank'>Coefficient " + d);
             sb_home_front.append("</a>\n");
         }
+        sb_home_front.append("  </div>\n");
 
-        sb_home_front.append("  </div>\n" +
-                "</div>\n" +
+
+        sb_home_front.append("</div>\n" +
                 "</header>\n");
 
         return sb_home_front.toString();
