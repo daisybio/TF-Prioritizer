@@ -698,6 +698,10 @@ public class COM2POSE_lib
 
                     //collapse thing
                     sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_diff\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_diff','table_"+fileDir_hm.getName()+"_diff')\"> GeneCounts\n");
+                    //tooltip
+                    sb_threshold.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:45px;height:40px;\"/>"+
+                            "  <span class=\"tooltiptext\">GeneCount is the unprocessed data counted by nfcore RNA-seq. A TF which is at least expressed with GeneCount 1000 is considered highly expressed and active.</span>\n" +
+                            "</div>");
                     sb_threshold.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_"+fileDir_hm.getName()+"_diff\">\n");
 
                     HashSet<String> total_numbers_tfs_hm_diff = new HashSet<>();
@@ -796,6 +800,10 @@ public class COM2POSE_lib
 
                     //collapse thing
                     sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_same\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_diff','table_"+fileDir_hm.getName()+"_same')\"> GeneCounts\n");
+                    //tooltip
+                    sb_threshold.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:45px;height:40px;\"/>"+
+                            "  <span class=\"tooltiptext\">GeneCount is the unprocessed data counted by nfcore RNA-seq. A TF which is at least expressed with GeneCount 1000 is considered highly expressed and active.</span>\n" +
+                            "</div>");
                     sb_threshold.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_"+fileDir_hm.getName()+"_same\">\n");
 
                     //gene count table for plot
@@ -876,6 +884,10 @@ public class COM2POSE_lib
 
                     //collapse thing
                     sb_threshold.append("<button class=\"button_expandable\" id=\"button_"+fileDir_hm.getName()+"_distTFs\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+fileDir_hm.getName()+"_distTFs','table_"+fileDir_hm.getName()+"_distTFs')\">"+fileDir_hm.getName()+": Distinct TFs\n");
+                    //tooltip
+                    sb_threshold.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:45px;height:40px;\"/>"+
+                            "  <span class=\"tooltiptext\">Distinct TFs in a group are the TFs in the union of different and same conditions.</span>\n" +
+                            "</div>");
                     sb_threshold.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_"+fileDir_hm.getName()+"_distTFs\">\n");
                     sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
                     for(String tf_distinct : total_number_tfs_hm)
@@ -904,6 +916,10 @@ public class COM2POSE_lib
 
                 //collapse thing
                 sb_threshold.append("<button class=\"button_expandable\" id=\"button_distTFs\" aria-expanded=\"false\" onclick=\"expand_collapse('button_distTFs','table_distTFs')\"> Distinct TFs overall\n");
+                //tooltip
+                sb_threshold.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:45px;height:40px;\"/>"+
+                        "  <span class=\"tooltiptext\">Distinct TFs in a threshold are the TFs in the union of all timepoints and different and same conditions.</span>\n" +
+                        "</div>");
                 sb_threshold.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_distTFs\">\n");
                 sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
                 for(String tf_distinct : total_number_tfs)
@@ -942,7 +958,7 @@ public class COM2POSE_lib
                     File f_output_tf_page = new File(f_output_tf_root.getAbsolutePath()+File.separator+tf.toUpperCase()+".html");
                     if(f_output_tf_page.exists())
                     {
-                        continue;
+                        //continue;
                     }
 
                     StringBuilder sb_tf_page = new StringBuilder();
@@ -1135,8 +1151,13 @@ public class COM2POSE_lib
                         }
                         if(anything_to_write)
                         {
-                            sb_tf_page.append("<h3> Target Genes - top "+options_intern.plot_top_k_genes+" (normalised value):</h3>\n");
-                            sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>");
+                            //tooltip
+
+                            sb_tf_page.append("<h3> Target Genes - top "+options_intern.plot_top_k_genes+" (normalised value):\n");
+                            sb_tf_page.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:35px;height:30px;\"/>"+
+                                    "  <span class=\"tooltiptext\">TargetGenes are harvested from TEPIC output. The higher the normalized affinity value the higher is the ranking.</span>\n" +
+                                    "</div></h3>\n");
+                            sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>\n");
                         }
 
                         for(File f_considered_no_tf : files_to_consider)
@@ -1144,6 +1165,10 @@ public class COM2POSE_lib
                             File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
                             if(f_considered.exists())
                             {
+                                sb_tf_page.append("<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_"+hm+"_"+f_considered_no_tf.getName()+"\" aria-expanded=\"false\" onclick=\"expand_collapse('button_"+hm+"_"+f_considered_no_tf.getName()+"','table_"+hm+"_"+f_considered_no_tf.getName()+"')\">"+hm+": "+f_considered_no_tf.getName()+"\n");
+                                sb_tf_page.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_"+hm+"_"+f_considered_no_tf.getName()+"\">\n");
+
+
                                 sb_tf_page.append("<h4> Point: "+f_considered_no_tf.getName()+" </h4>\n");
 
                                 sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
@@ -1186,6 +1211,7 @@ public class COM2POSE_lib
                                 br_point_target_genes.close();
 
                                 sb_tf_page.append("\t\t</table>\n");
+                                sb_tf_page.append("</div>\n</button>\n");
                             }
                         }
                     }
