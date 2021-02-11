@@ -83,6 +83,7 @@ public class Options_intern
     public String folder_out_website_interactive_plots_tps="TIMEPOINTS_CONDITIONS";
     public String folder_out_website_interactive_plots_overview="OVERVIEW";
 
+    public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_postprocessing_output_mean_affinities ="Mean_Affinities_";
@@ -130,6 +131,8 @@ public class Options_intern
     public String deseq2_input_directory="";
     //#[REQ]: gene ID file from nfcore RNA-seq (each line names one gene ID (ENSG) - must be same order as deseq2_input_directory files
     public String deseq2_input_gene_id="";
+    //#[OPT]:
+    public String deseq2_biomart_dataset_species="";
     //#[OPT]: minimum count over all samples of two timepoints for DESeq2, default: 0
     public int deseq2_count_threshold=0;
     /*

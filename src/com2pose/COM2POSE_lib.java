@@ -47,6 +47,9 @@ public class COM2POSE_lib
     }
 
 
+    /**
+     * creates the HTML report
+     */
     public void create_overview_website() throws Exception {
         logger.logLine("[WEBSITE] Start creating overview website.");
 
@@ -4223,7 +4226,7 @@ public class COM2POSE_lib
         File output_intermediate_steps = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing);
         if(output_intermediate_steps.exists())
         {
-            logger.logLine("Working directory was already used - please us another one or empty this one completely");
+            //logger.logLine("Working directory was already used - please us another one or empty this one completely");
             //TODO: after debugging use system exit !!!
             //System.exit(1);
         }
@@ -4554,6 +4557,59 @@ public class COM2POSE_lib
 
         logger.logLine("Finished creating RScripts for running DESeq2");
 
+
+    }
+
+    public void get_ensg_symbol_mapping() throws Exception {
+
+        logger.logLine("[DESEQ2] Start mapping ENSG to GENE SYMBOLS.");
+
+        File script_output_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing);
+        script_output_dir.mkdir();
+
+        File results = new File(script_output_dir.getAbsolutePath()+File.separator+options_intern.file_suffix_deseq2_mapping);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                "  install.packages(\"BiocManager\")\n" +
+                "\n" +
+                "if (!requireNamespace(\"biomaRt\", quietly = TRUE))\n" +
+                "  install.packages(\"biomaRt\")\n" +
+                "\n" +
+                "library('biomaRt')\n");
+
+        sb.append("df <- read.csv('"+options_intern.deseq2_input_gene_id+"')\n");
+
+        sb.append("mart <- useDataset(\""+options_intern.deseq2_biomart_dataset_species+"\", useMart(\"ensembl\"))");
+        sb.append("\n");
+
+        sb.append("df$id <- NA\n" +
+                "G_list <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\"mgi_symbol\"),values=df$Geneid,mart= mart)\n" +
+                "write.table(G_list,\""+results.getAbsolutePath()+"\", row.names = FALSE, quote = F, sep=\"\\t\")\n");
+
+
+        File script_output = new File(script_output_dir.getAbsolutePath()+File.separator+"ENSG_SYMBOL_MAP.R");
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(script_output));
+        bw.write(sb.toString());
+        bw.close();
+
+        String command = "Rscript " + script_output.getAbsolutePath();
+        Process child = Runtime.getRuntime().exec(command);
+        logger.logLine("[DESEQ2] Running script " + script_output.getName()+": " + command);
+        int code = child.waitFor();
+        switch (code) {
+            case 0:
+                break;
+            case 1:
+                String message = child.getErrorStream().toString();
+                throw new Exception(message);
+        }
+
+        options_intern.tepic_ensg_symbol = results.getAbsolutePath();
+
+
+        logger.logLine("[DESEQ2] Finished mapping ENSG to GENE SYMBOLS.");
 
     }
 
@@ -5443,6 +5499,9 @@ public class COM2POSE_lib
                 case "deseq2_input_gene_id":
                     options_intern.deseq2_input_gene_id=split[1].substring(1,split[1].length()-1);
                     break;
+                case "deseq2_biomart_dataset_species":
+                    options_intern.deseq2_biomart_dataset_species=split[1].substring(1,split[1].length()-1);
+                    break;
                 case "deseq2_count_threshold":
                     options_intern.deseq2_count_threshold=Integer.parseInt(split[1]);
                     break;
@@ -5727,6 +5786,12 @@ public class COM2POSE_lib
             }
         }
 
+        if(options_intern.deseq2_biomart_dataset_species.equals("") && options_intern.tepic_ensg_symbol.equals(""))
+        {
+            logger.logLine("[DESEQ2] deseq2_biomart_dataset_species must be filled if tepic_ensg_symbol is empty!");
+            all_set=false;
+        }
+
 
         /**
          * TEPIC options
@@ -5811,7 +5876,7 @@ public class COM2POSE_lib
         }
 
         //check for map ensg symbol
-        if(options_intern.tepic_ensg_symbol.equals(""))
+        if(options_intern.tepic_ensg_symbol.equals("") && options_intern.deseq2_biomart_dataset_species.equals(""))
         {
             logger.logLine("[TEPIC] No map of ENSG to Gene Symbol is given!");
         }

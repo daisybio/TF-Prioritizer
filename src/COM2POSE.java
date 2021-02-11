@@ -28,13 +28,16 @@ public class COM2POSE
         {
             com2pose_lib.preprocess_blacklist();
             com2pose_lib.filter_blacklist();
-        }
+        }*/
 
         //DESeq2
+        if(options_intern.tepic_ensg_symbol.equals("")||!options_intern.deseq2_biomart_dataset_species.equals(""))
+        {
+            com2pose_lib.get_ensg_symbol_mapping();
+        }
+        /*
         com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.run_and_postprocess_DESeq2();
-
-
 
         //TEPIC
         com2pose_lib.run_tepic();
@@ -64,7 +67,7 @@ public class COM2POSE
         //PLOTS
         com2pose_lib.create_tp_plots();
         com2pose_lib.analyze_plots_data();
-        com2pose_lib.get_top_k_target_genes_plots();
+        //com2pose_lib.get_top_k_target_genes_plots();
 
         //CREATE OVERVIEW WEBSITE
         com2pose_lib.create_overview_website();
