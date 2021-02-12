@@ -213,6 +213,12 @@ public class COM2POSE_lib
                 sb_parameter.append("\t\t\t</tr>");
 
                 sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>deseq2_biomart_dataset_species</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.deseq2_biomart_dataset_species+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[REQ]: biomart dataset name for the species which is used in RNA-seq and CHIP-seq data, (https://www.bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/biomaRt.html)\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
+                sb_parameter.append("\t\t\t<tr>");
                 sb_parameter.append("\t\t\t\t<th>deseq2_count_threshold</th>");
                 sb_parameter.append("\t\t\t\t<th>"+options_intern.deseq2_count_threshold+"</th>");
                 sb_parameter.append("\t\t\t\t<th>#[OPT]: minimum count over all samples of two timepoints for DESeq2, default: 0\n</th>");
@@ -5880,7 +5886,7 @@ public class COM2POSE_lib
         {
             logger.logLine("[TEPIC] No map of ENSG to Gene Symbol is given!");
         }
-        else
+        else if(options_intern.deseq2_biomart_dataset_species.equals(""))
         {
             File f = new File(options_intern.tepic_ensg_symbol);
             if(!f.exists())
