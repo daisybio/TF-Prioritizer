@@ -72,6 +72,8 @@ public class Options_intern
     public String folder_out_analysis_data_WEBSITE_OVERVIEW = "03_WEBSITE_OVERVIEW";
     public String folder_out_analysis_data_WEBSITE_NUMBER_TFs = "04_WEBSITE_NUMBER_TFs";
     public String folder_out_target_genes ="06_D_PLOTS_TARGET_GENES";
+    public String folder_out_distribution ="07_DISTRIBUTION_ANALYSIS";
+    public String folder_out_distribution_analyzed_tfs ="01_ANALYSED_TFS";
     public String folder_out_website="Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -97,6 +99,7 @@ public class Options_intern
     public String file_suffix_analysis_plot_data_hm_level_different ="all_data_different.csv";
     public String file_suffix_analysis_plot_data_hm_level_same ="all_data_same.csv";
     public String file_suffix_website_analysis_tf_available = "available_tfs.csv";
+    public String file_suffix_distribution_analysis_analysed_tfs = "analysable_tfs.csv";
 
 
     public String directory_for_tepic_scripts = "ext"+ File.separator+"TEPIC"+File.separator+"TEPIC";

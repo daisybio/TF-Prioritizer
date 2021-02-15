@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.nio.Buffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class COM2POSE_lib
@@ -47,10 +48,221 @@ public class COM2POSE_lib
     }
 
 
+    public void perform_distribution_analysis() throws IOException {
+        logger.logLine("[DISTRIBUTION-ANALYSIS] Calculate distributions for TFs");
+
+        File f_distr_analysis = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
+        File f_distr_analysis_analysed_tfs = new File(f_distr_analysis.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_analyzed_tfs);
+        File f_distr_analysis_analysed_tfs_csv = new File(f_distr_analysis_analysed_tfs.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_analysed_tfs);
+
+
+        HashMap<String,HashSet<String>> distinct_hms_tfs = new HashMap<>();
+        HashMap<String,HashSet<String>> distinct_tfs_hms = new HashMap<>();
+
+        HashMap<String,String> ensg_symbol = new HashMap<>();
+        HashMap<String,HashSet<String>> symbol_ensg = new HashMap<>();
+
+        HashMap<String,HashMap<String,Double>> timepoint_ensg_gene_counts = new HashMap<>();
+        HashMap<String,HashMap<String,Double>> group_clash_diff_gene_expression = new HashMap<>();
+
+        BufferedReader br_distinct_hms_tfs = new BufferedReader(new FileReader(f_distr_analysis_analysed_tfs_csv));
+        String line_distinct_hms_tfs = br_distinct_hms_tfs.readLine();
+        while((line_distinct_hms_tfs=br_distinct_hms_tfs.readLine())!=null)
+        {
+            String[] split = line_distinct_hms_tfs.split("\t");
+            HashSet<String> current_hm_tfs;
+
+            if(distinct_hms_tfs.containsKey(split[1]))
+            {
+                current_hm_tfs = distinct_hms_tfs.get(split[1]);
+            }
+            else
+            {
+                current_hm_tfs=new HashSet<>();
+            }
+
+            current_hm_tfs.add(split[0]);
+            distinct_hms_tfs.put(split[1],current_hm_tfs);
+
+            HashSet<String> current_tf_hms;
+            if(distinct_tfs_hms.containsKey(split[0]))
+            {
+                current_tf_hms = distinct_tfs_hms.get(split[0]);
+            }
+            else
+            {
+                current_tf_hms = new HashSet<>();
+            }
+
+            current_tf_hms.add(split[1]);
+            distinct_tfs_hms.put(split[0],current_tf_hms);
+        }
+        br_distinct_hms_tfs.close();
+
+        BufferedReader br_ensg_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_symbol = br_ensg_symbol.readLine();
+        while((line_ensg_symbol = br_ensg_symbol.readLine())!=null)
+        {
+            String[] split=line_ensg_symbol.split("\t");
+            if(split.length>1)
+            {
+                ensg_symbol.put(split[0].toUpperCase(),split[1].toUpperCase());
+
+                HashSet<String> current_ensgs;
+                if(symbol_ensg.containsKey(split[1].toUpperCase()))
+                {
+                    current_ensgs=symbol_ensg.get(split[1].toUpperCase());
+                }
+                else
+                {
+                    current_ensgs=new HashSet<>();
+                }
+                current_ensgs.add(split[0].toUpperCase());
+                symbol_ensg.put(split[1].toUpperCase(),current_ensgs);
+            }
+
+
+        }
+        br_ensg_symbol.close();
+
+        File f_genecounts_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_symbols);
+        for(File fileDir:f_genecounts_root.listFiles())
+        {
+            if(fileDir.isFile())
+            {
+                String name_tp = fileDir.getName().split("\\.")[0];
+
+                HashMap<String,Double> ensg_genecount = new HashMap<>();
+
+                BufferedReader br_gene_counts = new BufferedReader(new FileReader(fileDir));
+                String line_gene_counts = br_gene_counts.readLine();
+                while((line_gene_counts=br_gene_counts.readLine())!=null)
+                {
+                    String[] split = line_gene_counts.split("\t");
+                    ensg_genecount.put(split[1].toUpperCase(),Double.parseDouble(split[2]));
+                }
+                br_gene_counts.close();
+
+                timepoint_ensg_gene_counts.put(name_tp,ensg_genecount);
+            }
+        }
+
+        File f_diff_gene_expr_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_output);
+        for(File fileDir:f_diff_gene_expr_root.listFiles())
+        {
+            if(fileDir.isFile())
+            {
+                String[] split_name =fileDir.getName().split("\\.")[0].split("_");
+                String name_group_clash = split_name[0]+"_"+split_name[1];
+
+                HashMap<String,Double> current_diff_expr = new HashMap<>();
+
+                BufferedReader br_diff_gene_expr = new BufferedReader(new FileReader(fileDir));
+                String line_diff_gene_expr = br_diff_gene_expr.readLine();
+                while((line_diff_gene_expr=br_diff_gene_expr.readLine())!=null)
+                {
+                    String[] split = line_diff_gene_expr.split("\t");
+                    current_diff_expr.put(split[0],Double.parseDouble(split[1]));
+                }
+                br_diff_gene_expr.close();
+
+                group_clash_diff_gene_expression.put(name_group_clash,current_diff_expr);
+            }
+        }
+
+
+
+        for(String key_tf : distinct_tfs_hms.keySet())
+        {
+            if(symbol_ensg.containsKey(key_tf))
+            {
+
+                HashMap<String,Double> group_clash_tf_score = new HashMap<>();
+
+                HashSet<String> ensgs = symbol_ensg.get(key_tf);
+
+                HashMap<String,Double> tp_gene_count = new HashMap<>();
+                HashMap<String,Double> group_clash_diff_gene_expr = new HashMap<>();
+
+                for(String k_tp : timepoint_ensg_gene_counts.keySet())
+                {
+                    int gene_count_total = 0;
+                    int found_gene_counts = 0;
+
+                    HashMap<String,Double> tp_specific_genecounts = timepoint_ensg_gene_counts.get(k_tp);
+
+                    for(String k_ensgs: ensgs)
+                    {
+                        if(tp_specific_genecounts.containsKey(k_ensgs))
+                        {
+                            gene_count_total+=tp_specific_genecounts.get(k_ensgs);
+                            found_gene_counts++;
+                        }
+                    }
+
+                    gene_count_total/=found_gene_counts;
+
+                    tp_gene_count.put(k_tp, (double) gene_count_total);
+                }
+
+                for(String k_group_clash : group_clash_diff_gene_expression.keySet())
+                {
+
+                    double diff_total = 0;
+                    int diff_count = 0;
+
+                    HashMap<String,Double> tp_specific_genecounts = group_clash_diff_gene_expression.get(k_group_clash);
+
+                    for(String k_ensgs: ensgs)
+                    {
+                        if(tp_specific_genecounts.containsKey(k_ensgs))
+                        {
+                            diff_total+=tp_specific_genecounts.get(k_ensgs);
+                            diff_count++;
+                        }
+                    }
+
+                    diff_total/=diff_count;
+
+                    group_clash_diff_gene_expr.put(k_group_clash,  diff_total);
+
+
+                }
+
+                for(String k_group_clash : group_clash_diff_gene_expr.keySet())
+                {
+                    String[] split_clash = k_group_clash.split("_");
+
+                    
+                    for(String k_tp : split_clash)
+                    {
+
+                    }
+
+                }
+
+
+
+                System.out.println("X");
+
+
+            }
+            else
+            {
+                continue;
+            }
+        }
+
+
+        logger.logLine("[DISTRIBUTION-ANALYSIS] Finished calculating distributions");
+    }
+
+
     /**
      * creates the HTML report
+     * it creates also one important file (available tfs in HMs and which stages) for distribution analysis
      */
-    public void create_overview_website() throws Exception {
+    public void create_overview_html_report_before_distribution_analysis() throws Exception {
         logger.logLine("[WEBSITE] Start creating overview website.");
 
         File f_website_css = new File(options_intern.path_to_COM2POSE+File.separator+"ext"+File.separator+"WEBSITE");
@@ -78,6 +290,8 @@ public class COM2POSE_lib
 
         for(int i_dont_know = 0; i_dont_know < 2; i_dont_know++)
         {
+
+            HashMap<String,HashMap<String,HashSet<String>>> distinct_tf_hm_diff_same = new HashMap<>();
 
             String html_tail = "</body>\n" +
                     "</html>";
@@ -761,6 +975,33 @@ public class COM2POSE_lib
                                     total_number_tfs.add(s.toUpperCase());
                                     total_number_tfs_hm.add(s.toUpperCase());
                                     total_numbers_tfs_hm_diff.add(s.toUpperCase());
+
+                                    HashMap<String,HashSet<String>> current_tf_hm;
+
+                                    if(distinct_tf_hm_diff_same.containsKey(s.toUpperCase()))
+                                    {
+                                        current_tf_hm=distinct_tf_hm_diff_same.get(s.toUpperCase());
+                                    }
+                                    else
+                                    {
+                                        current_tf_hm = new HashMap<>();
+                                    }
+
+                                    HashSet<String> current_tf_hm_stage = new HashSet<>();
+
+                                    if(current_tf_hm.containsKey(fileDir_hm.getName()))
+                                    {
+                                        current_tf_hm_stage = current_tf_hm.get(fileDir_hm.getName());
+                                    }
+                                    else
+                                    {
+                                        current_tf_hm_stage= new HashSet<>();
+                                    }
+
+                                    current_tf_hm_stage.add("DIFFERENT_TPS");
+                                    current_tf_hm.put(fileDir_hm.getName(),current_tf_hm_stage);
+                                    distinct_tf_hm_diff_same.put(s.toUpperCase(),current_tf_hm);
+
                                 }
                                 else
                                 {
@@ -864,6 +1105,32 @@ public class COM2POSE_lib
                                     total_number_tfs.add(s.toUpperCase());
                                     total_number_tfs_hm.add(s.toUpperCase());
                                     total_numbers_tfs_hm_same.add(s.toUpperCase());
+
+                                    HashMap<String,HashSet<String>> current_tf_hm;
+
+                                    if(distinct_tf_hm_diff_same.containsKey(s.toUpperCase()))
+                                    {
+                                        current_tf_hm=distinct_tf_hm_diff_same.get(s.toUpperCase());
+                                    }
+                                    else
+                                    {
+                                        current_tf_hm = new HashMap<>();
+                                    }
+
+                                    HashSet<String> current_tf_hm_stage = new HashSet<>();
+
+                                    if(current_tf_hm.containsKey(fileDir_hm.getName()))
+                                    {
+                                        current_tf_hm_stage = current_tf_hm.get(fileDir_hm.getName());
+                                    }
+                                    else
+                                    {
+                                        current_tf_hm_stage= new HashSet<>();
+                                    }
+
+                                    current_tf_hm_stage.add("SAME_TPS");
+                                    current_tf_hm.put(fileDir_hm.getName(),current_tf_hm_stage);
+                                    distinct_tf_hm_diff_same.put(s.toUpperCase(),current_tf_hm);
                                 }
                                 else
                                 {
@@ -1009,73 +1276,6 @@ public class COM2POSE_lib
                         sb_tf_page.append("\t\t\t\t<th>"+s+"</th>\n");
                     }
                     sb_tf_page.append("\t\t\t</tr>\n");
-
-                    /*File f_gene_counts_input_different = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+poss_hms_list.get(0)+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_different);
-
-                    BufferedReader br_tf_gc = new BufferedReader(new FileReader(f_gene_counts_input_different));
-                    String line_tf_gc = br_tf_gc.readLine();
-
-                    String[] split_tf_gc = line_tf_gc.split("\t");
-                    sb_tf_page.append("\t\t\t<tr>\n");
-                    for(String stg : split_tf_gc)
-                    {
-                        sb_tf_page.append("\t\t\t\t<th>");
-                        sb_tf_page.append(stg);
-                        sb_tf_page.append("\t\t\t\t</th>\n");
-                    }
-                    sb_tf_page.append("\t\t\t</tr>\n");
-
-                    boolean found_writing = false;
-
-                    while((line_tf_gc=br_tf_gc.readLine())!= null)
-                    {
-
-                        String[] split_tf_gc_inner = line_tf_gc.split("\t");
-
-                        if(split_tf_gc_inner[0].toUpperCase().equals(tf.toUpperCase()))
-                        {
-                            sb_tf_page.append("\t\t\t<tr>\n");
-                            for(String stg : split_tf_gc_inner)
-                            {
-                                sb_tf_page.append("\t\t\t\t<th>");
-                                sb_tf_page.append(stg);
-                                sb_tf_page.append("\t\t\t\t</th>\n");
-                                found_writing=true;
-                            }
-                            sb_tf_page.append("\t\t\t</tr>\n");
-                            break;
-                        }
-                    }
-                    br_tf_gc.close();
-
-                    if(!found_writing)
-                    {
-                        File f_gene_counts_input_same = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+poss_hms_list.get(0)+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_same);
-
-                        BufferedReader br_tf_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
-                        String line_tf_gc_same = br_tf_gc_same.readLine();
-
-                        while((line_tf_gc_same=br_tf_gc_same.readLine())!= null)
-                        {
-
-                            String[] split_tf_gc_inner = line_tf_gc_same.split("\t");
-
-                            if(split_tf_gc_inner[0].toUpperCase().equals(tf.toUpperCase()))
-                            {
-                                sb_tf_page.append("\t\t\t<tr>\n");
-                                for(String stg : split_tf_gc_inner)
-                                {
-                                    sb_tf_page.append("\t\t\t\t<th>");
-                                    sb_tf_page.append(stg);
-                                    sb_tf_page.append("\t\t\t\t</th>\n");
-                                }
-                                sb_tf_page.append("\t\t\t</tr>\n");
-                                break;
-                            }
-                        }
-                        br_tf_gc.close();
-
-                    }*/
 
                     sb_tf_page.append("</table>");
 
@@ -1232,6 +1432,52 @@ public class COM2POSE_lib
                     bw_tf.close();
                 }
 
+                File f_output_distribution_analysis = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
+                f_output_distribution_analysis.mkdir();
+
+                File f_output_distribution_analysis_analyzed_tfs = new File(f_output_distribution_analysis.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_analyzed_tfs);
+                f_output_distribution_analysis_analyzed_tfs.mkdir();
+
+                BufferedWriter bw_distinct_tf_hm_diff_same = new BufferedWriter(new FileWriter(new File(f_output_distribution_analysis_analyzed_tfs.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_analysed_tfs)));
+
+                bw_distinct_tf_hm_diff_same.write("TF\tHM\tSTAGES");
+                bw_distinct_tf_hm_diff_same.newLine();
+
+                for(String key_tf : distinct_tf_hm_diff_same.keySet())
+                {
+                    HashMap<String,HashSet<String>> hm_diff_stages = distinct_tf_hm_diff_same.get(key_tf);
+
+                    for(String key_hm : hm_diff_stages.keySet())
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(key_tf);
+                        sb.append("\t");
+                        sb.append(key_hm);
+                        sb.append("\t");
+
+                        int i=0;
+                        for(String stages:hm_diff_stages.get(key_hm))
+                        {
+                            if(i==0)
+                            {
+                                sb.append(stages);
+                            }
+                            else
+                            {
+                                sb.append(";");
+                                sb.append(stages);
+                            }
+                            i++;
+                        }
+
+                        bw_distinct_tf_hm_diff_same.write(sb.toString());
+                        bw_distinct_tf_hm_diff_same.newLine();
+
+                    }
+
+                }
+
+                bw_distinct_tf_hm_diff_same.close();
             }
         }
 
@@ -5796,6 +6042,11 @@ public class COM2POSE_lib
         {
             logger.logLine("[DESEQ2] deseq2_biomart_dataset_species must be filled if tepic_ensg_symbol is empty!");
             all_set=false;
+        }
+
+        if(!options_intern.deseq2_biomart_dataset_species.equals(""))
+        {
+            options_intern.tepic_ensg_symbol=options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.file_suffix_deseq2_mapping;
         }
 
 
