@@ -1,13 +1,6 @@
-//TODO: AUTOMATIC CREATE MAP ENSG -> SYMBOL after DESEQ2 RUN! CURL or something / biomart?
-
 package com2pose;
 import util.*;
-
-import javax.swing.*;
 import java.io.*;
-import java.lang.reflect.Array;
-import java.nio.Buffer;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class COM2POSE_lib
@@ -54,9 +47,9 @@ public class COM2POSE_lib
         File f_analysis_distr_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
         File f_root_plots = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots);
         f_root_plots.mkdir();
-        File f_root_plots_all = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_ALL);
+        File f_root_plots_all = new File(f_root_plots.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_ALL);
         f_root_plots_all.mkdir();
-        File f_root_plots_hm = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_HM);
+        File f_root_plots_hm = new File(f_root_plots.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_HM);
         f_root_plots_hm.mkdir();
 
 
