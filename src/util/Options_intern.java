@@ -46,6 +46,7 @@ public class Options_intern
     public String folder_name_tepic_postprocessing = "03_B_TEPIC_postprocessing";
     public String folder_name_tepic_postprocessing_input = "input";
     public String folder_name_tepic_postprocessing_output = "output";
+    public String folder_name_tepic_postprocessing_tfs = "TFs";
     public String folder_name_tepic_postprocessing_output_mean_affinities= "MeanAffinities";
     public String folder_name_tepic_postprocessing_output_ratios = "Ratios";
     public String folder_name_tgen = "04_TGENE";
@@ -74,6 +75,16 @@ public class Options_intern
     public String folder_out_target_genes ="06_D_PLOTS_TARGET_GENES";
     public String folder_out_distribution ="07_DISTRIBUTION_ANALYSIS";
     public String folder_out_distribution_analyzed_tfs ="01_ANALYSED_TFS";
+    public String folder_out_distribution_tf_tg_scores = "02_TF_TG_SCORES";
+    public String folder_out_distribution_tf_tg_scores_background_distr = "01_BACKGROUND_DISTRIBUTION";
+    public String folder_out_distribution_tf_tg_scores_background_distr_ALL = "01_ALL";
+    public String folder_out_distribution_tf_tg_scores_background_distr_HM = "02_HM";
+    public String folder_out_distribution_tf_tg_scores_tf_distributions = "02_TF_DISTRIBUTION";
+    public String folder_out_distribution_tf_tg_scores_tf_distributions_ALL = "01_ALL";
+    public String folder_out_distribution_tf_tg_scores_tf_distributions_HM = "02_HM";
+    public String folder_out_distribution_plots = "03_DISTR_PLOTS";
+    public String folder_out_distribution_plots_ALL = "01_ALL";
+    public String folder_out_distribution_plots_HM = "02_HM";
     public String folder_out_website="Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -90,6 +101,7 @@ public class Options_intern
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_postprocessing_output_mean_affinities ="Mean_Affinities_";
     public String file_suffix_tepic_postprocessing_output_ratios ="Ratio_Affinities_";
+    public String file_suffix_tepic_postprocessing_tfs_tfs = "tfs.csv";
     public String file_suffix_tgen_preprocess_gtf = "_transcripts_only.gtf";
     public String file_suffix_tgen_output = "links.tsv";
     public String file_suffic_tgen_output_groups = "tgene_merged_groups.txt";
@@ -100,6 +112,7 @@ public class Options_intern
     public String file_suffix_analysis_plot_data_hm_level_same ="all_data_same.csv";
     public String file_suffix_website_analysis_tf_available = "available_tfs.csv";
     public String file_suffix_distribution_analysis_analysed_tfs = "analysable_tfs.csv";
+    public String file_suffix_distribution_analysis_distributions = "distribution.csv";
 
 
     public String directory_for_tepic_scripts = "ext"+ File.separator+"TEPIC"+File.separator+"TEPIC";

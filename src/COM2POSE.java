@@ -36,14 +36,15 @@ public class COM2POSE
         {
             com2pose_lib.get_ensg_symbol_mapping();
         }
-
-        com2pose_lib.create_DESeq2_scripts();
+           */
+        //com2pose_lib.create_DESeq2_scripts();
+        /*
         com2pose_lib.run_and_postprocess_DESeq2();
 
         //TEPIC
-        com2pose_lib.run_tepic();
-        com2pose_lib.postprocess_tepic_output();
-
+        com2pose_lib.run_tepic();*/
+        //com2pose_lib.postprocess_tepic_output();
+        /*
         //TGen
         if(!options_intern.path_tgen.equals(""))
         {
@@ -64,18 +65,20 @@ public class COM2POSE
         com2pose_lib.preprocess_dynamite();
         com2pose_lib.run_DYNAMITE();
 
+        */
 
         //PLOTS
-        com2pose_lib.create_tp_plots();
-        com2pose_lib.analyze_plots_data();
-        com2pose_lib.get_top_k_target_genes_plots();
-        */
+        //com2pose_lib.create_tp_plots();
+        //com2pose_lib.analyze_plots_data();
+        //com2pose_lib.get_top_k_target_genes_plots();
+
 
         //CREATE OVERVIEW WEBSITE FOR EVERYTHING BEFORE DISTRIBUTION
         //com2pose_lib.create_overview_html_report_before_distribution_analysis();
 
         //DISTRIBUTION ANALYSIS
-        com2pose_lib.perform_distribution_analysis();
+        //com2pose_lib.perform_distribution_analysis();
+        com2pose_lib.create_distribution_plots();
 
 
         System.out.println("X");

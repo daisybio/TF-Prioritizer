@@ -48,13 +48,46 @@ public class COM2POSE_lib
     }
 
 
+    public void create_distribution_plots() throws IOException {
+        logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Start comparing background distribution to TF distribution and create plots for outstanding TFs");
+
+        File f_analysis_distr_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
+        File f_root_plots = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots);
+        f_root_plots.mkdir();
+        File f_root_plots_all = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_ALL);
+        f_root_plots_all.mkdir();
+        File f_root_plots_hm = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_HM);
+        f_root_plots_hm.mkdir();
+
+
+        logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Finished comparing background distribution to TF distribution and create plots for outstanding TFs");
+    }
+
+    /**
+     * creates data needed for distribution plots
+     */
     public void perform_distribution_analysis() throws IOException {
         logger.logLine("[DISTRIBUTION-ANALYSIS] Calculate distributions for TFs");
 
+        //search input directories and create output directories
         File f_distr_analysis = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
         File f_distr_analysis_analysed_tfs = new File(f_distr_analysis.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_analyzed_tfs);
         File f_distr_analysis_analysed_tfs_csv = new File(f_distr_analysis_analysed_tfs.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_analysed_tfs);
 
+        File f_out_distr_analysis_tf_tg_scores = new File(f_distr_analysis.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores);
+        f_out_distr_analysis_tf_tg_scores.mkdir();
+        File f_out_distr_analysis_tf_tg_scores_background_distr = new File(f_out_distr_analysis_tf_tg_scores.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr);
+        f_out_distr_analysis_tf_tg_scores_background_distr.mkdir();
+        File f_out_distr_analysis_tf_tg_scores_background_distr_ALL = new File(f_out_distr_analysis_tf_tg_scores_background_distr.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr_ALL);
+        f_out_distr_analysis_tf_tg_scores_background_distr_ALL.mkdir();
+        File f_out_distr_analysis_tf_tg_scores_background_distr_HM = new File(f_out_distr_analysis_tf_tg_scores_background_distr.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr_HM);
+        f_out_distr_analysis_tf_tg_scores_background_distr_HM.mkdir();
+        File f_out_distr_analysis_tf_tg_scores_tf_distr = new File(f_out_distr_analysis_tf_tg_scores.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_tf_distributions);
+        f_out_distr_analysis_tf_tg_scores_tf_distr.mkdir();
+        File f_out_distr_analysis_tf_tg_scores_tf_distr_ALL = new File(f_out_distr_analysis_tf_tg_scores_tf_distr.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_tf_distributions_ALL);
+        f_out_distr_analysis_tf_tg_scores_tf_distr_ALL.mkdir();
+        File f_out_distr_analysis_tf_tg_scores_tf_distr_HM = new File(f_out_distr_analysis_tf_tg_scores_tf_distr.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_tf_distributions_HM);
+        f_out_distr_analysis_tf_tg_scores_tf_distr_HM.mkdir();
 
         HashMap<String,HashSet<String>> distinct_hms_tfs = new HashMap<>();
         HashMap<String,HashSet<String>> distinct_tfs_hms = new HashMap<>();
@@ -64,6 +97,25 @@ public class COM2POSE_lib
 
         HashMap<String,HashMap<String,Double>> timepoint_ensg_gene_counts = new HashMap<>();
         HashMap<String,HashMap<String,Double>> group_clash_diff_gene_expression = new HashMap<>();
+
+        HashMap<String,String> composed_tfs = new HashMap<>();
+        HashMap<String,HashSet<String>> composed_tfs_tfs = new HashMap<>();
+
+        BufferedReader br_composed_tfs = new BufferedReader(new FileReader(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_tfs+File.separator+options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
+        String line_composed_tfs = "";
+        while((line_composed_tfs=br_composed_tfs.readLine())!=null)
+        {
+            String[] split = line_composed_tfs.split("\t");
+
+            HashSet temp_set = new HashSet();
+            for(int i = 1; i < split.length;i++)
+            {
+                composed_tfs.put(split[i],split[0]);
+                temp_set.add(split[i]);
+            }
+            composed_tfs_tfs.put(split[0],temp_set);
+        }
+        br_composed_tfs.close();
 
         BufferedReader br_distinct_hms_tfs = new BufferedReader(new FileReader(f_distr_analysis_analysed_tfs_csv));
         String line_distinct_hms_tfs = br_distinct_hms_tfs.readLine();
@@ -79,6 +131,13 @@ public class COM2POSE_lib
             else
             {
                 current_hm_tfs=new HashSet<>();
+
+                File f_out_hms_background = new File(f_out_distr_analysis_tf_tg_scores_background_distr_HM.getAbsolutePath()+File.separator+split[1]);
+                f_out_hms_background.mkdir();
+
+                File f_out_hms_tf = new File(f_out_distr_analysis_tf_tg_scores_tf_distr_HM.getAbsolutePath()+File.separator+split[1]);
+                f_out_hms_tf.mkdir();
+
             }
 
             current_hm_tfs.add(split[0]);
@@ -106,22 +165,28 @@ public class COM2POSE_lib
             String[] split=line_ensg_symbol.split("\t");
             if(split.length>1)
             {
-                ensg_symbol.put(split[0].toUpperCase(),split[1].toUpperCase());
+                String symbol = split[1].toUpperCase();
+
+                if(composed_tfs.containsKey(symbol))
+                {
+                    symbol = composed_tfs.get(symbol);
+                }
+
+                ensg_symbol.put(split[0].toUpperCase(),symbol);
 
                 HashSet<String> current_ensgs;
-                if(symbol_ensg.containsKey(split[1].toUpperCase()))
+                if(symbol_ensg.containsKey(symbol))
                 {
-                    current_ensgs=symbol_ensg.get(split[1].toUpperCase());
+                    current_ensgs=symbol_ensg.get(symbol);
                 }
                 else
                 {
                     current_ensgs=new HashSet<>();
                 }
                 current_ensgs.add(split[0].toUpperCase());
-                symbol_ensg.put(split[1].toUpperCase(),current_ensgs);
+                symbol_ensg.put(symbol,current_ensgs);
+
             }
-
-
         }
         br_ensg_symbol.close();
 
@@ -170,15 +235,10 @@ public class COM2POSE_lib
             }
         }
 
-
-
         for(String key_tf : distinct_tfs_hms.keySet())
         {
             if(symbol_ensg.containsKey(key_tf))
             {
-
-                HashMap<String,Double> group_clash_tf_score = new HashMap<>();
-
                 HashSet<String> ensgs = symbol_ensg.get(key_tf);
 
                 HashMap<String,Double> tp_gene_count = new HashMap<>();
@@ -231,21 +291,303 @@ public class COM2POSE_lib
 
                 for(String k_group_clash : group_clash_diff_gene_expr.keySet())
                 {
-                    String[] split_clash = k_group_clash.split("_");
+                    HashSet<String> available_hms = distinct_tfs_hms.get(key_tf);
 
-                    
-                    for(String k_tp : split_clash)
+                    for (String k_hm : available_hms)
                     {
+                        HashSet<String> available_ensgs = new HashSet<>();
 
+                        boolean found_tgene_file = true;
+                        if(!options_intern.path_tgen.equals(""))
+                        {
+                            File f_tgene_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_filter_target_genes+File.separator+k_hm+File.separator+k_group_clash);
+
+                            if(!f_tgene_input.exists())
+                            {
+                                found_tgene_file=false;
+                            }
+                            if(found_tgene_file)
+                            {
+                                for(File fileDir: f_tgene_input.listFiles())
+                                {
+                                    if(fileDir.isFile())
+                                    {
+                                        f_tgene_input=fileDir;
+                                    }
+                                }
+
+                                BufferedReader br_tgene_input = new BufferedReader(new FileReader(f_tgene_input));
+                                String line_tgene_input = br_tgene_input.readLine();
+                                while((line_tgene_input=br_tgene_input.readLine())!=null)
+                                {
+                                    String[] split = line_tgene_input.split("\t");
+                                    available_ensgs.add(split[0]);
+                                }
+                                br_tgene_input.close();
+                            }
+
+                        }
+
+                        double tf_regression_coefficient = 0.0;
+
+                        File f_hm_tf_coeff_input = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_put_DYNAMITE + File.separator + k_hm + File.separator+k_group_clash+ File.separator + options_intern.file_suffix_dynamite_output_to_be_plotted);
+                        if (f_hm_tf_coeff_input.exists() && f_hm_tf_coeff_input.isFile())
+                        {
+                            BufferedReader br_hm_tf_coeff = new BufferedReader(new FileReader(f_hm_tf_coeff_input));
+                            String line_hm_tf_coeff = br_hm_tf_coeff.readLine();
+                            while ((line_hm_tf_coeff = br_hm_tf_coeff.readLine()) != null)
+                            {
+                                String[] split = line_hm_tf_coeff.split("\t");
+
+                                if (split[0].toUpperCase().equals(key_tf.toUpperCase()))
+                                {
+                                    if (split[1].equals("0"))
+                                    {
+                                        break;
+                                    }
+                                    tf_regression_coefficient = Double.parseDouble(split[1]);
+                                    break;
+                                }
+
+                            }
+                        } else {
+                            continue;
+                        }
+
+                        if(tf_regression_coefficient==0)
+                        {
+                            continue;
+                        }
+
+                        String[] split_clash = k_group_clash.split("_");
+
+                        double current_diff_gene_expr = group_clash_diff_gene_expr.get(k_group_clash);
+                        double current_gene_counts = tp_gene_count.get(split_clash[0]) + tp_gene_count.get(split_clash[1]);
+
+                        double current_tf_score = current_gene_counts * current_diff_gene_expr;
+                        if (current_tf_score < 0) {
+                            current_tf_score *= -1;
+                        }
+
+                        File f_group1_hm_tf_target_genes_root = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_postprocessing + File.separator + options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm + File.separator + k_group_clash + File.separator + split_clash[0]);
+
+                        File f_group1_hm_tf_target_genes = new File("");
+                        for(File fileDir:f_group1_hm_tf_target_genes_root.listFiles())
+                        {
+                            if(fileDir.isFile())
+                            {
+                                f_group1_hm_tf_target_genes=fileDir;
+                                break;
+                            }
+                        }
+
+
+                        File f_group2_hm_tf_target_genes_root = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_postprocessing + File.separator + options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm + File.separator + k_group_clash + File.separator + split_clash[1]);
+                        File f_group2_hm_tf_target_genes = new File("");
+                        for(File fileDir:f_group2_hm_tf_target_genes_root.listFiles())
+                        {
+                            if(fileDir.isFile())
+                            {
+                                f_group2_hm_tf_target_genes=fileDir;
+                                break;
+                            }
+                        }
+
+                        if (f_group1_hm_tf_target_genes.exists() && f_group1_hm_tf_target_genes.isFile() && f_group2_hm_tf_target_genes.exists() && f_group2_hm_tf_target_genes.isFile())
+                        {
+
+                            Map<String,Double> target_genes_scores_group1 = new HashMap<>();
+                            Map<String,Double> target_genes_scores_group2 = new HashMap<>();
+
+                            BufferedReader br_group1_hm_tf_target_genes = new BufferedReader(new FileReader(f_group1_hm_tf_target_genes));
+                            String line_group1_hm_tf_target_genes=br_group1_hm_tf_target_genes.readLine();
+
+                            String temp_key_tf = key_tf.replace(".",":");
+
+                            int index_tf_group1_hm_tf_target_genes = -1;
+                            String[] split_header_group1_hm_tf_target_gens = line_group1_hm_tf_target_genes.split("\t");
+                            for(int i = 0; i < split_header_group1_hm_tf_target_gens.length;i++)
+                            {
+                                if(split_header_group1_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf))
+                                {
+                                    index_tf_group1_hm_tf_target_genes=i;
+                                    break;
+                                }
+                            }
+
+                            while((line_group1_hm_tf_target_genes=br_group1_hm_tf_target_genes.readLine())!=null)
+                            {
+                                String[] split = line_group1_hm_tf_target_genes.split("\t");
+                                target_genes_scores_group1.put(split[0],Double.parseDouble(split[index_tf_group1_hm_tf_target_genes]));
+                            }
+                            br_group1_hm_tf_target_genes.close();
+
+                            BufferedReader br_group2_hm_tf_target_genes = new BufferedReader(new FileReader(f_group2_hm_tf_target_genes));
+                            String line_group2_hm_tf_target_genes=br_group2_hm_tf_target_genes.readLine();
+
+                            int index_tf_group2_hm_tf_target_genes = -1;
+                            String[] split_header_group2_hm_tf_target_gens = line_group2_hm_tf_target_genes.split("\t");
+                            for(int i = 0; i < split_header_group2_hm_tf_target_gens.length;i++)
+                            {
+                                if(split_header_group2_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf))
+                                {
+                                    index_tf_group2_hm_tf_target_genes=i;
+                                    break;
+                                }
+                            }
+
+                            while((line_group2_hm_tf_target_genes=br_group2_hm_tf_target_genes.readLine())!=null)
+                            {
+                                String[] split = line_group2_hm_tf_target_genes.split("\t");
+                                target_genes_scores_group2.put(split[0],Double.parseDouble(split[index_tf_group2_hm_tf_target_genes]));
+                            }
+                            br_group2_hm_tf_target_genes.close();
+
+
+                            BufferedWriter bw_background_ALL;
+                            File f_out_background_ALL = new File(f_out_distr_analysis_tf_tg_scores_background_distr_ALL.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_distributions);
+                            if(f_out_background_ALL.exists())
+                            {
+                                bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL,true));
+                            }
+                            else
+                            {
+                                bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL));
+                                bw_background_ALL.write("##HM\tALL\n");
+                                bw_background_ALL.write("##TF\tALL\n");
+                                bw_background_ALL.write("##TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+
+                            }
+
+                            File f_out_background_HM = new File(f_out_distr_analysis_tf_tg_scores_background_distr_HM.getAbsolutePath()+File.separator+k_hm+File.separator+options_intern.file_suffix_distribution_analysis_distributions);
+                            BufferedWriter bw_background_HM;
+                            if(f_out_background_HM.exists())
+                            {
+                                bw_background_HM = new BufferedWriter(new FileWriter(f_out_background_HM,true));
+                            }
+                            else
+                            {
+                                bw_background_HM = new BufferedWriter(new FileWriter(f_out_background_HM));
+                                bw_background_HM.write("##HM\t"+k_hm+"\n");
+                                bw_background_HM.write("##TF\tALL\n");
+                                bw_background_HM.write("##TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                            }
+
+                            File f_out_tf_ALL = new File(f_out_distr_analysis_tf_tg_scores_tf_distr_ALL.getAbsolutePath()+File.separator+key_tf+"_"+options_intern.file_suffix_distribution_analysis_distributions);
+                            BufferedWriter bw_tf_ALL;
+                            if(f_out_tf_ALL.exists())
+                            {
+                                bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL,true));
+                            }
+                            else
+                            {
+                                bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL));
+                                bw_tf_ALL.write("##HM\tALL\n");
+                                bw_tf_ALL.write("##TF\t"+key_tf+"\n");
+                                bw_tf_ALL.write("##TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                            }
+
+                            BufferedWriter bw_tf_HM;
+                            File f_out_tf_HM = new File(f_out_distr_analysis_tf_tg_scores_tf_distr_HM.getAbsolutePath()+File.separator+k_hm+File.separator+key_tf+"_"+options_intern.file_suffix_distribution_analysis_distributions);
+                            if(f_out_tf_HM.exists())
+                            {
+                                bw_tf_HM = new BufferedWriter(new FileWriter(f_out_tf_HM,true));
+                            }
+                            else
+                            {
+                                bw_tf_HM = new BufferedWriter(new FileWriter(f_out_tf_HM));
+                                bw_tf_HM.write("##HM\t"+k_hm+"\n");
+                                bw_tf_HM.write("##TF\t"+key_tf+"\n");
+                                bw_tf_HM.write("##TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                            }
+
+                            for(String k_target_gene : target_genes_scores_group1.keySet())
+                            {
+                                if(!options_intern.path_tgen.equals("")&&found_tgene_file)
+                                {
+                                    if(!available_ensgs.contains(k_target_gene))
+                                    {
+                                        continue;
+                                    }
+                                }
+
+                                if(target_genes_scores_group2.containsKey(k_target_gene))
+                                {
+                                    double gene_score1 = target_genes_scores_group1.get(k_target_gene);
+                                    double gene_score2 = target_genes_scores_group2.get(k_target_gene);
+
+                                    double genecount_1 = 0;
+                                    double genecount_2 = 0;
+
+                                    double ensg_diff_gene_expr = 0;
+                                    if(timepoint_ensg_gene_counts.get(split_clash[0]).containsKey(k_target_gene))
+                                    {
+                                        genecount_1=timepoint_ensg_gene_counts.get(split_clash[0]).get(k_target_gene);
+                                    }
+
+                                    if(timepoint_ensg_gene_counts.get(split_clash[1]).containsKey(k_target_gene))
+                                    {
+                                        genecount_2=timepoint_ensg_gene_counts.get(split_clash[1]).get(k_target_gene);
+                                    }
+
+                                    if(group_clash_diff_gene_expr.containsKey(k_group_clash))
+                                    {
+                                        ensg_diff_gene_expr=group_clash_diff_gene_expr.get(k_group_clash);
+                                    }
+
+                                    double tg_score_1 = genecount_1*ensg_diff_gene_expr*gene_score1;
+                                    double tg_score_2 = genecount_2*ensg_diff_gene_expr*gene_score2;
+                                    if(tg_score_1<0)
+                                    {
+                                        tg_score_1*=-1;
+                                    }
+                                    if(tg_score_2<0)
+                                    {
+                                        tg_score_2*=-1;
+                                    }
+
+                                    double tg_score_cumm = tg_score_1 + tg_score_2;
+
+                                    double tf_tg_score = (current_tf_score*tg_score_cumm)*tf_regression_coefficient;
+
+                                    if(tf_tg_score<0)
+                                    {
+                                        tf_tg_score*=-1;
+                                    }
+
+                                    StringBuilder sb_line = new StringBuilder();
+                                    sb_line.append(k_target_gene);
+                                    sb_line.append("\t");
+                                    sb_line.append(tf_tg_score);
+                                    sb_line.append("\t");
+                                    sb_line.append(k_hm);
+                                    sb_line.append("\t");
+                                    sb_line.append(k_group_clash);
+                                    sb_line.append("\t");
+                                    sb_line.append(key_tf);
+                                    sb_line.append("\t");
+                                    sb_line.append(tf_regression_coefficient);
+
+                                    bw_background_HM.write(sb_line.toString());
+                                    bw_background_HM.newLine();
+
+                                    bw_background_ALL.write(sb_line.toString());
+                                    bw_background_ALL.newLine();
+
+                                    bw_tf_ALL.write(sb_line.toString());
+                                    bw_tf_ALL.newLine();
+
+                                    bw_tf_HM.write(sb_line.toString());
+                                    bw_tf_HM.newLine();
+                                }
+                            }
+                            bw_background_ALL.close();
+                            bw_background_HM.close();
+                            bw_tf_ALL.close();
+                            bw_tf_HM.close();
+                        }
                     }
-
                 }
-
-
-
-                System.out.println("X");
-
-
             }
             else
             {
@@ -256,7 +598,6 @@ public class COM2POSE_lib
 
         logger.logLine("[DISTRIBUTION-ANALYSIS] Finished calculating distributions");
     }
-
 
     /**
      * creates the HTML report
@@ -1096,6 +1437,7 @@ public class COM2POSE_lib
                                 File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
                                 if(f_try.exists())
                                 {
+
                                     sb_threshold.append("<a href='");
                                     //sb_threshold.append(f_try.getAbsolutePath());
                                     sb_threshold.append("TFs"+File.separator+f_try.getName());
@@ -1627,27 +1969,65 @@ public class COM2POSE_lib
         HashMap<String,HashMap<String,HashMap<String,HashMap<String,Double>>>> cutoff_hm_tf_counts_DIFFERENT = new HashMap<>();
         HashMap<String,HashMap<String,HashMap<String,HashMap<String,Double>>>> cutoff_hm_tf_counts_SAME = new HashMap<>();
 
+        HashMap<String,String> composed_tfs = new HashMap<>();
+        HashMap<String,HashSet<String>> composed_tfs_tfs = new HashMap<>();
+        BufferedReader br_composed_tfs = new BufferedReader(new FileReader(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_tfs+File.separator+options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
+        String line_composed_tfs = "";
+        while((line_composed_tfs=br_composed_tfs.readLine())!=null)
+        {
+            String[] split = line_composed_tfs.split("\t");
+
+            HashSet temp_set = new HashSet();
+            for(int i = 1; i < split.length;i++)
+            {
+                composed_tfs.put(split[i],split[0]);
+                temp_set.add(split[i]);
+            }
+            composed_tfs_tfs.put(split[0],temp_set);
+        }
+        br_composed_tfs.close();
 
         HashMap<String,HashMap<String,Double>> tp_tf_gene_counts = new HashMap<>();
 
         for(File fileDir:input_read_counts.listFiles())
         {
             String tp_name = fileDir.getName().split("\\.")[0];
+
             HashMap<String,Double> n_hm = new HashMap<>();
+            HashMap<String,Double> composed_tfs_counts = new HashMap<>();
 
             BufferedReader br = new BufferedReader(new FileReader(fileDir));
             String line = br.readLine();
             while((line=br.readLine())!=null)
             {
                 String[] split = line.split("\t");
-                n_hm.put(split[0].toUpperCase(),Double.parseDouble(split[2]));
 
+                if(composed_tfs.containsKey(split[0].toUpperCase()))
+                {
+                    String key_composed_tf = composed_tfs.get(split[0].toUpperCase());
+                    double sum=0;
+
+                    if(composed_tfs_counts.containsKey(key_composed_tf))
+                    {
+                        sum += composed_tfs_counts.get(key_composed_tf);
+                    }
+
+                    sum+=Double.parseDouble(split[2]);
+                    composed_tfs_counts.put(key_composed_tf,sum);
+                }
+                else
+                {
+                    n_hm.put(split[0].toUpperCase(),Double.parseDouble(split[2]));
+                }
             }
             br.close();
+
+            n_hm.putAll(composed_tfs_counts);
 
             tp_tf_gene_counts.put(tp_name,n_hm);
 
         }
+
 
         HashMap<String,HashMap<String,HashMap<String,Boolean>>> hm_th_tf_found= new HashMap<>();
 
@@ -2739,6 +3119,21 @@ public class COM2POSE_lib
         folder_output.mkdir();
         //create necessary folder structure -> TEMPLATE: postprocess TEPIC
         File folder_tepic_postprocess = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+
+        HashMap<String,String> composed_tfs = new HashMap<>();
+        BufferedReader br_composed_tfs = new BufferedReader(new FileReader(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_tfs+File.separator+options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
+        String line_composed_tfs = "";
+        while((line_composed_tfs=br_composed_tfs.readLine())!=null)
+        {
+            String[] split = line_composed_tfs.split("\t");
+
+            for(int i = 1; i < split.length;i++)
+            {
+                composed_tfs.put(split[i],split[0]);
+            }
+        }
+        br_composed_tfs.close();
+
         for(File firDir:folder_tepic_postprocess.listFiles())
         {
             if(firDir.isDirectory())
@@ -2764,7 +3159,14 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if(split.length>1)
             {
-                ensg_gene_symbol_map.put(split[1].toUpperCase(),split[0]);
+                if(composed_tfs.containsKey(split[0]))
+                {
+                    ensg_gene_symbol_map.put(split[1].toUpperCase(),composed_tfs.get(split[0]));
+                }
+                else
+                {
+                    ensg_gene_symbol_map.put(split[1].toUpperCase(),split[0]);
+                }
             }
         }
         br_ensg_gene_symbol.close();
@@ -3859,7 +4261,8 @@ public class COM2POSE_lib
     /**
      * postprocesses the TEPIC output (checks for TPM filter and copies files into a structure where preprocessing of DYNAMITE can happen
      */
-    public void postprocess_tepic_output() throws Exception {
+    public void postprocess_tepic_output() throws Exception
+    {
         logger.logLine("Start postprocessing of TEPIC output");
 
         HashMap<String,HashMap<String,HashSet<String>>> groups_to_compare = checkGroupsTEPIC();
@@ -3886,6 +4289,9 @@ public class COM2POSE_lib
 
         HashSet<String> available_hms = new HashSet<>();
 
+        HashSet<String> check_tfs = new HashSet<>();
+        String seperator= "";
+
         //generate input structure and copy files
         for(String s : groups_to_compare.keySet())
         {
@@ -3910,6 +4316,28 @@ public class COM2POSE_lib
                                 String name = fileDir2.getName();
                                 if (name.matches(".*" + suffix))
                                 {
+                                    //check tfs
+                                    BufferedReader br = new BufferedReader(new FileReader(fileDir2));
+                                    String line = br.readLine();
+                                    String[] split = line.split("\t");
+                                    for(String st : split)
+                                    {
+                                        if(st.matches(".*::.*") || st.matches(".*[.][.].*"))
+                                        {
+                                            check_tfs.add(st);
+                                            if(st.matches(".*::.*"))
+                                            {
+                                                seperator="::";
+                                            }
+                                            else
+                                            {
+                                                seperator="[.][.]";
+                                            }
+                                        }
+                                    }
+
+                                    br.close();
+
                                     //COPY!!
                                     String command = "cp -u " + fileDir2.getAbsolutePath() + " " + folder_pp_input.getAbsolutePath() + File.separator + s + File.separator + ss;
                                     Process child = Runtime.getRuntime().exec(command);
@@ -3929,6 +4357,38 @@ public class COM2POSE_lib
                 }
             }
         }
+
+        File f_out_tfs = new File(folder_postprocessing.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_tfs);
+        f_out_tfs.mkdir();
+        BufferedWriter bw_check_tfs = new BufferedWriter(new FileWriter(f_out_tfs.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
+        for(String key_tfs : check_tfs)
+        {
+            String[] split = key_tfs.split(seperator);
+
+            StringBuilder sb = new StringBuilder();
+
+            for(int i = 0; i < split.length;i++)
+            {
+                if(i<1)
+                {
+                    sb.append(split[i].toUpperCase());
+                }
+                else
+                {
+                    sb.append("..");
+                    sb.append(split[i].toUpperCase());
+                }
+            }
+
+            for(int i = 0; i < split.length;i++)
+            {
+                sb.append("\t");
+                sb.append(split[i].toUpperCase());
+            }
+            bw_check_tfs.write(sb.toString());
+            bw_check_tfs.newLine();
+        }
+        bw_check_tfs.close();
 
         //generate output structure
         //HMs
