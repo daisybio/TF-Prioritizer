@@ -82,16 +82,25 @@ public class Options_intern
     public String folder_out_distribution_tf_tg_scores_tf_distributions = "02_TF_DISTRIBUTION";
     public String folder_out_distribution_tf_tg_scores_tf_distributions_ALL = "01_ALL";
     public String folder_out_distribution_tf_tg_scores_tf_distributions_HM = "02_HM";
-    public String folder_out_distribution_plots = "03_DISTR_PLOTS";
+    public String folder_out_distribution_plots_scripts = "03_PLOT_SCRIPTS";
+    public String folder_out_distribution_plots_script_ALL = "01_ALL";
+    public String folder_out_distribution_plots_scripts_HM = "02_HM";
+    public String folder_out_distribution_plots = "04_DISTR_PLOTS";
     public String folder_out_distribution_plots_ALL = "01_ALL";
     public String folder_out_distribution_plots_HM = "02_HM";
+    public String folder_out_distribution_stats = "05_STATS";
+    public String folder_out_distribution_stats_ALL = "01_ALL";
+    public String folder_out_distribution_stats_HM = "01_HM";
     public String folder_out_website="Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
     public String folder_out_website_basics_website = "WEBSITE";
     public String folder_out_website_basics_website_css = "CSS";
     public String folder_out_website_basics_website_images = "images";
-    public String folder_out_website_htmls = "HTMLS";
+    public String folder_out_website_htmls_regression_coefficients = "HTMLS_REGRESSION_COEFFICIENT_ANALYSIS";
+    public String folder_out_website_htmls_distribution_analysis = "HTMLS_DISTRIBUTION_ANALYSIS";
+    public String folder_out_website_htmls_distribution_analysis_ALL = "01_ALL";
+    public String folder_out_website_htmls_distribution_analysis_HM = "02_HM";
     public String folder_out_website_htmls_TFs = "TFs";
     public String folder_out_website_interactive_plots_tps="TIMEPOINTS_CONDITIONS";
     public String folder_out_website_interactive_plots_overview="OVERVIEW";
@@ -113,6 +122,14 @@ public class Options_intern
     public String file_suffix_website_analysis_tf_available = "available_tfs.csv";
     public String file_suffix_distribution_analysis_analysed_tfs = "analysable_tfs.csv";
     public String file_suffix_distribution_analysis_distributions = "distribution.csv";
+    public String file_suffix_distribution_analysis_python_script = "analyse_tf_to_background.py";
+    public String file_suffix_distribution_analysis_plot_stats = "stats.csv";
+
+    public String html_report_home_regression_coefficient_analysis = "HOME_REGRESSION.html";
+    public String html_report_home_regression_distribution_analysis = "HOME_DISTRIBUTION.html";
+
+    public String analysis_types_distribution_analysis ="DISTRIBUTION_ANALYSIS";
+    public String analysis_types_regression_coefficient_analysis = "REGRESSION_COEFFICIENT";
 
 
     public String directory_for_tepic_scripts = "ext"+ File.separator+"TEPIC"+File.separator+"TEPIC";

@@ -40,11 +40,63 @@ public class COM2POSE_lib
         logger.logLine("COM2POSE path set to: "+ options_intern.path_to_COM2POSE);
     }
 
+    /**
+     * CREATE HTML REPORT FOR DISTRIBUTION ANALYSIS
+     */
+    public void create_overview_html_report_distribution() throws IOException
+    {
+        logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Create HTML report.");
 
-    public void create_distribution_plots() throws IOException {
+        File f_output_website_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website);
+
+        File f_website_distr_analysis_html_folder = new File(f_output_website_root.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_distribution_analysis);
+        f_website_distr_analysis_html_folder.mkdir();
+        File f_website_distr_analysis_html_folder_ALL = new File(f_website_distr_analysis_html_folder.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_ALL);
+        f_website_distr_analysis_html_folder_ALL.mkdir();
+        File f_website_distr_analysis_html_folder_HM = new File(f_website_distr_analysis_html_folder.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_HM);
+        f_website_distr_analysis_html_folder_HM.mkdir();
+
+        String html_header = get_header_html("HOME",options_intern.analysis_types_distribution_analysis);
+        String html_tail = "</body>\n" +
+                "</html>";
+
+        File html_home_distribution_analysis = new File(f_output_website_root.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis);
+        StringBuilder sb_home = new StringBuilder();
+
+        sb_home.append(html_header);
+        sb_home.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
+
+
+
+
+        sb_home.append(html_tail);
+
+        BufferedWriter bw_html_home = new BufferedWriter(new FileWriter(html_home_distribution_analysis));
+        bw_html_home.write(sb_home.toString());
+        bw_html_home.close();
+
+
+        logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Finished HTML report.");
+    }
+
+    /**
+     * CREATE python scripts for plots, to only accept TFs which have a higher mean TF-TG-SCORE than the background distribution
+     */
+    public void create_distribution_plots() throws Exception {
         logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Start comparing background distribution to TF distribution and create plots for outstanding TFs");
 
         File f_analysis_distr_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
+
+        File f_analysis_distr_HM_level_input = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr_HM);
+
+        File f_root_plots_scripts = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_scripts);
+        f_root_plots_scripts.mkdir();
+        File f_root_plots_scripts_all = new File(f_root_plots_scripts.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_script_ALL);
+        f_root_plots_scripts_all.mkdir();
+        File f_root_plots_scripts_hm = new File(f_root_plots_scripts.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_scripts_HM);
+        f_root_plots_scripts_hm.mkdir();
+
+
         File f_root_plots = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots);
         f_root_plots.mkdir();
         File f_root_plots_all = new File(f_root_plots.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_ALL);
@@ -52,6 +104,70 @@ public class COM2POSE_lib
         File f_root_plots_hm = new File(f_root_plots.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_HM);
         f_root_plots_hm.mkdir();
 
+        File f_scores_root = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores);
+
+        File f_background_distr_root = new File(f_scores_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr);
+        File f_background_distr_tfs_ALL = new File(f_scores_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_tf_distributions+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr_ALL);
+        File f_background_distr_tfs_HM = new File(f_scores_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr_HM);
+
+        File f_tf_distribution_ALL = new File(f_scores_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_tf_distributions+File.separator+options_intern.folder_out_distribution_tf_tg_scores_tf_distributions_ALL);
+        File f_tf_distribution_HM = new File(f_scores_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_tf_distributions+File.separator+options_intern.folder_out_distribution_tf_tg_scores_tf_distributions_HM);
+
+        File f_stats = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats);
+        f_stats.mkdir();
+        File f_stats_ALL = new File(f_stats.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_ALL);
+        f_stats_ALL.mkdir();
+        File f_stats_HM = new File(f_stats.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_HM);
+        f_stats_HM.mkdir();
+
+        ArrayList<File> scripts_to_execute = new ArrayList<>();
+
+        for(File fileDir_hm : f_analysis_distr_HM_level_input.listFiles())
+        {
+            if(fileDir_hm.isDirectory())
+            {
+                File f_output_script = new File(f_root_plots_scripts_hm.getAbsolutePath()+File.separator+fileDir_hm.getName());
+                f_output_script.mkdir();
+                File f_output_script_file = new File(f_output_script.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_python_script);
+
+                File f_output_plot = new File(f_root_plots_hm.getAbsolutePath()+File.separator+fileDir_hm.getName());
+                f_output_plot.mkdir();
+
+                File f_output_stats = new File(f_stats_HM.getAbsolutePath()+File.separator+fileDir_hm.getName());
+                f_output_stats.mkdir();
+
+                File f_input_background_distr = new File(f_background_distr_tfs_HM.getAbsolutePath()+File.separator+fileDir_hm.getName()+File.separator+options_intern.file_suffix_distribution_analysis_distributions);
+                File f_input_tf_distr = new File(f_tf_distribution_HM.getAbsolutePath()+File.separator+fileDir_hm.getName());
+
+                scripts_to_execute.add(f_output_script_file);
+
+                //File input_background_file, File input_tf_root, File output_plots, File output_script_file, File output_stats) throws IOException {
+
+                write_python_script_distribution_analysis(f_input_background_distr,f_input_tf_distr,f_output_plot,f_output_script_file,f_output_stats);
+            }
+        }
+
+        File all_background_distr= new File(f_background_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_tf_tg_scores_background_distr_ALL+File.separator+options_intern.file_suffix_distribution_analysis_distributions);
+        File f_script_out_all = new File(f_root_plots_scripts_all.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_python_script);
+
+        write_python_script_distribution_analysis(all_background_distr,f_tf_distribution_ALL,f_root_plots_all,f_script_out_all,f_stats_ALL);
+        scripts_to_execute.add(f_script_out_all);
+
+        for(File fileDir: scripts_to_execute)
+        {
+            String command_edited = "python3 "+ fileDir.getAbsolutePath();
+            logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Run python script: "+ command_edited);
+
+            Process child = Runtime.getRuntime().exec(command_edited);
+            int code = child.waitFor();
+            switch (code){
+                case 0:
+                    break;
+                case 1:
+                    String message = child.getErrorStream().toString();
+                    throw new Exception(message);
+            }
+        }
 
         logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Finished comparing background distribution to TF distribution and create plots for outstanding TFs");
     }
@@ -230,6 +346,7 @@ public class COM2POSE_lib
 
         for(String key_tf : distinct_tfs_hms.keySet())
         {
+            String name_anhaengsel = "";
             if(symbol_ensg.containsKey(key_tf))
             {
                 HashSet<String> ensgs = symbol_ensg.get(key_tf);
@@ -332,7 +449,16 @@ public class COM2POSE_lib
                             {
                                 String[] split = line_hm_tf_coeff.split("\t");
 
-                                if (split[0].toUpperCase().equals(key_tf.toUpperCase()))
+                                String[] split_tf_long_name = split[0].split("_");
+
+                                String tf_in_file = split_tf_long_name[0];
+
+                                if(split_tf_long_name.length>1)
+                                {
+                                    name_anhaengsel=split_tf_long_name[1];
+                                }
+
+                                if (tf_in_file.toUpperCase().equals(key_tf.toUpperCase()))
                                 {
                                     if (split[1].equals("0"))
                                     {
@@ -396,12 +522,17 @@ public class COM2POSE_lib
                             String line_group1_hm_tf_target_genes=br_group1_hm_tf_target_genes.readLine();
 
                             String temp_key_tf = key_tf.replace(".",":");
+                            String temp_key_tf_2 = key_tf.replace(".",":");
+                            if(!name_anhaengsel.equals(""))
+                            {
+                                temp_key_tf+="_"+name_anhaengsel;
+                            }
 
                             int index_tf_group1_hm_tf_target_genes = -1;
                             String[] split_header_group1_hm_tf_target_gens = line_group1_hm_tf_target_genes.split("\t");
                             for(int i = 0; i < split_header_group1_hm_tf_target_gens.length;i++)
                             {
-                                if(split_header_group1_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf))
+                                if(split_header_group1_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf)||split_header_group1_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf_2))
                                 {
                                     index_tf_group1_hm_tf_target_genes=i;
                                     break;
@@ -422,7 +553,7 @@ public class COM2POSE_lib
                             String[] split_header_group2_hm_tf_target_gens = line_group2_hm_tf_target_genes.split("\t");
                             for(int i = 0; i < split_header_group2_hm_tf_target_gens.length;i++)
                             {
-                                if(split_header_group2_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf))
+                                if(split_header_group2_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf)||split_header_group2_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf_2))
                                 {
                                     index_tf_group2_hm_tf_target_genes=i;
                                     break;
@@ -448,7 +579,7 @@ public class COM2POSE_lib
                                 bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL));
                                 bw_background_ALL.write("##HM\tALL\n");
                                 bw_background_ALL.write("##TF\tALL\n");
-                                bw_background_ALL.write("##TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                                bw_background_ALL.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
 
                             }
 
@@ -463,7 +594,7 @@ public class COM2POSE_lib
                                 bw_background_HM = new BufferedWriter(new FileWriter(f_out_background_HM));
                                 bw_background_HM.write("##HM\t"+k_hm+"\n");
                                 bw_background_HM.write("##TF\tALL\n");
-                                bw_background_HM.write("##TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                                bw_background_HM.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
                             }
 
                             File f_out_tf_ALL = new File(f_out_distr_analysis_tf_tg_scores_tf_distr_ALL.getAbsolutePath()+File.separator+key_tf+"_"+options_intern.file_suffix_distribution_analysis_distributions);
@@ -477,7 +608,7 @@ public class COM2POSE_lib
                                 bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL));
                                 bw_tf_ALL.write("##HM\tALL\n");
                                 bw_tf_ALL.write("##TF\t"+key_tf+"\n");
-                                bw_tf_ALL.write("##TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                                bw_tf_ALL.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
                             }
 
                             BufferedWriter bw_tf_HM;
@@ -491,7 +622,7 @@ public class COM2POSE_lib
                                 bw_tf_HM = new BufferedWriter(new FileWriter(f_out_tf_HM));
                                 bw_tf_HM.write("##HM\t"+k_hm+"\n");
                                 bw_tf_HM.write("##TF\t"+key_tf+"\n");
-                                bw_tf_HM.write("##TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                                bw_tf_HM.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
                             }
 
                             for(String k_target_gene : target_genes_scores_group1.keySet())
@@ -607,7 +738,7 @@ public class COM2POSE_lib
         File f_output_website = new File(options_intern.com2pose_working_directory+ File.separator+options_intern.folder_out_website);
         f_output_website.mkdir();
 
-        File f_output_website_htmls = new File(f_output_website.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls);
+        File f_output_website_htmls = new File(f_output_website.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_regression_coefficients);
         f_output_website_htmls.mkdir();
 
         String command = "cp -u -r " + f_website_css.getAbsolutePath() + " " + f_move_css.getAbsolutePath();
@@ -630,10 +761,10 @@ public class COM2POSE_lib
             String html_tail = "</body>\n" +
                     "</html>";
 
-            BufferedWriter bw_home = new BufferedWriter(new FileWriter(f_output_website+File.separator+"HOME.html"));
+            BufferedWriter bw_home = new BufferedWriter(new FileWriter(f_output_website+File.separator+options_intern.html_report_home_regression_coefficient_analysis));
 
             //bw_home.write(sb_home_front.toString());
-            bw_home.write(get_header_html("HOME"));
+            bw_home.write(get_header_html("HOME", options_intern.analysis_types_regression_coefficient_analysis));
 
             threshold_folders_filled =true;
 
@@ -647,7 +778,7 @@ public class COM2POSE_lib
             bw_home.close();
 
 
-            StringBuilder sb_parameter = new StringBuilder(get_header_html("HOME"));
+            StringBuilder sb_parameter = new StringBuilder(get_header_html("HOME",options_intern.analysis_types_regression_coefficient_analysis));
 
             sb_parameter.append(" <script>\n" +
                     " document.title = \"PARAMETERS\";\n" +
@@ -1210,7 +1341,7 @@ public class COM2POSE_lib
 
                 File f_interactive_plots_root = new File(f_output_website.getAbsolutePath()+ File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName());
 
-                StringBuilder sb_threshold = new StringBuilder(get_header_html("THRESHOLD"));
+                StringBuilder sb_threshold = new StringBuilder(get_header_html("THRESHOLD",options_intern.analysis_types_regression_coefficient_analysis));
                 sb_threshold.append(" <script>\n" +
                         " document.title = \"TH: "+fileDir.getName()+"\";\n" +
                         " </script>\n");
@@ -1297,7 +1428,7 @@ public class COM2POSE_lib
                             }
                             else
                             {
-                                File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
+                                File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls_regression_coefficients+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
                                 if(f_try.exists())
                                 {
                                     sb_threshold.append("<a href='");
@@ -1427,7 +1558,7 @@ public class COM2POSE_lib
                             }
                             else
                             {
-                                File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
+                                File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls_regression_coefficients+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
                                 if(f_try.exists())
                                 {
 
@@ -1573,7 +1704,7 @@ public class COM2POSE_lib
                     }
 
                     StringBuilder sb_tf_page = new StringBuilder();
-                    sb_tf_page.append(get_header_html("TF"));
+                    sb_tf_page.append(get_header_html("TF",options_intern.analysis_types_regression_coefficient_analysis));
                     sb_tf_page.append(" <script>\n" +
                             " document.title = \"TF: "+tf.toUpperCase()+" TH: "+fileDir.getName()+"\";\n" +
                             " </script>\n");
@@ -6161,7 +6292,6 @@ public class COM2POSE_lib
         }
     }
 
-
     /**
      * read config file
      * @param check_options should options be checked for validity? Should be true if pipeline is run, should be false if analyse programms are run
@@ -7040,17 +7170,18 @@ public class COM2POSE_lib
         return sb.toString();
     }
 
-    private String get_header_html(String level) {
+    private String get_header_html(String level, String which_analysis) {
 
         File f_website_css = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+ options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css);
 
         File f_output_website = new File(options_intern.com2pose_working_directory+ File.separator+options_intern.folder_out_website);
-        File f_output_website_htmls = new File(f_output_website.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls);
+        File f_output_website_htmls = new File(f_output_website.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_regression_coefficients);
 
         StringBuilder sb_home_front = new StringBuilder();
         sb_home_front.append("<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
-                "<title>COM2POSE</title>\n" +
+                "<title>COM2POSE: "+which_analysis
+                +"</title>\n" +
                 "<meta charset=\"UTF-8\">\n" +
                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
         sb_home_front.append("<head>\n<script>\n" +
@@ -7099,15 +7230,30 @@ public class COM2POSE_lib
         String rel_path = "";
         if(level.equals("HOME"))
         {
-            rel_path="HOME.html";
+            rel_path=options_intern.html_report_home_regression_coefficient_analysis;
         }
         if(level.equals("THRESHOLD"))
         {
-            rel_path=".."+File.separator+".."+File.separator+"HOME.html";
+            rel_path=".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_coefficient_analysis;
         }
         if(level.equals("TF"))
         {
-            rel_path=".."+File.separator+".."+File.separator+".."+File.separator+"HOME.html";
+            rel_path=".."+File.separator+".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_coefficient_analysis;
+        }
+
+
+        String rel_path_distribution_analysis = "";
+        if(level.equals("HOME"))
+        {
+            rel_path_distribution_analysis=options_intern.html_report_home_regression_distribution_analysis;
+        }
+        if(level.equals("THRESHOLD"))
+        {
+            rel_path_distribution_analysis=".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_distribution_analysis;
+        }
+        if(level.equals("TF"))
+        {
+            rel_path_distribution_analysis=".."+File.separator+".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_distribution_analysis;
         }
 
 
@@ -7134,7 +7280,8 @@ public class COM2POSE_lib
                 "  \n" +
                 "<!-- Header -->\n" +
                 "<header class=\"w3-container w3-red w3-center\" style=\"padding:128px 16px\">\n" +
-                " <a href='"+rel_path+"' target='_blank'><button class=\"button\">HOME</button></a>\n");
+                " <a href='"+rel_path+"' target='_blank'><button class=\"button\">HOME coefficient analysis</button></a>\n" +
+                " <a href='"+rel_path_distribution_analysis+"' target='_blank'><button class=\"button\">HOME distribution analysis</button></a>\n");
 
         String rel_path_parameter = "";
         if(level.equals("HOME"))
@@ -7154,50 +7301,198 @@ public class COM2POSE_lib
 
         sb_home_front.append(
                 "  <h1 class=\"w3-margin w3-jumbo\">COM2POSE: <i>results overview</i></h1>\n" +
-                "  \n" +
-                "    <div class=\"dropdown\">\n" +
-                "  <h2>Please choose a threshold</h2>\n" +
-                "  <button class=\"dropbtn\">Threshold</button>\n" +
-                "  <div class=\"dropdown-content\">\n");
+                "  \n" );
 
-
-
-        for(Double d: options_intern.plot_th_coefficient)
+        if(which_analysis.equals(options_intern.analysis_types_distribution_analysis))
         {
-            File f_output_website_htmls_th = new File(f_output_website_htmls.getAbsolutePath()+File.separator+d);
-            f_output_website_htmls_th.mkdir();
-
-            if(!threshold_folders_filled)
-            {
-                threshold_folders.add(f_output_website_htmls_th);
-            }
-
-            String rel_path_2 = "";
-            if(level.equals("HOME"))
-            {
-                rel_path_2=options_intern.folder_out_website_htmls+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
-            }
-            if(level.equals("THRESHOLD"))
-            {
-                rel_path_2=".."+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
-
-            }
-            if(level.equals("TF"))
-            {
-                rel_path_2=".."+File.separator+".."+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
-            }
-
-
-            sb_home_front.append("<a href=\"");
-            sb_home_front.append(rel_path_2+"\" target='_blank'>Coefficient " + d);
-            sb_home_front.append("</a>\n");
+            sb_home_front.append("  <h2 class=\"w3-center\" style='margin-left:27%'><i>TF-TG Score Distribution Analysis</i></h2>\n");
         }
-        sb_home_front.append("  </div>\n");
+
+        if(which_analysis.equals(options_intern.analysis_types_regression_coefficient_analysis))
+        {
+            sb_home_front.append("  <h2 class=\"w3-center\" style='margin-left:27%'><i>Regression Coefficient Analysis</i></h2>\n");
+
+            sb_home_front.append("    <div class=\"dropdown\">\n" +
+                    "  <h2>Please choose a threshold</h2>\n" +
+                    "  <button class=\"dropbtn\">Threshold</button>\n" +
+                    "  <div class=\"dropdown-content\">\n");
+
+
+
+            for(Double d: options_intern.plot_th_coefficient)
+            {
+                File f_output_website_htmls_th = new File(f_output_website_htmls.getAbsolutePath()+File.separator+d);
+                f_output_website_htmls_th.mkdir();
+
+                if(!threshold_folders_filled)
+                {
+                    threshold_folders.add(f_output_website_htmls_th);
+                }
+
+                String rel_path_2 = "";
+                if(level.equals("HOME"))
+                {
+                    rel_path_2=options_intern.folder_out_website_htmls_regression_coefficients+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
+                }
+                if(level.equals("THRESHOLD"))
+                {
+                    rel_path_2=".."+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
+
+                }
+                if(level.equals("TF"))
+                {
+                    rel_path_2=".."+File.separator+".."+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
+                }
+
+
+                sb_home_front.append("<a href=\"");
+                sb_home_front.append(rel_path_2+"\" target='_blank'>Coefficient " + d);
+                sb_home_front.append("</a>\n");
+            }
+            sb_home_front.append("  </div>\n");
+
+        }
+
 
 
         sb_home_front.append("</div>\n" +
                 "</header>\n");
 
         return sb_home_front.toString();
+    }
+
+    private void write_python_script_distribution_analysis(File input_background_file, File input_tf_root, File output_plots, File output_script_file, File output_stats) throws IOException {
+        HashMap<String,String> composed_tfs = new HashMap<>();
+        HashMap<String,HashSet<String>> composed_tfs_tfs = new HashMap<>();
+
+        BufferedReader br_composed_tfs = new BufferedReader(new FileReader(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_tfs+File.separator+options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
+        String line_composed_tfs = "";
+        while((line_composed_tfs=br_composed_tfs.readLine())!=null)
+        {
+            String[] split = line_composed_tfs.split("\t");
+
+            HashSet temp_set = new HashSet();
+            for(int i = 1; i < split.length;i++)
+            {
+                composed_tfs.put(split[i],split[0]);
+                temp_set.add(split[i]);
+            }
+            composed_tfs_tfs.put(split[0],temp_set);
+        }
+        br_composed_tfs.close();
+
+        String imports = "import pip\n" +
+                "\n" +
+                "def import_or_install(package):\n" +
+                "    try:\n" +
+                "        __import__(package)\n" +
+                "    except ImportError:\n" +
+                "        pip.main(['install', package])\n" +
+                "\n" +
+                "import io\n" +
+                "from base64 import b64encode\n" +
+                "import_or_install(\"plotly.express\")\n" +
+                "import plotly.express as px\n" +
+                "import_or_install(\"dash\")\n" +
+                "import_or_install(\"dash_core_components\")\n" +
+                "import_or_install(\"dash_html_components\")\n" +
+                "import dash_core_components as dcc\n" +
+                "import dash_html_components as html\n" +
+                "from dash.dependencies import Input, Output\n" +
+                "import plotly.graph_objs as go\n" +
+                "\n" +
+                "import_or_install(\"pandas\")\n" +
+                "import_or_install(\"seaborn\")\n" +
+                "import_or_install(\"matplotlib.pyplot\")\n" +
+                "import pandas as pd\n" +
+                "import seaborn as sns\n" +
+                "import matplotlib.pyplot as plt\n" +
+                "sns.set_context(\"notebook\")\n" +
+                "color = \"#A6CEE3\"\n" +
+                "sns.set_context(\"talk\")\n" +
+                "sns.set_style(\"whitegrid\")\n" +
+                "\n" +
+                "import_or_install(\"numpy\")\n" +
+                "import numpy as np\n" +
+                "import_or_install(\"sts\")\n" +
+                "import statistics as sts\n"+
+                "plt.figure(figsize=(20, 17))\n\n\n" +
+                "df_interesting_stats=pd.DataFrame(columns=['label','sum_all_values','number_target_genes','mean','median','95_quantile','99_quantile'])\n" +
+                "row_counter=0\n\n" +
+                "";
+
+        StringBuilder sb_all = new StringBuilder(imports);
+
+        sb_all.append("background=pd.read_table('");
+        sb_all.append(input_background_file);
+        sb_all.append("', comment=\"#\", usecols=['TF_TG_SCORE']).sort_values(['TF_TG_SCORE'], ascending=False)\n");
+        sb_all.append("background[\"label\"] = \"background\"\n" +
+                "\n"+
+                "background_sum = sum(background[\"TF_TG_SCORE\"])\n" +
+                "background_length = len(background)\n" +
+                "background_mean = background_sum/background_length\n" +
+                "background_median=sts.median(background['TF_TG_SCORE'])\n"+
+                "background_quantile=np.percentile(background[\"TF_TG_SCORE\"],95)\n"+
+                "background_quantile_99=np.percentile(background[\"TF_TG_SCORE\"],99)\n" +
+                "df_interesting_stats.loc[0]=['background',background_sum,background_length,background_mean,background_median,background_quantile,background_quantile_99]\n"+
+                "row_counter=1"+
+                "\n\n\n");
+
+        for(File fileDir: input_tf_root.listFiles())
+        {
+            String name_tf = fileDir.getName().split("\\.")[0].split("_")[0];
+            String name_composed ="";
+
+            if(composed_tfs.containsKey(name_tf))
+            {
+                name_composed=composed_tfs.get(name_tf);
+            }
+
+            sb_all.append(name_tf);
+            sb_all.append("=pd.read_table('");
+            sb_all.append(fileDir.getAbsolutePath());
+            sb_all.append("', comment=\"#\", usecols=['TF_TG_SCORE','TF']).sort_values(['TF_TG_SCORE'], ascending=False)\n");
+            sb_all.append(name_tf);
+            sb_all.append(".columns=['TF_TG_SCORE','label']\n");
+            sb_all.append(name_tf+"_sum = sum("+name_tf+"['TF_TG_SCORE'])\n" +
+                    name_tf+"_length = len("+name_tf+")\n" +
+                    name_tf+"_mean = "+name_tf+"_sum/"+name_tf+"_length\n");
+            sb_all.append(name_tf+"_quantile=np.percentile("+name_tf+"['TF_TG_SCORE'], 99)\n");
+            sb_all.append(name_tf+"_quantile_95=np.percentile("+name_tf+"['TF_TG_SCORE'], 95)\n");
+            sb_all.append(name_tf+"_median=sts.median("+name_tf+"['TF_TG_SCORE'])\n");
+            sb_all.append("if("+name_tf+"_median > background_median and "+name_tf+"_quantile > background_quantile):\n");
+            sb_all.append("    background_"+name_tf+" = pd.concat([background,"+name_tf+"],axis=0)\n" +
+                    "    ax_"+name_tf+" = sns.boxplot(x=\"label\", y=\"TF_TG_SCORE\",data=background_"+name_tf+",palette=\"Set3\")\n" +
+                    "    ax_"+name_tf+".set_yscale(\"log\")\n");
+            if(name_composed.equals(""))
+            {
+                sb_all.append("    plt.savefig(f'"+output_plots.getAbsolutePath()+File.separator+name_tf+".png')\n");
+            }
+            else
+            {
+                sb_all.append("    plt.savefig(f'"+output_plots.getAbsolutePath()+File.separator+name_composed+".png')\n");
+            }
+            sb_all.append("    del background_"+name_tf+"\n"+
+                    "    plt.clf()\n" +
+                    "    row_counter=row_counter+1\n");
+            if(name_composed.equals(""))
+            {
+                sb_all.append("    df_interesting_stats.loc[row_counter]=['"+name_tf+"',"+name_tf+"_sum,"+name_tf+"_length,"+name_tf+"_mean,"+name_tf+"_median,"+name_tf+"_quantile_95,"+name_tf+"_quantile]\n");
+            }
+            else
+            {
+                sb_all.append("    df_interesting_stats.loc[row_counter]=['"+name_composed+"',"+name_tf+"_sum,"+name_tf+"_length,"+name_tf+"_mean,"+name_tf+"_median,"+name_tf+"_quantile_95,"+name_tf+"_quantile]\n");
+            }
+            sb_all.append("del "+name_tf+"\n"
+                    + "plt.figure(figsize=(20, 17))\n\n\n");
+        }
+
+        File f_stats_all_print = new File(output_stats.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats);
+
+        sb_all.append("df_interesting_stats.to_csv('"+f_stats_all_print.getAbsolutePath()+"',sep='\t')\n");
+
+        BufferedWriter bw_all = new BufferedWriter(new FileWriter(output_script_file.getAbsolutePath()));
+        bw_all.write(sb_all.toString());
+        bw_all.close();
     }
 }
