@@ -74,9 +74,7 @@ public class COM2POSE_lib
 
         for(File fileDir: f_distr_stats_HM.listFiles())
         {
-            File f_website_html_HM = new File(f_website_distr_analysis_html_folder_HM.getAbsolutePath()+File.separator+fileDir.getName());
-            f_website_html_HM.mkdir();
-
+            File f_website_html_HM = new File(f_website_distr_analysis_html_folder_HM.getAbsolutePath());
             sb_home.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_html_HM.getAbsolutePath()+File.separator+fileDir.getName()+".html' target='_blank'><button class='button_expandable'>"+fileDir.getName()+"</button></a></div>");
         }
 
@@ -85,6 +83,9 @@ public class COM2POSE_lib
         BufferedWriter bw_html_home = new BufferedWriter(new FileWriter(html_home_distribution_analysis));
         bw_html_home.write(sb_home.toString());
         bw_html_home.close();
+
+        //create html reports for ALL and the different HMs each by its own
+        //create_htmls_distribution_analysis_
 
         logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Finished HTML report.");
     }
