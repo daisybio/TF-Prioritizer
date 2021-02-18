@@ -125,8 +125,15 @@ public class Options_intern
     public String file_suffix_distribution_analysis_python_script = "analyse_tf_to_background.py";
     public String file_suffix_distribution_analysis_plot_stats = "stats.csv";
 
+    public String html_report_home_home = "HOME.html";
     public String html_report_home_regression_coefficient_analysis = "HOME_REGRESSION.html";
     public String html_report_home_regression_distribution_analysis = "HOME_DISTRIBUTION.html";
+    public String html_report_home_regression_distribution_analysis_all = "ALL.html";
+
+    public String html_report_levels_home = "HOME";
+    public String html_report_levels_2_steps= "LEVEL_2";
+    public String html_report_levels_3_steps = "THRESHOLD";
+    public String html_report_levels_4_steps = "TF";
 
     public String analysis_types_distribution_analysis ="DISTRIBUTION_ANALYSIS";
     public String analysis_types_regression_coefficient_analysis = "REGRESSION_COEFFICIENT";

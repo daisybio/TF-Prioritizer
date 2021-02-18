@@ -166,7 +166,7 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .w3-pink,.w3-hover-pink:hover{color:#fff!important;background-color:#e91e63!important}
 .w3-purple,.w3-hover-purple:hover{color:#fff!important;background-color:#9c27b0!important}
 .w3-deep-purple,.w3-hover-deep-purple:hover{color:#fff!important;background-color:#673ab7!important}
-.w3-red,.w3-hover-red:hover{color:#fff!important;background-color:#f44336!important}
+.w3-red,.w3-hover-red:hover{color:#fff!important;background-color:#7D221B!important}
 .w3-sand,.w3-hover-sand:hover{color:#000!important;background-color:#fdf5e6!important}
 .w3-teal,.w3-hover-teal:hover{color:#fff!important;background-color:#009688!important}
 .w3-yellow,.w3-hover-yellow:hover{color:#000!important;background-color:#ffeb3b!important}
@@ -237,7 +237,7 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .collapse:not(.show) {
     display: none;
 }
-.button_expandable{width:100%;background-color: #4CAF50;border: none;color: white;padding: 14px 31px;text-align: center;text-decoration: none;display: inline-block; font-size: 25px;margin: 4px 2px;cursor: pointer;}
+.button_expandable{width:100%;background-color: #19631c;border: none;color: white;padding: 14px 31px;text-align: center;text-decoration: none;display: inline-block; font-size: 25px;margin: 4px 2px;cursor: pointer;}
 /* Tooltip container */
 .tooltip {
     position: relative;
@@ -249,8 +249,8 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 400px;
-    background-color: #555;
-    color: #fff;
+    background-color: #419444;
+    color: white;
     text-align: center;
     padding: 5px 0;
     border-radius: 6px;

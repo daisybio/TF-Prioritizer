@@ -56,6 +56,12 @@ public class COM2POSE_lib
         File f_website_distr_analysis_html_folder_HM = new File(f_website_distr_analysis_html_folder.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_HM);
         f_website_distr_analysis_html_folder_HM.mkdir();
 
+        File f_distr_analysis_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
+
+        File f_distr_analysis_stats_root = new File(f_distr_analysis_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats);
+        File f_distr_stats_ALL = new File(f_distr_analysis_stats_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_ALL);
+        File f_distr_stats_HM = new File(f_distr_analysis_stats_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_HM);
+
         String html_header = get_header_html("HOME",options_intern.analysis_types_distribution_analysis);
         String html_tail = "</body>\n" +
                 "</html>";
@@ -64,17 +70,21 @@ public class COM2POSE_lib
         StringBuilder sb_home = new StringBuilder();
 
         sb_home.append(html_header);
-        sb_home.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
+        sb_home.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_ALL.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
 
+        for(File fileDir: f_distr_stats_HM.listFiles())
+        {
+            File f_website_html_HM = new File(f_website_distr_analysis_html_folder_HM.getAbsolutePath()+File.separator+fileDir.getName());
+            f_website_html_HM.mkdir();
 
-
+            sb_home.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_html_HM.getAbsolutePath()+File.separator+fileDir.getName()+".html' target='_blank'><button class='button_expandable'>"+fileDir.getName()+"</button></a></div>");
+        }
 
         sb_home.append(html_tail);
 
         BufferedWriter bw_html_home = new BufferedWriter(new FileWriter(html_home_distribution_analysis));
         bw_html_home.write(sb_home.toString());
         bw_html_home.close();
-
 
         logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Finished HTML report.");
     }
@@ -761,10 +771,14 @@ public class COM2POSE_lib
             String html_tail = "</body>\n" +
                     "</html>";
 
+            BufferedWriter bw_home_home = new BufferedWriter(new FileWriter(f_output_website.getAbsolutePath()+File.separator+options_intern.html_report_home_home));
+            bw_home_home.write(get_header_html(options_intern.html_report_levels_home,options_intern.html_report_levels_home));
+            bw_home_home.close();
+
             BufferedWriter bw_home = new BufferedWriter(new FileWriter(f_output_website+File.separator+options_intern.html_report_home_regression_coefficient_analysis));
 
             //bw_home.write(sb_home_front.toString());
-            bw_home.write(get_header_html("HOME", options_intern.analysis_types_regression_coefficient_analysis));
+            bw_home.write(get_header_html(options_intern.html_report_levels_home, options_intern.analysis_types_regression_coefficient_analysis));
 
             threshold_folders_filled =true;
 
@@ -778,7 +792,7 @@ public class COM2POSE_lib
             bw_home.close();
 
 
-            StringBuilder sb_parameter = new StringBuilder(get_header_html("HOME",options_intern.analysis_types_regression_coefficient_analysis));
+            StringBuilder sb_parameter = new StringBuilder(get_header_html(options_intern.html_report_levels_home,""));
 
             sb_parameter.append(" <script>\n" +
                     " document.title = \"PARAMETERS\";\n" +
@@ -1341,7 +1355,7 @@ public class COM2POSE_lib
 
                 File f_interactive_plots_root = new File(f_output_website.getAbsolutePath()+ File.separator+options_intern.folder_out_website_interactive_plots+File.separator+fileDir.getName());
 
-                StringBuilder sb_threshold = new StringBuilder(get_header_html("THRESHOLD",options_intern.analysis_types_regression_coefficient_analysis));
+                StringBuilder sb_threshold = new StringBuilder(get_header_html(options_intern.html_report_levels_3_steps,options_intern.analysis_types_regression_coefficient_analysis));
                 sb_threshold.append(" <script>\n" +
                         " document.title = \"TH: "+fileDir.getName()+"\";\n" +
                         " </script>\n");
@@ -1704,7 +1718,7 @@ public class COM2POSE_lib
                     }
 
                     StringBuilder sb_tf_page = new StringBuilder();
-                    sb_tf_page.append(get_header_html("TF",options_intern.analysis_types_regression_coefficient_analysis));
+                    sb_tf_page.append(get_header_html(options_intern.html_report_levels_4_steps,options_intern.analysis_types_regression_coefficient_analysis));
                     sb_tf_page.append(" <script>\n" +
                             " document.title = \"TF: "+tf.toUpperCase()+" TH: "+fileDir.getName()+"\";\n" +
                             " </script>\n");
@@ -7134,12 +7148,12 @@ public class COM2POSE_lib
                 if(current_tf_list.get(tf))
                 {
                     sb.append("\t\t\t\t<th>");
-                    if(level.equals("HOME"))
+                    if(level.equals(options_intern.html_report_levels_home))
                     {
                         sb.append("<img src=\""+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"is_available.png"+"\" style=\"width:50px;height:50px;\"/>");
 
                     }
-                    if(level.equals("THRESHOLD"))
+                    if(level.equals(options_intern.html_report_levels_3_steps))
                     {
                         sb.append("<img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"is_available.png"+"\" style=\"width:50px;height:50px;\"/>");
 
@@ -7149,12 +7163,12 @@ public class COM2POSE_lib
                 else
                 {
                     sb.append("\t\t\t\t<th>");
-                    if(level.equals("HOME"))
+                    if(level.equals(options_intern.html_report_levels_home))
                     {
                         sb.append("<img src=\""+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"not_available.png"+"\" style=\"width:50px;height:50px;\"/>");
 
                     }
-                    if(level.equals("THRESHOLD"))
+                    if(level.equals(options_intern.html_report_levels_3_steps))
                     {
                         sb.append("<img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"not_available.png"+"\" style=\"width:50px;height:50px;\"/>");
                     }
@@ -7210,16 +7224,21 @@ public class COM2POSE_lib
             if(fileDir.isFile())
             {
                 sb_home_front.append("<link rel=\"stylesheet\" href=\"");
-                if(level.equals("HOME"))
+                if(level.equals(options_intern.html_report_levels_home))
                 {
                     sb_home_front.append(options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css+File.separator+fileDir.getName());
                 }
-                if(level.equals("THRESHOLD"))
+                if(level.equals(options_intern.html_report_levels_2_steps))
+                {
+                    sb_home_front.append(".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css+File.separator+fileDir.getName());
+
+                }
+                if(level.equals(options_intern.html_report_levels_3_steps))
                 {
                     sb_home_front.append(".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css+File.separator+fileDir.getName());
 
                 }
-                if(level.equals("TF"))
+                if(level.equals(options_intern.html_report_levels_4_steps))
                 {
                     sb_home_front.append(".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_css+File.separator+fileDir.getName());
                 }
@@ -7228,30 +7247,38 @@ public class COM2POSE_lib
         }
 
         String rel_path = "";
-        if(level.equals("HOME"))
+        if(level.equals(options_intern.html_report_levels_home))
         {
             rel_path=options_intern.html_report_home_regression_coefficient_analysis;
         }
-        if(level.equals("THRESHOLD"))
+        if(level.equals(options_intern.html_report_levels_2_steps))
+        {
+            rel_path=".."+File.separator+options_intern.html_report_home_regression_coefficient_analysis;
+        }
+        if(level.equals(options_intern.html_report_levels_3_steps))
         {
             rel_path=".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_coefficient_analysis;
         }
-        if(level.equals("TF"))
+        if(level.equals(options_intern.html_report_levels_4_steps))
         {
             rel_path=".."+File.separator+".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_coefficient_analysis;
         }
 
 
         String rel_path_distribution_analysis = "";
-        if(level.equals("HOME"))
+        if(level.equals(options_intern.html_report_levels_home))
         {
             rel_path_distribution_analysis=options_intern.html_report_home_regression_distribution_analysis;
         }
-        if(level.equals("THRESHOLD"))
+        if(level.equals(options_intern.html_report_levels_2_steps))
+        {
+            rel_path_distribution_analysis=".."+File.separator+options_intern.html_report_home_regression_distribution_analysis;
+        }
+        if(level.equals(options_intern.html_report_levels_3_steps))
         {
             rel_path_distribution_analysis=".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_distribution_analysis;
         }
-        if(level.equals("TF"))
+        if(level.equals(options_intern.html_report_levels_4_steps))
         {
             rel_path_distribution_analysis=".."+File.separator+".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_distribution_analysis;
         }
@@ -7263,7 +7290,7 @@ public class COM2POSE_lib
                 //,button {font-family: "Montserrat", sans-serif}
                 ".fa-anchor,.fa-coffee {font-size:200px}\n" +
                 ".button {\n" +
-                "  background-color: #4CAF50; /* Green */\n" +
+                "  background-color: #19631c; /* Green */\n" +
                 "  border: none;\n" +
                 "  color: white;\n" +
                 "  padding: 14px 31px;\n" +
@@ -7284,15 +7311,19 @@ public class COM2POSE_lib
                 " <a href='"+rel_path_distribution_analysis+"' target='_blank'><button class=\"button\">HOME distribution analysis</button></a>\n");
 
         String rel_path_parameter = "";
-        if(level.equals("HOME"))
+        if(level.equals(options_intern.html_report_levels_home))
         {
             rel_path_parameter="PARAMETERS.html";
         }
-        if(level.equals("THRESHOLD"))
+        if(level.equals(options_intern.html_report_levels_2_steps))
+        {
+            rel_path_parameter=".."+File.separator+"PARAMETERS.html";
+        }
+        if(level.equals(options_intern.html_report_levels_3_steps))
         {
             rel_path_parameter=".."+File.separator+".."+File.separator+"PARAMETERS.html";
         }
-        if(level.equals("TF"))
+        if(level.equals(options_intern.html_report_levels_4_steps))
         {
             rel_path_parameter=".."+File.separator+".."+File.separator+".."+File.separator+"PARAMETERS.html";
         }
@@ -7318,7 +7349,6 @@ public class COM2POSE_lib
                     "  <div class=\"dropdown-content\">\n");
 
 
-
             for(Double d: options_intern.plot_th_coefficient)
             {
                 File f_output_website_htmls_th = new File(f_output_website_htmls.getAbsolutePath()+File.separator+d);
@@ -7330,16 +7360,19 @@ public class COM2POSE_lib
                 }
 
                 String rel_path_2 = "";
-                if(level.equals("HOME"))
+                if(level.equals(options_intern.html_report_levels_home))
                 {
                     rel_path_2=options_intern.folder_out_website_htmls_regression_coefficients+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
                 }
-                if(level.equals("THRESHOLD"))
+                if(level.equals(options_intern.html_report_levels_2_steps))
+                {
+                    rel_path_2=d+File.separator+"threshold_"+d+"_overview.html";
+                }
+                if(level.equals(options_intern.html_report_levels_3_steps))
                 {
                     rel_path_2=".."+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
-
                 }
-                if(level.equals("TF"))
+                if(level.equals(options_intern.html_report_levels_4_steps))
                 {
                     rel_path_2=".."+File.separator+".."+File.separator+d+File.separator+"threshold_"+d+"_overview.html";
                 }
@@ -7473,8 +7506,7 @@ public class COM2POSE_lib
                 sb_all.append("    plt.savefig(f'"+output_plots.getAbsolutePath()+File.separator+name_composed+".png')\n");
             }
             sb_all.append("    del background_"+name_tf+"\n"+
-                    "    plt.clf()\n" +
-                    "    row_counter=row_counter+1\n");
+                    "    plt.clf()\n");
             if(name_composed.equals(""))
             {
                 sb_all.append("    df_interesting_stats.loc[row_counter]=['"+name_tf+"',"+name_tf+"_sum,"+name_tf+"_length,"+name_tf+"_mean,"+name_tf+"_median,"+name_tf+"_quantile_95,"+name_tf+"_quantile]\n");
@@ -7483,6 +7515,7 @@ public class COM2POSE_lib
             {
                 sb_all.append("    df_interesting_stats.loc[row_counter]=['"+name_composed+"',"+name_tf+"_sum,"+name_tf+"_length,"+name_tf+"_mean,"+name_tf+"_median,"+name_tf+"_quantile_95,"+name_tf+"_quantile]\n");
             }
+            sb_all.append( "    row_counter=row_counter+1\n");
             sb_all.append("del "+name_tf+"\n"
                     + "plt.figure(figsize=(20, 17))\n\n\n");
         }

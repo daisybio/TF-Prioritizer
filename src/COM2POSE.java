@@ -74,11 +74,11 @@ public class COM2POSE
 
 
         //CREATE OVERVIEW WEBSITE FOR EVERYTHING BEFORE DISTRIBUTION
-        //com2pose_lib.create_overview_html_report_before_distribution_analysis();
+        com2pose_lib.create_overview_html_report_before_distribution_analysis();
 
         //DISTRIBUTION ANALYSIS
         //com2pose_lib.perform_distribution_analysis();
-        com2pose_lib.create_distribution_plots();
+        //com2pose_lib.create_distribution_plots();
         com2pose_lib.create_overview_html_report_distribution();
 
 
