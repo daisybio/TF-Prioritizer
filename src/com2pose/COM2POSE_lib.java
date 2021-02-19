@@ -43,7 +43,7 @@ public class COM2POSE_lib
     /**
      * CREATE HTML REPORT FOR DISTRIBUTION ANALYSIS
      */
-    public void create_overview_html_report_distribution() throws IOException
+    public void create_overview_html_report_distribution() throws Exception
     {
         logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Create HTML report.");
 
@@ -62,20 +62,43 @@ public class COM2POSE_lib
         File f_distr_stats_ALL = new File(f_distr_analysis_stats_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_ALL);
         File f_distr_stats_HM = new File(f_distr_analysis_stats_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_HM);
 
+        File f_distr_plots_html_report = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_plots_distribution_analysis);
+        f_distr_plots_html_report.mkdir();
+
+        File f_root_plots = new File(f_distr_analysis_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots);
+
+        //copy plots
+        String command = "cp -u -r " + f_root_plots.getAbsolutePath() + " " + f_distr_plots_html_report.getAbsolutePath();
+        Process child = Runtime.getRuntime().exec(command);
+        logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Copy plots for transferable html report: " + command);
+        int code = child.waitFor();
+        switch (code) {
+            case 0:
+                break;
+            case 1:
+                String message = child.getErrorStream().toString();
+                throw new Exception(message);
+        }
+
+
         String html_header = get_header_html("HOME",options_intern.analysis_types_distribution_analysis);
         String html_tail = "</body>\n" +
                 "</html>";
 
-        File html_home_distribution_analysis = new File(f_output_website_root.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis);
+        File html_home_distribution_analysis = new File(f_output_website_root.getAbsolutePath()+File.separator+options_intern.html_report_home_distribution_analysis);
         StringBuilder sb_home = new StringBuilder();
 
         sb_home.append(html_header);
         sb_home.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_ALL.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
 
-        for(File fileDir: f_distr_stats_HM.listFiles())
+        for(File fileDir_stat: f_distr_stats_HM.listFiles())
         {
-            File f_website_html_HM = new File(f_website_distr_analysis_html_folder_HM.getAbsolutePath());
-            sb_home.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_html_HM.getAbsolutePath()+File.separator+fileDir.getName()+".html' target='_blank'><button class='button_expandable'>"+fileDir.getName()+"</button></a></div>");
+            File f_website_html_HM = new File(f_website_distr_analysis_html_folder_HM.getAbsolutePath()+File.separator+fileDir_stat.getName()+".html");
+            sb_home.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_html_HM.getAbsolutePath()+"' target='_blank'><button class='button_expandable'>"+fileDir_stat.getName()+"</button></a></div>");
+
+            //File f_root_plots = new File(File.separator+options_intern.folder_out_distribution_plots_HM+File.separator+fileDir_stat.getName());
+
+            write_html_distribution_analysis_plots(f_website_html_HM, fileDir_stat, "HM");
         }
 
         sb_home.append(html_tail);
@@ -83,10 +106,6 @@ public class COM2POSE_lib
         BufferedWriter bw_html_home = new BufferedWriter(new FileWriter(html_home_distribution_analysis));
         bw_html_home.write(sb_home.toString());
         bw_html_home.close();
-
-        //create html reports for ALL and the different HMs each by its own
-        //create_htmls_distribution_analysis_
-
         logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Finished HTML report.");
     }
 
@@ -785,7 +804,7 @@ public class COM2POSE_lib
 
             for(Double d: options_intern.plot_th_coefficient)
             {
-                bw_home.append(write_table_html(d,"HOME"));
+                bw_home.append(write_regression_coeffecient_analysis_found_table_html(d,"HOME"));
             }
 
             bw_home.write(html_tail);
@@ -1689,7 +1708,7 @@ public class COM2POSE_lib
                 sb_threshold.append("</div>\n");
                 sb_threshold.append("</button>\n");
 
-                sb_threshold.append(write_table_html(Double.parseDouble(fileDir.getName()),"THRESHOLD"));
+                sb_threshold.append(write_regression_coeffecient_analysis_found_table_html(Double.parseDouble(fileDir.getName()),"THRESHOLD"));
 
                 sb_threshold.append("</div>\n");
                 sb_threshold.append("</div>\n");
@@ -7084,7 +7103,7 @@ public class COM2POSE_lib
         }
     }
 
-    private String write_table_html(Double d, String level) throws IOException {
+    private String write_regression_coeffecient_analysis_found_table_html(Double d, String level) throws IOException {
 
         File input_dir_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_WEBSITE_OVERVIEW);
         //HashMap<String,File> hm_file = new HashMap<>();
@@ -7269,19 +7288,19 @@ public class COM2POSE_lib
         String rel_path_distribution_analysis = "";
         if(level.equals(options_intern.html_report_levels_home))
         {
-            rel_path_distribution_analysis=options_intern.html_report_home_regression_distribution_analysis;
+            rel_path_distribution_analysis=options_intern.html_report_home_distribution_analysis;
         }
         if(level.equals(options_intern.html_report_levels_2_steps))
         {
-            rel_path_distribution_analysis=".."+File.separator+options_intern.html_report_home_regression_distribution_analysis;
+            rel_path_distribution_analysis=".."+File.separator+options_intern.html_report_home_distribution_analysis;
         }
         if(level.equals(options_intern.html_report_levels_3_steps))
         {
-            rel_path_distribution_analysis=".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_distribution_analysis;
+            rel_path_distribution_analysis=".."+File.separator+".."+File.separator+options_intern.html_report_home_distribution_analysis;
         }
         if(level.equals(options_intern.html_report_levels_4_steps))
         {
-            rel_path_distribution_analysis=".."+File.separator+".."+File.separator+".."+File.separator+options_intern.html_report_home_regression_distribution_analysis;
+            rel_path_distribution_analysis=".."+File.separator+".."+File.separator+".."+File.separator+options_intern.html_report_home_distribution_analysis;
         }
 
 
@@ -7528,5 +7547,85 @@ public class COM2POSE_lib
         BufferedWriter bw_all = new BufferedWriter(new FileWriter(output_script_file.getAbsolutePath()));
         bw_all.write(sb_all.toString());
         bw_all.close();
+    }
+
+    private void write_html_distribution_analysis_plots(File f_website_html_hm, File fileDir_stat, String level) throws IOException {
+        //read in stats
+        BufferedReader br = new BufferedReader(new FileReader(fileDir_stat+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats));
+        String line = br.readLine();
+        line = br.readLine();
+
+        ArrayList<Analysis_distribution_stats> all_considered_tfs = new ArrayList<>();
+
+        String[] split_background = line.split("\t");
+        Analysis_distribution_stats background = new Analysis_distribution_stats();
+        background.label = split_background[1];
+        background.sum_all_values = Double.parseDouble(split_background[2]);
+        background.number_target_genes = Double.parseDouble(split_background[3]);
+        background.mean=Double.parseDouble(split_background[4]);
+        background.median=Double.parseDouble(split_background[5]);
+        background.quantile_95=Double.parseDouble(split_background[6]);
+        background.quantile_99=Double.parseDouble(split_background[7]);
+
+        while((line=br.readLine())!=null)
+        {
+            String[] split = line.split("\t");
+
+            Analysis_distribution_stats tf = new Analysis_distribution_stats();
+            tf.label = split[1];
+            tf.sum_all_values = Double.parseDouble(split[2]);
+            tf.number_target_genes = Double.parseDouble(split[3]);
+            tf.mean=Double.parseDouble(split[4]);
+            tf.median=Double.parseDouble(split[5]);
+            tf.quantile_95=Double.parseDouble(split[6]);
+            tf.quantile_99=Double.parseDouble(split[7]);
+            all_considered_tfs.add(tf);
+        }
+
+        //sort stats - median and then quantile - mean?
+
+        Collections.sort(all_considered_tfs);
+
+        //setup webpage basics
+        String html_tail = "</body>\n" +
+                "</html>";
+
+        StringBuilder sb = new StringBuilder(get_header_html(options_intern.html_report_levels_3_steps,options_intern.html_report_home_distribution_analysis));
+
+
+        //write stats table inc. comparison to background
+
+        int rank = 1;
+        for(Analysis_distribution_stats as : all_considered_tfs)
+        {
+            sb.append("<div class='w3-content'>\n");
+            sb.append("<h2>"+rank+". "+ as.label.toUpperCase()+ "</h2>\n");
+            sb.append(as.to_html_String(background));
+            String rel_path = ".." + File.separator+ ".." + File.separator+options_intern.folder_out_website_plots_distribution_analysis+File.separator+options_intern.folder_out_distribution_plots;
+            if(level.equals("HM"))
+            {
+                rel_path+=File.separator+options_intern.folder_out_distribution_plots_HM+File.separator+fileDir_stat.getName()+File.separator+as.label.toUpperCase()+".png";
+            }
+            else
+            {
+                rel_path+=File.separator+options_intern.folder_out_distribution_plots_ALL+File.separator+as.label.toUpperCase()+".png";
+
+            }
+            sb.append("<img src=\""+rel_path+"\" style=\"width:900px;height:800px;\"/>\n");
+            sb.append("</div>\n");
+
+            rank++;
+        }
+
+
+        //include img
+
+        sb.append(html_tail);
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f_website_html_hm));
+        bw.write(sb.toString());
+        bw.close();
+
+
     }
 }

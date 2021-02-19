@@ -104,6 +104,7 @@ public class Options_intern
     public String folder_out_website_htmls_TFs = "TFs";
     public String folder_out_website_interactive_plots_tps="TIMEPOINTS_CONDITIONS";
     public String folder_out_website_interactive_plots_overview="OVERVIEW";
+    public String folder_out_website_plots_distribution_analysis = "DISTRIBUTION_ANALYSIS_PLOTS";
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
@@ -127,7 +128,7 @@ public class Options_intern
 
     public String html_report_home_home = "HOME.html";
     public String html_report_home_regression_coefficient_analysis = "HOME_REGRESSION.html";
-    public String html_report_home_regression_distribution_analysis = "HOME_DISTRIBUTION.html";
+    public String html_report_home_distribution_analysis = "HOME_DISTRIBUTION.html";
     public String html_report_home_regression_distribution_analysis_all = "ALL.html";
 
     public String html_report_levels_home = "HOME";
