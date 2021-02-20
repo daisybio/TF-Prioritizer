@@ -1,5 +1,7 @@
 package util;
 
+import java.text.DecimalFormat;
+
 public class Analysis_distribution_stats implements Comparable{
     public String label = "";
     public double sum_all_values = 0;
@@ -18,34 +20,36 @@ public class Analysis_distribution_stats implements Comparable{
 
         if(other.median > this.median)
         {
-            return -1;
+            return 1;
         }
         if(other.median < this.median)
         {
-            return 1;
+            return -1;
         }
 
         if(other.quantile_95 > this.quantile_95)
         {
-            return -1;
+            return 1;
         }
         if(other.quantile_95 < this.quantile_95)
         {
-            return 1;
+            return -1;
         }
 
         if(other.quantile_99 > this.quantile_99)
         {
-            return -1;
+            return 1;
         }
         else
         {
-            return 1;
+            return -1;
         }
     }
 
     public String to_html_String(Analysis_distribution_stats background)
     {
+        DecimalFormat df = new DecimalFormat("0.00");
+
         StringBuilder sb = new StringBuilder();
         sb.append("\t\t<table style=\"width:80%\">\n");
         sb.append("\t\t\t<tr>\n");
@@ -70,16 +74,16 @@ public class Analysis_distribution_stats implements Comparable{
         sb.append("BACKGROUND");
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t\t<th>");
-        sb.append(background.median);
+        sb.append(df.format(background.median));
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t\t<th>");
-        sb.append(background.mean);
+        sb.append(df.format(background.mean));
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t\t<th>");
-        sb.append(background.quantile_95);
+        sb.append(df.format(background.quantile_95));
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t\t<th>");
-        sb.append(background.quantile_99);
+        sb.append(df.format(background.quantile_99));
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t</tr>\n");
         sb.append("\t\t\t<tr>\n");
@@ -87,18 +91,19 @@ public class Analysis_distribution_stats implements Comparable{
         sb.append(this.label.toUpperCase());
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t\t<th>");
-        sb.append(this.median);
+        sb.append(df.format(this.median));
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t\t<th>");
-        sb.append(this.mean);
+        sb.append(df.format(this.mean));
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t\t<th>");
-        sb.append(this.quantile_95);
+        sb.append(df.format(this.quantile_95));
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t\t<th>");
-        sb.append(this.quantile_99);
+        sb.append(df.format(this.quantile_99));
         sb.append("\t\t\t\t</th>\n");
         sb.append("\t\t\t</tr>\n");
+        sb.append("\t\t</table>\n");
 
 
         return  sb.toString();
