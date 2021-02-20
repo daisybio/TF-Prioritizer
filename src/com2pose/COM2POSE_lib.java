@@ -7629,7 +7629,7 @@ public class COM2POSE_lib
         for(Analysis_distribution_stats as : all_considered_tfs)
         {
             sb.append("<div class='w3-content'>\n");
-            sb.append("<h2>"+rank+". "+ as.label.toUpperCase()+ "</h2>\n");
+            sb.append("<h2>"+rank+". <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+as.label.toUpperCase()+"' target='_blank'><button class='button'>"+ as.label.toUpperCase()+ "</button></a></h2>\n");
             sb.append(as.to_html_String(background));
             String rel_path = ".." + File.separator+ ".." + File.separator+options_intern.folder_out_website_plots_distribution_analysis+File.separator+options_intern.folder_out_distribution_plots;
             if(level.equals("HM"))
