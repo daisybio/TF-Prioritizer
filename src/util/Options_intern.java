@@ -101,6 +101,7 @@ public class Options_intern
     public String folder_out_website_htmls_distribution_analysis = "HTMLS_DISTRIBUTION_ANALYSIS";
     public String folder_out_website_htmls_distribution_analysis_ALL = "01_ALL";
     public String folder_out_website_htmls_distribution_analysis_HM = "02_HM";
+    public String folder_out_website_htmls_distribution_analysis_cumulative_gain = "03_CUMULATIVE_GAIN";
     public String folder_out_website_htmls_TFs = "TFs";
     public String folder_out_website_interactive_plots_tps="TIMEPOINTS_CONDITIONS";
     public String folder_out_website_interactive_plots_overview="OVERVIEW";

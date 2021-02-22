@@ -42,6 +42,135 @@ public class COM2POSE_lib
     }
 
     /**
+     * calculate discounted cumulative gain rank for distribution analysis and set up html report for it
+     */
+    public void calculate_discounted_cumulative_gain_rank_distribution_analysis() throws IOException {
+        logger.logLine("[DISTRIBUTION-ANALYSIS] Start calculate ranks overall groups.");
+
+        //calculate ranks overall groups
+        HashMap<String,HashMap<String,Integer>> group_analysis_distr_stats = new HashMap<>();
+        HashMap<String,Analysis_distribution_stats_object> group_analysis_distr_stats_objects = new HashMap<>();
+
+        File f_distr_analysis_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
+
+        File f_distr_analysis_stats_root = new File(f_distr_analysis_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats);
+        File f_distr_stats_ALL = new File(f_distr_analysis_stats_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_ALL);
+        File f_distr_stats_HM = new File(f_distr_analysis_stats_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_HM);
+
+
+        for(File fileDir_stat: f_distr_stats_HM.listFiles())
+        {
+            Analysis_distribution_stats_object current_object = get_distribution_analysis_stats_ordered(fileDir_stat);
+            group_analysis_distr_stats_objects.put(fileDir_stat.getName(),current_object);
+        }
+
+        Analysis_distribution_stats_object all_object = get_distribution_analysis_stats_ordered(f_distr_stats_ALL);
+        group_analysis_distr_stats_objects.put("ALL",all_object);
+
+        int not_found_factor = 0;
+        int group_number=0;
+
+
+        for(String key_group : group_analysis_distr_stats_objects.keySet())
+        {
+            HashMap<String,Integer> tf_to_ranks = new HashMap<>();
+            int rank = 0;
+
+            ArrayList<Analysis_distribution_stats> currents_tfs_to_rank = group_analysis_distr_stats_objects.get(key_group).ordered_tfs;
+
+            for(Analysis_distribution_stats tf : currents_tfs_to_rank)
+            {
+                tf_to_ranks.put(tf.label,rank+1);
+                rank++;
+            }
+            group_analysis_distr_stats.put(key_group,tf_to_ranks);
+
+            not_found_factor+=currents_tfs_to_rank.size();
+            group_number++;
+        }
+
+        not_found_factor/=group_number;
+
+        ArrayList<Analysis_distribution_stats_cumulative_gain> fin_ranks = new ArrayList<>();
+        HashSet<String> already_calculated_tfs = new HashSet<>();
+
+        for(String key_group : group_analysis_distr_stats.keySet())
+        {
+            HashMap<String,Integer> current_tfs = group_analysis_distr_stats.get(key_group);
+            for(String key_tf : current_tfs.keySet())
+            {
+                if(already_calculated_tfs.contains(key_tf))
+                {
+                    continue;
+                }
+
+                int rank_overall = current_tfs.get(key_tf);
+
+                HashMap<String,Analysis_distribution_stats> current_group_stats = new HashMap<>();
+                HashMap<String,Analysis_distribution_stats> current_group_background = new HashMap<>();
+
+                Analysis_distribution_stats_object xx = group_analysis_distr_stats_objects.get(key_group);
+                current_group_stats.put(key_group,xx.ordered_tfs.get(current_tfs.get(key_tf)-1));
+                current_group_background.put("background",xx.background);
+
+
+                for(String key_group_clash: group_analysis_distr_stats.keySet())
+                {
+                    if(key_group_clash.equals(key_group))
+                    {
+                        continue;
+                    }
+                    HashMap<String,Integer> current_tfs_clash = group_analysis_distr_stats.get(key_group_clash);
+                    if(current_tfs_clash.containsKey(key_tf))
+                    {
+                        int x = current_tfs_clash.get(key_tf);
+                        if(x > not_found_factor)
+                        {
+                            rank_overall+=not_found_factor;
+                        }
+                        else
+                        {
+                            rank_overall+=x;
+                        }
+                    }
+                    else
+                    {
+                        rank_overall+=not_found_factor;
+                    }
+                }
+                Analysis_distribution_stats_cumulative_gain ac = new Analysis_distribution_stats_cumulative_gain();
+                ac.label=key_tf;
+                ac.rank=rank_overall;
+                ac.group_object = current_group_stats;
+                ac.group_background= current_group_background;
+                fin_ranks.add(ac);
+                already_calculated_tfs.add(key_tf);
+            }
+        }
+
+        Collections.sort(fin_ranks);
+
+        //CREATE HTML_REPORT
+        File folder_website_out = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls_distribution_analysis+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_cumulative_gain);
+        folder_website_out.mkdir();
+
+        String html_tail = "</body>\n" +
+                "</html>";
+
+        StringBuilder sb_cumulative_gain_website = new StringBuilder();
+        sb_cumulative_gain_website.append(get_header_html(options_intern.html_report_levels_3_steps,"Distribution Analysis: "+"CUMULATIVE GAIN"));
+
+        //TODO: create html report here
+
+        sb_cumulative_gain_website.append(html_tail);
+        BufferedWriter bw= new BufferedWriter(new FileWriter(folder_website_out.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all));
+        bw.write(sb_cumulative_gain_website.toString());
+        bw.close();
+
+        logger.logLine("[DISTRIBUTION-ANALYSIS] Finish calculate ranks overall groups.");
+    }
+
+    /**
      * CREATE HTML REPORT FOR DISTRIBUTION ANALYSIS
      */
     public void create_overview_html_report_distribution() throws Exception
@@ -56,6 +185,8 @@ public class COM2POSE_lib
         f_website_distr_analysis_html_folder_ALL.mkdir();
         File f_website_distr_analysis_html_folder_HM = new File(f_website_distr_analysis_html_folder.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_HM);
         f_website_distr_analysis_html_folder_HM.mkdir();
+        File f_website_distr_analysis_html_folder_cumulative_gain = new File(f_website_distr_analysis_html_folder.getAbsolutePath()+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_cumulative_gain);
+        f_website_distr_analysis_html_folder_cumulative_gain.mkdir();
 
         File f_distr_analysis_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
 
@@ -81,6 +212,54 @@ public class COM2POSE_lib
             case 1:
                 String message = child.getErrorStream().toString();
                 throw new Exception(message);
+        }
+
+        HashMap<String,HashMap<String,String>> tp_tf_gene_count = new HashMap<>();
+
+        File f_input_genecounts_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_HM_LEVEL);
+        for(File fileDir:f_input_genecounts_root.listFiles())
+        {
+            if(fileDir.isDirectory())
+            {
+                for(File fileDir_gc : fileDir.listFiles())
+                {
+                    if(fileDir_gc.isFile())
+                    {
+                        BufferedReader br = new BufferedReader(new FileReader(fileDir_gc));
+                        String line = br.readLine();
+                        String[] split_header = line.split("\t");
+
+                        while((line=br.readLine())!=null)
+                        {
+                            String[] split_line = line.split("\t");
+
+                            String name_tf = split_line[0];
+
+                            for(int i = 1; i < split_header.length; i++)
+                            {
+                                HashMap<String,String> tf_genecount_for_tp;
+
+                                if(tp_tf_gene_count.containsKey(split_header[i]))
+                                {
+                                    tf_genecount_for_tp = tp_tf_gene_count.get(split_header[i]);
+                                }
+                                else
+                                {
+                                    tf_genecount_for_tp = new HashMap<>();
+                                }
+
+                                String x = split_line[i];
+                                tf_genecount_for_tp.put(name_tf.toUpperCase(),x);
+
+                                tp_tf_gene_count.put(split_header[i],tf_genecount_for_tp);
+
+                            }
+
+                        }
+                        br.close();
+                    }
+                }
+            }
         }
 
 
@@ -128,16 +307,18 @@ public class COM2POSE_lib
 
         sb_home_distribution_analysis.append(html_header);
         sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_ALL.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
+        sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_cumulative_gain.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>CUMULATIVE GAIN</button></a></div>");
+
 
         for(File fileDir_stat: f_distr_stats_HM.listFiles())
         {
             File f_website_html_HM = new File(f_website_distr_analysis_html_folder_HM.getAbsolutePath()+File.separator+fileDir_stat.getName()+".html");
             sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_html_HM.getAbsolutePath()+"' target='_blank'><button class='button_expandable'>"+fileDir_stat.getName()+"</button></a></div>");
 
-            write_html_distribution_analysis_plots_hm_page(f_website_html_HM, fileDir_stat, "HM");
+            write_html_distribution_analysis_plots_hm_page(f_website_html_HM, fileDir_stat, "HM", tp_tf_gene_count);
         }
 
-        write_html_distribution_analysis_plots_hm_page(f_website_distr_analysis_html_folder_ALL_FILE,f_distr_stats_ALL,"ALL");
+        write_html_distribution_analysis_plots_hm_page(f_website_distr_analysis_html_folder_ALL_FILE,f_distr_stats_ALL,"ALL",tp_tf_gene_count);
 
         sb_home_distribution_analysis.append(html_tail);
 
@@ -7537,10 +7718,15 @@ public class COM2POSE_lib
             sb_all.append(".columns=['TF_TG_SCORE','label']\n");
             sb_all.append(name_tf+"_sum = sum("+name_tf+"['TF_TG_SCORE'])\n" +
                     name_tf+"_length = len("+name_tf+")\n" +
-                    name_tf+"_mean = "+name_tf+"_sum/"+name_tf+"_length\n");
-            sb_all.append(name_tf+"_quantile=np.percentile("+name_tf+"['TF_TG_SCORE'], 99)\n");
-            sb_all.append(name_tf+"_quantile_95=np.percentile("+name_tf+"['TF_TG_SCORE'], 95)\n");
-            sb_all.append(name_tf+"_median=sts.median("+name_tf+"['TF_TG_SCORE'])\n");
+                    name_tf+"_mean=0\n" +
+                    name_tf+"_quantile=0\n"+
+                    name_tf+"_quantile_95=0\n"+
+                    name_tf+"_median=0\n"+
+                    "if("+name_tf+"_length>0):\n"+
+                    "    "+name_tf+"_mean="+name_tf+"_sum/"+name_tf+"_length\n");
+            sb_all.append("    "+name_tf+"_quantile=np.percentile("+name_tf+"['TF_TG_SCORE'], 99)\n");
+            sb_all.append("    "+name_tf+"_quantile_95=np.percentile("+name_tf+"['TF_TG_SCORE'], 95)\n");
+            sb_all.append("    "+name_tf+"_median=sts.median("+name_tf+"['TF_TG_SCORE'])\n");
             sb_all.append("if("+name_tf+"_median > background_median):\n");
             sb_all.append("    background_"+name_tf+" = pd.concat([background,"+name_tf+"],axis=0)\n" +
                     "    ax_"+name_tf+" = sns.boxplot(x=\"label\", y=\"TF_TG_SCORE\",data=background_"+name_tf+",palette=\"Set3\")\n" +
@@ -7577,7 +7763,14 @@ public class COM2POSE_lib
         bw_all.close();
     }
 
-    private void write_html_distribution_analysis_plots_hm_page(File f_website_html_hm, File fileDir_stat, String level) throws IOException {
+    private void write_html_distribution_analysis_plots_hm_page(File f_website_html_hm, File fileDir_stat, String level, HashMap<String,HashMap<String,String>> tp_tf_gene_count) throws IOException {
+
+        Analysis_distribution_stats_object stats_object = get_distribution_analysis_stats_ordered(fileDir_stat);
+
+        ArrayList<Analysis_distribution_stats> all_considered_tfs = stats_object.ordered_tfs;
+        Analysis_distribution_stats background = stats_object.background;
+
+        /*
         //read in stats
         BufferedReader br = new BufferedReader(new FileReader(fileDir_stat+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats));
         String line = br.readLine();
@@ -7612,7 +7805,7 @@ public class COM2POSE_lib
 
         //sort stats - median and then quantile - mean?
 
-        Collections.sort(all_considered_tfs);
+        Collections.sort(all_considered_tfs);*/
 
         //setup webpage basics
         String html_tail = "</body>\n" +
@@ -7630,7 +7823,52 @@ public class COM2POSE_lib
         {
             sb.append("<div class='w3-content'>\n");
             sb.append("<h2>"+rank+". <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+as.label.toUpperCase()+"' target='_blank'><button class='button'>"+ as.label.toUpperCase()+ "</button></a></h2>\n");
+
+            sb.append("<h5>Distribution Analysis Details:</h5>\n");
             sb.append(as.to_html_String(background));
+
+            ArrayList<String> tps = new ArrayList<>();
+
+            sb.append("<h5>Gene Counts Table </h5>\n");
+
+            sb.append("\t\t<table style=\"width:80%\">\n");
+            sb.append("\t\t\t<tr>\n");
+            sb.append("\t\t\t\t<th>\n");
+            sb.append("TF");
+            sb.append("\t\t\t\t</th>\n");
+
+            for(String key: tp_tf_gene_count.keySet())
+            {
+                sb.append("\t\t\t\t<th>\n");
+                sb.append(key);
+                sb.append("\t\t\t\t</th>\n");
+
+                tps.add(key);
+            }
+            sb.append("\t\t\t</tr>\n");
+            sb.append("\t\t\t<tr>\n");
+            sb.append("\t\t\t\t<th>\n");
+            sb.append(as.label.toUpperCase());
+            sb.append("\t\t\t\t</th>\n");
+
+            for(String key: tps)
+            {
+                String value = "0.0";
+                HashMap<String,String> current_x = tp_tf_gene_count.get(key);
+                if(current_x.containsKey(as.label.toUpperCase()))
+                {
+                    value=current_x.get(as.label.toUpperCase());
+                }
+
+                sb.append("\t\t\t\t<th>");
+                sb.append(value);
+                sb.append("\t\t\t\t</th>\n");
+            }
+
+            sb.append("\t\t\t</tr>\n");
+
+            sb.append("\t\t</table>");
+
             String rel_path = ".." + File.separator+ ".." + File.separator+options_intern.folder_out_website_plots_distribution_analysis+File.separator+options_intern.folder_out_distribution_plots;
             if(level.equals("HM"))
             {
@@ -7669,9 +7907,14 @@ public class COM2POSE_lib
         {
             String name = fileDir_hm.getName();
 
-            ArrayList<Analysis_distribution_stats> all_considered_tfs = new ArrayList<>();
+            //File stats_file = new File(fileDir_hm.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats);
 
-            BufferedReader br = new BufferedReader(new FileReader(fileDir_hm.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats));
+            Analysis_distribution_stats_object stats_object = get_distribution_analysis_stats_ordered(fileDir_hm);
+
+            ArrayList<Analysis_distribution_stats> all_considered_tfs = stats_object.ordered_tfs;
+
+            /*
+            BufferedReader br = new BufferedReader(new FileReader(stats_file));
             String line = br.readLine();
             line=br.readLine();
             while((line=br.readLine())!=null)
@@ -7688,12 +7931,12 @@ public class COM2POSE_lib
                 tf.quantile_99=Double.parseDouble(split[7]);
                 all_considered_tfs.add(tf);
             }
+            br.close();
 
-            Collections.sort(all_considered_tfs);
+            Collections.sort(all_considered_tfs);*/
 
             hm_distribution_stats.put(name,all_considered_tfs);
             hm_names_order.add(name);
-            br.close();
         }
         sb_table.append("<div class='w3-content'>\n");
         sb_table.append("\t\t<table style=\"width:80%;\">\n");
@@ -7781,5 +8024,53 @@ public class COM2POSE_lib
         sb_table.append("</div>\n");
 
         return sb_table.toString();
+    }
+
+    private Analysis_distribution_stats_object get_distribution_analysis_stats_ordered(File fileDir_stat) throws IOException {
+
+        Analysis_distribution_stats background = new Analysis_distribution_stats();
+
+        //read in stats
+        BufferedReader br = new BufferedReader(new FileReader(fileDir_stat+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats));
+        String line = br.readLine();
+        line = br.readLine();
+
+        ArrayList<Analysis_distribution_stats> all_considered_tfs = new ArrayList<>();
+
+        String[] split_background = line.split("\t");
+        background.label = split_background[1];
+        background.sum_all_values = Double.parseDouble(split_background[2]);
+        background.number_target_genes = Double.parseDouble(split_background[3]);
+        background.mean=Double.parseDouble(split_background[4]);
+        background.median=Double.parseDouble(split_background[5]);
+        background.quantile_95=Double.parseDouble(split_background[6]);
+        background.quantile_99=Double.parseDouble(split_background[7]);
+
+        while((line=br.readLine())!=null)
+        {
+            String[] split = line.split("\t");
+
+            Analysis_distribution_stats tf = new Analysis_distribution_stats();
+            tf.label = split[1];
+            tf.sum_all_values = Double.parseDouble(split[2]);
+            tf.number_target_genes = Double.parseDouble(split[3]);
+            tf.mean=Double.parseDouble(split[4]);
+            tf.median=Double.parseDouble(split[5]);
+            tf.quantile_95=Double.parseDouble(split[6]);
+            tf.quantile_99=Double.parseDouble(split[7]);
+            all_considered_tfs.add(tf);
+        }
+
+        //sort stats - median and then quantile - mean?
+
+        Collections.sort(all_considered_tfs);
+
+
+
+        Analysis_distribution_stats_object ret_obj = new Analysis_distribution_stats_object();
+        ret_obj.ordered_tfs=all_considered_tfs;
+        ret_obj.background=background;
+
+        return ret_obj;
     }
 }
