@@ -50,6 +50,9 @@ public class COM2POSE_lib
         //calculate ranks overall groups
         HashMap<String,HashMap<String,Integer>> group_analysis_distr_stats = new HashMap<>();
         HashMap<String,Analysis_distribution_stats_object> group_analysis_distr_stats_objects = new HashMap<>();
+        HashSet<String> available_modifications = new HashSet<>();
+
+        HashMap<String,Integer> final_ranks_only = new HashMap<>();
 
         File f_distr_analysis_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution);
 
@@ -73,6 +76,8 @@ public class COM2POSE_lib
 
         for(String key_group : group_analysis_distr_stats_objects.keySet())
         {
+            available_modifications.add(key_group);
+
             HashMap<String,Integer> tf_to_ranks = new HashMap<>();
             int rank = 0;
 
@@ -104,14 +109,17 @@ public class COM2POSE_lib
                     continue;
                 }
 
-                int rank_overall = current_tfs.get(key_tf);
+                double rank_overall =0;
+
+                double rank_current_group = (current_tfs.size()-current_tfs.get(key_tf))/(current_tfs.size()*1.0);
+                rank_overall+=rank_current_group;
 
                 HashMap<String,Analysis_distribution_stats> current_group_stats = new HashMap<>();
                 HashMap<String,Analysis_distribution_stats> current_group_background = new HashMap<>();
 
                 Analysis_distribution_stats_object xx = group_analysis_distr_stats_objects.get(key_group);
                 current_group_stats.put(key_group,xx.ordered_tfs.get(current_tfs.get(key_tf)-1));
-                current_group_background.put("background",xx.background);
+                current_group_background.put(key_group,xx.background);
 
 
                 for(String key_group_clash: group_analysis_distr_stats.keySet())
@@ -123,20 +131,16 @@ public class COM2POSE_lib
                     HashMap<String,Integer> current_tfs_clash = group_analysis_distr_stats.get(key_group_clash);
                     if(current_tfs_clash.containsKey(key_tf))
                     {
-                        int x = current_tfs_clash.get(key_tf);
-                        if(x > not_found_factor)
-                        {
-                            rank_overall+=not_found_factor;
-                        }
-                        else
-                        {
-                            rank_overall+=x;
-                        }
+                        HashMap<String,Integer> current_tfs_clash_x = group_analysis_distr_stats.get(key_group_clash);
+
+                        Analysis_distribution_stats_object xx_clash = group_analysis_distr_stats_objects.get(key_group_clash);
+                        current_group_stats.put(key_group_clash,xx_clash.ordered_tfs.get(current_tfs_clash_x.get(key_tf)-1));
+                        current_group_background.put(key_group_clash,xx_clash.background);
+                        double rank_current_group_clash = (current_tfs_clash_x.size()-current_tfs_clash_x.get(key_tf))/(current_tfs_clash_x.size()*1.0);
+                        rank_overall+=rank_current_group_clash;
+
                     }
-                    else
-                    {
-                        rank_overall+=not_found_factor;
-                    }
+
                 }
                 Analysis_distribution_stats_cumulative_gain ac = new Analysis_distribution_stats_cumulative_gain();
                 ac.label=key_tf;
@@ -160,12 +164,226 @@ public class COM2POSE_lib
         StringBuilder sb_cumulative_gain_website = new StringBuilder();
         sb_cumulative_gain_website.append(get_header_html(options_intern.html_report_levels_3_steps,"Distribution Analysis: "+"CUMULATIVE GAIN"));
 
-        //TODO: create html report here
+        //get gene counts
+        HashMap<String,HashMap<String,String>> tp_tf_gene_count = new HashMap<>();
+
+        File f_input_genecounts_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_HM_LEVEL);
+        for(File fileDir:f_input_genecounts_root.listFiles())
+        {
+            if(fileDir.isDirectory())
+            {
+                for(File fileDir_gc : fileDir.listFiles())
+                {
+                    if(fileDir_gc.isFile())
+                    {
+                        BufferedReader br = new BufferedReader(new FileReader(fileDir_gc));
+                        String line = br.readLine();
+                        String[] split_header = line.split("\t");
+
+                        while((line=br.readLine())!=null)
+                        {
+                            String[] split_line = line.split("\t");
+
+                            String name_tf = split_line[0];
+
+                            for(int i = 1; i < split_header.length; i++)
+                            {
+                                HashMap<String,String> tf_genecount_for_tp;
+
+                                if(tp_tf_gene_count.containsKey(split_header[i]))
+                                {
+                                    tf_genecount_for_tp = tp_tf_gene_count.get(split_header[i]);
+                                }
+                                else
+                                {
+                                    tf_genecount_for_tp = new HashMap<>();
+                                }
+
+                                String x = split_line[i];
+                                tf_genecount_for_tp.put(name_tf.toUpperCase(),x);
+
+                                tp_tf_gene_count.put(split_header[i],tf_genecount_for_tp);
+
+                            }
+
+                        }
+                        br.close();
+                    }
+                }
+            }
+        }
+
+        DecimalFormat df = new DecimalFormat("0.00");
+
+        for(int i = 0; i < fin_ranks.size(); i++)
+        {
+            int rank_overall = i+1;
+            Analysis_distribution_stats_cumulative_gain as = fin_ranks.get(i);
+            HashMap<String,Analysis_distribution_stats> group_object = as.group_object;
+
+            final_ranks_only.put(as.label.toUpperCase(),rank_overall);
+
+            sb_cumulative_gain_website.append("<div id='"+as.label.toUpperCase()+"' class='w3-content'>\n");
+            sb_cumulative_gain_website.append("<h2>"+rank_overall+". <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+as.label.toUpperCase()+"' target='_blank'><button class='button'>"+ as.label.toUpperCase()+ "</button></a></h2>\n");
+
+            sb_cumulative_gain_website.append("<h5>Discounted cumulative gain details:</h5>\n");
+
+            sb_cumulative_gain_website.append("\t\t<table style=\"width:80%;\">\n");
+            sb_cumulative_gain_website.append("\t\t\t<tr>\n");
+            sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+            sb_cumulative_gain_website.append("Modification");
+            sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+            sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+            sb_cumulative_gain_website.append("Availability");
+            sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+            sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+            sb_cumulative_gain_website.append("Rank");
+            sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+            sb_cumulative_gain_website.append("\t\t</tr>\n");
+
+            for(String key_group : available_modifications)
+            {
+                sb_cumulative_gain_website.append("\t\t\t<tr>\n");
+
+                if(as.group_object.containsKey(key_group))
+                {
+                    Analysis_distribution_stats as_obj = as.group_object.get(key_group);
+
+                    HashMap<String,Integer> actual_ranks = group_analysis_distr_stats.get(key_group);
+
+                    sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+                    if(key_group.equals("ALL"))
+                    {
+                        sb_cumulative_gain_website.append("<a href='"+".."+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_ALL+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"#"+as.label.toUpperCase()+"' target='_blank'><button class='button' style='background-color:#67cb67;'>");
+
+                    }
+                    else
+                    {
+                        sb_cumulative_gain_website.append("<a href='"+".."+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_HM+File.separator+key_group+".html#"+as.label.toUpperCase()+"' target='_blank'><button class='button' style='background-color:#67cb67;'>");
+                    }
+                    sb_cumulative_gain_website.append(key_group);
+                    sb_cumulative_gain_website.append("</button></a>\n");
+                    sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+                    sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+                    sb_cumulative_gain_website.append("<img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"is_available.png"+"\" style=\"width:50px;height:50px;\"/>");
+                    sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+                    sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+                    sb_cumulative_gain_website.append(actual_ranks.get(as.label.toUpperCase())+"/"+actual_ranks.size());
+                    sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+                }
+                else
+                {
+                    sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+                    sb_cumulative_gain_website.append(key_group);
+                    sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+                    sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+                    sb_cumulative_gain_website.append("<img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"not_available.png"+"\" style=\"width:50px;height:50px;\"/>");
+                    sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+                    sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+                    sb_cumulative_gain_website.append("-");
+                    sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+                }
+                sb_cumulative_gain_website.append("\t\t</tr>\n");
+            }
+            sb_cumulative_gain_website.append("\t\t<tr>\n");
+            sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+            sb_cumulative_gain_website.append("OVERALL SCORE");
+            sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+            sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+            sb_cumulative_gain_website.append("");
+            sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+            sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+            sb_cumulative_gain_website.append(df.format(as.rank));
+            sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+            sb_cumulative_gain_website.append("\t\t</tr>\n");
+
+
+            sb_cumulative_gain_website.append("\t\t</table>\n");
+
+            sb_cumulative_gain_website.append("<h5>Gene Counts Table </h5>\n");
+
+            sb_cumulative_gain_website.append("\t\t<table style=\"width:80%\">\n");
+            sb_cumulative_gain_website.append("\t\t\t<tr>\n");
+            sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+            sb_cumulative_gain_website.append("TF");
+            sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+
+            HashSet<String> tps = new HashSet<>();
+
+            for(String key: tp_tf_gene_count.keySet())
+            {
+                sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+                sb_cumulative_gain_website.append(key);
+                sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+
+                tps.add(key);
+            }
+            sb_cumulative_gain_website.append("\t\t\t</tr>\n");
+            sb_cumulative_gain_website.append("\t\t\t<tr>\n");
+            sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
+            sb_cumulative_gain_website.append(as.label.toUpperCase());
+            sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+
+            for(String key: tps)
+            {
+                String value = "0.0";
+                HashMap<String,String> current_x = tp_tf_gene_count.get(key);
+                if(current_x.containsKey(as.label.toUpperCase()))
+                {
+                    value=current_x.get(as.label.toUpperCase());
+                }
+
+                sb_cumulative_gain_website.append("\t\t\t\t<th>");
+                sb_cumulative_gain_website.append(value);
+                sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
+            }
+
+            sb_cumulative_gain_website.append("\t\t\t</tr>\n");
+
+            sb_cumulative_gain_website.append("\t\t</table>");
+            sb_cumulative_gain_website.append("</div>");
+        }
 
         sb_cumulative_gain_website.append(html_tail);
         BufferedWriter bw= new BufferedWriter(new FileWriter(folder_website_out.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all));
         bw.write(sb_cumulative_gain_website.toString());
         bw.close();
+
+        StringBuilder sb_home_home = new StringBuilder();
+        sb_home_home.append(get_header_html(options_intern.html_report_levels_home,options_intern.html_report_levels_home));
+
+        //CREATE EXPANDABLE BUTTONS FOR DISTRIBUTION ANALYSIS OVERVIEW
+        sb_home_home.append("<button class=\"button_expandable\" id=\"button_distribution_analysis\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_distribution_analysis','table_distribution_analysis')\"> TF-TG-Score Distribution Analysis - OVERVIEW\n");
+        sb_home_home.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_distribution_analysis\">\n");
+
+        ArrayList<File> stat_files = new ArrayList<>();
+        stat_files.add(f_distr_stats_ALL);
+        for(File fileDir_stat: f_distr_stats_HM.listFiles())
+        {
+            stat_files.add(fileDir_stat);
+        }
+
+        sb_home_home.append(get_html_table_found_tfs_in_distribution_analysis(stat_files, options_intern.html_report_levels_home,final_ranks_only));
+
+        sb_home_home.append("</div>\n</button>\n");
+
+
+        //CREATE EXPANDABLE BUTTONS FOR REGRESSION COEFFICIENT ANALYSIS
+        sb_home_home.append("<button class=\"button_expandable\" id=\"button_regression_coefficient_analysis\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_regression_coefficient_analysis','table_regression_coefficient_analysis')\"> Regression Coefficient Analysis - OVERVIEW\n");
+        sb_home_home.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_regression_coefficient_analysis\">\n");
+        for(Double d: options_intern.plot_th_coefficient)
+        {
+            sb_home_home.append(write_regression_coeffecient_analysis_found_table_html(d,options_intern.html_report_levels_home));
+        }
+
+        sb_home_home.append("</div>\n</button>\n");
+
+        sb_home_home.append(html_tail);
+
+        File f_output_website_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website);
+        BufferedWriter bw_home_home = new BufferedWriter(new FileWriter(f_output_website_root.getAbsolutePath()+File.separator+options_intern.html_report_home_home));
+        bw_home_home.write(sb_home_home.toString());
+        bw_home_home.close();
 
         logger.logLine("[DISTRIBUTION-ANALYSIS] Finish calculate ranks overall groups.");
     }
@@ -267,47 +485,12 @@ public class COM2POSE_lib
         String html_tail = "</body>\n" +
                 "</html>";
 
-        StringBuilder sb_home_home = new StringBuilder();
-        sb_home_home.append(get_header_html(options_intern.html_report_levels_home,options_intern.html_report_levels_home));
-
-        //CREATE EXPANDABLE BUTTONS FOR DISTRIBUTION ANALYSIS OVERVIEW
-        sb_home_home.append("<button class=\"button_expandable\" id=\"button_distribution_analysis\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_distribution_analysis','table_distribution_analysis')\"> TF-TG-Score Distribution Analysis - OVERVIEW\n");
-        sb_home_home.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_distribution_analysis\">\n");
-
-        ArrayList<File> stat_files = new ArrayList<>();
-        stat_files.add(f_distr_stats_ALL);
-        for(File fileDir_stat: f_distr_stats_HM.listFiles())
-        {
-            stat_files.add(fileDir_stat);
-        }
-
-        sb_home_home.append(get_html_table_found_tfs_in_distribution_analysis(stat_files, options_intern.html_report_levels_home));
-
-        sb_home_home.append("</div>\n</button>\n");
-
-
-        //CREATE EXPANDABLE BUTTONS FOR REGRESSION COEFFICIENT ANALYSIS
-        sb_home_home.append("<button class=\"button_expandable\" id=\"button_regression_coefficient_analysis\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_regression_coefficient_analysis','table_regression_coefficient_analysis')\"> Regression Coefficient Analysis - OVERVIEW\n");
-        sb_home_home.append("<div style=\"display: none;background-color: white;color:black;\" id=\"table_regression_coefficient_analysis\">\n");
-        for(Double d: options_intern.plot_th_coefficient)
-        {
-            sb_home_home.append(write_regression_coeffecient_analysis_found_table_html(d,options_intern.html_report_levels_home));
-        }
-
-        sb_home_home.append("</div>\n</button>\n");
-
-        sb_home_home.append(html_tail);
-
-        BufferedWriter bw_home_home = new BufferedWriter(new FileWriter(f_output_website_root.getAbsolutePath()+File.separator+options_intern.html_report_home_home));
-        bw_home_home.write(sb_home_home.toString());
-        bw_home_home.close();
-
         File html_home_distribution_analysis = new File(f_output_website_root.getAbsolutePath()+File.separator+options_intern.html_report_home_distribution_analysis);
         StringBuilder sb_home_distribution_analysis = new StringBuilder();
 
         sb_home_distribution_analysis.append(html_header);
+        sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_cumulative_gain.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>DISCOUNTED CUMULATIVE GAIN</button></a></div>");
         sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_ALL.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
-        sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_cumulative_gain.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>CUMULATIVE GAIN</button></a></div>");
 
 
         for(File fileDir_stat: f_distr_stats_HM.listFiles())
@@ -732,7 +915,7 @@ public class COM2POSE_lib
                         double current_diff_gene_expr = group_clash_diff_gene_expr.get(k_group_clash);
                         double current_gene_counts = tp_gene_count.get(split_clash[0]) + tp_gene_count.get(split_clash[1]);
 
-                        double current_tf_score = current_gene_counts * current_diff_gene_expr;
+                        double current_tf_score = current_gene_counts;
                         if (current_tf_score < 0) {
                             current_tf_score *= -1;
                         }
@@ -7381,7 +7564,6 @@ public class COM2POSE_lib
                     if(level.equals(options_intern.html_report_levels_3_steps))
                     {
                         sb.append("<img src=\".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"is_available.png"+"\" style=\"width:50px;height:50px;\"/>");
-
                     }
                     sb.append("\t\t\t\t</th>\n");
                 }
@@ -7525,7 +7707,7 @@ public class COM2POSE_lib
                 "  font-size: 15px;\n" +
                 "  margin: 4px 2px;\n" +
                 "  cursor: pointer;\n" +
-                "  width: 130px;\n" +
+                "  width: 180px;\n" +
                 "}\n"+
                 "</style>\n" +
                 "<body>\n" +
@@ -7821,7 +8003,7 @@ public class COM2POSE_lib
         int rank = 1;
         for(Analysis_distribution_stats as : all_considered_tfs)
         {
-            sb.append("<div class='w3-content'>\n");
+            sb.append("<div id='"+as.label.toUpperCase()+"' class='w3-content'>\n");
             sb.append("<h2>"+rank+". <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+as.label.toUpperCase()+"' target='_blank'><button class='button'>"+ as.label.toUpperCase()+ "</button></a></h2>\n");
 
             sb.append("<h5>Distribution Analysis Details:</h5>\n");
@@ -7897,7 +8079,7 @@ public class COM2POSE_lib
 
     }
 
-    private String get_html_table_found_tfs_in_distribution_analysis(ArrayList<File> files_stat, String level) throws IOException {
+    private String get_html_table_found_tfs_in_distribution_analysis(ArrayList<File> files_stat, String level, HashMap<String,Integer> fin_rank) throws IOException {
         StringBuilder sb_table = new StringBuilder();
 
         HashMap<String,ArrayList<Analysis_distribution_stats>> hm_distribution_stats = new HashMap<>();
@@ -7912,28 +8094,6 @@ public class COM2POSE_lib
             Analysis_distribution_stats_object stats_object = get_distribution_analysis_stats_ordered(fileDir_hm);
 
             ArrayList<Analysis_distribution_stats> all_considered_tfs = stats_object.ordered_tfs;
-
-            /*
-            BufferedReader br = new BufferedReader(new FileReader(stats_file));
-            String line = br.readLine();
-            line=br.readLine();
-            while((line=br.readLine())!=null)
-            {
-                String[] split = line.split("\t");
-
-                Analysis_distribution_stats tf = new Analysis_distribution_stats();
-                tf.label = split[1];
-                tf.sum_all_values = Double.parseDouble(split[2]);
-                tf.number_target_genes = Double.parseDouble(split[3]);
-                tf.mean=Double.parseDouble(split[4]);
-                tf.median=Double.parseDouble(split[5]);
-                tf.quantile_95=Double.parseDouble(split[6]);
-                tf.quantile_99=Double.parseDouble(split[7]);
-                all_considered_tfs.add(tf);
-            }
-            br.close();
-
-            Collections.sort(all_considered_tfs);*/
 
             hm_distribution_stats.put(name,all_considered_tfs);
             hm_names_order.add(name);
@@ -7953,7 +8113,31 @@ public class COM2POSE_lib
             sb_table.append("RANK");
             sb_table.append("\t\t\t\t</th>\n");
         }
+        sb_table.append("\t\t\t\t<th>\n");
+        sb_table.append("DISCOUNTED CUMULATIVE GAIN");
+        sb_table.append("\t\t\t\t</th>\n");
+        sb_table.append("\t\t\t\t<th>\n");
+        sb_table.append("RANK");
+        sb_table.append("\t\t\t\t</th>\n");
         sb_table.append("\t\t</tr>\n");
+
+        String rel_path ="";
+        if(level.equals(options_intern.html_report_levels_home))
+        {
+            rel_path+= options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
+        }
+        if(level.equals(options_intern.html_report_levels_2_steps))
+        {
+            rel_path+= ".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
+        }
+        if(level.equals(options_intern.html_report_levels_3_steps))
+        {
+            rel_path+= ".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
+        }
+        if(level.equals(options_intern.html_report_levels_4_steps))
+        {
+            rel_path+= ".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
+        }
 
         for(String k_tf: options_intern.website_interesting_tfs)
         {
@@ -7978,25 +8162,6 @@ public class COM2POSE_lib
                     rank_max++;
                 }
 
-                String rel_path ="";
-                if(level.equals(options_intern.html_report_levels_home))
-                {
-                    rel_path+= options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
-                }
-                if(level.equals(options_intern.html_report_levels_2_steps))
-                {
-                    rel_path+= ".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
-                }
-                if(level.equals(options_intern.html_report_levels_3_steps))
-                {
-                    rel_path+= ".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
-                }
-                if(level.equals(options_intern.html_report_levels_4_steps))
-                {
-                    rel_path+= ".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
-                }
-
-
                 if(rank_intern!=-1)
                 {
                     sb_table.append("\t\t\t\t<th>\n");
@@ -8017,6 +8182,26 @@ public class COM2POSE_lib
                 }
 
             }
+            if(fin_rank.containsKey(k_tf))
+            {
+                sb_table.append("\t\t\t\t<th>\n");
+                sb_table.append("<img src=\""+rel_path+File.separator+"is_available.png\" style=\"width:50px;height:50px;\"/>");
+                sb_table.append("\t\t\t\t</th>\n");
+                sb_table.append("\t\t\t\t<th>\n");
+                sb_table.append(fin_rank.get(k_tf)+"/"+fin_rank.size());
+                sb_table.append("\t\t\t\t</th>\n");
+            }
+            else
+            {
+                sb_table.append("\t\t\t\t<th>\n");
+                sb_table.append("<img src=\""+rel_path+File.separator+"not_available.png\" style=\"width:50px;height:50px;\"/>");
+                sb_table.append("\t\t\t\t</th>\n");
+                sb_table.append("\t\t\t\t<th>\n");
+                sb_table.append("-");
+                sb_table.append("\t\t\t\t</th>\n");
+            }
+
+
             sb_table.append("\t\t\t</tr>\n");
 
         }

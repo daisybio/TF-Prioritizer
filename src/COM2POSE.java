@@ -79,7 +79,7 @@ public class COM2POSE
         //DISTRIBUTION ANALYSIS
         //com2pose_lib.perform_distribution_analysis();
         //com2pose_lib.create_distribution_plots();
-        com2pose_lib.create_overview_html_report_distribution();
+        //com2pose_lib.create_overview_html_report_distribution();
         com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();
 
 

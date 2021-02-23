@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class Analysis_distribution_stats_cumulative_gain implements Comparable {
 
     public String label;
-    public int rank;
+    public double rank;
     public HashMap<String,Analysis_distribution_stats> group_object;
     public HashMap<String,Analysis_distribution_stats> group_background;
 
@@ -15,11 +15,11 @@ public class Analysis_distribution_stats_cumulative_gain implements Comparable {
 
         if(other.rank > this.rank)
         {
-            return -1;
+            return 1;
         }
         else
         {
-            return 1;
+            return -1;
         }
     }
 }
