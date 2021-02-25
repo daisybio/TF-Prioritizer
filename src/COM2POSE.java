@@ -16,7 +16,8 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
-        /*
+
+        
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -36,23 +37,25 @@ public class COM2POSE
         {
             com2pose_lib.get_ensg_symbol_mapping();
         }
-           */
-        //com2pose_lib.create_DESeq2_scripts();
-        /*
+
+        com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.run_and_postprocess_DESeq2();
 
-        //TEPIC
-        com2pose_lib.run_tepic();*/
-        //com2pose_lib.postprocess_tepic_output();
-        /*
-        //TGen
-        if(!options_intern.path_tgen.equals(""))
-        {
+
+        if(!options_intern.path_tgen.equals("")) {
             com2pose_lib.preprocess_tgen();
             com2pose_lib.run_tgen();
             com2pose_lib.merge_tgen();
-            com2pose_lib.create_tgen_groups();
+        }
 
+        //TEPIC
+        com2pose_lib.run_tepic();
+        com2pose_lib.postprocess_tepic_output();
+
+        //TGen
+        if(!options_intern.path_tgen.equals(""))
+        {
+            com2pose_lib.create_tgen_groups();
             com2pose_lib.filter_target_genes_tgen();
 
             if(options_intern.tgen_self_regulatory)
@@ -65,21 +68,19 @@ public class COM2POSE
         com2pose_lib.preprocess_dynamite();
         com2pose_lib.run_DYNAMITE();
 
-        */
-
         //PLOTS
-        //com2pose_lib.create_tp_plots();
-        //com2pose_lib.analyze_plots_data();
-        //com2pose_lib.get_top_k_target_genes_plots();
+        com2pose_lib.create_tp_plots();
+        com2pose_lib.analyze_plots_data();
+        com2pose_lib.get_top_k_target_genes_plots();
 
 
         //CREATE OVERVIEW WEBSITE FOR EVERYTHING BEFORE DISTRIBUTION
-        //com2pose_lib.create_overview_html_report_before_distribution_analysis();
+        com2pose_lib.create_overview_html_report_before_distribution_analysis();
 
         //DISTRIBUTION ANALYSIS
-        //com2pose_lib.perform_distribution_analysis();
-        //com2pose_lib.create_distribution_plots();
-        //com2pose_lib.create_overview_html_report_distribution();
+        com2pose_lib.perform_distribution_analysis();
+        com2pose_lib.create_distribution_plots();
+        com2pose_lib.create_overview_html_report_distribution();
         com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();
 
 

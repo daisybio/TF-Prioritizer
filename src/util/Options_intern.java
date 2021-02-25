@@ -239,6 +239,8 @@ public class Options_intern
     public double tepic_tpm_cutoff=-1;
     //#[OPT]: path to input file ensg to gene symbol file, required for TPM filter
     public String tepic_ensg_symbol="";
+    //#[OPT]: use only tgene linked target genes default: true
+    public boolean tepic_tgene_target_genes=true;
 
     /*######################
      ####TGENE parameters###

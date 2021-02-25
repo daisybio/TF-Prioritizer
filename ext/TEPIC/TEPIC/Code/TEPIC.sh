@@ -62,8 +62,9 @@ genecountsfile="NOT_SET"
 gene_annot_desq2="NOT_SET"
 ensg_sym_map="NOT_SET"
 tpm_cutoff=-1.0
+tgene_file="NOT_SET"
 #Parsing command line
-while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjtG:T:A:E:" o;
+while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjtG:T:A:E:L:" o;
 do
 case $o in
 	g)	genome=$OPTARG;;
@@ -96,6 +97,7 @@ case $o in
   T) tpm_cutoff=$OPTARG;;
   A) gene_annot_desq2=$OPTARG;;
   E) ensg_sym_map=$OPTARG;;
+  L) tgene_file=$OPTARG;;
 esac
 done
 
@@ -298,7 +300,7 @@ fi
 if [ -n "$filter" ];
 then
 echo "Filter total peak set"
-python ${working_dir}/generateIntersectionWindows.py ${filter} ${window} ${geneBody} ${transcripts} > ${prefix}_gene_windows.temp.bed 
+python3 ${working_dir}/generateIntersectionWindows.py ${filter} ${window} ${geneBody} ${transcripts} > ${prefix}_gene_windows.temp.bed
 bedtools intersect -b ${prefix}_gene_windows.temp.bed -a ${filteredRegions}_sorted.bed -u > ${filteredRegions}_temp.bed
 mv ${filteredRegions}_temp.bed ${filteredRegions}_sorted.bed
 #rm ${prefix}_gene_windows.temp.bed
@@ -308,7 +310,7 @@ fi
 if [ -n "$randomGenome" ];
 then
 echo "Generating random genomic regions"
-python ${working_dir}/findBackground.py -i ${filteredRegions}_sorted.bed -g ${randomGenome} -o ${prefix}_Random_Regions.bed -w ${cores} --time-out ${minutes}
+python3 ${working_dir}/findBackground.py -i ${filteredRegions}_sorted.bed -g ${randomGenome} -o ${prefix}_Random_Regions.bed -w ${cores} --time-out ${minutes}
 fi
 
 if [ ${chrPrefix} == "TRUE" ];
@@ -345,12 +347,12 @@ fi
 
 echo "Converting invalid characters"
 #Remove R and Y from the sequence
-python ${working_dir}/convertInvalidCharacterstoN.py $openRegionSequences $prefix-FilteredSequences.fa
+python3 ${working_dir}/convertInvalidCharacterstoN.py $openRegionSequences $prefix-FilteredSequences.fa
 #rm $openRegionSequences
 
 if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 then
-python ${working_dir}/convertInvalidCharacterstoN.py ${openRegionSequences}_Random $prefix-Random-FilteredSequences.fa
+python3 ${working_dir}/convertInvalidCharacterstoN.py ${openRegionSequences}_Random $prefix-Random-FilteredSequences.fa
 #rm ${openRegionSequences}_Random
 fi
 
@@ -388,14 +390,14 @@ fi
 if [ -n "$dnase" ] ;
 then 
 	sort -s -k1,1 -k2,2 -k3,3 $dnase > ${dnase}_sorted
-	python ${working_dir}/computeDNaseCoverage.py ${dnase}_sorted ${filteredRegions}_sorted.bed > ${prefix}_Peak_Coverage.txt
+	python3 ${working_dir}/computeDNaseCoverage.py ${dnase}_sorted ${filteredRegions}_sorted.bed > ${prefix}_Peak_Coverage.txt
 	#rm ${dnase}_sorted
 	if [ "$originalScaling" == "TRUE" ];
 	then
-		python ${working_dir}/scaleAffinity.py --is-sorted -s ${prefix}_Peak_Coverage.txt -a ${affinity}_temp > ${prefix}_Scaled_Affinity_temp.txt
+		python3 ${working_dir}/scaleAffinity.py --is-sorted -s ${prefix}_Peak_Coverage.txt -a ${affinity}_temp > ${prefix}_Scaled_Affinity_temp.txt
 		if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 		then
-			python ${working_dir}/scaleAffinity.py --is-sorted -s ${prefix}_Peak_Coverage.txt -a ${prefix}_Filtered_Affinities_temp.txt > ${prefix}_Filtered_Scaled_Affinity_temp.txt
+			python3 ${working_dir}/scaleAffinity.py --is-sorted -s ${prefix}_Peak_Coverage.txt -a ${prefix}_Filtered_Affinities_temp.txt > ${prefix}_Filtered_Scaled_Affinity_temp.txt
 		fi
 	fi
 fi
@@ -404,10 +406,10 @@ if [ -n "${column}" ] ;
 then
 	if [ "$originalScaling" == "TRUE" ] ;
 	then
-		python ${working_dir}/scaleAffinity.py --is-sorted --scale-col ${column} -s ${filteredRegions}_sorted.bed -a ${affinity}_temp > ${prefix}_Scaled_Affinity_temp.txt
+		python3 ${working_dir}/scaleAffinity.py --is-sorted --scale-col ${column} -s ${filteredRegions}_sorted.bed -a ${affinity}_temp > ${prefix}_Scaled_Affinity_temp.txt
 		if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 		then
-			python ${working_dir}/scaleAffinity.py --is-sorted --scale-col ${column} -s ${filteredRegions}_sorted.bed -a ${prefix}_Filtered_Affinities_temp.txt > ${prefix}_Filtered_Scaled_Affinity_temp.txt
+			python3 ${working_dir}/scaleAffinity.py --is-sorted --scale-col ${column} -s ${filteredRegions}_sorted.bed -a ${prefix}_Filtered_Affinities_temp.txt > ${prefix}_Filtered_Scaled_Affinity_temp.txt
 		fi
 	else
 		cut -f 1,2,3,${column} ${filteredRegions}_sorted.bed > ${prefix}_Peak_Coverage.txt
@@ -417,10 +419,10 @@ fi
 
 #Removing regions that could not be annotated
 echo "Filter regions that could not be annotated"
-python ${working_dir}/filterInvalidRegions.py ${affinity}_temp $affinity
+python3 ${working_dir}/filterInvalidRegions.py ${affinity}_temp $affinity
 if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ] ;
 then
-	python ${working_dir}/filterInvalidRegions.py ${prefix}_Filtered_Affinities_temp.txt ${prefix}_Thresholded_Affinities.txt
+	python3 ${working_dir}/filterInvalidRegions.py ${prefix}_Filtered_Affinities_temp.txt ${prefix}_Thresholded_Affinities.txt
 	#rm ${prefix}_Filtered_Affinities_temp.txt
 fi
 #rm ${affinity}_temp
@@ -429,11 +431,11 @@ if [ -n "$dnase" ] ||  [ -n "$column" ] ;
 then
 	if [ "$originalScaling" == "TRUE" ] ;
 	then
-		python ${working_dir}/filterInvalidRegions.py ${prefix}_Scaled_Affinity_temp.txt ${prefix}_Scaled_Affinity.txt
+		python3 ${working_dir}/filterInvalidRegions.py ${prefix}_Scaled_Affinity_temp.txt ${prefix}_Scaled_Affinity.txt
 		#rm ${prefix}_Scaled_Affinity_temp.txt
 		if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 		then
-			python ${working_dir}/filterInvalidRegions.py ${prefix}_Filtered_Scaled_Affinity_temp.txt ${prefix}_Thresholded_Scaled_Affinity.txt
+			python3 ${working_dir}/filterInvalidRegions.py ${prefix}_Filtered_Scaled_Affinity_temp.txt ${prefix}_Thresholded_Scaled_Affinity.txt
 			#rm ${prefix}_Filtered_Scaled_Affinity_temp.txt
 		fi
 	fi
@@ -450,24 +452,24 @@ then
 		then
 			if [ "$originalScaling" == "FALSE" ] ;
 			then
-				python ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--peakCoverage" ${prefix}_Peak_Coverage.txt "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--lwindows" ${loopWindow} "--conformationData" ${loopList}
+				python3 ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--peakCoverage" ${prefix}_Peak_Coverage.txt "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--lwindows" ${loopWindow} "--conformationData" ${loopList} "--tgeneFile" ${tgene_file}
 			else
-				python ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay  "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--signalScale" ${prefix}_Scaled_Affinity.txt "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--lwindows" ${loopWindow} "--conformationData" ${loopList}
+				python3 ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay  "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--signalScale" ${prefix}_Scaled_Affinity.txt "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--lwindows" ${loopWindow} "--conformationData" ${loopList} "--tgeneFile" ${tgene_file}
 			fi
 		else
-			python ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--geneBody" $geneBody "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--lwindows" ${loopWindow} "--conformationData" ${loopList}
+			python3 ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--geneBody" $geneBody "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--lwindows" ${loopWindow} "--conformationData" ${loopList} "--tgeneFile" ${tgene_file}
 		fi 
 	else
 		if [ -n "$dnase" ] ||  [ -n "$column" ] ;
 		then
 			if [ "$originalScaling" == "FALSE" ] ;
 			then
-				python ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--peakCoverage" ${prefix}_Peak_Coverage.txt "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts}
+				python3 ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--peakCoverage" ${prefix}_Peak_Coverage.txt "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--tgeneFile" ${tgene_file}
 			else
-				python ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay  "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--signalScale" ${prefix}_Scaled_Affinity.txt "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts}
+				python3 ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay  "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--signalScale" ${prefix}_Scaled_Affinity.txt "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--tgeneFile" ${tgene_file}
 			fi
 		else
-			python ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--geneBody" $geneBody "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts}
+			python3 ${working_dir}/annotateTSS.py ${annotation} ${affinity} "--geneViewAffinity" ${prefix}_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--geneBody" $geneBody "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures}  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--tgeneFile" ${tgene_file}
 		fi
 	fi 
 
@@ -477,12 +479,12 @@ then
 			then
 			if [ "$originalScaling" == "FALSE" ] ;
 				then
-				python ${working_dir}/annotateTSS.py ${annotation} ${prefix}_Thresholded_Affinities.txt "--geneViewAffinity" ${prefix}_Thresholded_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--peakCoverage" ${prefix}_Peak_Coverage.txt "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures} "--sparseRep" $sparsity  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts}
+				python3 ${working_dir}/annotateTSS.py ${annotation} ${prefix}_Thresholded_Affinities.txt "--geneViewAffinity" ${prefix}_Thresholded_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--peakCoverage" ${prefix}_Peak_Coverage.txt "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures} "--sparseRep" $sparsity  "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--tgeneFile" ${tgene_file}
 				else
-				python ${working_dir}/annotateTSS.py ${annotation} ${prefix}_Thresholded_Affinities.txt "--geneViewAffinity" ${prefix}_Thresholded_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--sparseRep" $sparsity "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--signalScale" ${prefix}_Thresholded_Scaled_Affinity.txt "--additionalPeakFeatures" ${peakFeatures} "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts}
+				python3 ${working_dir}/annotateTSS.py ${annotation} ${prefix}_Thresholded_Affinities.txt "--geneViewAffinity" ${prefix}_Thresholded_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--sparseRep" $sparsity "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--signalScale" ${prefix}_Thresholded_Scaled_Affinity.txt "--additionalPeakFeatures" ${peakFeatures} "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--tgeneFile" ${tgene_file}
 			fi
 		else
-		python ${working_dir}/annotateTSS.py ${annotation} ${prefix}_Thresholded_Affinities.txt "--geneViewAffinity" ${prefix}_Thresholded_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--geneBody" $geneBody "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures} "--sparseRep" $sparsity "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts}
+		python3 ${working_dir}/annotateTSS.py ${annotation} ${prefix}_Thresholded_Affinities.txt "--geneViewAffinity" ${prefix}_Thresholded_Affinity_Gene_View.txt "--windows" $window "--decay" $decay "--geneBody" $geneBody "--geneBody" ${geneBody} "--normaliseLength" ${lengthNorm} "--motifLength" ${motifLength} "--additionalPeakFeatures" ${peakFeatures} "--sparseRep" $sparsity "--onlyPeakFeatures" ${onlyPeakFeatures} "--transcript" ${transcripts} "--tgeneFile" ${tgene_file}
 		fi
 	fi
 	#Creating files containing only genes for which TF predictions are available
@@ -495,38 +497,38 @@ then
 			then
 				if [ "$originalScaling" == "FALSE" ];
 				then
-					python ${working_dir}/filterGeneView.py ${prefix}_Decay_Three_Peak_Based_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Decay_Three_Peak_Based_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Decay_Three_Peak_Based_Features_Affinity_Gene_View.txt
 					if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 					then
-						python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Three_Peak_Based_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+						python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Three_Peak_Based_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 						#rm ${prefix}_Thresholded_Decay_Three_Peak_Based_Features_Affinity_Gene_View.txt
 					fi
 				else
-					python ${working_dir}/filterGeneView.py ${prefix}_Decay_Scaled_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Decay_Scaled_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Decay_Scaled_Peak_Features_Affinity_Gene_View.txt
 					if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 					then
-						python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Scaled_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+						python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Scaled_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 						#rm ${prefix}_Thresholded_Decay_Scaled_Peak_Features_Affinity_Gene_View.txt
 					fi
 				fi
 			else
 				if [ "$originalScaling" == "TRUE" ];
 				then
-					python ${working_dir}/filterGeneView.py ${prefix}_Decay_Scaled_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Decay_Scaled_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Decay_Scaled_Affinity_Gene_View.txt
 					if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 					then
-						python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Scaled_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+						python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Scaled_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 						#rm ${prefix}_Thresholded_Decay_Scaled_Affinity_Gene_View.txt
 					fi
 				else
-					python ${working_dir}/filterGeneView.py ${prefix}_Decay_Signal_Feature_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Decay_Signal_Feature_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Decay_Signal_Feature_Affinity_Gene_View.txt
 					if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 					then
-						python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Signal_Feature_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+						python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Signal_Feature_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 						#rm ${prefix}_Thresholded_Decay_Signal_Feature_Affinity_Gene_View.txt
 					fi
 				fi
@@ -534,19 +536,19 @@ then
 		fi
 			if [ "$peakFeatures" == "TRUE" ];
 			then
-				python ${working_dir}/filterGeneView.py ${prefix}_Decay_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+				python3 ${working_dir}/filterGeneView.py ${prefix}_Decay_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 				#rm ${prefix}_Decay_Peak_Features_Affinity_Gene_View.txt
 				if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 				then
-					python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Thresholded_Decay_Peak_Features_Affinity_Gene_View.txt
 				fi
 			else
-				python ${working_dir}/filterGeneView.py ${prefix}_Decay_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+				python3 ${working_dir}/filterGeneView.py ${prefix}_Decay_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 				#rm ${prefix}_Decay_Affinity_Gene_View.txt
 				if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 				then
-					python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Decay_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Thresholded_Decay_Affinity_Gene_View.txt
 				fi
 			fi		
@@ -557,38 +559,38 @@ then
 			then
 				if [ "$originalScaling" == "FALSE" ];
 				then
-					python ${working_dir}/filterGeneView.py ${prefix}_Three_Peak_Based_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Three_Peak_Based_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Three_Peak_Based_Features_Affinity_Gene_View.txt
 					if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 					then
-						python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Three_Peak_Based_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+						python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Three_Peak_Based_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 						#rm ${prefix}_Thresholded_Three_Peak_Based_Features_Affinity_Gene_View.txt
 					fi
 				else
-					python ${working_dir}/filterGeneView.py ${prefix}_Scaled_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Scaled_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Scaled_Peak_Features_Affinity_Gene_View.txt
 					if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 					then
-						python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Scaled_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+						python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Scaled_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 						#rm ${prefix}_Thresholded_Scaled_Peak_Features_Affinity_Gene_View.txt
 					fi
 				fi
 			else
 				if [ "$originalScaling" == "TRUE" ];
 				then
-					python ${working_dir}/filterGeneView.py ${prefix}_Scaled_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Scaled_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Scaled_Affinity_Gene_View.txt
 					if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 					then
-						python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Scaled_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+						python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Scaled_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 						#rm ${prefix}_Thresholded_Scaled_Affinity_Gene_View.txt
 					fi
 				else
-					python ${working_dir}/filterGeneView.py ${prefix}_Signal_Feature_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Signal_Feature_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Signal_Feature_Affinity_Gene_View.txt
 					if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 					then
-						python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Signal_Feature_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+						python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Signal_Feature_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 						#rm ${prefix}_Thresholded_Signal_Feature_Affinity_Gene_View.txt
 					fi
 				fi
@@ -596,19 +598,19 @@ then
 		fi
 			if [ "$peakFeatures" == "TRUE" ]
 			then
-				python ${working_dir}/filterGeneView.py ${prefix}_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+				python3 ${working_dir}/filterGeneView.py ${prefix}_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 				#rm ${prefix}_Peak_Features_Affinity_Gene_View.txt
 				if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 				then
-					python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Peak_Features_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Thresholded_Peak_Features_Affinity_Gene_View.txt
 				fi
 			else
-				python ${working_dir}/filterGeneView.py ${prefix}_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+				python3 ${working_dir}/filterGeneView.py ${prefix}_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 				#rm ${prefix}_Affinity_Gene_View.txt
 				if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 				then
-					python ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
+					python3 ${working_dir}/filterGeneView.py ${prefix}_Thresholded_Affinity_Gene_View.txt ${genecountsfile} ${tpm_cutoff} ${gene_annot_desq2} ${ensg_sym_map} ${annotation}
 					#rm ${prefix}_Thresholded_Affinity_Gene_View.txt
 				fi
 			fi

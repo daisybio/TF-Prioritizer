@@ -1506,6 +1506,12 @@ public class COM2POSE_lib
                 sb_parameter.append("\t\t\t\t<th>#[REQ]: IF NOT SET MAPPING WILL BE PERFORMED AUTOMATICALLY - path to input file ensg to gene symbol file\n</th>");
                 sb_parameter.append("\t\t\t</tr>");
 
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>tepic_tgene_target_genes</th>");
+                sb_parameter.append("\t\t\t\t<th>"+options_intern.tepic_tgene_target_genes+"</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: use only tgene linked target genes default: true\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
+
                 sb_parameter.append("\t\t</table>");
                 sb_parameter.append("</div>\n</button>\n");
 
@@ -3337,7 +3343,7 @@ public class COM2POSE_lib
 
                         File input_diff_gene_expr = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_output+File.separator+fileDirGroups.getName()+options_intern.file_suffix_deseq2_output_DYNAMITE);
 
-                        String command = "python " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"integrateData.py";
+                        String command = "python3 " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"integrateData.py";
                         command += " "+ input_ratios.getAbsolutePath();
                         command += " " + input_diff_gene_expr.getAbsolutePath();
                         command += " " + folder_output_group.getAbsolutePath()+File.separator+options_intern.file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff;
@@ -3786,6 +3792,34 @@ public class COM2POSE_lib
      */
     public void create_tgen_groups() throws IOException {
         logger.logLine("[TGENE] Create TGene groupe data");
+
+        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        if(options_intern.mix_option.equals("HM_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+        }
+        if(!options_intern.black_list_dir.equals(""))
+        {
+            File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+            File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
+            output_folder_new_input.mkdir();
+
+            //set new folder directory for tepic input and save old one
+            options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
 
         File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_merged);
         File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_groups);
@@ -4323,6 +4357,34 @@ public class COM2POSE_lib
     public void run_tgen() throws Exception {
         logger.logLine("[TGENE] Run TGene");
 
+        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        if(options_intern.mix_option.equals("HM_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+        }
+        if(!options_intern.black_list_dir.equals(""))
+        {
+            File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+            File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
+            output_folder_new_input.mkdir();
+
+            //set new folder directory for tepic input and save old one
+            options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
+
         String command_base =options_intern.path_tgen+File.separator +"bin"+File.separator+"tgene";
 
         File output_tgen = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output);
@@ -4415,6 +4477,34 @@ public class COM2POSE_lib
      */
     public void preprocess_tgen() throws IOException {
         logger.logLine("[TGENE] Consensus approach with TGen is used. Preprocessing ...");
+
+        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        if(options_intern.mix_option.equals("HM_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+        }
+        if(!options_intern.black_list_dir.equals(""))
+        {
+            File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+            File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
+            output_folder_new_input.mkdir();
+
+            //set new folder directory for tepic input and save old one
+            options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
 
         //create necessary folders for preprocessing
         File f_TGEN = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen);
@@ -4984,7 +5074,7 @@ public class COM2POSE_lib
         }
 
         //prepare command line for all (computeMeanRatioTFAffinities.py
-        String command_base = "python " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"computeMeanRatioTFAffinities.py";
+        String command_base = "python3 " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"computeMeanRatioTFAffinities.py";
 
         for(File fileDir : folder_pp_output.listFiles())
         {
@@ -5225,6 +5315,35 @@ public class COM2POSE_lib
     public void run_tepic() throws Exception {
         logger.logLine("Start TEPIC.sh");
 
+        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        if(options_intern.mix_option.equals("HM_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+        }
+        if(!options_intern.black_list_dir.equals(""))
+        {
+            File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+            File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
+            output_folder_new_input.mkdir();
+
+            //set new folder directory for tepic input and save old one
+            options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
+
+
         String command = "bash";
         String tepic_path = " " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_scripts_code_tepic_sh;
         command += tepic_path;
@@ -5364,6 +5483,13 @@ public class COM2POSE_lib
                         {
                             String n_dir = options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+dirGroup.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts;
                             command_tail_sample += " -G " + n_dir;
+                        }
+
+                        if(!options_intern.path_tgen.equals("") && options_intern.tepic_tgene_target_genes)
+                        {
+                            File f_tgene_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output+File.separator+dirGroup.getName()+File.separator+dirHM.getName()+File.separator+dirGroup.getName()+"_"+dirHM.getName()+File.separator+options_intern.file_suffix_tgen_output);
+                            command_tail_sample += " -L " + f_tgene_input.getAbsolutePath();
+                            logger.logLine("[TEPIC-TGENE] using only tgene linked target genes for TF-Gene score calculation.");
                         }
 
                         String command_execute = command_sample + command_tail_sample;
@@ -6016,6 +6142,24 @@ public class COM2POSE_lib
         f_blacklist_pre.mkdir();
         File f_blacklist_pre_chr = new File(f_blacklist_pre.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_preprocessing_perChr);
         f_blacklist_pre_chr.mkdir();
+
+        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        if(options_intern.mix_option.equals("HM_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+        }
 
         BufferedReader br_chr = new BufferedReader(new FileReader(new File(options_intern.black_list_dir)));
         ArrayList<BL_ranges_binary_tree> chr_ius= new ArrayList<>();
@@ -6846,6 +6990,9 @@ public class COM2POSE_lib
                     break;
                 case "tepic_ensg_symbol":
                     options_intern.tepic_ensg_symbol=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "tepic_tgene_target_genes":
+                    options_intern.tepic_tgene_target_genes=Boolean.parseBoolean(split[1]);
                     break;
                 case "tgen_consensus":
                     options_intern.tgen_consensus=Double.parseDouble(split[1]);
