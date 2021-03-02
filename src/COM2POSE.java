@@ -17,7 +17,7 @@ public class COM2POSE
         com2pose_lib.read_config_file(true);
 
 
-        
+
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {

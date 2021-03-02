@@ -85,7 +85,7 @@ def readOC_Region(filename):
 
 # Extract the TF affinities and compute peak length and count features from the TF affinity file
 def extractTF_Affinity(openRegions, genesInOpenChromatin, filename, genePositions, openChromatin, expDecay, geneBody,
-                       peakFeatures, lengthNormalisation, motifLength, chr_tree):
+                       peakFeatures, lengthNormalisation, motifLength):
     geneAffinities = {}
     numberOfPeaks = {}
     totalPeakLength = {}
@@ -1018,7 +1018,8 @@ def main():
     #will be empty if no tgene file is available
     chr_tree = dict()
     if(args.tgeneFile != None and args.tgeneFile != "NOT_SET"):
-        target_genes=pd.read_table(args.tgeneFile,usecols=("Gene_ID","RE_Locus"), comment="#")
+        target_genes = pd.read_table(args.tgeneFile, usecols=("Gene_ID", "RE_Locus"), comment="#")
+        """ MAYBE I DONT EVEN NEED THE TREE!!
         current_chr=""
         tree = it.IntervalTree()
         re_to_geneID = dict()
@@ -1044,6 +1045,7 @@ def main():
                 if(not it.IntervalTree.__contains__(tree,test_interval)):
                     it.IntervalTree.add(tree,interval=test_interval)
         chr_tree[current_chr] = tree
+        """
 
 
     # Check arguments
@@ -1067,53 +1069,94 @@ def main():
     # Determine gene windows in open chromatin regions
     genesInOpenChromatin = {}
     usedRegions = set()
-    for gene in tss.keys():
-        # Define window borders here
-        if (not geneBody):
-            leftBorder = tss[gene][1][0] - shift
-            rightBorder = tss[gene][1][0] + shift
-        else:
-            if (int(tss[gene][1][0]) < int(tss[gene][1][1])):
-                leftBorder = tss[gene][1][0] - shift
-                rightBorder = tss[gene][1][1]
-            else:
-                leftBorder = tss[gene][1][1]
-                rightBorder = tss[gene][1][0] + shift
-        chrom = tss[gene][0]
-        if (chrom in oC):
-            try:
-                left_item = oC[chrom].find_lt(leftBorder)
-            except ValueError:
+
+    if (args.tgeneFile != None and args.tgeneFile != "NOT_SET"):
+        #print("HERE I NEED TO IMPLEMENT MY STUFF")
+        for i, row in target_genes.iterrows():
+            gene=row[0]
+            region = str(row[1])
+            region_split_first = region.split(":")
+            region_split_second = region_split_first[1].split("-")
+            chrom = region_split_first[0]
+            leftBorder = int(region_split_second[0])
+            rightBorder = int(region_split_second[1])
+            if (chrom in oC):
                 try:
-                    left_item = oC[chrom].find_ge(leftBorder)
+                    left_item = oC[chrom].find_lt(leftBorder)
                 except ValueError:
-                    left_item = None
-            else:
-                if left_item[2] < leftBorder:
                     try:
                         left_item = oC[chrom].find_ge(leftBorder)
                     except ValueError:
                         left_item = None
-            try:
-                right_item = oC[chrom].find_le(rightBorder)
-            except ValueError:
-                right_item = None
-            if left_item is not None and right_item is not None:
-                left_index = oC[chrom].index(left_item)
-                right_index = oC[chrom].index(right_item)
-                if left_index <= right_index:
-                    for i in range(left_index, right_index + 1):
-                        identifier = str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2])
-                        if identifier in genesInOpenChromatin:
-                            genesInOpenChromatin[identifier] += [gene]
-                        else:
-                            genesInOpenChromatin[identifier] = [gene]
-                        usedRegions.add(str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2]))
+                else:
+                    if left_item[2] < leftBorder:
+                        try:
+                            left_item = oC[chrom].find_ge(leftBorder)
+                        except ValueError:
+                            left_item = None
+                try:
+                    right_item = oC[chrom].find_le(rightBorder)
+                except ValueError:
+                    right_item = None
+                if left_item is not None and right_item is not None:
+                    left_index = oC[chrom].index(left_item)
+                    right_index = oC[chrom].index(right_item)
+                    if left_index <= right_index:
+                        for i in range(left_index, right_index + 1):
+                            identifier = str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2])
+                            if identifier in genesInOpenChromatin:
+                                genesInOpenChromatin[identifier] += [gene]
+                            else:
+                                genesInOpenChromatin[identifier] = [gene]
+                            usedRegions.add(str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2]))
+    else:
+        for gene in tss.keys():
+            # Define window borders here
+            if (not geneBody):
+                leftBorder = tss[gene][1][0] - shift
+                rightBorder = tss[gene][1][0] + shift
+            else:
+                if (int(tss[gene][1][0]) < int(tss[gene][1][1])):
+                    leftBorder = tss[gene][1][0] - shift
+                    rightBorder = tss[gene][1][1]
+                else:
+                    leftBorder = tss[gene][1][1]
+                    rightBorder = tss[gene][1][0] + shift
+            chrom = tss[gene][0]
+            if (chrom in oC):
+                try:
+                    left_item = oC[chrom].find_lt(leftBorder)
+                except ValueError:
+                    try:
+                        left_item = oC[chrom].find_ge(leftBorder)
+                    except ValueError:
+                        left_item = None
+                else:
+                    if left_item[2] < leftBorder:
+                        try:
+                            left_item = oC[chrom].find_ge(leftBorder)
+                        except ValueError:
+                            left_item = None
+                try:
+                    right_item = oC[chrom].find_le(rightBorder)
+                except ValueError:
+                    right_item = None
+                if left_item is not None and right_item is not None:
+                    left_index = oC[chrom].index(left_item)
+                    right_index = oC[chrom].index(right_item)
+                    if left_index <= right_index:
+                        for i in range(left_index, right_index + 1):
+                            identifier = str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2])
+                            if identifier in genesInOpenChromatin:
+                                genesInOpenChromatin[identifier] += [gene]
+                            else:
+                                genesInOpenChromatin[identifier] = [gene]
+                            usedRegions.add(str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2]))
 
     # Extract bound transcription factors
     affinities, numberOfPeaks, peakLength = extractTF_Affinity(usedRegions, genesInOpenChromatin, args.affinity[0], tss,
                                                                oC, decay, geneBody, addPeakFT, normaliseLength,
-                                                               motifLengths, chr_tree)
+                                                               motifLengths)
 
     # Generate Peak based features
     if (args.peakCoverage != None):
