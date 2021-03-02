@@ -104,7 +104,10 @@ def extractTF_Affinity(openRegions, genesInOpenChromatin, filename, genePosition
             if (s[0] in genesInOpenChromatin):
                 for geneID in genesInOpenChromatin[s[0]]:
                     if (s[0] in openRegions):
-                        tss = genePositions[geneID][1][0]
+                        if(geneID in genePositions):
+                            tss = genePositions[geneID][1][0]
+                        else:
+                            continue
                         if (expDecay):
                             factor = math.exp(-(float(float(abs(tss - middle)) / 5000.0)))
                             if (geneID in geneAffinities):
