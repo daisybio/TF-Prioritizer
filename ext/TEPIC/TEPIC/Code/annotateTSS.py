@@ -124,6 +124,8 @@ def extractTF_Affinity(openRegions, genesInOpenChromatin, filename, genePosition
                             else:
                                 numbers = list(map(lambda x: float(x) * float(factor), s[1:]))
                                 if (lengthNormalisation):
+                                    if(motifLength==0 or numbers==0 or length ==0 or factor==0):
+                                        continue
                                     geneAffinities[geneID] = list(map(operator.truediv, numbers, list(
                                         map(lambda x: factor * (length - x + 1) if (length - x + 1 > 0) else 1,
                                             motifLength))))
@@ -1076,7 +1078,7 @@ def main():
     if (args.tgeneFile != None and args.tgeneFile != "NOT_SET"):
         #print("HERE I NEED TO IMPLEMENT MY STUFF")
         for i, row in target_genes.iterrows():
-            gene=row[0]
+            gene= "\""+row[0]+"\";"
             region = str(row[1])
             region_split_first = region.split(":")
             region_split_second = region_split_first[1].split("-")
