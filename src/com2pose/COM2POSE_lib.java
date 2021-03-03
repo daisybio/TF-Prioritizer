@@ -5494,7 +5494,7 @@ public class COM2POSE_lib
 
                         String command_execute = command_sample + command_tail_sample;
                         logger.logLine("[TEPIC] execute TEPIC with command line: " + command_execute);
-                        Process child = Runtime.getRuntime().exec(command_execute);
+                        /*Process child = Runtime.getRuntime().exec(command_execute);
                         int code = child.waitFor();
                         switch (code){
                             case 0:
@@ -5502,7 +5502,7 @@ public class COM2POSE_lib
                             case 1:
                                 String message = child.getErrorStream().toString();
                                 throw new Exception(message);
-                        }
+                        }*/
                     }
                 }
             }

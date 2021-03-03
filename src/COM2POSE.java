@@ -16,6 +16,7 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
+
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -46,6 +47,7 @@ public class COM2POSE
             com2pose_lib.merge_tgen();
         }
 
+         
         //TEPIC
         com2pose_lib.run_tepic();
         com2pose_lib.postprocess_tepic_output();

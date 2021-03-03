@@ -112,6 +112,8 @@ def extractTF_Affinity(openRegions, genesInOpenChromatin, filename, genePosition
                             factor = math.exp(-(float(float(abs(tss - middle)) / 5000.0)))
                             if (geneID in geneAffinities):
                                 if (lengthNormalisation):
+                                    if (motifLength == 0 or length == 0 or factor == 0):
+                                        continue
                                     geneAffinities[geneID] = list(map(operator.add, geneAffinities[geneID], list(
                                         map(operator.truediv, list(map(lambda x: factor * float(x), s[1:])), list(
                                             map(lambda x: factor * (length - x + 1) if (length - x + 1 > 0) else 1,
