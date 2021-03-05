@@ -1079,6 +1079,9 @@ def main():
 
     if (args.tgeneFile != None and args.tgeneFile != "NOT_SET"):
         #print("HERE I NEED TO IMPLEMENT MY STUFF")
+
+        found_genes=set()
+
         for i, row in target_genes.iterrows():
             gene= "\""+row[0]+"\";"
             region = str(row[1])
@@ -1113,9 +1116,58 @@ def main():
                             identifier = str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2])
                             if identifier in genesInOpenChromatin:
                                 genesInOpenChromatin[identifier] += [gene]
+                                found_genes.add(gene)
                             else:
                                 genesInOpenChromatin[identifier] = [gene]
+                                found_genes.add(gene)
                             usedRegions.add(str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2]))
+
+        #for all not found genes TGENE try to find TEPIC based REs
+        for gene in tss.keys():
+            if(gene in found_genes):
+                continue
+            if (not geneBody):
+                leftBorder = tss[gene][1][0] - shift
+                rightBorder = tss[gene][1][0] + shift
+            else:
+                if (int(tss[gene][1][0]) < int(tss[gene][1][1])):
+                    leftBorder = tss[gene][1][0] - shift
+                    rightBorder = tss[gene][1][1]
+                else:
+                    leftBorder = tss[gene][1][1]
+                    rightBorder = tss[gene][1][0] + shift
+            chrom = tss[gene][0]
+            if (chrom in oC):
+                try:
+                    left_item = oC[chrom].find_lt(leftBorder)
+                except ValueError:
+                    try:
+                        left_item = oC[chrom].find_ge(leftBorder)
+                    except ValueError:
+                        left_item = None
+                else:
+                    if left_item[2] < leftBorder:
+                        try:
+                            left_item = oC[chrom].find_ge(leftBorder)
+                        except ValueError:
+                            left_item = None
+                try:
+                    right_item = oC[chrom].find_le(rightBorder)
+                except ValueError:
+                    right_item = None
+                if left_item is not None and right_item is not None:
+                    left_index = oC[chrom].index(left_item)
+                    right_index = oC[chrom].index(right_item)
+                    if left_index <= right_index:
+                        for i in range(left_index, right_index + 1):
+                            identifier = str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(
+                                oC[chrom][i][2])
+                            if identifier in genesInOpenChromatin:
+                                genesInOpenChromatin[identifier] += [gene]
+                            else:
+                                genesInOpenChromatin[identifier] = [gene]
+                            usedRegions.add(
+                                str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2]))
     else:
         for gene in tss.keys():
             # Define window borders here
