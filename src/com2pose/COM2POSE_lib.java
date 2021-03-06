@@ -5971,7 +5971,7 @@ public class COM2POSE_lib
         sb.append("\n");
 
         sb.append("df$id <- NA\n" +
-                "G_list <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\"mgi_symbol\"),values=df$Geneid,mart= mart)\n" +
+                "G_list <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\""+options_intern.deseq2_biomart_dataset_symbol_column+"\"),values=df$Geneid,mart= mart)\n" +
                 "write.table(G_list,\""+results.getAbsolutePath()+"\", row.names = FALSE, quote = F, sep=\"\\t\")\n");
 
 
@@ -6905,6 +6905,9 @@ public class COM2POSE_lib
                     break;
                 case "deseq2_biomart_dataset_species":
                     options_intern.deseq2_biomart_dataset_species=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "deseq2_biomart_dataset_symbol_column":
+                    options_intern.deseq2_biomart_dataset_symbol_column=split[1].substring(1,split[1].length()-1);
                     break;
                 case "deseq2_count_threshold":
                     options_intern.deseq2_count_threshold=Integer.parseInt(split[1]);

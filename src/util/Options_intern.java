@@ -175,6 +175,8 @@ public class Options_intern
     public String deseq2_input_gene_id="";
     //#[OPT]:
     public String deseq2_biomart_dataset_species="";
+    //#[REQ]: biomart dataset column for gene symbols (e.g. human: hgnc_symbol, mouse: mgi_symbol)
+    public String deseq2_biomart_dataset_symbol_column="mgi_symbol";
     //#[OPT]: minimum count over all samples of two timepoints for DESeq2, default: 0
     public int deseq2_count_threshold=0;
     /*
