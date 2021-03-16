@@ -27,7 +27,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../SPONGEdb_TCGA/src/get_best_mirnas_to_target_genes/plot_mimat_target_genes_regression_coefficient.py" />
+    <property name="last_opened_file_path" value="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/14_LIKE_10_TGENE_FILT_SELF_REG/working_dir/09_PLOTS_output/Pol2/0.1/DAVID_test.py" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -36,7 +36,29 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Python.test_boxplot_interactive">
+  <component name="RunManager" selected="Python.DAVID_test">
+    <configuration name="DAVID_test" type="PythonConfigurationType" factoryName="Python">
+      <module name="TEPIC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python3.8" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/14_LIKE_10_TGENE_FILT_SELF_REG/working_dir/09_PLOTS_output/Pol2/0.1" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/14_LIKE_10_TGENE_FILT_SELF_REG/working_dir/09_PLOTS_output/Pol2/0.1/DAVID_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="H3K4me3_0.1" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -251,6 +273,7 @@
     <list>
       <item itemvalue="Python.H3K4me3_0.1" />
       <item itemvalue="Python.test_boxplot_interactive" />
+      <item itemvalue="Python.DAVID_test" />
       <item itemvalue="Python.analyse_tf_to_background" />
       <item itemvalue="Python.annotateTSS" />
       <item itemvalue="Python.plot_mimat_target_genes_regression_coefficient" />
@@ -316,6 +339,9 @@
       <workItem from="1614781982772" duration="599000" />
       <workItem from="1614928760943" duration="2947000" />
       <workItem from="1615197509797" duration="4099000" />
+      <workItem from="1615545041671" duration="1075000" />
+      <workItem from="1615624463101" duration="599000" />
+      <workItem from="1615805176861" duration="1198000" />
     </task>
     <servers />
   </component>

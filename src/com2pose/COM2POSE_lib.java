@@ -44,7 +44,7 @@ public class COM2POSE_lib
     /**
      * calculate discounted cumulative gain rank for distribution analysis and set up html report for it
      */
-    public void calculate_discounted_cumulative_gain_rank_distribution_analysis() throws IOException {
+    public void calculate_discounted_cumulative_gain_rank_distribution_analysis() throws Exception {
         logger.logLine("[DISTRIBUTION-ANALYSIS] Start calculate ranks overall groups.");
 
         //calculate ranks overall groups
@@ -5076,6 +5076,8 @@ public class COM2POSE_lib
         //prepare command line for all (computeMeanRatioTFAffinities.py
         String command_base = "python3 " + options_intern.path_to_COM2POSE+File.separator+options_intern.directory_for_tepic_DYNAMITE+File.separator+"computeMeanRatioTFAffinities.py";
 
+        HashSet<String> all_tfs = new HashSet<>();
+
         for(File fileDir : folder_pp_output.listFiles())
         {
             if(fileDir.isDirectory())
@@ -5093,6 +5095,22 @@ public class COM2POSE_lib
 
                         String group1_input_dir ="";
                         String group2_input_dir="";
+
+                        File folder_group1_check_tfs = new File(folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM);
+                        File folder_group2_check_tfs = new File(folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM);
+                        File[] samples_group1_check_tfs = folder_group1_check_tfs.listFiles();
+                        File[] samples_group2_check_tfs = folder_group2_check_tfs.listFiles();
+
+                        BufferedReader br_group1_check_tfs = new BufferedReader(new FileReader((samples_group1_check_tfs[0])));
+                        String header_group1_check_tfs = br_group1_check_tfs.readLine();
+                        all_tfs.addAll(Arrays.asList(header_group1_check_tfs.split("\t")));
+                        br_group1_check_tfs.close();
+
+                        BufferedReader br_group2_check_tfs = new BufferedReader(new FileReader((samples_group2_check_tfs[0])));
+                        String header_group2_check_tfs = br_group2_check_tfs.readLine();
+                        all_tfs.addAll(Arrays.asList(header_group2_check_tfs.split("\t")));
+                        br_group2_check_tfs.close();
+
                         //if TPM filter was used we need to postprocess the TPM files. otherwise it will not work!
                         if(options_intern.tepic_tpm_cutoff>0)
                         {
@@ -5305,6 +5323,14 @@ public class COM2POSE_lib
                 }
             }
         }
+
+        BufferedWriter bw_all_tfs = new BufferedWriter(new FileWriter(new File(folder_postprocessing.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_postprocessing_all_tfs)));
+        for(String k: all_tfs)
+        {
+            bw_all_tfs.write(k);
+            bw_all_tfs.newLine();
+        }
+        bw_all_tfs.close();
         logger.logLine("Finished postprocessing of TEPIC output");
     }
 
@@ -8229,7 +8255,7 @@ public class COM2POSE_lib
 
     }
 
-    private String get_html_table_found_tfs_in_distribution_analysis(ArrayList<File> files_stat, String level, HashMap<String,Integer> fin_rank) throws IOException {
+    private String get_html_table_found_tfs_in_distribution_analysis(ArrayList<File> files_stat, String level, HashMap<String,Integer> fin_rank) throws Exception {
         StringBuilder sb_table = new StringBuilder();
 
         HashMap<String,ArrayList<Analysis_distribution_stats>> hm_distribution_stats = new HashMap<>();
@@ -8289,6 +8315,11 @@ public class COM2POSE_lib
             rel_path+= ".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images;
         }
 
+        HashMap<String,HashSet<String>> hm_drawn_white_balls = new HashMap<>();
+        HashMap<String,Integer> hm_sample_size = new HashMap<>();
+
+        hm_sample_size.put("DISCOUNTED CUMULATIVE GAIN",fin_rank.size());
+
         for(String k_tf: options_intern.website_interesting_tfs)
         {
             sb_table.append("\t\t\t<tr>\n");
@@ -8312,6 +8343,9 @@ public class COM2POSE_lib
                     rank_max++;
                 }
 
+                hm_sample_size.put(hms,rank_max);
+
+
                 if(rank_intern!=-1)
                 {
                     sb_table.append("\t\t\t\t<th>\n");
@@ -8320,6 +8354,18 @@ public class COM2POSE_lib
                     sb_table.append("\t\t\t\t<th>\n");
                     sb_table.append(rank_intern+"/"+rank_max);
                     sb_table.append("\t\t\t\t</th>\n");
+
+                    HashSet<String> drawn_white_balls;
+                    if(hm_drawn_white_balls.containsKey(hms))
+                    {
+                        drawn_white_balls = hm_drawn_white_balls.get(hms);
+                    }
+                    else
+                    {
+                        drawn_white_balls=new HashSet<>();
+                    }
+                    drawn_white_balls.add(k_tf);
+                    hm_drawn_white_balls.put(hms,drawn_white_balls);
                 }
                 else
                 {
@@ -8340,6 +8386,18 @@ public class COM2POSE_lib
                 sb_table.append("\t\t\t\t<th>\n");
                 sb_table.append(fin_rank.get(k_tf)+"/"+fin_rank.size());
                 sb_table.append("\t\t\t\t</th>\n");
+
+                HashSet<String> drawn_white_balls;
+                if(hm_drawn_white_balls.containsKey("DISCOUNTED CUMULATIVE GAIN"))
+                {
+                    drawn_white_balls = hm_drawn_white_balls.get("DISCOUNTED CUMULATIVE GAIN");
+                }
+                else
+                {
+                    drawn_white_balls=new HashSet<>();
+                }
+                drawn_white_balls.add(k_tf);
+                hm_drawn_white_balls.put("DISCOUNTED CUMULATIVE GAIN",drawn_white_balls);
             }
             else
             {
@@ -8355,6 +8413,112 @@ public class COM2POSE_lib
             sb_table.append("\t\t\t</tr>\n");
 
         }
+
+        //last row with hypergeometric test results for each group
+        int size_white_balls = options_intern.website_interesting_tfs.size();
+
+        //read in all_tfs.csv
+        HashSet<String> all_tfs = new HashSet<>();
+        File f_input_all_tfs = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.file_suffix_tepic_postprocessing_all_tfs);
+        BufferedReader br_all_tfs = new BufferedReader(new FileReader(f_input_all_tfs));
+        String line_all_tfs = "";
+        while((line_all_tfs=br_all_tfs.readLine())!=null)
+        {
+            all_tfs.add(line_all_tfs);
+        }
+        br_all_tfs.close();
+
+        int size_all_balls = all_tfs.size();
+
+        //WRITE AND EXECUTE R_SCRIPT FOR HYPERGEOMETRIC TEST
+        File f_out_rscript_hypergeometric_test_directory = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_hypergeometric_test);
+        f_out_rscript_hypergeometric_test_directory.mkdir();
+
+        File f_out_hypergeometric_test_results = new File(f_out_rscript_hypergeometric_test_directory.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_hypergeometric_test_output);
+
+        StringBuilder sb_rscript_hypergeometric_test = new StringBuilder();
+
+        sb_rscript_hypergeometric_test.append("results<-data.frame(Name=character(),p_value=double())\n");
+
+        for(String key_hm : hm_sample_size.keySet())
+        {
+            String name = key_hm.replace(" ","_");
+            if(name.startsWith("01"))
+            {
+                name=name.substring(3);
+            }
+            sb_rscript_hypergeometric_test.append(name+"_name<-");
+            sb_rscript_hypergeometric_test.append("\""+key_hm+"\"\n");
+            sb_rscript_hypergeometric_test.append(name);
+            sb_rscript_hypergeometric_test.append("<-1-phyper(");
+            sb_rscript_hypergeometric_test.append(hm_drawn_white_balls.get(key_hm).size());
+            sb_rscript_hypergeometric_test.append(",");
+            sb_rscript_hypergeometric_test.append(size_white_balls);
+            sb_rscript_hypergeometric_test.append(",");
+            sb_rscript_hypergeometric_test.append(size_all_balls-size_white_balls);
+            sb_rscript_hypergeometric_test.append(",");
+            sb_rscript_hypergeometric_test.append(hm_sample_size.get(key_hm));
+            sb_rscript_hypergeometric_test.append(")\n");
+            sb_rscript_hypergeometric_test.append("results<-rbind(results,c(");
+            sb_rscript_hypergeometric_test.append(name+"_name,"+name);
+            sb_rscript_hypergeometric_test.append("))\n");
+        }
+        sb_rscript_hypergeometric_test.append("write.csv(results,\"" + f_out_hypergeometric_test_results.getAbsolutePath()+"\", sep=\"\\t\")");
+
+
+        File f_out_rscript_hypergeometric_test = new File(f_out_rscript_hypergeometric_test_directory.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_hypergeometric_test_rscript);
+        BufferedWriter bw_rscript_hypergeometric_test = new BufferedWriter(new FileWriter(f_out_rscript_hypergeometric_test));
+        bw_rscript_hypergeometric_test.write(sb_rscript_hypergeometric_test.toString());
+        bw_rscript_hypergeometric_test.close();
+
+        String command = "Rscript "+ f_out_rscript_hypergeometric_test;
+        logger.logLine("[DISTRIBUTION ANALYSIS] Perform hypergeometric test: " + command);
+        Process child = Runtime.getRuntime().exec(command);
+        int code = child.waitFor();
+        switch (code){
+            case 0:
+                break;
+            case 1:
+                String message = child.getErrorStream().toString();
+                throw new Exception(message);
+        }
+
+        HashMap<String,Double> results_hypergeometric_test = new HashMap<>();
+        BufferedReader br_results_hyp_geo_test = new BufferedReader(new FileReader(f_out_hypergeometric_test_results));
+        String line_results_hyp_geo_test = br_results_hyp_geo_test.readLine();
+        while((line_results_hyp_geo_test=br_results_hyp_geo_test.readLine())!=null)
+        {
+            line_results_hyp_geo_test=line_results_hyp_geo_test.replace("\"","");
+            String[] split = line_results_hyp_geo_test.split(",");
+            results_hypergeometric_test.put(split[1],Double.parseDouble(split[2]));
+        }
+        br_results_hyp_geo_test.close();
+
+        DecimalFormat df = new DecimalFormat("0.00000");
+
+        sb_table.append("\t\t\t<tr>\n");
+        sb_table.append("\t\t\t\t<th>\n");
+        sb_table.append("HYP.GEO.TEST p_value");
+        sb_table.append("\t\t\t\t</th>\n");
+        for(String key_hm : hm_names_order)
+        {
+            sb_table.append("\t\t\t\t<th>\n");
+            sb_table.append(df.format(results_hypergeometric_test.get(key_hm)));
+            sb_table.append("\t\t\t\t</th>\n");
+            sb_table.append("\t\t\t\t<th>\n");
+            sb_table.append("\t\t\t\t</th>\n");
+        }
+        sb_table.append("\t\t\t\t<th>\n");
+        sb_table.append(df.format(results_hypergeometric_test.get("DISCOUNTED CUMULATIVE GAIN")));
+        sb_table.append("\t\t\t\t</th>\n");
+        sb_table.append("\t\t\t\t<th>\n");
+        sb_table.append("\t\t\t\t</th>\n");
+
+
+
+        sb_table.append("\t\t\t</tr>\n");
+
+
         sb_table.append("</table>\n");
         sb_table.append("</div>\n");
 
