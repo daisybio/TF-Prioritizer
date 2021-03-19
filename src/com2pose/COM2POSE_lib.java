@@ -1251,6 +1251,12 @@ public class COM2POSE_lib
                 }
                 sb_parameter.append("\t\t</table>");
                 sb_parameter.append("</div>\n</button>\n");
+
+                sb_parameter.append("\t\t\t<tr>");
+                sb_parameter.append("\t\t\t\t<th>mix_mutually_exclusive</th>");
+                sb_parameter.append("\t\t\t\t<th>" + options_intern.mix_mutually_exclusive + "</th>");
+                sb_parameter.append("\t\t\t\t<th>#[OPT]: mutually exclusive peaks. Use only peaks, which are mutually exclusive, default: TRUE\n</th>");
+                sb_parameter.append("\t\t\t</tr>");
             }
 
             //blacklist parameters
@@ -3820,6 +3826,11 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev=options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
         }
+        if(options_intern.mix_mutually_exclusive)
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
+        }
 
         File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_merged);
         File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_groups);
@@ -3863,8 +3874,20 @@ public class COM2POSE_lib
                         String group1 = split_name[0];
                         String group2 = split_name[1];
 
-                        File input_group1 = new File(folder_input.getAbsolutePath()+File.separator+group1+File.separator+hm+File.separator+hm+"_"+group1+".txt");
-                        File input_group2 = new File(folder_input.getAbsolutePath()+File.separator+group2+File.separator+hm+File.separator+hm+"_"+group2+".txt");
+                        File input_group1;
+                        File input_group2;
+
+                        if(!options_intern.mix_mutually_exclusive)
+                        {
+                            input_group1 = new File(folder_input.getAbsolutePath()+File.separator+group1+File.separator+hm+File.separator+hm+"_"+group1+".txt");
+                            input_group2 = new File(folder_input.getAbsolutePath()+File.separator+group2+File.separator+hm+File.separator+hm+"_"+group2+".txt");
+
+                        }
+                        else
+                        {
+                            input_group1 = new File(folder_input.getAbsolutePath()+File.separator+folderDirHM_Group.getName()+File.separator+hm+File.separator+hm+"_"+group1+".txt");
+                            input_group2 = new File(folder_input.getAbsolutePath()+File.separator+folderDirHM_Group.getName()+File.separator+hm+File.separator+hm+"_"+group2+".txt");
+                        }
 
                         HashMap<String,ArrayList<ENSG_ranges_binary_trees>> chr_unmerged_ius = new HashMap<>();
 
@@ -4175,19 +4198,54 @@ public class COM2POSE_lib
                             double tpm_cutoff = options_intern.tepic_tpm_cutoff;
                             File f_ensg_map_symbol = new File(options_intern.tepic_ensg_symbol);
                             File f_gene_annot_deseq2 = new File(options_intern.deseq2_input_gene_id);
-                            File f_gene_count_group1 = new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+fileDirTP.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts);
                             File f_ref_genome = new File(options_intern.tepic_gene_annot);
 
-
                             ArrayList<Integer> gene_counts = new ArrayList<>();
-                            BufferedReader br_gene_counts_1 = new BufferedReader(new FileReader(f_gene_count_group1));
-                            String line_gene_count_1 = br_gene_counts_1.readLine();
-                            while ((line_gene_count_1= br_gene_counts_1.readLine())!=null)
-                            {
-                                gene_counts.add(Integer.parseInt(line_gene_count_1));
-                            }
-                            br_gene_counts_1.close();
 
+                            if(!options_intern.mix_mutually_exclusive)
+                            {
+                                File f_gene_count_group1;
+
+                                f_gene_count_group1 = new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+fileDirTP.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts);
+                                BufferedReader br_gene_counts_1 = new BufferedReader(new FileReader(f_gene_count_group1));
+                                String line_gene_count_1 = br_gene_counts_1.readLine();
+                                while ((line_gene_count_1= br_gene_counts_1.readLine())!=null)
+                                {
+                                    gene_counts.add(Integer.parseInt(line_gene_count_1));
+                                }
+                                br_gene_counts_1.close();
+                            }
+                            else {
+                                String names[] = fileDirTP.getName().split("_");
+
+                                File f_gene_count_group1 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_deseq2_preprocessing + File.separator + options_intern.folder_name_deseq2_preprocessing_single + File.separator + names[0] + options_intern.file_suffix_deseq2_preprocessing_meanCounts);
+                                File f_gene_count_group2 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_deseq2_preprocessing + File.separator + options_intern.folder_name_deseq2_preprocessing_single + File.separator + names[1] + options_intern.file_suffix_deseq2_preprocessing_meanCounts);
+
+                                HashMap<Integer, Integer> position_counts = new HashMap<>();
+
+                                BufferedReader br_gene_counts_1 = new BufferedReader(new FileReader(f_gene_count_group1));
+                                int counts = 0;
+                                String line_gene_count_1 = br_gene_counts_1.readLine();
+                                while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null) {
+                                    position_counts.put(counts, Integer.parseInt(line_gene_count_1));
+                                    counts++;
+                                }
+                                br_gene_counts_1.close();
+
+                                BufferedReader br_gene_counts_2 = new BufferedReader(new FileReader(f_gene_count_group2));
+                                counts = 0;
+                                String line_gene_count_2 = br_gene_counts_2.readLine();
+                                while ((line_gene_count_2 = br_gene_counts_2.readLine()) != null) {
+                                    int mean_count = (position_counts.get(counts) + Integer.parseInt(line_gene_count_2)) / 2;
+                                    position_counts.put(counts, mean_count);
+                                    counts++;
+                                }
+                                br_gene_counts_2.close();
+
+                                for (int i = 0; i < position_counts.size(); i++) {
+                                    gene_counts.add(position_counts.get(i));
+                                }
+                            }
 
                             ArrayList<String> ensg_numbers = new ArrayList<>();
                             BufferedReader br_ensg_numbers = new BufferedReader(new FileReader(f_gene_annot_deseq2));
@@ -4384,6 +4442,11 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev=options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
         }
+        if(options_intern.mix_mutually_exclusive)
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
+        }
 
         String command_base =options_intern.path_tgen+File.separator +"bin"+File.separator+"tgene";
 
@@ -4504,6 +4567,12 @@ public class COM2POSE_lib
             //set new folder directory for tepic input and save old one
             options_intern.tepic_input_prev=options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
+
+        if(options_intern.mix_mutually_exclusive)
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
         }
 
         //create necessary folders for preprocessing
@@ -4897,6 +4966,62 @@ public class COM2POSE_lib
         logger.logLine("[TGENE] Finished preprocessing.");
     }
 
+    public void postprocess_tepic_output_mutually_exclusive() throws IOException {
+        logger.logLine("Start postprocessing of TEPIC output");
+
+        String suffix="";
+
+        if(options_intern.tepic_tpm_cutoff>0)
+        {
+            suffix="_Gene_View_Filtered_TPM.txt";
+        }
+        else
+        {
+            suffix="_Gene_View_Filtered.txt";
+        }
+
+        File folder_postprocessing = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing);
+        folder_postprocessing.mkdir();
+
+        File folder_pp_input = new File(folder_postprocessing.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_input);
+        folder_pp_input.mkdir();
+
+        File folder_pp_output = new File(folder_postprocessing.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_output);
+        folder_pp_output.mkdir();
+
+        HashSet<String> available_hms = new HashSet<>();
+        HashSet<String> available_group_clashes = new HashSet<>();
+        HashSet<String> check_tfs = new HashSet<>();
+
+        File f_tepic_output_raw = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw);
+
+        for(File fileDir_clash : f_tepic_output_raw.listFiles())
+        {
+            if(fileDir_clash.isDirectory())
+            {
+                available_group_clashes.add(fileDir_clash.getName());
+                for(File fileDir_HM: fileDir_clash.listFiles())
+                {
+                    if(fileDir_HM.isDirectory())
+                    {
+                        available_hms.add(fileDir_HM.getName());
+
+
+
+                    }
+                }
+
+            }
+        }
+
+
+
+
+
+
+        logger.logLine("Finished postprocessing of TEPIC output");
+    }
+
     /**
      * postprocesses the TEPIC output (checks for TPM filter and copies files into a structure where preprocessing of DYNAMITE can happen
      */
@@ -5066,9 +5191,26 @@ public class COM2POSE_lib
                 {
                     if(group2_hms.containsKey(k))
                     {
-                        File f = new File(pp_output_hms_files.get(k).getAbsolutePath()+File.separator+key1);
-                        f.mkdir();
+                        if(!options_intern.mix_mutually_exclusive)
+                        {
+                            File f = new File(pp_output_hms_files.get(k).getAbsolutePath()+File.separator+key1);
+                            f.mkdir();
+                        }
                     }
+                }
+            }
+        }
+
+        if(options_intern.mix_mutually_exclusive)
+        {
+            for(String key_groupClash : groups_to_compare.keySet())
+            {
+                HashMap<String,HashSet<String>> hms = groups_to_compare.get(key_groupClash);
+
+                for(String hm: hms.keySet())
+                {
+                    File f = new File(folder_pp_output.getAbsolutePath()+File.separator+hm+File.separator+key_groupClash);
+                    f.mkdir();
                 }
             }
         }
@@ -5096,20 +5238,48 @@ public class COM2POSE_lib
                         String group1_input_dir ="";
                         String group2_input_dir="";
 
-                        File folder_group1_check_tfs = new File(folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM);
-                        File folder_group2_check_tfs = new File(folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM);
+                        File folder_group1_check_tfs;
+                        File folder_group2_check_tfs;
+
+                        if(!options_intern.mix_mutually_exclusive)
+                        {
+                            folder_group1_check_tfs = new File(folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM);
+                            folder_group2_check_tfs = new File(folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM);
+                        }
+                        else
+                        {
+                            folder_group1_check_tfs = new File(folder_pp_input.getAbsolutePath()+File.separator+current_group_clash+File.separator+current_HM);
+                            folder_group2_check_tfs = new File(folder_pp_input.getAbsolutePath()+File.separator+current_group_clash+File.separator+current_HM);
+                        }
+
                         File[] samples_group1_check_tfs = folder_group1_check_tfs.listFiles();
                         File[] samples_group2_check_tfs = folder_group2_check_tfs.listFiles();
 
-                        BufferedReader br_group1_check_tfs = new BufferedReader(new FileReader((samples_group1_check_tfs[0])));
-                        String header_group1_check_tfs = br_group1_check_tfs.readLine();
-                        all_tfs.addAll(Arrays.asList(header_group1_check_tfs.split("\t")));
-                        br_group1_check_tfs.close();
+                        if(!options_intern.mix_mutually_exclusive)
+                        {
+                            BufferedReader br_group1_check_tfs = new BufferedReader(new FileReader((samples_group1_check_tfs[0])));
+                            String header_group1_check_tfs = br_group1_check_tfs.readLine();
+                            all_tfs.addAll(Arrays.asList(header_group1_check_tfs.split("\t")));
+                            br_group1_check_tfs.close();
 
-                        BufferedReader br_group2_check_tfs = new BufferedReader(new FileReader((samples_group2_check_tfs[0])));
-                        String header_group2_check_tfs = br_group2_check_tfs.readLine();
-                        all_tfs.addAll(Arrays.asList(header_group2_check_tfs.split("\t")));
-                        br_group2_check_tfs.close();
+                            BufferedReader br_group2_check_tfs = new BufferedReader(new FileReader((samples_group2_check_tfs[0])));
+                            String header_group2_check_tfs = br_group2_check_tfs.readLine();
+                            all_tfs.addAll(Arrays.asList(header_group2_check_tfs.split("\t")));
+                            br_group2_check_tfs.close();
+                        }
+                        else
+                        {
+                            BufferedReader br_group1_check_tfs = new BufferedReader(new FileReader((samples_group1_check_tfs[0])));
+                            String header_group1_check_tfs = br_group1_check_tfs.readLine();
+                            all_tfs.addAll(Arrays.asList(header_group1_check_tfs.split("\t")));
+                            br_group1_check_tfs.close();
+
+                            BufferedReader br_group2_check_tfs = new BufferedReader(new FileReader((samples_group2_check_tfs[1])));
+                            String header_group2_check_tfs = br_group2_check_tfs.readLine();
+                            all_tfs.addAll(Arrays.asList(header_group2_check_tfs.split("\t")));
+                            br_group2_check_tfs.close();
+                        }
+
 
                         //if TPM filter was used we need to postprocess the TPM files. otherwise it will not work!
                         if(options_intern.tepic_tpm_cutoff>0)
@@ -5122,11 +5292,28 @@ public class COM2POSE_lib
 
                             //build intersect and write new files with filter
 
-                            File folder_group1 = new File(folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM);
-                            File folder_group2 = new File(folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM);
+                            File folder_group1;
+                            File folder_group2;
+                            File[] samples_group1;
+                            File[] samples_group2;
 
-                            File[] samples_group1 = folder_group1.listFiles();
-                            File[] samples_group2 = folder_group2.listFiles();
+                            if(!options_intern.mix_mutually_exclusive)
+                            {
+                                folder_group1 = new File(folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM);
+                                folder_group2 = new File(folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM);
+
+                                samples_group1 = folder_group1.listFiles();
+                                samples_group2 = folder_group2.listFiles();
+                            }
+                            else
+                            {
+                                folder_group1 = new File(folder_pp_input.getAbsolutePath()+File.separator+current_group_clash+File.separator+current_HM);
+                                folder_group2 = new File(folder_pp_input.getAbsolutePath()+File.separator+current_group_clash+File.separator+current_HM);
+                                samples_group1 = new File[1];
+                                samples_group1[0] = folder_group1.listFiles()[0];
+                                samples_group2 = new File[1];
+                                samples_group2[0] = folder_group2.listFiles()[1];
+                            }
 
                             ArrayList<Boolean> write_group1 = new ArrayList<>();
                             ArrayList<Boolean> write_group2 = new ArrayList<>();
@@ -5173,6 +5360,11 @@ public class COM2POSE_lib
 
                             for(File f:folder_group1.listFiles())
                             {
+                                if(options_intern.mix_mutually_exclusive)
+                                {
+                                    f=folder_group1.listFiles()[0];
+                                }
+
                                 BufferedReader br_group1 = new BufferedReader(new FileReader(f));
                                 BufferedWriter bw_group1 = new BufferedWriter(new FileWriter(new File(output_post_group1.getAbsolutePath()+File.separator+f.getName())));
 
@@ -5202,11 +5394,20 @@ public class COM2POSE_lib
                                 }
                                 bw_group1.close();
                                 br_group1.close();
+                                if(options_intern.mix_mutually_exclusive)
+                                {
+                                    break;
+                                }
                             }
 
 
                             for(File f:folder_group2.listFiles())
                             {
+                                if(options_intern.mix_mutually_exclusive)
+                                {
+                                    f=folder_group1.listFiles()[1];
+                                }
+
                                 BufferedReader br_group2 = new BufferedReader(new FileReader(f));
                                 BufferedWriter bw_group2 = new BufferedWriter(new FileWriter(new File(output_post_group2.getAbsolutePath()+File.separator+f.getName())));
 
@@ -5236,6 +5437,10 @@ public class COM2POSE_lib
                                 }
                                 bw_group2.close();
                                 br_group2.close();
+                                if(options_intern.mix_mutually_exclusive)
+                                {
+                                    break;
+                                }
                             }
                             logger.logLine("[TEPIC] TPM filter > 0, end postprocessing of TPM filtered scores");
 
@@ -5245,8 +5450,60 @@ public class COM2POSE_lib
                         }
                         else
                         {
-                            group1_input_dir = folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM;
-                            group2_input_dir = folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM;
+                            if(!options_intern.mix_mutually_exclusive)
+                            {
+                                group1_input_dir = folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM;
+                                group2_input_dir = folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM;
+                            }
+                            else
+                            {
+                                //NOTE: THIS IS NOT TESTED AND COULD CAUSE TROUBLE WITH NO TPM + MUTUALLY EXCLUSIVE OPTION
+                                if(options_intern.mix_mutually_exclusive)
+                                {
+                                    File f_group1_file = new File(folder_pp_input.getAbsolutePath()+File.separator+current_group_clash+File.separator+current_HM+File.separator+group_clash_split[0]);
+                                    f_group1_file.mkdir();
+
+                                    File f_group2_file = new File(folder_pp_input.getAbsolutePath()+File.separator+current_group_clash+File.separator+current_HM+File.separator+group_clash_split[1]);
+                                    f_group1_file.mkdir();
+
+                                    File f_group1_data = new File(folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM).listFiles()[0];
+                                    File f_group2_data = new File(folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM).listFiles()[1];
+
+                                    String command_edited = "mv " + f_group1_data.getAbsolutePath() + " " + f_group1_file.getAbsolutePath()+File.separator+f_group1_data.getName();
+
+                                    logger.logLine("[TEPIC] Moving file due to mutually exclusive option: " + command_edited);
+                                    Process child = Runtime.getRuntime().exec(command_edited);
+                                    int code = child.waitFor();
+                                    switch (code){
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            String message = child.getErrorStream().toString();
+                                            throw new Exception(message);
+                                    }
+
+                                    String command_edited_2 = "mv " + f_group2_data.getAbsolutePath() + " " + f_group2_file.getAbsolutePath()+File.separator+f_group2_data.getName();
+
+                                    logger.logLine("[TEPIC] Moving file due to mutually exclusive option: " + command_edited_2);
+                                    Process child2 = Runtime.getRuntime().exec(command_edited_2);
+                                    int code2 = child2.waitFor();
+                                    switch (code2){
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            String message = child2.getErrorStream().toString();
+                                            throw new Exception(message);
+                                    }
+
+                                    group1_input_dir = f_group1_file.getAbsolutePath();
+                                    group2_input_dir = f_group2_file.getAbsolutePath();
+                                }
+                                else
+                                {
+                                    group1_input_dir = folder_pp_input.getAbsolutePath()+File.separator+group1+File.separator+current_HM;
+                                    group2_input_dir =folder_pp_input.getAbsolutePath()+File.separator+group2+File.separator+current_HM;
+                                }
+                            }
                         }
 
 
@@ -5367,6 +5624,11 @@ public class COM2POSE_lib
             //set new folder directory for tepic input and save old one
             options_intern.tepic_input_prev=options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
+        if(options_intern.mix_mutually_exclusive)
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
         }
 
 
@@ -5507,13 +5769,41 @@ public class COM2POSE_lib
                         String command_tail_sample = new String(command_tail);
                         if(options_intern.tepic_tpm_cutoff>0)
                         {
-                            String n_dir = options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+dirGroup.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts;
+                            String n_dir = "";
+
+                            if(!options_intern.mix_mutually_exclusive)
+                            {
+                                n_dir=options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+dirGroup.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts;
+                            }
+                            else
+                            {
+                                String[] names_sample = sample.getName().split("_");
+                                String name_sample = names_sample[0];
+                                n_dir=options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+name_sample+options_intern.file_suffix_deseq2_preprocessing_meanCounts;
+                            }
+
+                            //n_dir=options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+dirGroup.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts;
+
                             command_tail_sample += " -G " + n_dir;
                         }
 
                         if(!options_intern.path_tgen.equals("") && options_intern.tepic_tgene_target_genes)
                         {
-                            File f_tgene_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output+File.separator+dirGroup.getName()+File.separator+dirHM.getName()+File.separator+dirGroup.getName()+"_"+dirHM.getName()+File.separator+options_intern.file_suffix_tgen_output);
+                            File f_tgene_input;
+
+                            if(!options_intern.mix_mutually_exclusive)
+                            {
+                                f_tgene_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output+File.separator+dirGroup.getName()+File.separator+dirHM.getName()+File.separator+dirGroup.getName()+"_"+dirHM.getName()+File.separator+options_intern.file_suffix_tgen_output);
+                            }
+                            else
+                            {
+                                String[] names_sample = sample.getName().split("_");
+                                String name_sample = names_sample[0];
+
+                                f_tgene_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output+File.separator+dirGroup.getName()+File.separator+dirHM.getName()+File.separator+name_sample+"_"+dirHM.getName()+File.separator+options_intern.file_suffix_tgen_output);
+                            }
+                            //f_tgene_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output+File.separator+dirGroup.getName()+File.separator+dirHM.getName()+File.separator+dirGroup.getName()+"_"+dirHM.getName()+File.separator+options_intern.file_suffix_tgen_output);
+
                             command_tail_sample += " -L " + f_tgene_input.getAbsolutePath();
                             logger.logLine("[TEPIC-TGENE] using only tgene linked target genes for TF-Gene score calculation.");
                         }
@@ -6024,6 +6314,372 @@ public class COM2POSE_lib
 
         logger.logLine("[DESEQ2] Finished mapping ENSG to GENE SYMBOLS.");
 
+    }
+
+    public void mix_mutually_exclusive_peaks() throws IOException {
+        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Start mutually exclusive peaks calculation.");
+        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Preprocessing mutually exclusive peaks for binary tree comparison.");
+        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        if(options_intern.mix_option.equals("HM_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+        }
+        if(!options_intern.black_list_dir.equals(""))
+        {
+            File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+            File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
+            output_folder_new_input.mkdir();
+
+            //set new folder directory for tepic input and save old one
+            options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
+
+        File f_output_mix_option = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+        f_output_mix_option.mkdir();
+
+        File f_output_mix_option_mutually_exclusive = new File(f_output_mix_option.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_mutually_exclusive);
+        f_output_mix_option_mutually_exclusive.mkdir();
+
+        File f_output_mix_option_mutually_exclusive_preprocessing = new File(f_output_mix_option_mutually_exclusive.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_mutually_exclusive_preprocessing);
+        f_output_mix_option_mutually_exclusive_preprocessing.mkdir();
+
+        File f_output_mix_option_mutually_exclusive_new_input = new File(f_output_mix_option_mutually_exclusive.getAbsolutePath()+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input);
+        f_output_mix_option_mutually_exclusive_new_input.mkdir();
+
+        HashMap<String,HashSet<String>> tps_to_hms = new HashMap<>();
+
+        File f_input_peaks = new File(options_intern.tepic_input_directory);
+
+        for(File fileDir_tp : f_input_peaks.listFiles())
+        {
+            if(fileDir_tp.isDirectory())
+            {
+                HashSet<String> hms;
+                if(tps_to_hms.containsKey(fileDir_tp.getName()))
+                {
+                    hms=tps_to_hms.get(fileDir_tp.getName());
+                }
+                else
+                {
+                    hms=new HashSet<>();
+                }
+
+                File output_tp = new File(f_output_mix_option_mutually_exclusive_preprocessing.getAbsolutePath()+File.separator+fileDir_tp.getName());
+                output_tp.mkdir();
+
+                for(File fileDir_hm : fileDir_tp.listFiles())
+                {
+                    if(fileDir_hm.isDirectory())
+                    {
+                        hms.add(fileDir_hm.getName());
+
+                        File output_hm = new File(output_tp.getAbsolutePath()+File.separator+fileDir_hm.getName());
+                        output_hm.mkdir();
+
+                        //we can only use this option with one input file
+                        if(fileDir_hm.listFiles().length>1)
+                        {
+                            logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] A UNION OVER SAMPLES MUST BE MADE! Start MIX-OPTION now");
+                            logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Setting parameters to \"UNION, SAMPLE_LEVEL\" now.");
+
+                            options_intern.mix_option="UNION";
+                            options_intern.mix_level="SAMPLE_LEVEL";
+
+                            mix_option();
+                            mix_mutually_exclusive_peaks();
+                            if(!options_intern.black_list_dir.equals(""))
+                            {
+                                logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Redo blacklist on unioned samples");
+                                preprocess_blacklist();
+                                filter_blacklist();
+                            }
+                        }
+
+                        BufferedReader br_peaks = new BufferedReader(new FileReader(fileDir_hm.listFiles()[0]));
+                        String line_peaks = "";
+                        String current_chr = "-1";
+                        int position = 0;
+                        ArrayList<BL_ranges_binary_tree> current_chr_ranges = new ArrayList<>();
+                        while((line_peaks=br_peaks.readLine())!=null)
+                        {
+                            String[] split = line_peaks.split("\t");
+
+                            if(!current_chr.equals(split[0]))
+                            {
+                                if(!current_chr.equals("-1"))
+                                {
+                                    ArrayList<BL_ranges_binary_tree> newly_ordered = new ArrayList<>();
+                                    //recursive_split
+                                    current_chr_ranges=recursive_split_BL(current_chr_ranges,newly_ordered);
+                                    //write_file
+                                    BufferedWriter bw_peaks = new BufferedWriter(new FileWriter(new File(output_hm.getAbsolutePath()+File.separator+current_chr+".txt")));
+                                    bw_peaks.append("#\tCHR\tLEFT_BORDER\tRIGHT_BORDER");
+                                    bw_peaks.newLine();
+                                    for(BL_ranges_binary_tree bl:newly_ordered)
+                                    {
+                                        bw_peaks.write(bl.toString());
+                                        bw_peaks.newLine();
+                                    }
+                                    bw_peaks.close();
+
+
+                                    current_chr=split[0];
+                                    current_chr_ranges = new ArrayList<>();
+                                    position=0;
+                                    continue;
+                                }
+                                else
+                                {
+                                    current_chr=split[0];
+                                }
+                            }
+
+                            BL_ranges_binary_tree range = new BL_ranges_binary_tree();
+                            range.left_border=Integer.parseInt(split[1]);
+                            range.right_border=Integer.parseInt(split[2]);
+                            range.chr=current_chr;
+                            //range.signal=split[0];
+                            range.number=position;
+
+                            current_chr_ranges.add(range);
+
+                            position++;
+
+
+                        }
+                        br_peaks.close();
+                        ArrayList<BL_ranges_binary_tree> newly_ordered = new ArrayList<>();
+                        //recursive_split
+                        current_chr_ranges=recursive_split_BL(current_chr_ranges,newly_ordered);
+                        //write_file
+                        BufferedWriter bw_peaks = new BufferedWriter(new FileWriter(new File(output_hm.getAbsolutePath()+File.separator+current_chr+".txt")));
+                        bw_peaks.append("#\tCHR\tLEFT_BORDER\tRIGHT_BORDER");
+                        bw_peaks.newLine();
+                        for(BL_ranges_binary_tree bl:newly_ordered)
+                        {
+                            bw_peaks.write(bl.toString());
+                            bw_peaks.newLine();
+                        }
+                        bw_peaks.close();
+                    }
+                }
+                tps_to_hms.put(fileDir_tp.getName(),hms);
+            }
+        }
+        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Finished preprocessing. Starting binary tree filtering now.");
+
+        HashSet<String> already_worked_tp_groups = new HashSet<>();
+
+        for(String key_tp_1 : tps_to_hms.keySet())
+        {
+            for(String key_tp_2: tps_to_hms.keySet())
+            {
+                if(key_tp_1.equals(key_tp_2))
+                {
+                    continue;
+                }
+
+                String key_clash1 = key_tp_1+"_"+key_tp_2;
+                String key_clash2 = key_tp_2+"_"+key_tp_1;
+
+                if(already_worked_tp_groups.contains(key_clash1)||already_worked_tp_groups.contains(key_clash2))
+                {
+                    continue;
+                }
+                else
+                {
+                    already_worked_tp_groups.add(key_clash1);
+                }
+
+                File clash_output = new File(f_output_mix_option_mutually_exclusive_new_input.getAbsolutePath()+File.separator+key_clash1);
+                clash_output.mkdir();
+
+                HashSet<String> hms_tp1 = tps_to_hms.get(key_tp_1);
+                HashSet<String> hms_tp2 = tps_to_hms.get(key_tp_2);
+
+                for(String key_hm : hms_tp1)
+                {
+                    if(hms_tp2.contains(key_hm))
+                    {
+                        File clash_output_hm = new File(clash_output.getAbsolutePath()+File.separator+key_hm);
+                        clash_output_hm.mkdir();
+
+                        //output input files
+                        File f_input_tp1_dir = new File(f_input_peaks.getAbsolutePath()+File.separator+key_tp_1+File.separator+key_hm);
+                        File f_input_tp2_dir = new File(f_input_peaks.getAbsolutePath()+File.separator+key_tp_2+File.separator+key_hm);
+                        File f_input_tp1 = f_input_tp1_dir.listFiles()[0];
+                        File f_input_tp2 = f_input_tp2_dir.listFiles()[0];
+
+
+
+                        //build binary tree for tp1
+                        HashMap<String,BL_binary_tree> chr_tree_tp1 = new HashMap<>();
+                        File input_folder_tp1 = new File(f_output_mix_option_mutually_exclusive_preprocessing.getAbsolutePath()+File.separator+key_tp_1+File.separator+key_hm);
+                        for(File fileChr : input_folder_tp1.listFiles())
+                        {
+                            if(fileChr.isFile())
+                            {
+                                String name= fileChr.getName().split("\\.")[0];
+
+                                ArrayList<BL_ranges_binary_tree> region = new ArrayList<>();
+
+                                BufferedReader br_chr = new BufferedReader(new FileReader(fileChr));
+                                String line_chr = br_chr.readLine();
+                                while((line_chr=br_chr.readLine())!=null)
+                                {
+                                    String[] split = line_chr.split("\t");
+
+                                    BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
+                                    iu.number=Integer.parseInt(split[0]);
+                                    iu.chr = split[1];
+                                    iu.left_border = Integer.parseInt(split[2]);
+                                    iu.right_border = Integer.parseInt(split[3]);
+                                    //iu.signal = split[4];
+
+                                    region.add(iu);
+                                }
+                                br_chr.close();
+
+                                BL_binary_tree_node root = new BL_binary_tree_node(region.get(0),region.get(0).number);
+                                BL_binary_tree tree = new BL_binary_tree(root);
+
+                                for(int i = 1; i < region.size(); i++)
+                                {
+                                    tree.add(region.get(i).number,region.get(i));
+                                }
+
+                                chr_tree_tp1.put(name,tree);
+
+                            }
+                        }
+
+                        //filter tp2
+                        BufferedWriter bw_tp2 = new BufferedWriter(new FileWriter(clash_output_hm.getAbsolutePath()+File.separator+f_input_tp2.getName()));
+                        BufferedReader br_tp2 = new BufferedReader(new FileReader(f_input_tp2));
+                        String line_tp2 = "";
+                        int count_line_tp_2=0;
+                        while((line_tp2=br_tp2.readLine())!=null)
+                        {
+                            String[] split = line_tp2.split("\t");
+
+                            String chr = split[0];
+
+                            BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
+                            iu.chr = chr;
+                            iu.left_border = Integer.parseInt(split[1]);
+                            iu.right_border = Integer.parseInt(split[2]);
+
+                            if(!chr_tree_tp1.containsKey(chr))
+                            {
+                                count_line_tp_2++;
+                                continue;
+                            }
+                            BL_binary_tree tree = chr_tree_tp1.get(chr);
+                            if(tree.containsNode(iu) == null)
+                            {
+                                //this peak is mutually exclusive
+                                bw_tp2.write(line_tp2);
+                                bw_tp2.newLine();
+                            }
+
+                        }
+                        br_tp2.close();
+                        bw_tp2.close();
+
+                        //build binary tree fpr tp2
+                        HashMap<String,BL_binary_tree> chr_tree_tp2 = new HashMap<>();
+                        File input_folder_tp2 = new File(f_output_mix_option_mutually_exclusive_preprocessing.getAbsolutePath()+File.separator+key_tp_2+File.separator+key_hm);
+                        for(File fileChr : input_folder_tp2.listFiles())
+                        {
+                            if(fileChr.isFile())
+                            {
+                                String name= fileChr.getName().split("\\.")[0];
+
+                                ArrayList<BL_ranges_binary_tree> region = new ArrayList<>();
+
+                                BufferedReader br_chr = new BufferedReader(new FileReader(fileChr));
+                                String line_chr = br_chr.readLine();
+                                while((line_chr=br_chr.readLine())!=null)
+                                {
+                                    String[] split = line_chr.split("\t");
+
+                                    BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
+                                    iu.number=Integer.parseInt(split[0]);
+                                    iu.chr = split[1];
+                                    iu.left_border = Integer.parseInt(split[2]);
+                                    iu.right_border = Integer.parseInt(split[3]);
+                                    //iu.signal = split[4];
+
+                                    region.add(iu);
+                                }
+                                br_chr.close();
+
+                                BL_binary_tree_node root = new BL_binary_tree_node(region.get(0),region.get(0).number);
+                                BL_binary_tree tree = new BL_binary_tree(root);
+
+                                for(int i = 1; i < region.size(); i++)
+                                {
+                                    tree.add(region.get(i).number,region.get(i));
+                                }
+
+                                chr_tree_tp2.put(name,tree);
+
+                            }
+                        }
+
+
+                        //filter tp1
+                        BufferedWriter bw_tp1 = new BufferedWriter(new FileWriter(clash_output_hm.getAbsolutePath()+File.separator+f_input_tp1.getName()));
+                        BufferedReader br_tp1 = new BufferedReader(new FileReader(f_input_tp1));
+                        String line_tp1 = "";
+                        int count_line_tp_1=0;
+                        while((line_tp1=br_tp1.readLine())!=null)
+                        {
+                            String[] split = line_tp1.split("\t");
+
+                            String chr = split[0];
+
+                            BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
+                            iu.chr = chr;
+                            iu.left_border = Integer.parseInt(split[1]);
+                            iu.right_border = Integer.parseInt(split[2]);
+
+                            if(!chr_tree_tp1.containsKey(chr))
+                            {
+                                count_line_tp_2++;
+                                continue;
+                            }
+                            BL_binary_tree tree = chr_tree_tp2.get(chr);
+                            if(tree.containsNode(iu) == null)
+                            {
+                                //this peak is mutually exclusive
+                                bw_tp1.write(line_tp1);
+                                bw_tp1.newLine();
+                            }
+
+                        }
+                        br_tp1.close();
+                        bw_tp1.close();
+
+                    }
+                }
+            }
+        }
+
+        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Finished binary tree filtering.");
     }
 
     /**
@@ -6916,6 +7572,9 @@ public class COM2POSE_lib
                     break;
                 case "mix_occurence_intersection":
                     options_intern.mix_occurence_intersection=Integer.parseInt(split[1]);
+                    break;
+                case "mix_mutually_exclusive":
+                    options_intern.mix_mutually_exclusive=Boolean.parseBoolean(split[1]);
                     break;
                 case "black_list_dir":
                     options_intern.black_list_dir=split[1].substring(1,split[1].length()-1);

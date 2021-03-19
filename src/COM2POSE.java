@@ -16,6 +16,7 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
+        /*
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -30,6 +31,12 @@ public class COM2POSE
             com2pose_lib.filter_blacklist();
         }
 
+        if(options_intern.mix_mutually_exclusive)
+        {
+            com2pose_lib.mix_mutually_exclusive_peaks();
+        }
+
+
         //DESeq2
         if(options_intern.tepic_ensg_symbol.equals("")||!options_intern.deseq2_biomart_dataset_species.equals(""))
         {
@@ -38,19 +45,21 @@ public class COM2POSE
 
         com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.run_and_postprocess_DESeq2();
-
+*/
 
         if(!options_intern.path_tgen.equals("")) {
-            com2pose_lib.preprocess_tgen();
-            com2pose_lib.run_tgen();
-            com2pose_lib.merge_tgen();
+            //com2pose_lib.preprocess_tgen();
+            //com2pose_lib.run_tgen();
+            //com2pose_lib.merge_tgen();
         }
 
 
         //TEPIC
-        com2pose_lib.run_tepic();
-        com2pose_lib.postprocess_tepic_output();
+        //com2pose_lib.run_tepic();
+        //com2pose_lib.postprocess_tepic_output();
 
+
+        /*
         //TGen
         if(!options_intern.path_tgen.equals(""))
         {
@@ -61,7 +70,7 @@ public class COM2POSE
             {
                 com2pose_lib.integrate_self_regulatory_tgen();
             }
-        }
+        }*/
 
         //DYNAMITE
         com2pose_lib.preprocess_dynamite();

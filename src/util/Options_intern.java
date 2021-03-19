@@ -30,6 +30,9 @@ public class Options_intern
     public String folder_name_mix_option_sample_mix = "01_SAMPLE_MIX";
     public String folder_name_mix_option_preprocess_hm_mix = "02_PREPROCESS_HM_MIX";
     public String folder_name_mix_option_hm_mix = "03_HM_MIX";
+    public String folder_name_mix_option_mutually_exclusive = "02_MUTUALLY_EXCLUSIVE";
+    public String folder_name_mix_option_mutually_exclusive_preprocessing = "01_PREPROCESSING";
+    public String folder_name_mix_options_mutually_exclusive_input = "02_NEW_INPUT";
     public String folder_name_blacklisted_regions = "01_blacklisted_regions";
     public String folder_name_blacklisted_regions_preprocessing = "01_preprocessing";
     public String folder_name_blacklisted_regions_preprocessing_perChr = "01_perChr";
@@ -159,6 +162,8 @@ public class Options_intern
     public String mix_option="";
     //#[OPT]: minimal occurence of peaks in intersection, default 2
     public int mix_occurence_intersection=2;
+    //#[OPT]: mutually exclusive peaks. Use only peaks, which are mutually exclusive, default: TRUE
+    public boolean mix_mutually_exclusive=true;
 
     /*
     #########################

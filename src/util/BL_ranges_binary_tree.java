@@ -6,7 +6,7 @@ public class BL_ranges_binary_tree implements Comparable
     public String chr;
     public int left_border;
     public int right_border;
-    public String signal;
+    public String signal="";
 
     public String toString()
     {
@@ -19,8 +19,11 @@ public class BL_ranges_binary_tree implements Comparable
         ret+=left_border;
         ret+="\t";
         ret+=right_border;
-        ret+="\t";
-        ret+=signal;
+        if(!signal.equals(""))
+        {
+            ret+="\t";
+            ret+=signal;
+        }
 
         return  ret;
     }
