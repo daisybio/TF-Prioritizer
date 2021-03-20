@@ -162,8 +162,8 @@ public class Options_intern
     public String mix_option="";
     //#[OPT]: minimal occurence of peaks in intersection, default 2
     public int mix_occurence_intersection=2;
-    //#[OPT]: mutually exclusive peaks. Use only peaks, which are mutually exclusive, default: TRUE
-    public boolean mix_mutually_exclusive=true;
+    //#[OPT]: mutually exclusive peaks. Use only peaks, which are mutually exclusive, default: FALSE
+    public boolean mix_mutually_exclusive=false;
 
     /*
     #########################
