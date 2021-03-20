@@ -3797,7 +3797,7 @@ public class COM2POSE_lib
      * creates TGENE group clash so it can be merged into TEPIC
      */
     public void create_tgen_groups() throws IOException {
-        logger.logLine("[TGENE] Create TGene groupe data");
+        logger.logLine("[TGENE] Create TGene group data");
 
         if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
         {
@@ -4087,10 +4087,18 @@ public class COM2POSE_lib
 
                         HashMap<String,ArrayList<ENSG_ranges_binary_trees>> tfs_to_regions = new HashMap<>();
 
+                        //this one is needed for mutually exclusive option
+                        HashMap<String,HashMap<String,ArrayList<ENSG_ranges_binary_trees>>> file_tfs_to_regions = new HashMap<>();
+
+
                         for(File fileDirTP_HM_Samples:fileDirTP_HM.listFiles())
                         {
                             if(fileDirTP_HM_Samples.isDirectory())
                             {
+                                //this one is needed for mutually exclusive option
+                                String file_name = fileDirTP_HM_Samples.getName();
+                                HashMap<String,ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions = new HashMap<>();
+
                                 File input_data = new File(fileDirTP_HM_Samples.getAbsolutePath()+File.separator+options_intern.file_suffix_tgen_output);
 
                                 BufferedReader br = new BufferedReader(new FileReader(input_data));
@@ -4127,13 +4135,40 @@ public class COM2POSE_lib
                                         x.add(iu);
                                         tfs_to_regions.put(split_chr[0],x);
                                     }
+
+                                    if(current_tfs_to_regions.containsKey(split_chr[0]))
+                                    {
+                                        ArrayList<ENSG_ranges_binary_trees> x = current_tfs_to_regions.get(split_chr[0]);
+                                        x.add(iu);
+                                        current_tfs_to_regions.put(split_chr[0],x);
+
+                                    }
+                                    else
+                                    {
+                                        ArrayList<ENSG_ranges_binary_trees> x = new ArrayList<>();
+                                        x.add(iu);
+                                        current_tfs_to_regions.put(split_chr[0],x);
+                                    }
                                 }
+
+                                file_tfs_to_regions.put(file_name,current_tfs_to_regions);
                             }
                         }
 
+                        //sort regions
                         for(String chr: tfs_to_regions.keySet())
                         {
                             Collections.sort(tfs_to_regions.get(chr));
+                        }
+
+                        for(String file_name : file_tfs_to_regions.keySet())
+                        {
+                            HashMap<String,ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions = file_tfs_to_regions.get(file_name);
+
+                            for(String chr: current_tfs_to_regions.keySet())
+                            {
+                                Collections.sort(current_tfs_to_regions.get(chr));
+                            }
                         }
 
                         for(String chr: tfs_to_regions.keySet())
@@ -4179,7 +4214,56 @@ public class COM2POSE_lib
                             tfs_to_regions.put(chr,tf_temp);
                         }
 
-                        //CHECK TPM if TPM filter is set!
+                        for(String file_name : file_tfs_to_regions.keySet())
+                        {
+                            HashMap<String,ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions = file_tfs_to_regions.get(file_name);
+
+                            for(String chr: current_tfs_to_regions.keySet())
+                            {
+                                ArrayList<ENSG_ranges_binary_trees> tf_reg = current_tfs_to_regions.get(chr);
+
+                                ArrayList<ENSG_ranges_binary_trees> tf_temp = new ArrayList<>();
+                                for(int i = 1; i < tf_reg.size(); i++)
+                                {
+                                    //delete all duplicates
+                                    ENSG_ranges_binary_trees iu_before = tf_reg.get(i-1);
+                                    ENSG_ranges_binary_trees iu_now = tf_reg.get(i);
+
+                                    if(iu_before.isTheSame(iu_now))
+                                    {
+                                        int temp_i = i+1;
+                                        boolean same = true;
+                                        int count_same = 0;
+                                        while(temp_i < tf_reg.size()&&same)
+                                        {
+                                            same=false;
+
+                                            ENSG_ranges_binary_trees iu_follow = tf_reg.get(temp_i);
+
+                                            if(iu_follow.isTheSame(iu_before))
+                                            {
+                                                same=true;
+                                                count_same++;
+                                            }
+
+                                            temp_i++;
+                                        }
+                                        i=temp_i+1;
+
+
+                                        tf_temp.add(iu_before);
+                                    }
+                                    else
+                                    {
+                                        tf_temp.add(iu_before);
+                                    }
+                                }
+                                current_tfs_to_regions.put(chr,tf_temp);
+                            }
+                            file_tfs_to_regions.put(file_name,current_tfs_to_regions);
+                        }
+
+                        //CHECK TPM if TPM filter is set! -> non mutually exclusive
                         if(options_intern.tepic_tpm_cutoff>0)
                         {
                                 /*command_tail += " -T " + options_intern.tepic_tpm_cutoff;
@@ -4216,6 +4300,7 @@ public class COM2POSE_lib
                                 br_gene_counts_1.close();
                             }
                             else {
+
                                 String names[] = fileDirTP.getName().split("_");
 
                                 File f_gene_count_group1 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_deseq2_preprocessing + File.separator + options_intern.folder_name_deseq2_preprocessing_single + File.separator + names[0] + options_intern.file_suffix_deseq2_preprocessing_meanCounts);
@@ -4387,21 +4472,318 @@ public class COM2POSE_lib
                             }
                         }
 
-
-                        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output_tp_hm.getAbsolutePath()+File.separator+name_output+".txt")));
-                        bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG");
-                        bw.newLine();
-                        for(String chr: tfs_to_regions.keySet())
+                        //CHECK TPM if TPM filter is set! -> mutually exclusive
+                        for(String file_name : file_tfs_to_regions.keySet())
                         {
-                            ArrayList<ENSG_ranges_binary_trees> tf_reg = tfs_to_regions.get(chr);
-                            for(ENSG_ranges_binary_trees iu : tf_reg)
+                            HashMap<String,ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions = file_tfs_to_regions.get(file_name);
+
+                            if(options_intern.tepic_tpm_cutoff>0)
                             {
-                                bw.write(iu.toString());
-                                bw.newLine();
+                                /*command_tail += " -T " + options_intern.tepic_tpm_cutoff;
+                                command_tail += " -E " + options_intern.tepic_ensg_symbol;
+                                command_tail += " -A " + options_intern.deseq2_input_gene_id;
+                                String n_dir = options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+dirGroup.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts;
+                                command_tail_sample += " -G " + n_dir;
+
+                                [-G input genes count file, if set, default TPM is 1]\n
+                                [-T set (T)ranscripts (P)er (M)illion cutoff must be in float form (e.g. 1.0)]
+                                [-A input gene annotation desq2 file, required for TPM filter]
+                                [-E input ensg to gene symbol file, required for TPM filter*/
+
+                                //logger.logLine("[TGENE] TPM filter is set. Filtering TGENE results: " + fileDirTP_HM.getName() + " - " + fileDirTP.getName()+".");
+
+                                double tpm_cutoff = options_intern.tepic_tpm_cutoff;
+                                File f_ensg_map_symbol = new File(options_intern.tepic_ensg_symbol);
+                                File f_gene_annot_deseq2 = new File(options_intern.deseq2_input_gene_id);
+                                File f_ref_genome = new File(options_intern.tepic_gene_annot);
+
+                                ArrayList<Integer> gene_counts = new ArrayList<>();
+
+                                if(!options_intern.mix_mutually_exclusive)
+                                {
+                                    File f_gene_count_group1;
+
+                                    f_gene_count_group1 = new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+fileDirTP.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts);
+                                    BufferedReader br_gene_counts_1 = new BufferedReader(new FileReader(f_gene_count_group1));
+                                    String line_gene_count_1 = br_gene_counts_1.readLine();
+                                    while ((line_gene_count_1= br_gene_counts_1.readLine())!=null)
+                                    {
+                                        gene_counts.add(Integer.parseInt(line_gene_count_1));
+                                    }
+                                    br_gene_counts_1.close();
+                                }
+                                else {
+
+                                    String names[] = fileDirTP.getName().split("_");
+
+                                    File f_gene_count_group1 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_deseq2_preprocessing + File.separator + options_intern.folder_name_deseq2_preprocessing_single + File.separator + file_name.split("_")[0]+ options_intern.file_suffix_deseq2_preprocessing_meanCounts);
+                                    File f_gene_count_group2 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_deseq2_preprocessing + File.separator + options_intern.folder_name_deseq2_preprocessing_single + File.separator + file_name.split("_")[0] + options_intern.file_suffix_deseq2_preprocessing_meanCounts);
+
+                                    HashMap<Integer, Integer> position_counts = new HashMap<>();
+
+                                    BufferedReader br_gene_counts_1 = new BufferedReader(new FileReader(f_gene_count_group1));
+                                    int counts = 0;
+                                    String line_gene_count_1 = br_gene_counts_1.readLine();
+                                    while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null) {
+                                        position_counts.put(counts, Integer.parseInt(line_gene_count_1));
+                                        counts++;
+                                    }
+                                    br_gene_counts_1.close();
+
+                                    BufferedReader br_gene_counts_2 = new BufferedReader(new FileReader(f_gene_count_group2));
+                                    counts = 0;
+                                    String line_gene_count_2 = br_gene_counts_2.readLine();
+                                    while ((line_gene_count_2 = br_gene_counts_2.readLine()) != null) {
+                                        int mean_count = (position_counts.get(counts) + Integer.parseInt(line_gene_count_2)) / 2;
+                                        position_counts.put(counts, mean_count);
+                                        counts++;
+                                    }
+                                    br_gene_counts_2.close();
+
+                                    for (int i = 0; i < position_counts.size(); i++) {
+                                        gene_counts.add(position_counts.get(i));
+                                    }
+                                }
+
+                                ArrayList<String> ensg_numbers = new ArrayList<>();
+                                BufferedReader br_ensg_numbers = new BufferedReader(new FileReader(f_gene_annot_deseq2));
+                                String line_ensg_numbers = br_ensg_numbers.readLine();
+                                while((line_ensg_numbers= br_ensg_numbers.readLine())!=null)
+                                {
+                                    ensg_numbers.add(line_ensg_numbers.toUpperCase());
+                                }
+                                br_ensg_numbers.close();
+
+                                int total_number_samples=0;
+                                HashMap<String,Integer> ensg_counts = new HashMap<>();
+                                for(int i = 0; i < gene_counts.size();i++)
+                                {
+                                    ensg_counts.put(ensg_numbers.get(i).toUpperCase(),gene_counts.get(i));
+                                    total_number_samples++;
+                                }
+
+                                HashMap<String,String> ensg_symb = new HashMap<>();
+
+                                BufferedReader br_ensg_symb = new BufferedReader(new FileReader(f_ensg_map_symbol));
+                                String line_ensg_symb = br_ensg_symb.readLine();
+                                while((line_ensg_symb=br_ensg_symb.readLine())!=null)
+                                {
+                                    String[] split = line_ensg_symb.split("\t");
+                                    if(split.length>1)
+                                    {
+                                        ensg_symb.put(split[1].toUpperCase(),split[0]);
+                                    }
+                                }
+                                br_ensg_symb.close();
+
+                                HashMap<String,Integer> gene_symbol_lengths = new HashMap<>();
+                                BufferedReader br_gene_symbol_lengths = new BufferedReader(new FileReader(f_ref_genome));
+                                String line_gene_symbol_lengths = "";
+                                while((line_gene_symbol_lengths=br_gene_symbol_lengths.readLine())!=null)
+                                {
+                                    if(line_gene_symbol_lengths.startsWith("#"))
+                                    {
+                                        continue;
+                                    }
+                                    String[] split = line_gene_symbol_lengths.split("\t");
+                                    if(split[2].equals("transcript"))
+                                    {
+                                        int start=Integer.parseInt(split[3]);
+                                        int end=Integer.parseInt(split[4]);
+                                        int diff=end-start+1;
+                                        String[] split_further = split[8].split(" ");
+                                        String ensg_name=split_further[1].replace("\"","");
+                                        ensg_name=ensg_name.replace(";","");
+                                        String[] ensg_name_split=ensg_name.split("\\.");
+                                        gene_symbol_lengths.put(ensg_name_split[0],diff);
+                                    }
+                                }
+                                br_gene_symbol_lengths.close();
+
+                                double all_rpk = 0.0;
+
+                                for(String ec : ensg_counts.keySet())
+                                {
+                                    if(!ensg_counts.containsKey(ec))
+                                    {
+                                        continue;
+                                    }
+
+                                    int ec_count = ensg_counts.get(ec);
+                                    int ec_lengths = 0;
+                                    if(!gene_symbol_lengths.containsKey(ec))
+                                    {
+                                        continue;
+                                    }
+                                    ec_lengths=gene_symbol_lengths.get(ec);
+                                    if(ec_lengths==0)
+                                    {
+                                        continue;
+                                    }
+                                    double norm_ec_lengths= ec_lengths/(1000*1.0);
+                                    double current_rpk = ec_count/(norm_ec_lengths*1.0);
+                                    all_rpk+=current_rpk;
+                                }
+
+                                double 	scaling_factor=all_rpk/(1000000*1.0);
+
+                                for(String chr: current_tfs_to_regions.keySet())
+                                {
+                                    ArrayList<ENSG_ranges_binary_trees> tf_reg = current_tfs_to_regions.get(chr);
+                                    ArrayList<ENSG_ranges_binary_trees> tf_reg_temp = new ArrayList<>();
+
+                                    for(ENSG_ranges_binary_trees iu : tf_reg)
+                                    {
+                                        boolean should_write = false;
+
+                                        //check if we want that TF
+                                        for(String ec: iu.ensgs)
+                                        {
+                                            ec = ec.toUpperCase();
+
+                                            if(ensg_symb.containsKey(ec))
+                                            {
+                                                ec = ensg_symb.get(ec);
+                                            }
+                                            else
+                                            {
+                                                continue;
+                                            }
+
+                                            if(!ensg_counts.containsKey(ec))
+                                            {
+                                                continue;
+                                            }
+
+                                            int ec_count = ensg_counts.get(ec);
+                                            int ec_lengths = 0;
+                                            if(!gene_symbol_lengths.containsKey(ec))
+                                            {
+                                                continue;
+                                            }
+                                            ec_lengths=gene_symbol_lengths.get(ec);
+                                            if(ec_lengths==0)
+                                            {
+                                                continue;
+                                            }
+                                            double norm_ec_lengths= ec_lengths/(1000*1.0);
+                                            double current_rpk = ec_count/(norm_ec_lengths*1.0);
+
+                                            if(current_rpk>=scaling_factor)
+                                            {
+                                                should_write=true;
+                                            }
+                                        }
+
+                                        if(should_write)
+                                        {
+                                            tf_reg_temp.add(iu);
+                                        }
+                                    }
+
+                                    current_tfs_to_regions.put(chr,tf_reg_temp);
+                                }
                             }
 
+                            file_tfs_to_regions.put(file_name,current_tfs_to_regions);
                         }
-                        bw.close();
+
+
+                        if(!options_intern.mix_mutually_exclusive)
+                        {
+                            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output_tp_hm.getAbsolutePath()+File.separator+name_output+".txt")));
+                            bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG");
+                            bw.newLine();
+                            for(String chr: tfs_to_regions.keySet())
+                            {
+                                ArrayList<ENSG_ranges_binary_trees> tf_reg = tfs_to_regions.get(chr);
+                                for(ENSG_ranges_binary_trees iu : tf_reg)
+                                {
+                                    bw.write(iu.toString());
+                                    bw.newLine();
+                                }
+
+                            }
+                            bw.close();
+                        }
+                        else
+                        {
+                            for(String file_name : file_tfs_to_regions.keySet())
+                            {
+                                HashMap<String,ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions = file_tfs_to_regions.get(file_name);
+
+                                name_output = fileDirTP_HM.getName()+"_"+file_name.split("_")[0];
+
+                                BufferedWriter bw = new BufferedWriter(new FileWriter(new File(output_tp_hm.getAbsolutePath()+File.separator+name_output+".txt")));
+                                bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG");
+                                bw.newLine();
+                                for(String chr: current_tfs_to_regions.keySet())
+                                {
+                                    ArrayList<ENSG_ranges_binary_trees> tf_reg = current_tfs_to_regions.get(chr);
+                                    for(ENSG_ranges_binary_trees iu : tf_reg)
+                                    {
+                                        bw.write(iu.toString());
+                                        bw.newLine();
+                                    }
+
+                                }
+                                bw.close();
+
+
+                            }
+
+                            //create tgen groups
+                            File folder_output_groups = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_groups);
+                            folder_output_groups.mkdir();
+
+                            File folder_output_groups_hm = new File(folder_output_groups.getAbsolutePath()+File.separator+fileDirTP_HM.getName()+File.separator+fileDirTP.getName());
+                            folder_output_groups_hm.mkdirs();
+
+                            logger.logLine("[TGENE] CREATE TGENE Group Clashes.");
+
+                            HashMap<String,ArrayList<ENSG_ranges_binary_trees>> updated_tfs_to_region_list = new HashMap<>();
+
+                            for(String chr : tfs_to_regions.keySet())
+                            {
+                                ArrayList<ENSG_ranges_binary_trees> old_chr_tfs_to_region_list = tfs_to_regions.get(chr);
+                                ArrayList<ENSG_ranges_binary_trees> updated_chr_tfs_to_region_list = new ArrayList<>();
+
+                                //merge same ranges
+                                ENSG_ranges_binary_trees iu = old_chr_tfs_to_region_list.get(0);
+                                for(int i = 1; i < old_chr_tfs_to_region_list.size(); i++)
+                                {
+                                    ENSG_ranges_binary_trees current_iu = old_chr_tfs_to_region_list.get(i);
+
+                                    if(iu.isSameRange(current_iu))
+                                    {
+                                        iu.ensgs.addAll(current_iu.ensgs);
+                                    }
+                                    else
+                                    {
+                                        updated_chr_tfs_to_region_list.add(iu);
+                                        iu = current_iu;
+                                    }
+                                }
+                                updated_tfs_to_region_list.put(chr,updated_chr_tfs_to_region_list);
+                            }
+
+
+                            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folder_output_groups_hm.getAbsolutePath()+File.separator+options_intern.file_suffic_tgen_output_groups)));
+                            bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSGS");
+                            bw.newLine();
+                            for(String chr: updated_tfs_to_region_list.keySet())
+                            {
+                                ArrayList<ENSG_ranges_binary_trees> tf_reg = updated_tfs_to_region_list.get(chr);
+                                for(ENSG_ranges_binary_trees iu : tf_reg)
+                                {
+                                    bw.write(iu.toString());
+                                    bw.newLine();
+                                }
+
+                            }
+                            bw.close();
+                        }
+
                     }
                 }
             }
@@ -8320,8 +8702,12 @@ public class COM2POSE_lib
 
                 for(int i = 0; i < options_intern.plot_top_k_genes;i++)
                 {
-                    bw.write(all_affinities.get(i).toString());
-                    bw.newLine();
+                    if(all_affinities.size() > i)
+                    {
+                        bw.write(all_affinities.get(i).toString());
+                        bw.newLine();
+                    }
+
                 }
 
                 bw.close();
@@ -9101,6 +9487,10 @@ public class COM2POSE_lib
 
         for(String key_hm : hm_sample_size.keySet())
         {
+            if(!hm_drawn_white_balls.containsKey(key_hm))
+            {
+                continue;
+            }
             String name = key_hm.replace(" ","_");
             if(name.startsWith("01"))
             {
@@ -9161,6 +9551,15 @@ public class COM2POSE_lib
         sb_table.append("\t\t\t\t</th>\n");
         for(String key_hm : hm_names_order)
         {
+            if(!results_hypergeometric_test.containsKey(key_hm))
+            {
+                sb_table.append("\t\t\t\t<th>\n");
+                sb_table.append("-");
+                sb_table.append("\t\t\t\t</th>\n");
+                sb_table.append("\t\t\t\t<th>\n");
+                sb_table.append("\t\t\t\t</th>\n");
+                continue;
+            }
             sb_table.append("\t\t\t\t<th>\n");
             sb_table.append(df.format(results_hypergeometric_test.get(key_hm)));
             sb_table.append("\t\t\t\t</th>\n");
