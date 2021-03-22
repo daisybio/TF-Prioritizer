@@ -835,33 +835,26 @@ public class COM2POSE_lib
                 {
                     HashSet<String> available_hms = distinct_tfs_hms.get(key_tf);
 
-                    for (String k_hm : available_hms)
-                    {
+                    for (String k_hm : available_hms) {
                         HashSet<String> available_ensgs = new HashSet<>();
 
                         boolean found_tgene_file = true;
-                        if(!options_intern.path_tgen.equals(""))
-                        {
-                            File f_tgene_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_filter_target_genes+File.separator+k_hm+File.separator+k_group_clash);
+                        if (!options_intern.path_tgen.equals("")) {
+                            File f_tgene_input = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tgen + File.separator + options_intern.folder_name_tgen_filter_target_genes + File.separator + k_hm + File.separator + k_group_clash);
 
-                            if(!f_tgene_input.exists())
-                            {
-                                found_tgene_file=false;
+                            if (!f_tgene_input.exists()) {
+                                found_tgene_file = false;
                             }
-                            if(found_tgene_file)
-                            {
-                                for(File fileDir: f_tgene_input.listFiles())
-                                {
-                                    if(fileDir.isFile())
-                                    {
-                                        f_tgene_input=fileDir;
+                            if (found_tgene_file) {
+                                for (File fileDir : f_tgene_input.listFiles()) {
+                                    if (fileDir.isFile()) {
+                                        f_tgene_input = fileDir;
                                     }
                                 }
 
                                 BufferedReader br_tgene_input = new BufferedReader(new FileReader(f_tgene_input));
                                 String line_tgene_input = br_tgene_input.readLine();
-                                while((line_tgene_input=br_tgene_input.readLine())!=null)
-                                {
+                                while ((line_tgene_input = br_tgene_input.readLine()) != null) {
                                     String[] split = line_tgene_input.split("\t");
                                     available_ensgs.add(split[0]);
                                 }
@@ -872,28 +865,23 @@ public class COM2POSE_lib
 
                         double tf_regression_coefficient = 0.0;
 
-                        File f_hm_tf_coeff_input = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_put_DYNAMITE + File.separator + k_hm + File.separator+k_group_clash+ File.separator + options_intern.file_suffix_dynamite_output_to_be_plotted);
-                        if (f_hm_tf_coeff_input.exists() && f_hm_tf_coeff_input.isFile())
-                        {
+                        File f_hm_tf_coeff_input = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_put_DYNAMITE + File.separator + k_hm + File.separator + k_group_clash + File.separator + options_intern.file_suffix_dynamite_output_to_be_plotted);
+                        if (f_hm_tf_coeff_input.exists() && f_hm_tf_coeff_input.isFile()) {
                             BufferedReader br_hm_tf_coeff = new BufferedReader(new FileReader(f_hm_tf_coeff_input));
                             String line_hm_tf_coeff = br_hm_tf_coeff.readLine();
-                            while ((line_hm_tf_coeff = br_hm_tf_coeff.readLine()) != null)
-                            {
+                            while ((line_hm_tf_coeff = br_hm_tf_coeff.readLine()) != null) {
                                 String[] split = line_hm_tf_coeff.split("\t");
 
                                 String[] split_tf_long_name = split[0].split("_");
 
                                 String tf_in_file = split_tf_long_name[0];
 
-                                if(split_tf_long_name.length>1)
-                                {
-                                    name_anhaengsel=split_tf_long_name[1];
+                                if (split_tf_long_name.length > 1) {
+                                    name_anhaengsel = split_tf_long_name[1];
                                 }
 
-                                if (tf_in_file.toUpperCase().equals(key_tf.toUpperCase()))
-                                {
-                                    if (split[1].equals("0"))
-                                    {
+                                if (tf_in_file.toUpperCase().equals(key_tf.toUpperCase())) {
+                                    if (split[1].equals("0")) {
                                         break;
                                     }
                                     tf_regression_coefficient = Double.parseDouble(split[1]);
@@ -905,8 +893,7 @@ public class COM2POSE_lib
                             continue;
                         }
 
-                        if(tf_regression_coefficient==0)
-                        {
+                        if (tf_regression_coefficient == 0) {
                             continue;
                         }
 
@@ -920,27 +907,83 @@ public class COM2POSE_lib
                             current_tf_score *= -1;
                         }
 
-                        File f_group1_hm_tf_target_genes_root = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_postprocessing + File.separator + options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm + File.separator + k_group_clash + File.separator + split_clash[0]);
+                        String[] group_clash_tps = k_group_clash.split("_");
 
-                        File f_group1_hm_tf_target_genes = new File("");
-                        for(File fileDir:f_group1_hm_tf_target_genes_root.listFiles())
-                        {
-                            if(fileDir.isFile())
-                            {
-                                f_group1_hm_tf_target_genes=fileDir;
-                                break;
-                            }
+                        File f_group1_hm_tf_target_genes_root;
+                        File parent_group1;
+
+                        if (options_intern.tepic_tpm_cutoff > 0) {
+                            f_group1_hm_tf_target_genes_root = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_postprocessing + File.separator + options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm + File.separator + k_group_clash + File.separator + split_clash[0]);
+                            parent_group1 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_postprocessing + File.separator + options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm + File.separator + k_group_clash + File.separator + split_clash[0]);
+
+                        } else {
+                            parent_group1 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_output_raw + File.separator + group_clash_tps[0] + File.separator + k_hm + File.separator);
+                            f_group1_hm_tf_target_genes_root = new File("");
+                        }
+
+                        String suffix = "";
+
+                        if (options_intern.tepic_tpm_cutoff > 0) {
+                            suffix = "_Gene_View_Filtered_TPM.txt";
+                        } else {
+                            suffix = "_Gene_View_Filtered.txt";
                         }
 
 
-                        File f_group2_hm_tf_target_genes_root = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_postprocessing + File.separator + options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm + File.separator + k_group_clash + File.separator + split_clash[1]);
+                        File f_group1_hm_tf_target_genes = new File("");
+
+                        for (int j = 0; j < parent_group1.listFiles().length; j++) {
+                            if (options_intern.tepic_tpm_cutoff > 0) {
+                                j = parent_group1.listFiles().length;
+                            } else {
+                                f_group1_hm_tf_target_genes_root = parent_group1.listFiles()[j];
+                            }
+
+                            for (File fileDir : f_group1_hm_tf_target_genes_root.listFiles()) {
+                                if (!fileDir.getName().matches(".*" + suffix + ".*")) {
+                                    continue;
+                                }
+                                if (fileDir.isFile()) {
+                                    f_group1_hm_tf_target_genes = fileDir;
+                                    break;
+                                }
+                            }
+                        }
+
+                        File f_group2_hm_tf_target_genes_root;
+                        File parent_group2;
+
+                        if (options_intern.tepic_tpm_cutoff > 0) {
+                            f_group2_hm_tf_target_genes_root = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_postprocessing + File.separator + options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm + File.separator + k_group_clash + File.separator + split_clash[1]);
+                            parent_group2 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_postprocessing + File.separator + options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm + File.separator + k_group_clash + File.separator + split_clash[1]);
+
+                        } else {
+                            parent_group2 = new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tepic_output_raw + File.separator + group_clash_tps[1] + File.separator + k_hm + File.separator);
+                            f_group2_hm_tf_target_genes_root = new File("");
+                        }
+
                         File f_group2_hm_tf_target_genes = new File("");
-                        for(File fileDir:f_group2_hm_tf_target_genes_root.listFiles())
+
+                        for (int j = 0; j < parent_group2.listFiles().length; j++)
                         {
-                            if(fileDir.isFile())
+                            if (options_intern.tepic_tpm_cutoff > 0) {
+
+                                j = parent_group2.listFiles().length;
+                            } else
                             {
-                                f_group2_hm_tf_target_genes=fileDir;
-                                break;
+                                f_group2_hm_tf_target_genes_root = parent_group2.listFiles()[j];
+                            }
+
+                            for(File fileDir:f_group2_hm_tf_target_genes_root.listFiles())
+                            {
+                                if (!fileDir.getName().matches(".*" + suffix + ".*")) {
+                                    continue;
+                                }
+                                if(fileDir.isFile())
+                                {
+                                    f_group2_hm_tf_target_genes=fileDir;
+                                    break;
+                                }
                             }
                         }
 
@@ -5348,62 +5391,6 @@ public class COM2POSE_lib
         logger.logLine("[TGENE] Finished preprocessing.");
     }
 
-    public void postprocess_tepic_output_mutually_exclusive() throws IOException {
-        logger.logLine("Start postprocessing of TEPIC output");
-
-        String suffix="";
-
-        if(options_intern.tepic_tpm_cutoff>0)
-        {
-            suffix="_Gene_View_Filtered_TPM.txt";
-        }
-        else
-        {
-            suffix="_Gene_View_Filtered.txt";
-        }
-
-        File folder_postprocessing = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing);
-        folder_postprocessing.mkdir();
-
-        File folder_pp_input = new File(folder_postprocessing.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_input);
-        folder_pp_input.mkdir();
-
-        File folder_pp_output = new File(folder_postprocessing.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_output);
-        folder_pp_output.mkdir();
-
-        HashSet<String> available_hms = new HashSet<>();
-        HashSet<String> available_group_clashes = new HashSet<>();
-        HashSet<String> check_tfs = new HashSet<>();
-
-        File f_tepic_output_raw = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw);
-
-        for(File fileDir_clash : f_tepic_output_raw.listFiles())
-        {
-            if(fileDir_clash.isDirectory())
-            {
-                available_group_clashes.add(fileDir_clash.getName());
-                for(File fileDir_HM: fileDir_clash.listFiles())
-                {
-                    if(fileDir_HM.isDirectory())
-                    {
-                        available_hms.add(fileDir_HM.getName());
-
-
-
-                    }
-                }
-
-            }
-        }
-
-
-
-
-
-
-        logger.logLine("Finished postprocessing of TEPIC output");
-    }
-
     /**
      * postprocesses the TEPIC output (checks for TPM filter and copies files into a structure where preprocessing of DYNAMITE can happen
      */
@@ -8649,70 +8636,109 @@ public class COM2POSE_lib
             f_input_target_genes_hm_group_clash = new File(path);
         }
 
-        File f_input = new File(f_input_target_genes_hm_group_clash.getAbsolutePath()+File.separator+timepoint);
+        File f_input;
+        File parent;
 
-
-
-        for(File fileDir: f_input.listFiles())
+        if(options_intern.tepic_tpm_cutoff>0)
         {
-            if(fileDir.isFile())
+            f_input  = new File(f_input_target_genes_hm_group_clash.getAbsolutePath()+File.separator+timepoint);
+            parent = new File(f_input_target_genes_hm_group_clash.getAbsolutePath()+File.separator+timepoint);
+        }
+        else
+        {
+            parent = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw+File.separator+timepoint+File.separator+f_input_target_genes_hm_group_clash.getParentFile().getName()+File.separator);
+            f_input = new File("");
+        }
+
+        String suffix="";
+
+        if(options_intern.tepic_tpm_cutoff>0)
+        {
+            suffix="_Gene_View_Filtered_TPM.txt";
+        }
+        else
+        {
+            suffix="_Gene_View_Filtered.txt";
+        }
+
+        for(int j = 0; j <parent.listFiles().length;j++)
+        {
+            if(options_intern.tepic_tpm_cutoff>0)
             {
-                BufferedReader br = new BufferedReader(new FileReader(fileDir));
-                String line = br.readLine();
+                j = parent.listFiles().length;
+            }
+            else
+            {
+                f_input=parent.listFiles()[j];
+            }
 
-                int interesting_column = -1;
-
-                String[] header = line.split("\t");
-                for(int i = 0; i < header.length;i++)
+            for(File fileDir: f_input.listFiles())
+            {
+                if(!fileDir.getName().matches(".*"+suffix+".*"))
                 {
-                    if(header[i].toUpperCase().matches(".*"+tf.toUpperCase()+".*"))
-                    {
-                        interesting_column=i;
-                    }
+                    continue;
                 }
-
-                if(interesting_column==-1)
+                if(fileDir.isFile())
                 {
-                    return;
-                }
+                    BufferedReader br = new BufferedReader(new FileReader(fileDir));
+                    String line = br.readLine();
 
-                ArrayList<Gene_Affinity_Value> all_affinities = new ArrayList<>();
+                    int interesting_column = -1;
 
-                while((line=br.readLine())!=null)
-                {
-                    String[] split = line.split("\t");
-
-                    Gene_Affinity_Value gav = new Gene_Affinity_Value();
-                    gav.gene_name = split[0];
-                    if(ensg_gene_symbol_map.containsKey(gav.gene_name))
+                    String[] header = line.split("\t");
+                    for(int i = 0; i < header.length;i++)
                     {
-                        gav.gene_symbol=ensg_gene_symbol_map.get(gav.gene_name);
-                    }
-                    gav.affinity_value=Double.parseDouble(split[interesting_column]);
-                    all_affinities.add(gav);
-                }
-                br.close();
-
-                Collections.sort(all_affinities);
-
-                BufferedWriter bw = new BufferedWriter(new FileWriter(new File(f_output.getAbsolutePath()+File.separator+tf+".csv")));
-
-                bw.write("ENSG\tSYMBOL\tAFFINITY");
-                bw.newLine();
-
-                for(int i = 0; i < options_intern.plot_top_k_genes;i++)
-                {
-                    if(all_affinities.size() > i)
-                    {
-                        bw.write(all_affinities.get(i).toString());
-                        bw.newLine();
+                        if(header[i].toUpperCase().matches(".*"+tf.toUpperCase()+".*"))
+                        {
+                            interesting_column=i;
+                        }
                     }
 
-                }
+                    if(interesting_column==-1)
+                    {
+                        return;
+                    }
 
-                bw.close();
+                    ArrayList<Gene_Affinity_Value> all_affinities = new ArrayList<>();
+
+                    while((line=br.readLine())!=null)
+                    {
+                        String[] split = line.split("\t");
+
+                        Gene_Affinity_Value gav = new Gene_Affinity_Value();
+                        gav.gene_name = split[0];
+                        if(ensg_gene_symbol_map.containsKey(gav.gene_name))
+                        {
+                            gav.gene_symbol=ensg_gene_symbol_map.get(gav.gene_name);
+                        }
+                        gav.affinity_value=Double.parseDouble(split[interesting_column]);
+                        all_affinities.add(gav);
+                    }
+                    br.close();
+
+                    Collections.sort(all_affinities);
+
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(new File(f_output.getAbsolutePath()+File.separator+tf+".csv")));
+
+                    bw.write("ENSG\tSYMBOL\tAFFINITY");
+                    bw.newLine();
+
+                    for(int i = 0; i < options_intern.plot_top_k_genes;i++)
+                    {
+                        if(all_affinities.size() > i)
+                        {
+                            bw.write(all_affinities.get(i).toString());
+                            bw.newLine();
+                        }
+
+                    }
+
+                    bw.close();
+                }
             }
         }
+
+
     }
 
     private String write_regression_coeffecient_analysis_found_table_html(Double d, String level) throws IOException {
