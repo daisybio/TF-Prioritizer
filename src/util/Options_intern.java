@@ -164,6 +164,8 @@ public class Options_intern
     public int mix_occurence_intersection=2;
     //#[OPT]: mutually exclusive peaks. Use only peaks, which are mutually exclusive, default: FALSE
     public boolean mix_mutually_exclusive=false;
+    //#[OPT]: includes peaks, which are not mutually exclusive, but are differential in peak signal (can only be used if mix_mutually_exclusive=TRUE), default = TRUE
+    public boolean mix_mutually_exclusive_diff_peak_signals=true;
 
     /*
     #########################

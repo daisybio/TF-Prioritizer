@@ -8,6 +8,8 @@ public class BL_ranges_binary_tree implements Comparable
     public int right_border;
     public String signal="";
 
+    public double peak_score = -1.0;
+
     public String toString()
     {
         String ret ="";
@@ -23,6 +25,11 @@ public class BL_ranges_binary_tree implements Comparable
         {
             ret+="\t";
             ret+=signal;
+        }
+        if(peak_score>-1)
+        {
+            ret+="\t";
+            ret+=peak_score;
         }
 
         return  ret;

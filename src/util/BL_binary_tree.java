@@ -1,8 +1,32 @@
 package util;
 
+import java.util.ArrayList;
+
 public class BL_binary_tree {
 
     public BL_binary_tree_node root;
+
+    /**
+     * only used in mutually exclusive option using differential peak signals
+     */
+    public ArrayList<Double> peak_signals = new ArrayList<>();
+    public double average_peak_score = 0.0;
+
+    public void calcualte_average_peak_score()
+    {
+        double all = 0.0;
+        for(int i = 0; i < peak_signals.size();i++)
+        {
+            all+=peak_signals.get(i);
+        }
+
+        average_peak_score=all/peak_signals.size();
+    }
+
+    /**
+     * only used in mutually exclusive option using differential peak signals
+     */
+
 
     public BL_binary_tree(BL_binary_tree_node root)
     {

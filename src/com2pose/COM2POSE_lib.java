@@ -6768,13 +6768,13 @@ public class COM2POSE_lib
                             options_intern.mix_level="SAMPLE_LEVEL";
 
                             mix_option();
-                            mix_mutually_exclusive_peaks();
                             if(!options_intern.black_list_dir.equals(""))
                             {
                                 logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Redo blacklist on unioned samples");
                                 preprocess_blacklist();
                                 filter_blacklist();
                             }
+                            mix_mutually_exclusive_peaks();
                         }
 
                         BufferedReader br_peaks = new BufferedReader(new FileReader(fileDir_hm.listFiles()[0]));
@@ -6795,7 +6795,7 @@ public class COM2POSE_lib
                                     current_chr_ranges=recursive_split_BL(current_chr_ranges,newly_ordered);
                                     //write_file
                                     BufferedWriter bw_peaks = new BufferedWriter(new FileWriter(new File(output_hm.getAbsolutePath()+File.separator+current_chr+".txt")));
-                                    bw_peaks.append("#\tCHR\tLEFT_BORDER\tRIGHT_BORDER");
+                                    bw_peaks.append("#\tCHR\tLEFT_BORDER\tRIGHT_BORDER\tPEAK_SCORE");
                                     bw_peaks.newLine();
                                     for(BL_ranges_binary_tree bl:newly_ordered)
                                     {
@@ -6822,6 +6822,7 @@ public class COM2POSE_lib
                             range.chr=current_chr;
                             //range.signal=split[0];
                             range.number=position;
+                            range.peak_score=Double.parseDouble(split[4]);
 
                             current_chr_ranges.add(range);
 
@@ -6917,6 +6918,7 @@ public class COM2POSE_lib
                                     iu.left_border = Integer.parseInt(split[2]);
                                     iu.right_border = Integer.parseInt(split[3]);
                                     //iu.signal = split[4];
+                                    iu.peak_score=Double.parseDouble(split[4]);
 
                                     region.add(iu);
                                 }
@@ -6928,7 +6930,10 @@ public class COM2POSE_lib
                                 for(int i = 1; i < region.size(); i++)
                                 {
                                     tree.add(region.get(i).number,region.get(i));
+                                    tree.peak_signals.add(region.get(i).peak_score);
                                 }
+
+                                tree.calcualte_average_peak_score();
 
                                 chr_tree_tp1.put(name,tree);
 
@@ -6950,6 +6955,7 @@ public class COM2POSE_lib
                             iu.chr = chr;
                             iu.left_border = Integer.parseInt(split[1]);
                             iu.right_border = Integer.parseInt(split[2]);
+                            iu.peak_score= Double.parseDouble(split[4]);
 
                             if(!chr_tree_tp1.containsKey(chr))
                             {
@@ -6957,12 +6963,40 @@ public class COM2POSE_lib
                                 continue;
                             }
                             BL_binary_tree tree = chr_tree_tp1.get(chr);
-                            if(tree.containsNode(iu) == null)
+
+                            if(options_intern.mix_mutually_exclusive_diff_peak_signals)
                             {
-                                //this peak is mutually exclusive
-                                bw_tp2.write(line_tp2);
-                                bw_tp2.newLine();
+                                BL_ranges_binary_tree current_match = tree.containsNode(iu);
+                                if(current_match == null)
+                                {
+                                    //this peak is mutually exclusive
+                                    bw_tp2.write(line_tp2);
+                                    bw_tp2.newLine();
+                                    continue;
+                                }
+
+                                double peak_difference = current_match.peak_score - iu.peak_score;
+
+                                if(peak_difference<0)
+                                    peak_difference*=-1;
+
+                                if(peak_difference >tree.average_peak_score)
+                                {
+                                    //this peak is mutually exclusive in peak score
+                                    bw_tp2.write(line_tp2);
+                                    bw_tp2.newLine();
+                                }
                             }
+                            else
+                            {
+                                if(tree.containsNode(iu) == null)
+                                {
+                                    //this peak is mutually exclusive
+                                    bw_tp2.write(line_tp2);
+                                    bw_tp2.newLine();
+                                }
+                            }
+
 
                         }
                         br_tp2.close();
@@ -6991,6 +7025,7 @@ public class COM2POSE_lib
                                     iu.left_border = Integer.parseInt(split[2]);
                                     iu.right_border = Integer.parseInt(split[3]);
                                     //iu.signal = split[4];
+                                    iu.peak_score = Double.parseDouble(split[4]);
 
                                     region.add(iu);
                                 }
@@ -7002,7 +7037,9 @@ public class COM2POSE_lib
                                 for(int i = 1; i < region.size(); i++)
                                 {
                                     tree.add(region.get(i).number,region.get(i));
+                                    tree.peak_signals.add(region.get(i).peak_score);
                                 }
+                                tree.calcualte_average_peak_score();
 
                                 chr_tree_tp2.put(name,tree);
 
@@ -7025,6 +7062,7 @@ public class COM2POSE_lib
                             iu.chr = chr;
                             iu.left_border = Integer.parseInt(split[1]);
                             iu.right_border = Integer.parseInt(split[2]);
+                            iu.peak_score= Double.parseDouble(split[4]);
 
                             if(!chr_tree_tp1.containsKey(chr))
                             {
@@ -7032,13 +7070,40 @@ public class COM2POSE_lib
                                 continue;
                             }
                             BL_binary_tree tree = chr_tree_tp2.get(chr);
-                            if(tree.containsNode(iu) == null)
-                            {
-                                //this peak is mutually exclusive
-                                bw_tp1.write(line_tp1);
-                                bw_tp1.newLine();
-                            }
 
+                            if(options_intern.mix_mutually_exclusive_diff_peak_signals)
+                            {
+                                BL_ranges_binary_tree current_match = tree.containsNode(iu);
+
+                                if(current_match==null)
+                                {
+                                    //this peak is mutually exclusive
+                                    bw_tp1.write(line_tp1);
+                                    bw_tp1.newLine();
+                                    continue;
+                                }
+
+                                double peak_difference = current_match.peak_score - iu.peak_score;
+
+                                if(peak_difference<0)
+                                    peak_difference*=-1;
+
+                                if(peak_difference > tree.average_peak_score)
+                                {
+                                    //this peak is mutually exclusive
+                                    bw_tp1.write(line_tp1);
+                                    bw_tp1.newLine();
+                                }
+                            }
+                            else
+                            {
+                                if(tree.containsNode(iu) == null)
+                                {
+                                    //this peak is mutually exclusive
+                                    bw_tp1.write(line_tp1);
+                                    bw_tp1.newLine();
+                                }
+                            }
                         }
                         br_tp1.close();
                         bw_tp1.close();
@@ -7944,6 +8009,9 @@ public class COM2POSE_lib
                     break;
                 case "mix_mutually_exclusive":
                     options_intern.mix_mutually_exclusive=Boolean.parseBoolean(split[1]);
+                    break;
+                case "mix_mutually_exclusive_diff_peak_signals":
+                    options_intern.mix_mutually_exclusive_diff_peak_signals=Boolean.parseBoolean(split[1]);
                     break;
                 case "black_list_dir":
                     options_intern.black_list_dir=split[1].substring(1,split[1].length()-1);
