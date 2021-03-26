@@ -8207,6 +8207,9 @@ public class COM2POSE_lib
                     String[] split_interesting_tfs_2 = split[1].substring(1,split[1].length()-1).split(";");
                     options_intern.website_interesting_tfs.addAll(Arrays.asList(split_interesting_tfs_2));
                     break;
+                case "plot_mann_whitneyU_pvalue_cutoff":
+                    options_intern.plot_mann_whitneyU_pvalue_cutoff=Double.parseDouble(split[1]);
+                    break;
                 default:
                     logger.logLine("Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
                     logger.logLine("Do not delete unused parameters in config data!");
@@ -8537,19 +8540,30 @@ public class COM2POSE_lib
         if(options_intern.plot_cutoff_tps<1)
         {
             logger.logLine("[PLOTS] plot_cutoff_tps must be >= 1");
+            all_set=false;
         }
         if(options_intern.plot_cutoff_hms<1)
         {
             logger.logLine("[PLOTS] plot_cutoff_hms must be >= 1");
+            all_set=false;
         }
         if(options_intern.plot_cutoff_gcs<0)
         {
             logger.logLine("[PLOTS] plot_cutoff_gcs must be >= 0");
+            all_set=false;
         }
         if(options_intern.plot_top_k_genes<1)
         {
             logger.logLine("[PLOTS] plot_top_k_genes must be >= 1");
+            all_set=false;
         }
+
+        if(options_intern.plot_mann_whitneyU_pvalue_cutoff<=0)
+        {
+            logger.logLine("[PLOTS] Mann WhitneyU pvalue cutoff must be > 0");
+            all_set=false;
+        }
+
 
         return all_set;
     }
@@ -9175,6 +9189,7 @@ public class COM2POSE_lib
                 "import numpy as np\n" +
                 "import_or_install(\"sts\")\n" +
                 "import statistics as sts\n"+
+                "import scipy.stats as scp\n"+
                 "plt.figure(figsize=(20, 17))\n\n\n" +
                 "df_interesting_stats=pd.DataFrame(columns=['label','sum_all_values','number_target_genes','mean','median','95_quantile','99_quantile'])\n" +
                 "row_counter=0\n\n" +
@@ -9219,12 +9234,13 @@ public class COM2POSE_lib
                     name_tf+"_quantile=0\n"+
                     name_tf+"_quantile_95=0\n"+
                     name_tf+"_median=0\n"+
+                    name_tf+"_mannwhitneyU=scp.mannwhitneyu(background['TF_TG_SCORE'],"+name_tf+"['TF_TG_SCORE'])\n"+
                     "if("+name_tf+"_length>0):\n"+
                     "    "+name_tf+"_mean="+name_tf+"_sum/"+name_tf+"_length\n");
             sb_all.append("    "+name_tf+"_quantile=np.percentile("+name_tf+"['TF_TG_SCORE'], 99)\n");
             sb_all.append("    "+name_tf+"_quantile_95=np.percentile("+name_tf+"['TF_TG_SCORE'], 95)\n");
             sb_all.append("    "+name_tf+"_median=sts.median("+name_tf+"['TF_TG_SCORE'])\n");
-            sb_all.append("if("+name_tf+"_median > background_median):\n");
+            sb_all.append("if("+name_tf+"_median > background_median and "+name_tf+"_mannwhitneyU[1]<"+options_intern.plot_mann_whitneyU_pvalue_cutoff+"):\n");
             sb_all.append("    background_"+name_tf+" = pd.concat([background,"+name_tf+"],axis=0)\n" +
                     "    ax_"+name_tf+" = sns.boxplot(x=\"label\", y=\"TF_TG_SCORE\",data=background_"+name_tf+",palette=\"Set3\")\n" +
                     "    ax_"+name_tf+".set_yscale(\"log\")\n");

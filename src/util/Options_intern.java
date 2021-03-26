@@ -320,6 +320,8 @@ public class Options_intern
     public int plot_cutoff_gcs=100;
     //#[OPT]: top k target genes for TFs, default: 30
     public int plot_top_k_genes=30;
+    //#[REQ]: mann-whitneyU pvalue cutoff (usually 0.05 or 0.01), default 0.01
+    public double plot_mann_whitneyU_pvalue_cutoff=0.01;
 
     /*#########################
       ####WEBSITE parameters###
