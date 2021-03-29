@@ -1,6 +1,7 @@
 package com2pose;
 import util.*;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -528,6 +529,20 @@ public class COM2POSE_lib
         File f_root_plots_scripts_hm = new File(f_root_plots_scripts.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_scripts_HM);
         f_root_plots_scripts_hm.mkdir();
 
+        File f_root_mwu_plots_scripts = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_mwu_scripts);
+        f_root_mwu_plots_scripts.mkdir();
+        File f_root_mwu_plots_scripts_ALL = new File(f_root_mwu_plots_scripts.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_ALL);
+        f_root_mwu_plots_scripts_ALL.mkdir();
+        File f_root_mwu_plots_scripts_HM = new File(f_root_mwu_plots_scripts.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_HM);
+        f_root_mwu_plots_scripts_HM.mkdir();
+
+        File f_root_muw_plots_plots = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_mwu_plots);
+        f_root_muw_plots_plots.mkdir();
+        File f_root_muw_plots_plots_ALL = new File(f_root_muw_plots_plots.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_ALL);
+        f_root_muw_plots_plots_ALL.mkdir();
+        File f_root_muw_plots_plots_HM = new File(f_root_muw_plots_plots.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots_HM);
+        f_root_muw_plots_plots_HM.mkdir();
+
 
         File f_root_plots = new File(f_analysis_distr_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_plots);
         f_root_plots.mkdir();
@@ -552,6 +567,8 @@ public class COM2POSE_lib
         File f_stats_HM = new File(f_stats.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_HM);
         f_stats_HM.mkdir();
 
+        ArrayList<MANN_WHITNEYU_PLOTS_FILES> mann_whitneyU_plots = new ArrayList<>();
+
         ArrayList<File> scripts_to_execute = new ArrayList<>();
 
         for(File fileDir_hm : f_analysis_distr_HM_level_input.listFiles())
@@ -562,8 +579,14 @@ public class COM2POSE_lib
                 f_output_script.mkdir();
                 File f_output_script_file = new File(f_output_script.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_python_script);
 
+                File f_output_mwu_script = new File(f_root_mwu_plots_scripts_HM.getAbsolutePath()+File.separator+fileDir_hm.getName());
+                f_output_mwu_script.mkdir();
+
                 File f_output_plot = new File(f_root_plots_hm.getAbsolutePath()+File.separator+fileDir_hm.getName());
                 f_output_plot.mkdir();
+
+                File f_output_mwu_plot = new File(f_root_muw_plots_plots_HM.getAbsolutePath()+File.separator+fileDir_hm.getName());
+                f_output_mwu_plot.mkdir();
 
                 File f_output_stats = new File(f_stats_HM.getAbsolutePath()+File.separator+fileDir_hm.getName());
                 f_output_stats.mkdir();
@@ -576,6 +599,18 @@ public class COM2POSE_lib
                 //File input_background_file, File input_tf_root, File output_plots, File output_script_file, File output_stats) throws IOException {
 
                 write_python_script_distribution_analysis(f_input_background_distr,f_input_tf_distr,f_output_plot,f_output_script_file,f_output_stats);
+
+
+                MANN_WHITNEYU_PLOTS_FILES mwu = new MANN_WHITNEYU_PLOTS_FILES();
+
+                mann_whitneyU_plots.add(mwu);
+                mwu.background= f_input_background_distr;
+                mwu.tf_data =f_input_tf_distr;
+                mwu.hm=true;
+                mwu.f_output_script=f_output_mwu_script;
+                mwu.f_output_plot=f_output_mwu_plot;
+                mwu.options_intern = options_intern;
+
             }
         }
 
@@ -584,6 +619,16 @@ public class COM2POSE_lib
 
         write_python_script_distribution_analysis(all_background_distr,f_tf_distribution_ALL,f_root_plots_all,f_script_out_all,f_stats_ALL);
         scripts_to_execute.add(f_script_out_all);
+
+        MANN_WHITNEYU_PLOTS_FILES mwu = new MANN_WHITNEYU_PLOTS_FILES();
+        mwu.background = all_background_distr;
+        mwu.tf_data = f_tf_distribution_ALL;
+        mwu.hm=false;
+        mwu.f_output_script = f_root_mwu_plots_scripts_ALL;
+        mwu.f_output_plot = f_root_muw_plots_plots_ALL;
+        mwu.options_intern = options_intern;
+
+        mann_whitneyU_plots.add(mwu);
 
         for(File fileDir: scripts_to_execute)
         {
@@ -599,6 +644,13 @@ public class COM2POSE_lib
                     String message = child.getErrorStream().toString();
                     throw new Exception(message);
             }
+        }
+
+        //DO MANN WHITNEY U PLOTS
+
+        for(MANN_WHITNEYU_PLOTS_FILES mwu_execute: mann_whitneyU_plots)
+        {
+            mwu_execute.write_and_execute_scripts();
         }
 
         logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Finished comparing background distribution to TF distribution and create plots for outstanding TFs");

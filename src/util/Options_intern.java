@@ -95,6 +95,8 @@ public class Options_intern
     public String folder_out_distribution_stats_ALL = "01_ALL";
     public String folder_out_distribution_stats_HM = "01_HM";
     public String folder_out_distribution_hypergeometric_test = "06_HYPERGEOMETRIC_TEST";
+    public String folder_out_distribution_mwu_scripts = "07_SCRIPTS_MANN_WHITNEYU_PLOTS";
+    public String folder_out_distribution_mwu_plots = "08_PLOTS_MANN_WHITNEYU_PLOTS";
     public String folder_out_website="Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -133,6 +135,7 @@ public class Options_intern
     public String file_suffix_distribution_analysis_plot_stats = "stats.csv";
     public String file_suffix_distribution_analysis_hypergeometric_test_rscript = "HYPERGEOMETRIC_TEST.R";
     public String file_suffix_distribution_analysis_hypergeometric_test_output = "STATS.csv";
+    public String file_suffix_distribution_analysis_mann_whitneyU_plot_scripts = "mann_whitneyU_plots.R";
 
     public String html_report_home_home = "HOME.html";
     public String html_report_home_regression_coefficient_analysis = "HOME_REGRESSION.html";
