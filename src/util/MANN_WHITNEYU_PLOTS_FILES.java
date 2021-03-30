@@ -20,7 +20,8 @@ public class MANN_WHITNEYU_PLOTS_FILES {
     public void write_and_execute_scripts() throws IOException {
         StringBuilder script = new StringBuilder();
         script.append("library(ggplot2)\n" +
-                "library(plyr)\n\n\n");
+                "library(plyr)\n" +
+                "library(dplyr)\n\n");
         script.append("setwd(\""+f_output_plot.getAbsolutePath()+"\")\n");
         script.append("background <- read.csv(\""+background.getAbsolutePath()+"\",sep=\"\\t\",comment.char = \"#\")\n");
         script.append("background$POPULATION <- rep(\"BACKGROUND\",nrow(background))\n");
@@ -29,7 +30,7 @@ public class MANN_WHITNEYU_PLOTS_FILES {
         script.append("\n");
         for(File tf : tf_data.listFiles())
         {
-            String tf_name = tf.getName().split("\\.")[0];
+            String tf_name = tf.getName().split("\\.")[0].split("_")[0];
 
             script.append("#######################################################################\n");
             script.append("#####START#############"+tf_name+"#####################################\n");
@@ -50,7 +51,7 @@ public class MANN_WHITNEYU_PLOTS_FILES {
                     "                                          colour = \"#D0D0D0\"), \n" +
                     "          panel.grid.minor = element_line(size = 0.25, linetype = 'solid',\n" +
                     "                                          colour = \"#D0D0D0\"),\n" +
-                    "          axis.text.x = element_text(angle=30, hjust=1)) + xlim(-1,100000) + ylim(0,15000)");
+                    "          axis.text.x = element_text(angle=30, hjust=1)) + xlim(-1,200000) + ylim(0,15000) + xlab(\"TF-TG Score\") + scale_fill_discrete(name = \"Population\", labels = c(\"Background\", \""+tf_name+"\")) + scale_color_discrete(name = \"Population\", labels = c(\"Background\", \""+tf_name+"\"))");
             script.append("\n");
 
             script.append("\n" +

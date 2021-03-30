@@ -16,8 +16,6 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
-        /*
-
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -89,10 +87,10 @@ public class COM2POSE
         com2pose_lib.create_overview_html_report_before_distribution_analysis();
 
         //DISTRIBUTION ANALYSIS
-        com2pose_lib.perform_distribution_analysis();*/
+        com2pose_lib.perform_distribution_analysis();
         com2pose_lib.create_distribution_plots();
-        //com2pose_lib.create_overview_html_report_distribution();
-        //com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();
+        com2pose_lib.create_overview_html_report_distribution();
+        com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();
 
         System.out.println("X");
     }

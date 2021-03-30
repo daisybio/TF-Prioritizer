@@ -635,6 +635,7 @@ public class COM2POSE_lib
             String command_edited = "python3 "+ fileDir.getAbsolutePath();
             logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Run python script: "+ command_edited);
 
+
             Process child = Runtime.getRuntime().exec(command_edited);
             int code = child.waitFor();
             switch (code){
