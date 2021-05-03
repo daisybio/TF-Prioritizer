@@ -45,7 +45,8 @@ public class Options_intern
     public String folder_name_deseq2_output_raw = "02_B_DESeq2_output_raw";
     public String folder_name_deseq2_R_scripts = "02_C_DESeq2_R_scripts";
     public String folder_name_deseq2_output = "02_D_DESeq2_output";
-    public String folder_name_tepic_output_raw = "03_A_TEPIC_output_raw";
+    public String folder_name_tepic_output_raw = "03_A0_TEPIC_output_raw";
+    public String folder_name_tepic_output_raw_shuffle = "03_A1_TEPIC_output_raw_shuffle";
     public String folder_name_tepic_postprocessing = "03_B_TEPIC_postprocessing";
     public String folder_name_tepic_postprocessing_input = "input";
     public String folder_name_tepic_postprocessing_output = "output";
@@ -257,6 +258,8 @@ public class Options_intern
     public String tepic_ensg_symbol="";
     //#[OPT]: use only tgene linked target genes default: true
     public boolean tepic_tgene_target_genes=true;
+    //#[OPT]: randomize TEPIC output, default: false
+    public boolean tepic_randomize_tf_gene_matrix=false;
 
     /*######################
      ####TGENE parameters###

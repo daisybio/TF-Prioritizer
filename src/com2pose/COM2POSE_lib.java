@@ -5444,6 +5444,7 @@ public class COM2POSE_lib
         logger.logLine("[TGENE] Finished preprocessing.");
     }
 
+
     /**
      * postprocesses the TEPIC output (checks for TPM filter and copies files into a structure where preprocessing of DYNAMITE can happen
      */
@@ -5491,7 +5492,15 @@ public class COM2POSE_lib
                 f_input_hm_folders.mkdir();
 
                 //move coresponding sample outputs to these folders
-                File f_input_samples = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw+File.separator+s+File.separator+ss);
+                File f_input_samples;
+                if(options_intern.tepic_randomize_tf_gene_matrix)
+                {
+                    f_input_samples= new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw_shuffle+File.separator+File.separator+s+File.separator+ss);
+                }
+                else
+                {
+                    f_input_samples = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw+File.separator+s+File.separator+ss);
+                }
 
                 for(File fileDir : f_input_samples.listFiles())
                 {
@@ -6011,6 +6020,114 @@ public class COM2POSE_lib
         }
         bw_all_tfs.close();
         logger.logLine("Finished postprocessing of TEPIC output");
+    }
+
+    /**
+     * randomizes TEPIC output for evaluation
+     * @throws IOException
+     */
+    public void randomize_tepic() throws IOException {
+        logger.logLine("[TEPIC] Randomize output start.");
+
+        File f_input_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw);
+
+        File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw_shuffle);
+        f_output_root.mkdir();
+
+        for(File fileDir_tp: f_input_root.listFiles())
+        {
+            File f_output_tp = new File(f_output_root.getAbsolutePath()+File.separator+fileDir_tp.getName());
+            f_output_tp.mkdir();
+
+            for(File fileDir_hm : fileDir_tp.listFiles())
+            {
+                File f_output_tp_hm = new File(f_output_tp.getAbsolutePath()+File.separator+fileDir_hm.getName());
+                f_output_tp_hm.mkdir();
+
+                for(File fileDir_sample : fileDir_hm.listFiles())
+                {
+                    File f_output_tp_hm_sample = new File(f_output_tp_hm.getAbsolutePath()+File.separator+fileDir_sample.getName());
+                    f_output_tp_hm_sample.mkdir();
+
+                    ArrayList<File> affinity_files = new ArrayList<>();
+
+                    for(File fileDir_affinity : fileDir_sample.listFiles())
+                    {
+                        if(fileDir_affinity.getName().matches(".*_Affinity_Gene_View_Filtered.*"))
+                        {
+                            affinity_files.add(fileDir_affinity);
+                        }
+                    }
+
+                    File file_to_shuffle = new File("");
+
+                    if(affinity_files.size()==2)
+                    {
+                        for(File f : affinity_files)
+                        {
+                            if(f.getName().matches(".*TPM.*"))
+                            {
+                                file_to_shuffle = f;
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        file_to_shuffle = affinity_files.get(0);
+                    }
+
+                    //now shuffle columns of this file and write line by line to new file
+                    File f_out_shuffled = new File(f_output_tp_hm_sample.getAbsolutePath()+File.separator+file_to_shuffle.getName());
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(f_out_shuffled));
+                    BufferedReader br= new BufferedReader(new FileReader(file_to_shuffle));
+                    String line = br.readLine();
+                    String[] split_header = line.split("\t");
+
+                    bw.write(line);
+                    bw.newLine();
+
+                    ArrayList<Integer> which_column_writes_which = new ArrayList<>();
+                    which_column_writes_which.add(0);
+
+                    ArrayList<Integer> not_shuffled = new ArrayList<>();
+                    for(int i = 1; i < split_header.length; i++)
+                    {
+                        not_shuffled.add(i);
+                    }
+
+                    Collections.shuffle(not_shuffled);
+                    which_column_writes_which.addAll(not_shuffled);
+
+                    while((line=br.readLine())!=null)
+                    {
+                        String[] split= line.split("\t");
+
+                        StringBuilder sb = new StringBuilder();
+
+                        int c = 0;
+                        for(Integer i : which_column_writes_which)
+                        {
+                            sb.append(split[i]);
+                            if(c < which_column_writes_which.size()-1)
+                            {
+                                sb.append("\t");
+                            }
+                            c++;
+                        }
+
+                        bw.write(sb.toString());
+                        bw.newLine();
+
+                    }
+
+                    br.close();
+                    bw.close();
+                }
+            }
+        }
+
+        logger.logLine("[TEPIC] Randomize output finished.");
+
     }
 
     /**
@@ -8171,6 +8288,9 @@ public class COM2POSE_lib
                     break;
                 case "tepic_tgene_target_genes":
                     options_intern.tepic_tgene_target_genes=Boolean.parseBoolean(split[1]);
+                    break;
+                case "tepic_randomize_tf_gene_matrix":
+                    options_intern.tepic_randomize_tf_gene_matrix=Boolean.parseBoolean(split[1]);
                     break;
                 case "tgen_consensus":
                     options_intern.tgen_consensus=Double.parseDouble(split[1]);
