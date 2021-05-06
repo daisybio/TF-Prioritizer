@@ -955,7 +955,7 @@ public class COM2POSE_lib
                         double current_diff_gene_expr = group_clash_diff_gene_expr.get(k_group_clash);
                         double current_gene_counts = tp_gene_count.get(split_clash[0]) + tp_gene_count.get(split_clash[1]);
 
-                        double current_tf_score = current_gene_counts;
+                        double current_tf_score = 1;//current_gene_counts;
                         if (current_tf_score < 0) {
                             current_tf_score *= -1;
                         }
@@ -1187,8 +1187,12 @@ public class COM2POSE_lib
                                         ensg_diff_gene_expr=group_clash_diff_gene_expr.get(k_group_clash);
                                     }
 
-                                    double tg_score_1 = genecount_1*ensg_diff_gene_expr*gene_score1;
-                                    double tg_score_2 = genecount_2*ensg_diff_gene_expr*gene_score2;
+                                    //double tg_score_1 = genecount_1*ensg_diff_gene_expr*gene_score1;
+                                    //double tg_score_2 = genecount_2*ensg_diff_gene_expr*gene_score2;
+
+                                    double tg_score_1 = ensg_diff_gene_expr*gene_score1;
+                                    double tg_score_2 = ensg_diff_gene_expr*gene_score2;
+
                                     if(tg_score_1<0)
                                     {
                                         tg_score_1*=-1;
