@@ -77,6 +77,8 @@ public class Options_intern
     public String folder_out_analysis_data_WEBSITE_OVERVIEW = "03_WEBSITE_OVERVIEW";
     public String folder_out_analysis_data_WEBSITE_NUMBER_TFs = "04_WEBSITE_NUMBER_TFs";
     public String folder_out_target_genes ="06_D_PLOTS_TARGET_GENES";
+    public String folder_out_target_genes_all_different = "all_data_different";
+    public String folder_out_target_genes_same = "all_data_same";
     public String folder_out_distribution ="07_DISTRIBUTION_ANALYSIS";
     public String folder_out_distribution_analyzed_tfs ="01_ANALYSED_TFS";
     public String folder_out_distribution_tf_tg_scores = "02_TF_TG_SCORES";
@@ -98,6 +100,7 @@ public class Options_intern
     public String folder_out_distribution_hypergeometric_test = "06_HYPERGEOMETRIC_TEST";
     public String folder_out_distribution_mwu_scripts = "07_SCRIPTS_MANN_WHITNEYU_PLOTS";
     public String folder_out_distribution_mwu_plots = "08_PLOTS_MANN_WHITNEYU_PLOTS";
+    public String folder_out_distribution_dcg = "09_DISCOUNTED_CUMULATIVE_GAIN";
     public String folder_out_website="Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -113,6 +116,7 @@ public class Options_intern
     public String folder_out_website_interactive_plots_tps="TIMEPOINTS_CONDITIONS";
     public String folder_out_website_interactive_plots_overview="OVERVIEW";
     public String folder_out_website_plots_distribution_analysis = "DISTRIBUTION_ANALYSIS_PLOTS";
+    public String folder_out_igv = "08_IGV_screenshots";
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
@@ -137,6 +141,7 @@ public class Options_intern
     public String file_suffix_distribution_analysis_hypergeometric_test_rscript = "HYPERGEOMETRIC_TEST.R";
     public String file_suffix_distribution_analysis_hypergeometric_test_output = "STATS.csv";
     public String file_suffix_distribution_analysis_mann_whitneyU_plot_scripts = "mann_whitneyU_plots.R";
+    public String file_suffix_distribution_analysis_dcg = "dcg_stats.csv";
 
     public String html_report_home_home = "HOME.html";
     public String html_report_home_regression_coefficient_analysis = "HOME_REGRESSION.html";
@@ -335,6 +340,18 @@ public class Options_intern
     //#[OPT]: list of TFs which you are interested in - is only used to search fast for known TFs in the results, it does not affect results
     //#e.g. website_interesting_tfs="STAT3;GATA3;NFIB"
     public HashSet<String> website_interesting_tfs=new HashSet<>();
+
+    /*########################
+        ####IGV parameters###
+        #########################*/
+    //#[OPT]: path to igv.sh, if not set no images of the top target genes of the discounted cumulative gain TFs will be taken
+    public String igv_path_to_igv="";
+    //#[OPT]: path to tf chip_seq data, of which you want to take images for target genes to see peaks
+    public String igv_path_to_tf_chip_seq="";
+    //#[OPT] port number of igv, default = 60151
+    public int igv_port_number=60151;
+    //#[OPT] igv species name for reference genome
+    public String igv_species_ref_genome="";
 
 
     /*##################################

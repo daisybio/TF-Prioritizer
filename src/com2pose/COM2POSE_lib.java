@@ -2,6 +2,8 @@ package com2pose;
 import util.*;
 import java.io.*;
 import java.lang.reflect.Array;
+import java.net.Socket;
+import java.nio.Buffer;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -40,6 +42,301 @@ public class COM2POSE_lib
         logger.logLine("#########################################");
         logger.logLine("Working directory set to: " + options_intern.com2pose_working_directory);
         logger.logLine("COM2POSE path set to: "+ options_intern.path_to_COM2POSE);
+    }
+
+    public void run_igv() throws Exception {
+        logger.logLine("[IGV] start taking screenshots for top TFs and their corresponding top target genes");
+
+        //read gtf for genome coordinates
+        HashMap<String,String> gene_to_coordinates = new HashMap<>();
+        BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(new File(options_intern.tepic_gene_annot)));
+        String line_gene_coordinates = br_gene_coordinates.readLine();
+        while((line_gene_coordinates=br_gene_coordinates.readLine())!=null)
+        {
+            if(line_gene_coordinates.startsWith("#"))
+            {
+                continue;
+            }
+
+            String[] split = line_gene_coordinates.split("\t");
+
+            if(!split[2].equals("gene"))
+            {
+                continue;
+            }
+
+            String chr = split[0];
+            String position = split[3]+"-"+split[4];
+            String gene_name = "";
+
+            String[] gene_name_prep = split[8].split(";");
+            for(String key : gene_name_prep)
+            {
+                key=key.trim();
+                if(key.startsWith("gene_name"))
+                {
+                    String[] split_intern = key.split("\"");
+                    gene_name=split_intern[1].toUpperCase();
+                }
+            }
+            gene_to_coordinates.put(gene_name,chr+":"+position);
+        }
+
+        //get most significant TFs
+        ArrayList<String> tfs_in_order = new ArrayList<>();
+        BufferedReader br_tfs = new BufferedReader(new FileReader(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_dcg+File.separator+options_intern.file_suffix_distribution_analysis_dcg));
+        String line_tfs = br_tfs.readLine();
+        while((line_tfs=br_tfs.readLine())!=null)
+        {
+            String[] split = line_tfs.split("\t");
+            tfs_in_order.add(split[1]);
+        }
+
+        //get target genes for tfs
+        HashSet<String> which_tfs = new HashSet<>();
+        HashMap<String,HashMap<String,HashMap<String,ArrayList<String>>>> hm_timepoint_tf_target_genes = new HashMap<>();
+        File f_root_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes);
+
+        for(File f_hm : f_root_target_genes.listFiles())
+        {
+            String hm = f_hm.getName();
+            HashMap<String,HashMap<String,ArrayList<String>>> hm_hm;
+            if(hm_timepoint_tf_target_genes.containsKey(hm))
+            {
+                hm_hm=hm_timepoint_tf_target_genes.get(hm);
+            }
+            else
+            {
+                hm_hm = new HashMap<>();
+                hm_timepoint_tf_target_genes.put(hm,hm_hm);
+            }
+
+            if(f_hm.isDirectory())
+            {
+                File f_hm_cutoff = new File(f_hm.getAbsolutePath()+File.separator+"0.1");
+                if(f_hm_cutoff.exists() && f_hm_cutoff.isDirectory())
+                {
+                    File f_hm_cutoff_all_diff_data = new File(f_hm_cutoff.getAbsolutePath()+File.separator+options_intern.folder_out_target_genes_all_different);
+                    if(f_hm_cutoff_all_diff_data.exists() && f_hm_cutoff_all_diff_data.isDirectory())
+                    {
+                        for(File f_hm_cutoff_all_diff_data_tp : f_hm_cutoff_all_diff_data.listFiles())
+                        {
+                            String tp = f_hm_cutoff_all_diff_data_tp.getName();
+
+                            HashMap<String,ArrayList<String>> hm_tp;
+                            if(hm_hm.containsKey(tp))
+                            {
+                                hm_tp=hm_hm.get(tp);
+                            }
+                            else
+                            {
+                                hm_tp=new HashMap<>();
+                                hm_hm.put(tp,hm_tp);
+                            }
+
+                            if(f_hm_cutoff_all_diff_data_tp.isDirectory())
+                            {
+                                for(String tfs: tfs_in_order)
+                                {
+                                    File f_tf_target_genes_input = new File(f_hm_cutoff_all_diff_data_tp.getAbsolutePath()+File.separator+tfs+".csv");
+                                    if(f_tf_target_genes_input.exists())
+                                    {
+                                        ArrayList<String> target_genes_ordered = new ArrayList<>();
+                                        hm_tp.put(tfs,target_genes_ordered);
+                                        which_tfs.add(tfs);
+
+                                        BufferedReader br_tg = new BufferedReader(new FileReader(f_tf_target_genes_input));
+                                        String line_tg = br_tg.readLine();
+                                        while((line_tg=br_tg.readLine())!=null)
+                                        {
+                                            String[] split = line_tg.split("\t");
+                                            target_genes_ordered.add(split[1].toUpperCase());
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        logger.logLine("[IGV] taking pictures ...");
+        //TODO: take pictures
+        /*
+        http://software.broadinstitute.org/software/igv/automation
+         */
+
+        File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv);
+        f_output_root.mkdir();
+
+        for(int i = 0; i < tfs_in_order.size(); i++)
+        {
+            String tf = tfs_in_order.get(i);
+            if(which_tfs.contains(tf))
+            {
+                File f_output_tf = new File(f_output_root.getAbsolutePath()+File.separator+i+"_"+tf);
+                f_output_tf.mkdir();
+
+                for(String key_hm: hm_timepoint_tf_target_genes.keySet())
+                {
+                    HashMap<String,HashMap<String,ArrayList<String>>> hm = hm_timepoint_tf_target_genes.get(key_hm);
+
+                    for(String key_tp : hm.keySet())
+                    {
+                        /*
+                        String command = "sh ";
+                        if(options_intern.igv_path_to_igv.endsWith("sh"))
+                        {
+                            command+=options_intern.igv_path_to_igv;
+                        }
+                        else
+                        {
+                            command+=options_intern.igv_path_to_igv+"igv.sh";
+                        }
+
+                        logger.logLine("[IGV] Open IGV to start local server ...");
+                        Process child = Runtime.getRuntime().exec("/bin/bash -c "+command);*/
+                        /*int code = child.waitFor();
+                        switch (code){
+                            case 0:
+                                break;
+                            case 1:
+                                String message = child.getErrorStream().toString();
+                                throw new Exception(message);
+                        }*/
+                        HashMap<String,ArrayList<String>> hm_tp = hm.get(key_tp);
+
+                        if(hm_tp.containsKey(tf))
+                        {
+
+                            String load_tf_chip_seq = "load ";
+                            ArrayList<String> tf_chip_seq_files = new ArrayList<>();
+
+                            File f_input_evaluation_lines_root = new File(options_intern.igv_path_to_tf_chip_seq);
+                            for(File f_evaluation_tp : f_input_evaluation_lines_root.listFiles())
+                            {
+                                if(f_evaluation_tp.getName().equals(key_tp))
+                                {
+                                    for(File f_evaluation_tp_tf : f_evaluation_tp.listFiles())
+                                    {
+                                        if(f_evaluation_tp_tf.isDirectory())
+                                        {
+                                            for(File f_evaluation_tp_tf_file : f_evaluation_tp_tf.listFiles())
+                                            {
+                                                if(f_evaluation_tp_tf_file.isFile())
+                                                {
+                                                    tf_chip_seq_files.add(f_evaluation_tp_tf_file.getAbsolutePath());
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+
+                            for(int j = 0; j < tf_chip_seq_files.size(); j++)
+                            {
+                                if(j==0)
+                                    load_tf_chip_seq+=tf_chip_seq_files.get(j);
+                                else
+                                    load_tf_chip_seq+=","+tf_chip_seq_files.get(j);
+                            }
+
+                            /*out.println("genome "+options_intern.igv_species_ref_genome);
+                            String response = in.readLine();
+                            if(!response.equals("OK"))
+                            {
+                                logger.logLine("[IGV] igv_species_ref_genome not OK!");
+                            }*/
+
+
+
+                            File f_output_tf_hm = new File(f_output_tf.getAbsolutePath()+File.separator+key_hm);
+                            f_output_tf_hm.mkdir();
+
+                            File f_output_tf_hm_tp = new File(f_output_tf_hm.getAbsolutePath()+File.separator+key_tp);
+                            f_output_tf_hm_tp.mkdir();
+
+
+                            ArrayList<String> target_genes_for_photo_session = hm_tp.get(tf);
+
+                            int count= 1;
+                            for(String targets : target_genes_for_photo_session)
+                            {
+                                Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
+                                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                                //logger.logLine("[IGV] " + load_tf_chip_seq);
+                                out.println(load_tf_chip_seq);
+                                String response_load = in.readLine();
+                                //logger.logLine("[IGV] " + response_load);
+
+                                //logger.logLine("[IGV] "+ "genome "+options_intern.igv_species_ref_genome);
+                                out.println("genome "+options_intern.igv_species_ref_genome);
+                                String response = in.readLine();
+                                //logger.logLine("[IGV] "+ response);
+
+                                File f_output_shot= new File(f_output_tf_hm_tp.getAbsolutePath()+File.separator+count+"_"+tf+"_"+targets);
+                                f_output_shot.mkdir();
+                                //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
+                                out.println("snapshotDirectory "+f_output_shot.getAbsolutePath());
+                                response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+                                //logger.logLine("[IGV] "+ "goto " + gene_to_coordinates.get(targets));
+                                out.println("goto " + gene_to_coordinates.get(targets));
+                                response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+                                //logger.logLine("[IGV] "+ "sort");
+                                //out.println("sort");
+                                //response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+                                //logger.logLine("[IGV] "+ "collapse");
+                                //out.println("collapse");
+                                //response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+                                //logger.logLine("[IGV] "+ "snapshot");
+                                out.println("snapshot");
+                                response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+
+                                out.println("new");
+                                response = in.readLine();
+                                //logger.logLine("[IGV] " + response);
+
+                                socket.close();
+
+                                count++;
+                            }
+
+                            //new session -> clear tracks
+                            /*logger.logLine("[IGV] "+ "new");
+                            out.println("new");
+                            String response = in.readLine();
+                            logger.logLine("[IGV] " + response);*/
+                        }
+                    }
+                }
+            }
+
+            double percentage_done = ((i*1.0)/tfs_in_order.size());
+            DecimalFormat df = new DecimalFormat("0.0");
+            String percentage_string =df.format(percentage_done);
+            percentage_done = Double.parseDouble(percentage_string)*100;
+            HashSet<Double> already_done_percentage = new HashSet<>();
+
+            if(percentage_done%10==0 && !already_done_percentage.contains(percentage_done))
+            {
+                logger.logLine("[IGV] percentage of tasks done: " + percentage_done + "%");
+                already_done_percentage.add(percentage_done);
+            }
+        }
+
+
+        logger.logLine("[IGV] start taking screenshots for top TFs and their corresponding top target genes");
     }
 
     /**
@@ -154,6 +451,24 @@ public class COM2POSE_lib
         }
 
         Collections.sort(fin_ranks);
+        //write dcg ranks
+        File f_out_dcg = new File(f_distr_analysis_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_dcg);
+        f_out_dcg.mkdir();
+
+        File f_out_dcg_file = new File(f_out_dcg.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_dcg);
+        StringBuilder sb_dcg = new StringBuilder();
+        sb_dcg.append("RANK\tTF\tSCORE\n");
+        int i_rank = 1;
+        for(Analysis_distribution_stats_cumulative_gain ac : fin_ranks)
+        {
+            sb_dcg.append(ac.toString(i_rank));
+            sb_dcg.append("\n");
+            i_rank++;
+        }
+
+        BufferedWriter bw_dcg = new BufferedWriter(new FileWriter(f_out_dcg_file));
+        bw_dcg.write(sb_dcg.toString());
+        bw_dcg.close();
 
         //CREATE HTML_REPORT
         File folder_website_out = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls_distribution_analysis+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_cumulative_gain);
@@ -2326,7 +2641,7 @@ public class COM2POSE_lib
                         //include target genes
                         HashSet<String> already_found_tps = new HashSet<>();
 
-                        File f_consider_different = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+"all_data_different");
+                        File f_consider_different = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_target_genes_all_different);
                         for(File tps_different : f_consider_different.listFiles())
                         {
                             if(tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
@@ -2336,7 +2651,7 @@ public class COM2POSE_lib
                             }
                         }
 
-                        File f_consider_same = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+"all_data_same");
+                        File f_consider_same = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_target_genes_same);
                         for(File tps_different : f_consider_same.listFiles())
                         {
                             if(tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
@@ -6820,7 +7135,7 @@ public class COM2POSE_lib
                 "  install.packages(\"BiocManager\")\n" +
                 "\n" +
                 "if (!requireNamespace(\"biomaRt\", quietly = TRUE))\n" +
-                "  install.packages(\"biomaRt\")\n" +
+                "  BiocManager::install(\"biomaRt\")\n" +
                 "\n" +
                 "library('biomaRt')\n");
 
@@ -8387,6 +8702,18 @@ public class COM2POSE_lib
                 case "plot_mann_whitneyU_pvalue_cutoff":
                     options_intern.plot_mann_whitneyU_pvalue_cutoff=Double.parseDouble(split[1]);
                     break;
+                case "igv_path_to_igv":
+                    options_intern.igv_path_to_igv=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "igv_path_to_tf_chip_seq":
+                    options_intern.igv_path_to_tf_chip_seq=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "igv_port_number":
+                    options_intern.igv_port_number=Integer.parseInt(split[1]);
+                    break;
+                case "igv_species_ref_genome":
+                    options_intern.igv_species_ref_genome=split[1].substring(1,split[1].length()-1);
+                    break;
                 default:
                     logger.logLine("Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
                     logger.logLine("Do not delete unused parameters in config data!");
@@ -8739,6 +9066,35 @@ public class COM2POSE_lib
         {
             logger.logLine("[PLOTS] Mann WhitneyU pvalue cutoff must be > 0");
             all_set=false;
+        }
+        /*
+        IGV options
+         */
+        if(!options_intern.igv_path_to_igv.equals(""))
+        {
+            if(options_intern.igv_path_to_tf_chip_seq.equals(""))
+            {
+                logger.logLine("[IGV] path to IGV set, but no TF ChIP-seq data provided.");
+                all_set=false;
+            }
+
+            if(options_intern.igv_species_ref_genome.equals(""))
+            {
+                logger.logLine("[IGV] reference genome not provided!");
+                all_set=false;
+            }
+
+            Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out.println("genome "+options_intern.igv_species_ref_genome);
+            String response = in.readLine();
+            if(!response.equals("OK"))
+            {
+                logger.logLine("[IGV] igv_species_ref_genome not OK!");
+                all_set=false;
+            }
+            socket.close();
         }
 
 

@@ -88,3 +88,26 @@ Important notice: the timepoint names of ROOT_RNA_SEQ and ROOT_CHIP_SEQ must be 
 Please do not have any other folders or files in ROOT_CHIP_SEQ. This could cause trouble with the COM2POSE framework.
 Important notice: the timepoint names of ROOT_RNA_SEQ and ROOT_CHIP_SEQ must be exactly similar. 
 Important notice: the histone modification names in ROOT_CHIP_SEQ must be exactly similar between the different timepoints.
+
+###evaluation TF ChIP-seq data
+
+If you want to use automatic IGV snapshot for validation of the predicted TFs, you need to open IGV before you start COM2POSE.
+The evaluation input directory has to be in this format:
+```
+                                                 +-- sample 1
+                   +-- timepoint 1 --+-- TF1 1 --+-- ...
+                   |                 |           +-- sample n
+                   |                 +--  ...
+                   |                 |          +-- sample 1
+                   |                 +-- TF n --+-- ...
+                   |                            +-- sample n
+----ROOT_CHIP_SEQ--+--  ...
+                   |
+                   |                            +-- sample 1
+                   +-- timepoint n --+-- TF 1 --+-- ...
+                                     |          +-- sample n
+                                     +--  ...
+                                     |          +-- sample 1
+                                     +-- TF n --+-- ...
+                                                +-- sample n
+```
