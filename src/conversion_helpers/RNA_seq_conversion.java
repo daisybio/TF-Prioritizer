@@ -6,6 +6,7 @@ import util.Options_intern;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class RNA_seq_conversion {
 
@@ -54,6 +55,17 @@ public class RNA_seq_conversion {
 
         }
 
+        //count files to be processed
+        int count_files_to_be_processed=0;
+        for(File rna_seq_files : f_input_dir.listFiles()) {
+            if (rna_seq_files.isDirectory() || rna_seq_files.getName().matches(".*formatted.*") || rna_seq_files.getName().matches(".*gene_mapping.*")) {
+                continue;
+            }
+            count_files_to_be_processed++;
+        }
+
+        HashMap<String, String> symbol_ensg = new HashMap<>();
+
         //perform ENSG mapping
         if(!options_intern.rna_seq_conversion_biomart_species_name.equals("")) {
             //3. if biomart option is set:
@@ -90,7 +102,7 @@ public class RNA_seq_conversion {
             bw_script.close();
 
             //b) execute R script
-
+/*
             String command = "Rscript " + f_result_script.getAbsolutePath();
             Process child = Runtime.getRuntime().exec(command);
             System.out.println("[R-SCRIPT] Running script " + f_result_script.getName()+": " + command);
@@ -101,10 +113,9 @@ public class RNA_seq_conversion {
                 case 1:
                     String message = child.getErrorStream().toString();
                     throw new Exception(message);
-            }
+            }*/
 
             //c) write new gene_file gene_names file
-            HashMap<String, String> symbol_ensg = new HashMap<>();
             BufferedReader br_mapping = new BufferedReader(new FileReader(f_result_r));
             String line_mapping = br_mapping.readLine();
             while ((line_mapping = br_mapping.readLine()) != null) {
@@ -114,21 +125,78 @@ public class RNA_seq_conversion {
 
             br_mapping.close();
 
+            HashSet<String> already_founds_ensgs= new HashSet<>();
+
 
             BufferedWriter bw_formatted = new BufferedWriter(new FileWriter(f_out));
             bw_formatted.write("Geneid");
             bw_formatted.newLine();
+            int count=0;
             for (String s : gene_names) {
                 if (!symbol_ensg.containsKey(s)) {
                     gene_names_should_write.add(false);
                 }
                 else {
-                    bw_formatted.write(symbol_ensg.get(s));
-                    bw_formatted.newLine();
-                    gene_names_should_write.add(true);
+
+                    if(already_founds_ensgs.contains(s))
+                    {
+                        gene_names_should_write.add(false);
+                    }
+                    else
+                    {
+                        bw_formatted.write(symbol_ensg.get(s));
+                        bw_formatted.newLine();
+                        gene_names_should_write.add(true);
+                        already_founds_ensgs.add(s);
+                    }
                 }
+                count++;
             }
             bw_formatted.close();
+
+            /*
+            int row_count=0;
+            for(Boolean b: gene_names_should_write)
+            {
+                if(b)
+                    row_count++;
+            }
+
+            HashMap<String,Integer> ensg_position = new HashMap<>();
+            ArrayList<String> mapped_list = new ArrayList<>();
+            ArrayList<String> is_double_or_not_found = new ArrayList<>();
+            HashSet<String> already_found_ensgs_count = new HashSet<>();
+            int count_doubles = 0;
+            int count_position=0;
+            for(String names : gene_names)
+            {
+                if(symbol_ensg.containsKey(names))
+                {
+                    String name_mapped = symbol_ensg.get(names);
+                    if(already_found_ensgs_count.contains(name_mapped))
+                    {
+                        is_double_or_not_found.add("D");
+                        count_doubles++;
+                    }
+                    else
+                    {
+                        is_double_or_not_found.add("T");
+                        already_found_ensgs_count.add(name_mapped);
+                    }
+                }
+                else
+                {
+                    is_double_or_not_found.add("F");
+                    continue;
+                }
+
+                count_position++;
+
+            }
+
+            String[][] files_to_counts = new String[row_count-count_doubles][count_files_to_be_processed+1];*/
+
+
         }
         else
         {
@@ -146,9 +214,11 @@ public class RNA_seq_conversion {
             {
                 gene_names_should_write.add(true);
             }
+
+
         }
 
-        //2. write gene counts in right order
+//2. write gene counts in right order
         int count_files = 0;
         for(File rna_seq_files : f_input_dir.listFiles())
         {
@@ -185,13 +255,6 @@ public class RNA_seq_conversion {
             count_files++;
 
         }
-
-
-
-
-        System.out.println("X");
-
-
     }
 
     private static void parseArguments(String[] args, Options_intern options_intern)

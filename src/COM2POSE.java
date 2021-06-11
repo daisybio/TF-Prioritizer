@@ -17,7 +17,6 @@ public class COM2POSE
         com2pose_lib.read_config_file(true);
 
 
-        /*
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -95,7 +94,7 @@ public class COM2POSE
         //DISTRIBUTION ANALYSIS
         com2pose_lib.perform_distribution_analysis();
         com2pose_lib.create_distribution_plots();
-        com2pose_lib.create_overview_html_report_distribution();*/
+        com2pose_lib.create_overview_html_report_distribution();
         //com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();
 
         if(!options_intern.igv_path_to_igv.equals(""))

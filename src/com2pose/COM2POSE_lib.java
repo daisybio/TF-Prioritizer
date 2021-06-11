@@ -7011,7 +7011,7 @@ public class COM2POSE_lib
                 sb.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n");
                 sb.append("  install.packages(\"BiocManager\")\n");
                 sb.append("if (!requireNamespace(\"DESeq2\", quietly = TRUE))\n");
-                sb.append("  install.packages(\"DESeq2\")\n");
+                sb.append("  BiocManager::install(\"DESeq2\")\n");
                 sb.append("library(DESeq2)\n");
                 sb.append("#"+group1+" VS "+group2+"\n");
                 logger.logLine("[DESEQ2] Group " + group1 + " VS " + group2);
@@ -7081,7 +7081,10 @@ public class COM2POSE_lib
                 sb.append(dir.getAbsolutePath());
                 sb.append(File.separator+dir.getName());
                 sb.append(".csv\"\n");
-                sb.append("count_df = read.csv(count_path, sep = \"\\t\", header = T, row.names = 1)\n");
+                sb.append("count_df = read.csv(count_path, sep = \"\\t\", header = T, row.names = NULL)\n");
+                sb.append("count_df=count_df[!duplicated(count_df$geneID), ]\n" +
+                        "row.names(count_df) <- count_df[,1]\n" +
+                        "count_df$geneID<-NULL\n");
 
                 sb.append("dds <- DESeqDataSetFromMatrix(countData=count_df, \n");
                 sb.append("                              colData=metadata_df, \n");

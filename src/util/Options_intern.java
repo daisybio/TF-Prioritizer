@@ -323,10 +323,10 @@ public class Options_intern
     //#e.g. 0.1 means it creates a plot of the coefficient range ([-1;1]), it uses all TFs of [-1,-0.1] and [0.1,1]
     //#default: 0.1;0.2;0.3;0.4;0.5;0.6
     public List<Double> plot_th_coefficient= new ArrayList<Double>(Arrays.asList(new Double[]{0.1, 0.2, 0.3, 0.4, 0.5, 0.6}));
-    //#[OPT]: in how many TPs should a TF be found, default: 2
-    public int plot_cutoff_tps=2;
-    //#[OPT]: in how many HMs should a TF be found, default: 2
-    public int plot_cutoff_hms=2;
+    //#[OPT]: in how many TPs should a TF be found, default: 1
+    public int plot_cutoff_tps=1;
+    //#[OPT]: in how many HMs should a TF be found, default: 1
+    public int plot_cutoff_hms=1;
     //#[OPT]: minimum gene counts, default: 100
     public int plot_cutoff_gcs=100;
     //#[OPT]: top k target genes for TFs, default: 30
