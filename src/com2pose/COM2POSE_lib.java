@@ -336,7 +336,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[IGV] start taking screenshots for top TFs and their corresponding top target genes");
+        logger.logLine("[IGV] finished taking screenshots for top TFs and their corresponding top target genes");
     }
 
     /**

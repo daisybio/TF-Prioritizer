@@ -373,6 +373,14 @@ public class Options_intern
 
     public String tpm_gc_filter_analysis_suffix_data = "data.txt";
 
+    /*##################################
+    ######conversion helpers############
+    ####################################*/
+
+    public String rna_seq_conversion_input="";
+    public String rna_seq_conversion_biomart_species_name="";
+    public String rna_seq_conversion_biomart_column="";
+
 
 
 }
