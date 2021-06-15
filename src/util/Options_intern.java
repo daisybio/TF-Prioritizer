@@ -68,6 +68,7 @@ public class Options_intern
     public String folder_output_preprocessing_DYNAMITE = "05_A_DYNAMITE_preprocessing";
     public String folder_output_preprocessing_DYNAMITE_integrateData = "integrateData";
     public String folder_output_preprocessing_DYNAMITE_prepareClass = "prepareClassification";
+    public String folder_output_preprocessing_DYNAMITE_install_required_packages="X_install_required_packages";
     public String folder_out_put_DYNAMITE = "05_B_DYNAMITE_output";
     public String folder_out_data_plots = "06_A_PLOTS_DATA";
     public String folder_plots = "06_B_PLOTS_output";
@@ -130,6 +131,7 @@ public class Options_intern
     public String file_suffic_tgen_output_groups = "tgene_merged_groups.txt";
     public String file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff= "Integrated_Data_Log2_Quotient.txt";
     public String file_suffix_output_preprocessing_DYNAMITE_prepClass ="Integrated_Data_For_Classification.txt";
+    public String file_suffix_output_preprocessing_DYNAMITE_install_required_packages_dynamite="install_required_packages_DYNAMITE.R";
     public String file_suffix_dynamite_output_to_be_plotted = "Regression_Coefficients_Entire_Data_Set_Integrated_Data_For_Classification.txt";
     public String file_suffix_analysis_plot_data_hm_level_different ="all_data_different.csv";
     public String file_suffix_analysis_plot_data_hm_level_same ="all_data_same.csv";

@@ -2370,92 +2370,96 @@ public class COM2POSE_lib
                     sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
 
                     File f_gene_counts_input_same = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_analysis_data+File.separator+options_intern.folder_out_analysis_data_TP_LEVEL+File.separator+fileDir_hm.getName()+File.separator+fileDir.getName()+File.separator+options_intern.file_suffix_analysis_plot_data_hm_level_same);
-                    BufferedReader br_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
-                    String line_gc_same ="";
-                    while((line_gc_same=br_gc_same.readLine())!=null)
+                    if(f_gene_counts_input_same.exists())
                     {
-                        String[] split = line_gc_same.split("\t");
-                        sb_threshold.append("\t\t\t<tr>\n");
-
-                        tfs_to_create_pages.add(split[0]);
-
-                        String tf_key="";
-                        ArrayList<String> tf_key_set = new ArrayList<>();
-
-                        int count = 0;
-                        for(String s: split)
+                        BufferedReader br_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
+                        String line_gc_same ="";
+                        while((line_gc_same=br_gc_same.readLine())!=null)
                         {
-                            if(count==0)
-                            {
-                                tf_key=s;
-                            }
-                            if(count!=0)
-                            {
-                                tf_key_set.add(s);
-                            }
+                            String[] split = line_gc_same.split("\t");
+                            sb_threshold.append("\t\t\t<tr>\n");
 
-                            sb_threshold.append("\t\t\t\t<th>");
-                            if(count!=0 || s.equals("TF"))
+                            tfs_to_create_pages.add(split[0]);
+
+                            String tf_key="";
+                            ArrayList<String> tf_key_set = new ArrayList<>();
+
+                            int count = 0;
+                            for(String s: split)
                             {
-                                sb_threshold.append(s.toUpperCase());
-                            }
-                            else
-                            {
-                                File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls_regression_coefficients+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
-                                if(f_try.exists())
+                                if(count==0)
                                 {
-
-                                    sb_threshold.append("<a href='");
-                                    //sb_threshold.append(f_try.getAbsolutePath());
-                                    sb_threshold.append("TFs"+File.separator+f_try.getName());
-                                    sb_threshold.append("' target='_blank'><button class=\"button\">"+s.toUpperCase()+"</button>");
-                                    sb_threshold.append("</a>");
-
-                                    total_number_tfs.add(s.toUpperCase());
-                                    total_number_tfs_hm.add(s.toUpperCase());
-                                    total_numbers_tfs_hm_same.add(s.toUpperCase());
-
-                                    HashMap<String,HashSet<String>> current_tf_hm;
-
-                                    if(distinct_tf_hm_diff_same.containsKey(s.toUpperCase()))
-                                    {
-                                        current_tf_hm=distinct_tf_hm_diff_same.get(s.toUpperCase());
-                                    }
-                                    else
-                                    {
-                                        current_tf_hm = new HashMap<>();
-                                    }
-
-                                    HashSet<String> current_tf_hm_stage = new HashSet<>();
-
-                                    if(current_tf_hm.containsKey(fileDir_hm.getName()))
-                                    {
-                                        current_tf_hm_stage = current_tf_hm.get(fileDir_hm.getName());
-                                    }
-                                    else
-                                    {
-                                        current_tf_hm_stage= new HashSet<>();
-                                    }
-
-                                    current_tf_hm_stage.add("SAME_TPS");
-                                    current_tf_hm.put(fileDir_hm.getName(),current_tf_hm_stage);
-                                    distinct_tf_hm_diff_same.put(s.toUpperCase(),current_tf_hm);
+                                    tf_key=s;
                                 }
-                                else
+                                if(count!=0)
+                                {
+                                    tf_key_set.add(s);
+                                }
+
+                                sb_threshold.append("\t\t\t\t<th>");
+                                if(count!=0 || s.equals("TF"))
                                 {
                                     sb_threshold.append(s.toUpperCase());
                                 }
+                                else
+                                {
+                                    File f_try = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_website+File.separator+options_intern.folder_out_website_htmls_regression_coefficients+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_website_htmls_TFs+File.separator+s.toUpperCase()+".html");
+                                    if(f_try.exists())
+                                    {
 
+                                        sb_threshold.append("<a href='");
+                                        //sb_threshold.append(f_try.getAbsolutePath());
+                                        sb_threshold.append("TFs"+File.separator+f_try.getName());
+                                        sb_threshold.append("' target='_blank'><button class=\"button\">"+s.toUpperCase()+"</button>");
+                                        sb_threshold.append("</a>");
+
+                                        total_number_tfs.add(s.toUpperCase());
+                                        total_number_tfs_hm.add(s.toUpperCase());
+                                        total_numbers_tfs_hm_same.add(s.toUpperCase());
+
+                                        HashMap<String,HashSet<String>> current_tf_hm;
+
+                                        if(distinct_tf_hm_diff_same.containsKey(s.toUpperCase()))
+                                        {
+                                            current_tf_hm=distinct_tf_hm_diff_same.get(s.toUpperCase());
+                                        }
+                                        else
+                                        {
+                                            current_tf_hm = new HashMap<>();
+                                        }
+
+                                        HashSet<String> current_tf_hm_stage = new HashSet<>();
+
+                                        if(current_tf_hm.containsKey(fileDir_hm.getName()))
+                                        {
+                                            current_tf_hm_stage = current_tf_hm.get(fileDir_hm.getName());
+                                        }
+                                        else
+                                        {
+                                            current_tf_hm_stage= new HashSet<>();
+                                        }
+
+                                        current_tf_hm_stage.add("SAME_TPS");
+                                        current_tf_hm.put(fileDir_hm.getName(),current_tf_hm_stage);
+                                        distinct_tf_hm_diff_same.put(s.toUpperCase(),current_tf_hm);
+                                    }
+                                    else
+                                    {
+                                        sb_threshold.append(s.toUpperCase());
+                                    }
+
+                                }
+                                sb_threshold.append("\t\t\t\t</th>\n");
+                                count++;
                             }
-                            sb_threshold.append("\t\t\t\t</th>\n");
-                            count++;
+                            tf_gene_count.put(tf_key.toUpperCase(),tf_key_set);
+
+                            sb_threshold.append("\t\t\t</tr>\n");
+
                         }
-                        tf_gene_count.put(tf_key.toUpperCase(),tf_key_set);
-
-                        sb_threshold.append("\t\t\t</tr>\n");
-
+                        br_gc_same.close();
                     }
-                    br_gc_same.close();
+
 
                     sb_threshold.append("\t\t</table>\n");
 
@@ -2635,9 +2639,6 @@ public class COM2POSE_lib
 
                         sb_tf_page.append("<div class=\"w3-twothird\">\n");
 
-
-
-
                         //include target genes
                         HashSet<String> already_found_tps = new HashSet<>();
 
@@ -2652,95 +2653,99 @@ public class COM2POSE_lib
                         }
 
                         File f_consider_same = new File(f_root_target_genes.getAbsolutePath()+File.separator+hm+File.separator+fileDir.getName()+File.separator+options_intern.folder_out_target_genes_same);
-                        for(File tps_different : f_consider_same.listFiles())
+                        if(f_consider_same.exists())
                         {
-                            if(tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
+                            for(File tps_different : f_consider_same.listFiles())
                             {
-                                files_to_consider.add(tps_different);
-                                already_found_tps.add(tps_different.getName());
-                            }
-                        }
-                        Boolean anything_to_write = false;
-                        for(File f_considered_no_tf : files_to_consider)
-                        {
-                            File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
-                            if(f_considered.exists())
-                            {
-                                anything_to_write=true;
-                            }
-                        }
-                        if(anything_to_write)
-                        {
-                            //tooltip
-
-                            sb_tf_page.append("<h3> Target Genes - top "+options_intern.plot_top_k_genes+" (normalised value):\n");
-                            sb_tf_page.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:35px;height:30px;\"/>"+
-                                    "  <span class=\"tooltiptext\">TargetGenes are harvested from TEPIC output. The higher the normalized affinity value the higher is the ranking.</span>\n" +
-                                    "</div></h3>\n");
-                            sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>\n");
-                        }
-
-                        for(File f_considered_no_tf : files_to_consider)
-                        {
-                            File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
-                            if(f_considered.exists())
-                            {
-                                sb_tf_page.append("<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_"+hm+"_"+f_considered_no_tf.getName()+"\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_"+hm+"_"+f_considered_no_tf.getName()+"','table_"+hm+"_"+f_considered_no_tf.getName()+"')\">"+hm+": "+f_considered_no_tf.getName()+"\n");
-                                sb_tf_page.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_"+hm+"_"+f_considered_no_tf.getName()+"\">\n");
-
-
-                                sb_tf_page.append("<h4> Point: "+f_considered_no_tf.getName()+" </h4>\n");
-
-                                sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
-
-                                BufferedReader br_point_target_genes = new BufferedReader(new FileReader(f_considered));
-                                String line_point_target_getnes ="";
-                                while((line_point_target_getnes=br_point_target_genes.readLine())!=null)
+                                if(tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
                                 {
-                                    String[] split = line_point_target_getnes.split("\t");
+                                    files_to_consider.add(tps_different);
+                                    already_found_tps.add(tps_different.getName());
+                                }
+                            }
+                            Boolean anything_to_write = false;
+                            for(File f_considered_no_tf : files_to_consider)
+                            {
+                                File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
+                                if(f_considered.exists())
+                                {
+                                    anything_to_write=true;
+                                }
+                            }
+                            if(anything_to_write)
+                            {
+                                //tooltip
 
-                                    sb_tf_page.append("\t\t\t<tr>\n");
+                                sb_tf_page.append("<h3> Target Genes - top "+options_intern.plot_top_k_genes+" (normalised value):\n");
+                                sb_tf_page.append("<div class=\"tooltip\"><img src=\".."+File.separator+".."+File.separator+".."+File.separator+options_intern.folder_out_website_basics+File.separator+options_intern.folder_out_website_basics_website+File.separator+options_intern.folder_out_website_basics_website_images+File.separator+"information.png"+"\" style=\"width:35px;height:30px;\"/>"+
+                                        "  <span class=\"tooltiptext\">TargetGenes are harvested from TEPIC output. The higher the normalized affinity value the higher is the ranking.</span>\n" +
+                                        "</div></h3>\n");
+                                sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>\n");
+                            }
 
-                                    int i = 0;
-                                    for(String xx:split)
+                            for(File f_considered_no_tf : files_to_consider)
+                            {
+                                File f_considered = new File(f_considered_no_tf.getAbsolutePath()+File.separator+tf+".csv");
+                                if(f_considered.exists())
+                                {
+                                    sb_tf_page.append("<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_"+hm+"_"+f_considered_no_tf.getName()+"\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_"+hm+"_"+f_considered_no_tf.getName()+"','table_"+hm+"_"+f_considered_no_tf.getName()+"')\">"+hm+": "+f_considered_no_tf.getName()+"\n");
+                                    sb_tf_page.append("<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_"+hm+"_"+f_considered_no_tf.getName()+"\">\n");
+
+
+                                    sb_tf_page.append("<h4> Point: "+f_considered_no_tf.getName()+" </h4>\n");
+
+                                    sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
+
+                                    BufferedReader br_point_target_genes = new BufferedReader(new FileReader(f_considered));
+                                    String line_point_target_getnes ="";
+                                    while((line_point_target_getnes=br_point_target_genes.readLine())!=null)
                                     {
-                                        if(xx.equals("NOT_AVAILABLE"))
-                                        {
-                                            sb_tf_page.append("\t\t\t\t<th>");
-                                            sb_tf_page.append("-");
-                                            sb_tf_page.append("\t\t\t\t</th>\n");
-                                        }
-                                        else
-                                        {
-                                            sb_tf_page.append("\t\t\t\t<th>");
-                                            if(i==1&&!xx.equals("SYMBOL"))
-                                            {
-                                                sb_tf_page.append("<a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+xx.toUpperCase()+"' target='_blank'><button class=\"button\">"+xx.toUpperCase()+"</button></a>");
-                                            }
-                                            else if(i==2&&!xx.equals("AFFINITY"))
-                                            {
+                                        String[] split = line_point_target_getnes.split("\t");
 
-                                                DecimalFormat df = new DecimalFormat("0.00000000");
-                                                sb_tf_page.append(df.format(Double.parseDouble(xx)));
+                                        sb_tf_page.append("\t\t\t<tr>\n");
 
+                                        int i = 0;
+                                        for(String xx:split)
+                                        {
+                                            if(xx.equals("NOT_AVAILABLE"))
+                                            {
+                                                sb_tf_page.append("\t\t\t\t<th>");
+                                                sb_tf_page.append("-");
+                                                sb_tf_page.append("\t\t\t\t</th>\n");
                                             }
                                             else
                                             {
-                                                sb_tf_page.append(xx.toUpperCase());
+                                                sb_tf_page.append("\t\t\t\t<th>");
+                                                if(i==1&&!xx.equals("SYMBOL"))
+                                                {
+                                                    sb_tf_page.append("<a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene="+xx.toUpperCase()+"' target='_blank'><button class=\"button\">"+xx.toUpperCase()+"</button></a>");
+                                                }
+                                                else if(i==2&&!xx.equals("AFFINITY"))
+                                                {
+
+                                                    DecimalFormat df = new DecimalFormat("0.00000000");
+                                                    sb_tf_page.append(df.format(Double.parseDouble(xx)));
+
+                                                }
+                                                else
+                                                {
+                                                    sb_tf_page.append(xx.toUpperCase());
+                                                }
+                                                sb_tf_page.append("\t\t\t\t</th>\n");
                                             }
-                                            sb_tf_page.append("\t\t\t\t</th>\n");
+                                            i++;
+
                                         }
-                                        i++;
-
+                                        sb_tf_page.append("\t\t\t</tr>\n");
                                     }
-                                    sb_tf_page.append("\t\t\t</tr>\n");
-                                }
-                                br_point_target_genes.close();
+                                    br_point_target_genes.close();
 
-                                sb_tf_page.append("\t\t</table>\n");
-                                sb_tf_page.append("</div>\n</button>\n");
+                                    sb_tf_page.append("\t\t</table>\n");
+                                    sb_tf_page.append("</div>\n</button>\n");
+                                }
                             }
                         }
+
                     }
 
 
@@ -3572,51 +3577,53 @@ public class COM2POSE_lib
                         sb.append(".index.duplicated(keep='first')]\n");
                     }
 
-                    sb.append("join_df_same = pd.concat([");
-                    c = 0;
-                    for(String s : th_group_samepoints)
+                    if(th_group_samepoints.size()!=0)
                     {
-                        if(c==0)
+                        sb.append("join_df_same = pd.concat([");
+                        c = 0;
+                        for(String s : th_group_samepoints)
                         {
-                            sb.append(s);
+                            if(c==0)
+                            {
+                                sb.append(s);
+                            }
+                            else
+                            {
+                                sb.append(", ");
+                                sb.append(s);
+                            }
+                            c++;
                         }
-                        else
-                        {
-                            sb.append(", ");
-                            sb.append(s);
-                        }
-                        c++;
+                        sb.append("], axis=1)\n");
+
+                        sb.append("join_df_same.to_csv(r'");
+                        sb.append(out_data_th.getAbsolutePath()+File.separator);
+                        sb.append(options_intern.file_suffix_analysis_plot_data_hm_level_same);
+                        sb.append("',index = True, header = True)");
+                        sb.append("\n");
+
+                        sb.append("if not ");
+                        sb.append("join_df_same");
+                        sb.append(".empty:\n");
+
+                        sb.append("    plot = sns.heatmap(join_df_same.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
+                        sb.append("    plt.savefig(\"");
+                        sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.png\")\n");
+                        /*WEBSITE_INTERACTIVE_PLOTS*/
+                        sb.append("    fig_fin = px.imshow(join_df_same.transpose())\n");
+                        sb.append("    fig_fin.update_layout(plot_bgcolor='rgb(136, 136, 136)')\n");
+                        sb.append("    fig_fin.update_xaxes(gridcolor='rgb(136, 136, 136)')\n");
+                        sb.append("    fig_fin.layout.xaxis.dtick=1\n");
+                        sb.append("    fig_fin.update_yaxes(gridcolor='rgb(136, 136, 136)')\n");
+                        sb.append("    fig_fin.layout.height=500\n");
+                        sb.append("    fig_fin.layout.width=2500\n");
+                        //sb.append("    fig_fin.update_layout(legend=dict(yanchor=\"top\", y=0.99, xanchor=\"left\", x=0.01))\n");
+                        sb.append("    fig_fin.layout.yaxis.dtick=1\n");
+                        sb.append("    fig_fin.write_html(f\"");
+                        sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.html\",include_plotlyjs=\"cdn\")\n");
                     }
-                    sb.append("], axis=1)\n");
 
-                    sb.append("join_df_same.to_csv(r'");
-                    sb.append(out_data_th.getAbsolutePath()+File.separator);
-                    sb.append(options_intern.file_suffix_analysis_plot_data_hm_level_same);
-                    sb.append("',index = True, header = True)");
-                    sb.append("\n");
-
-                    sb.append("if not ");
-                    sb.append("join_df_same");
-                    sb.append(".empty:\n");
-
-                    sb.append("    plot = sns.heatmap(join_df_same.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
-                    sb.append("    plt.savefig(\"");
-                    sb.append(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.png\")\n");
                     /*WEBSITE_INTERACTIVE_PLOTS*/
-                    sb.append("    fig_fin = px.imshow(join_df_same.transpose())\n");
-                    sb.append("    fig_fin.update_layout(plot_bgcolor='rgb(136, 136, 136)')\n");
-                    sb.append("    fig_fin.update_xaxes(gridcolor='rgb(136, 136, 136)')\n");
-                    sb.append("    fig_fin.layout.xaxis.dtick=1\n");
-                    sb.append("    fig_fin.update_yaxes(gridcolor='rgb(136, 136, 136)')\n");
-                    sb.append("    fig_fin.layout.height=500\n");
-                    sb.append("    fig_fin.layout.width=2500\n");
-                    //sb.append("    fig_fin.update_layout(legend=dict(yanchor=\"top\", y=0.99, xanchor=\"left\", x=0.01))\n");
-                    sb.append("    fig_fin.layout.yaxis.dtick=1\n");
-                    sb.append("    fig_fin.write_html(f\"");
-                    sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath()+File.separator+fileDirHM.getName()+"_threshold_"+d+"_same_stages.html\",include_plotlyjs=\"cdn\")\n");
-                    /*WEBSITE_INTERACTIVE_PLOTS*/
-
-
                     BufferedWriter bw = new BufferedWriter(new FileWriter(new File(out_th.getAbsolutePath()+File.separator+fileDirHM.getName()+"_"+d+".py")));
                     bw.write(sb.toString());
                     bw.close();
@@ -3704,6 +3711,40 @@ public class COM2POSE_lib
 
         logger.logLine("[DYNAMITE] finished running DYNAMITE");
     }
+
+    /**
+     * install required R packages for DYNAMITE
+     */
+    public void install_required_packages() throws Exception {
+        logger.logLine("[DYNAMITE] installing required packages... please wait ...");
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("packages <- c(\"ggplot2\", \"dplyr\", \"gplots\", \"glmnet\", \"doMC\", \"methods\")\n" +
+                "\n" +
+                "install.packages(setdiff(packages, rownames(installed.packages())))\n");
+
+        File file_output_script = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_output_preprocessing_DYNAMITE+File.separator+options_intern.folder_output_preprocessing_DYNAMITE_install_required_packages);
+        file_output_script.mkdir();
+        File file_output_script_to_exectue = new File(file_output_script.getAbsolutePath()+File.separator+options_intern.file_suffix_output_preprocessing_DYNAMITE_install_required_packages_dynamite);
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file_output_script_to_exectue));
+        bw.write(sb.toString());
+        bw.close();
+
+        String command = "Rscript "+ file_output_script_to_exectue.getAbsolutePath();
+
+        Process child = Runtime.getRuntime().exec(command);
+        int code = child.waitFor();
+        switch (code){
+            case 0:
+                break;
+            case 1:
+                String message = child.getErrorStream().toString();
+                throw new Exception(message);
+        }
+        logger.logLine("[DYNAMITE] required packages ready!");
+    }
+
     /**
      * run integrateData.py and prepareForClassification.R
      */
