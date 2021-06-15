@@ -16,7 +16,6 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
-        /*
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -87,7 +86,7 @@ public class COM2POSE
         //PLOTS
         com2pose_lib.create_tp_plots();
         com2pose_lib.analyze_plots_data();
-        com2pose_lib.get_top_k_target_genes_plots();*/
+        com2pose_lib.get_top_k_target_genes_plots();
 
 
         //CREATE OVERVIEW WEBSITE FOR EVERYTHING BEFORE DISTRIBUTION
