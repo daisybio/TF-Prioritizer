@@ -805,14 +805,18 @@ public class COM2POSE_lib
         StringBuilder sb_home_distribution_analysis = new StringBuilder();
 
         sb_home_distribution_analysis.append(html_header);
-        sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_cumulative_gain.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>DISCOUNTED CUMULATIVE GAIN</button></a></div>");
-        sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_ALL.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
+        sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='."+File.separator+f_website_distr_analysis_html_folder_cumulative_gain.getParentFile().getName()+File.separator+f_website_distr_analysis_html_folder_cumulative_gain.getName()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>DISCOUNTED CUMULATIVE GAIN</button></a></div>");
+        sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='."+File.separator+f_website_distr_analysis_html_folder_ALL.getParentFile().getName()+File.separator+f_website_distr_analysis_html_folder_ALL.getName()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
+
+        //sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_cumulative_gain.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>DISCOUNTED CUMULATIVE GAIN</button></a></div>");
+        //sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_ALL.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
 
 
         for(File fileDir_stat: f_distr_stats_HM.listFiles())
         {
             File f_website_html_HM = new File(f_website_distr_analysis_html_folder_HM.getAbsolutePath()+File.separator+fileDir_stat.getName()+".html");
-            sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_html_HM.getAbsolutePath()+"' target='_blank'><button class='button_expandable'>"+fileDir_stat.getName()+"</button></a></div>");
+            //sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_html_HM.getAbsolutePath()+"' target='_blank'><button class='button_expandable'>"+fileDir_stat.getName()+"</button></a></div>");
+            sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='."+File.separator+f_website_html_HM.getParentFile().getParentFile().getName()+File.separator+f_website_html_HM.getParentFile().getName()+File.separator+f_website_html_HM.getName()+"' target='_blank'><button class='button_expandable'>"+fileDir_stat.getName()+"</button></a></div>");
 
             write_html_distribution_analysis_plots_hm_page(f_website_html_HM, fileDir_stat, "HM", tp_tf_gene_count);
         }
