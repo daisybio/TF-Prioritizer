@@ -23,6 +23,7 @@ Before using COM2POSE please install following software:
 - Python (minimum version of 2.7 with path to python and version 3.8 with path to python3).
 - Python packages: pandas, seaborn, matplotlib.pyplot in path python3
 - C++ compiler A C++ compiler supporting openmp to use the parallel implementation of TRAP.
+- unzip must be usable in command line
 - [MEME suite](http://meme-suite.org/doc/download.html) for consensus approach between TEPIC and TGen
 - [BLACKLIST](https://github.com/Boyle-Lab/Blacklist/tree/master/lists) if you want to use the blacklist filter, download the corresponding list
 
@@ -89,7 +90,7 @@ Please do not have any other folders or files in ROOT_CHIP_SEQ. This could cause
 Important notice: the timepoint names of ROOT_RNA_SEQ and ROOT_CHIP_SEQ must be exactly similar. 
 Important notice: the histone modification names in ROOT_CHIP_SEQ must be exactly similar between the different timepoints.
 
-###evaluation TF ChIP-seq data
+### evaluation TF ChIP-seq data
 
 If you want to use automatic IGV snapshot for validation of the predicted TFs, you need to open IGV before you start COM2POSE.
 The evaluation input directory has to be in this format:

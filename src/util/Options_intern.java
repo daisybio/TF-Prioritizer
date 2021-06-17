@@ -117,7 +117,13 @@ public class Options_intern
     public String folder_out_website_interactive_plots_tps="TIMEPOINTS_CONDITIONS";
     public String folder_out_website_interactive_plots_overview="OVERVIEW";
     public String folder_out_website_plots_distribution_analysis = "DISTRIBUTION_ANALYSIS_PLOTS";
-    public String folder_out_igv = "08_IGV_screenshots";
+    public String folder_out_chip_atlas = "08_CHIP_ATLAS_EVALUATION_PEAK_DATA";
+    public String folder_out_chip_atlas_list = "01_CHIP_ATLAS_LIST";
+    public String folder_out_chip_atlas_peak_files = "02_CHIP_ATLAS_PEAK_FILES";
+    public String folder_out_igv = "09_IGV_screenshots";
+    public String folder_out_igv_own_data="01_own_tf_data";
+    public String folder_out_igv_chip_atlas_data="02_chip_atlas_tf_data";
+
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
@@ -144,6 +150,8 @@ public class Options_intern
     public String file_suffix_distribution_analysis_hypergeometric_test_output = "STATS.csv";
     public String file_suffix_distribution_analysis_mann_whitneyU_plot_scripts = "mann_whitneyU_plots.R";
     public String file_suffix_distribution_analysis_dcg = "dcg_stats.csv";
+    public String file_suffix_chip_atlas_list_zipped = "chip_atlas_file_list.zip";
+    public String file_suffix_chip_atlas_list_csv = "chip_atlas_file_list.csv";
 
     public String html_report_home_home = "HOME.html";
     public String html_report_home_regression_coefficient_analysis = "HOME_REGRESSION.html";
@@ -342,6 +350,22 @@ public class Options_intern
     //#[OPT]: list of TFs which you are interested in - is only used to search fast for known TFs in the results, it does not affect results
     //#e.g. website_interesting_tfs="STAT3;GATA3;NFIB"
     public HashSet<String> website_interesting_tfs=new HashSet<>();
+
+    /*############################
+      ####ChIP-atlas parameters###
+      ############################*/
+    public boolean chip_atlas_activated_chip_atlas =false;
+    public String chip_atlas_url_to_list="https://dbarchive.biosciencedbc.jp/data/chip-atlas/LATEST/chip_atlas_file_list.zip";
+    public String chip_atlas_column_gene_version="Genome assembly";
+    public String chip_atlas_column_antigen_class="Antigen class";
+    public String chip_atlas_column_antigen="Antigen";
+    public String chip_atlas_column_cell_type_class="Cell type class";
+    public String chip_atlas_column_url="Peak-call (BED)";
+    //##if no validation TF ChIP-seq data is available, you can provide the chip atlas genome version and the tissue type, to automatically get all available ChIP atlas data for the TFs
+    //#[OPT]: chip atlas genome version (e.g. hg19, hg38, mm9, mm10, ...) look at: https://chip-atlas.org/peak_browser
+    public String chip_atlas_genome_version="";
+    //#[OPT]: chip atlas tissue type (e.g. lung, ...), look at: https://chip-atlas.org/peak_browser
+    public String chip_atlas_tissue_type="";
 
     /*########################
         ####IGV parameters###

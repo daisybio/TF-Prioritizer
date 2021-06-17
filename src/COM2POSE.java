@@ -94,11 +94,23 @@ public class COM2POSE
 
         //DISTRIBUTION ANALYSIS
         com2pose_lib.perform_distribution_analysis();
-        com2pose_lib.create_distribution_plots();*/
+        com2pose_lib.create_distribution_plots();
         com2pose_lib.create_overview_html_report_distribution();
-        com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();
+        com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();*/
 
-        if(!options_intern.igv_path_to_igv.equals(""))
+        //get target genes of TFs based on dcg analysis
+
+        //check for ChIP-seq data for TFs on ChIP-Atlas
+        if(options_intern.chip_atlas_activated_chip_atlas)
+        {
+            com2pose_lib.get_chip_atlas_data();
+
+        }
+
+        //shoot IGV for TF ChIP-seq data by ChIP-Atlas
+
+        //shoot IGV for own TF ChIP-seq data
+        if(!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))
         {
             com2pose_lib.run_igv();
         }

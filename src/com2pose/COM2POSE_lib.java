@@ -1,9 +1,18 @@
 package com2pose;
+import org.apache.commons.compress.utils.IOUtils;
 import util.*;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.Socket;
-import java.nio.Buffer;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -337,6 +346,222 @@ public class COM2POSE_lib
 
 
         logger.logLine("[IGV] finished taking screenshots for top TFs and their corresponding top target genes");
+    }
+
+    public void get_chip_atlas_data() throws Exception {
+        logger.logLine("[ChIP-ATLAS] get ChIP-Atlas Data for Discounted Cumulative Gain TFs!");
+        logger.logLine("[ChIP-ATLAS] Genome version: " + options_intern.chip_atlas_genome_version);
+        logger.logLine("[ChIP-ATLAS] Tissue type: "+ options_intern.chip_atlas_tissue_type);
+
+        File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas);
+        f_output_root.mkdir();
+
+        File f_output_list = new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_out_chip_atlas_list);
+        f_output_list.mkdir();
+
+        File f_output_peak_files = new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_out_chip_atlas_peak_files);
+        f_output_peak_files.mkdir();
+
+        /**
+         * Download list of latest available ChIP-ATLAS files
+         */
+        logger.logLine("[ChIP-ATLAS] Downloading list of available TF ChIP-seq Files from " + options_intern.chip_atlas_url_to_list);
+        logger.logLine("[ChIP-ATLAS] waiting ...");
+        File f_output_list_zip = new File(f_output_list.getAbsolutePath()+File.separator+options_intern.file_suffix_chip_atlas_list_zipped);
+        if(!f_output_list_zip.exists())
+        {
+            // Create a new trust manager that trust all certificates
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+            // Activate the new trust manager
+            try {
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // And as before now you can use URL and URLConnection
+            URL url = new URL(options_intern.chip_atlas_url_to_list);
+            URLConnection connection = url.openConnection();
+            InputStream is = connection.getInputStream();
+
+            try(OutputStream outputStream = new FileOutputStream(f_output_list_zip)){
+                IOUtils.copy(is, outputStream);
+            } catch (FileNotFoundException e) {
+                // handle exception here
+                e.printStackTrace();
+            } catch (IOException e) {
+                // handle exception here
+                e.printStackTrace();
+            }
+        }
+
+        logger.logLine("[ChIP-ATLAS] Unzipping file: "+ f_output_list.getAbsolutePath());
+        File f_output_list_csv = new File(f_output_list.getAbsolutePath()+File.separator+options_intern.file_suffix_chip_atlas_list_csv);
+        if(!f_output_list_csv.exists())
+        {
+            //unzip file
+            String command_edited= "unzip " + f_output_list_zip + " -d " + f_output_list_csv.getParentFile().getAbsolutePath();
+            logger.logLine("[ChIP-ATLAS] executing command: "+ command_edited);
+            Process child = Runtime.getRuntime().exec(command_edited);
+            int code = child.waitFor();
+            switch (code){
+                case 0:
+                    break;
+                case 1:
+                    String message = child.getErrorStream().toString();
+                    throw new Exception(message);
+            }
+
+        }
+
+        logger.logLine("[ChIP-ATLAS] Reading available TFs in ChIP-Atlas ...");
+
+        HashMap<String,String> tf_to_url = new HashMap<>();
+
+        BufferedReader br = new BufferedReader(new FileReader(f_output_list_csv.getAbsolutePath()));
+        String line = br.readLine();
+        String[] split_header = line.split(",");
+
+        int column_gene_version=-1;
+        int column_antigen_class=-1;
+        int column_antigen=-1;
+        int column_cell_type_class=-1;
+        int column_url=-1;
+
+        String regex_tissue_type="";
+        String[] split_tissue_type=options_intern.chip_atlas_tissue_type.split(" ");
+        for(String s: split_tissue_type)
+        {
+            regex_tissue_type+= ".*" + s;
+        }
+        regex_tissue_type+=".*";
+        regex_tissue_type=regex_tissue_type.toUpperCase();
+
+        for(int i = 0; i < split_header.length;i++)
+        {
+            if(split_header[i].equals(options_intern.chip_atlas_column_gene_version))
+                column_gene_version=i;
+            if(split_header[i].equals(options_intern.chip_atlas_column_antigen_class))
+                column_antigen_class=i;
+            if(split_header[i].equals(options_intern.chip_atlas_column_antigen))
+                column_antigen=i;
+            if(split_header[i].equals(options_intern.chip_atlas_column_cell_type_class))
+                column_cell_type_class=i;
+            if(split_header[i].equals(options_intern.chip_atlas_column_url))
+                column_url=i;
+        }
+
+        while((line=br.readLine())!=null)
+        {
+            String[] split = line.split(",");
+            if(!split[column_gene_version].equals(options_intern.chip_atlas_genome_version))
+            {
+                continue;
+            }
+            if(!split[column_antigen_class].equals("TFs and others"))
+            {
+                continue;
+            }
+            if(!split[column_cell_type_class].toUpperCase().matches(regex_tissue_type))
+            {
+                continue;
+            }
+
+            String url = split[split.length-1];
+            String tf = split[column_antigen];
+            if(!tf.equals(""))
+                tf_to_url.put(tf,url);
+
+        }
+        br.close();
+
+        logger.logLine("[ChIP-ATLAS] downloading available TF data");
+        logger.logLine("[ChIP-ATLAS] waiting ...");
+
+        //read in discounted cumulative gain tfs
+        File f_input_dcg_result = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_dcg+File.separator+options_intern.file_suffix_distribution_analysis_dcg);
+        ArrayList<String> ordered_tfs_dcg = new ArrayList<>();
+
+        BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
+        String line_dcg= br_dcg.readLine();
+        while((line_dcg= br_dcg.readLine())!=null)
+        {
+            String[] split = line_dcg.split("\t");
+            ordered_tfs_dcg.add(split[1]);
+        }
+        br_dcg.close();
+
+        for(int i = 0; i < ordered_tfs_dcg.size(); i++)
+        {
+            if(tf_to_url.containsKey(ordered_tfs_dcg.get(i)))
+            {
+                File f_download_tf = new File(f_output_peak_files.getAbsolutePath()+File.separator+i+"_"+ordered_tfs_dcg.get(i));
+                f_download_tf.mkdir();
+                File f_download_tf_file = new File(f_download_tf.getAbsolutePath()+File.separator+ordered_tfs_dcg.get(i)+".bed");
+
+                // Create a new trust manager that trust all certificates
+                TrustManager[] trustAllCerts = new TrustManager[]{
+                        new X509TrustManager() {
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                return null;
+                            }
+                            public void checkClientTrusted(
+                                    java.security.cert.X509Certificate[] certs, String authType) {
+                            }
+                            public void checkServerTrusted(
+                                    java.security.cert.X509Certificate[] certs, String authType) {
+                            }
+                        }
+                };
+                // Activate the new trust manager
+                try {
+                    SSLContext sc = SSLContext.getInstance("SSL");
+                    sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                // And as before now you can use URL and URLConnection
+                URL url = new URL(tf_to_url.get(ordered_tfs_dcg.get(i)));
+                URLConnection connection = url.openConnection();
+                InputStream is = connection.getInputStream();
+
+                try(OutputStream outputStream = new FileOutputStream(f_download_tf_file)){
+                    IOUtils.copy(is, outputStream);
+                } catch (FileNotFoundException e) {
+                    // handle exception here
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // handle exception here
+                    e.printStackTrace();
+                }
+
+                //check if valid bed file, if not, delete
+                Path path = Paths.get(f_download_tf_file.getAbsolutePath());
+                long size= Files.size(path);
+                if(size<100)
+                {
+                    f_download_tf_file.delete();
+                    f_download_tf.delete();
+                }
+            }
+        }
+
+
+        logger.logLine("[ChIP-ATLAS] finished downloading all available ChIP-Atlas Data");
     }
 
     /**
@@ -8750,6 +8975,12 @@ public class COM2POSE_lib
                 case "plot_mann_whitneyU_pvalue_cutoff":
                     options_intern.plot_mann_whitneyU_pvalue_cutoff=Double.parseDouble(split[1]);
                     break;
+                case "chip_atlas_genome_version":
+                    options_intern.chip_atlas_genome_version=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "chip_atlas_tissue_type":
+                    options_intern.chip_atlas_tissue_type=split[1].substring(1,split[1].length()-1);
+                    break;
                 case "igv_path_to_igv":
                     options_intern.igv_path_to_igv=split[1].substring(1,split[1].length()-1);
                     break;
@@ -8967,7 +9198,9 @@ public class COM2POSE_lib
             }
         }
 
-        //check for map ensg symbol
+        /**
+         *check for map ensg symbol
+         */
         if(options_intern.tepic_ensg_symbol.equals("") && options_intern.deseq2_biomart_dataset_species.equals(""))
         {
             logger.logLine("[TEPIC] No map of ENSG to Gene Symbol is given!");
@@ -9069,7 +9302,6 @@ public class COM2POSE_lib
         /**
          * DYNAMITE OPTIONS
          */
-
         if(!options_intern.dynamite_preprocessing_integrate_data_consider_geneFile.equals(""))
         {
             File f = new File(options_intern.dynamite_preprocessing_integrate_data_consider_geneFile);
@@ -9083,7 +9315,6 @@ public class COM2POSE_lib
         /**
          * PLOT OPTIONS
          */
-
         if(options_intern.plot_th_coefficient.isEmpty())
         {
             logger.logLine("[PLOTS] plot th coefficients is empty, please use at least one coefficient.");
@@ -9109,14 +9340,32 @@ public class COM2POSE_lib
             logger.logLine("[PLOTS] plot_top_k_genes must be >= 1");
             all_set=false;
         }
-
         if(options_intern.plot_mann_whitneyU_pvalue_cutoff<=0)
         {
             logger.logLine("[PLOTS] Mann WhitneyU pvalue cutoff must be > 0");
             all_set=false;
         }
-        /*
-        IGV options
+
+        /**
+         * ChIP ATLAS OPTIONS
+         */
+        if(!options_intern.chip_atlas_genome_version.equals("")&&!options_intern.chip_atlas_tissue_type.equals(""))
+        {
+            options_intern.chip_atlas_activated_chip_atlas =true;
+        }
+        if(options_intern.chip_atlas_tissue_type.equals("")&&!options_intern.chip_atlas_genome_version.equals(""))
+        {
+            logger.logLine("[ChIP-ATLAS] Genome version specified, but no tissue type specified. (chip_atlas_tissue_type).");
+            all_set=false;
+        }
+        if(options_intern.chip_atlas_tissue_type.equals("")&&!options_intern.chip_atlas_genome_version.equals(""))
+        {
+            logger.logLine("[ChIP-ATLAS] Tissue type specified, but no genome version specified. (chip_atlas_genome_version).");
+            all_set=false;
+        }
+
+        /**
+         * IGV OPTIONS
          */
         if(!options_intern.igv_path_to_igv.equals(""))
         {
