@@ -511,6 +511,8 @@ public class COM2POSE_lib
 
         //go over all dcg ordered tfs
         int i = 0;
+        HashSet<Double> already_done_percentage = new HashSet<>();
+
         for(String key_tf : ordered_tfs_dcg)
         {
             File f_input_bed_test = new File(f_bed_data_input_root.getAbsolutePath()+File.separator+i+"_"+key_tf);
@@ -577,9 +579,6 @@ public class COM2POSE_lib
                             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                            out.println("genome "+options_intern.igv_species_ref_genome);
-                            String response_genome = in.readLine();
-
                             out.println(load_tf_chip_seq);
                             String response_load = in.readLine();
 
@@ -591,6 +590,9 @@ public class COM2POSE_lib
                                 //logger.logLine("[IGV] " + response_load);
                                 //logger.logLine("[IGV] "+ "genome "+options_intern.igv_species_ref_genome);
                                 //logger.logLine("[IGV] "+ response);
+                                out.println("genome "+options_intern.igv_species_ref_genome);
+                                String response_genome = in.readLine();
+
                                 File f_output_shot= new File(f_output_tf_hm_tp.getAbsolutePath());
                                 f_output_shot.mkdir();
                                 //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
@@ -602,8 +604,8 @@ public class COM2POSE_lib
                                 response=in.readLine();
                                 //logger.logLine("[IGV] " + response);
                                 //logger.logLine("[IGV] "+ "sort");
-                                out.println("sort");
-                                response=in.readLine();
+                                //out.println("sort");
+                                //response=in.readLine();
                                 //logger.logLine("[IGV] " + response);
                                 //logger.logLine("[IGV] "+ "collapse");
                                 out.println("collapse");
@@ -630,7 +632,6 @@ public class COM2POSE_lib
             DecimalFormat df = new DecimalFormat("0.0");
             String percentage_string =df.format(percentage_done);
             percentage_done = Double.parseDouble(percentage_string)*100;
-            HashSet<Double> already_done_percentage = new HashSet<>();
             already_done_percentage.add(-1.0);
 
             if(percentage_done%10==0 && !already_done_percentage.contains(percentage_done))
