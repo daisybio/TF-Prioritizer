@@ -80,6 +80,7 @@ public class Options_intern
     public String folder_out_target_genes ="06_D_PLOTS_TARGET_GENES";
     public String folder_out_target_genes_all_different = "all_data_different";
     public String folder_out_target_genes_same = "all_data_same";
+    public String folder_out_target_genes_dcg = "06_E_TARGET_GENES_DCG";
     public String folder_out_distribution ="07_DISTRIBUTION_ANALYSIS";
     public String folder_out_distribution_analyzed_tfs ="01_ANALYSED_TFS";
     public String folder_out_distribution_tf_tg_scores = "02_TF_TG_SCORES";

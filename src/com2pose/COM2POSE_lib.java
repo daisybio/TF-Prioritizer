@@ -7,6 +7,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
+import java.lang.annotation.Target;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
@@ -53,7 +54,11 @@ public class COM2POSE_lib
         logger.logLine("COM2POSE path set to: "+ options_intern.path_to_COM2POSE);
     }
 
-    public void run_igv() throws Exception {
+    /**
+     * run IGV on own TF ChIP-seq data.
+     * @throws Exception
+     */
+    public void run_igv_own_data() throws Exception {
         logger.logLine("[IGV] start taking screenshots for top TFs and their corresponding top target genes");
 
         //read gtf for genome coordinates
@@ -104,6 +109,81 @@ public class COM2POSE_lib
         //get target genes for tfs
         HashSet<String> which_tfs = new HashSet<>();
         HashMap<String,HashMap<String,HashMap<String,ArrayList<String>>>> hm_timepoint_tf_target_genes = new HashMap<>();
+        File f_root_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes_dcg);
+
+        //prefill map
+        for(File f_target_genes_tp : f_root_target_genes.listFiles())
+        {
+            if (f_target_genes_tp.isDirectory())
+            {
+                for(File f_target_genes_tp_hm : f_target_genes_tp.listFiles())
+                {
+                    if (f_target_genes_tp_hm.isDirectory())
+                    {
+                        HashMap<String,HashMap<String,ArrayList<String>>> tp_tf_target_genes = new HashMap<>();
+                        hm_timepoint_tf_target_genes.put(f_target_genes_tp_hm.getName(),tp_tf_target_genes);
+                    }
+                }
+            }
+        }
+        for(File f_target_genes_tp : f_root_target_genes.listFiles())
+        {
+            String hm = "";
+            if (f_target_genes_tp.isDirectory())
+            {
+                for(File f_target_genes_tp_hm : f_target_genes_tp.listFiles())
+                {
+                    if (f_target_genes_tp_hm.isDirectory())
+                    {
+                        hm = f_target_genes_tp_hm.getName();
+                        HashMap<String,ArrayList<String>> tf_target_genes = new HashMap<>();
+                        hm_timepoint_tf_target_genes.get(hm).put(f_target_genes_tp.getName(),tf_target_genes);
+
+                    }
+                }
+            }
+        }
+
+        for(File f_target_genes_tp : f_root_target_genes.listFiles())
+        {
+            if(f_target_genes_tp.isDirectory())
+            {
+                for(File f_target_genes_tp_hm : f_target_genes_tp.listFiles())
+                {
+                    if(f_target_genes_tp_hm.isDirectory())
+                    {
+                        HashMap<String,ArrayList<String>> tf_target_genes = new HashMap<>();
+                        hm_timepoint_tf_target_genes.get(f_target_genes_tp_hm.getName()).put(f_target_genes_tp.getName(),tf_target_genes);
+
+                        for(File f_target_genes_tp_hm_tf : f_target_genes_tp_hm.listFiles()) {
+                            if (f_target_genes_tp_hm_tf.isDirectory()) {
+                                String tf_name = f_target_genes_tp_hm_tf.getName();
+
+                                ArrayList<String> target_genes = new ArrayList<>();
+
+                                tf_target_genes.put(tf_name, target_genes);
+
+                                BufferedReader br = new BufferedReader(new FileReader(new File(f_target_genes_tp_hm_tf.getAbsolutePath() + File.separator + tf_name + ".csv")));
+                                String line = br.readLine();
+                                int count = 0;
+                                while ((line = br.readLine()) != null) {
+                                    String[] split = line.split("\t");
+                                    target_genes.add(split[0]);
+
+                                    if (count == options_intern.plot_top_k_genes - 1)
+                                        break;
+
+                                    count++;
+                                }
+                                br.close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
         File f_root_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes);
 
         for(File f_hm : f_root_target_genes.listFiles())
@@ -169,17 +249,16 @@ public class COM2POSE_lib
                     }
                 }
             }
-        }
+        }*/
 
 
         logger.logLine("[IGV] taking pictures ...");
-        //TODO: take pictures
         /*
         http://software.broadinstitute.org/software/igv/automation
          */
 
-        File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv);
-        f_output_root.mkdir();
+        File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_own_data);
+        f_output_root.mkdirs();
 
         for(int i = 0; i < tfs_in_order.size(); i++)
         {
@@ -272,7 +351,7 @@ public class COM2POSE_lib
 
                             ArrayList<String> target_genes_for_photo_session = hm_tp.get(tf);
 
-                            int count= 1;
+                            int count= 0;
                             for(String targets : target_genes_for_photo_session)
                             {
                                 Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
@@ -348,6 +427,229 @@ public class COM2POSE_lib
         logger.logLine("[IGV] finished taking screenshots for top TFs and their corresponding top target genes");
     }
 
+    /**
+     * run igv on chip atlas data
+     */
+    public void run_igv_chip_atlas_data() throws IOException {
+        logger.logLine("[ChIP-ATLAS-IGV] Start running ChIP Atlas evaluation data.");
+
+        File f_output_igv_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_chip_atlas_data);
+        f_output_igv_root.mkdirs();
+
+        File f_bed_data_input_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas+File.separator+options_intern.folder_out_chip_atlas_peak_files);
+        File f_target_genes_input_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes_dcg);
+        File f_important_tfs_per_hm = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_stats+File.separator+options_intern.folder_out_distribution_stats_HM);
+
+        //retrieve ordered tfs
+        File f_input_dcg_result = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_dcg+File.separator+options_intern.file_suffix_distribution_analysis_dcg);
+        ArrayList<String> ordered_tfs_dcg = new ArrayList<>();
+
+        //read gtf for genome coordinates
+        HashMap<String,String> gene_to_coordinates = new HashMap<>();
+        BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(new File(options_intern.tepic_gene_annot)));
+        String line_gene_coordinates = br_gene_coordinates.readLine();
+        while((line_gene_coordinates=br_gene_coordinates.readLine())!=null)
+        {
+            if(line_gene_coordinates.startsWith("#"))
+            {
+                continue;
+            }
+
+            String[] split = line_gene_coordinates.split("\t");
+
+            if(!split[2].equals("gene"))
+            {
+                continue;
+            }
+
+            String chr = split[0];
+            String position = split[3]+"-"+split[4];
+            String gene_name = "";
+
+            String[] gene_name_prep = split[8].split(";");
+            for(String key : gene_name_prep)
+            {
+                key=key.trim();
+                if(key.startsWith("gene_name"))
+                {
+                    String[] split_intern = key.split("\"");
+                    gene_name=split_intern[1].toUpperCase();
+                }
+            }
+            gene_to_coordinates.put(gene_name,chr+":"+position);
+        }
+
+        BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
+        String line_dcg= br_dcg.readLine();
+        while((line_dcg= br_dcg.readLine())!=null)
+        {
+            String[] split = line_dcg.split("\t");
+            ordered_tfs_dcg.add(split[1]);
+        }
+        br_dcg.close();
+
+        //read in all important tfs per hm
+        HashMap<String,HashSet<String>> hm_to_important_tfs = new HashMap<>();
+        for(File fileDir_hm : f_important_tfs_per_hm.listFiles())
+        {
+            if(fileDir_hm.isDirectory())
+            {
+                HashSet<String> important_tfs = new HashSet<>();
+                hm_to_important_tfs.put(fileDir_hm.getName(),important_tfs);
+
+                BufferedReader br = new BufferedReader(new FileReader(new File(fileDir_hm.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats)));
+                String line = br.readLine();
+                line= br.readLine();
+                while((line= br.readLine())!=null)
+                {
+                    String[] split = line.split("\t");
+                    important_tfs.add(split[1]);
+                }
+            }
+        }
+
+
+        //go over all dcg ordered tfs
+        int i = 0;
+        for(String key_tf : ordered_tfs_dcg)
+        {
+            File f_input_bed_test = new File(f_bed_data_input_root.getAbsolutePath()+File.separator+i+"_"+key_tf);
+            if(!f_input_bed_test.exists())
+            {
+                i++;
+                continue;
+            }
+
+            File f_output_igv_shots = new File(f_output_igv_root.getAbsolutePath()+File.separator+i+"_"+key_tf);
+            f_output_igv_shots.mkdirs();
+
+            for(File file_dir_tp : f_target_genes_input_root.listFiles())
+            {
+                if(file_dir_tp.isDirectory())
+                {
+                    File f_output_igv_shots_tp = new File(f_output_igv_shots.getAbsolutePath()+File.separator+file_dir_tp.getName());
+                    f_output_igv_shots_tp.mkdirs();
+
+                    for(String key_hm : hm_to_important_tfs.keySet())
+                    {
+                        if(hm_to_important_tfs.get(key_hm).contains(key_tf))
+                        {
+                            File f_output_igv_shots_tp_hm = new File(f_output_igv_shots_tp.getAbsolutePath()+File.separator+key_hm);
+                            f_output_igv_shots_tp_hm.mkdirs();
+
+                            //read in all target genes
+                            ArrayList<String> target_genes = new ArrayList<>();
+
+                            File f_input_target_genes_file = new File(file_dir_tp.getAbsolutePath()+File.separator+key_hm+File.separator+key_tf+File.separator+key_tf+".csv");
+
+                            if(!f_input_target_genes_file.exists())
+                                continue;
+
+                            BufferedReader br = new BufferedReader(new FileReader(f_input_target_genes_file));
+                            String line = br.readLine();
+                            int count_target_genes = 0;
+                            while((line=br.readLine())!=null)
+                            {
+                                String[] split = line.split("\t");
+                                target_genes.add(split[0]);
+
+                                if(count_target_genes == options_intern.plot_top_k_genes-1)
+                                {
+                                    break;
+                                }
+                                count_target_genes++;
+                            }
+                            br.close();
+
+                            //shoot igv now
+                            int count=0;
+                            String load_tf_chip_seq="load ";
+                            File f_input_bed = new File(f_bed_data_input_root.getAbsolutePath()+File.separator+i+"_"+key_tf);
+                            if(!f_input_bed.exists())
+                            {
+                                continue;
+                            }
+                            load_tf_chip_seq += f_input_bed.getAbsolutePath()+File.separator+key_tf+".bed";
+
+
+
+                            Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
+                            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                            out.println("genome "+options_intern.igv_species_ref_genome);
+                            String response_genome = in.readLine();
+
+                            out.println(load_tf_chip_seq);
+                            String response_load = in.readLine();
+
+                            for(String key_target_gene : target_genes)
+                            {
+                                File f_output_tf_hm_tp = new File(f_output_igv_shots_tp_hm.getAbsolutePath()+File.separator+count+"_" + key_target_gene);
+
+                                //logger.logLine("[IGV] " + load_tf_chip_seq);
+                                //logger.logLine("[IGV] " + response_load);
+                                //logger.logLine("[IGV] "+ "genome "+options_intern.igv_species_ref_genome);
+                                //logger.logLine("[IGV] "+ response);
+                                File f_output_shot= new File(f_output_tf_hm_tp.getAbsolutePath());
+                                f_output_shot.mkdir();
+                                //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
+                                out.println("snapshotDirectory "+f_output_shot.getAbsolutePath());
+                                String response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+                                //logger.logLine("[IGV] "+ "goto " + gene_to_coordinates.get(targets));
+                                out.println("goto " + gene_to_coordinates.get(key_target_gene));
+                                response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+                                //logger.logLine("[IGV] "+ "sort");
+                                out.println("sort");
+                                response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+                                //logger.logLine("[IGV] "+ "collapse");
+                                out.println("collapse");
+                                response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+                                //logger.logLine("[IGV] "+ "snapshot");
+                                out.println("snapshot");
+                                response=in.readLine();
+                                //logger.logLine("[IGV] " + response);
+
+                                count++;
+
+                            }
+                            out.println("new");
+                            String response = in.readLine();
+                            //logger.logLine("[IGV] " + response);
+                            socket.close();
+                        }
+                    }
+                }
+            }
+
+            double percentage_done = ((i*1.0)/ordered_tfs_dcg.size());
+            DecimalFormat df = new DecimalFormat("0.0");
+            String percentage_string =df.format(percentage_done);
+            percentage_done = Double.parseDouble(percentage_string)*100;
+            HashSet<Double> already_done_percentage = new HashSet<>();
+            already_done_percentage.add(-1.0);
+
+            if(percentage_done%10==0 && !already_done_percentage.contains(percentage_done))
+            {
+                logger.logLine("[ChIP-ATLAS-IGV] percentage of tasks done: " + percentage_done + "%");
+                already_done_percentage.add(percentage_done);
+            }
+
+            i++;
+        }
+
+
+        logger.logLine("[ChIP-ATLAS-IGV] Finished evaluation with ChIP Atlas data.");
+    }
+
+    /**
+     * retrieve available TF ChIP-seq from ChIP-ATLAS
+     * @throws Exception
+     */
     public void get_chip_atlas_data() throws Exception {
         logger.logLine("[ChIP-ATLAS] get ChIP-Atlas Data for Discounted Cumulative Gain TFs!");
         logger.logLine("[ChIP-ATLAS] Genome version: " + options_intern.chip_atlas_genome_version);
@@ -557,11 +859,186 @@ public class COM2POSE_lib
                     f_download_tf_file.delete();
                     f_download_tf.delete();
                 }
+                else
+                {
+                    logger.logLine("[ChIP-ATLAS] processed " + ((i*1.0/ordered_tfs_dcg.size()))*100 + " TFs.");
+                }
             }
         }
 
 
         logger.logLine("[ChIP-ATLAS] finished downloading all available ChIP-Atlas Data");
+    }
+
+    /**
+     * retrieve top k target genes of DCG found TFs
+     */
+    public void get_top_k_target_genes_dcg() throws IOException {
+        logger.logLine("[EVALUATION-PREPROCESSING] retrieve top " + options_intern.plot_top_k_genes + " target genes foreach discounted cumulative gain TF");
+
+        File f_output_results_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes_dcg);
+        f_output_results_root.mkdir();
+
+        File f_input_affinity_values_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_input);
+
+        //retrieve ordered tfs
+        File f_input_dcg_result = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_dcg+File.separator+options_intern.file_suffix_distribution_analysis_dcg);
+        ArrayList<String> ordered_tfs_dcg = new ArrayList<>();
+        HashSet<String> unordered_tfs_dcg = new HashSet<>();
+
+        BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
+        String line_dcg= br_dcg.readLine();
+        while((line_dcg= br_dcg.readLine())!=null)
+        {
+            String[] split = line_dcg.split("\t");
+            ordered_tfs_dcg.add(split[1]);
+            unordered_tfs_dcg.add(split[1]);
+        }
+        br_dcg.close();
+
+        HashSet<String> found_tfs = new HashSet<>();
+
+        HashMap<String,String> ensg_gene_symbol_map = new HashMap<>();
+        BufferedReader br_ensg_gene_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
+        while((line_ensg_gene_symbol=br_ensg_gene_symbol.readLine())!=null)
+        {
+            String[] split = line_ensg_gene_symbol.split("\t");
+            if(split.length>1)
+            {
+                ensg_gene_symbol_map.put(split[0].toUpperCase(),split[1].toUpperCase());
+            }
+        }
+        br_ensg_gene_symbol.close();
+
+
+        for(File file_dir_tp : f_input_affinity_values_root.listFiles())
+        {
+            if(file_dir_tp.isDirectory())
+            {
+                File f_output_tp = new File(f_output_results_root.getAbsolutePath()+File.separator+file_dir_tp.getName());
+                f_output_tp.mkdir();
+
+                for(File file_dir_tp_hm : file_dir_tp.listFiles())
+                {
+                    if(file_dir_tp_hm.isDirectory())
+                    {
+                        File f_output_tp_hm = new File(f_output_tp.getAbsolutePath()+File.separator+file_dir_tp_hm.getName());
+                        f_output_tp_hm.mkdir();
+
+                        HashMap<String,TF_TargetGene_DCG> tf_to_target_genes = new HashMap<>();
+                        for(String key_tf : ordered_tfs_dcg)
+                        {
+                            TF_TargetGene_DCG dcg = new TF_TargetGene_DCG();
+                            dcg.TF = key_tf;
+                            tf_to_target_genes.put(key_tf,dcg);
+                        }
+
+                        for(File file_dir_tp_hm_file : file_dir_tp_hm.listFiles())
+                        {
+                            if(file_dir_tp_hm_file.isFile())
+                            {
+                                HashMap<Integer,String> index_to_tf = new HashMap<>();
+                                HashMap<String,Integer> tf_to_index = new HashMap<>();
+
+                                BufferedReader br = new BufferedReader(new FileReader(file_dir_tp_hm_file));
+                                String line = br.readLine();
+                                String[] split_header = line.split("\t");
+                                for(int i = 1; i < split_header.length;i++)
+                                {
+                                    String name_tf = split_header[i].split("_")[0];
+                                    name_tf=name_tf.replaceAll(":","\\.");
+
+                                    if(unordered_tfs_dcg.contains(name_tf))
+                                    {
+                                        index_to_tf.put(i,name_tf);
+                                        tf_to_index.put(name_tf,i);
+                                    }
+                                }
+
+                                while((line=br.readLine())!=null)
+                                {
+                                    String[] split = line.split("\t");
+
+                                    String gene_name="";
+                                    if(ensg_gene_symbol_map.containsKey(split[0]))
+                                    {
+                                        gene_name=ensg_gene_symbol_map.get(split[0]).toUpperCase();
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+
+                                    for(int i =1; i < split.length;i++)
+                                    {
+                                        if(index_to_tf.containsKey(i))
+                                        {
+                                            String tf = index_to_tf.get(i);
+
+                                            TF_TargetGene_DCG dcg = tf_to_target_genes.get(tf);
+
+                                            if(dcg.target_gene_affinity_values.containsKey(gene_name))
+                                            {
+                                                dcg.target_gene_affinity_values.get(gene_name).affinity_values.add(Double.parseDouble(split[i]));
+                                            }
+                                            else
+                                            {
+                                                TargetGene_DCG tdcg = new TargetGene_DCG();
+                                                tdcg.target_gene=gene_name;
+                                                tdcg.affinity_values.add(Double.parseDouble(split[i]));
+                                                dcg.target_gene_affinity_values.put(gene_name,tdcg);
+                                            }
+                                        }
+                                    }
+
+                                }
+                                br.close();
+                            }
+                        }
+
+                        //calculate means
+                        for(String key_tf : tf_to_target_genes.keySet())
+                        {
+                            TF_TargetGene_DCG dcg = tf_to_target_genes.get(key_tf);
+                            if(dcg.target_gene_affinity_values.isEmpty())
+                            {
+                                continue;
+                            }
+
+                            ArrayList<TargetGene_DCG> tdcg_ordered = dcg.get_ordered_target_gene_list();
+
+                            if(tdcg_ordered.isEmpty())
+                            {
+                                continue;
+                            }
+
+                            File f_output_tf = new File(f_output_tp_hm.getAbsolutePath()+File.separator+key_tf);
+                            f_output_tf.mkdir();
+                            File f_output_tf_file = new File(f_output_tf.getAbsolutePath()+File.separator+key_tf+".csv");
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("TARGET_GENE\tAFFINITY_SCORE");
+                            sb.append("\n");
+                            for(TargetGene_DCG tdcg : tdcg_ordered)
+                            {
+                                sb.append(tdcg.target_gene);
+                                sb.append("\t");
+                                sb.append(tdcg.mean_affinity_value);
+                                sb.append("\n");
+                            }
+
+                            found_tfs.add(key_tf);
+
+                            BufferedWriter bw = new BufferedWriter(new FileWriter(f_output_tf_file));
+                            bw.write(sb.toString());
+                            bw.close();
+                        }
+                    }
+                }
+            }
+        }
+
+        logger.logLine("[EVALUATION-PREPROCESSING] finished retrieving target genes.");
     }
 
     /**
@@ -9363,13 +9840,48 @@ public class COM2POSE_lib
             logger.logLine("[ChIP-ATLAS] Tissue type specified, but no genome version specified. (chip_atlas_genome_version).");
             all_set=false;
         }
+        if(options_intern.chip_atlas_activated_chip_atlas)
+        {
+            if(options_intern.igv_path_to_igv.equals(""))
+            {
+                logger.logLine("[ChIP-ATLAS-IGV] ChIP-ATLAS activated, but no IGV path set.");
+                all_set=false;
+            }
+            if(options_intern.igv_species_ref_genome.equals(""))
+            {
+                logger.logLine("[ChIP-ATLAS-IGV] ChIP-ATLAS activated, but no IGV ref genome set set.");
+                all_set=false;
+            }
+
+            Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out.println("genome "+options_intern.igv_species_ref_genome);
+            String response = in.readLine();
+            if(!response.equals("OK"))
+            {
+                logger.logLine("[IGV] igv_species_ref_genome not OK!");
+                all_set=false;
+            }
+            socket.close();
+        }
 
         /**
          * IGV OPTIONS
          */
         if(!options_intern.igv_path_to_igv.equals(""))
         {
-            if(options_intern.igv_path_to_tf_chip_seq.equals(""))
+            if(!options_intern.igv_path_to_tf_chip_seq.equals(""))
+            {
+                File f = new File(options_intern.igv_path_to_tf_chip_seq);
+                if(!f.exists())
+                {
+                    logger.logLine("[IGV] path to TF ChIP-seq data does not exist!");
+                    all_set=false;
+                }
+            }
+
+            if(options_intern.igv_path_to_tf_chip_seq.equals("") && !options_intern.chip_atlas_activated_chip_atlas)
             {
                 logger.logLine("[IGV] path to IGV set, but no TF ChIP-seq data provided.");
                 all_set=false;
