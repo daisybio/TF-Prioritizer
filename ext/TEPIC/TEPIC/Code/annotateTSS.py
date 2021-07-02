@@ -95,6 +95,7 @@ def extractTF_Affinity(openRegions, genesInOpenChromatin, filename, genePosition
         for l in tfpa:
             s = l.split()
             if (headerlength != len(s) - 1):
+                continue
                 print(
                     "Header of TF affinity file is not correctly formatted. Number of columns does not match the header")
                 exit()
@@ -159,6 +160,7 @@ def extractTF_Affinity(openRegions, genesInOpenChromatin, filename, genePosition
         for l in tfpa:
             s = l.split()
             if (headerlength != len(s) - 1):
+                continue
                 print(
                     "Header of TF affinity file is not correctly formatted. Number of columns does not match the header")
                 exit()

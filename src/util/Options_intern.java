@@ -42,6 +42,9 @@ public class Options_intern
     public String folder_name_deseq2_preprocessing_single = "single";
     public String folder_name_deseq2_preprocessing_combined = "combined";
     public String folder_name_deseq2_preprocessing_gene_symbols = "symbols_ensg_mean_counts";
+    public String folder_name_deseq2_preprocessing_tpm = "tpm_mapping";
+    public String folder_name_deseq2_preprocessing_tpm_scripts = "01_scripts";
+    public String folder_name_deseq2_preprocessing_tpm_results = "02_tpm_mappings";
     public String folder_name_deseq2_output_raw = "02_B_DESeq2_output_raw";
     public String folder_name_deseq2_R_scripts = "02_C_DESeq2_R_scripts";
     public String folder_name_deseq2_output = "02_D_DESeq2_output";
@@ -128,6 +131,10 @@ public class Options_intern
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
+    public String file_suffix_deseq2_preprocessing_tpm_mapping_get_geneLengths_script ="get_gene_lengths.R";
+    public String file_suffix_deseq2_preprocessing_tpm_mapping_geneLengths_file = "gene_lengths.csv";
+    public String file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_script = "_get_tpms.R";
+    public String file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_data = "_tpms.csv";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_postprocessing_all_tfs = "ALL_TFs.csv";
     public String file_suffix_tepic_postprocessing_output_mean_affinities ="Mean_Affinities_";

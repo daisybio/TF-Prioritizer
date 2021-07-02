@@ -6728,6 +6728,7 @@ public class COM2POSE_lib
                     {
                         String current_HM = fileDir.getName();
                         String current_group_clash = fileDir2.getName();
+                        logger.logLine("[TEPIC] Postprocess: "+ current_HM + " - " + current_group_clash);
                         String[] group_clash_split = current_group_clash.split("_");
 
                         String group1 = group_clash_split[0];
@@ -7446,8 +7447,8 @@ public class COM2POSE_lib
             if(!dir.isDirectory())
             {
                 String command = "Rscript " + dir.getAbsolutePath();
-                Process child = Runtime.getRuntime().exec(command);
                 logger.logLine("[DESEQ2] Running script " + dir.getName()+": " + command);
+                Process child = Runtime.getRuntime().exec(command);
                 int code = child.waitFor();
                 switch (code){
                     case 0:
@@ -7510,6 +7511,98 @@ public class COM2POSE_lib
 
         logger.logLine("Finished postprocessing DESeq2 data for input to DYNAMITE");
 
+    }
+
+    /**
+     * creates a mapping for TPM values for all RNA-seq genes
+     */
+    public void create_TPM_mappings() throws Exception {
+        logger.logLine("[PREP] Create TPM values for all RNA-seq data.");
+
+        File f_output_ot = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_tpm);
+        f_output_ot.mkdirs();
+
+        File f_output_script_lengths = new File(f_output_ot.getAbsolutePath()+File.separator+options_intern.file_suffix_deseq2_preprocessing_tpm_mapping_get_geneLengths_script);
+        File f_output_lengths = new File(f_output_ot.getAbsolutePath()+File.separator+options_intern.file_suffix_deseq2_preprocessing_tpm_mapping_geneLengths_file);
+
+        logger.logLine("[PREP] Get gene lengths ...");
+
+        StringBuilder sb_lengths = new StringBuilder();
+        sb_lengths.append("if(!\"EDASeq\" %in% rownames(installed.packages()))\n" +
+                "{\n" +
+                "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                "  {\n" +
+                "    install.packages(\"BiocManager\")\n" +
+                "  \n" +
+                "  }\n" +
+                "  \n" +
+                "  BiocManager::install(\"EDASeq\")\n" +
+                "}\n" +
+                "\n" +
+                "if(!\"biomaRt\" %in% rownames(installed.packages()))\n" +
+                "{\n" +
+                "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                "  {\n" +
+                "    install.packages(\"BiocManager\")\n" +
+                "  }\n" +
+                "  BiocManager::install(\"biomaRt\")\n" +
+                "}\n");
+
+        sb_lengths.append("require(\"dplyr\")\n");
+
+        sb_lengths.append("ensg_names<-read.csv('"+options_intern.deseq2_input_gene_id+"',sep='\\t')\n");
+        sb_lengths.append("ensembl_list<-ensg_names$Geneid\n");
+        sb_lengths.append("ensembl_to_lenth=getGeneLengthAndGCContent(ensembl_list, \""+options_intern.deseq2_biomart_dataset_species+"\")\n");
+        sb_lengths.append("write.table(ensembl_to_lenth, file=\""+f_output_lengths.getAbsolutePath()+"\", sep='\\t', quote=FALSE, row.names=FALSE)\n");
+
+        BufferedWriter bw_lengths_script = new BufferedWriter(new FileWriter(f_output_script_lengths));
+        bw_lengths_script.append(sb_lengths.toString());
+        bw_lengths_script.close();
+
+        String command = "Rscript " + f_output_script_lengths;
+        logger.logLine("[PREP] run R script: " + command);
+        Process child = Runtime.getRuntime().exec(command);
+        int code = child.waitFor();
+        switch (code){
+            case 0:
+                break;
+            case 1:
+                String message = child.getErrorStream().toString();
+                throw new Exception(message);
+        }
+
+        //now do this for all RNA-seq data
+
+        File f_output_scripts_rna_seq = new File(f_output_ot.getAbsolutePath()+File.separator+options_intern.folder_name_deseq2_preprocessing_tpm_scripts);
+        f_output_scripts_rna_seq.mkdirs();
+
+        File f_output_data_rna_seq = new File(f_output_ot.getAbsolutePath()+File.separator+options_intern.folder_name_deseq2_preprocessing_tpm_results);
+        f_output_data_rna_seq.mkdirs();
+
+        File f_input_rna_seq_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_symbols);
+
+        HashSet<File> files_to_execute = new HashSet<>();
+
+        for(File f_rnaseq : f_input_rna_seq_root.listFiles())
+        {
+            if(f_rnaseq.isFile())
+            {
+                File f_output_script = new File(f_output_scripts_rna_seq.getAbsolutePath()+File.separator+f_rnaseq.getName().split("\\.")[0]+options_intern.file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_script);
+                files_to_execute.add(f_output_script);
+
+                File f_output_data = new File(f_output_data_rna_seq.getAbsolutePath()+File.separator+f_rnaseq.getName().split("\\.")[0]+options_intern.file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_data);
+
+                StringBuilder sb_rscript_calc_tpm = new StringBuilder();
+
+                BufferedWriter bw = new BufferedWriter(new FileWriter(f_output_script));
+                bw.write(sb_rscript_calc_tpm.toString());
+                bw.close();
+
+            }
+        }
+
+
+        logger.logLine("[PREP] TPM values finished.");
     }
 
     /**

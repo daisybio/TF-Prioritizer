@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="" />
+    <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../../src/COM2POSE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/COM2POSE.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,7 +39,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Python.H3K27ac_0.1">
+  <component name="RunManager" selected="Python.annotateTSS">
     <configuration name="DAVID_test" type="PythonConfigurationType" factoryName="Python">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -139,7 +142,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Code/annotateTSS.py" />
-      <option name="PARAMETERS" value="$USER_HOME$/data/COM2POSE/04_requiredData/gencode.vM25.annotation.gtf $USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC/working_dir/03_A_TEPIC_output_raw/p13/H3K27ac/p13_H3K27ac.broadPeak/p13_H3K27ac.broadPeak_TEPIC_03_05_21_09_07_06_581535901_Affinity.txt --geneViewAffinity $USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC/working_dir/03_A_TEPIC_output_raw/p13/H3K27ac/p13_H3K27ac.broadPeak/p13_H3K27ac.broadPeak_TEPIC_03_05_21_09_07_06_581535901_Affinity_Gene_View.txt --windows 50000 --decay TRUE --geneBody FALSE --geneBody FALSE --normaliseLength TRUE --motifLength --additionalPeakFeatures TRUE --onlyPeakFeatures FALSE --transcript FALSE --tgeneFile $USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC/working_dir/04_TGENE/02_output/p13/H3K27ac/p13_H3K27ac/links.tsv" />
+      <option name="PARAMETERS" value="$USER_HOME$/data/COM2POSE/07_requiredData_covid/gencode.v19.annotation.gtf $USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/03_A0_TEPIC_output_raw/Treatment/PolII/Treatment_PolII.broadPeak/Treatment_PolII.broadPeak_TEPIC_07_02_21_08_18_13_263165516_Affinity.txt --geneViewAffinity $USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/03_A0_TEPIC_output_raw/Treatment/PolII/Treatment_PolII.broadPeak/Treatment_PolII.broadPeak_TEPIC_07_02_21_08_18_13_263165516_Affinity_Gene_View.txt --windows 50000 --decay TRUE --geneBody FALSE --geneBody FALSE --normaliseLength TRUE --motifLength --additionalPeakFeatures TRUE --onlyPeakFeatures FALSE --transcript FALSE" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -403,6 +406,7 @@
       <workItem from="1623652450086" duration="755000" />
       <workItem from="1623743991360" duration="953000" />
       <workItem from="1623828795522" duration="66000" />
+      <workItem from="1625208246862" duration="2596000" />
     </task>
     <servers />
   </component>
@@ -474,6 +478,31 @@
           <line>8</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Code/annotateTSS.py</url>
+          <line>161</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Code/annotateTSS.py</url>
+          <line>164</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Code/annotateTSS.py</url>
+          <line>99</line>
+          <option name="timeStamp" value="55" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Code/annotateTSS.py</url>
+          <line>98</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Code/annotateTSS.py</url>
+          <line>100</line>
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -488,7 +517,7 @@
     <SUITE FILE_PATH="coverage/TEPIC$distribution_analysis_statistical_tests.coverage" NAME="distribution_analysis_statistical_tests Coverage Results" MODIFIED="1616762420670" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Test" />
     <SUITE FILE_PATH="coverage/TEPIC$plot_mimat_target_genes_regression_coefficient.coverage" NAME="plot_mimat_target_genes_regression_coefficient Coverage Results" MODIFIED="1614502286084" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../../SPONGEdb_TCGA/src/get_best_mirnas_to_target_genes" />
     <SUITE FILE_PATH="coverage/TEPIC$filterGeneView.coverage" NAME="filterGeneView Coverage Results" MODIFIED="1608646521776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
-    <SUITE FILE_PATH="coverage/TEPIC$annotateTSS.coverage" NAME="annotateTSS Coverage Results" MODIFIED="1614942799082" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
+    <SUITE FILE_PATH="coverage/TEPIC$annotateTSS.coverage" NAME="annotateTSS Coverage Results" MODIFIED="1625225968189" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
     <SUITE FILE_PATH="coverage/TEPIC$H3K4me3_0_1.coverage" NAME="H3K4me3_0.1 Coverage Results" MODIFIED="1612281516285" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/10_SAMPLE_UNION_07/working_dir/09_PLOTS_output/H3K4me3/0.1" />
     <SUITE FILE_PATH="coverage/TEPIC$H3K27ac_0_1.coverage" NAME="H3K27ac_0.1 Coverage Results" MODIFIED="1623744156829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/06_B_PLOTS_output/H3K27ac/0.1" />
     <SUITE FILE_PATH="coverage/TEPIC$test_boxplot_interactive.coverage" NAME="test_boxplot_interactive Coverage Results" MODIFIED="1615216729075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/14_LIKE_10_TGENE_FILT_SELF_REG/working_dir/09_PLOTS_output/Pol2/0.1" />
