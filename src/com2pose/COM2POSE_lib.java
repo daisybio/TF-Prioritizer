@@ -7549,10 +7549,15 @@ public class COM2POSE_lib
                 "}\n");
 
         sb_lengths.append("require(\"dplyr\")\n");
+        sb_lengths.append("require(\"biomaRt\")\n");
+        sb_lengths.append("require(\"EDASeq\")\n");
 
         sb_lengths.append("ensg_names<-read.csv('"+options_intern.deseq2_input_gene_id+"',sep='\\t')\n");
         sb_lengths.append("ensembl_list<-ensg_names$Geneid\n");
         sb_lengths.append("ensembl_to_lenth=getGeneLengthAndGCContent(ensembl_list, \""+options_intern.deseq2_biomart_dataset_species+"\")\n");
+        sb_lengths.append("ensembl_to_lenth=as.data.frame(ensembl_to_lenth)\n");
+        sb_lengths.append("ensembl_to_lenth=setDT(ensembl_to_lenth, keep.rownames = TRUE)[]\n");
+        sb_lengths.append("colnames(ensembl_to_lenth)<-c(\"ENSG\",\"length\",\"gc\")\n");
         sb_lengths.append("write.table(ensembl_to_lenth, file=\""+f_output_lengths.getAbsolutePath()+"\", sep='\\t', quote=FALSE, row.names=FALSE)\n");
 
         BufferedWriter bw_lengths_script = new BufferedWriter(new FileWriter(f_output_script_lengths));
@@ -7560,7 +7565,8 @@ public class COM2POSE_lib
         bw_lengths_script.close();
 
         String command = "Rscript " + f_output_script_lengths;
-        logger.logLine("[PREP] run R script: " + command);
+        logger.logLine("[PREP-TPM] run R script: " + command);
+
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();
         switch (code){
@@ -7593,11 +7599,69 @@ public class COM2POSE_lib
                 File f_output_data = new File(f_output_data_rna_seq.getAbsolutePath()+File.separator+f_rnaseq.getName().split("\\.")[0]+options_intern.file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_data);
 
                 StringBuilder sb_rscript_calc_tpm = new StringBuilder();
+                sb_rscript_calc_tpm.append("require(\"dplyr\")\n");
+                sb_rscript_calc_tpm.append("require(\"tidyr\")\n");
+                sb_rscript_calc_tpm.append("require(\"data.table\")\n");
+                sb_rscript_calc_tpm.append("require(\"tibble\")\n");
+
+                sb_rscript_calc_tpm.append("tpm3 <- function(counts,len) {\n" +
+                        "  x <- counts/len\n" +
+                        "  return(t(t(x)*1e6/colSums(x)))\n" +
+                        "}\n");
+
+                sb_rscript_calc_tpm.append("expression_matrix=read.csv(\""+f_rnaseq.getAbsolutePath()+"\",sep=\"\\t\")\n");
+                sb_rscript_calc_tpm.append("gene_lengths=read.csv(\""+f_output_lengths.getAbsolutePath()+"\",sep=\"\\t\")\n");
+
+                sb_rscript_calc_tpm.append("##CHECK DISTINCT VALUES\n" +
+                        "gene_lengths=gene_lengths%>%dplyr::select(ENSG,length)\n" +
+                        "gene_lengths=distinct(gene_lengths)\n" +
+                        "\n" +
+                        "gene_counts=dplyr::select(expression_matrix, c(\"ENSG\",\"MEAN_COUNT\"))\n" +
+                        "gene_counts=distinct(gene_counts)\n" +
+                        "\n" +
+                        "##CHECK VALUES INSIDE gene_counts and gene_lengths\n" +
+                        "available_ensg_counts=gene_counts$ENSG\n" +
+                        "available_ensg_lenghts=gene_lengths$ENSG\n" +
+                        "gene_counts=filter(gene_counts, ENSG %in% available_ensg_lenghts)\n" +
+                        "gene_lengths=filter(gene_lengths, ENSG %in% available_ensg_counts)\n" +
+                        "\n" +
+                        "gene_counts$ENSG=sort(gene_counts$ENSG)\n" +
+                        "gene_lengths$ENSG=sort(gene_lengths$ENSG)\n" +
+                        "\n" +
+                        "gene_lengths=column_to_rownames(gene_lengths,\"ENSG\")\n" +
+                        "gene_counts=column_to_rownames(gene_counts,\"ENSG\")\n" +
+                        "\n" +
+                        "tpm_value=tpm3(gene_counts,gene_lengths)\n" +
+                        "tpm_value=as.data.frame(tpm_value)\n" +
+                        "\n" +
+                        "tpm_value=setDT(tpm_value, keep.rownames = TRUE)[]\n" +
+                        "colnames(tpm_value)=c(\"ENSG\",\"TPM\")\n" +
+                        "\n" +
+                        "gene_lengths=setDT(gene_lengths, keep.rownames = TRUE)[]\n" +
+                        "colnames(gene_lengths)=c(\"ENSG\",\"length\")\n" +
+                        "\n" +
+                        "\n" +
+                        "merged_output=merge(expression_matrix,tpm_value)\n" +
+                        "merged_output=merge(merged_output,gene_lengths)\n" +
+                        "\n" +
+                        "write.table(merged_output, file=\""+f_output_data.getAbsolutePath()+"\", sep=\"\\t\", row.names = FALSE, quote = FALSE)\n");
 
                 BufferedWriter bw = new BufferedWriter(new FileWriter(f_output_script));
                 bw.write(sb_rscript_calc_tpm.toString());
                 bw.close();
 
+                String command_intern = "Rscript " + f_output_script;
+                logger.logLine("[PREP-TPM] run R script: " + command);
+
+                Process child_intern = Runtime.getRuntime().exec(command_intern);
+                int code_intern = child_intern.waitFor();
+                switch (code_intern){
+                    case 0:
+                        break;
+                    case 1:
+                        String message = child_intern.getErrorStream().toString();
+                        throw new Exception(message);
+                }
             }
         }
 
@@ -10699,8 +10763,17 @@ public class COM2POSE_lib
                 sb_all.append("    df_interesting_stats.loc[row_counter]=['"+name_composed+"',"+name_tf+"_sum,"+name_tf+"_length,"+name_tf+"_mean,"+name_tf+"_median,"+name_tf+"_quantile_95,"+name_tf+"_quantile]\n");
             }
             sb_all.append( "    row_counter=row_counter+1\n");
+            sb_all.append("del "+name_tf+"_sum\n");
+            sb_all.append("del "+name_tf+"_length\n");
+            sb_all.append("del "+name_tf+"_mean\n");
+            sb_all.append("del "+name_tf+"_median\n");
+            sb_all.append("del "+name_tf+"_quantile_95\n");
+            sb_all.append("del "+name_tf+"_quantile\n");
+            sb_all.append("del "+name_tf+"_mannwhitneyU\n");
+            sb_all.append("plt.clf()\n");
             sb_all.append("del "+name_tf+"\n"
-                    + "plt.figure(figsize=(20, 17))\n\n\n");
+                    + "#plt.figure(figsize=(20, 17))\n\n\n");
+
         }
 
         File f_stats_all_print = new File(output_stats.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats);

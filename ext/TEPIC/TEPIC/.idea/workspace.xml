@@ -30,7 +30,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/06_B_PLOTS_output/H3K27ac/0.1/H3K27ac_0.1.py" />
+    <property name="last_opened_file_path" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL/analyse_tf_to_background.py" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -39,7 +39,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Python.annotateTSS">
+  <component name="RunManager" selected="Python.analyse_tf_to_background_new">
     <configuration name="DAVID_test" type="PythonConfigurationType" factoryName="Python">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -62,28 +62,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="H3K27ac_0.1" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="TEPIC" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="/usr/bin/python3.8" />
-      <option name="WORKING_DIRECTORY" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/06_B_PLOTS_output/H3K27ac/0.1" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/06_B_PLOTS_output/H3K27ac/0.1/H3K27ac_0.1.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="analyse_tf_to_background" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -92,12 +70,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="/usr/bin/python3.8" />
-      <option name="WORKING_DIRECTORY" value="$USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC_COPY/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC_COPY/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL/analyse_tf_to_background.py" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL/analyse_tf_to_background.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -120,6 +98,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC_COPY/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL/analyse_tf_to_background.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="analyse_tf_to_background_new" type="PythonConfigurationType" factoryName="Python">
+      <module name="TEPIC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python3.8" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL/analyse_tf_to_background.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -320,11 +320,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.H3K27ac_0.1" />
+      <item itemvalue="Python.analyse_tf_to_background" />
       <item itemvalue="Python.test_boxplot_interactive" />
       <item itemvalue="Python.DAVID_test" />
       <item itemvalue="Python.distribution_analysis_statistical_tests" />
-      <item itemvalue="Python.analyse_tf_to_background" />
+      <item itemvalue="Python.analyse_tf_to_background_new" />
       <item itemvalue="Python.analyse_tf_to_background_mannWhitneyU" />
       <item itemvalue="Python.annotateTSS" />
       <item itemvalue="Python.plot_mimat_target_genes_regression_coefficient" />
@@ -406,7 +406,9 @@
       <workItem from="1623652450086" duration="755000" />
       <workItem from="1623743991360" duration="953000" />
       <workItem from="1623828795522" duration="66000" />
-      <workItem from="1625208246862" duration="2596000" />
+      <workItem from="1625208246862" duration="2673000" />
+      <workItem from="1625471403062" duration="6918000" />
+      <workItem from="1625497758618" duration="951000" />
     </task>
     <servers />
   </component>
@@ -503,6 +505,11 @@
           <line>100</line>
           <option name="timeStamp" value="57" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL/analyse_tf_to_background.py</url>
+          <line>7685</line>
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -522,6 +529,7 @@
     <SUITE FILE_PATH="coverage/TEPIC$H3K27ac_0_1.coverage" NAME="H3K27ac_0.1 Coverage Results" MODIFIED="1623744156829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/06_B_PLOTS_output/H3K27ac/0.1" />
     <SUITE FILE_PATH="coverage/TEPIC$test_boxplot_interactive.coverage" NAME="test_boxplot_interactive Coverage Results" MODIFIED="1615216729075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/14_LIKE_10_TGENE_FILT_SELF_REG/working_dir/09_PLOTS_output/Pol2/0.1" />
     <SUITE FILE_PATH="coverage/TEPIC$analyse_tf_to_background.coverage" NAME="analyse_tf_to_background_mannWhitneyU Coverage Results" MODIFIED="1616764324102" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC_COPY/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
+    <SUITE FILE_PATH="coverage/TEPIC$analyse_tf_to_background_new.coverage" NAME="analyse_tf_to_background_new Coverage Results" MODIFIED="1625498110400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
     <SUITE FILE_PATH="coverage/TEPIC$computeMeanRatioTFAffinities.coverage" NAME="computeMeanRatioTFAffinities Coverage Results" MODIFIED="1623653195912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts" />
   </component>
 </project>

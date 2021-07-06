@@ -16,7 +16,7 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
-
+/*
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -43,9 +43,9 @@ public class COM2POSE
             com2pose_lib.get_ensg_symbol_mapping();
         }
 
-        com2pose_lib.create_DESeq2_scripts();
-        //com2pose_lib.create_TPM_mappings();
-        com2pose_lib.run_and_postprocess_DESeq2();
+        com2pose_lib.create_DESeq2_scripts();*/
+        com2pose_lib.create_TPM_mappings();
+        /*com2pose_lib.run_and_postprocess_DESeq2();
 
 
         if(!options_intern.path_tgen.equals("")) {
@@ -114,7 +114,7 @@ public class COM2POSE
         if(!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))
         {
             com2pose_lib.run_igv_own_data();
-        }
+        }*/
 
         System.out.println("X");
     }
