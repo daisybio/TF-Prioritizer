@@ -3654,6 +3654,44 @@ public class COM2POSE_lib
         File output_analysis_website_overview = new File(output_analysis_root.getAbsolutePath()+File.separator+options_intern.folder_out_analysis_data_WEBSITE_OVERVIEW);
         output_analysis_website_overview.mkdir();
 
+        HashMap<String,HashMap<String,Double>> tp_gene_tpm_value = new HashMap<>();
+        File f_input_tpms_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_tpm+File.separator+options_intern.folder_name_deseq2_preprocessing_tpm_results);
+
+        for(File f_tpm_tp : f_input_tpms_root.listFiles())
+        {
+            if(f_tpm_tp.isFile())
+            {
+                String name_tp = f_tpm_tp.getName().split("\\.")[0].split("_")[0];
+
+                HashMap<String,Double> gene_tpm = new HashMap<>();
+
+                BufferedReader br = new BufferedReader(new FileReader(f_tpm_tp));
+                String line =br.readLine();
+                String[] split_header = line.split("\t");
+                while((line=br.readLine())!=null)
+                {
+                    String[] split = line.split("\t");
+                    gene_tpm.put(split[0],Double.parseDouble(split[3]));
+                }
+                br.close();
+
+                tp_gene_tpm_value.put(name_tp,gene_tpm);
+            }
+        }
+
+        HashMap<String,String> symbol_ensg_map = new HashMap<>();
+        BufferedReader br_ensg_gene_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
+        while((line_ensg_gene_symbol=br_ensg_gene_symbol.readLine())!=null)
+        {
+            String[] split = line_ensg_gene_symbol.split("\t");
+            if(split.length>1)
+            {
+                symbol_ensg_map.put(split[1].toUpperCase(),split[0].toUpperCase());
+            }
+        }
+        br_ensg_gene_symbol.close();
+
         HashMap<String,HashMap<String,HashMap<String,HashMap<String,Double>>>> cutoff_hm_tf_counts_DIFFERENT = new HashMap<>();
         HashMap<String,HashMap<String,HashMap<String,HashMap<String,Double>>>> cutoff_hm_tf_counts_SAME = new HashMap<>();
 
@@ -3854,6 +3892,8 @@ public class COM2POSE_lib
 
                                     }
 
+                                    String ensg_name = symbol_ensg_map.get(split[0]);
+
                                     if(count>options_intern.plot_cutoff_tps)
                                     {
                                         HashMap<String,Double> tf_gc = new HashMap<>();
@@ -3874,13 +3914,36 @@ public class COM2POSE_lib
                                             }
                                         }
 
+                                        double cumm_tpm = 0.0;
+
+                                        for(String key_group : tp_gene_tpm_value.keySet())
+                                        {
+                                            HashMap<String,Double> lookup = tp_gene_tpm_value.get(key_group);
+                                            if(lookup.containsKey(ensg_name))
+                                                cumm_tpm+=lookup.get(ensg_name);
+                                        }
+
+                                        boolean passed_count_threshold = false;
+
                                         if(count_row>=options_intern.plot_cutoff_gcs)
+                                        {
+                                            passed_count_threshold=true;
+                                        }
+
+                                        boolean passed_tpm_threshold = false;
+                                        if(cumm_tpm>=options_intern.plot_cutoff_tpms)
+                                        {
+                                            passed_tpm_threshold=true;
+                                        }
+
+                                        if(passed_count_threshold && passed_tpm_threshold)
                                         {
                                             hm_intern.put(split[0].toUpperCase(),tf_gc);
                                             //WRITE
                                             bw.write(sb_intern.toString());
                                             bw.newLine();
                                         }
+
                                     }
                                 }
                                 br.close();
@@ -7514,6 +7577,135 @@ public class COM2POSE_lib
     }
 
     /**
+     * edit input files if TPM filter is set
+     */
+    public void preprocess_deseq2_input_tpm() throws IOException {
+        logger.logLine("[DESEQ2-PREP-TPM] Filter genes with TPM under cutoff.");
+
+        //read in TPMs
+        HashMap<String,HashMap<String,Double>> tp_gene_tpm_value = new HashMap<>();
+
+        File f_input_tpms_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_tpm+File.separator+options_intern.folder_name_deseq2_preprocessing_tpm_results);
+
+        for(File f_tpm_tp : f_input_tpms_root.listFiles())
+        {
+            if(f_tpm_tp.isFile())
+            {
+                String name_tp = f_tpm_tp.getName().split("\\.")[0].split("_")[0];
+
+                HashMap<String,Double> gene_tpm = new HashMap<>();
+
+                BufferedReader br = new BufferedReader(new FileReader(f_tpm_tp));
+                String line =br.readLine();
+                String[] split_header = line.split("\t");
+                while((line=br.readLine())!=null)
+                {
+                    String[] split = line.split("\t");
+                    gene_tpm.put(split[0],Double.parseDouble(split[3]));
+                }
+                br.close();
+
+                tp_gene_tpm_value.put(name_tp,gene_tpm);
+            }
+        }
+
+        File f_combined_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_combined);
+
+        File f_output_copy = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_combined_original);
+        f_output_copy.mkdirs();
+
+        for(File f_input : f_combined_root.listFiles())
+        {
+            if(f_input.isDirectory())
+            {
+                String[] groups = f_input.getName().split("_");
+                String name1= groups[0];
+                String name2= groups[1];
+
+                File f_output_copy_group = new File(f_output_copy.getAbsolutePath()+File.separator+f_input.getName());
+                f_output_copy_group.mkdirs();
+
+                for(File f_input_read : f_input.listFiles())
+                {
+                    if(f_input_read.isFile())
+                    {
+                        StringBuilder sb_copy = new StringBuilder();
+
+                        StringBuilder sb_tpm_filtered = new StringBuilder();
+
+                        BufferedReader br = new BufferedReader(new FileReader(f_input_read));
+                        String line =br.readLine();
+
+                        sb_copy.append(line);
+                        sb_copy.append("\n");
+
+                        sb_tpm_filtered.append(line);
+                        sb_tpm_filtered.append("\n");
+
+                        String[] header = line.split("\t");
+
+                        for(int i = 1; i < header.length; i++)
+                        {
+                            if(header[i].matches(".*"+name1+".*"))
+                            {
+                                header[i] = name1;
+                            }
+                            if(header[i].matches(".*"+name2+".*"))
+                            {
+                                header[i] = name2;
+                            }
+                        }
+
+                        while((line=br.readLine())!=null)
+                        {
+                            sb_copy.append(line);
+                            sb_copy.append("\n");
+
+                            String[] split = line.split("\t");
+
+                            sb_tpm_filtered.append(split[0]);
+
+                            for(int i = 1; i < split.length; i++)
+                            {
+                                String group_name = header[i];
+                                HashMap<String,Double> lookup = tp_gene_tpm_value.get(group_name);
+
+                                double tpm_value = lookup.get(split[0]);
+                                if(tpm_value< options_intern.deseq2_tpm_filter)
+                                {
+                                    sb_tpm_filtered.append("\t");
+                                    sb_tpm_filtered.append("0");
+                                }
+                                else
+                                {
+                                    sb_tpm_filtered.append("\t");
+                                    sb_tpm_filtered.append(split[i]);
+                                }
+                            }
+                            sb_tpm_filtered.append("\n");
+
+                        }
+                        br.close();
+
+                        BufferedWriter bw_copy = new BufferedWriter(new FileWriter(new File(f_output_copy_group.getAbsolutePath()+File.separator+f_input_read.getName())));
+                        bw_copy.write(sb_copy.toString());
+                        bw_copy.close();
+
+                        BufferedWriter bw_tpm_filtered = new BufferedWriter(new FileWriter(f_input_read));
+                        bw_tpm_filtered.write(sb_tpm_filtered.toString());
+                        bw_tpm_filtered.close();
+                    }
+                }
+            }
+        }
+
+
+
+
+
+    }
+
+    /**
      * creates a mapping for TPM values for all RNA-seq genes
      */
     public void create_TPM_mappings() throws Exception {
@@ -9432,6 +9624,9 @@ public class COM2POSE_lib
                 case "deseq2_count_threshold":
                     options_intern.deseq2_count_threshold=Integer.parseInt(split[1]);
                     break;
+                case "deseq2_tpm_filter":
+                    options_intern.deseq2_tpm_filter=Double.parseDouble(split[1]);
+                    break;
                 case "tepic_input_directory":
                     options_intern.tepic_input_directory=split[1].substring(1,split[1].length()-1);
                     options_intern.tepic_input_original=split[1].substring(1,split[1].length()-1);
@@ -9596,6 +9791,9 @@ public class COM2POSE_lib
                     break;
                 case "plot_cutoff_gcs":
                     options_intern.plot_cutoff_gcs=Integer.parseInt(split[1]);
+                    break;
+                case "plot_cutoff_tpms":
+                    options_intern.plot_cutoff_tpms=Double.parseDouble(split[1]);
                     break;
                 case "plot_top_k_genes":
                     options_intern.plot_top_k_genes=Integer.parseInt(split[1]);
@@ -9969,6 +10167,11 @@ public class COM2POSE_lib
         if(options_intern.plot_cutoff_gcs<0)
         {
             logger.logLine("[PLOTS] plot_cutoff_gcs must be >= 0");
+            all_set=false;
+        }
+        if(options_intern.plot_cutoff_tpms<0)
+        {
+            logger.logLine("[PLOTS] plot_cutoff_tpms must be >= 0.0");
             all_set=false;
         }
         if(options_intern.plot_top_k_genes<1)

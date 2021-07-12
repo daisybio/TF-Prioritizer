@@ -41,6 +41,7 @@ public class Options_intern
     public String folder_name_deseq2_preprocessing = "02_A_DESeq2_preprocessing";
     public String folder_name_deseq2_preprocessing_single = "single";
     public String folder_name_deseq2_preprocessing_combined = "combined";
+    public String folder_name_deseq2_preprocessing_combined_original = "combined_original";
     public String folder_name_deseq2_preprocessing_gene_symbols = "symbols_ensg_mean_counts";
     public String folder_name_deseq2_preprocessing_tpm = "tpm_mapping";
     public String folder_name_deseq2_preprocessing_tpm_scripts = "01_scripts";
@@ -217,6 +218,8 @@ public class Options_intern
     public String deseq2_biomart_dataset_symbol_column="mgi_symbol";
     //#[OPT]: minimum count over all samples of two timepoints for DESeq2, default: 0
     public int deseq2_count_threshold=0;
+    //#[OPT]: TPM filter for RNA-seq data, default: 0.0
+    public double deseq2_tpm_filter=0.0;
     /*
     ######################
     ##TEPIC parameters####
@@ -347,6 +350,8 @@ public class Options_intern
     public int plot_cutoff_hms=1;
     //#[OPT]: minimum gene counts, default: 100
     public int plot_cutoff_gcs=100;
+    //#[OPT]: minimum TPM, default: 0.0
+    public double plot_cutoff_tpms=0.0;
     //#[OPT]: top k target genes for TFs, default: 30
     public int plot_top_k_genes=30;
     //#[REQ]: mann-whitneyU pvalue cutoff (usually 0.05 or 0.01), default 0.01

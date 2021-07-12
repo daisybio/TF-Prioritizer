@@ -15,7 +15,7 @@ public class COM2POSE
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
-
+/*
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -44,6 +44,10 @@ public class COM2POSE
 
         com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.create_TPM_mappings();
+        if(options_intern.deseq2_tpm_filter>0)
+        {
+            com2pose_lib.preprocess_deseq2_input_tpm();
+        }
         com2pose_lib.run_and_postprocess_DESeq2();
 
 
@@ -85,8 +89,8 @@ public class COM2POSE
         com2pose_lib.run_DYNAMITE();
 
         //PLOTS
-        com2pose_lib.create_tp_plots();
-        com2pose_lib.analyze_plots_data();
+        com2pose_lib.create_tp_plots();*/
+        com2pose_lib.analyze_plots_data();/*
         com2pose_lib.get_top_k_target_genes_plots();
 
 
@@ -113,7 +117,7 @@ public class COM2POSE
         if(!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))
         {
             com2pose_lib.run_igv_own_data();
-        }
+        }*/
 
         System.out.println("X");
     }
