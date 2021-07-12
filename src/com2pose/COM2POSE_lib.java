@@ -7551,6 +7551,7 @@ public class COM2POSE_lib
         sb_lengths.append("require(\"dplyr\")\n");
         sb_lengths.append("require(\"biomaRt\")\n");
         sb_lengths.append("require(\"EDASeq\")\n");
+        sb_lengths.append("require(\"data.table\")\n");
 
         sb_lengths.append("ensg_names<-read.csv('"+options_intern.deseq2_input_gene_id+"',sep='\\t')\n");
         sb_lengths.append("ensembl_list<-ensg_names$Geneid\n");
@@ -7651,7 +7652,7 @@ public class COM2POSE_lib
                 bw.close();
 
                 String command_intern = "Rscript " + f_output_script;
-                logger.logLine("[PREP-TPM] run R script: " + command);
+                logger.logLine("[PREP-TPM] run R script: " + command_intern);
 
                 Process child_intern = Runtime.getRuntime().exec(command_intern);
                 int code_intern = child_intern.waitFor();
@@ -10011,17 +10012,24 @@ public class COM2POSE_lib
                 all_set=false;
             }
 
-            Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out.println("genome "+options_intern.igv_species_ref_genome);
-            String response = in.readLine();
-            if(!response.equals("OK"))
+            try{
+                Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out.println("genome "+options_intern.igv_species_ref_genome);
+                String response = in.readLine();
+                if(!response.equals("OK"))
+                {
+                    logger.logLine("[IGV] igv_species_ref_genome not OK!");
+                    all_set=false;
+                }
+                socket.close();
+            }catch (Exception e)
             {
-                logger.logLine("[IGV] igv_species_ref_genome not OK!");
-                all_set=false;
+                logger.logLine("[IGV] IGV option is used, but IGV is not started. Please start IGV, so COM2POSE can listen to its port: " + options_intern.igv_port_number);
+                System.exit(1);
             }
-            socket.close();
+
         }
 
         /**
