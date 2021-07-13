@@ -7665,6 +7665,10 @@ public class COM2POSE_lib
 
                             sb_tpm_filtered.append(split[0]);
 
+                            boolean one_changed = false;
+
+                            StringBuilder changer = new StringBuilder();
+
                             for(int i = 1; i < split.length; i++)
                             {
                                 String group_name = header[i];
@@ -7673,16 +7677,34 @@ public class COM2POSE_lib
                                 double tpm_value = lookup.get(split[0]);
                                 if(tpm_value< options_intern.deseq2_tpm_filter)
                                 {
-                                    sb_tpm_filtered.append("\t");
-                                    sb_tpm_filtered.append("0");
+                                    changer.append("\t");
+                                    changer.append("0");
+                                    one_changed=true;
                                 }
                                 else
                                 {
-                                    sb_tpm_filtered.append("\t");
-                                    sb_tpm_filtered.append(split[i]);
+                                    changer.append("\t");
+                                    changer.append(split[i]);
                                 }
                             }
-                            sb_tpm_filtered.append("\n");
+                            changer.append("\n");
+
+                            if(one_changed)
+                            {
+                                StringBuilder sb_complete_changer = new StringBuilder();
+                                for(int i = 1; i < split.length; i++)
+                                {
+                                    sb_complete_changer.append("\t0");
+                                }
+                                sb_complete_changer.append("\n");
+
+                                sb_tpm_filtered.append(sb_complete_changer.toString());
+
+                            }
+                            else
+                            {
+                                sb_tpm_filtered.append(changer.toString());
+                            }
 
                         }
                         br.close();
