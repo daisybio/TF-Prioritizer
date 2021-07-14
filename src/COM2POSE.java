@@ -41,7 +41,6 @@ public class COM2POSE
         {
             com2pose_lib.get_ensg_symbol_mapping();
         }
-
         com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.create_TPM_mappings();
         if(options_intern.deseq2_tpm_filter>0)

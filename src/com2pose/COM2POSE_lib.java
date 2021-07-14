@@ -7601,6 +7601,8 @@ public class COM2POSE_lib
                 while((line=br.readLine())!=null)
                 {
                     String[] split = line.split("\t");
+                    if(split[3].equals("NA"))
+                        continue;
                     gene_tpm.put(split[0],Double.parseDouble(split[3]));
                 }
                 br.close();
@@ -7673,6 +7675,14 @@ public class COM2POSE_lib
                             {
                                 String group_name = header[i];
                                 HashMap<String,Double> lookup = tp_gene_tpm_value.get(group_name);
+
+                                if(!lookup.containsKey(split[0]))
+                                {
+                                    changer.append("\t");
+                                    changer.append("0");
+                                    one_changed=true;
+                                    continue;
+                                }
 
                                 double tpm_value = lookup.get(split[0]);
                                 if(tpm_value< options_intern.deseq2_tpm_filter)
@@ -7766,6 +7776,7 @@ public class COM2POSE_lib
         sb_lengths.append("require(\"biomaRt\")\n");
         sb_lengths.append("require(\"EDASeq\")\n");
         sb_lengths.append("require(\"data.table\")\n");
+        sb_lengths.append("httr::set_config(httr::config(ssl_verifypeer = FALSE))\n");
 
         sb_lengths.append("ensg_names<-read.csv('"+options_intern.deseq2_input_gene_id+"',sep='\\t')\n");
         sb_lengths.append("ensembl_list<-ensg_names$Geneid\n");
@@ -7826,7 +7837,9 @@ public class COM2POSE_lib
 
                 sb_rscript_calc_tpm.append("expression_matrix=read.csv(\""+f_rnaseq.getAbsolutePath()+"\",sep=\"\\t\")\n");
                 sb_rscript_calc_tpm.append("gene_lengths=read.csv(\""+f_output_lengths.getAbsolutePath()+"\",sep=\"\\t\")\n");
-
+                sb_rscript_calc_tpm.append("##CHECK NAs\n" +
+                        "expression_matrix=na.omit(expression_matrix)\n" +
+                        "gene_lengths=na.omit(gene_lengths)\n");
                 sb_rscript_calc_tpm.append("##CHECK DISTINCT VALUES\n" +
                         "gene_lengths=gene_lengths%>%dplyr::select(ENSG,length)\n" +
                         "gene_lengths=distinct(gene_lengths)\n" +
@@ -8261,6 +8274,8 @@ public class COM2POSE_lib
                 "  BiocManager::install(\"biomaRt\")\n" +
                 "\n" +
                 "library('biomaRt')\n");
+
+        sb.append("httr::set_config(httr::config(ssl_verifypeer = FALSE))\n");
 
         sb.append("df <- read.csv('"+options_intern.deseq2_input_gene_id+"')\n");
 
