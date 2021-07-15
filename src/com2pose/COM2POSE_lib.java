@@ -10949,6 +10949,7 @@ public class COM2POSE_lib
         sb_all.append(input_background_file);
         sb_all.append("', comment=\"#\", usecols=['TF_TG_SCORE']).sort_values(['TF_TG_SCORE'], ascending=False)\n");
         sb_all.append("background[\"label\"] = \"background\"\n" +
+                "background.dropna(subset = [\"TF_TG_SCORE\"], inplace=True)\n"+
                 "\n"+
                 "background_sum = sum(background[\"TF_TG_SCORE\"])\n" +
                 "background_length = len(background)\n" +
@@ -10976,6 +10977,7 @@ public class COM2POSE_lib
             sb_all.append("', comment=\"#\", usecols=['TF_TG_SCORE','TF']).sort_values(['TF_TG_SCORE'], ascending=False)\n");
             sb_all.append(name_tf);
             sb_all.append(".columns=['TF_TG_SCORE','label']\n");
+            sb_all.append(name_tf+".dropna(subset = [\"TF_TG_SCORE\"], inplace=True)\n");
             sb_all.append(name_tf+"_sum = sum("+name_tf+"['TF_TG_SCORE'])\n" +
                     name_tf+"_length = len("+name_tf+")\n" +
                     name_tf+"_mean=0\n" +
