@@ -29,12 +29,26 @@ public class MIX_Interval implements Comparable
         if(level.equals("SAMPLE_LEVEL"))
         {
             String[] split = description_pre.split("_");
-            description_pre=split[0]+"_"+split[1]+"_"+split[2]+"_SMIX_"+split[4]+"_";
+            if(split.length>4)
+            {
+                description_pre=split[0]+"_"+split[1]+"_"+split[2]+"_SMIX_"+split[4]+"_";
+            }
+            else
+            {
+                description_pre=description_pre;
+            }
         }
         if(level.equals("HM_LEVEL"))
         {
             String[] split = description_pre.split("_");
-            description_pre=split[0]+"_"+split[1]+"_HMMIX_"+split[3]+"_"+split[4]+"_";
+            if(split.length>4)
+            {
+                description_pre=split[0]+"_"+split[1]+"_HMMIX_"+split[3]+"_"+split[4]+"_";
+            }
+            else
+            {
+                description_pre=description_pre;
+            }
         }
         means.description=description_pre;
         means.val2=merged_intervals.get(0).val2;

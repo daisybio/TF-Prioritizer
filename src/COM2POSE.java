@@ -22,7 +22,6 @@ public class COM2POSE
             com2pose_lib.mix_option();
         }
 
-
         //black listed regions filter
         if(!options_intern.black_list_dir.equals(""))
         {
