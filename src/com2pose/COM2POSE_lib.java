@@ -7752,8 +7752,81 @@ public class COM2POSE_lib
 
         logger.logLine("[PREP] Get gene lengths ...");
 
+        logger.logLine("[PREP] if not done in 2 hours:");
+        logger.logLine("[PREP] 1. Please stop com2pose.");
+        logger.logLine("[PREP] 2. Please run script manually in RStudio.");
+        logger.logLine("[PREP] Script path: " + f_output_script_lengths.getAbsolutePath());
+        logger.logLine("[PREP] 3. Afterwards add paramter -m to com2pose command line, so this script wont be started again.");
+        logger.logLine("[PREP] 4. restart com2pose");
+        logger.logLine("[PREP] waiting ...");
+
+
+
         if(options_intern.calculate_tpm_lengths)
         {
+            StringBuilder sb_lengths = new StringBuilder();
+            sb_lengths.append("if(!\"EDASeq\" %in% rownames(installed.packages()))\n" +
+                    "{\n" +
+                    "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                    "  {\n" +
+                    "    install.packages(\"BiocManager\")\n" +
+                    "    \n" +
+                    "  }\n" +
+                    "  \n" +
+                    "  BiocManager::install(\"EDASeq\")\n" +
+                    "}\n" +
+                    "\n" +
+                    "if(!\"biomaRt\" %in% rownames(installed.packages()))\n" +
+                    "{\n" +
+                    "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                    "  {\n" +
+                    "    install.packages(\"BiocManager\")\n" +
+                    "  }\n" +
+                    "  BiocManager::install(\"biomaRt\")\n" +
+                    "}\n" +
+                    "require(\"dplyr\")\n" +
+                    "require(\"biomaRt\")\n" +
+                    "require(\"EDASeq\")\n" +
+                    "require(\"data.table\")\n" +
+                    "\n" +
+                    "httr::set_config(httr::config(ssl_verifypeer = FALSE))\n" +
+                    "ensg_names<-read.csv('"+options_intern.deseq2_input_gene_id+"',sep='\\t')\n" +
+                    "ensg_names=dplyr::filter(ensg_names, !grepl(\"_\",Geneid))\n" +
+                    "list_of_something<-split(ensg_names, (0:nrow(ensg_names) %/% 5000))  # modulo division\n" +
+                    "\n" +
+                    "ensembl_to_lenth<- data.frame()\n" +
+                    "\n" +
+                    "counter=1\n" +
+                    "counter_end=length(list_of_something)\n" +
+                    "\n" +
+                    "while(counter<=counter_end)\n" +
+                    "{\n" +
+                    "  print(\"starting\")\n" +
+                    "  print(counter)\n" +
+                    "  df<-unlist(list_of_something[counter])\n" +
+                    "  df<-as.data.frame(df)\n" +
+                    "  df_names<-df$df\n" +
+                    "  result = tryCatch({\n" +
+                    "    ensembl_to_lenth_slice=getGeneLengthAndGCContent(df_names, \""+options_intern.deseq2_biomart_dataset_species+"\")\n" +
+                    "    ensembl_to_lenth<-rbind(ensembl_to_lenth,ensembl_to_lenth_slice)\n" +
+                    "    print(\"Success: I made it!!\")\n" +
+                    "    print(\"current length of output csv\")\n" +
+                    "    print(length(ensembl_to_lenth))\n" +
+                    "    counter=counter+1\n" +
+                    "  }, warning = function(w) {\n" +
+                    "    print(\"WARNING SECTION\")\n" +
+                    "    print(w)\n" +
+                    "  }, error = function(e) {\n" +
+                    "    print(\"ERROR SECTION\")\n" +
+                    "    print(e)\n" +
+                    "  }, finally = {\n" +
+                    "  })\n" +
+                    "}\n\n");
+            sb_lengths.append("ensembl_to_lenth=setDT(ensembl_to_lenth, keep.rownames = TRUE)[]\n" +
+                    "colnames(ensembl_to_lenth)<-c(\"ENSG\",\"length\",\"gc\")\n" +
+                    "write.table(ensembl_to_lenth, file=\""+f_output_lengths.getAbsolutePath()+"\", sep='\\t', quote=FALSE, row.names=FALSE)\n");
+
+            /*
             StringBuilder sb_lengths = new StringBuilder();
             sb_lengths.append("if(!\"EDASeq\" %in% rownames(installed.packages()))\n" +
                     "{\n" +
@@ -7787,7 +7860,7 @@ public class COM2POSE_lib
             sb_lengths.append("ensembl_to_lenth=as.data.frame(ensembl_to_lenth)\n");
             sb_lengths.append("ensembl_to_lenth=setDT(ensembl_to_lenth, keep.rownames = TRUE)[]\n");
             sb_lengths.append("colnames(ensembl_to_lenth)<-c(\"ENSG\",\"length\",\"gc\")\n");
-            sb_lengths.append("write.table(ensembl_to_lenth, file=\""+f_output_lengths.getAbsolutePath()+"\", sep='\\t', quote=FALSE, row.names=FALSE)\n");
+            sb_lengths.append("write.table(ensembl_to_lenth, file=\""+f_output_lengths.getAbsolutePath()+"\", sep='\\t', quote=FALSE, row.names=FALSE)\n");*/
 
             BufferedWriter bw_lengths_script = new BufferedWriter(new FileWriter(f_output_script_lengths));
             bw_lengths_script.append(sb_lengths.toString());
@@ -8266,13 +8339,58 @@ public class COM2POSE_lib
 
     public void get_ensg_symbol_mapping() throws Exception {
 
-        logger.logLine("[DESEQ2] Start mapping ENSG to GENE SYMBOLS.");
-
         File script_output_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing);
         script_output_dir.mkdir();
+        File script_output = new File(script_output_dir.getAbsolutePath()+File.separator+"ENSG_SYMBOL_MAP.R");
+
+        logger.logLine("[DESEQ2] Start mapping ENSG to GENE SYMBOLS.");
+        logger.logLine("[DESEQ2] if not done in 2 hours:");
+        logger.logLine("[DESEQ2] 1. Please stop com2pose.");
+        logger.logLine("[DESEQ2] 2. Please run script manually in RStudio.");
+        logger.logLine("[DESEQ2] Script path: " + script_output.getAbsolutePath());
+        logger.logLine("[DESEQ2] 3. Afterwards add paramter -m to com2pose command line, so this script wont be started again.");
+        logger.logLine("[DESEQ2] 4. restart com2pose");
+        logger.logLine("[DESEQ2] waiting ...");
+
 
         File results = new File(script_output_dir.getAbsolutePath()+File.separator+options_intern.file_suffix_deseq2_mapping);
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                "  install.packages(\"BiocManager\")\n" +
+                "\n" +
+                "if (!requireNamespace(\"biomaRt\", quietly = TRUE))\n" +
+                "  BiocManager::install(\"biomaRt\")\n" +
+                "\n" +
+                "library('biomaRt')\n" +
+                "httr::set_config(httr::config(ssl_verifypeer = FALSE))\n" +
+                "df <- read.csv('"+options_intern.deseq2_input_gene_id+"')\n" +
+                "\n" +
+                "not_done=TRUE\n" +
+                "\n" +
+                "G_list= data.frame()\n" +
+                "\n" +
+                "while(not_done)\n" +
+                "{\n" +
+                "  tryCatch({\n" +
+                "    mart <- useDataset(\""+options_intern.deseq2_biomart_dataset_species+"\", useMart(\"ensembl\"))\n" +
+                "    df$id <- NA\n" +
+                "    G_list_intern <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\""+options_intern.deseq2_biomart_dataset_symbol_column+"\"),values=df$Geneid,mart= mart)\n" +
+                "    G_list=rbind(G_list,G_list_intern)\n" +
+                "    not_done=FALSE\n" +
+                "  }, warning = function(w) {\n" +
+                "    print(\"WARNING SECTION\")\n" +
+                "    print(w)\n" +
+                "  }, error = function(e) {\n" +
+                "    print(\"ERROR SECTION\")\n" +
+                "    print(e)\n" +
+                "  }, finally = {\n" +
+                "  })\n" +
+                "}\n" +
+                "\n" +
+                "write.table(G_list,\""+results.getAbsolutePath()+"\", row.names = FALSE, quote = F, sep=\"\\t\")\n");
+
+        /*
         StringBuilder sb = new StringBuilder();
         sb.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
                 "  install.packages(\"BiocManager\")\n" +
@@ -8291,10 +8409,9 @@ public class COM2POSE_lib
 
         sb.append("df$id <- NA\n" +
                 "G_list <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\""+options_intern.deseq2_biomart_dataset_symbol_column+"\"),values=df$Geneid,mart= mart)\n" +
-                "write.table(G_list,\""+results.getAbsolutePath()+"\", row.names = FALSE, quote = F, sep=\"\\t\")\n");
+                "write.table(G_list,\""+results.getAbsolutePath()+"\", row.names = FALSE, quote = F, sep=\"\\t\")\n");*/
 
 
-        File script_output = new File(script_output_dir.getAbsolutePath()+File.separator+"ENSG_SYMBOL_MAP.R");
 
         BufferedWriter bw = new BufferedWriter(new FileWriter(script_output));
         bw.write(sb.toString());
