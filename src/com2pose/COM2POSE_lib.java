@@ -1,4 +1,5 @@
 package com2pose;
+import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import util.*;
 
@@ -7751,56 +7752,62 @@ public class COM2POSE_lib
 
         logger.logLine("[PREP] Get gene lengths ...");
 
-        StringBuilder sb_lengths = new StringBuilder();
-        sb_lengths.append("if(!\"EDASeq\" %in% rownames(installed.packages()))\n" +
-                "{\n" +
-                "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
-                "  {\n" +
-                "    install.packages(\"BiocManager\")\n" +
-                "  \n" +
-                "  }\n" +
-                "  \n" +
-                "  BiocManager::install(\"EDASeq\")\n" +
-                "}\n" +
-                "\n" +
-                "if(!\"biomaRt\" %in% rownames(installed.packages()))\n" +
-                "{\n" +
-                "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
-                "  {\n" +
-                "    install.packages(\"BiocManager\")\n" +
-                "  }\n" +
-                "  BiocManager::install(\"biomaRt\")\n" +
-                "}\n");
+        if(options_intern.calculate_tpm_lengths)
+        {
+            StringBuilder sb_lengths = new StringBuilder();
+            sb_lengths.append("if(!\"EDASeq\" %in% rownames(installed.packages()))\n" +
+                    "{\n" +
+                    "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                    "  {\n" +
+                    "    install.packages(\"BiocManager\")\n" +
+                    "  \n" +
+                    "  }\n" +
+                    "  \n" +
+                    "  BiocManager::install(\"EDASeq\")\n" +
+                    "}\n" +
+                    "\n" +
+                    "if(!\"biomaRt\" %in% rownames(installed.packages()))\n" +
+                    "{\n" +
+                    "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                    "  {\n" +
+                    "    install.packages(\"BiocManager\")\n" +
+                    "  }\n" +
+                    "  BiocManager::install(\"biomaRt\")\n" +
+                    "}\n");
 
-        sb_lengths.append("require(\"dplyr\")\n");
-        sb_lengths.append("require(\"biomaRt\")\n");
-        sb_lengths.append("require(\"EDASeq\")\n");
-        sb_lengths.append("require(\"data.table\")\n");
-        sb_lengths.append("httr::set_config(httr::config(ssl_verifypeer = FALSE))\n");
+            sb_lengths.append("require(\"dplyr\")\n");
+            sb_lengths.append("require(\"biomaRt\")\n");
+            sb_lengths.append("require(\"EDASeq\")\n");
+            sb_lengths.append("require(\"data.table\")\n");
+            sb_lengths.append("httr::set_config(httr::config(ssl_verifypeer = FALSE))\n");
 
-        sb_lengths.append("ensg_names<-read.csv('"+options_intern.deseq2_input_gene_id+"',sep='\\t')\n");
-        sb_lengths.append("ensembl_list<-ensg_names$Geneid\n");
-        sb_lengths.append("ensembl_to_lenth=getGeneLengthAndGCContent(ensembl_list, \""+options_intern.deseq2_biomart_dataset_species+"\")\n");
-        sb_lengths.append("ensembl_to_lenth=as.data.frame(ensembl_to_lenth)\n");
-        sb_lengths.append("ensembl_to_lenth=setDT(ensembl_to_lenth, keep.rownames = TRUE)[]\n");
-        sb_lengths.append("colnames(ensembl_to_lenth)<-c(\"ENSG\",\"length\",\"gc\")\n");
-        sb_lengths.append("write.table(ensembl_to_lenth, file=\""+f_output_lengths.getAbsolutePath()+"\", sep='\\t', quote=FALSE, row.names=FALSE)\n");
+            sb_lengths.append("ensg_names<-read.csv('"+options_intern.deseq2_input_gene_id+"',sep='\\t')\n");
+            sb_lengths.append("ensembl_list<-ensg_names$Geneid\n");
+            sb_lengths.append("ensembl_to_lenth=getGeneLengthAndGCContent(ensembl_list, \""+options_intern.deseq2_biomart_dataset_species+"\")\n");
+            sb_lengths.append("ensembl_to_lenth=as.data.frame(ensembl_to_lenth)\n");
+            sb_lengths.append("ensembl_to_lenth=setDT(ensembl_to_lenth, keep.rownames = TRUE)[]\n");
+            sb_lengths.append("colnames(ensembl_to_lenth)<-c(\"ENSG\",\"length\",\"gc\")\n");
+            sb_lengths.append("write.table(ensembl_to_lenth, file=\""+f_output_lengths.getAbsolutePath()+"\", sep='\\t', quote=FALSE, row.names=FALSE)\n");
 
-        BufferedWriter bw_lengths_script = new BufferedWriter(new FileWriter(f_output_script_lengths));
-        bw_lengths_script.append(sb_lengths.toString());
-        bw_lengths_script.close();
+            BufferedWriter bw_lengths_script = new BufferedWriter(new FileWriter(f_output_script_lengths));
+            bw_lengths_script.append(sb_lengths.toString());
+            bw_lengths_script.close();
 
-        String command = "Rscript " + f_output_script_lengths;
-        logger.logLine("[PREP-TPM] run R script: " + command);
+            String command = "Rscript " + f_output_script_lengths;
+            logger.logLine("[PREP-TPM] run R script: " + command);
 
-        Process child = Runtime.getRuntime().exec(command);
-        int code = child.waitFor();
-        switch (code){
-            case 0:
-                break;
-            case 1:
-                String message = child.getErrorStream().toString();
-                throw new Exception(message);
+            Process child = Runtime.getRuntime().exec(command);
+            int code = child.waitFor();
+            switch (code){
+                case 0:
+                    break;
+                case 1:
+                    String message = child.getErrorStream().toString();
+                    logger.logLine("[PREP-TPM] Script failed due to bioMart connection error. Please run script manually in RStudio.");
+                    logger.logLine("[PREP-TPM] Script path: " + f_output_script_lengths.getAbsolutePath());
+                    logger.logLine("[PREP-TPM] Afterwards, add paramter -t to com2pose command line, so this script wont be started again.");
+                    throw new Exception(message);
+            }
         }
 
         //now do this for all RNA-seq data
@@ -8302,7 +8309,10 @@ public class COM2POSE_lib
                 break;
             case 1:
                 String message = child.getErrorStream().toString();
-                throw new Exception(message);
+                logger.logLine("[DESEQ2] Script failed due to bioMart connection error. Please run script manually in RStudio.");
+                logger.logLine("[DESEQ2] Script path: " + script_output.getAbsolutePath());
+                logger.logLine("[DESEQ2] Afterwards add paramter -m to com2pose command line, so this script wont be started again.");
+                System.exit(1);
         }
 
         options_intern.tepic_ensg_symbol = results.getAbsolutePath();

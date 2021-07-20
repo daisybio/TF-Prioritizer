@@ -18,6 +18,8 @@ public class Options_intern
     public String path_tgen = "";
 
     public boolean write_to_logfile = true;
+    public boolean do_ensg_mapping= true;
+    public boolean calculate_tpm_lengths = true;
 
     /**
      * COM2POSE private options - cannot be set from the outside

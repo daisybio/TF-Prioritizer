@@ -38,10 +38,14 @@ public class COM2POSE
         //DESeq2
         if(options_intern.tepic_ensg_symbol.equals("")||!options_intern.deseq2_biomart_dataset_species.equals(""))
         {
-            com2pose_lib.get_ensg_symbol_mapping();
+            if(options_intern.do_ensg_mapping)
+            {
+                com2pose_lib.get_ensg_symbol_mapping();
+            }
         }
         com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.create_TPM_mappings();
+
         if(options_intern.deseq2_tpm_filter>0)
         {
             com2pose_lib.preprocess_deseq2_input_tpm();
@@ -142,6 +146,12 @@ public class COM2POSE
         Option opt_write_logfile = new Option("l","write-log-file",false,"[OPT]: if flag is set no logfile will be written, default: logfile will be written");
         options.addOption(opt_write_logfile);
 
+        Option opt_do_ensg_mapping = new Option("m","do-ensg-mapping",false,"[OPT]: if flag is set no ensg mapping will be done (only use when biomart error)");
+        options.addOption(opt_do_ensg_mapping);
+
+        Option opt_do_tpm_length_calculation = new Option("t","do-tpm-length-calculation",false,"[OPT]: if flag is set no tpm length calculation will be done (only use when biomart error)");
+        options.addOption(opt_do_tpm_length_calculation);
+
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -166,10 +176,18 @@ public class COM2POSE
             {
                 options_intern.write_to_logfile=false;
             }
+            if(cmd.hasOption("do-ensg-mapping"))
+            {
+                options_intern.do_ensg_mapping=false;
+            }
+            if(cmd.hasOption("do-tpm-length-calculation"))
+            {
+                options_intern.calculate_tpm_lengths=false;
+            }
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("-c <com2pose-config> -w <working-directory> -p <path-com2pose> [-t <tgen-dir>] [-l]",options);
+            formatter.printHelp("-c <com2pose-config> -w <working-directory> -p <path-com2pose> [-t <tgen-dir>] [-l] [-m] [-t]",options);
             System.exit(1);
         }
     }
