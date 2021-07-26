@@ -330,6 +330,7 @@ fi
 
 echo "Runnig bedtools"
 #Run bedtools to get a fasta file containing the sequence data for predicted open chromatin regions contained in the bedfile
+echo bedtools getfasta -fi $genome -bed ${getFastaRegion} -fo $openRegionSequences
 bedtools getfasta -fi $genome -bed ${getFastaRegion} -fo $openRegionSequences
 if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 then

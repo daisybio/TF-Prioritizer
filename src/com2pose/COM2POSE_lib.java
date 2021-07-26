@@ -648,14 +648,7 @@ public class COM2POSE_lib
         logger.logLine("[ChIP-ATLAS-IGV] Finished evaluation with ChIP Atlas data.");
     }
 
-    /**
-     * retrieve available TF ChIP-seq from ChIP-ATLAS
-     * @throws Exception
-     */
-    public void get_chip_atlas_data() throws Exception {
-        logger.logLine("[ChIP-ATLAS] get ChIP-Atlas Data for Discounted Cumulative Gain TFs!");
-        logger.logLine("[ChIP-ATLAS] Genome version: " + options_intern.chip_atlas_genome_version);
-        logger.logLine("[ChIP-ATLAS] Tissue type: "+ options_intern.chip_atlas_tissue_type);
+    public void get_chip_atlas_data() throws IOException {
 
         File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas);
         f_output_root.mkdir();
@@ -666,70 +659,8 @@ public class COM2POSE_lib
         File f_output_peak_files = new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_out_chip_atlas_peak_files);
         f_output_peak_files.mkdir();
 
-        /**
-         * Download list of latest available ChIP-ATLAS files
-         */
-        logger.logLine("[ChIP-ATLAS] Downloading list of available TF ChIP-seq Files from " + options_intern.chip_atlas_url_to_list);
-        logger.logLine("[ChIP-ATLAS] waiting ...");
-        File f_output_list_zip = new File(f_output_list.getAbsolutePath()+File.separator+options_intern.file_suffix_chip_atlas_list_zipped);
-        if(!f_output_list_zip.exists())
-        {
-            // Create a new trust manager that trust all certificates
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return null;
-                        }
-                        public void checkClientTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                        }
-                        public void checkServerTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
-                        }
-                    }
-            };
-            // Activate the new trust manager
-            try {
-                SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            // And as before now you can use URL and URLConnection
-            URL url = new URL(options_intern.chip_atlas_url_to_list);
-            URLConnection connection = url.openConnection();
-            InputStream is = connection.getInputStream();
-
-            try(OutputStream outputStream = new FileOutputStream(f_output_list_zip)){
-                IOUtils.copy(is, outputStream);
-            } catch (FileNotFoundException e) {
-                // handle exception here
-                e.printStackTrace();
-            } catch (IOException e) {
-                // handle exception here
-                e.printStackTrace();
-            }
-        }
-
-        logger.logLine("[ChIP-ATLAS] Unzipping file: "+ f_output_list.getAbsolutePath());
         File f_output_list_csv = new File(f_output_list.getAbsolutePath()+File.separator+options_intern.file_suffix_chip_atlas_list_csv);
-        if(!f_output_list_csv.exists())
-        {
-            //unzip file
-            String command_edited= "unzip " + f_output_list_zip + " -d " + f_output_list_csv.getParentFile().getAbsolutePath();
-            logger.logLine("[ChIP-ATLAS] executing command: "+ command_edited);
-            Process child = Runtime.getRuntime().exec(command_edited);
-            int code = child.waitFor();
-            switch (code){
-                case 0:
-                    break;
-                case 1:
-                    String message = child.getErrorStream().toString();
-                    throw new Exception(message);
-            }
 
-        }
 
         logger.logLine("[ChIP-ATLAS] Reading available TFs in ChIP-Atlas ...");
 
@@ -870,6 +801,91 @@ public class COM2POSE_lib
 
 
         logger.logLine("[ChIP-ATLAS] finished downloading all available ChIP-Atlas Data");
+
+    }
+
+    /**
+     * retrieve available TF ChIP-seq from ChIP-ATLAS
+     * @throws Exception
+     */
+    public void get_chip_atlas_data_list() throws Exception {
+        logger.logLine("[ChIP-ATLAS] get ChIP-Atlas Data for Discounted Cumulative Gain TFs!");
+        logger.logLine("[ChIP-ATLAS] Genome version: " + options_intern.chip_atlas_genome_version);
+        logger.logLine("[ChIP-ATLAS] Tissue type: "+ options_intern.chip_atlas_tissue_type);
+
+        File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas);
+        f_output_root.mkdir();
+
+        File f_output_list = new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_out_chip_atlas_list);
+        f_output_list.mkdir();
+
+        File f_output_peak_files = new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_out_chip_atlas_peak_files);
+        f_output_peak_files.mkdir();
+
+        /**
+         * Download list of latest available ChIP-ATLAS files
+         */
+        logger.logLine("[ChIP-ATLAS] Downloading list of available TF ChIP-seq Files from " + options_intern.chip_atlas_url_to_list);
+        logger.logLine("[ChIP-ATLAS] waiting ...");
+        File f_output_list_zip = new File(f_output_list.getAbsolutePath()+File.separator+options_intern.file_suffix_chip_atlas_list_zipped);
+        if(!f_output_list_zip.exists())
+        {
+            // Create a new trust manager that trust all certificates
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+            // Activate the new trust manager
+            try {
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // And as before now you can use URL and URLConnection
+            URL url = new URL(options_intern.chip_atlas_url_to_list);
+            URLConnection connection = url.openConnection();
+            InputStream is = connection.getInputStream();
+
+            try(OutputStream outputStream = new FileOutputStream(f_output_list_zip)){
+                IOUtils.copy(is, outputStream);
+            } catch (FileNotFoundException e) {
+                // handle exception here
+                e.printStackTrace();
+            } catch (IOException e) {
+                // handle exception here
+                e.printStackTrace();
+            }
+        }
+
+        logger.logLine("[ChIP-ATLAS] Unzipping file: "+ f_output_list.getAbsolutePath());
+        File f_output_list_csv = new File(f_output_list.getAbsolutePath()+File.separator+options_intern.file_suffix_chip_atlas_list_csv);
+        if(!f_output_list_csv.exists())
+        {
+            //unzip file
+            String command_edited= "unzip " + f_output_list_zip + " -d " + f_output_list_csv.getParentFile().getAbsolutePath();
+            logger.logLine("[ChIP-ATLAS] executing command: "+ command_edited);
+            Process child = Runtime.getRuntime().exec(command_edited);
+            int code = child.waitFor();
+            switch (code){
+                case 0:
+                    break;
+                case 1:
+                    String message = child.getErrorStream().toString();
+                    throw new Exception(message);
+            }
+
+        }
     }
 
     /**
@@ -6798,6 +6814,37 @@ public class COM2POSE_lib
                         String group1 = group_clash_split[0];
                         String group2 = group_clash_split[1];
 
+                        if(group_clash_split.length>2)
+                        {
+                            int found_non = -1;
+
+                            for(int i = 0; i < group_clash_split.length; i++)
+                            {
+                                if(group_clash_split[i].equals("non") || group_clash_split[i].equals("Non"))
+                                {
+                                    found_non=i;
+                                }
+                            }
+                            //group1= group_clash_split[0].substring(0, 1).toUpperCase() + group_clash_split[0].substring(1);
+                            //group2= group_clash_split[1].substring(0, 1).toUpperCase() + group_clash_split[1].substring(1);
+
+                            if(found_non!=-1)
+                            {
+                                if(found_non==0)
+                                {
+                                    group1=group_clash_split[0]+"_"+group_clash_split[1];
+                                    group2=group_clash_split[2];
+                                }
+                                if(found_non==1)
+                                {
+                                    group1=group_clash_split[0];
+                                    group2=group_clash_split[1]+"_"+group_clash_split[2];
+                                }
+                            }
+                        }
+
+
+
                         String group1_input_dir ="";
                         String group2_input_dir="";
 
@@ -7592,7 +7639,13 @@ public class COM2POSE_lib
         {
             if(f_tpm_tp.isFile())
             {
-                String name_tp = f_tpm_tp.getName().split("\\.")[0].split("_")[0];
+                String name_tp = f_tpm_tp.getName().split("\\.")[0].replace("_tpms","");
+
+                if(name_tp.split("_").length>1)
+                {
+                    String[] split = name_tp.split("_");
+                    name_tp=split[0].substring(0, 1).toUpperCase() + split[0].substring(1)+split[1].substring(0, 1).toUpperCase() + split[1].substring(1);
+                }
 
                 HashMap<String,Double> gene_tpm = new HashMap<>();
 
@@ -7622,8 +7675,39 @@ public class COM2POSE_lib
             if(f_input.isDirectory())
             {
                 String[] groups = f_input.getName().split("_");
-                String name1= groups[0];
-                String name2= groups[1];
+                String name1=groups[0];
+                String name2=groups[1];
+
+                if(groups.length>2)
+                {
+                    int found_non = -1;
+
+                    for(int i = 0; i < groups.length; i++)
+                    {
+                        if(groups[i].equals("non") || groups[i].equals("Non"))
+                        {
+                            found_non=i;
+                        }
+                    }
+
+                    name1= groups[0].substring(0, 1).toUpperCase() + groups[0].substring(1);
+                    name2= groups[1].substring(0, 1).toUpperCase() + groups[1].substring(1);
+
+                    if(found_non==0)
+                    {
+                        name1=groups[0].substring(0, 1).toUpperCase() + groups[0].substring(1)+groups[1].substring(0, 1).toUpperCase() + groups[1].substring(1);
+                        name2=groups[2].substring(0, 1).toUpperCase() + groups[2].substring(1);
+                    }
+                    else if(found_non==1)
+                    {
+                        name1=groups[0].substring(0, 1).toUpperCase() + groups[0].substring(1);
+                        name2=groups[1].substring(0, 1).toUpperCase() + groups[1].substring(1)+groups[2].substring(0, 1).toUpperCase() + groups[2].substring(1);
+                    }
+
+                }
+
+
+
 
                 File f_output_copy_group = new File(f_output_copy.getAbsolutePath()+File.separator+f_input.getName());
                 f_output_copy_group.mkdirs();
@@ -7649,11 +7733,11 @@ public class COM2POSE_lib
 
                         for(int i = 1; i < header.length; i++)
                         {
-                            if(header[i].matches(".*"+name1+".*"))
+                            if(header[i].matches(name1+".*"))
                             {
                                 header[i] = name1;
                             }
-                            if(header[i].matches(".*"+name2+".*"))
+                            if(header[i].matches(name2+".*"))
                             {
                                 header[i] = name2;
                             }
@@ -7675,7 +7759,17 @@ public class COM2POSE_lib
                             for(int i = 1; i < split.length; i++)
                             {
                                 String group_name = header[i];
-                                HashMap<String,Double> lookup = tp_gene_tpm_value.get(group_name);
+                                HashMap<String,Double> lookup=new HashMap<>();
+
+                                if(tp_gene_tpm_value.containsKey(group_name))
+                                {
+                                    lookup = tp_gene_tpm_value.get(group_name);
+                                }
+                                else
+                                {
+                                    System.out.println("X");
+                                }
+
 
                                 if(!lookup.containsKey(split[0]))
                                 {
@@ -7752,7 +7846,7 @@ public class COM2POSE_lib
 
         logger.logLine("[PREP] Get gene lengths ...");
 
-        logger.logLine("[PREP] if not done in 2 hours:");
+        logger.logLine("[PREP] if not done in 5 hours:");
         logger.logLine("[PREP] 1. Please stop com2pose.");
         logger.logLine("[PREP] 2. Please run script manually in RStudio.");
         logger.logLine("[PREP] Script path: " + f_output_script_lengths.getAbsolutePath());
@@ -7881,6 +7975,10 @@ public class COM2POSE_lib
                     logger.logLine("[PREP-TPM] Afterwards, add paramter -t to com2pose command line, so this script wont be started again.");
                     throw new Exception(message);
             }
+        }
+        else
+        {
+            logger.logLine("[PREP-TPM] -t is set, get gene_lengths script is not executed, as it was executed manually.");
         }
 
         //now do this for all RNA-seq data
