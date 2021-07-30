@@ -11,7 +11,6 @@ public class COM2POSE
         Options_intern options_intern= new Options_intern();
         parseArguments(args, options_intern);
 
-
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
@@ -114,6 +113,8 @@ public class COM2POSE
             com2pose_lib.get_chip_atlas_data_list();
             com2pose_lib.get_chip_atlas_data();
             com2pose_lib.run_igv_chip_atlas_data();
+            com2pose_lib.run_igv_chr_wide_data();
+
         }
 
         //shoot IGV for own TF ChIP-seq data
@@ -150,7 +151,7 @@ public class COM2POSE
         Option opt_do_ensg_mapping = new Option("m","do-ensg-mapping",false,"[OPT]: if flag is set no ensg mapping will be done (only use when biomart error)");
         options.addOption(opt_do_ensg_mapping);
 
-        Option opt_do_tpm_length_calculation = new Option("t","do-tpm-length-calculation",false,"[OPT]: if flag is set no tpm length calculation will be done (only use when biomart error)");
+        Option opt_do_tpm_length_calculation = new Option("a","do-tpm-length-calculation",false,"[OPT]: if flag is set no tpm length calculation will be done (only use when biomart error)");
         options.addOption(opt_do_tpm_length_calculation);
 
 

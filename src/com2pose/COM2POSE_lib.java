@@ -429,6 +429,182 @@ public class COM2POSE_lib
     }
 
     /**
+     * run IGV and take screenshots chr wide
+     */
+    public void run_igv_chr_wide_data() throws IOException {
+        logger.logLine("[IGV] Take screenshots of peaks chr wide and genome wide");
+
+        if(options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        if(options_intern.mix_level.equals("HM_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+        }
+        if(!options_intern.black_list_dir.equals(""))
+        {
+            File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+            File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
+            output_folder_new_input.mkdir();
+
+            //set new folder directory for tepic input and save old one
+            options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
+        if(options_intern.mix_mutually_exclusive)
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
+        }
+
+        HashSet<String> chromosomes = new HashSet<>();
+
+        File f_input_userInput_bedfiles = new File(File.separator+options_intern.tepic_input_directory);
+        File f_input_chipATLAS_data = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas+File.separator+options_intern.folder_out_chip_atlas_peak_files);
+
+        File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_chipAtlas_chrWide_genomeWide_views);
+        f_output_root.mkdirs();
+
+        Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        out.println("new");
+        String response = in.readLine();
+
+        //load ChIP-seq CHIPATLAS data
+        for(File f_dir_atlas:f_input_chipATLAS_data.listFiles())
+        {
+            if(f_dir_atlas.isDirectory())
+            {
+                for(File f_dir_bed : f_dir_atlas.listFiles())
+                {
+                    if(f_dir_bed.isFile())
+                    {
+                        out.println("load "+f_dir_bed.getAbsolutePath());
+                        String response_load = in.readLine();
+                    }
+                }
+            }
+        }
+
+        //load input ChIP-seq data
+        for(File f_tp : f_input_userInput_bedfiles.listFiles())
+        {
+            if(f_tp.isDirectory())
+            {
+                for(File f_hm : f_tp.listFiles())
+                {
+                    if(f_hm.isDirectory())
+                    {
+                        for(File f_bed : f_hm.listFiles())
+                        {
+                            if(f_bed.isFile())
+                            {
+                                out.println("load "+f_bed.getAbsolutePath());
+                                String response_load = in.readLine();
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        File f_fasta_for_chromosomes = new File(options_intern.tepic_input_ref_genome);
+        BufferedReader br_fasta = new BufferedReader(new FileReader(f_fasta_for_chromosomes));
+        String line_fasta ="";
+        while((line_fasta= br_fasta.readLine())!=null)
+        {
+            if(line_fasta.startsWith(">"))
+            {
+                String[] split = line_fasta.split(">");
+                if(split[1].length()<=3)
+                    chromosomes.add(split[1]);
+            }
+        }
+
+        //take screenshots of all chromosomes and genome wide
+
+        for(String key_chr : chromosomes)
+        {
+            if(!key_chr.contains("chr"))
+                key_chr="chr"+key_chr;
+
+            out.println("genome "+options_intern.igv_species_ref_genome);
+            String response_genome = in.readLine();
+
+            File f_output_shot= new File(f_output_root.getAbsolutePath());
+            //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
+            out.println("snapshotDirectory "+f_output_shot.getAbsolutePath());
+            String response_next=in.readLine();
+            //logger.logLine("[IGV] " + response);
+            //logger.logLine("[IGV] "+ "goto " + gene_to_coordinates.get(targets));
+            out.println("goto " + key_chr);
+            response_next=in.readLine();
+            //logger.logLine("[IGV] " + response);
+            //logger.logLine("[IGV] "+ "sort");
+            //out.println("sort");
+            //response=in.readLine();
+            //logger.logLine("[IGV] " + response);
+            //logger.logLine("[IGV] "+ "collapse");
+            out.println("collapse");
+            response_next=in.readLine();
+            //logger.logLine("[IGV] " + response);
+            //logger.logLine("[IGV] "+ "snapshot");
+            out.println("snapshot");
+            response_next=in.readLine();
+        }
+
+        //take screenshot of genome view
+
+        out.println("genome "+options_intern.igv_species_ref_genome);
+        String response_genome = in.readLine();
+
+        File f_output_shot= new File(f_output_root.getAbsolutePath());
+        //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
+        out.println("snapshotDirectory "+f_output_shot.getAbsolutePath());
+        String response_next=in.readLine();
+        //logger.logLine("[IGV] " + response);
+        //logger.logLine("[IGV] "+ "goto " + gene_to_coordinates.get(targets));
+        out.println("goto genome");
+        response_next=in.readLine();
+        //logger.logLine("[IGV] " + response);
+        //logger.logLine("[IGV] "+ "sort");
+        //out.println("sort");
+        //response=in.readLine();
+        //logger.logLine("[IGV] " + response);
+        //logger.logLine("[IGV] "+ "collapse");
+        out.println("collapse");
+        response_next=in.readLine();
+        //logger.logLine("[IGV] " + response);
+        //logger.logLine("[IGV] "+ "snapshot");
+        out.println("snapshot");
+        response_next=in.readLine();
+
+
+
+
+        out.println("new");
+        String response_end = in.readLine();
+        //logger.logLine("[IGV] " + response);
+        socket.close();
+
+        logger.logLine("[IGV] Finished taking screenshots of peaks chr wide");
+
+    }
+
+    /**
      * run igv on chip atlas data
      */
     public void run_igv_chip_atlas_data() throws IOException {
@@ -7316,7 +7492,7 @@ public class COM2POSE_lib
     public void run_tepic() throws Exception {
         logger.logLine("Start TEPIC.sh");
 
-        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        if(options_intern.mix_level.equals("SAMPLE_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
             File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
@@ -7324,7 +7500,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
         }
 
-        if(options_intern.mix_option.equals("HM_LEVEL"))
+        if(options_intern.mix_level.equals("HM_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
             File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
@@ -7850,7 +8026,7 @@ public class COM2POSE_lib
         logger.logLine("[PREP] 1. Please stop com2pose.");
         logger.logLine("[PREP] 2. Please run script manually in RStudio.");
         logger.logLine("[PREP] Script path: " + f_output_script_lengths.getAbsolutePath());
-        logger.logLine("[PREP] 3. Afterwards add paramter -m to com2pose command line, so this script wont be started again.");
+        logger.logLine("[PREP] 3. Afterwards add paramter -a to com2pose command line, so this script wont be started again.");
         logger.logLine("[PREP] 4. restart com2pose");
         logger.logLine("[PREP] waiting ...");
 
@@ -7972,13 +8148,13 @@ public class COM2POSE_lib
                     String message = child.getErrorStream().toString();
                     logger.logLine("[PREP-TPM] Script failed due to bioMart connection error. Please run script manually in RStudio.");
                     logger.logLine("[PREP-TPM] Script path: " + f_output_script_lengths.getAbsolutePath());
-                    logger.logLine("[PREP-TPM] Afterwards, add paramter -t to com2pose command line, so this script wont be started again.");
+                    logger.logLine("[PREP-TPM] Afterwards, add paramter -a to com2pose command line, so this script wont be started again.");
                     throw new Exception(message);
             }
         }
         else
         {
-            logger.logLine("[PREP-TPM] -t is set, get gene_lengths script is not executed, as it was executed manually.");
+            logger.logLine("[PREP-TPM] -a is set, get gene_lengths script is not executed, as it was executed manually.");
         }
 
         //now do this for all RNA-seq data
@@ -8540,7 +8716,7 @@ public class COM2POSE_lib
     public void mix_mutually_exclusive_peaks() throws IOException {
         logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Start mutually exclusive peaks calculation.");
         logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Preprocessing mutually exclusive peaks for binary tree comparison.");
-        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        if(options_intern.mix_level.equals("SAMPLE_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
             File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
@@ -8548,7 +8724,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
         }
 
-        if(options_intern.mix_option.equals("HM_LEVEL"))
+        if(options_intern.mix_level.equals("HM_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
             File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);

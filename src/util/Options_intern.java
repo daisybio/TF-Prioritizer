@@ -130,6 +130,7 @@ public class Options_intern
     public String folder_out_igv = "09_IGV_screenshots";
     public String folder_out_igv_own_data="01_own_tf_data";
     public String folder_out_igv_chip_atlas_data="02_chip_atlas_tf_data";
+    public String folder_out_igv_chipAtlas_chrWide_genomeWide_views = "03_chip_atlas_chrWide_genomeWide_views";
 
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
