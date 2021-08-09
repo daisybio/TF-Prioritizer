@@ -75,6 +75,7 @@ public class COM2POSE
             {
                 com2pose_lib.create_tgen_groups();
             }
+
             com2pose_lib.filter_target_genes_tgen();
 
             if(options_intern.tgen_self_regulatory)

@@ -4629,13 +4629,37 @@ public class COM2POSE_lib
             if(fileDirHM.isDirectory())
             {
                 File folder_outputHM = new File(folder_output.getAbsolutePath()+File.separator+fileDirHM.getName());
-                folder_outputHM.mkdir();
+                //folder_outputHM.mkdir();
 
                 for(File fileDirHM_Group : fileDirHM.listFiles())
                 {
                     if(fileDirHM_Group.isDirectory())
                     {
                         File folder_outputHM_Group = new File(folder_outputHM.getAbsolutePath()+File.separator+fileDirHM_Group.getName());
+                        //folder_outputHM_Group.mkdir();
+
+                        int count_line_br=0;
+
+                        for(File f_x: fileDirHM_Group.listFiles())
+                        {
+                            if(f_x.isFile())
+                            {
+                                BufferedReader br = new BufferedReader(new FileReader(f_x));
+                                String line=br.readLine();
+                                while((line=br.readLine())!=null)
+                                {
+                                    count_line_br++;
+                                }
+
+                                br.close();
+                            }
+                        }
+
+                        if(count_line_br <2)
+                        {
+                            continue;
+                        }
+                        folder_outputHM.mkdir();
                         folder_outputHM_Group.mkdir();
 
                         String input_dir = fileDirHM_Group.getAbsolutePath()+File.separator;
@@ -5190,6 +5214,8 @@ public class COM2POSE_lib
                         BufferedWriter bw_tepic = new BufferedWriter(new FileWriter(folderDirHM_Group.getAbsolutePath()+File.separator+input_data_TEPIC.getName()));
                         BufferedReader br_tepic = new BufferedReader(new FileReader(input_data_TEPIC));
                         String line_tepic = br_tepic.readLine();
+                        if(line_tepic==null)
+                            continue;
                         bw_tepic.write(line_tepic);
                         bw_tepic.newLine();
 
@@ -11831,13 +11857,28 @@ public class COM2POSE_lib
                 continue;
             }
             sb_table.append("\t\t\t\t<th>\n");
-            sb_table.append(df.format(results_hypergeometric_test.get(key_hm)));
+            if(results_hypergeometric_test.containsKey(key_hm))
+            {
+                sb_table.append(df.format(results_hypergeometric_test.get(key_hm)));
+            }
+            else
+            {
+                sb_table.append("NOT PERFORMED");
+            }
             sb_table.append("\t\t\t\t</th>\n");
             sb_table.append("\t\t\t\t<th>\n");
             sb_table.append("\t\t\t\t</th>\n");
         }
         sb_table.append("\t\t\t\t<th>\n");
-        sb_table.append(df.format(results_hypergeometric_test.get("DISCOUNTED CUMULATIVE GAIN")));
+        String key_hypergeometric_test="DISCOUNTED CUMULATIVE GAIN";
+        if(results_hypergeometric_test.containsKey(key_hypergeometric_test))
+        {
+            sb_table.append(df.format(results_hypergeometric_test.get(key_hypergeometric_test)));
+        }
+        else
+        {
+            sb_table.append("NOT PERFORMED");
+        }
         sb_table.append("\t\t\t\t</th>\n");
         sb_table.append("\t\t\t\t<th>\n");
         sb_table.append("\t\t\t\t</th>\n");
