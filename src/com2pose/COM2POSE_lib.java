@@ -7694,6 +7694,7 @@ public class COM2POSE_lib
                             if(!options_intern.mix_mutually_exclusive)
                             {
                                 n_dir=options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_single+File.separator+dirGroup.getName()+options_intern.file_suffix_deseq2_preprocessing_meanCounts;
+
                             }
                             else
                             {
@@ -10738,6 +10739,112 @@ public class COM2POSE_lib
             }
             socket.close();
         }
+
+        /**
+         * CHECK NAMING CONVENTIONS
+         */
+        all_set=check_naming_conventions();
+
+
+        return all_set;
+    }
+
+    /**
+     * CHECK naming conventions between RNA-seq and ChIP-seq/ATAC-seq data
+     */
+    private boolean check_naming_conventions() throws IOException {
+        boolean all_set=true;
+
+        HashSet<String> chipseq_tp_names= new HashSet<>();
+        HashSet<String> rnaseq_tp_names = new HashSet<>();
+        HashSet<String> chipseq_hm_names = new HashSet<>();
+        HashSet<String> rna_seq_hm_names = new HashSet<>();
+
+
+        File f_chipseq_root = new File(options_intern.tepic_input_directory);
+        for(File f_tp: f_chipseq_root.listFiles())
+        {
+            if(f_tp.isDirectory())
+            {
+                String tp_name=f_tp.getName();
+                chipseq_tp_names.add(tp_name);
+
+                for(File f_hm : f_tp.listFiles())
+                {
+                    if(f_hm.isDirectory())
+                    {
+                        String hm_name = f_hm.getName();
+                        chipseq_hm_names.add(hm_name);
+                    }
+                }
+            }
+        }
+
+        File f_rnaseq_root = new File(options_intern.deseq2_input_directory);
+
+        for(File f_tp: f_rnaseq_root.listFiles())
+        {
+            if(f_tp.isDirectory())
+            {
+                String tp_name=f_tp.getName();
+                rnaseq_tp_names.add(tp_name);
+
+                for(File f_hm : f_tp.listFiles())
+                {
+                    if(f_hm.isDirectory())
+                    {
+                        String hm_name = f_hm.getName();
+                        rna_seq_hm_names.add(hm_name);
+                    }
+                }
+            }
+        }
+
+        /*
+        for(String control_hm: chipseq_hm_names)
+        {
+            if(!rna_seq_hm_names.contains(control_hm))
+            {
+                all_set=false;
+                logger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_hm);
+                logger.logLine("[NAMING-CONVENTIONS] ERROR: RNA-seq namings do not match ChIP-seq namings. (Timepoints or Groups)");
+                break;
+            }
+        }
+
+        for(String control_hm: rna_seq_hm_names)
+        {
+            if(!chipseq_hm_names.contains(control_hm))
+            {
+                all_set=false;
+                logger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_hm);
+                logger.logLine("[NAMING-CONVENTIONS] ERROR: RNA-seq namings do not match ChIP-seq namings. (Histone Modification or ATAC-seq)");
+                break;
+            }
+        }*/
+
+        for(String control_tp: chipseq_tp_names)
+        {
+            if(!rnaseq_tp_names.contains(control_tp))
+            {
+                all_set=false;
+                logger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_tp);
+                logger.logLine("[NAMING-CONVENTIONS] ERROR: RNA-seq namings do not match ChIP-seq namings. (Timepoints or Groups)");
+                break;
+            }
+        }
+
+        for(String control_tp: rnaseq_tp_names)
+        {
+            if(!chipseq_tp_names.contains(control_tp))
+            {
+                all_set=false;
+                logger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_tp);
+                logger.logLine("[NAMING-CONVENTIONS] ERROR: RNA-seq namings do not match ChIP-seq namings. (Timepoints or Groups)");
+                break;
+            }
+        }
+
 
 
         return all_set;

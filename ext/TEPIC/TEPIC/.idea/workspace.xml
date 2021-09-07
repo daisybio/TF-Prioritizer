@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" afterDir="false" />
-    </list>
+    <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -29,7 +27,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/data/COM2POSE/01_COM2POSE/16_noTgen_ChIP_ATLAS/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL/analyse_tf_to_background.py" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Dropbox/UNI/Promotion_Projekte/PhD_work/H_ATAC_SEQ/PCA/olga_analysis" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -412,6 +410,7 @@
       <workItem from="1626331598791" duration="1267000" />
       <workItem from="1626351602344" duration="1872000" />
       <workItem from="1626938177989" duration="2148000" />
+      <workItem from="1628582346356" duration="265000" />
     </task>
     <servers />
   </component>
@@ -494,15 +493,15 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/TEPIC$distribution_analysis_statistical_tests.coverage" NAME="distribution_analysis_statistical_tests Coverage Results" MODIFIED="1616762420670" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Test" />
-    <SUITE FILE_PATH="coverage/TEPIC$plot_mimat_target_genes_regression_coefficient.coverage" NAME="plot_mimat_target_genes_regression_coefficient Coverage Results" MODIFIED="1614502286084" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../../SPONGEdb_TCGA/src/get_best_mirnas_to_target_genes" />
-    <SUITE FILE_PATH="coverage/TEPIC$filterGeneView.coverage" NAME="filterGeneView Coverage Results" MODIFIED="1608646521776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
-    <SUITE FILE_PATH="coverage/TEPIC$annotateTSS.coverage" NAME="annotateTSS Coverage Results" MODIFIED="1625225968189" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
-    <SUITE FILE_PATH="coverage/TEPIC$H3K4me3_0_1.coverage" NAME="H3K4me3_0.1 Coverage Results" MODIFIED="1612281516285" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/10_SAMPLE_UNION_07/working_dir/09_PLOTS_output/H3K4me3/0.1" />
-    <SUITE FILE_PATH="coverage/TEPIC$H3K27ac_0_1.coverage" NAME="H3K27ac_0.1 Coverage Results" MODIFIED="1623744156829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/06_B_PLOTS_output/H3K27ac/0.1" />
+    <SUITE FILE_PATH="coverage/TEPIC$computeMeanRatioTFAffinities.coverage" NAME="computeMeanRatioTFAffinities Coverage Results" MODIFIED="1623653195912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts" />
     <SUITE FILE_PATH="coverage/TEPIC$test_boxplot_interactive.coverage" NAME="test_boxplot_interactive Coverage Results" MODIFIED="1615216729075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/14_LIKE_10_TGENE_FILT_SELF_REG/working_dir/09_PLOTS_output/Pol2/0.1" />
     <SUITE FILE_PATH="coverage/TEPIC$analyse_tf_to_background.coverage" NAME="analyse_tf_to_background_mannWhitneyU Coverage Results" MODIFIED="1616764324102" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC_COPY/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
     <SUITE FILE_PATH="coverage/TEPIC$analyse_tf_to_background_new.coverage" NAME="analyse_tf_to_background_new Coverage Results" MODIFIED="1626416933550" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01_COM2POSE/16_noTgen_ChIP_ATLAS/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
-    <SUITE FILE_PATH="coverage/TEPIC$computeMeanRatioTFAffinities.coverage" NAME="computeMeanRatioTFAffinities Coverage Results" MODIFIED="1623653195912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts" />
+    <SUITE FILE_PATH="coverage/TEPIC$annotateTSS.coverage" NAME="annotateTSS Coverage Results" MODIFIED="1625225968189" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
+    <SUITE FILE_PATH="coverage/TEPIC$distribution_analysis_statistical_tests.coverage" NAME="distribution_analysis_statistical_tests Coverage Results" MODIFIED="1616762420670" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Test" />
+    <SUITE FILE_PATH="coverage/TEPIC$plot_mimat_target_genes_regression_coefficient.coverage" NAME="plot_mimat_target_genes_regression_coefficient Coverage Results" MODIFIED="1614502286084" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../../SPONGEdb_TCGA/src/get_best_mirnas_to_target_genes" />
+    <SUITE FILE_PATH="coverage/TEPIC$filterGeneView.coverage" NAME="filterGeneView Coverage Results" MODIFIED="1608646521776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
+    <SUITE FILE_PATH="coverage/TEPIC$H3K4me3_0_1.coverage" NAME="H3K4me3_0.1 Coverage Results" MODIFIED="1612281516285" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/10_SAMPLE_UNION_07/working_dir/09_PLOTS_output/H3K4me3/0.1" />
+    <SUITE FILE_PATH="coverage/TEPIC$H3K27ac_0_1.coverage" NAME="H3K27ac_0.1 Coverage Results" MODIFIED="1623744156829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/06_B_PLOTS_output/H3K27ac/0.1" />
   </component>
 </project>
