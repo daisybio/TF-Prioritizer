@@ -941,7 +941,7 @@ public class COM2POSE_lib
             String url = split[split.length-1];
             String tf = split[column_antigen];
             if(!tf.equals(""))
-                tf_to_url.put(tf,url);
+                tf_to_url.put(tf.toUpperCase(),url);
 
         }
         br.close();
@@ -964,7 +964,7 @@ public class COM2POSE_lib
 
         for(int i = 0; i < ordered_tfs_dcg.size(); i++)
         {
-            if(tf_to_url.containsKey(ordered_tfs_dcg.get(i)))
+            if(tf_to_url.containsKey(ordered_tfs_dcg.get(i).toUpperCase()))
             {
                 File f_download_tf = new File(f_output_peak_files.getAbsolutePath()+File.separator+i+"_"+ordered_tfs_dcg.get(i));
                 f_download_tf.mkdir();

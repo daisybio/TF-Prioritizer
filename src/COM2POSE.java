@@ -14,7 +14,7 @@ public class COM2POSE
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
-/*
+
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -107,7 +107,7 @@ public class COM2POSE
 
         //get target genes of TFs based on dcg analysis
         com2pose_lib.get_top_k_target_genes_dcg();
-*/
+
         //check for ChIP-seq data for TFs on ChIP-Atlas
         if(options_intern.chip_atlas_activated_chip_atlas)
         {
