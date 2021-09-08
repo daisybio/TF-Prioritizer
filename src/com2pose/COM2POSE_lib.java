@@ -607,7 +607,7 @@ public class COM2POSE_lib
     /**
      * run igv on chip atlas data
      */
-    public void run_igv_chip_atlas_data() throws IOException {
+    public void run_igv_chip_atlas_data() throws Exception {
         logger.logLine("[ChIP-ATLAS-IGV] Start running ChIP Atlas evaluation data.");
 
         File f_output_igv_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_chip_atlas_data);
@@ -761,6 +761,8 @@ public class COM2POSE_lib
 
                             for(String key_target_gene : target_genes)
                             {
+                                String snapshot_name=count+"_" + key_target_gene+".png";
+
                                 File f_output_tf_hm_tp = new File(f_output_igv_shots_tp_hm.getAbsolutePath()+File.separator+count+"_" + key_target_gene);
 
                                 //logger.logLine("[IGV] " + load_tf_chip_seq);
@@ -770,8 +772,13 @@ public class COM2POSE_lib
                                 out.println("genome "+options_intern.igv_species_ref_genome);
                                 String response_genome = in.readLine();
 
-                                File f_output_shot= new File(f_output_tf_hm_tp.getAbsolutePath());
+                                //File f_output_shot= new File(f_output_tf_hm_tp.getAbsolutePath());
+                                //f_output_shot.mkdir();
+
+                                File f_output_shot= new File(f_output_igv_shots_tp_hm.getAbsolutePath());
                                 f_output_shot.mkdir();
+
+
                                 //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
                                 out.println("snapshotDirectory "+f_output_shot.getAbsolutePath());
                                 String response=in.readLine();
@@ -792,6 +799,46 @@ public class COM2POSE_lib
                                 out.println("snapshot");
                                 response=in.readLine();
                                 //logger.logLine("[IGV] " + response);
+
+                                File f_snapshot_made=new File("NO");
+
+                                //search png name
+                                for(File f_snapshot: f_output_igv_shots_tp_hm.listFiles())
+                                {
+                                    if(f_snapshot.isFile())
+                                    {
+                                        if(f_snapshot.getName().startsWith("chr"))
+                                        {
+                                            f_snapshot_made=f_snapshot;
+                                            break;
+                                        }
+
+                                    }
+                                }
+
+                                if(!f_snapshot_made.exists())
+                                {
+                                    logger.logLine("[ERROR]: trying to move file which does not exist!");
+                                }
+                                else {
+
+                                    String command_mv = "mv " + f_snapshot_made.getAbsolutePath()+ " " + f_snapshot_made.getParentFile().getAbsolutePath()+File.separator+snapshot_name;
+
+
+
+                                    Process child = Runtime.getRuntime().exec(command_mv);
+                                    int code = child.waitFor();
+                                    switch (code){
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            String message = child.getErrorStream().toString();
+                                            throw new Exception(message);
+                                    }
+
+
+                                }
+
 
                                 count++;
 
