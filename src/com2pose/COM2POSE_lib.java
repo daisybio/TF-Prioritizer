@@ -900,13 +900,49 @@ public class COM2POSE_lib
         int column_url=-1;
 
         String regex_tissue_type="";
-        String[] split_tissue_type=options_intern.chip_atlas_tissue_type.split(" ");
-        for(String s: split_tissue_type)
+
+
+        String[] split_types = options_intern.chip_atlas_tissue_type.split(";");
+
+        ArrayList<String> all_regex = new ArrayList<>();
+        for(String key_type : split_types)
         {
-            regex_tissue_type+= ".*" + s;
+            String regex_for_this_type="";
+
+            String[] split_tissue_type=key_type.split(" ");
+            for(String s: split_tissue_type)
+            {
+                regex_for_this_type+= ".*" + s;
+            }
+            regex_for_this_type+=".*";
+            regex_for_this_type=regex_for_this_type.toUpperCase();
+
+            all_regex.add(regex_for_this_type);
         }
-        regex_tissue_type+=".*";
-        regex_tissue_type=regex_tissue_type.toUpperCase();
+
+        if(all_regex.size()>1)
+        {
+            regex_tissue_type+="(";
+        }
+
+        for(int i = 0; i < all_regex.size(); i++)
+        {
+            if(i>0)
+            {
+                regex_tissue_type+="|"+all_regex.get(i);
+            }
+            else
+            {
+                regex_tissue_type+=all_regex.get(i);
+            }
+        }
+
+        if(all_regex.size()>1)
+        {
+            regex_tissue_type+=")";
+        }
+
+
 
         for(int i = 0; i < split_header.length;i++)
         {
