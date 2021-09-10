@@ -44,6 +44,7 @@ public class COM2POSE
         }
         com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.create_TPM_mappings();
+        com2pose_lib.create_gene_positions();
 
         if(options_intern.deseq2_tpm_filter>0)
         {
@@ -111,8 +112,8 @@ public class COM2POSE
         //check for ChIP-seq data for TFs on ChIP-Atlas
         if(options_intern.chip_atlas_activated_chip_atlas)
         {
-            com2pose_lib.get_chip_atlas_data_list();
-            com2pose_lib.get_chip_atlas_data();
+            //com2pose_lib.get_chip_atlas_data_list();
+            //com2pose_lib.get_chip_atlas_data();
             com2pose_lib.run_igv_chip_atlas_data();
             com2pose_lib.run_igv_chr_wide_data();
 
@@ -155,6 +156,9 @@ public class COM2POSE
         Option opt_do_tpm_length_calculation = new Option("a","do-tpm-length-calculation",false,"[OPT]: if flag is set no tpm length calculation will be done (only use when biomart error)");
         options.addOption(opt_do_tpm_length_calculation);
 
+        Option opt_do_position_calculation = new Option("b","do-position-calculations",false,"[OPT]: if flag is set no gene position retrieval via biomart will be done (only use when biomart error)");
+        options.addOption(opt_do_position_calculation);
+
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -187,10 +191,16 @@ public class COM2POSE
             {
                 options_intern.calculate_tpm_lengths=false;
             }
+            if(cmd.hasOption("do-position-calculations"))
+            {
+                options_intern.calculcate_gene_positions=false;
+            }
+
+
 
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("-c <com2pose-config> -w <working-directory> -p <path-com2pose> [-t <tgen-dir>] [-l] [-m] [-t]",options);
+            formatter.printHelp("-c <com2pose-config> -w <working-directory> -p <path-com2pose> [-t <tgen-dir>] [-l] [-m] [-a] [-t] [-b]",options);
             System.exit(1);
         }
     }
