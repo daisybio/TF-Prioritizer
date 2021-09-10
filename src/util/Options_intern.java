@@ -20,6 +20,7 @@ public class Options_intern
     public boolean write_to_logfile = true;
     public boolean do_ensg_mapping= true;
     public boolean calculate_tpm_lengths = true;
+    public boolean calculcate_gene_positions=true;
 
     /**
      * COM2POSE private options - cannot be set from the outside
@@ -46,6 +47,7 @@ public class Options_intern
     public String folder_name_deseq2_preprocessing_combined_original = "combined_original";
     public String folder_name_deseq2_preprocessing_gene_symbols = "symbols_ensg_mean_counts";
     public String folder_name_deseq2_preprocessing_tpm = "tpm_mapping";
+    public String folder_name_deseq2_preprocessing_gene_positions = "gene_positions";
     public String folder_name_deseq2_preprocessing_tpm_scripts = "01_scripts";
     public String folder_name_deseq2_preprocessing_tpm_results = "02_tpm_mappings";
     public String folder_name_deseq2_output_raw = "02_B_DESeq2_output_raw";
@@ -139,7 +141,10 @@ public class Options_intern
     public String file_suffix_deseq2_preprocessing_tpm_mapping_geneLengths_file = "gene_lengths.csv";
     public String file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_script = "_get_tpms.R";
     public String file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_data = "_tpms.csv";
+    public String file_suffix_deseq2_preprocessing_gene_positions_script="get_gene_positions.R";
+    public String file_suffix_deseq2_preprocessing_gene_positions_data = "gene_positions.csv";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
+    public String file_suffix_tepic_output_regions_to_target_genes = "regions_to_target_genes.csv";
     public String file_suffix_tepic_postprocessing_all_tfs = "ALL_TFs.csv";
     public String file_suffix_tepic_postprocessing_output_mean_affinities ="Mean_Affinities_";
     public String file_suffix_tepic_postprocessing_output_ratios ="Ratio_Affinities_";
