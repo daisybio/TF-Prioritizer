@@ -17,6 +17,8 @@ from decimal import Decimal
 from SortedCollection import SortedCollection
 from pprint import pprint
 import pandas as pd
+import_or_install("pathlib")
+from pathlib import Path
 
 import_or_install("intervaltree")
 import intervaltree as it
@@ -1213,6 +1215,15 @@ def main():
                             else:
                                 genesInOpenChromatin[identifier] = [gene]
                             usedRegions.add(str(chrom) + ":" + str(oC[chrom][i][1]) + "-" + str(oC[chrom][i][2]))
+
+
+    path_regions_to_target_genes = Path(args.affinity[0])
+    outfile_regions_to_target_genes = path_regions_to_target_genes.parent / "regions_to_target_genes.csv"
+    output_regions_to_target_genes = open(outfile_regions_to_target_genes, "w")
+    output_regions_to_target_genes.write("REGION\tTARGET_ENSG\n")
+    for key, value in genesInOpenChromatin.items():
+        line= key+ '\t'+  "".join(value).replace("\"","") + '\n'
+        output_regions_to_target_genes.write(line)
 
     # Extract bound transcription factors
     affinities, numberOfPeaks, peakLength = extractTF_Affinity(usedRegions, genesInOpenChromatin, args.affinity[0], tss,
