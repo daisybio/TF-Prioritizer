@@ -112,8 +112,8 @@ public class COM2POSE
         //check for ChIP-seq data for TFs on ChIP-Atlas
         if(options_intern.chip_atlas_activated_chip_atlas)
         {
-            //com2pose_lib.get_chip_atlas_data_list();
-            //com2pose_lib.get_chip_atlas_data();
+            com2pose_lib.get_chip_atlas_data_list();
+            com2pose_lib.get_chip_atlas_data();
             com2pose_lib.run_igv_chip_atlas_data();
             com2pose_lib.run_igv_chr_wide_data();
 
