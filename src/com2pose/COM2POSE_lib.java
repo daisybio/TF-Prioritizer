@@ -623,6 +623,30 @@ public class COM2POSE_lib
 
         //read gtf for genome coordinates
         HashMap<String,String> gene_to_coordinates = new HashMap<>();
+
+        File f_input_gene_to_coordinates = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
+        BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(f_input_gene_to_coordinates));
+        String line_gene_coordinates = br_gene_coordinates.readLine();
+        String[] header_gene_coordinates = line_gene_coordinates.split("\t");
+        while((line_gene_coordinates=br_gene_coordinates.readLine())!=null)
+        {
+            String[] split = line_gene_coordinates.split("\t");
+
+            if(split[1].startsWith("CHR"))
+                continue;
+
+            String gene_name =split[0];
+            String chr = "chr"+split[1];
+            String begin =split[2];
+            String end =split[3];
+
+            String position_string = chr+":"+begin+"-"+end;
+            gene_to_coordinates.put(gene_name,position_string);
+        }
+
+        /*
+
+        //with this kind of thing it got messed up... use the biomart version!
         BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(new File(options_intern.tepic_gene_annot)));
         String line_gene_coordinates = br_gene_coordinates.readLine();
         while((line_gene_coordinates=br_gene_coordinates.readLine())!=null)
@@ -653,8 +677,23 @@ public class COM2POSE_lib
                     gene_name=split_intern[1].toUpperCase();
                 }
             }
+
             gene_to_coordinates.put(gene_name,chr+":"+position);
+        }*/
+
+        HashMap<String,String> ensg_gene_symbol_map = new HashMap<>();
+        BufferedReader br_ensg_gene_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
+        while((line_ensg_gene_symbol=br_ensg_gene_symbol.readLine())!=null)
+        {
+            String[] split = line_ensg_gene_symbol.split("\t");
+            if(split.length>1)
+            {
+                ensg_gene_symbol_map.put(split[0].toUpperCase(),split[1].toUpperCase());
+            }
         }
+        br_ensg_gene_symbol.close();
+
 
         BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
         String line_dcg= br_dcg.readLine();
@@ -713,6 +752,155 @@ public class COM2POSE_lib
                     {
                         if(hm_to_important_tfs.get(key_hm).contains(key_tf))
                         {
+                            //read in regions to target gene table
+                            HashMap<String,HashSet<String>> gene_to_regions_all = new HashMap<>();
+                            File f_input_regions_to_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw+File.separator+file_dir_tp.getName()+File.separator+key_hm);
+                            File f_input_regions_to_target_genes_search = new File("");
+                            for(File f_search : f_input_regions_to_target_genes.listFiles())
+                            {
+                                f_input_regions_to_target_genes_search=f_search;
+                            }
+                            f_input_regions_to_target_genes_search= new File(f_input_regions_to_target_genes_search.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_output_regions_to_target_genes);
+
+                            BufferedReader br_regions_to_target_genes = new BufferedReader(new FileReader(f_input_regions_to_target_genes_search));
+                            String line_regions_to_target_genes = br_regions_to_target_genes.readLine();
+                            String[] header_regions_to_target_genes = line_regions_to_target_genes.split("\t");
+                            while((line_regions_to_target_genes=br_regions_to_target_genes.readLine())!=null)
+                            {
+                                String[] split = line_regions_to_target_genes.split("\t");
+                                String region = split[0];
+                                String[] split_target_genes = split[1].split(";");
+
+                                for(String key_target_gene: split_target_genes)
+                                {
+                                    key_target_gene = key_target_gene.split("\\.")[0];
+                                    key_target_gene = ensg_gene_symbol_map.get(key_target_gene);
+
+                                    if(key_target_gene == null)
+                                        continue;
+
+                                    if(gene_to_regions_all.containsKey(key_target_gene))
+                                    {
+                                        gene_to_regions_all.get(key_target_gene).add(region);
+                                    }
+                                    else
+                                    {
+                                        HashSet<String> x = new HashSet<>();
+                                        x.add(region);
+                                        gene_to_regions_all.put(key_target_gene,x);
+                                    }
+                                }
+                            }
+                            br_regions_to_target_genes.close();
+
+                            //create wides range for each possible target gene
+                            HashMap<String,String> gene_to_region = new HashMap<>();
+                            for(String key_gene : gene_to_regions_all.keySet())
+                            {
+                                HashSet<String> regions_into_one = gene_to_regions_all.get(key_gene);
+
+                                String chr = "";
+                                int begin = Integer.MAX_VALUE;
+                                int end = Integer.MIN_VALUE;
+
+                                for(String position : regions_into_one)
+                                {
+                                    String[] split = position.split(":");
+
+                                    if(chr.equals(""))
+                                    {
+                                        chr=split[0];
+                                    }
+                                    else
+                                    {
+                                        if(!chr.equals(split[0]))
+                                        {
+                                            logger.logLine("[ERROR] DIFFERENT CHROMOSOME FOR LOOKUP?!");
+                                        }
+                                    }
+
+                                    String[] split_pos = split[1].split("-");
+                                    int begin_n = Integer.parseInt(split_pos[0]);
+                                    int end_n = Integer.parseInt(split_pos[1]);
+
+                                    if(begin_n<begin)
+                                    {
+                                        begin=begin_n;
+                                    }
+                                    if(end<end_n)
+                                    {
+                                        end=end_n;
+                                    }
+
+                                }
+
+                                begin+=1000;
+                                end+=1000;
+
+                                String position = "chr"+chr+":"+begin+"-"+end;
+                                gene_to_region.put(key_gene,position);
+                            }
+
+                            //create new gene ranges
+                            HashMap<String,String> gene_to_coordinates_this_run = new HashMap<>(gene_to_coordinates);
+                            for(String key_gene_to_region : gene_to_region.keySet())
+                            {
+                                if(gene_to_coordinates_this_run.containsKey(key_gene_to_region))
+                                {
+                                    String position = gene_to_coordinates_this_run.get(key_gene_to_region);
+                                    String region_tf = gene_to_region.get(key_gene_to_region);
+
+                                    String[] split_p = position.split(":");
+                                    String[] split_p_position = split_p[1].split("-");
+
+                                    String[] split_r = region_tf.split(":");
+                                    String[] split_r_position = split_r[1].split("-");
+
+                                    String chr_p = split_p[0];
+                                    String chr_r = split_r[0];
+
+                                    if(!chr_p.equals(chr_r))
+                                    {
+                                        logger.logLine("[ERROR]: chromosome do not match");
+                                    }
+
+                                    int begin_p = Integer.parseInt(split_p_position[0]);
+                                    int end_p = Integer.parseInt(split_p_position[1]);
+
+                                    int begin_r = Integer.parseInt(split_r_position[0]);
+                                    int end_r = Integer.parseInt(split_r_position[1]);
+
+
+                                    int begin_final = Integer.MAX_VALUE;
+                                    int end_final = Integer.MIN_VALUE;
+
+                                    if(begin_r<begin_p)
+                                    {
+                                        begin_final=begin_r;
+                                    }
+                                    else
+                                    {
+                                        begin_final=begin_p;
+                                    }
+                                    if(end_r<end_p)
+                                    {
+                                        end_final=end_p;
+                                    }
+                                    else
+                                    {
+                                        end_final=end_r;
+                                    }
+
+                                    begin_final-=100000;
+                                    end_final+=100000;
+
+                                    String final_string = chr_p+":"+begin_final+"-"+end_final;
+
+                                    gene_to_coordinates_this_run.put(key_gene_to_region,final_string);
+
+                                }
+                            }
+
                             File f_output_igv_shots_tp_hm = new File(f_output_igv_shots_tp.getAbsolutePath()+File.separator+key_hm);
                             f_output_igv_shots_tp_hm.mkdirs();
 
@@ -784,7 +972,8 @@ public class COM2POSE_lib
                                 String response=in.readLine();
                                 //logger.logLine("[IGV] " + response);
                                 //logger.logLine("[IGV] "+ "goto " + gene_to_coordinates.get(targets));
-                                out.println("goto " + gene_to_coordinates.get(key_target_gene));
+                                //out.println("goto " + gene_to_coordinates.get(key_target_gene));
+                                out.println("goto " + gene_to_coordinates_this_run.get(key_target_gene));
                                 response=in.readLine();
                                 //logger.logLine("[IGV] " + response);
                                 //logger.logLine("[IGV] "+ "sort");
@@ -8114,6 +8303,92 @@ public class COM2POSE_lib
 
 
 
+
+
+    }
+
+    /**
+     * created a chromosome and position mapping from biomart
+     */
+    public void create_gene_positions() throws Exception {
+
+        if(!options_intern.calculcate_gene_positions)
+            return;
+
+        File f_output_positions_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions);
+        f_output_positions_root.mkdir();
+
+        File f_data_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.file_suffix_deseq2_mapping);
+
+        File f_script = new File(f_output_positions_root.getAbsolutePath()+File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_script);
+        File f_data = new File(f_output_positions_root.getAbsolutePath()+File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
+
+        logger.logLine("[PREP] Create gene positions for all RNA-seq data.");
+        logger.logLine("[PREP] Get gene lengths ...");
+
+        logger.logLine("[PREP] if not done in 5 hours:");
+        logger.logLine("[PREP] 1. Please stop com2pose.");
+        logger.logLine("[PREP] 2. Please run script manually in RStudio.");
+        logger.logLine("[PREP] Script path: " + f_script.getAbsolutePath());
+        logger.logLine("[PREP] 3. Afterwards add paramter -a to com2pose command line, so this script wont be started again.");
+        logger.logLine("[PREP] 4. restart com2pose");
+        logger.logLine("[PREP] waiting ...");
+
+        StringBuilder sb_script = new StringBuilder();
+        sb_script.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                "  install.packages(\"BiocManager\")\n" +
+                "\n" +
+                "if (!requireNamespace(\"biomaRt\", quietly = TRUE))\n" +
+                "  BiocManager::install(\"biomaRt\")\n" +
+                "\n" +
+                "library('biomaRt')\n" +
+                "httr::set_config(httr::config(ssl_verifypeer = FALSE))\n\n");
+        sb_script.append("input<-read.csv('"+f_data_input.getAbsolutePath()+"', sep = '\\t')\n");
+        sb_script.append("input<-input$"+options_intern.deseq2_biomart_dataset_symbol_column+"\n");
+
+        sb_script.append("not_done=TRUE\n" +
+                "\n" +
+                "G_list= data.frame()\n" +
+                "\n" +
+                "while(not_done)\n" +
+                "{\n" +
+                "  tryCatch({\n" +
+                "    mart <- useDataset(\""+options_intern.deseq2_biomart_dataset_species+"\", useMart(\"ensembl\"))\n" +
+                "    #df$id <- NA\n" +
+                "    G_list_intern <- getBM(filters= \"hgnc_symbol\", attributes= c(\""+options_intern.deseq2_biomart_dataset_symbol_column+"\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\",\"band\"),values=input,mart= mart)\n" +
+                "    G_list=rbind(G_list,G_list_intern)\n" +
+                "    not_done=FALSE\n" +
+                "  }, warning = function(w) {\n" +
+                "    print(\"WARNING SECTION\")\n" +
+                "    print(w)\n" +
+                "  }, error = function(e) {\n" +
+                "    print(\"ERROR SECTION\")\n" +
+                "    print(e)\n" +
+                "  }, finally = {\n" +
+                "  })\n" +
+                "}\n" +
+                "write.table(G_list,\""+f_data.getAbsolutePath()+"\", row.names = FALSE, quote = F, sep=\"\\t\")\n");
+
+        BufferedWriter bw_script = new BufferedWriter(new FileWriter(f_script));
+        bw_script.write(sb_script.toString());
+        bw_script.close();
+
+        String command = "Rscript " + f_script;
+        logger.logLine("[PREP] run R script: " + command);
+
+        Process child = Runtime.getRuntime().exec(command);
+        int code = child.waitFor();
+        switch (code){
+            case 0:
+                break;
+            case 1:
+                String message = child.getErrorStream().toString();
+                logger.logLine("[PREP-TPM] Script failed due to bioMart connection error. Please run script manually in RStudio.");
+                logger.logLine("[PREP-TPM] Script path: " + f_script.getAbsolutePath());
+                logger.logLine("[PREP-TPM] Afterwards, add paramter -b to com2pose command line, so this script wont be started again.");
+                throw new Exception(message);
+        }
+        logger.logLine("[PREP] Finished creating gene positions for all RNA-seq data.");
 
 
     }
