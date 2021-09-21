@@ -28,6 +28,8 @@ public class Options_intern
 
     public String folder_name_usual_working_dir_name = "working_dir";
 
+    public String distribution_analysis_all_name = "ALL";
+
     public String folder_name_mix_option = "00_MIX_OPTION";
     public String folder_name_mix_option_sample_mix_preprocessing = "00_PREPROCESSING_SAMPLE_MIX";
     public String folder_name_mix_option_sample_mix = "01_SAMPLE_MIX";

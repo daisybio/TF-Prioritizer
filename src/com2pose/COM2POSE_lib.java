@@ -12,6 +12,7 @@ import java.lang.annotation.Target;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -621,7 +622,6 @@ public class COM2POSE_lib
         File f_input_dcg_result = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_dcg+File.separator+options_intern.file_suffix_distribution_analysis_dcg);
         ArrayList<String> ordered_tfs_dcg = new ArrayList<>();
 
-        //read gtf for genome coordinates
         HashMap<String,String> gene_to_coordinates = new HashMap<>();
 
         File f_input_gene_to_coordinates = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
@@ -641,11 +641,12 @@ public class COM2POSE_lib
             String end =split[3];
 
             String position_string = chr+":"+begin+"-"+end;
-            gene_to_coordinates.put(gene_name,position_string);
+            gene_to_coordinates.put(gene_name.toUpperCase(),position_string);
         }
 
         /*
 
+        //read gtf for genome coordinates
         //with this kind of thing it got messed up... use the biomart version!
         BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(new File(options_intern.tepic_gene_annot)));
         String line_gene_coordinates = br_gene_coordinates.readLine();
@@ -724,6 +725,27 @@ public class COM2POSE_lib
             }
         }
 
+        //read in TFs from ALL analysis
+        File f_input_all_hm_to_important_tfs = new File(f_important_tfs_per_hm.getParentFile().getAbsolutePath()+File.separator+options_intern.folder_out_distribution_stats_ALL+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats);
+        BufferedReader br_input_all_hm_to_important_tfs = new BufferedReader(new FileReader(f_input_all_hm_to_important_tfs));
+        String line_input_all_hm_to_important_tfs = br_input_all_hm_to_important_tfs.readLine();
+        HashSet<String> hs_input_all_hm_to_important_tfs = new HashSet<>();
+        while((line_input_all_hm_to_important_tfs=br_input_all_hm_to_important_tfs.readLine())!=null)
+        {
+            String[] split = line_input_all_hm_to_important_tfs.split("\t");
+            hs_input_all_hm_to_important_tfs.add(split[1]);
+
+            //retrieve all TF targets from ALL analysis
+            for(String key_hm: hm_to_important_tfs.keySet())
+            {
+                hm_to_important_tfs.get(key_hm).add(split[1]);
+
+            }
+
+        }
+        br_input_all_hm_to_important_tfs.close();
+        hm_to_important_tfs.put(options_intern.distribution_analysis_all_name,hs_input_all_hm_to_important_tfs);
+
 
         //go over all dcg ordered tfs
         int i = 0;
@@ -752,10 +774,28 @@ public class COM2POSE_lib
                     {
                         if(hm_to_important_tfs.get(key_hm).contains(key_tf))
                         {
+
                             //read in regions to target gene table
                             HashMap<String,HashSet<String>> gene_to_regions_all = new HashMap<>();
                             File f_input_regions_to_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw+File.separator+file_dir_tp.getName()+File.separator+key_hm);
                             File f_input_regions_to_target_genes_search = new File("");
+                            if(!f_input_regions_to_target_genes.exists())
+                            {
+                                if(!key_hm.equals(options_intern.distribution_analysis_all_name))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    //could be unnecessary
+                                    for(String key_hm_to_important : hm_to_important_tfs.keySet())
+                                    {
+                                        hm_to_important_tfs.get(key_hm_to_important).add(key_tf);
+                                    }
+                                    continue;
+                                }
+                            }
+
                             for(File f_search : f_input_regions_to_target_genes.listFiles())
                             {
                                 f_input_regions_to_target_genes_search=f_search;
@@ -815,7 +855,8 @@ public class COM2POSE_lib
                                     {
                                         if(!chr.equals(split[0]))
                                         {
-                                            logger.logLine("[ERROR] DIFFERENT CHROMOSOME FOR LOOKUP?!");
+                                            //logger.logLine("[ERROR] DIFFERENT CHROMOSOME FOR LOOKUP?!");
+                                            continue;
                                         }
                                     }
 
@@ -859,16 +900,25 @@ public class COM2POSE_lib
                                     String chr_p = split_p[0];
                                     String chr_r = split_r[0];
 
-                                    if(!chr_p.equals(chr_r))
-                                    {
-                                        logger.logLine("[ERROR]: chromosome do not match");
-                                    }
+
 
                                     int begin_p = Integer.parseInt(split_p_position[0]);
                                     int end_p = Integer.parseInt(split_p_position[1]);
 
                                     int begin_r = Integer.parseInt(split_r_position[0]);
                                     int end_r = Integer.parseInt(split_r_position[1]);
+
+                                    if(!chr_p.equals(chr_r))
+                                    {
+                                        //logger.logLine("[ERROR]: chromosome do not match");
+                                        begin_p-=100000;
+                                        end_p+=100000;
+
+                                        String final_string = chr_p+":"+begin_p+"-"+end_p;
+
+                                        gene_to_coordinates_this_run.put(key_gene_to_region.toUpperCase(),final_string);
+                                        continue;
+                                    }
 
 
                                     int begin_final = Integer.MAX_VALUE;
@@ -896,7 +946,7 @@ public class COM2POSE_lib
 
                                     String final_string = chr_p+":"+begin_final+"-"+end_final;
 
-                                    gene_to_coordinates_this_run.put(key_gene_to_region,final_string);
+                                    gene_to_coordinates_this_run.put(key_gene_to_region.toUpperCase(),final_string);
 
                                 }
                             }
@@ -981,8 +1031,8 @@ public class COM2POSE_lib
                                 //response=in.readLine();
                                 //logger.logLine("[IGV] " + response);
                                 //logger.logLine("[IGV] "+ "collapse");
-                                out.println("collapse");
-                                response=in.readLine();
+                                //out.println("collapse");
+                                //response=in.readLine();
                                 //logger.logLine("[IGV] " + response);
                                 //logger.logLine("[IGV] "+ "snapshot");
                                 out.println("snapshot");
@@ -1007,7 +1057,8 @@ public class COM2POSE_lib
 
                                 if(!f_snapshot_made.exists())
                                 {
-                                    logger.logLine("[ERROR]: trying to move file which does not exist!");
+                                    //its the all overview
+                                    //logger.logLine("[ERROR]: trying to move file which does not exist!");
                                 }
                                 else {
 
@@ -1415,10 +1466,10 @@ public class COM2POSE_lib
                                     String name_tf = split_header[i].split("_")[0];
                                     name_tf=name_tf.replaceAll(":","\\.");
 
-                                    if(unordered_tfs_dcg.contains(name_tf))
+                                    if(unordered_tfs_dcg.contains(name_tf.toUpperCase()))
                                     {
-                                        index_to_tf.put(i,name_tf);
-                                        tf_to_index.put(name_tf,i);
+                                        index_to_tf.put(i,name_tf.toUpperCase());
+                                        tf_to_index.put(name_tf.toUpperCase(),i);
                                     }
                                 }
 
@@ -1534,7 +1585,7 @@ public class COM2POSE_lib
         }
 
         Analysis_distribution_stats_object all_object = get_distribution_analysis_stats_ordered(f_distr_stats_ALL);
-        group_analysis_distr_stats_objects.put("ALL",all_object);
+        group_analysis_distr_stats_objects.put(options_intern.distribution_analysis_all_name,all_object);
 
         int not_found_factor = 0;
         int group_number=0;
@@ -1736,7 +1787,7 @@ public class COM2POSE_lib
                     HashMap<String,Integer> actual_ranks = group_analysis_distr_stats.get(key_group);
 
                     sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
-                    if(key_group.equals("ALL"))
+                    if(key_group.equals(options_intern.distribution_analysis_all_name))
                     {
                         sb_cumulative_gain_website.append("<a href='"+".."+File.separator+options_intern.folder_out_website_htmls_distribution_analysis_ALL+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"#"+as.label.toUpperCase()+"' target='_blank'><button class='button' style='background-color:#67cb67;'>");
 
@@ -1989,7 +2040,7 @@ public class COM2POSE_lib
             write_html_distribution_analysis_plots_hm_page(f_website_html_HM, fileDir_stat, "HM", tp_tf_gene_count);
         }
 
-        write_html_distribution_analysis_plots_hm_page(f_website_distr_analysis_html_folder_ALL_FILE,f_distr_stats_ALL,"ALL",tp_tf_gene_count);
+        write_html_distribution_analysis_plots_hm_page(f_website_distr_analysis_html_folder_ALL_FILE,f_distr_stats_ALL,options_intern.distribution_analysis_all_name,tp_tf_gene_count);
 
         sb_home_distribution_analysis.append(html_tail);
 
@@ -8355,7 +8406,7 @@ public class COM2POSE_lib
                 "  tryCatch({\n" +
                 "    mart <- useDataset(\""+options_intern.deseq2_biomart_dataset_species+"\", useMart(\"ensembl\"))\n" +
                 "    #df$id <- NA\n" +
-                "    G_list_intern <- getBM(filters= \"hgnc_symbol\", attributes= c(\""+options_intern.deseq2_biomart_dataset_symbol_column+"\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\",\"band\"),values=input,mart= mart)\n" +
+                "    G_list_intern <- getBM(filters= \""+options_intern.deseq2_biomart_dataset_symbol_column+"\", attributes= c(\""+options_intern.deseq2_biomart_dataset_symbol_column+"\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\",\"band\"),values=input,mart= mart)\n" +
                 "    G_list=rbind(G_list,G_list_intern)\n" +
                 "    not_done=FALSE\n" +
                 "  }, warning = function(w) {\n" +
