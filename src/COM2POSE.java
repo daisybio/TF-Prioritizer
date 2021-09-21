@@ -14,7 +14,7 @@ public class COM2POSE
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
-
+/*
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -117,7 +117,7 @@ public class COM2POSE
             com2pose_lib.run_igv_chip_atlas_data();
             com2pose_lib.run_igv_chr_wide_data();
 
-        }
+        }*/
 
         //shoot IGV for own TF ChIP-seq data
         if(!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))

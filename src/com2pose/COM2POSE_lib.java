@@ -63,6 +63,32 @@ public class COM2POSE_lib
     public void run_igv_own_data() throws Exception {
         logger.logLine("[IGV] start taking screenshots for top TFs and their corresponding top target genes");
 
+        HashMap<String,String> gene_to_coordinates = new HashMap<>();
+
+        File f_input_gene_to_coordinates = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
+        BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(f_input_gene_to_coordinates));
+        String line_gene_coordinates = br_gene_coordinates.readLine();
+        String[] header_gene_coordinates = line_gene_coordinates.split("\t");
+        while((line_gene_coordinates=br_gene_coordinates.readLine())!=null)
+        {
+            String[] split = line_gene_coordinates.split("\t");
+
+            if(split[1].startsWith("CHR"))
+                continue;
+
+            String gene_name =split[0];
+            String chr = "chr"+split[1];
+            int begin =Integer.parseInt(split[2]);
+            int end = Integer.parseInt(split[3]);
+
+            begin-=50000;
+            end+=50000;
+
+            String position_string = chr+":"+begin+"-"+end;
+            gene_to_coordinates.put(gene_name.toUpperCase(),position_string);
+        }
+
+        /*
         //read gtf for genome coordinates
         HashMap<String,String> gene_to_coordinates = new HashMap<>();
         BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(new File(options_intern.tepic_gene_annot)));
@@ -97,6 +123,7 @@ public class COM2POSE_lib
             }
             gene_to_coordinates.put(gene_name,chr+":"+position);
         }
+        */
 
         //get most significant TFs
         ArrayList<String> tfs_in_order = new ArrayList<>();
@@ -109,7 +136,6 @@ public class COM2POSE_lib
         }
 
         //get target genes for tfs
-        HashSet<String> which_tfs = new HashSet<>();
         HashMap<String,HashMap<String,HashMap<String,ArrayList<String>>>> hm_timepoint_tf_target_genes = new HashMap<>();
         File f_root_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes_dcg);
 
@@ -185,9 +211,9 @@ public class COM2POSE_lib
             }
         }
 
+
         /*
         File f_root_target_genes = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes);
-
         for(File f_hm : f_root_target_genes.listFiles())
         {
             String hm = f_hm.getName();
@@ -258,6 +284,22 @@ public class COM2POSE_lib
         /*
         http://software.broadinstitute.org/software/igv/automation
          */
+
+        //fill which tfs from all dcg
+        HashSet<String> which_tfs = new HashSet<>();
+        HashMap<String,Integer> tf_to_dcg_place = new HashMap<>();
+
+        File f_input_all_dcg = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_dcg+File.separator+options_intern.file_suffix_distribution_analysis_dcg);
+        BufferedReader br_input_all_dcg = new BufferedReader(new FileReader(f_input_all_dcg));
+        String line_input_all_dcg = br_input_all_dcg.readLine();
+        while ((line_input_all_dcg=br_input_all_dcg.readLine())!=null)
+        {
+            String[] split = line_input_all_dcg.split("\t");
+            which_tfs.add(split[1]);
+
+            tf_to_dcg_place.put(split[1],Integer.parseInt(split[0]));
+        }
+        br_input_all_dcg.close();
 
         File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_own_data);
         f_output_root.mkdirs();
@@ -360,6 +402,8 @@ public class COM2POSE_lib
                                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+                                String snapshot_name = count+"_"+tf+"_"+targets+".png";
+
                                 //logger.logLine("[IGV] " + load_tf_chip_seq);
                                 out.println(load_tf_chip_seq);
                                 String response_load = in.readLine();
@@ -370,7 +414,7 @@ public class COM2POSE_lib
                                 String response = in.readLine();
                                 //logger.logLine("[IGV] "+ response);
 
-                                File f_output_shot= new File(f_output_tf_hm_tp.getAbsolutePath()+File.separator+count+"_"+tf+"_"+targets);
+                                File f_output_shot= new File(f_output_tf_hm_tp.getAbsolutePath());
                                 f_output_shot.mkdir();
                                 //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
                                 out.println("snapshotDirectory "+f_output_shot.getAbsolutePath());
@@ -396,6 +440,49 @@ public class COM2POSE_lib
                                 out.println("new");
                                 response = in.readLine();
                                 //logger.logLine("[IGV] " + response);
+
+                                File f_snapshot_made=new File("NO");
+
+                                //search png name
+                                for(File f_snapshot: f_output_shot.listFiles())
+                                {
+                                    if(f_snapshot.isFile())
+                                    {
+                                        if(f_snapshot.getName().startsWith("chr"))
+                                        {
+                                            f_snapshot_made=f_snapshot;
+                                            break;
+                                        }
+
+                                    }
+                                }
+
+                                if(!f_snapshot_made.exists())
+                                {
+                                    //its the all overview
+                                    //logger.logLine("[ERROR]: trying to move file which does not exist!");
+                                }
+                                else {
+
+                                    String command_mv = "mv " + f_snapshot_made.getAbsolutePath()+ " " + f_snapshot_made.getParentFile().getAbsolutePath()+File.separator+snapshot_name;
+
+
+
+                                    Process child = Runtime.getRuntime().exec(command_mv);
+                                    int code = child.waitFor();
+                                    switch (code){
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            String message = child.getErrorStream().toString();
+                                            throw new Exception(message);
+                                    }
+
+
+                                }
+
+
+
 
                                 socket.close();
 
