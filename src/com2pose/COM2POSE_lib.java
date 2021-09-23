@@ -1273,15 +1273,15 @@ public class COM2POSE_lib
 
         for(int i = 0; i < split_header.length;i++)
         {
-            if(split_header[i].equals(options_intern.chip_atlas_column_gene_version))
+            if(split_header[i].matches(options_intern.chip_atlas_column_gene_version))
                 column_gene_version=i;
-            if(split_header[i].equals(options_intern.chip_atlas_column_antigen_class))
+            if(split_header[i].matches(options_intern.chip_atlas_column_antigen_class))
                 column_antigen_class=i;
-            if(split_header[i].equals(options_intern.chip_atlas_column_antigen))
+            if(split_header[i].matches(options_intern.chip_atlas_column_antigen))
                 column_antigen=i;
-            if(split_header[i].equals(options_intern.chip_atlas_column_cell_type_class))
+            if(split_header[i].matches(options_intern.chip_atlas_column_cell_type_class))
                 column_cell_type_class=i;
-            if(split_header[i].equals(options_intern.chip_atlas_column_url))
+            if(split_header[i].matches(options_intern.chip_atlas_column_url))
                 column_url=i;
         }
 

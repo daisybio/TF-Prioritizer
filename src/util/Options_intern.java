@@ -380,11 +380,11 @@ public class Options_intern
     public boolean chip_atlas_activated_chip_atlas =false;
     //public String chip_atlas_url_to_list="https://dbarchive.biosciencedbc.jp/data/chip-atlas/LATEST/chip_atlas_file_list.zip";
     public String chip_atlas_url_to_list="http://togodb.biosciencedbc.jp/togodb/release/chip_atlas_file_list.csv";
-    public String chip_atlas_column_gene_version="Genome assembly";
-    public String chip_atlas_column_antigen_class="Antigen class";
-    public String chip_atlas_column_antigen="Antigen";
-    public String chip_atlas_column_cell_type_class="Cell type class";
-    public String chip_atlas_column_url="Peak-call (BED)";
+    public String chip_atlas_column_gene_version=".*genome.*assembly.*";
+    public String chip_atlas_column_antigen_class=".*antigen.*class.*";
+    public String chip_atlas_column_antigen=".*antigen.*";
+    public String chip_atlas_column_cell_type_class=".*cell.*type.*class.*";
+    public String chip_atlas_column_url=".*file.*url.*";
     //##if no validation TF ChIP-seq data is available, you can provide the chip atlas genome version and the tissue type, to automatically get all available ChIP atlas data for the TFs
     //#[OPT]: chip atlas genome version (e.g. hg19, hg38, mm9, mm10, ...) look at: https://chip-atlas.org/peak_browser
     public String chip_atlas_genome_version="";
