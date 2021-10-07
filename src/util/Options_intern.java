@@ -378,6 +378,7 @@ public class Options_intern
       ####ChIP-atlas parameters###
       ############################*/
     public boolean chip_atlas_activated_chip_atlas =false;
+    //before the restructuring of CHIP-Atlas
     //public String chip_atlas_url_to_list="https://dbarchive.biosciencedbc.jp/data/chip-atlas/LATEST/chip_atlas_file_list.zip";
     public String chip_atlas_url_to_list="http://togodb.biosciencedbc.jp/togodb/release/chip_atlas_file_list.csv";
     public String chip_atlas_column_gene_version=".*genome.*assembly.*";

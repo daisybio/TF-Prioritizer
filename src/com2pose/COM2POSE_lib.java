@@ -1373,14 +1373,16 @@ public class COM2POSE_lib
                 //check if valid bed file, if not, delete
                 Path path = Paths.get(f_download_tf_file.getAbsolutePath());
                 long size= Files.size(path);
-                if(size<100)
+                if(size<300)
                 {
                     f_download_tf_file.delete();
                     f_download_tf.delete();
                 }
                 else
                 {
-                    logger.logLine("[ChIP-ATLAS] processed " + ((i*1.0/ordered_tfs_dcg.size()))*100 + " TFs.");
+                    DecimalFormat df = new DecimalFormat("0.00");
+
+                    logger.logLine("[ChIP-ATLAS] processed " + df.format(((i*1.0/ordered_tfs_dcg.size()))*100)+ "% TFs.");
                 }
             }
         }
