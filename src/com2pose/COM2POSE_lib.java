@@ -697,6 +697,7 @@ public class COM2POSE_lib
      */
     public void run_igv_chip_atlas_data() throws Exception {
         logger.logLine("[ChIP-ATLAS-IGV] Start running ChIP Atlas evaluation data.");
+        //logger.logLine("[ChIP-ATLAS-IGV] This is as far automated as possible. If a .bed file is very big a user entry is prompted at IGV, please click GO there!");
 
         File f_output_igv_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_chip_atlas_data);
         f_output_igv_root.mkdirs();
@@ -1067,26 +1068,35 @@ public class COM2POSE_lib
 
                             //shoot igv now
                             int count=0;
-                            String load_tf_chip_seq="load ";
-                            File f_input_bed = new File(f_bed_data_input_root.getAbsolutePath()+File.separator+i+"_"+key_tf);
-                            if(!f_input_bed.exists())
-                            {
-                                continue;
-                            }
-                            load_tf_chip_seq += f_input_bed.getAbsolutePath()+File.separator+key_tf+".bed";
-
-
 
                             Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
                             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                            out.println(load_tf_chip_seq);
-                            String response_load = in.readLine();
+                            File f_input_bed = new File(f_bed_data_input_root.getAbsolutePath()+File.separator+i+"_"+key_tf);
+                            if(!f_input_bed.exists())
+                            {
+                                continue;
+                            }
+
+                            for(File f_bed_files : f_input_bed.listFiles())
+                            {
+
+                                if(f_bed_files.getName().endsWith("idx"))
+                                {
+                                    continue;
+                                }
+                                String load_tf_chip_seq = "load " + f_bed_files.getAbsolutePath();
+
+                                out.println(load_tf_chip_seq);
+                                String response_load = in.readLine();
+
+                            }
+
 
                             for(String key_target_gene : target_genes)
                             {
-                                String snapshot_name=count+"_" + key_target_gene+".png";
+                                String snapshot_name=count+"_"+ key_tf+"_" + key_target_gene+".png";
 
                                 File f_output_tf_hm_tp = new File(f_output_igv_shots_tp_hm.getAbsolutePath()+File.separator+count+"_" + key_target_gene);
 
@@ -1198,7 +1208,7 @@ public class COM2POSE_lib
         logger.logLine("[ChIP-ATLAS-IGV] Finished evaluation with ChIP Atlas data.");
     }
 
-    public void get_chip_atlas_data() throws IOException {
+    public void get_chip_atlas_data() throws Exception {
 
         File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas);
         f_output_root.mkdir();
@@ -1309,81 +1319,135 @@ public class COM2POSE_lib
         }
         br.close();
 
-        logger.logLine("[ChIP-ATLAS] downloading available TF data");
+        logger.logLine("[ChIP-ATLAS] downloading available TF data and creating IGV index files");
         logger.logLine("[ChIP-ATLAS] waiting ...");
 
         //read in discounted cumulative gain tfs
         File f_input_dcg_result = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_dcg+File.separator+options_intern.file_suffix_distribution_analysis_dcg);
         ArrayList<String> ordered_tfs_dcg = new ArrayList<>();
+        HashSet<String> unordered_tfs_dcg = new HashSet<>();
+        HashMap<String,HashSet<String>> tf_to_splits = new HashMap<>();
 
         BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
         String line_dcg= br_dcg.readLine();
         while((line_dcg= br_dcg.readLine())!=null)
         {
             String[] split = line_dcg.split("\t");
+
+            String[] split_tf=split[1].split("\\.");
+
+            HashSet<String>splits = new HashSet<>();
+            for(String tf_name_chipatlas : split_tf)
+            {
+                if(!tf_name_chipatlas.startsWith(" "))
+                unordered_tfs_dcg.add(tf_name_chipatlas);
+
+                splits.add(tf_name_chipatlas);
+            }
+
             ordered_tfs_dcg.add(split[1]);
+            tf_to_splits.put(split[1].toUpperCase(),splits);
+
+
         }
         br_dcg.close();
 
         for(int i = 0; i < ordered_tfs_dcg.size(); i++)
         {
-            if(tf_to_url.containsKey(ordered_tfs_dcg.get(i).toUpperCase()))
+            boolean found_tf = false;
+
+            ArrayList<String> found_tfs_to_download= new ArrayList<>();
+
+            HashSet<String> split_of_tfs = tf_to_splits.get(ordered_tfs_dcg.get(i).toUpperCase());
+            for(String split_tf : split_of_tfs)
+            {
+                if(tf_to_url.containsKey(split_tf))
+                {
+                    found_tf=true;
+                    found_tfs_to_download.add(split_tf);
+                }
+            }
+
+
+            if(found_tf)
             {
                 File f_download_tf = new File(f_output_peak_files.getAbsolutePath()+File.separator+i+"_"+ordered_tfs_dcg.get(i));
                 f_download_tf.mkdir();
-                File f_download_tf_file = new File(f_download_tf.getAbsolutePath()+File.separator+ordered_tfs_dcg.get(i)+".bed");
 
-                // Create a new trust manager that trust all certificates
-                TrustManager[] trustAllCerts = new TrustManager[]{
-                        new X509TrustManager() {
-                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                                return null;
-                            }
-                            public void checkClientTrusted(
-                                    java.security.cert.X509Certificate[] certs, String authType) {
-                            }
-                            public void checkServerTrusted(
-                                    java.security.cert.X509Certificate[] certs, String authType) {
-                            }
-                        }
-                };
-                // Activate the new trust manager
-                try {
-                    SSLContext sc = SSLContext.getInstance("SSL");
-                    sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                // And as before now you can use URL and URLConnection
-                URL url = new URL(tf_to_url.get(ordered_tfs_dcg.get(i)));
-                URLConnection connection = url.openConnection();
-                InputStream is = connection.getInputStream();
-
-                try(OutputStream outputStream = new FileOutputStream(f_download_tf_file)){
-                    IOUtils.copy(is, outputStream);
-                } catch (FileNotFoundException e) {
-                    // handle exception here
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // handle exception here
-                    e.printStackTrace();
-                }
-
-                //check if valid bed file, if not, delete
-                Path path = Paths.get(f_download_tf_file.getAbsolutePath());
-                long size= Files.size(path);
-                if(size<300)
+                for(String tf_found_split : found_tfs_to_download)
                 {
-                    f_download_tf_file.delete();
-                    f_download_tf.delete();
-                }
-                else
-                {
-                    DecimalFormat df = new DecimalFormat("0.00");
+                    File f_download_tf_file = new File(f_download_tf.getAbsolutePath()+File.separator+tf_found_split+".bed");
 
-                    logger.logLine("[ChIP-ATLAS] processed " + df.format(((i*1.0/ordered_tfs_dcg.size()))*100)+ "% TFs.");
+                    // Create a new trust manager that trust all certificates
+                    TrustManager[] trustAllCerts = new TrustManager[]{
+                            new X509TrustManager() {
+                                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                    return null;
+                                }
+                                public void checkClientTrusted(
+                                        java.security.cert.X509Certificate[] certs, String authType) {
+                                }
+                                public void checkServerTrusted(
+                                        java.security.cert.X509Certificate[] certs, String authType) {
+                                }
+                            }
+                    };
+                    // Activate the new trust manager
+                    try {
+                        SSLContext sc = SSLContext.getInstance("SSL");
+                        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                    } catch (Exception e) {
+                        //e.printStackTrace();
+                    }
+                    // And as before now you can use URL and URLConnection
+                    URL url = new URL(tf_to_url.get(tf_found_split));
+                    URLConnection connection = url.openConnection();
+                    InputStream is = connection.getInputStream();
+
+                    try(OutputStream outputStream = new FileOutputStream(f_download_tf_file)){
+                        IOUtils.copy(is, outputStream);
+                    } catch (FileNotFoundException e) {
+                        // handle exception here
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        // handle exception here
+                        //e.printStackTrace();
+                    }
+
+                    //check if valid bed file, if not, delete
+                    Path path = Paths.get(f_download_tf_file.getAbsolutePath());
+                    long size= Files.size(path);
+                    if(size<300)
+                    {
+                        f_download_tf_file.delete();
+                        f_download_tf.delete();
+                    }
+                    else
+                    {
+                        DecimalFormat df = new DecimalFormat("0.00");
+
+                        double percentage=((i*1.0/ordered_tfs_dcg.size()))*100;
+                        if(percentage<=100)
+                            logger.logLine("[ChIP-ATLAS] processed " + df.format(percentage)+ "% TFs.");
+                    }
+
+                    //create index file for IGV
+                    String command_create_index = options_intern.igv_path_to_igv+File.separator+"igvtools index " + f_download_tf_file.getAbsolutePath();
+
+                    Process child = Runtime.getRuntime().exec(command_create_index);
+                    int code = child.waitFor();
+                    switch (code){
+                        case 0:
+                            break;
+                        case 1:
+                            String message = child.getErrorStream().toString();
+                            throw new Exception(message);
+                    }
+
                 }
+
+
             }
         }
 
@@ -7816,6 +7880,133 @@ public class COM2POSE_lib
     }
 
     /**
+     * creates violine plots of lengths
+     * @throws IOException
+     */
+    public void create_open_regions_violin_plots() throws Exception {
+        logger.logLine("[TEPIC-ANALYSIS] Create Violine Plots of lengths of Peaks");
+
+        //create R dataformat
+        File f_output_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_postprocessing+File.separator+options_intern.folder_name_tepic_postprocessing_open_chromatin_violins);
+        f_output_root.mkdir();
+        File f_output_data = new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_open_chromatin_violins_data);
+        f_output_data.mkdir();
+        File f_output_script = new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_open_chromatin_violins_script);
+        f_output_script.mkdir();
+        File f_output_plot = new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_name_tepic_postprocessing_open_chromatin_violins_plots);
+        f_output_plot.mkdir();
+
+        File f_input_root = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw);
+
+        HashMap<String,ArrayList<Integer>> hm_to_open_chr_lengths = new HashMap<>();
+
+        for(File f_tp : f_input_root.listFiles())
+        {
+            if(f_tp.isDirectory())
+            {
+                for(File f_hm : f_tp.listFiles())
+                {
+                    if(f_hm.isDirectory())
+                    {
+                        String hm_name = f_hm.getName();
+                        ArrayList<Integer> hm_lengths = new ArrayList<>();
+                        if(hm_to_open_chr_lengths.containsKey(hm_name))
+                        {
+                            hm_lengths=hm_to_open_chr_lengths.get(hm_name);
+                        }
+                        hm_to_open_chr_lengths.put(hm_name,hm_lengths);
+
+                        for(File f_sample : f_hm.listFiles())
+                        {
+                            if(f_sample.isDirectory())
+                            {
+                                for(File f_regions_to_targets : f_sample.listFiles())
+                                {
+                                    if(f_regions_to_targets.isFile())
+                                    {
+                                        if(f_regions_to_targets.getName().equals(options_intern.file_suffix_tepic_output_regions_to_target_genes))
+                                        {
+
+                                            BufferedReader br_regions_to_targets = new BufferedReader(new FileReader(f_regions_to_targets));
+                                            String line_regions_to_targets = br_regions_to_targets.readLine();
+                                            String[] header_regions_to_targets = line_regions_to_targets.split("\t");
+                                            while((line_regions_to_targets= br_regions_to_targets.readLine())!=null)
+                                            {
+                                                String[] split = line_regions_to_targets.split("\t");
+                                                String[] split_chr = split[0].split(":");
+                                                String[] split_position = split_chr[1].split("-");
+
+                                                int start = Integer.parseInt(split_position[0]);
+                                                int end = Integer.parseInt(split_position[1]);
+
+                                                int length = end-start;
+
+                                                hm_lengths.add(length);
+
+                                            }
+                                            br_regions_to_targets.close();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        File f_data_file = new File(f_output_data.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_postprocessing_violin_plots_data);
+        BufferedWriter bw_data_file = new BufferedWriter(new FileWriter(f_data_file));
+        bw_data_file.write("HM\tLENGTH\n");
+        for(String hm:hm_to_open_chr_lengths.keySet())
+        {
+            for(Integer length : hm_to_open_chr_lengths.get(hm))
+            {
+                bw_data_file.write(hm + "\t" + length + "\n");
+            }
+        }
+
+        bw_data_file.close();
+
+        //create Rscript and execute Rscript
+        File f_script = new File(f_output_script.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_postprocessing_violin_plots_script);
+        File f_plot = new File(f_output_plot.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_postprocessing_violin_plots_plot);
+
+        StringBuilder sb_script = new StringBuilder();
+        sb_script.append("require(ggplot2)\n" +
+                "require(scales)\n");
+        sb_script.append("hm_to_lengths=read.csv('"+f_data_file.getAbsolutePath()+"',sep='\\t')\n");
+        sb_script.append("p <- ggplot(hm_to_lengths, aes(HM, LENGTH))\n" +
+                "p<-p + geom_violin() + geom_boxplot(width=0.1)\n" +
+                "p<-p+ scale_y_log10(breaks = trans_breaks(\"log10\", function(x) 10^x),\n" +
+                "              labels = trans_format(\"log10\", math_format(10^.x)))\n" +
+                "p<- p+ theme(axis.title.x = element_blank())\n" +
+                "p <- p+ylab(\"log10 length of open chromatin\") +theme(text = element_text(size=20))\n" +
+                "#p\n");
+
+        sb_script.append("ggsave(filename ='"+f_plot.getAbsolutePath()+"' , plot = p)\n");
+
+
+        BufferedWriter bw_script = new BufferedWriter(new FileWriter(f_script));
+        bw_script.write(sb_script.toString());
+        bw_script.close();
+
+        String command_execute = "Rscript " + f_script.getAbsolutePath();
+        logger.logLine("[TEPIC-ANALYSIS] execute Rscript for violin plot: " + command_execute);
+        Process child = Runtime.getRuntime().exec(command_execute);
+        int code = child.waitFor();
+        switch (code){
+            case 0:
+                break;
+            case 1:
+                String message = child.getErrorStream().toString();
+                throw new Exception(message);
+        }
+
+
+        logger.logLine("[TEPIC-ANALYSIS] Finished Violine Plots");
+    }
+
+    /**
      * randomizes TEPIC output for evaluation
      * @throws IOException
      */
@@ -11241,6 +11432,10 @@ public class COM2POSE_lib
         /**
          * CHECK NAMING CONVENTIONS
          */
+
+        if(!all_set)
+            return all_set;
+
         all_set=check_naming_conventions();
 
 

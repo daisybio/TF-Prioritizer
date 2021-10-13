@@ -26,6 +26,7 @@ Before using COM2POSE please install following software:
 - unzip must be usable in command line
 - [MEME suite](http://meme-suite.org/doc/download.html) for consensus approach between TEPIC and TGen
 - [BLACKLIST](https://github.com/Boyle-Lab/Blacklist/tree/master/lists) if you want to use the blacklist filter, download the corresponding list
+- [IGV and IGVtools](http://software.broadinstitute.org/software/igv/download) for automatic validation - IGV and IGVtools are needed. A solo IGV installation is not enough
 
 ## 4. Installation under Unix
 

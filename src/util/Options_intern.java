@@ -63,6 +63,10 @@ public class Options_intern
     public String folder_name_tepic_postprocessing_tfs = "TFs";
     public String folder_name_tepic_postprocessing_output_mean_affinities= "MeanAffinities";
     public String folder_name_tepic_postprocessing_output_ratios = "Ratios";
+    public String folder_name_tepic_postprocessing_open_chromatin_violins="open_chromatin_violin_plots";
+    public String folder_name_tepic_postprocessing_open_chromatin_violins_data="01_data";
+    public String folder_name_tepic_postprocessing_open_chromatin_violins_script="02_script";
+    public String folder_name_tepic_postprocessing_open_chromatin_violins_plots="03_open_chromatin_violin_plots";
     public String folder_name_tgen = "04_TGENE";
     public String folder_name_tgen_preprocessing = "01_preprocessing";
     public String folder_name_tgen_preprocessing_gtf = "01_GTF";
@@ -151,6 +155,9 @@ public class Options_intern
     public String file_suffix_tepic_postprocessing_output_mean_affinities ="Mean_Affinities_";
     public String file_suffix_tepic_postprocessing_output_ratios ="Ratio_Affinities_";
     public String file_suffix_tepic_postprocessing_tfs_tfs = "tfs.csv";
+    public String file_suffix_tepic_postprocessing_violin_plots_data = "hm_to_open_chromatin_lengths.csv";
+    public String file_suffix_tepic_postprocessing_violin_plots_script = "violin_plots_hm_to_open_chromatin_lengths.R";
+    public String file_suffix_tepic_postprocessing_violin_plots_plot ="open_chromatin_lengths_violin.png";
     public String file_suffix_tgen_preprocess_gtf = "_transcripts_only.gtf";
     public String file_suffix_tgen_output = "links.tsv";
     public String file_suffic_tgen_output_groups = "tgene_merged_groups.txt";
