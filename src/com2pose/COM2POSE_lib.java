@@ -6755,6 +6755,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
         }*/
 
+        logger.logLine("[TGENE] Used data: " + options_intern.tepic_input_directory);
 
 
         String command_base =options_intern.path_tgen+File.separator +"bin"+File.separator+"tgene";
@@ -6891,6 +6892,8 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
         }*/
+
+        logger.logLine("[TGENE] Used data: " + options_intern.tepic_input_directory);
 
         //create necessary folders for preprocessing
         File f_TGEN = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen);
@@ -8169,6 +8172,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
         }*/
+        logger.logLine("[TEPIC] Used data: " + options_intern.tepic_input_directory);
 
 
 
@@ -9451,6 +9455,10 @@ public class COM2POSE_lib
     public void mix_mutually_exclusive_peaks() throws IOException {
         logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Start mutually exclusive peaks calculation.");
         logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Preprocessing mutually exclusive peaks for binary tree comparison.");
+
+        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Used data: " + options_intern.tepic_input_directory);
+
+
         if(options_intern.mix_level.equals("SAMPLE_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
@@ -9486,6 +9494,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev=options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
         }
+
 
 
         File f_output_mix_option = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
@@ -9904,6 +9913,8 @@ public class COM2POSE_lib
         File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
         output_folder_new_input.mkdir();
 
+        logger.logLine("[BLACKLIST] Used input: " + options_intern.tepic_input_directory);
+
         //set new folder directory for tepic input and save old one
         options_intern.tepic_input_prev=options_intern.tepic_input_directory;
         options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
@@ -10203,6 +10214,8 @@ public class COM2POSE_lib
             options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
         }
 
+        logger.logLine("[FOOTPRINTS] Used data: " + options_intern.tepic_input_directory);
+
         File folder_input = new File(options_intern.tepic_input_directory);
 
         File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
@@ -10435,6 +10448,8 @@ public class COM2POSE_lib
 
         File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
         f_sample_mix_output.mkdir();
+
+        logger.logLine("[MIX] Used data: " + options_intern.tepic_input_directory);
 
         if(options_intern.mix_level.equals("SAMPLE_LEVEL"))
         {
