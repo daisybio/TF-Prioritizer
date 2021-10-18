@@ -64,7 +64,7 @@ ensg_sym_map="NOT_SET"
 tpm_cutoff=-1.0
 tgene_file="NOT_SET"
 #Parsing command line
-while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjtG:T:A:E:L:" o;
+while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjtG:T:A:E:L:B:" o;
 do
 case $o in
 	g)	genome=$OPTARG;;
@@ -98,6 +98,7 @@ case $o in
   A) gene_annot_desq2=$OPTARG;;
   E) ensg_sym_map=$OPTARG;;
   L) tgene_file=$OPTARG;;
+  B) between_gaps=$OPTARG;;
 esac
 done
 
@@ -281,8 +282,15 @@ echo "[Metrics]" >> $metadatafile
 numReg=`wc -l $regions | cut -f 1 -d " "`
 echo "Number of provided regions	"$numReg >> $metadatafile
 numMat=`grep ">" $pwms | wc -l`
-echo "Number of considered pwms	"$numMat >> $metadatafile 
+echo "Number of considered pwms	"$numMat >> $metadatafile
 
+#not needed anymore this is a corpse
+#if [ $between_gaps == "BETWEEN" ]; then
+#  regions_altered=${prefix}_between_peaks.bed
+#  echo "python3 between_gaps.py ${regions} ${regions_altered}"
+#  python3 ${working_dir}/between_gaps.py $regions $regions_altered
+#  regions=regions_altered
+#fi
 
 echo "Preprocessing region file: Removing chr prefix, sorting regions and removing duplicats"
 sed 's/chr//g' $regions >  ${filteredRegions}_Filtered_Regions.bed
@@ -295,7 +303,7 @@ echo "Preprocessing background file"
 sed 's/chr//g' $backgroundRegions >  ${filteredRegions}_Filtered_Regions_background.bed
 sort -s -k1,1 -k2,2 -k3,3 ${filteredRegions}_Filtered_Regions_background.bed | uniq > ${prefix}_Random_Regions.bed
 rm ${filteredRegions}_Filtered_Regions_background.bed
-fi 
+fi
 
 if [ -n "$filter" ];
 then
@@ -315,17 +323,17 @@ fi
 
 if [ ${chrPrefix} == "TRUE" ];
 then
-	echo "Adapting chr prefix in bed files for intersection with the reference genome"
-	awk '{print "chr"$1"\t"$2"\t"$3}' ${filteredRegions}_sorted.bed > ${prefix}_tempFasta.bed
-	getFastaRegion=${prefix}_tempFasta.bed
-	if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ]; 
-		then
-		awk '{print "chr"$1"\t"$2"\t"$3}' ${prefix}_Random_Regions.bed > ${prefix}_tempFastaRandom.bed
-		getFastaRegionRandom=${prefix}_tempFastaRandom.bed
-		fi
+  echo "Adapting chr prefix in bed files for intersection with the reference genome"
+  awk '{print "chr"$1"\t"$2"\t"$3}' ${filteredRegions}_sorted.bed > ${prefix}_tempFasta.bed
+  getFastaRegion=${prefix}_tempFasta.bed
+  if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
+    then
+    awk '{print "chr"$1"\t"$2"\t"$3}' ${prefix}_Random_Regions.bed > ${prefix}_tempFastaRandom.bed
+    getFastaRegionRandom=${prefix}_tempFastaRandom.bed
+    fi
 else
-	getFastaRegion=${filteredRegions}_sorted.bed
-	getFastaRegionRandom=${prefix}_Random_Regions.bed
+  getFastaRegion=${filteredRegions}_sorted.bed
+  getFastaRegionRandom=${prefix}_Random_Regions.bed
 fi
 
 echo "Runnig bedtools"

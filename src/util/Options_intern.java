@@ -38,6 +38,7 @@ public class Options_intern
     public String folder_name_mix_option_mutually_exclusive = "02_MUTUALLY_EXCLUSIVE";
     public String folder_name_mix_option_mutually_exclusive_preprocessing = "01_PREPROCESSING";
     public String folder_name_mix_options_mutually_exclusive_input = "02_NEW_INPUT";
+    public String folder_name_mix_options_footprints_between_peaks = "04_FOOTPRINTS";
     public String folder_name_blacklisted_regions = "01_blacklisted_regions";
     public String folder_name_blacklisted_regions_preprocessing = "01_preprocessing";
     public String folder_name_blacklisted_regions_preprocessing_perChr = "01_perChr";
@@ -303,7 +304,10 @@ public class Options_intern
     public boolean tepic_tgene_target_genes=true;
     //#[OPT]: randomize TEPIC output, default: false
     public boolean tepic_randomize_tf_gene_matrix=false;
-
+    //#[OPT]: option to search for TF binding sites BETWEEN peaks instead of INSIDE peaks (default INSIDE)
+    public String tepic_tf_binding_site_search="INSIDE";
+    //#[OPT]: maximal bps BETWEEN peaks (only applicable if tepic_tf_binding_site_search is set to BETWEEN) (default: 500)
+    public int tepic_between_max_bps=500;
     /*######################
      ####TGENE parameters###
      #######################*/

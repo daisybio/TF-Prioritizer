@@ -21,6 +21,12 @@ public class COM2POSE
             com2pose_lib.mix_option();
         }
 
+        //create footprints if needed
+        if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        {
+            com2pose_lib.create_footprints_between_peaks();
+        }
+
         //black listed regions filter
         if(!options_intern.black_list_dir.equals(""))
         {

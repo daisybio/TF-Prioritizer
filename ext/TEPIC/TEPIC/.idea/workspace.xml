@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../../../src/util/Footprint_Interval.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../config_templates/com2pose_template.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/../../../config_templates/com2pose_template.cfg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../src/COM2POSE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/COM2POSE.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../src/util/Options_intern.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/util/Options_intern.java" afterDir="false" />
@@ -31,7 +33,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/git_projects/jtg_bot_detection" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Code/between_gaps.py" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -40,7 +42,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Python.test_spongedb_db">
+  <component name="RunManager" selected="Python.between_gaps">
     <configuration name="DAVID_test" type="PythonConfigurationType" factoryName="Python">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -146,6 +148,28 @@
       <option name="PARAMETERS" value="$USER_HOME$/data/COM2POSE/07_requiredData_covid/gencode.v19.annotation.gtf $USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/03_A0_TEPIC_output_raw/Treatment/PolII/Treatment_PolII.broadPeak/Treatment_PolII.broadPeak_TEPIC_06_14_21_21_49_18_126565294_Affinity.txt --geneViewAffinity $USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/01_INC_TREATMENT_DEFAULT/working_dir/03_A0_TEPIC_output_raw/Treatment/PolII/Treatment_PolII.broadPeak/Treatment_PolII.broadPeak_TEPIC_06_14_21_21_49_18_126565294_Affinity.txt --windows 50000 --decay TRUE --geneBody FALSE --geneBody FALSE --normaliseLength TRUE --motifLength --additionalPeakFeatures TRUE --onlyPeakFeatures FALSE --transcript FALSE" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="true" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="between_gaps" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="TEPIC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python3.8" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Code" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Code/between_gaps.py" />
+      <option name="PARAMETERS" value="$USER_HOME$/data/COM2POSE/01_COM2POSE/15_TEST_BETWEEN_PEAKS/working_dir/01_blacklisted_regions/02_new_input/p13/H3K27ac/p13_H3K27ac.broadPeak $USER_HOME$/data/COM2POSE/01_COM2POSE/15_TEST_BETWEEN_PEAKS/working_dir/03_A0_TEPIC_output_raw/p13/H3K27ac/p13_H3K27ac.broadPeak/p13_H3K27ac.broadPeak_TEPIC_10_14_21_11_14_13_335351932_between_peaks.bed" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
@@ -351,6 +375,7 @@
       <item itemvalue="Python.analyse_tf_to_background_mannWhitneyU" />
       <item itemvalue="Python.annotateTSS" />
       <item itemvalue="Python.test_spongedb_db" />
+      <item itemvalue="Python.between_gaps" />
       <item itemvalue="Python.plot_mimat_target_genes_regression_coefficient" />
       <item itemvalue="Python.computeMeanRatioTFAffinities" />
       <item itemvalue="Python.filterGeneView" />
@@ -445,6 +470,8 @@
       <workItem from="1632731899513" duration="71000" />
       <workItem from="1632745910808" duration="343000" />
       <workItem from="1633551599908" duration="171000" />
+      <workItem from="1634196867115" duration="4866000" />
+      <workItem from="1634493893628" duration="13000" />
     </task>
     <servers />
   </component>
@@ -521,11 +548,6 @@
           <line>79</line>
           <option name="timeStamp" value="52" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/TestRun/test_spongedb_db.py</url>
-          <line>4</line>
-          <option name="timeStamp" value="54" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -539,6 +561,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/TEPIC$test_spongedb_db.coverage" NAME="test_spongedb_db Coverage Results" MODIFIED="1631609995806" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/TestRun" />
     <SUITE FILE_PATH="coverage/TEPIC$computeMeanRatioTFAffinities.coverage" NAME="computeMeanRatioTFAffinities Coverage Results" MODIFIED="1623653195912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MachineLearningPipelines/DYNAMITE/Scripts" />
+    <SUITE FILE_PATH="coverage/TEPIC$between_gaps.coverage" NAME="between_gaps Coverage Results" MODIFIED="1634203127033" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
     <SUITE FILE_PATH="coverage/TEPIC$test_boxplot_interactive.coverage" NAME="test_boxplot_interactive Coverage Results" MODIFIED="1615216729075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/00_test_COM2POSE/test_tgen_consensus/14_LIKE_10_TGENE_FILT_SELF_REG/working_dir/09_PLOTS_output/Pol2/0.1" />
     <SUITE FILE_PATH="coverage/TEPIC$analyse_tf_to_background.coverage" NAME="analyse_tf_to_background_mannWhitneyU Coverage Results" MODIFIED="1616764324102" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01_COM2POSE/06_LIKE_03_COMBINED_TGENE_TEPIC_COPY/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
     <SUITE FILE_PATH="coverage/TEPIC$analyse_tf_to_background_new.coverage" NAME="analyse_tf_to_background_new Coverage Results" MODIFIED="1626416933550" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/data/COM2POSE/01_COM2POSE/16_noTgen_ChIP_ATLAS/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />

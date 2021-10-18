@@ -5720,6 +5720,8 @@ public class COM2POSE_lib
     public void create_tgen_groups() throws IOException {
         logger.logLine("[TGENE] Create TGene group data");
 
+        check_tepic_input_with_options();
+        /*
         if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
@@ -5751,7 +5753,7 @@ public class COM2POSE_lib
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
-        }
+        }*/
 
         File folder_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_merged);
         File folder_output = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_groups);
@@ -6718,6 +6720,8 @@ public class COM2POSE_lib
     public void run_tgen() throws Exception {
         logger.logLine("[TGENE] Run TGene");
 
+        check_tepic_input_with_options();
+        /*
         if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
@@ -6749,7 +6753,9 @@ public class COM2POSE_lib
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
-        }
+        }*/
+
+
 
         String command_base =options_intern.path_tgen+File.separator +"bin"+File.separator+"tgene";
 
@@ -6844,6 +6850,8 @@ public class COM2POSE_lib
     public void preprocess_tgen() throws IOException {
         logger.logLine("[TGENE] Consensus approach with TGen is used. Preprocessing ...");
 
+        check_tepic_input_with_options();
+        /*
         if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
@@ -6861,6 +6869,12 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
         }
+        if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option + File.separator+options_intern.folder_name_mix_options_footprints_between_peaks;
+
+        }
         if(!options_intern.black_list_dir.equals(""))
         {
             File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
@@ -6876,7 +6890,7 @@ public class COM2POSE_lib
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
-        }
+        }*/
 
         //create necessary folders for preprocessing
         File f_TGEN = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen);
@@ -8121,6 +8135,9 @@ public class COM2POSE_lib
     public void run_tepic() throws Exception {
         logger.logLine("Start TEPIC.sh");
 
+        check_tepic_input_with_options();
+
+        /*
         if(options_intern.mix_level.equals("SAMPLE_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
@@ -8128,7 +8145,6 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
         }
-
         if(options_intern.mix_level.equals("HM_LEVEL"))
         {
             File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
@@ -8152,7 +8168,8 @@ public class COM2POSE_lib
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
-        }
+        }*/
+
 
 
         String command = "bash";
@@ -8256,6 +8273,8 @@ public class COM2POSE_lib
             command_tail += " -A " + options_intern.deseq2_input_gene_id;
         }
 
+        command_tail += " -B " + options_intern.tepic_tf_binding_site_search;
+
         File output_TEPIC = new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_tepic_output_raw);
         output_TEPIC.mkdir();
 
@@ -8347,7 +8366,7 @@ public class COM2POSE_lib
                 }
             }
         }
-        logger.logLine("Finished TEPIC.sh");
+        logger.logLine("[TEPIC] Finished TEPIC.sh");
     }
 
     /**
@@ -9449,6 +9468,14 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
         }
+
+        if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option + File.separator+options_intern.folder_name_mix_options_footprints_between_peaks;
+
+        }
+
         if(!options_intern.black_list_dir.equals(""))
         {
             File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
@@ -9459,6 +9486,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev=options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
         }
+
 
         File f_output_mix_option = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
         f_output_mix_option.mkdir();
@@ -9864,6 +9892,13 @@ public class COM2POSE_lib
      * Filter TEPIC input files for blacklisted regions
      */
     public void filter_blacklist() throws IOException {
+
+        if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option + File.separator+options_intern.folder_name_mix_options_footprints_between_peaks;
+
+        }
         File folder_input = new File(options_intern.tepic_input_directory);
         File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
         File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
@@ -9872,6 +9907,9 @@ public class COM2POSE_lib
         //set new folder directory for tepic input and save old one
         options_intern.tepic_input_prev=options_intern.tepic_input_directory;
         options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+
+
+
 
         logger.logLine("[BLACKLIST] Create chromosome binary trees.");
         //CREATE BINARY TREES
@@ -10139,6 +10177,249 @@ public class COM2POSE_lib
         logger.logLine("[BLACKLIST] finished preprocessing blacklist");
 
 
+    }
+
+    /**
+     * CREATES FOOTPRINTS OF GAPS BETWEEN PEAKS
+     * @throws IOException
+     */
+    public void create_footprints_between_peaks() throws IOException {
+        logger.logLine("[FOOTPRINTS] OPTION tepic_tf_binding_site_search=\"BETWEEN\" was set!");
+        logger.logLine("[FOOTPRINTS] creating footprints");
+
+
+        File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+        root_mix_working_dir.mkdir();
+
+        File f_sample_mix_preprocess = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix_preprocessing);
+        f_sample_mix_preprocess.mkdir();
+
+        File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+        f_sample_mix_output.mkdir();
+
+        if(options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        File folder_input = new File(options_intern.tepic_input_directory);
+
+        File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+        File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_mix_options_footprints_between_peaks);
+        output_folder_new_input.mkdirs();
+
+        //set new folder directory for tepic input and save old one
+        options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+        options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+
+
+        for(File f_tp : folder_input.listFiles())
+        {
+            if(f_tp.isDirectory())
+            {
+                String key_tp = f_tp.getName();
+                File f_output_tp = new File(output_folder_new_input.getAbsolutePath()+File.separator+key_tp);
+                f_output_tp.mkdir();
+
+                for(File f_hm : f_tp.listFiles())
+                {
+                    if(f_hm.isDirectory())
+                    {
+                        String key_hm = f_hm.getName();
+                        File f_output_tp_hm = new File(f_output_tp.getAbsolutePath()+File.separator+key_hm);
+                        f_output_tp_hm.mkdir();
+
+                        for(File f_sample : f_hm.listFiles())
+                        {
+                            if(f_sample.isFile())
+                            {
+                                File f_output_peak_file = new File(f_output_tp_hm.getAbsolutePath()+File.separator+f_sample.getName());
+
+                                //read in all regions in array list per chromosome
+                                HashMap<String,ArrayList<Footprint_Interval>> chr_regions = new HashMap<>();
+
+                                BufferedReader br_input_regions_chr = new BufferedReader(new FileReader(f_sample));
+                                String line_input_regions_chr ="";
+                                while((line_input_regions_chr=br_input_regions_chr.readLine())!=null)
+                                {
+                                    String[] split = line_input_regions_chr.split("\t");
+                                    if(chr_regions.containsKey(split[0]))
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        ArrayList<Footprint_Interval> fp_al = new ArrayList<>();
+                                        chr_regions.put(split[0],fp_al);
+                                    }
+
+                                }
+                                br_input_regions_chr.close();
+
+                                BufferedReader br_input_regions = new BufferedReader(new FileReader(f_sample));
+                                String line_input_regions ="";
+                                while((line_input_regions=br_input_regions.readLine())!=null)
+                                {
+                                    String[] split = line_input_regions.split("\t");
+
+                                    String chromosome = split[0];
+                                    int start = Integer.parseInt(split[1]);
+                                    int end = Integer.parseInt(split[2]);
+                                    String name = split[3];
+                                    int score = Integer.parseInt(split[4]);
+                                    String strand = split[5];
+                                    double signalValue = Double.parseDouble(split[6]);
+                                    double pValue = Double.parseDouble(split[7]);
+                                    double qValue = Double.parseDouble(split[8]);
+                                    Footprint_Interval fp = new Footprint_Interval(chromosome,start,end,name,score,strand,signalValue,pValue,qValue,line_input_regions);
+
+                                    ArrayList<Footprint_Interval> fp_al = chr_regions.get(chromosome);
+                                    fp_al.add(fp);
+                                }
+                                br_input_regions.close();
+
+                                //sort region array lists per chromosome
+                                for(String key_chr : chr_regions.keySet())
+                                {
+                                    Collections.sort(chr_regions.get(key_chr));
+                                }
+
+                                //determine chromosome order
+                                ArrayList<String> chromosome_ordered = new ArrayList<>();
+                                for(int i = 0; i < 100; i++)
+                                {
+                                    String search_chr = ""+i;
+                                    if(chr_regions.containsKey(search_chr))
+                                    {
+                                        chromosome_ordered.add(search_chr);
+                                    }
+                                }
+                                ArrayList<String> character_chromosomes = new ArrayList<>();
+                                for(String key_chr : chr_regions.keySet())
+                                {
+                                    if(!chromosome_ordered.contains(key_chr))
+                                        character_chromosomes.add(key_chr);
+                                }
+                                Collections.sort(character_chromosomes);
+                                if(character_chromosomes.get(0).matches(".*M.*"))
+                                {
+                                    String mt_chr = character_chromosomes.get(0);
+                                    character_chromosomes.remove(0);
+                                    character_chromosomes.add(mt_chr);
+                                }
+                                chromosome_ordered.addAll(character_chromosomes);
+
+
+                                //see if gaps between Footprint Intervals are < tepic_between_max_bps if so connect to one region for TEPIC
+
+                                for(String key_chr : chr_regions.keySet())
+                                {
+                                    ArrayList<Footprint_Interval> intervals = chr_regions.get(key_chr);
+
+                                    ArrayList<Footprint_Interval> intervals_combined = new ArrayList<>();
+
+                                    for(int i = 0; i < intervals.size(); i++)
+                                    {
+                                        int start_i = i;
+                                        int end_i = i;
+
+                                        int start_position = intervals.get(i).start;
+                                        int end_position = intervals.get(i).end;
+
+                                        String name = intervals.get(i).name;
+                                        int score = intervals.get(i).score;
+                                        String strand = intervals.get(i).strand;
+                                        double signalValue = intervals.get(i).signalValue;
+                                        double pValue = intervals.get(i).pValue;
+                                        double qValue = intervals.get(i).qValue;
+                                        
+
+                                        boolean include_next_peak=true;
+
+                                        while(include_next_peak)
+                                        {
+                                            if(end_i+1 >= intervals.size())
+                                                break;
+
+                                            int start_position_next = intervals.get(end_i+1).start;
+                                            int end_position_next = intervals.get(end_i+1).end;
+
+                                            int distance = start_position_next-end_position;
+
+                                            if(distance<options_intern.tepic_between_max_bps)
+                                            {
+                                                include_next_peak=true;
+                                                end_position=end_position_next;
+                                                name+=";"+intervals.get(end_i+1).name;
+                                                strand+=";"+intervals.get(end_i+1).strand;
+
+
+                                                score+=intervals.get(end_i+1).score;
+                                                signalValue+=intervals.get(end_i+1).signalValue;
+                                                pValue+=intervals.get(end_i+1).pValue;
+                                                qValue+=intervals.get(end_i+1).qValue;
+
+
+                                                end_i+=1;
+                                            }
+                                            else
+                                            {
+                                                include_next_peak=false;
+                                            }
+                                        }
+
+                                        if(start_i==end_i)
+                                        {
+                                            intervals_combined.add(intervals.get(i));
+                                        }
+                                        else
+                                        {
+                                            i = end_i+1;
+
+                                            int quotient = end_i - start_i +1;
+
+                                            score/=quotient;
+                                            signalValue/=quotient;
+                                            pValue/=quotient;
+                                            qValue/=quotient;
+
+
+                                            Footprint_Interval combined = new Footprint_Interval(key_chr,start_position,end_position,name,score,strand,signalValue,pValue,qValue);
+                                            combined.make_line();
+
+                                            intervals_combined.add(combined);
+                                        }
+                                    }
+                                    chr_regions.put(key_chr,intervals_combined);
+                                }
+
+                                //write output file
+
+                                BufferedWriter bw_out = new BufferedWriter(new FileWriter(f_output_peak_file));
+
+                                for(String key_chr : chromosome_ordered)
+                                {
+                                    ArrayList<Footprint_Interval> footprints = chr_regions.get(key_chr);
+
+                                    for(Footprint_Interval fpi : footprints)
+                                    {
+                                        bw_out.write(fpi.line);
+                                        bw_out.newLine();
+                                    }
+
+                                }
+
+                                bw_out.close();
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        logger.logLine("[FOOTPRINTS] finished footprints");
     }
 
     /**
@@ -10869,6 +11150,12 @@ public class COM2POSE_lib
                 case "tepic_randomize_tf_gene_matrix":
                     options_intern.tepic_randomize_tf_gene_matrix=Boolean.parseBoolean(split[1]);
                     break;
+                case "tepic_tf_binding_site_search":
+                    options_intern.tepic_tf_binding_site_search=split[1].substring(1,split[1].length()-1);
+                    break;
+                case "tepic_between_max_bps":
+                    options_intern.tepic_between_max_bps=Integer.parseInt(split[1]);
+                    break;
                 case "tgen_consensus":
                     options_intern.tgen_consensus=Double.parseDouble(split[1]);
                     break;
@@ -11185,6 +11472,19 @@ public class COM2POSE_lib
                 }
             }
         }
+
+        if(options_intern.tepic_tf_binding_site_search.equals("") || !(options_intern.tepic_tf_binding_site_search.equals("INSIDE") || options_intern.tepic_tf_binding_site_search.equals("BETWEEN")))
+        {
+            //check tf_binding_site_search option
+            logger.logLine("[TEPIC] tepic_tf_binding_site_search must be either INSIDE or BETWEEN");
+            all_set=false;
+        }
+        if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN") && options_intern.tepic_between_max_bps<=0)
+        {
+            logger.logLine("[TEPIC] tepic_tf_binding_site_search is set to 'BETWEEN', tepic_between_max_bps must be set > 0");
+            all_set=false;
+        }
+
 
         /**
          *check for map ensg symbol
@@ -12740,5 +13040,48 @@ public class COM2POSE_lib
         ret_obj.background=background;
 
         return ret_obj;
+    }
+
+    private void check_tepic_input_with_options()
+    {
+        if(options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_sample_mix);
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_sample_mix_output.getAbsolutePath();
+        }
+
+        if(options_intern.mix_option.equals("HM_LEVEL"))
+        {
+            File root_mix_working_dir = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option);
+            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath()+File.separator+options_intern.folder_name_mix_option_hm_mix);
+            f_output_hm.mkdir();
+
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory=f_output_hm.getAbsolutePath();
+        }
+        if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option + File.separator+options_intern.folder_name_mix_options_footprints_between_peaks;
+
+        }
+        if(!options_intern.black_list_dir.equals(""))
+        {
+            File output_folder = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_blacklisted_regions);
+            File output_folder_new_input = new File(output_folder.getAbsolutePath()+File.separator+options_intern.folder_name_blacklisted_regions_new_input);
+            output_folder_new_input.mkdir();
+
+            //set new folder directory for tepic input and save old one
+            options_intern.tepic_input_prev=options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
+        }
+
+        if(options_intern.mix_mutually_exclusive)
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
+        }
     }
 }
