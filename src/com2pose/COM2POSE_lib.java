@@ -11025,6 +11025,22 @@ public class COM2POSE_lib
 
         logger.logLine("Start reading config file at "+ options_intern.config_data_path);
 
+        File f_check_config = new File(options_intern.config_data_path);
+        if(!f_check_config.exists())
+        {
+            logger.logLine("[CHECK] config file does not exist. Please check path!");
+            logger.logLine("[CHECK] " + options_intern.config_data_path);
+            System.exit(1);
+        }
+
+        File f_check_working_dir = new File(options_intern.com2pose_working_directory);
+        if(!f_check_working_dir.exists())
+        {
+            logger.logLine("[CHECK] working directory does not exist. Please check path!");
+            logger.logLine("[CHECK] " + options_intern.com2pose_working_directory);
+            System.exit(1);
+        }
+
         BufferedReader br = new BufferedReader(new FileReader(new File(options_intern.config_data_path)));
         String line= "";
         while((line=br.readLine())!=null)
