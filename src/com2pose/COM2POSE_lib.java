@@ -2878,11 +2878,22 @@ public class COM2POSE_lib
                                         ensg_diff_gene_expr=group_clash_diff_gene_expr.get(k_group_clash);
                                     }
 
-                                    //double tg_score_1 = genecount_1*ensg_diff_gene_expr*gene_score1;
-                                    //double tg_score_2 = genecount_2*ensg_diff_gene_expr*gene_score2;
+                                    double tg_score_1 = 0;
+                                    double tg_score_2 = 0;
 
-                                    double tg_score_1 = ensg_diff_gene_expr*gene_score1;
-                                    double tg_score_2 = ensg_diff_gene_expr*gene_score2;
+                                    if(options_intern.plot_distribution_analysis_score_type.equals("EXCL_GENE_COUTNS"))
+                                    {
+                                        tg_score_1 = ensg_diff_gene_expr*gene_score1;
+                                        tg_score_2 = ensg_diff_gene_expr*gene_score2;
+                                    }
+                                    if(options_intern.plot_distribution_analysis_score_type.equals("GENE_COUNTS"))
+                                    {
+                                        tg_score_1 = genecount_1*ensg_diff_gene_expr*gene_score1;
+                                        tg_score_2 = genecount_2*ensg_diff_gene_expr*gene_score2;
+                                    }
+
+
+
 
                                     if(tg_score_1<0)
                                     {
@@ -11270,6 +11281,9 @@ public class COM2POSE_lib
                 case "plot_top_k_genes":
                     options_intern.plot_top_k_genes=Integer.parseInt(split[1]);
                     break;
+                case "plot_distribution_analysis_score_type":
+                    options_intern.plot_distribution_analysis_score_type=split[1].substring(1,split[1].length()-1);
+                    break;
                 case "website_interesting_tfs":
                     String[] split_interesting_tfs = split[1].substring(1,split[1].length()-1).split(";");
                     options_intern.website_interesting_tfs.addAll(Arrays.asList(split_interesting_tfs));
@@ -11667,6 +11681,16 @@ public class COM2POSE_lib
         if(options_intern.plot_mann_whitneyU_pvalue_cutoff<=0)
         {
             logger.logLine("[PLOTS] Mann WhitneyU pvalue cutoff must be > 0");
+            all_set=false;
+        }
+        if(options_intern.plot_distribution_analysis_score_type.equals(""))
+        {
+            logger.logLine("[PLOTS] plot_distribution_analysis_score_type must be either set to GENE_COUNTS or EXCL_GENE_COUNTS");
+            all_set=false;
+        }
+        if(!options_intern.plot_distribution_analysis_score_type.equals("GENE_COUNTS") && !options_intern.plot_distribution_analysis_score_type.equals("EXCL_GENE_COUNTS"))
+        {
+            logger.logLine("[PLOTS] plot_distribution_analysis_score_type must be either set to GENE_COUNTS or EXCL_GENE_COUNTS");
             all_set=false;
         }
 

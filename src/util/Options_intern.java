@@ -377,6 +377,8 @@ public class Options_intern
     public int plot_top_k_genes=30;
     //#[REQ]: mann-whitneyU pvalue cutoff (usually 0.05 or 0.01), default 0.01
     public double plot_mann_whitneyU_pvalue_cutoff=0.01;
+    //#[OPT]: score type: either including gene counts (more biased to biology) or excluding gene counts (more statistically) options: GENE_COUNTS, EXCL_GENE_COUNTS (default: EXCL_GENE_COUTNS)
+    public String plot_distribution_analysis_score_type="EXCL_GENE_COUTNS";
 
     /*#########################
       ####WEBSITE parameters###
