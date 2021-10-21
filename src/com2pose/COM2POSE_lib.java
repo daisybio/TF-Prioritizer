@@ -10458,8 +10458,8 @@ public class COM2POSE_lib
 
                                                 if(distance<options_intern.tepic_between_max_bps)
                                                 {
-                                                    end_position=start_position_next;
                                                     start_position = end_position;
+                                                    end_position=start_position_next;
 
                                                     name+=";"+intervals.get(end_i+1).name;
                                                     strand+=";"+intervals.get(end_i+1).strand;
@@ -11603,10 +11603,10 @@ public class COM2POSE_lib
             }
         }
 
-        if(options_intern.tepic_tf_binding_site_search.equals("") || !(options_intern.tepic_tf_binding_site_search.equals("INSIDE") || options_intern.tepic_tf_binding_site_search.equals("BETWEEN") || !options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN")))
+        if(options_intern.tepic_tf_binding_site_search.equals("") || !(options_intern.tepic_tf_binding_site_search.equals("INSIDE") || options_intern.tepic_tf_binding_site_search.equals("BETWEEN") || options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN")))
         {
             //check tf_binding_site_search option
-            logger.logLine("[TEPIC] tepic_tf_binding_site_search must be either INSIDE or BETWEEN");
+            logger.logLine("[TEPIC] tepic_tf_binding_site_search must be either INSIDE or BETWEEN or EXCL_BETWEEN");
             all_set=false;
         }
         if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN") && options_intern.tepic_between_max_bps<=0)
