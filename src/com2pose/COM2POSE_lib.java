@@ -2881,7 +2881,7 @@ public class COM2POSE_lib
                                     double tg_score_1 = 0;
                                     double tg_score_2 = 0;
 
-                                    if(options_intern.plot_distribution_analysis_score_type.equals("EXCL_GENE_COUTNS"))
+                                    if(options_intern.plot_distribution_analysis_score_type.equals("EXCL_GENE_COUNTS"))
                                     {
                                         tg_score_1 = ensg_diff_gene_expr*gene_score1;
                                         tg_score_2 = ensg_diff_gene_expr*gene_score2;

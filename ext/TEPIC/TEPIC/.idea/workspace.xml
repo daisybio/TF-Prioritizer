@@ -42,7 +42,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Python.between_gaps">
+  <component name="RunManager" selected="Python.analyse_tf_to_background">
     <configuration name="DAVID_test" type="PythonConfigurationType" factoryName="Python">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -73,12 +73,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="/usr/bin/python3.8" />
-      <option name="WORKING_DIRECTORY" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/data/COM2POSE/01_COM2POSE/18_EXCL_BETWEEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/02_HM/Pol2" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$USER_HOME$/data/COM2POSE/01B_COM2POSE_covid/03_LIKE_01_NO_TGEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/01_ALL/analyse_tf_to_background.py" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/data/COM2POSE/01_COM2POSE/18_EXCL_BETWEEN/working_dir/07_DISTRIBUTION_ANALYSIS/03_PLOT_SCRIPTS/02_HM/Pol2/analyse_tf_to_background.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
