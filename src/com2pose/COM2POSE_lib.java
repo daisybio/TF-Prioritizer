@@ -10337,86 +10337,171 @@ public class COM2POSE_lib
 
                                 //see if gaps between Footprint Intervals are < tepic_between_max_bps if so connect to one region for TEPIC
 
-                                for(String key_chr : chr_regions.keySet())
+                                if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
                                 {
-                                    ArrayList<Footprint_Interval> intervals = chr_regions.get(key_chr);
-
-                                    ArrayList<Footprint_Interval> intervals_combined = new ArrayList<>();
-
-                                    for(int i = 0; i < intervals.size(); i++)
+                                    for(String key_chr : chr_regions.keySet())
                                     {
-                                        int start_i = i;
-                                        int end_i = i;
+                                        ArrayList<Footprint_Interval> intervals = chr_regions.get(key_chr);
 
-                                        int start_position = intervals.get(i).start;
-                                        int end_position = intervals.get(i).end;
+                                        ArrayList<Footprint_Interval> intervals_combined = new ArrayList<>();
 
-                                        String name = intervals.get(i).name;
-                                        int score = intervals.get(i).score;
-                                        String strand = intervals.get(i).strand;
-                                        double signalValue = intervals.get(i).signalValue;
-                                        double pValue = intervals.get(i).pValue;
-                                        double qValue = intervals.get(i).qValue;
-                                        
-
-                                        boolean include_next_peak=true;
-
-                                        while(include_next_peak)
+                                        for(int i = 0; i < intervals.size(); i++)
                                         {
-                                            if(end_i+1 >= intervals.size())
-                                                break;
+                                            int start_i = i;
+                                            int end_i = i;
 
-                                            int start_position_next = intervals.get(end_i+1).start;
-                                            int end_position_next = intervals.get(end_i+1).end;
+                                            int start_position = intervals.get(i).start;
+                                            int end_position = intervals.get(i).end;
 
-                                            int distance = start_position_next-end_position;
+                                            String name = intervals.get(i).name;
+                                            int score = intervals.get(i).score;
+                                            String strand = intervals.get(i).strand;
+                                            double signalValue = intervals.get(i).signalValue;
+                                            double pValue = intervals.get(i).pValue;
+                                            double qValue = intervals.get(i).qValue;
 
-                                            if(distance<options_intern.tepic_between_max_bps)
+
+                                            boolean include_next_peak=true;
+
+                                            while(include_next_peak)
                                             {
-                                                include_next_peak=true;
-                                                end_position=end_position_next;
-                                                name+=";"+intervals.get(end_i+1).name;
-                                                strand+=";"+intervals.get(end_i+1).strand;
+                                                if(end_i+1 >= intervals.size())
+                                                    break;
+
+                                                int start_position_next = intervals.get(end_i+1).start;
+                                                int end_position_next = intervals.get(end_i+1).end;
+
+                                                int distance = start_position_next-end_position;
+
+                                                if(distance<options_intern.tepic_between_max_bps)
+                                                {
+                                                    include_next_peak=true;
+                                                    end_position=end_position_next;
+                                                    name+=";"+intervals.get(end_i+1).name;
+                                                    strand+=";"+intervals.get(end_i+1).strand;
 
 
-                                                score+=intervals.get(end_i+1).score;
-                                                signalValue+=intervals.get(end_i+1).signalValue;
-                                                pValue+=intervals.get(end_i+1).pValue;
-                                                qValue+=intervals.get(end_i+1).qValue;
+                                                    score+=intervals.get(end_i+1).score;
+                                                    signalValue+=intervals.get(end_i+1).signalValue;
+                                                    pValue+=intervals.get(end_i+1).pValue;
+                                                    qValue+=intervals.get(end_i+1).qValue;
 
 
-                                                end_i+=1;
+                                                    end_i+=1;
+                                                }
+                                                else
+                                                {
+                                                    include_next_peak=false;
+                                                }
+                                            }
+
+                                            if(start_i==end_i)
+                                            {
+                                                intervals_combined.add(intervals.get(i));
                                             }
                                             else
                                             {
-                                                include_next_peak=false;
+                                                i = end_i+1;
+
+                                                int quotient = end_i - start_i +1;
+
+                                                score/=quotient;
+                                                signalValue/=quotient;
+                                                pValue/=quotient;
+                                                qValue/=quotient;
+
+
+                                                Footprint_Interval combined = new Footprint_Interval(key_chr,start_position,end_position,name,score,strand,signalValue,pValue,qValue);
+                                                combined.make_line();
+
+                                                intervals_combined.add(combined);
                                             }
                                         }
-
-                                        if(start_i==end_i)
-                                        {
-                                            intervals_combined.add(intervals.get(i));
-                                        }
-                                        else
-                                        {
-                                            i = end_i+1;
-
-                                            int quotient = end_i - start_i +1;
-
-                                            score/=quotient;
-                                            signalValue/=quotient;
-                                            pValue/=quotient;
-                                            qValue/=quotient;
-
-
-                                            Footprint_Interval combined = new Footprint_Interval(key_chr,start_position,end_position,name,score,strand,signalValue,pValue,qValue);
-                                            combined.make_line();
-
-                                            intervals_combined.add(combined);
-                                        }
+                                        chr_regions.put(key_chr,intervals_combined);
                                     }
-                                    chr_regions.put(key_chr,intervals_combined);
                                 }
+
+                                if(options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
+                                {
+                                    for(String key_chr : chr_regions.keySet())
+                                    {
+                                        ArrayList<Footprint_Interval> intervals = chr_regions.get(key_chr);
+
+                                        ArrayList<Footprint_Interval> intervals_combined = new ArrayList<>();
+
+                                        for(int i = 0; i < intervals.size(); i++)
+                                        {
+                                            int start_i = i;
+                                            int end_i = i;
+
+                                            int start_position = intervals.get(i).start;
+                                            int end_position = intervals.get(i).end;
+
+                                            String name = intervals.get(i).name;
+                                            int score = intervals.get(i).score;
+                                            String strand = intervals.get(i).strand;
+                                            double signalValue = intervals.get(i).signalValue;
+                                            double pValue = intervals.get(i).pValue;
+                                            double qValue = intervals.get(i).qValue;
+
+                                            if(end_i+1 >= intervals.size())
+                                            {
+                                                intervals_combined.add(intervals.get(i));
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                int start_position_next = intervals.get(end_i+1).start;
+                                                int end_position_next = intervals.get(end_i+1).end;
+
+                                                int distance = start_position_next-end_position;
+
+                                                if(distance<options_intern.tepic_between_max_bps)
+                                                {
+                                                    end_position=start_position_next;
+                                                    start_position = end_position;
+
+                                                    name+=";"+intervals.get(end_i+1).name;
+                                                    strand+=";"+intervals.get(end_i+1).strand;
+
+
+                                                    score+=intervals.get(end_i+1).score;
+                                                    signalValue+=intervals.get(end_i+1).signalValue;
+                                                    pValue+=intervals.get(end_i+1).pValue;
+                                                    qValue+=intervals.get(end_i+1).qValue;
+
+
+                                                    end_i+=1;
+
+                                                }
+                                            }
+
+                                            if(start_i==end_i)
+                                            {
+                                                intervals_combined.add(intervals.get(i));
+                                            }
+                                            else
+                                            {
+                                                i = end_i+1;
+
+                                                int quotient = end_i - start_i +1;
+
+                                                score/=quotient;
+                                                signalValue/=quotient;
+                                                pValue/=quotient;
+                                                qValue/=quotient;
+
+
+                                                Footprint_Interval combined = new Footprint_Interval(key_chr,start_position,end_position,name,score,strand,signalValue,pValue,qValue);
+                                                combined.make_line();
+
+                                                intervals_combined.add(combined);
+                                            }
+                                        }
+                                        chr_regions.put(key_chr,intervals_combined);
+                                    }
+                                }
+
 
                                 //write output file
 
@@ -11518,7 +11603,7 @@ public class COM2POSE_lib
             }
         }
 
-        if(options_intern.tepic_tf_binding_site_search.equals("") || !(options_intern.tepic_tf_binding_site_search.equals("INSIDE") || options_intern.tepic_tf_binding_site_search.equals("BETWEEN")))
+        if(options_intern.tepic_tf_binding_site_search.equals("") || !(options_intern.tepic_tf_binding_site_search.equals("INSIDE") || options_intern.tepic_tf_binding_site_search.equals("BETWEEN") || !options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN")))
         {
             //check tf_binding_site_search option
             logger.logLine("[TEPIC] tepic_tf_binding_site_search must be either INSIDE or BETWEEN");

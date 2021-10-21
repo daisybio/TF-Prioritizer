@@ -22,7 +22,7 @@ public class COM2POSE
         }
 
         //create footprints if needed
-        if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        if(options_intern.tepic_tf_binding_site_search.equals("BETWEEN") || options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
         {
             com2pose_lib.create_footprints_between_peaks();
         }
