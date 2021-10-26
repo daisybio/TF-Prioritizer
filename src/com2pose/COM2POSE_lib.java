@@ -10206,7 +10206,7 @@ public class COM2POSE_lib
      * @throws IOException
      */
     public void create_footprints_between_peaks() throws IOException {
-        logger.logLine("[FOOTPRINTS] OPTION tepic_tf_binding_site_search=\"BETWEEN\" was set!");
+        logger.logLine("[FOOTPRINTS] OPTION tepic_tf_binding_site_search=\""+options_intern.tepic_tf_binding_site_search+"\" was set!");
         logger.logLine("[FOOTPRINTS] creating footprints");
 
 
