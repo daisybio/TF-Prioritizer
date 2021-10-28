@@ -11856,6 +11856,13 @@ public class COM2POSE_lib
                 all_set=false;
             }
 
+            File f_igv_tools = new File(options_intern.igv_path_to_igv+File.separator+"igvtools");
+            if(!f_igv_tools.exists())
+            {
+                all_set=false;
+                logger.logLine("[IGV] igvtools does not exists. Please make sure that you download the full installation of IGV");
+            }
+
             Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
