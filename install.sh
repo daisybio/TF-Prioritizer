@@ -37,3 +37,26 @@ sudo apt-get install bedtools python3 unzip
 
 # Install required python packages
 python3 -m pip install -r install/requirements.txt
+
+# Install MEME Suite
+if meme -version; then
+    echo "MEME already installed."
+else
+    echo "Installing MEME."
+    wget https://meme-suite.org/meme/meme-software/5.4.1/meme-5.4.1.tar.gz
+    tar -xf meme-5.4.1.tar.gz
+    rm meme-5.4.1.tar.gz
+    cd meme-5.4.1
+    ./configure --prefix=$HOME/.meme --enable-build-libxml2 --enable-build-libxslt
+    make
+    make test
+    make install
+    cd ..
+
+    touch $HOME/.profile
+
+    echo "PATH=\"\$PATH:/home/nico/.meme/libexec/meme-5.4.1:/home/nico/.meme/bin\"" >>$HOME/.profile
+    rm -rf meme-5.4.1
+    
+    echo "Finished MEME installation."
+fi
