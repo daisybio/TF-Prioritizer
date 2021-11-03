@@ -46,6 +46,7 @@ else
     wget https://meme-suite.org/meme/meme-software/5.4.1/meme-5.4.1.tar.gz
     tar -xf meme-5.4.1.tar.gz
     rm meme-5.4.1.tar.gz
+
     cd meme-5.4.1
     ./configure --prefix=$HOME/.meme --enable-build-libxml2 --enable-build-libxslt
     make
@@ -57,6 +58,18 @@ else
 
     echo "PATH=\"\$PATH:/home/nico/.meme/libexec/meme-5.4.1:/home/nico/.meme/bin\"" >>$HOME/.profile
     rm -rf meme-5.4.1
-    
+
     echo "Finished MEME installation."
 fi
+
+# TODO:
+# Install command line IGV and igvtools 
+# wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
+# unzip IGV_2.11.2.zip
+# rm IGV_2.11.2.zip
+# Further installation?
+
+# C++ Compiler?
+# Blacklist?
+# Java installation?
+# Version freezing?
