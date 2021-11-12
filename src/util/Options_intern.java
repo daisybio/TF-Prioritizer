@@ -31,6 +31,7 @@ public class Options_intern
     public String distribution_analysis_all_name = "ALL";
 
     public String folder_name_mix_option = "00_MIX_OPTION";
+    public String folder_name_mix_option_preprocessing_check_chr = "00_chromosome_annotation checking";
     public String folder_name_mix_option_sample_mix_preprocessing = "00_PREPROCESSING_SAMPLE_MIX";
     public String folder_name_mix_option_sample_mix = "01_SAMPLE_MIX";
     public String folder_name_mix_option_preprocess_hm_mix = "02_PREPROCESS_HM_MIX";
@@ -138,6 +139,7 @@ public class Options_intern
     public String folder_out_chip_atlas_peak_files = "02_CHIP_ATLAS_PEAK_FILES";
     public String folder_out_igv = "09_IGV_screenshots";
     public String folder_out_igv_own_data="01_own_tf_data";
+    public String folder_out_igv_session = "A_SESSIONS";
     public String folder_out_igv_chip_atlas_data="02_chip_atlas_tf_data";
     public String folder_out_igv_chipAtlas_chrWide_genomeWide_views = "03_chip_atlas_chrWide_genomeWide_views";
 
@@ -179,6 +181,7 @@ public class Options_intern
     public String file_suffix_distribution_analysis_dcg = "dcg_stats.csv";
     public String file_suffix_chip_atlas_list_zipped = "chip_atlas_file_list.zip";
     public String file_suffix_chip_atlas_list_csv = "chip_atlas_file_list.csv";
+    public String file_suffix_session = "session.xml";
 
     public String html_report_home_home = "HOME.html";
     public String html_report_home_regression_coefficient_analysis = "HOME_REGRESSION.html";

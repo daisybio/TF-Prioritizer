@@ -15,6 +15,8 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
+        com2pose_lib.check_chromosomes();
+
         //mix histone modifications
         if(!options_intern.mix_level.equals(""))
         {
@@ -151,19 +153,19 @@ public class COM2POSE
         opt_path_to_COM2POSE.setRequired(true);
         options.addOption(opt_path_to_COM2POSE);
 
-        Option opt_tgen = new Option("t","tgen-dir", true, "[OPT]: use a consensus approach of TGen and TEPIC, provide directory to MEME suite installation folder here");
+        Option opt_tgen = new Option("t","tgen-dir", true, "[OPT]: Use a consensus approach of TGen and TEPIC, provide directory to MEME suite installation folder here");
         options.addOption(opt_tgen);
 
-        Option opt_write_logfile = new Option("l","write-log-file",false,"[OPT]: if flag is set no logfile will be written, default: logfile will be written");
+        Option opt_write_logfile = new Option("l","write-log-file",false,"[OPT]: If flag is set no logfile will be written, default: logfile will be written");
         options.addOption(opt_write_logfile);
 
-        Option opt_do_ensg_mapping = new Option("m","do-ensg-mapping",false,"[OPT]: if flag is set no ensg mapping will be done (only use when biomart error)");
+        Option opt_do_ensg_mapping = new Option("m","do-ensg-mapping",false,"[OPT]: If flag is set no ensg mapping will be done (only use when biomart error)");
         options.addOption(opt_do_ensg_mapping);
 
-        Option opt_do_tpm_length_calculation = new Option("a","do-tpm-length-calculation",false,"[OPT]: if flag is set no tpm length calculation will be done (only use when biomart error)");
+        Option opt_do_tpm_length_calculation = new Option("a","do-tpm-length-calculation",false,"[OPT]: If flag is set no tpm length calculation will be done (only use when biomart error)");
         options.addOption(opt_do_tpm_length_calculation);
 
-        Option opt_do_position_calculation = new Option("b","do-position-calculations",false,"[OPT]: if flag is set no gene position retrieval via biomart will be done (only use when biomart error)");
+        Option opt_do_position_calculation = new Option("b","do-position-calculations",false,"[OPT]: If flag is set no gene position retrieval via biomart will be done (only use when biomart error)");
         options.addOption(opt_do_position_calculation);
 
 
