@@ -346,7 +346,8 @@ public class COM2POSE_lib
             String tf = tfs_in_order.get(i);
             if(which_tfs.contains(tf))
             {
-                File f_output_tf = new File(f_output_root.getAbsolutePath()+File.separator+i+"_"+tf);
+                int rank = i+1;
+                File f_output_tf = new File(f_output_root.getAbsolutePath()+File.separator+rank+"_"+tf);
                 f_output_tf.mkdir();
                 File f_out_session = new File(f_output_tf.getAbsolutePath()+File.separator+options_intern.folder_out_igv_session);
                 f_out_session.mkdir();
@@ -658,10 +659,6 @@ public class COM2POSE_lib
                                 response=in.readLine();
                                 //logger.logLine("[IGV] " + response);
 
-                                out.println("new");
-                                response = in.readLine();
-                                //logger.logLine("[IGV] " + response);
-
                                 File f_snapshot_made=new File("NO");
 
                                 //search png name
@@ -705,10 +702,15 @@ public class COM2POSE_lib
 
 
 
-                                socket.close();
 
                                 count++;
                             }
+
+                            out.println("new");
+                            response = in.readLine();
+                            //logger.logLine("[IGV] " + response);
+
+                            socket.close();
 
                             //new session -> clear tracks
                             /*logger.logLine("[IGV] "+ "new");
@@ -1328,7 +1330,7 @@ public class COM2POSE_lib
                                 out.println(load_tf_chip_seq);
                                 String response_load = in.readLine();
 
-                                load_bed_files_overall+=f_bed_files.getAbsolutePath();
+                                load_bed_files_overall+=" "+f_bed_files.getAbsolutePath();
 
                             }
 
