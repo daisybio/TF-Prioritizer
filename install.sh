@@ -82,3 +82,25 @@ rm IGV_2.11.2.zip
 
 # Install GCC 9.3.0
 sudo apt-get install build-essential
+
+# Install additional Java packages
+
+# Install org.apache.commons.compress
+wget https://dlcdn.apache.org//commons/compress/binaries/commons-compress-1.21-bin.tar.gz
+tar -xf commons-compress-1.21-bin.tar.gz
+rm commons-compress-1.21-bin.tar.gz
+mkdir -p lib
+mv commons-compress-1.21 lib/commons-compress-1.21
+
+# Install org.apache.commons.cli
+wget https://dlcdn.apache.org//commons/cli/binaries/commons-cli-1.5.0-bin.tar.gz
+tar -xf commons-cli-1.5.0-bin.tar.gz
+rm commons-cli-1.5.0-bin.tar.gz
+mv commons-cli-1.5.0 lib/commons-cli-1.5.0
+
+# Install weka classifier
+wget http://www.java2s.com/Code/JarDownload/weka/weka.jar.zip
+unzip weka.jar.zip
+rm weka.jar.zip
+mkdir -p lib/weka
+mv weka.jar lib/weka/weka.jar
