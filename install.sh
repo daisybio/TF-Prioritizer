@@ -23,6 +23,16 @@ else
     echo "Finished R installation."
 fi
 
+if java --version; then
+    echo "Java already installed."
+else
+    echo "Installing Java."
+
+    sudo apt-get install openjdk-17-jdk openjdk-17-demo openjdk-17-doc openjdk-17-jre-headless openjdk-17-source openjdk-17-jre
+
+    echo "Finished Java installation."
+fi
+
 # Install dependencies for R packages
 sudo apt-get install libcurl4-openssl-dev libxml2-dev
 
@@ -62,14 +72,9 @@ else
     echo "Finished MEME installation."
 fi
 
-# TODO:
-# Install command line IGV and igvtools 
-# wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
-# unzip IGV_2.11.2.zip
-# rm IGV_2.11.2.zip
-# Further installation?
+# Install command line IGV and igvtools
+wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
+unzip IGV_2.11.2.zip
+rm IGV_2.11.2.zip
 
 # C++ Compiler?
-# Blacklist?
-# Java installation?
-# Version freezing?
