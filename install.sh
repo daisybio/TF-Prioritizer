@@ -66,7 +66,7 @@ else
 
     touch $HOME/.profile
 
-    echo "PATH=\"\$PATH:/home/nico/.meme/libexec/meme-5.4.1:/home/nico/.meme/bin\"" >>$HOME/.profile
+    echo "PATH=\"\$PATH:$HOME/.meme/libexec/meme-5.4.1:/home/nico/.meme/bin\"" >>$HOME/.profile
     rm -rf meme-5.4.1
 
     echo "Finished MEME installation."
