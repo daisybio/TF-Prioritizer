@@ -42,6 +42,9 @@ sudo chown -R $USER /usr/lib/R/library
 # Install DESeq2 R package
 Rscript install/deseq2.R
 
+# Install R packages required for TEPIC
+Rscript ext/TEPIC/TEPIC/Code/installRpackages.R
+
 # Install some more linux packages
 sudo apt-get install bedtools python3 unzip
 
