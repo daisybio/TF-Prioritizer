@@ -76,9 +76,11 @@ else
 fi
 
 # Install command line IGV and igvtools
-wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
-unzip IGV_2.11.2.zip
-rm IGV_2.11.2.zip
+if [ ! -d "IGV_2.11.2" ]; then
+    wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
+    unzip IGV_2.11.2.zip
+    rm IGV_2.11.2.zip
+fi
 
 # Install GCC 9.3.0
 sudo apt-get install build-essential
