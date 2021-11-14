@@ -14,15 +14,14 @@ public class atac_seq_download_cancer_blocks {
     public String input_gdc_sample_sheet = "";
     public String input_clinical = "";
 
-    public String output_directory ="";
+    public String output_directory = "";
 
     public HashSet<String> groups = new HashSet<>();
-    public String other_samples ="";
+    public String other_samples = "";
 
     //rna_seq only
-    public String input_dir_root="";
-    public int number_groups= -1;
-
+    public String input_dir_root = "";
+    public int number_groups = -1;
 
 
 }

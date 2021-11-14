@@ -2,7 +2,7 @@ package util;
 
 import java.text.DecimalFormat;
 
-public class Analysis_distribution_stats implements Comparable{
+public class Analysis_distribution_stats implements Comparable {
     public String label = "";
     public double sum_all_values = 0;
     public double number_target_genes = 0;
@@ -11,43 +11,35 @@ public class Analysis_distribution_stats implements Comparable{
     public double quantile_95 = 0;
     public double quantile_99 = 0;
 
-    public Analysis_distribution_stats(){}
+    public Analysis_distribution_stats() {
+    }
 
 
-    @Override
-    public int compareTo(Object o) {
+    @Override public int compareTo(Object o) {
         Analysis_distribution_stats other = (Analysis_distribution_stats) o;
 
-        if(other.median > this.median)
-        {
+        if (other.median > this.median) {
             return 1;
         }
-        if(other.median < this.median)
-        {
+        if (other.median < this.median) {
             return -1;
         }
 
-        if(other.quantile_95 > this.quantile_95)
-        {
+        if (other.quantile_95 > this.quantile_95) {
             return 1;
         }
-        if(other.quantile_95 < this.quantile_95)
-        {
+        if (other.quantile_95 < this.quantile_95) {
             return -1;
         }
 
-        if(other.quantile_99 > this.quantile_99)
-        {
+        if (other.quantile_99 > this.quantile_99) {
             return 1;
-        }
-        else
-        {
+        } else {
             return -1;
         }
     }
 
-    public String to_html_String(Analysis_distribution_stats background)
-    {
+    public String to_html_String(Analysis_distribution_stats background) {
         DecimalFormat df = new DecimalFormat("0.00");
 
         StringBuilder sb = new StringBuilder();
@@ -106,7 +98,7 @@ public class Analysis_distribution_stats implements Comparable{
         sb.append("\t\t</table>\n");
 
 
-        return  sb.toString();
+        return sb.toString();
 
     }
 }
