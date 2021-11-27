@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Prerequisits
-# sudo usermod -a -G staff $USER
-
 if R --version; then
     echo "R already installed."
 else
@@ -42,7 +39,7 @@ fi
 sudo apt-get install libcurl4-openssl-dev libxml2-dev libssl-dev
 
 # Make libraries writeable for active user
-sudo chown -R "$USER" /usr/lib/R/library
+sudo chown -R "$USER" /usr/local/lib/R/site-library
 
 # Install DESeq2 R package
 Rscript install/r_dependencies.R
