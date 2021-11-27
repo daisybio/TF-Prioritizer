@@ -91,7 +91,7 @@ sudo apt-get install build-essential
 mkdir -p ext/lib
 
 # Install org.apache.commons.compress
-if [ ! -d "lib/commons-compress-1.21" ]; then
+if [ ! -d "ext/lib/commons-compress-1.21" ]; then
     wget https://dlcdn.apache.org//commons/compress/binaries/commons-compress-1.21-bin.tar.gz
     tar -xf commons-compress-1.21-bin.tar.gz
     rm commons-compress-1.21-bin.tar.gz
@@ -99,7 +99,7 @@ if [ ! -d "lib/commons-compress-1.21" ]; then
 fi
 
 # Install org.apache.commons.cli
-if [ ! -d "lib/commons-cli-1.5.0" ]; then
+if [ ! -d "ext/lib/commons-cli-1.5.0" ]; then
     wget https://dlcdn.apache.org//commons/cli/binaries/commons-cli-1.5.0-bin.tar.gz
     tar -xf commons-cli-1.5.0-bin.tar.gz
     rm commons-cli-1.5.0-bin.tar.gz
@@ -107,7 +107,7 @@ if [ ! -d "lib/commons-cli-1.5.0" ]; then
 fi
 
 # Install weka classifier
-if [ ! -d "lib/weka" ]; then
+if [ ! -d "ext/lib/weka" ]; then
     wget http://www.java2s.com/Code/JarDownload/weka/weka.jar.zip
     unzip weka.jar.zip
     rm weka.jar.zip
