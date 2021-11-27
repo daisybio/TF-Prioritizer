@@ -3,8 +3,6 @@
 
 # But not these files...
 !.gitignore
-!weka.jar
-!commons-cli-1.4.jar
 !TEPIC.zip
 !run_deseq2.R
 !/TEPIC/TEPIC/*
