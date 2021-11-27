@@ -15,6 +15,11 @@ else
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
     sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/'
 
+    # Install libicu66
+    wget http://security.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb
+    sudo apt update && sudo dpkg -i libicu66_66.1-2ubuntu2_amd64.deb
+    rm libicu66_66.1-2ubuntu2_amd64.deb
+
     # Install R
     sudo apt-get install r-base
 
