@@ -34,13 +34,13 @@ else
 fi
 
 # Install dependencies for R packages
-sudo apt-get install libcurl4-openssl-dev libxml2-dev
+sudo apt-get install libcurl4-openssl-dev libxml2-dev libssl-dev
 
 # Make libraries writeable for active user
-sudo chown -R $USER /usr/lib/R/library
+sudo chown -R "$USER" /usr/lib/R/library
 
 # Install DESeq2 R package
-Rscript install/deseq2.R
+Rscript install/r_dependencies.R
 
 # Install R packages required for TEPIC
 Rscript ext/TEPIC/TEPIC/Code/installRpackages.R
@@ -69,7 +69,7 @@ else
 
     touch $HOME/.profile
 
-    echo "PATH=\"\$PATH:$HOME/.meme/libexec/meme-5.4.1:$HOME/.meme/bin\"" >>$HOME/.profile
+    echo "PATH=\"\$PATH:$HOME/.meme/libexec/meme-5.4.1:$HOME/.meme/bin\"" >>"$HOME"/.profile
     rm -rf meme-5.4.1
 
     echo "Finished MEME installation."

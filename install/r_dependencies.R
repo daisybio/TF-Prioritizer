@@ -8,3 +8,6 @@ if (!requireNamespace("biomaRt", quietly = TRUE))
 
 if (!requireNamespace("DESeq2", quietly = TRUE))
     BiocManager::install("DESeq2")
+
+if (!requireNamespace("data.table", quietly = TRUE))
+  BiocManager::install("data.table")
