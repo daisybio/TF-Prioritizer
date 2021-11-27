@@ -11,3 +11,5 @@ if (!requireNamespace("DESeq2", quietly = TRUE))
 
 if (!requireNamespace("data.table", quietly = TRUE))
   BiocManager::install("data.table")
+
+ BiocManager::install(version="3.13")
