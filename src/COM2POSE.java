@@ -13,8 +13,7 @@ public class COM2POSE {
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
-
-        com2pose_lib.check_chromosomes();
+/*        com2pose_lib.check_chromosomes();
 
         //mix histone modifications
         if (!options_intern.mix_level.equals("")) {
@@ -45,9 +44,9 @@ public class COM2POSE {
             }
         }
         com2pose_lib.create_DESeq2_scripts();
-        com2pose_lib.create_TPM_mappings();
+        com2pose_lib.create_TPM_mappings();*/
         com2pose_lib.create_gene_positions();
-
+/*
         if (options_intern.deseq2_tpm_filter > 0) {
             com2pose_lib.preprocess_deseq2_input_tpm();
         }
@@ -106,7 +105,7 @@ public class COM2POSE {
 
         //get target genes of TFs based on dcg analysis
         com2pose_lib.get_top_k_target_genes_dcg();
-
+*/
         //check for ChIP-seq data for TFs on ChIP-Atlas
         if (options_intern.chip_atlas_activated_chip_atlas) {
             com2pose_lib.get_chip_atlas_data_list();
@@ -119,6 +118,11 @@ public class COM2POSE {
         //shoot IGV for own TF ChIP-seq data
         if (!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals("")) {
             com2pose_lib.run_igv_own_data();
+        }
+
+        if(options_intern.igv_important_locus_all_prio_tf.size()>0)
+        {
+            com2pose_lib.run_igv_on_important_loci();
         }
 
         System.out.println("X");

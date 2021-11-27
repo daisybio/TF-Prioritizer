@@ -141,6 +141,7 @@ public class Options_intern {
     public String folder_out_igv_session = "A_SESSIONS";
     public String folder_out_igv_chip_atlas_data = "02_chip_atlas_tf_data";
     public String folder_out_igv_chipAtlas_chrWide_genomeWide_views = "03_chip_atlas_chrWide_genomeWide_views";
+    public String folder_out_igv_important_loci="04_important_loci";
 
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
@@ -150,6 +151,9 @@ public class Options_intern {
     public String file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_script = "_get_tpms.R";
     public String file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_data = "_tpms.csv";
     public String file_suffix_deseq2_preprocessing_gene_positions_script = "get_gene_positions.R";
+    public String file_suffix_deseq2_preprocessing_gene_positions_data_prev = "gene_positions_prev.csv";
+    public String file_suffix_deseq2_preprocessing_gene_positions_data_prev_version = "version.csv";
+    public String file_suffix_deseq2_preprocessing_gene_positions_data_upliftpy = "uplift_positions.py";
     public String file_suffix_deseq2_preprocessing_gene_positions_data = "gene_positions.csv";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_output_regions_to_target_genes = "regions_to_target_genes.csv";
@@ -420,12 +424,19 @@ public class Options_intern {
         #########################*/
     //#[OPT]: path to igv.sh, if not set no images of the top target genes of the discounted cumulative gain TFs will be taken
     public String igv_path_to_igv = "";
+    //#[OPT] ChIP-seq names, which should be included in own ChIP-seq data defined in tepic_input_directory
+    //#e.g., "H3K27ac;Pol2"
+    public ArrayList<String> igv_include_prediction_data= new ArrayList<>();
+    //#[OPT] Loci of interest for data
+    //#e.g., "CSN;WAP;SOCS2;STAT5"
+    public ArrayList<String> igv_important_locus_all_prio_tf= new ArrayList<>();
     //#[OPT]: path to tf chip_seq data, of which you want to take images for target genes to see peaks
     public String igv_path_to_tf_chip_seq = "";
     //#[OPT] port number of igv, default = 60151
     public int igv_port_number = 60151;
     //#[OPT] igv species name for reference genome
     public String igv_species_ref_genome = "";
+
 
 
     /*##################################

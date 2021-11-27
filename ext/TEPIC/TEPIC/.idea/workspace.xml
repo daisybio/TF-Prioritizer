@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../src/COM2POSE.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/COM2POSE.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/com2pose/COM2POSE_lib.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../src/util/Options_intern.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../src/util/Options_intern.java" afterDir="false" />
-    </list>
+    <list default="true" id="05699830-2599-473c-8d16-0381ed8d9c69" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -50,7 +46,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/git_projects/Hennighausen_covid/src/variants/copy_all_gene_counts_to_one_file_using_parent_name.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Evaluation/biological_relevance_evaluation.py" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -59,7 +55,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Python.copy_all_gene_counts_to_one_file_using_parent_name">
+  <component name="RunManager" selected="Python.biological_relevance_evaluation">
     <configuration name="DAVID_test" type="PythonConfigurationType" factoryName="Python">
       <module name="TEPIC" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -163,6 +159,28 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Code/between_gaps.py" />
       <option name="PARAMETERS" value="$USER_HOME$/data/COM2POSE/01_COM2POSE/15_TEST_BETWEEN_PEAKS/working_dir/01_blacklisted_regions/02_new_input/p13/H3K27ac/p13_H3K27ac.broadPeak $USER_HOME$/data/COM2POSE/01_COM2POSE/15_TEST_BETWEEN_PEAKS/working_dir/03_A0_TEPIC_output_raw/p13/H3K27ac/p13_H3K27ac.broadPeak/p13_H3K27ac.broadPeak_TEPIC_10_14_21_11_14_13_335351932_between_peaks.bed" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="biological_relevance_evaluation" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="TEPIC" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python3.8" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Evaluation" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Evaluation/biological_relevance_evaluation.py" />
+      <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -385,6 +403,7 @@
     </configuration>
     <list>
       <item itemvalue="Python.copy_all_gene_counts_to_one_file_using_parent_name" />
+      <item itemvalue="Python.biological_relevance_evaluation" />
       <item itemvalue="Python.test_boxplot_interactive" />
       <item itemvalue="Python.DAVID_test" />
       <item itemvalue="Python.distribution_analysis_statistical_tests" />
@@ -493,6 +512,7 @@
       <workItem from="1634886126908" duration="5127000" />
       <workItem from="1635489054141" duration="880000" />
       <workItem from="1635582112720" duration="22000" />
+      <workItem from="1636964088000" duration="361000" />
     </task>
     <servers />
   </component>
