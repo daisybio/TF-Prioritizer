@@ -9018,8 +9018,8 @@ public class COM2POSE_lib
                 if (options_intern.tepic_randomize_tf_gene_matrix)
                 {
                     f_input_samples = new File(options_intern.com2pose_working_directory + File.separator +
-                            options_intern.folder_name_tepic_output_raw_shuffle + File.separator + File.separator + s +
-                            File.separator + ss);
+                            options_intern.folder_name_tepic_output_raw_shuffle + File.separator + s + File.separator +
+                            ss);
                 } else
                 {
                     f_input_samples = new File(options_intern.com2pose_working_directory + File.separator +
