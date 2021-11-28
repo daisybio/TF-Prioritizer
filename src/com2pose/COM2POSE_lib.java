@@ -10556,8 +10556,6 @@ public class COM2POSE_lib
                 throw new Exception(message);
         }
 
-        /*
-
         File f_data = new File(f_output_positions_root.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
         File f_uplift_script = new File(f_output_positions_root.getAbsolutePath() + File.separator +
@@ -10627,8 +10625,6 @@ public class COM2POSE_lib
                 String message = child_pyuplift.getErrorStream().toString();
                 throw new Exception(message);
         }
-
-        */
 
         logger.logLine("[PREP] Finished creating gene positions for all RNA-seq data.");
 
