@@ -4,56 +4,66 @@ import org.apache.commons.cli.*;
 import util.Options_intern;
 
 
-public class COM2POSE {
+public class COM2POSE
+{
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
         Options_intern options_intern = new Options_intern();
         parseArguments(args, options_intern);
 
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
-/*        com2pose_lib.check_chromosomes();
+        com2pose_lib.check_chromosomes();
 
         //mix histone modifications
-        if (!options_intern.mix_level.equals("")) {
+        if (!options_intern.mix_level.equals(""))
+        {
             com2pose_lib.mix_option();
         }
 
         //create footprints if needed
         if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") ||
-                options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN")) {
+                options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
+        {
             com2pose_lib.create_footprints_between_peaks();
         }
 
         //black listed regions filter
-        if (!options_intern.black_list_dir.equals("")) {
+        if (!options_intern.black_list_dir.equals(""))
+        {
             com2pose_lib.preprocess_blacklist();
             com2pose_lib.filter_blacklist();
         }
 
-        if (options_intern.mix_mutually_exclusive) {
+        if (options_intern.mix_mutually_exclusive)
+        {
             com2pose_lib.mix_mutually_exclusive_peaks();
         }
 
 
         //DESeq2
-        if (options_intern.tepic_ensg_symbol.equals("") || !options_intern.deseq2_biomart_dataset_species.equals("")) {
-            if (options_intern.do_ensg_mapping) {
+        if (options_intern.tepic_ensg_symbol.equals("") || !options_intern.deseq2_biomart_dataset_species.equals(""))
+        {
+            if (options_intern.do_ensg_mapping)
+            {
                 com2pose_lib.get_ensg_symbol_mapping();
             }
         }
         com2pose_lib.create_DESeq2_scripts();
-        com2pose_lib.create_TPM_mappings();*/
+        com2pose_lib.create_TPM_mappings();
         com2pose_lib.create_gene_positions();
-/*
-        if (options_intern.deseq2_tpm_filter > 0) {
+
+        if (options_intern.deseq2_tpm_filter > 0)
+        {
             com2pose_lib.preprocess_deseq2_input_tpm();
         }
         com2pose_lib.run_and_postprocess_DESeq2();
 
 
-        if (!options_intern.path_tgen.equals("")) {
+        if (!options_intern.path_tgen.equals(""))
+        {
             com2pose_lib.preprocess_tgen();
             com2pose_lib.run_tgen();
             com2pose_lib.merge_tgen();
@@ -62,7 +72,8 @@ public class COM2POSE {
 
         //TEPIC
         com2pose_lib.run_tepic();
-        if (options_intern.tepic_randomize_tf_gene_matrix) {
+        if (options_intern.tepic_randomize_tf_gene_matrix)
+        {
             com2pose_lib.randomize_tepic();
         }
 
@@ -70,14 +81,17 @@ public class COM2POSE {
         com2pose_lib.create_open_regions_violin_plots();
 
         //TGen
-        if (!options_intern.path_tgen.equals("")) {
-            if (!options_intern.mix_mutually_exclusive) {
+        if (!options_intern.path_tgen.equals(""))
+        {
+            if (!options_intern.mix_mutually_exclusive)
+            {
                 com2pose_lib.create_tgen_groups();
             }
 
             com2pose_lib.filter_target_genes_tgen();
 
-            if (options_intern.tgen_self_regulatory) {
+            if (options_intern.tgen_self_regulatory)
+            {
                 com2pose_lib.integrate_self_regulatory_tgen();
             }
         }
@@ -105,9 +119,10 @@ public class COM2POSE {
 
         //get target genes of TFs based on dcg analysis
         com2pose_lib.get_top_k_target_genes_dcg();
-*/
+
         //check for ChIP-seq data for TFs on ChIP-Atlas
-        if (options_intern.chip_atlas_activated_chip_atlas) {
+        if (options_intern.chip_atlas_activated_chip_atlas)
+        {
             com2pose_lib.get_chip_atlas_data_list();
             com2pose_lib.get_chip_atlas_data();
             com2pose_lib.run_igv_chip_atlas_data();
@@ -116,11 +131,12 @@ public class COM2POSE {
         }
 
         //shoot IGV for own TF ChIP-seq data
-        if (!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals("")) {
+        if (!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))
+        {
             com2pose_lib.run_igv_own_data();
         }
 
-        if(options_intern.igv_important_locus_all_prio_tf.size()>0)
+        if (options_intern.igv_important_locus_all_prio_tf.size() > 0)
         {
             com2pose_lib.run_igv_on_important_loci();
         }
@@ -128,7 +144,8 @@ public class COM2POSE {
         System.out.println("X");
     }
 
-    private static void parseArguments(String[] args, Options_intern options_intern) {
+    private static void parseArguments(String[] args, Options_intern options_intern)
+    {
         Options options = new Options();
 
         Option opt_cfg_file = new Option("c", "com2pose-config", true,
@@ -171,7 +188,8 @@ public class COM2POSE {
         CommandLine cmd;
 
 
-        try {
+        try
+        {
             cmd = parser.parse(options, args);
 
 
@@ -179,25 +197,31 @@ public class COM2POSE {
             options_intern.com2pose_working_directory = cmd.getOptionValue("working-directory");
             options_intern.path_to_COM2POSE = cmd.getOptionValue("path-com2pose");
 
-            if (cmd.hasOption("tgen-dir")) {
+            if (cmd.hasOption("tgen-dir"))
+            {
                 options_intern.path_tgen = cmd.getOptionValue("tgen-dir");
             }
 
-            if (cmd.hasOption("write-log-file")) {
+            if (cmd.hasOption("write-log-file"))
+            {
                 options_intern.write_to_logfile = false;
             }
-            if (cmd.hasOption("do-ensg-mapping")) {
+            if (cmd.hasOption("do-ensg-mapping"))
+            {
                 options_intern.do_ensg_mapping = false;
             }
-            if (cmd.hasOption("do-tpm-length-calculation")) {
+            if (cmd.hasOption("do-tpm-length-calculation"))
+            {
                 options_intern.calculate_tpm_lengths = false;
             }
-            if (cmd.hasOption("do-position-calculations")) {
+            if (cmd.hasOption("do-position-calculations"))
+            {
                 options_intern.calculcate_gene_positions = false;
             }
 
 
-        } catch (ParseException e) {
+        } catch (ParseException e)
+        {
             System.out.println(e.getMessage());
             formatter.printHelp(
                     "-c <com2pose-config> -w <working-directory> -p <path-com2pose> [-t <tgen-dir>] [-l] [-m] [-a] [-t] [-b]",
