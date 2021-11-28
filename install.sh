@@ -48,7 +48,7 @@ Rscript install/r_dependencies.R
 Rscript ext/TEPIC/TEPIC/Code/installRpackages.R
 
 # Install some more linux packages
-sudo apt-get install bedtools python3 unzip
+sudo apt-get install bedtools python3 unzip python3-pip
 
 # Install required python packages
 python3 -m pip install -r install/requirements.txt
