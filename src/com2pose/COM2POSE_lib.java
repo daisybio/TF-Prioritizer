@@ -10111,11 +10111,17 @@ public class COM2POSE_lib
 
                             if (!options_intern.mix_mutually_exclusive)
                             {
+                                String sample_name = sample.getName();
+
+                                if (sample_name.contains("."))
+                                {
+                                    sample_name = sample_name.substring(0, sample_name.lastIndexOf("."));
+                                }
                                 f_tgene_input = new File(options_intern.com2pose_working_directory + File.separator +
                                         options_intern.folder_name_tgen + File.separator +
                                         options_intern.folder_name_tgen_output + File.separator + dirGroup.getName() +
-                                        File.separator + dirHM.getName() + File.separator + dirGroup.getName() + "_" +
-                                        dirHM.getName() + File.separator + options_intern.file_suffix_tgen_output);
+                                        File.separator + dirHM.getName() + File.separator + sample_name +
+                                        File.separator + options_intern.file_suffix_tgen_output);
                             } else
                             {
                                 String[] names_sample = sample.getName().split("_");
