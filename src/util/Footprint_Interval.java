@@ -1,6 +1,7 @@
 package util;
 
-public class Footprint_Interval implements Comparable {
+public class Footprint_Interval implements Comparable
+{
 
     public String chromosome = "";
     public int start;
@@ -14,7 +15,8 @@ public class Footprint_Interval implements Comparable {
     public String line = "";
 
     public Footprint_Interval(String chromosome, int start, int end, String name, int score, String strand,
-                              double signalValue, double pValue, double qValue, String line) {
+                              double signalValue, double pValue, double qValue, String line)
+    {
         this.chromosome = chromosome;
         this.start = start;
         this.end = end;
@@ -28,7 +30,8 @@ public class Footprint_Interval implements Comparable {
     }
 
     public Footprint_Interval(String chromosome, int start, int end, String name, int score, String strand,
-                              double signalValue, double pValue, double qValue) {
+                              double signalValue, double pValue, double qValue)
+    {
         this.chromosome = chromosome;
         this.start = start;
         this.end = end;
@@ -40,7 +43,8 @@ public class Footprint_Interval implements Comparable {
         this.qValue = qValue;
     }
 
-    public void make_line() {
+    public void make_line()
+    {
         StringBuilder sb = new StringBuilder();
         sb.append(chromosome);
         sb.append("\t");
@@ -63,7 +67,8 @@ public class Footprint_Interval implements Comparable {
         line = sb.toString();
     }
 
-    @Override public int compareTo(Object o) {
+    @Override public int compareTo(Object o)
+    {
         int compare = ((Footprint_Interval) o).start;
 
         return this.start - compare;

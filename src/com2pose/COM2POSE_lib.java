@@ -10573,11 +10573,10 @@ public class COM2POSE_lib
                 "    second = converter.convert_coordinate(c, int(y),s)\n" + "\n" +
                 "    if(first is None or second is None):\n" + "        return None, None\n" + "\n" +
                 "    if len(first) == 0 or len(second) == 0:\n" + "        return None, None\n" + "\n" +
-                "    return str(first[0][1]), str(second[0][1])\n" + "\n" + "def main():\n" +
-                "    path_to_X = \""+f_data_prev.getAbsolutePath()+"\"\n" +
-                "    path_to_version =\""+f_data_version.getAbsolutePath()+"\"\n" +
-                "    path_to_newSave = \""+f_data.getAbsolutePath()+"\"\n" +
-                "\n" + "    version_of_our_dat=\""+options_intern.igv_species_ref_genome+"\"\n" + "\n" +
+                "    return str(first[0][1]), str(second[0][1])\n" + "\n" + "def main():\n" + "    path_to_X = \"" +
+                f_data_prev.getAbsolutePath() + "\"\n" + "    path_to_version =\"" + f_data_version.getAbsolutePath() +
+                "\"\n" + "    path_to_newSave = \"" + f_data.getAbsolutePath() + "\"\n" + "\n" +
+                "    version_of_our_dat=\"" + options_intern.igv_species_ref_genome + "\"\n" + "\n" +
                 "    version_of_our_dat_n= re.findall(r'\\d+', version_of_our_dat)\n" +
                 "    version_of_our_dat_n=version_of_our_dat_n.__getitem__(0)\n" +
                 "    name=version_of_our_dat.split(version_of_our_dat_n)\n" + "    name=name.__getitem__(0)\n" + "\n" +
@@ -10606,8 +10605,7 @@ public class COM2POSE_lib
                 "\n" + "        #string_converted = chromosome+\":\"+x_converted+\"-\"+y_converted\n" +
                 "        #print(\"X\")\n" + "\n" +
                 "    df_converted = pd.DataFrame(data_output, columns=column_names)\n" +
-                "    df_converted.to_csv(path_to_newSave,sep=\"\\t\",index=False)\n\n" +
-                "main()\n\n");
+                "    df_converted.to_csv(path_to_newSave,sep=\"\\t\",index=False)\n\n" + "main()\n\n");
 
         BufferedWriter bw_pyuplift = new BufferedWriter(new FileWriter(f_uplift_script));
         bw_pyuplift.write(sb_pyuplift.toString());
@@ -10615,13 +10613,14 @@ public class COM2POSE_lib
 
         logger.logLine("[PREP] Uplift positions to correct genome version");
 
-        String command_pyuplift = "python3 "+ f_uplift_script.getAbsolutePath();
+        String command_pyuplift = "python3 " + f_uplift_script.getAbsolutePath();
 
         logger.logLine("[PREP] executing command: " + command_pyuplift);
 
         Process child_pyuplift = Runtime.getRuntime().exec(command_pyuplift);
         int code_pyuplift = child_pyuplift.waitFor();
-        switch (code_pyuplift) {
+        switch (code_pyuplift)
+        {
             case 0:
                 break;
             case 1:
@@ -10630,7 +10629,6 @@ public class COM2POSE_lib
         }
 
         */
-
 
         logger.logLine("[PREP] Finished creating gene positions for all RNA-seq data.");
 

@@ -6,7 +6,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-public class Options_intern {
+public class Options_intern
+{
     /**
      * COM2POSE OPTIONS intern
      */
@@ -141,7 +142,7 @@ public class Options_intern {
     public String folder_out_igv_session = "A_SESSIONS";
     public String folder_out_igv_chip_atlas_data = "02_chip_atlas_tf_data";
     public String folder_out_igv_chipAtlas_chrWide_genomeWide_views = "03_chip_atlas_chrWide_genomeWide_views";
-    public String folder_out_igv_important_loci="04_important_loci";
+    public String folder_out_igv_important_loci = "04_important_loci";
 
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
@@ -426,10 +427,10 @@ public class Options_intern {
     public String igv_path_to_igv = "";
     //#[OPT] ChIP-seq names, which should be included in own ChIP-seq data defined in tepic_input_directory
     //#e.g., "H3K27ac;Pol2"
-    public ArrayList<String> igv_include_prediction_data= new ArrayList<>();
+    public ArrayList<String> igv_include_prediction_data = new ArrayList<>();
     //#[OPT] Loci of interest for data
     //#e.g., "CSN;WAP;SOCS2;STAT5"
-    public ArrayList<String> igv_important_locus_all_prio_tf= new ArrayList<>();
+    public ArrayList<String> igv_important_locus_all_prio_tf = new ArrayList<>();
     //#[OPT]: path to tf chip_seq data, of which you want to take images for target genes to see peaks
     public String igv_path_to_tf_chip_seq = "";
     //#[OPT]: path to bigWig files (same structure as ChIP-seq or ATAC-seq)
@@ -438,7 +439,6 @@ public class Options_intern {
     public int igv_port_number = 60151;
     //#[OPT] igv species name for reference genome
     public String igv_species_ref_genome = "";
-
 
 
     /*##################################

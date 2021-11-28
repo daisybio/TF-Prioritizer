@@ -1,6 +1,7 @@
 package util;
 
-public class BL_ranges_binary_tree implements Comparable {
+public class BL_ranges_binary_tree implements Comparable
+{
     public int number;
     public String chr;
     public int left_border;
@@ -9,7 +10,8 @@ public class BL_ranges_binary_tree implements Comparable {
 
     public double peak_score = -1.0;
 
-    public String toString() {
+    public String toString()
+    {
         String ret = "";
 
         ret += number;
@@ -19,11 +21,13 @@ public class BL_ranges_binary_tree implements Comparable {
         ret += left_border;
         ret += "\t";
         ret += right_border;
-        if (!signal.equals("")) {
+        if (!signal.equals(""))
+        {
             ret += "\t";
             ret += signal;
         }
-        if (peak_score > -1) {
+        if (peak_score > -1)
+        {
             ret += "\t";
             ret += peak_score;
         }
@@ -31,7 +35,8 @@ public class BL_ranges_binary_tree implements Comparable {
         return ret;
     }
 
-    @Override public int compareTo(Object o) {
+    @Override public int compareTo(Object o)
+    {
         int compare = ((BL_ranges_binary_tree) o).left_border;
 
         return this.left_border - compare;

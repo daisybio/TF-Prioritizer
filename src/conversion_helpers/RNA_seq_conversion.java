@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class RNA_seq_conversion {
+public class RNA_seq_conversion
+{
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
         Options_intern options_intern = new Options_intern();
 
         parseArguments(args, options_intern);
@@ -18,7 +20,8 @@ public class RNA_seq_conversion {
         convert_all_together_to_seperate_gene_symbols(options_intern);
     }
 
-    private static void convert_all_together_to_seperate_gene_symbols(Options_intern options_intern) throws Exception {
+    private static void convert_all_together_to_seperate_gene_symbols(Options_intern options_intern) throws Exception
+    {
 
         ArrayList<String> gene_names = new ArrayList<>();
         ArrayList<Boolean> gene_names_should_write = new ArrayList<>();
@@ -28,17 +31,21 @@ public class RNA_seq_conversion {
         File f_out = new File(options_intern.rna_seq_conversion_input + File.separator + "formatted_names.txt");
 
 
-        for (File rna_seq_files : f_input_dir.listFiles()) {
+        for (File rna_seq_files : f_input_dir.listFiles())
+        {
             if (rna_seq_files.isDirectory() || rna_seq_files.getName().matches(".*formatted.*") ||
-                    rna_seq_files.getName().matches(".*gene_mapping.*")) {
+                    rna_seq_files.getName().matches(".*gene_mapping.*"))
+            {
                 continue;
             }
 
             BufferedReader br = new BufferedReader(new FileReader(rna_seq_files));
             String line = "";
             int count_genes = 0;
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("#") || line.startsWith("_")) {
+            while ((line = br.readLine()) != null)
+            {
+                if (line.startsWith("#") || line.startsWith("_"))
+                {
                     continue;
                 }
 
@@ -55,9 +62,11 @@ public class RNA_seq_conversion {
 
         //count files to be processed
         int count_files_to_be_processed = 0;
-        for (File rna_seq_files : f_input_dir.listFiles()) {
+        for (File rna_seq_files : f_input_dir.listFiles())
+        {
             if (rna_seq_files.isDirectory() || rna_seq_files.getName().matches(".*formatted.*") ||
-                    rna_seq_files.getName().matches(".*gene_mapping.*")) {
+                    rna_seq_files.getName().matches(".*gene_mapping.*"))
+            {
                 continue;
             }
             count_files_to_be_processed++;
@@ -66,7 +75,8 @@ public class RNA_seq_conversion {
         HashMap<String, String> symbol_ensg = new HashMap<>();
 
         //perform ENSG mapping
-        if (!options_intern.rna_seq_conversion_biomart_species_name.equals("")) {
+        if (!options_intern.rna_seq_conversion_biomart_species_name.equals(""))
+        {
             //3. if biomart option is set:
             //a) convert symbol to ENSG
 
@@ -118,7 +128,8 @@ public class RNA_seq_conversion {
             //c) write new gene_file gene_names file
             BufferedReader br_mapping = new BufferedReader(new FileReader(f_result_r));
             String line_mapping = br_mapping.readLine();
-            while ((line_mapping = br_mapping.readLine()) != null) {
+            while ((line_mapping = br_mapping.readLine()) != null)
+            {
                 String[] split = line_mapping.split("\t");
                 symbol_ensg.put(split[1], split[0]);
             }
@@ -132,14 +143,19 @@ public class RNA_seq_conversion {
             bw_formatted.write("Geneid");
             bw_formatted.newLine();
             int count = 0;
-            for (String s : gene_names) {
-                if (!symbol_ensg.containsKey(s)) {
+            for (String s : gene_names)
+            {
+                if (!symbol_ensg.containsKey(s))
+                {
                     gene_names_should_write.add(false);
-                } else {
+                } else
+                {
 
-                    if (already_founds_ensgs.contains(s)) {
+                    if (already_founds_ensgs.contains(s))
+                    {
                         gene_names_should_write.add(false);
-                    } else {
+                    } else
+                    {
                         bw_formatted.write(symbol_ensg.get(s));
                         bw_formatted.newLine();
                         gene_names_should_write.add(true);
@@ -193,17 +209,20 @@ public class RNA_seq_conversion {
             String[][] files_to_counts = new String[row_count-count_doubles][count_files_to_be_processed+1];*/
 
 
-        } else {
+        } else
+        {
             BufferedWriter bw_ensg_out = new BufferedWriter(new FileWriter(f_out));
             bw_ensg_out.write("Geneid");
             bw_ensg_out.newLine();
-            for (String gene_name : gene_names) {
+            for (String gene_name : gene_names)
+            {
                 bw_ensg_out.write(gene_name);
                 bw_ensg_out.newLine();
             }
             bw_ensg_out.close();
 
-            for (String s : gene_names) {
+            for (String s : gene_names)
+            {
                 gene_names_should_write.add(true);
             }
 
@@ -212,9 +231,11 @@ public class RNA_seq_conversion {
 
         //2. write gene counts in right order
         int count_files = 0;
-        for (File rna_seq_files : f_input_dir.listFiles()) {
+        for (File rna_seq_files : f_input_dir.listFiles())
+        {
             if (rna_seq_files.isDirectory() || rna_seq_files.getName().matches(".*formatted.*") ||
-                    rna_seq_files.getName().matches(".*gene_mapping.*")) {
+                    rna_seq_files.getName().matches(".*gene_mapping.*"))
+            {
                 continue;
             }
 
@@ -225,13 +246,16 @@ public class RNA_seq_conversion {
             BufferedReader br = new BufferedReader(new FileReader(rna_seq_files));
             String line = "";
             int count_genes = 0;
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("#") || line.startsWith("_")) {
+            while ((line = br.readLine()) != null)
+            {
+                if (line.startsWith("#") || line.startsWith("_"))
+                {
                     continue;
                 }
 
                 String[] split = line.split("\t");
-                if (gene_names_should_write.get(count_genes)) {
+                if (gene_names_should_write.get(count_genes))
+                {
                     bw.write(split[1]);
                     bw.newLine();
                 }
@@ -245,7 +269,8 @@ public class RNA_seq_conversion {
         }
     }
 
-    private static void parseArguments(String[] args, Options_intern options_intern) {
+    private static void parseArguments(String[] args, Options_intern options_intern)
+    {
         Options options = new Options();
 
         Option opt_working_dir =
@@ -266,7 +291,8 @@ public class RNA_seq_conversion {
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd;
 
-        try {
+        try
+        {
             cmd = parser.parse(options, args);
 
 
@@ -275,7 +301,8 @@ public class RNA_seq_conversion {
             options_intern.rna_seq_conversion_biomart_column = cmd.getOptionValue("biomart-column", "");
 
 
-        } catch (ParseException e) {
+        } catch (ParseException e)
+        {
             System.out.println(e.getMessage());
             formatter.printHelp("-i <file-directory> [-s <biomart-species>] [-c <biomart-column>]", options);
             System.exit(1);

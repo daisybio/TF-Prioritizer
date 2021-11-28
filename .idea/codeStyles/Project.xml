@@ -10,6 +10,10 @@
       <option name="KEEP_LINE_BREAKS" value="false" />
       <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
       <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+      <option name="BRACE_STYLE" value="2" />
+      <option name="CLASS_BRACE_STYLE" value="2" />
+      <option name="METHOD_BRACE_STYLE" value="2" />
+      <option name="LAMBDA_BRACE_STYLE" value="2" />
       <option name="CALL_PARAMETERS_WRAP" value="1" />
       <option name="METHOD_PARAMETERS_WRAP" value="1" />
       <option name="RESOURCE_LIST_WRAP" value="1" />

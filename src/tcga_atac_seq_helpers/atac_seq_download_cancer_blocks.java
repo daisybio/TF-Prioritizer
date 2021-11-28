@@ -2,7 +2,8 @@ package tcga_atac_seq_helpers;
 
 import java.util.HashSet;
 
-public class atac_seq_download_cancer_blocks {
+public class atac_seq_download_cancer_blocks
+{
 
     public String input_gdc_client = "/home/markus/Downloads/gdc-client_v1.6.1_Ubuntu_x64/gdc-client";
     public String input_token = "/home/markus/Downloads/gdc-user-token.2021-07-16T10_22_43.173Z.txt";
