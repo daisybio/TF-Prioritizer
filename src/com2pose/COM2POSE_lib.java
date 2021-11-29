@@ -10,6 +10,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.lang.annotation.Target;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
@@ -81,6 +82,8 @@ public class COM2POSE_lib {
                 options_intern.folder_name_deseq2_preprocessing_gene_positions + File.separator +
                 options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
 
+        ArrayList<String> gene_symbols = new ArrayList<>();
+
         BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(f_input_gene_to_coordinates));
         String line_gene_coordinates = br_gene_coordinates.readLine();
         String[] header_gene_coordinates = line_gene_coordinates.split("\t");
@@ -92,14 +95,6 @@ public class COM2POSE_lib {
             }
 
             String gene_name = split[0];
-            //chr10:95,381,903-95,419,253
-            //chr10:95,221,224-95,253,042
-            //chr10:95,217,767-95,255,176
-            //chr10:95,217,765-95,255,115
-            if(gene_name.equals("Socs2"))
-            {
-                System.out.println("X");
-            }
 
             String chr = "chr" + split[1];
             int begin = Integer.parseInt(split[2]);
@@ -110,7 +105,31 @@ public class COM2POSE_lib {
 
             String position_string = chr + ":" + begin + "-" + end;
             gene_to_coordinates.put(gene_name.toUpperCase(), position_string);
+
+            gene_symbols.add(gene_name.toUpperCase());
         }
+
+        ArrayList<String> add_to_important_loci = new ArrayList<>();
+        ArrayList<String> remove_from_important_loci = new ArrayList<>();
+
+        //check if symbol is available, if not check if similar one is there
+        for(String locus : options_intern.igv_important_locus_all_prio_tf)
+        {
+            if(!gene_to_coordinates.containsKey(locus))
+            {
+                for(String loci : gene_symbols)
+                {
+                    if(loci.matches(".*"+locus+".*"))
+                    {
+                        add_to_important_loci.add(loci);
+                    }
+                }
+                remove_from_important_loci.add(locus);
+            }
+        }
+        options_intern.igv_important_locus_all_prio_tf.addAll(add_to_important_loci);
+        options_intern.igv_important_locus_all_prio_tf.removeAll(remove_from_important_loci);
+
 
         //create ouput folder
         File f_output_root =
@@ -126,218 +145,207 @@ public class COM2POSE_lib {
             {
                 String key_tp = f_tp.getName();
 
-                for(File f_hm : f_tp.listFiles())
+                File f_output_tf_hm_tp =
+                        new File(f_output_root.getAbsolutePath() + File.separator + key_tp);
+                f_output_tf_hm_tp.mkdir();
+
+                String load_tf_chip_seq = "load ";
+                boolean added_prediction_data=false;
+
+                //include predictive HMs
+                if(options_intern.igv_include_prediction_data.size()>0)
                 {
-                    if(f_hm.isDirectory())
+                    File f_input =
+                            new File(options_intern.tepic_input_directory+File.separator + key_tp);
+
+                    for(String including_hm : options_intern.igv_include_prediction_data)
                     {
-                        String key_hm = f_hm.getName();
-
-                        File f_output_tf_hm = new File(f_output_root.getAbsolutePath() + File.separator + key_hm);
-                        f_output_tf_hm.mkdir();
-
-                        File f_output_tf_hm_tp =
-                                new File(f_output_tf_hm.getAbsolutePath() + File.separator + key_tp);
-                        f_output_tf_hm_tp.mkdir();
-
-                        String load_tf_chip_seq = "load ";
-                        boolean added_prediction_data=false;
-
-                        //include predictive HMs
-                        if(options_intern.igv_include_prediction_data.size()>0)
+                        File f_hm_input = new File(f_input.getAbsolutePath()+File.separator+including_hm);
+                        if(f_hm_input.exists())
                         {
-                            File f_input =
-                                    new File(options_intern.tepic_input_directory+File.separator + key_tp);
-
-                            for(String including_hm : options_intern.igv_include_prediction_data)
+                            for(File f_file : f_hm_input.listFiles())
                             {
-                                File f_hm_input = new File(f_input.getAbsolutePath()+File.separator+including_hm);
-                                if(f_hm_input.exists())
+                                if(added_prediction_data)
                                 {
-                                    for(File f_file : f_hm_input.listFiles())
-                                    {
-                                        if(added_prediction_data)
-                                        {
-                                            load_tf_chip_seq+="," + f_file.getAbsolutePath();
-                                        }
-                                        else
-                                        {
-                                            added_prediction_data=true;
-                                            load_tf_chip_seq+= f_file.getAbsolutePath();
-                                        }
-                                    }
+                                    load_tf_chip_seq+="," + f_file.getAbsolutePath();
+                                }
+                                else
+                                {
+                                    added_prediction_data=true;
+                                    load_tf_chip_seq+= f_file.getAbsolutePath();
                                 }
                             }
                         }
+                    }
+                }
 
-                        //add all own TF ChIP-seq if available
-                        if(!options_intern.igv_path_to_tf_chip_seq.equals(""))
+                //add all own TF ChIP-seq if available
+                if(!options_intern.igv_path_to_tf_chip_seq.equals(""))
+                {
+                    File f_input_tf_chip_seq = new File(options_intern.igv_path_to_tf_chip_seq);
+                    File f_input_tf_chip_seq_for_now =
+                            new File(f_input_tf_chip_seq.getAbsolutePath()+File.separator+ key_tp);
+                    if(f_input_tf_chip_seq_for_now.exists())
+                    {
+                        if(f_input_tf_chip_seq_for_now.isDirectory())
                         {
-                            File f_input_tf_chip_seq = new File(options_intern.igv_path_to_tf_chip_seq);
-                            File f_input_tf_chip_seq_for_now =
-                                    new File(f_input_tf_chip_seq.getAbsolutePath()+File.separator+ key_tp);
-                            if(f_input_tf_chip_seq_for_now.exists())
+                            for(File f_tf_chipseq : f_input_tf_chip_seq_for_now.listFiles())
                             {
-                                if(f_input_tf_chip_seq_for_now.isDirectory())
-                                {
-                                    for(File f_tf_chipseq : f_input_tf_chip_seq_for_now.listFiles())
-                                    {
-                                        if(f_tf_chipseq.isDirectory())
-                                        {
-
-                                            for(File f_tf_chipseq_TF_file:f_tf_chipseq.listFiles() )
-                                            {
-                                                if(f_tf_chipseq_TF_file.isFile())
-                                                {
-                                                    if(added_prediction_data)
-                                                    {
-                                                        load_tf_chip_seq+="," + f_tf_chipseq_TF_file.getAbsolutePath();
-                                                    }
-                                                    else
-                                                    {
-                                                        added_prediction_data=true;
-                                                        load_tf_chip_seq+= f_tf_chipseq_TF_file.getAbsolutePath();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        //add all ChIP-ATLAS ChIP-seq if available
-                        File f_chip_atlas_tf_chipseq_data_root =
-                                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas+File.separator+options_intern.folder_out_chip_atlas_peak_files);
-
-                        if(f_chip_atlas_tf_chipseq_data_root.exists())
-                        {
-                            for(File f_tf : f_chip_atlas_tf_chipseq_data_root.listFiles())
-                            {
-                                if(f_tf.isDirectory())
+                                if(f_tf_chipseq.isDirectory())
                                 {
 
-                                    for(File f_tf_file : f_tf.listFiles())
+                                    for(File f_tf_chipseq_TF_file:f_tf_chipseq.listFiles() )
                                     {
-                                        if(f_tf_file.isFile())
+                                        if(f_tf_chipseq_TF_file.isFile())
                                         {
-                                            String file_name = f_tf_file.getName();
-                                            if(file_name.endsWith("idx"))
-                                                continue;
-
                                             if(added_prediction_data)
                                             {
-                                                load_tf_chip_seq+="," + f_tf_file.getAbsolutePath();
+                                                load_tf_chip_seq+="," + f_tf_chipseq_TF_file.getAbsolutePath();
                                             }
                                             else
                                             {
                                                 added_prediction_data=true;
-                                                load_tf_chip_seq+= f_tf_file.getAbsolutePath();
+                                                load_tf_chip_seq+= f_tf_chipseq_TF_file.getAbsolutePath();
                                             }
-
                                         }
                                     }
-
                                 }
                             }
                         }
+                    }
+                }
 
-                        if(!added_prediction_data)
-                            continue;
+                //add all ChIP-ATLAS ChIP-seq if available
+                File f_chip_atlas_tf_chipseq_data_root =
+                        new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas+File.separator+options_intern.folder_out_chip_atlas_peak_files);
 
-                        //save session
-                        File f_save_session =
-                                new File(f_output_tf_hm_tp.getAbsolutePath()+File.separator+options_intern.file_suffix_session);
-                        igv_save_sessions(f_save_session,load_tf_chip_seq);
-
-                        Socket socket_session = new Socket("127.0.0.1", options_intern.igv_port_number);
-                        PrintWriter out_session = new PrintWriter(socket_session.getOutputStream(), true);
-                        BufferedReader in_session = new BufferedReader(new InputStreamReader(socket_session.getInputStream()));
-
-                        out_session.println("genome " + options_intern.igv_species_ref_genome);
-                        String response_session = in_session.readLine();
-
-                        //logger.logLine("[IGV] " + load_tf_chip_seq);
-                        out_session.println(load_tf_chip_seq);
-                        String response_load_sessoin = in_session.readLine();
-
-                        //do pics of important loci
-                        for(String locus: options_intern.igv_important_locus_all_prio_tf)
+                if(f_chip_atlas_tf_chipseq_data_root.exists())
+                {
+                    for(File f_tf : f_chip_atlas_tf_chipseq_data_root.listFiles())
+                    {
+                        if(f_tf.isDirectory())
                         {
-                            if (!gene_to_coordinates.containsKey(locus))
+
+                            for(File f_tf_file : f_tf.listFiles())
                             {
-                                continue;
-                            }
+                                if(f_tf_file.isFile())
+                                {
+                                    String file_name = f_tf_file.getName();
+                                    if(file_name.endsWith("idx"))
+                                        continue;
 
-                            String snapshot_name = locus + ".png";
-                            String response ="";
-
-                            File f_output_shot = new File(f_output_tf_hm_tp.getAbsolutePath());
-                            f_output_shot.mkdir();
-                            //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
-                            out_session.println("snapshotDirectory " + f_output_shot.getAbsolutePath());
-                            response = in_session.readLine();
-                            //logger.logLine("[IGV] " + response);
-                            //logger.logLine("[IGV] "+ "goto " + gene_to_coordinates.get(targets));
-                            out_session.println("goto " + gene_to_coordinates.get(locus));
-                            response = in_session.readLine();
-                            //logger.logLine("[IGV] " + response);
-                            //logger.logLine("[IGV] "+ "sort");
-                            //out.println("sort");
-                            //response=in.readLine();
-                            //logger.logLine("[IGV] " + response);
-                            //logger.logLine("[IGV] "+ "collapse");
-                            //out.println("collapse");
-                            //response=in.readLine();
-                            //logger.logLine("[IGV] " + response);
-                            //logger.logLine("[IGV] "+ "snapshot");
-                            out_session.println("snapshot");
-                            response = in_session.readLine();
-                            //logger.logLine("[IGV] " + response);
-
-                            File f_snapshot_made = new File("NO");
-
-                            //search png name
-                            for (File f_snapshot : f_output_shot.listFiles()) {
-                                if (f_snapshot.isFile()) {
-                                    if (f_snapshot.getName().startsWith("chr")) {
-                                        f_snapshot_made = f_snapshot;
-                                        break;
+                                    if(added_prediction_data)
+                                    {
+                                        load_tf_chip_seq+="," + f_tf_file.getAbsolutePath();
+                                    }
+                                    else
+                                    {
+                                        added_prediction_data=true;
+                                        load_tf_chip_seq+= f_tf_file.getAbsolutePath();
                                     }
 
                                 }
                             }
 
-                            if (!f_snapshot_made.exists()) {
-                                //its the all overview
-                                //logger.logLine("[ERROR]: trying to move file which does not exist!");
-                            } else {
+                        }
+                    }
+                }
 
-                                String command_mv = "mv " + f_snapshot_made.getAbsolutePath() + " " +
-                                        f_snapshot_made.getParentFile().getAbsolutePath() + File.separator +
-                                        snapshot_name;
+                if(!added_prediction_data)
+                    continue;
 
+                //save session
+                File f_save_session =
+                        new File(f_output_tf_hm_tp.getAbsolutePath()+File.separator+options_intern.file_suffix_session);
+                igv_save_sessions(f_save_session,load_tf_chip_seq);
 
-                                Process child = Runtime.getRuntime().exec(command_mv);
-                                int code = child.waitFor();
-                                switch (code) {
-                                    case 0:
-                                        break;
-                                    case 1:
-                                        String message = child.getErrorStream().toString();
-                                        throw new Exception(message);
-                                }
+                Socket socket_session = new Socket("127.0.0.1", options_intern.igv_port_number);
+                PrintWriter out_session = new PrintWriter(socket_session.getOutputStream(), true);
+                BufferedReader in_session = new BufferedReader(new InputStreamReader(socket_session.getInputStream()));
 
+                out_session.println("genome " + options_intern.igv_species_ref_genome);
+                String response_session = in_session.readLine();
 
+                //logger.logLine("[IGV] " + load_tf_chip_seq);
+                out_session.println(load_tf_chip_seq);
+                String response_load_sessoin = in_session.readLine();
+
+                //do pics of important loci
+                for(String locus: options_intern.igv_important_locus_all_prio_tf)
+                {
+                    if (!gene_to_coordinates.containsKey(locus))
+                    {
+                        continue;
+                    }
+
+                    String snapshot_name = locus + ".png";
+                    String response ="";
+
+                    File f_output_shot = new File(f_output_tf_hm_tp.getAbsolutePath());
+                    f_output_shot.mkdir();
+                    //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
+                    out_session.println("snapshotDirectory " + f_output_shot.getAbsolutePath());
+                    response = in_session.readLine();
+                    //logger.logLine("[IGV] " + response);
+                    //logger.logLine("[IGV] "+ "goto " + gene_to_coordinates.get(targets));
+                    out_session.println("goto " + gene_to_coordinates.get(locus));
+                    response = in_session.readLine();
+                    //logger.logLine("[IGV] " + response);
+                    //logger.logLine("[IGV] "+ "sort");
+                    //out.println("sort");
+                    //response=in.readLine();
+                    //logger.logLine("[IGV] " + response);
+                    //logger.logLine("[IGV] "+ "collapse");
+                    //out.println("collapse");
+                    //response=in.readLine();
+                    //logger.logLine("[IGV] " + response);
+                    //logger.logLine("[IGV] "+ "snapshot");
+                    out_session.println("snapshot");
+                    response = in_session.readLine();
+                    //logger.logLine("[IGV] " + response);
+
+                    File f_snapshot_made = new File("NO");
+
+                    //search png name
+                    for (File f_snapshot : f_output_shot.listFiles()) {
+                        if (f_snapshot.isFile()) {
+                            if (f_snapshot.getName().startsWith("chr")) {
+                                f_snapshot_made = f_snapshot;
+                                break;
                             }
+
+                        }
+                    }
+
+                    if (!f_snapshot_made.exists()) {
+                        //its the all overview
+                        //logger.logLine("[ERROR]: trying to move file which does not exist!");
+                    } else {
+
+                        String command_mv = "mv " + f_snapshot_made.getAbsolutePath() + " " +
+                                f_snapshot_made.getParentFile().getAbsolutePath() + File.separator +
+                                snapshot_name;
+
+
+                        Process child = Runtime.getRuntime().exec(command_mv);
+                        int code = child.waitFor();
+                        switch (code) {
+                            case 0:
+                                break;
+                            case 1:
+                                String message = child.getErrorStream().toString();
+                                throw new Exception(message);
                         }
 
 
-                        out_session.println("new");
-                        response_session = in_session.readLine();
-
-                        socket_session.close();
                     }
                 }
+
+
+                out_session.println("new");
+                response_session = in_session.readLine();
+
+                socket_session.close();
             }
         }
 
