@@ -1,10 +1,7 @@
 package util;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class Options_intern
 {
@@ -435,6 +432,9 @@ public class Options_intern
     public String igv_path_to_tf_chip_seq = "";
     //#[OPT]: path to bigWig files (same structure as ChIP-seq or ATAC-seq)
     public String igv_path_to_tdf="";
+    //#[OPT] dictionary of GRC to synonyms (e.g., GRCh38=hg19 or GRCm39=mm39), GRCh and GRCm are already included
+    //#format= "GRCx1=symbol1;GRCx2=symbol2"
+    public HashMap<String,String> igv_GRC_synonym_dict= new HashMap<>();
     //#[OPT] port number of igv, default = 60151
     public int igv_port_number = 60151;
     //#[OPT] igv species name for reference genome

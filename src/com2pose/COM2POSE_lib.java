@@ -10540,6 +10540,7 @@ public class COM2POSE_lib
         String command = "Rscript " + f_script;
         logger.logLine("[PREP] run R script: " + command);
 
+
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();
         switch (code)
@@ -10574,15 +10575,22 @@ public class COM2POSE_lib
                 "    return str(first[0][1]), str(second[0][1])\n" + "\n" + "def main():\n" + "    path_to_X = \"" +
                 f_data_prev.getAbsolutePath() + "\"\n" + "    path_to_version =\"" + f_data_version.getAbsolutePath() +
                 "\"\n" + "    path_to_newSave = \"" + f_data.getAbsolutePath() + "\"\n" + "\n" +
-                "    version_of_our_dat=\"" + options_intern.igv_species_ref_genome + "\"\n" + "\n" +
-                "    version_of_our_dat_n= re.findall(r'\\d+', version_of_our_dat)\n" +
-                "    version_of_our_dat_n=version_of_our_dat_n.__getitem__(0)\n" +
-                "    name=version_of_our_dat.split(version_of_our_dat_n)\n" + "    name=name.__getitem__(0)\n" + "\n" +
-                "    version = []\n" + "    with open(path_to_version) as file:\n" +
-                "        version=file.readlines()\n" + "\n" + "    version = version.__getitem__(0).rstrip(\"\\n\")\n" +
-                "    version_n = re.findall(r'\\d+', version)\n" + "    version_n = version_n.__getitem__(0)\n" + "\n" +
-                "    version_convert_from = name+str(version_n)\n" + "\n" + "    please_convert=True\n" +
-                "    if(version_of_our_dat_n == version_convert_from):\n" + "        please_convert=False\n" + "\n" +
+                "    version_of_our_dat=\"" + options_intern.igv_species_ref_genome + "\"\n" + "\n");
+
+        sb_pyuplift.append("    grc_dict={}\n\n");
+        for(String key_grc : options_intern.igv_GRC_synonym_dict.keySet())
+        {
+            sb_pyuplift.append("    grc_dict['"+key_grc+"']='"+options_intern.igv_GRC_synonym_dict.get(key_grc)+"'\n");
+        }
+        sb_pyuplift.append("    version = []\n" + "    with open(path_to_version) as file:\n" +
+                "        version=file.readlines()\n" + "\n" + "    version = version.__getitem__(0).rstrip(\"\\n\")\n");
+        sb_pyuplift.append("    version = version.split(\".\")[0]\n");
+        sb_pyuplift.append("    version_convert_from = grc_dict.get(version)\n");
+        sb_pyuplift.append("    please_convert = True\n");
+
+        sb_pyuplift.append("    if(version_of_our_dat == version_convert_from):\n" + "        please_convert" +
+            "=False" +
+            "\n" + "\n" +
                 "\n" + "    df = pd.read_csv(path_to_X, sep=\"\\t\")\n" + "\n" + "    data_output = []\n" + "\n" +
                 "    column_names=[]\n" + "\n" + "    for col in df.columns:\n" + "        column_names.append(col)\n" +
                 "\n" + "    converter = LiftOver(version_convert_from, version_of_our_dat)\n" + "\n" +
@@ -13201,6 +13209,13 @@ public class COM2POSE_lib
             System.exit(1);
         }
 
+        //fill GRC to synonym hashmap with default values
+        options_intern.igv_GRC_synonym_dict.put("GRCm39","mm39");
+        options_intern.igv_GRC_synonym_dict.put("GRCm38","mm10");
+        options_intern.igv_GRC_synonym_dict.put("GRCm37","mm9");
+        options_intern.igv_GRC_synonym_dict.put("GRCh37","hg19");
+        options_intern.igv_GRC_synonym_dict.put("GRCh38","hg38");
+
         BufferedReader br = new BufferedReader(new FileReader(new File(options_intern.config_data_path)));
         String line = "";
         while ((line = br.readLine()) != null)
@@ -13470,6 +13485,22 @@ public class COM2POSE_lib
                     break;
                 case "igv_path_to_tdf":
                     options_intern.igv_path_to_tdf = split[1].substring(1, split[1].length() - 1);
+                    break;
+                case "igv_GRC_synonym_dict":
+                    String input= split[1].substring(1, split[1].length() - 1);
+                    if(input.length()<3)
+                    {
+                        break;
+                    }
+                    String[] groups = input.split(";");
+                    for(String g : groups)
+                    {
+                        String[] split_groups = g.split("=");
+                        if(split_groups.length>2)
+                        {
+                            options_intern.igv_GRC_synonym_dict.put(split_groups[0],split_groups[1]);
+                        }
+                    }
                     break;
                 case "igv_port_number":
                     options_intern.igv_port_number = Integer.parseInt(split[1]);
