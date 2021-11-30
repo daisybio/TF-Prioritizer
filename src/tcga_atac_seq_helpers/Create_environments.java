@@ -2,9 +2,11 @@ package tcga_atac_seq_helpers;
 
 import java.io.*;
 
-public class Create_environments {
+public class Create_environments
+{
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException
+    {
         String root_file_input = "/home/markus/data/COM2POSE/08_TCGA_ATAC_SEQ";
         String root_file_working_directories = "/home/markus/data/COM2POSE/01C_TCGA";
         String default_conifg =
@@ -17,8 +19,8 @@ public class Create_environments {
 
     private static void create_and_copy_config_and_commandline(String root_file, String default_command,
                                                                String default_conifg,
-                                                               String root_file_working_directories)
-            throws IOException {
+                                                               String root_file_working_directories) throws IOException
+    {
 
         File f_root_file_working_directories = new File(root_file_working_directories);
         File f_root = new File(root_file);
@@ -26,11 +28,14 @@ public class Create_environments {
         File f_default_config = new File(default_conifg);
         File f_default_command = new File(default_command);
 
-        for (File f_file : f_root.listFiles()) {
-            if (f_file.isDirectory()) {
+        for (File f_file : f_root.listFiles())
+        {
+            if (f_file.isDirectory())
+            {
                 String name = f_file.getName();
 
-                if (name.startsWith("00_requiredData")) {
+                if (name.startsWith("00_requiredData"))
+                {
                     continue;
                 }
 
@@ -44,7 +49,8 @@ public class Create_environments {
                 File f_dir_to_atac_seq_data = new File(
                         f_file.getAbsoluteFile() + File.separator + atac_seq + File.separator + atac_seq +
                                 File.separator + sorted_data);
-                if (!f_dir_to_atac_seq_data.exists()) {
+                if (!f_dir_to_atac_seq_data.exists())
+                {
                     System.out.println("[ERROR]: ATAC_SEQ file does not exist");
                     System.out.println("[ERROR]: at " + f_file.getName());
                     continue;
@@ -55,7 +61,8 @@ public class Create_environments {
 
                 File f_dir_rna_seq_data =
                         new File(f_file.getAbsolutePath() + File.separator + rna_seq + File.separator + formatted);
-                if (!f_dir_rna_seq_data.exists()) {
+                if (!f_dir_rna_seq_data.exists())
+                {
                     System.out.println("[ERROR]: RNA_SEQ file does not exist");
                     System.out.println("[ERROR]: at " + f_file.getName());
                     continue;
@@ -64,12 +71,14 @@ public class Create_environments {
 
                 File f_dir_rna_seq_data_geneids =
                         new File(f_dir_rna_seq_data.getAbsolutePath() + File.separator + "names_formatted.txt");
-                if (!f_dir_rna_seq_data_geneids.exists()) {
+                if (!f_dir_rna_seq_data_geneids.exists())
+                {
                     System.out.println("[ERROR]: RNA_SEQ geneids file does not exist");
                     System.exit(1);
                 }
 
-                if (f_dir_to_atac_seq_data.listFiles().length > 1) {
+                if (f_dir_to_atac_seq_data.listFiles().length > 1)
+                {
                     //create head folder
                     File f_head = new File(f_root_file_working_directories.getAbsolutePath() + File.separator + name);
                     f_head.mkdir();
@@ -135,23 +144,28 @@ public class Create_environments {
                     StringBuilder sb_altered_config_file = new StringBuilder();
                     BufferedReader br_old_config_file = new BufferedReader(new FileReader(f_default_config));
                     String line_old_config_file = "";
-                    while ((line_old_config_file = br_old_config_file.readLine()) != null) {
-                        if (line_old_config_file.startsWith("deseq2_input_directory")) {
+                    while ((line_old_config_file = br_old_config_file.readLine()) != null)
+                    {
+                        if (line_old_config_file.startsWith("deseq2_input_directory"))
+                        {
                             sb_altered_config_file.append("deseq2_input_directory=\"");
                             sb_altered_config_file.append(f_dir_rna_seq_data.getAbsolutePath());
                             sb_altered_config_file.append("\"\n");
 
-                        } else if (line_old_config_file.startsWith("deseq2_input_gene_id")) {
+                        } else if (line_old_config_file.startsWith("deseq2_input_gene_id"))
+                        {
                             sb_altered_config_file.append("deseq2_input_gene_id=\"");
                             sb_altered_config_file.append(f_dir_rna_seq_data_geneids.getAbsolutePath());
                             sb_altered_config_file.append("\"\n");
 
-                        } else if (line_old_config_file.startsWith("tepic_input_directory")) {
+                        } else if (line_old_config_file.startsWith("tepic_input_directory"))
+                        {
                             sb_altered_config_file.append("tepic_input_directory=\"");
                             sb_altered_config_file.append(f_dir_to_atac_seq_data.getAbsolutePath());
                             sb_altered_config_file.append("\"\n");
 
-                        } else {
+                        } else
+                        {
                             sb_altered_config_file.append(line_old_config_file);
                             sb_altered_config_file.append("\n");
                         }

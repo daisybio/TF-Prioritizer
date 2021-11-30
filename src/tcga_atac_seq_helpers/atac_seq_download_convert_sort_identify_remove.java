@@ -4,9 +4,11 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class atac_seq_download_convert_sort_identify_remove {
+public class atac_seq_download_convert_sort_identify_remove
+{
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception
+    {
 
         //COUNT WITH BASH DISTINCT VALUES OF A COLUMN
         //awk -F '\t' '{print $108}' clinical.tsv | sort | uniq -c | sort -nr
@@ -545,7 +547,8 @@ public class atac_seq_download_convert_sort_identify_remove {
 
     }
 
-    public static void execute_all(atac_seq_download_cancer_blocks block) throws Exception {
+    public static void execute_all(atac_seq_download_cancer_blocks block) throws Exception
+    {
 
         System.out.println("EXECUTING DOWNLOADS FOR CANCER: " + block.name);
 
@@ -582,12 +585,14 @@ public class atac_seq_download_convert_sort_identify_remove {
         //execute_peak_calling(f_output_dir_raw_data);
 
         File f_input_sample = new File(input_gdc_sample_sheet);
-        if (!f_input_sample.exists()) {
+        if (!f_input_sample.exists())
+        {
             System.out.println("CANNOT FIND SAMPLE SHEET");
             return;
         }
         File f_clinical = new File(input_clinical);
-        if (!f_clinical.exists()) {
+        if (!f_clinical.exists())
+        {
             System.out.println("CANNOT FIND CLINICAL");
             return;
         }
@@ -600,7 +605,8 @@ public class atac_seq_download_convert_sort_identify_remove {
 
     }
 
-    private static void execute_chr_remove(File f_output_dir_raw_data) {
+    private static void execute_chr_remove(File f_output_dir_raw_data)
+    {
         System.out.println("remove chr prefixes in .broadPeak files");
         String command = "find " + f_output_dir_raw_data.getAbsolutePath() +
                 " -name \\*.broadPeak -exec sh -c 'echo {}; sed -i -e 's/chr//g' {}' \\;";
@@ -611,11 +617,13 @@ public class atac_seq_download_convert_sort_identify_remove {
                                         File f_output_dir_raw_data, File f_output_dir_sorted_data,
                                         File f_output_dir_sorted_data_gapped, HashSet<String> groups,
                                         String other_samples, File f_output_dir_sorted_data_rscript,
-                                        File f_output_dir_sorted_data_allpeaks) throws Exception {
+                                        File f_output_dir_sorted_data_allpeaks) throws Exception
+    {
 
         System.out.println("START SORTING");
         //create all output_dirs
-        for (String k_groups : groups) {
+        for (String k_groups : groups)
+        {
             File f_out_sorted_data_parent =
                     new File(f_output_dir_sorted_data.getAbsolutePath() + File.separator + k_groups);
             f_out_sorted_data_parent.mkdirs();
@@ -690,7 +698,8 @@ public class atac_seq_download_convert_sort_identify_remove {
         BufferedReader br_gdc_sample_sheet = new BufferedReader(new FileReader(f_input_gdc_sample_sheet));
         String line_gdc_sample_sheet = br_gdc_sample_sheet.readLine();
         String[] header_gdc_sample_sheet = line_gdc_sample_sheet.split("\t");
-        while ((line_gdc_sample_sheet = br_gdc_sample_sheet.readLine()) != null) {
+        while ((line_gdc_sample_sheet = br_gdc_sample_sheet.readLine()) != null)
+        {
             String[] split = line_gdc_sample_sheet.split("\t");
             String file_id = split[0];
             String file_name = split[1];
@@ -709,7 +718,8 @@ public class atac_seq_download_convert_sort_identify_remove {
         BufferedReader br_clinical = new BufferedReader(new FileReader(f_input_clinical));
         String line_clinical = br_clinical.readLine();
         String[] header_clinical = line_clinical.split("\t");
-        while ((line_clinical = br_clinical.readLine()) != null) {
+        while ((line_clinical = br_clinical.readLine()) != null)
+        {
             String[] split = line_clinical.split("\t");
             String subtype = split[107];
             String caseID = split[0];
@@ -725,10 +735,13 @@ public class atac_seq_download_convert_sort_identify_remove {
         sb_mappings.append(
                 "sample_name\tcase_submitter_id\tcase_ID\tgdc_fileID\tgdc_file_name\tsubtype\tspecific_subtype\n");
 
-        for (File f_down_file : f_output_dir_raw_data.listFiles()) {
-            if (f_down_file.isDirectory()) {
+        for (File f_down_file : f_output_dir_raw_data.listFiles())
+        {
+            if (f_down_file.isDirectory())
+            {
                 String file_id = f_down_file.getName();
-                if (file_id_sample.containsKey(file_id)) {
+                if (file_id_sample.containsKey(file_id))
+                {
                     String sample_name = file_id_sample.get(file_id);
 
                     String file_name_intern = file_id_name.get(file_id);
@@ -737,32 +750,40 @@ public class atac_seq_download_convert_sort_identify_remove {
                     String subtype_name = sample_subtype.get(sample_name);
                     String subtype_sorted = "";
 
-                    for (String key_subtypes : groups) {
-                        if (subtype_name.matches(".*" + key_subtypes + ".*")) {
+                    for (String key_subtypes : groups)
+                    {
+                        if (subtype_name.matches(".*" + key_subtypes + ".*"))
+                        {
                             subtype_sorted = key_subtypes;
                             subtype_name = key_subtypes;
                         }
                     }
 
                     boolean other_sample_here = false;
-                    if (subtype_sorted.equals("")) {
+                    if (subtype_sorted.equals(""))
+                    {
                         subtype_sorted = other_samples;
                         other_sample_here = true;
                     }
 
                     File f_macs2_files = new File(f_down_file.getAbsolutePath() + File.separator + file_name_intern);
-                    if (f_macs2_files.exists()) {
-                        if (f_macs2_files.isDirectory()) {
-                            for (File f_macs2_outputs : f_macs2_files.listFiles()) {
+                    if (f_macs2_files.exists())
+                    {
+                        if (f_macs2_files.isDirectory())
+                        {
+                            for (File f_macs2_outputs : f_macs2_files.listFiles())
+                            {
                                 String command = "cp " + f_macs2_outputs.getAbsolutePath() + " ";
                                 String command_move = "mv ";
 
                                 String name_f_move = f_macs2_outputs.getName();
 
-                                if (name_f_move.matches(".*broadPeak.*")) {
+                                if (name_f_move.matches(".*broadPeak.*"))
+                                {
                                     String f_name_moved = "";
 
-                                    if (other_sample_here) {
+                                    if (other_sample_here)
+                                    {
                                         int sample_number = f_out_sorted_data.listFiles().length;
                                         sample_number++;
 
@@ -772,7 +793,8 @@ public class atac_seq_download_convert_sort_identify_remove {
                                                 f_macs2_outputs.getName() + " " + f_out_sorted_data.getAbsolutePath() +
                                                 File.separator + f_name_moved;
 
-                                    } else {
+                                    } else
+                                    {
                                         File f_output_group = new File(
                                                 f_output_dir_sorted_data.getAbsolutePath() + File.separator +
                                                         subtype_sorted + File.separator + "ATAC_SEQ");
@@ -807,10 +829,12 @@ public class atac_seq_download_convert_sort_identify_remove {
 
                                 }
 
-                                if (name_f_move.matches(".*gappedPeak.*")) {
+                                if (name_f_move.matches(".*gappedPeak.*"))
+                                {
                                     String f_name_moved = "";
 
-                                    if (other_sample_here) {
+                                    if (other_sample_here)
+                                    {
                                         int sample_number = f_out_gapped.listFiles().length;
                                         sample_number++;
 
@@ -820,7 +844,8 @@ public class atac_seq_download_convert_sort_identify_remove {
                                                 f_macs2_outputs.getName() + " " + f_out_gapped.getAbsolutePath() +
                                                 File.separator + f_name_moved;
 
-                                    } else {
+                                    } else
+                                    {
                                         File f_output_group = new File(
                                                 f_output_dir_sorted_data_gapped.getAbsolutePath() + File.separator +
                                                         subtype_sorted + File.separator + "ATAC_SEQ");
@@ -837,10 +862,12 @@ public class atac_seq_download_convert_sort_identify_remove {
                                     }
                                 }
 
-                                if (name_f_move.matches(".*_model.*")) {
+                                if (name_f_move.matches(".*_model.*"))
+                                {
                                     String f_name_moved = "";
 
-                                    if (other_sample_here) {
+                                    if (other_sample_here)
+                                    {
                                         int sample_number = f_out_rscript.listFiles().length;
                                         sample_number++;
 
@@ -851,7 +878,8 @@ public class atac_seq_download_convert_sort_identify_remove {
                                                 File.separator + f_name_moved;
 
 
-                                    } else {
+                                    } else
+                                    {
                                         File f_output_group = new File(
                                                 f_output_dir_sorted_data_rscript.getAbsolutePath() + File.separator +
                                                         subtype_sorted + File.separator + "ATAC_SEQ");
@@ -868,10 +896,12 @@ public class atac_seq_download_convert_sort_identify_remove {
                                     }
                                 }
 
-                                if (name_f_move.matches(".*_peaks.xls.*")) {
+                                if (name_f_move.matches(".*_peaks.xls.*"))
+                                {
                                     String f_name_moved = "";
 
-                                    if (other_sample_here) {
+                                    if (other_sample_here)
+                                    {
                                         int sample_number = f_out_allpeaks.listFiles().length;
                                         sample_number++;
 
@@ -882,7 +912,8 @@ public class atac_seq_download_convert_sort_identify_remove {
                                                 File.separator + f_name_moved;
 
 
-                                    } else {
+                                    } else
+                                    {
                                         File f_output_group = new File(
                                                 f_output_dir_sorted_data_allpeaks.getAbsolutePath() + File.separator +
                                                         subtype_sorted + File.separator + "ATAC_SEQ");
@@ -902,7 +933,8 @@ public class atac_seq_download_convert_sort_identify_remove {
                                 //copy file
                                 Process child = Runtime.getRuntime().exec(command);
                                 int code = child.waitFor();
-                                switch (code) {
+                                switch (code)
+                                {
                                     case 0:
                                         break;
                                     case 1:
@@ -913,7 +945,8 @@ public class atac_seq_download_convert_sort_identify_remove {
                                 //rename file
                                 Process child_move = Runtime.getRuntime().exec(command_move);
                                 int code_move = child_move.waitFor();
-                                switch (code_move) {
+                                switch (code_move)
+                                {
                                     case 0:
                                         break;
                                     case 1:
@@ -939,7 +972,8 @@ public class atac_seq_download_convert_sort_identify_remove {
 
     }
 
-    private static void execute_peak_calling(File f_output_dir_raw_data) throws Exception {
+    private static void execute_peak_calling(File f_output_dir_raw_data) throws Exception
+    {
         System.out.println("START PEAK CALLING");
         String command_mkdir = "find " + f_output_dir_raw_data.getAbsolutePath() +
                 " -name \\*.bam -exec sh -c 'echo {}; mkdir {}_file' \\;";
@@ -963,7 +997,8 @@ public class atac_seq_download_convert_sort_identify_remove {
     }
 
     private static void execute_download(String input_manifest, String input_gdc_client, File f_output_dir_raw_data,
-                                         String input_token, String name) throws Exception {
+                                         String input_token, String name) throws Exception
+    {
         System.out.println("DOWNLOADING");
         File f_input_manifest = new File(input_manifest);
 

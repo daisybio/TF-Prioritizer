@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="com2pose_dependencies">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ext/lib/commons-cli-1.5.0/commons-cli-1.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ext/lib/commons-compress-1.21/commons-compress-1.21.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ext/lib/weka/weka.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

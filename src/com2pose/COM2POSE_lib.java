@@ -21,7 +21,8 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class COM2POSE_lib {
+public class COM2POSE_lib
+{
     public Options_intern options_intern;
     public Logger logger;
 
@@ -35,7 +36,8 @@ public class COM2POSE_lib {
      * @param options_intern
      * @param logger
      */
-    public COM2POSE_lib(Options_intern options_intern, Logger logger) {
+    public COM2POSE_lib(Options_intern options_intern, Logger logger)
+    {
         this.options_intern = options_intern;
         this.logger = logger;
     }
@@ -46,7 +48,8 @@ public class COM2POSE_lib {
      * @param options_intern
      * @throws IOException
      */
-    public COM2POSE_lib(Options_intern options_intern) throws IOException {
+    public COM2POSE_lib(Options_intern options_intern) throws IOException
+    {
         this.options_intern = options_intern;
 
         logger = new Logger(options_intern.write_to_logfile, options_intern.com2pose_working_directory);
@@ -58,7 +61,8 @@ public class COM2POSE_lib {
         logger.logLine("COM2POSE path set to: " + options_intern.path_to_COM2POSE);
     }
 
-    public void run_igv_on_important_loci() throws Exception {
+    public void run_igv_on_important_loci() throws Exception
+    {
         logger.logLine("[IGV] Run IGV on important loci.");
 
         check_tepic_input_with_options();
@@ -69,9 +73,11 @@ public class COM2POSE_lib {
         BufferedReader br_ensg_gene_symbol =
                 new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
-        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null) {
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_gene_symbol.split("\t");
-            if (split.length > 1) {
+            if (split.length > 1)
+            {
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
@@ -87,10 +93,12 @@ public class COM2POSE_lib {
         BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(f_input_gene_to_coordinates));
         String line_gene_coordinates = br_gene_coordinates.readLine();
         String[] header_gene_coordinates = line_gene_coordinates.split("\t");
-        while ((line_gene_coordinates = br_gene_coordinates.readLine()) != null) {
+        while ((line_gene_coordinates = br_gene_coordinates.readLine()) != null)
+        {
             String[] split = line_gene_coordinates.split("\t");
 
-            if (split[1].startsWith("CHR")) {
+            if (split[1].startsWith("CHR"))
+            {
                 continue;
             }
 
@@ -132,16 +140,16 @@ public class COM2POSE_lib {
 
 
         //create ouput folder
-        File f_output_root =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+
-                        File.separator+ options_intern.folder_out_igv_important_loci);
+        File f_output_root = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv +
+                        File.separator + options_intern.folder_out_igv_important_loci);
         f_output_root.mkdir();
 
-        File root_copy =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_target_genes_dcg);
-        for(File f_tp : root_copy.listFiles())
+        File root_copy = new File(options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_out_target_genes_dcg);
+        for (File f_tp : root_copy.listFiles())
         {
-            if(f_tp.isDirectory())
+            if (f_tp.isDirectory())
             {
                 String key_tp = f_tp.getName();
 
@@ -404,8 +412,6 @@ public class COM2POSE_lib {
         }
 
 
-
-
         logger.logLine("[IGV] Finished run IGV on important loci.");
 
 
@@ -416,7 +422,8 @@ public class COM2POSE_lib {
      *
      * @throws Exception
      */
-    public void run_igv_own_data() throws Exception {
+    public void run_igv_own_data() throws Exception
+    {
         logger.logLine(
                 "[IGV] start taking screenshots for top TFs and their corresponding top target genes (OWN TF DATA)");
 
@@ -428,9 +435,11 @@ public class COM2POSE_lib {
         BufferedReader br_ensg_gene_symbol =
                 new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
-        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null) {
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_gene_symbol.split("\t");
-            if (split.length > 1) {
+            if (split.length > 1)
+            {
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
@@ -443,10 +452,12 @@ public class COM2POSE_lib {
         BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(f_input_gene_to_coordinates));
         String line_gene_coordinates = br_gene_coordinates.readLine();
         String[] header_gene_coordinates = line_gene_coordinates.split("\t");
-        while ((line_gene_coordinates = br_gene_coordinates.readLine()) != null) {
+        while ((line_gene_coordinates = br_gene_coordinates.readLine()) != null)
+        {
             String[] split = line_gene_coordinates.split("\t");
 
-            if (split[1].startsWith("CHR")) {
+            if (split[1].startsWith("CHR"))
+            {
                 continue;
             }
 
@@ -506,7 +517,8 @@ public class COM2POSE_lib {
                         File.separator + options_intern.folder_out_distribution_dcg + File.separator +
                         options_intern.file_suffix_distribution_analysis_dcg));
         String line_tfs = br_tfs.readLine();
-        while ((line_tfs = br_tfs.readLine()) != null) {
+        while ((line_tfs = br_tfs.readLine()) != null)
+        {
             String[] split = line_tfs.split("\t");
             tfs_in_order.add(split[1]);
         }
@@ -518,21 +530,29 @@ public class COM2POSE_lib {
                 options_intern.folder_out_target_genes_dcg);
 
         //prefill map
-        for (File f_target_genes_tp : f_root_target_genes.listFiles()) {
-            if (f_target_genes_tp.isDirectory()) {
-                for (File f_target_genes_tp_hm : f_target_genes_tp.listFiles()) {
-                    if (f_target_genes_tp_hm.isDirectory()) {
+        for (File f_target_genes_tp : f_root_target_genes.listFiles())
+        {
+            if (f_target_genes_tp.isDirectory())
+            {
+                for (File f_target_genes_tp_hm : f_target_genes_tp.listFiles())
+                {
+                    if (f_target_genes_tp_hm.isDirectory())
+                    {
                         HashMap<String, HashMap<String, ArrayList<String>>> tp_tf_target_genes = new HashMap<>();
                         hm_timepoint_tf_target_genes.put(f_target_genes_tp_hm.getName(), tp_tf_target_genes);
                     }
                 }
             }
         }
-        for (File f_target_genes_tp : f_root_target_genes.listFiles()) {
+        for (File f_target_genes_tp : f_root_target_genes.listFiles())
+        {
             String hm = "";
-            if (f_target_genes_tp.isDirectory()) {
-                for (File f_target_genes_tp_hm : f_target_genes_tp.listFiles()) {
-                    if (f_target_genes_tp_hm.isDirectory()) {
+            if (f_target_genes_tp.isDirectory())
+            {
+                for (File f_target_genes_tp_hm : f_target_genes_tp.listFiles())
+                {
+                    if (f_target_genes_tp_hm.isDirectory())
+                    {
                         hm = f_target_genes_tp_hm.getName();
                         HashMap<String, ArrayList<String>> tf_target_genes = new HashMap<>();
                         hm_timepoint_tf_target_genes.get(hm).put(f_target_genes_tp.getName(), tf_target_genes);
@@ -542,16 +562,22 @@ public class COM2POSE_lib {
             }
         }
 
-        for (File f_target_genes_tp : f_root_target_genes.listFiles()) {
-            if (f_target_genes_tp.isDirectory()) {
-                for (File f_target_genes_tp_hm : f_target_genes_tp.listFiles()) {
-                    if (f_target_genes_tp_hm.isDirectory()) {
+        for (File f_target_genes_tp : f_root_target_genes.listFiles())
+        {
+            if (f_target_genes_tp.isDirectory())
+            {
+                for (File f_target_genes_tp_hm : f_target_genes_tp.listFiles())
+                {
+                    if (f_target_genes_tp_hm.isDirectory())
+                    {
                         HashMap<String, ArrayList<String>> tf_target_genes = new HashMap<>();
                         hm_timepoint_tf_target_genes.get(f_target_genes_tp_hm.getName())
                                 .put(f_target_genes_tp.getName(), tf_target_genes);
 
-                        for (File f_target_genes_tp_hm_tf : f_target_genes_tp_hm.listFiles()) {
-                            if (f_target_genes_tp_hm_tf.isDirectory()) {
+                        for (File f_target_genes_tp_hm_tf : f_target_genes_tp_hm.listFiles())
+                        {
+                            if (f_target_genes_tp_hm_tf.isDirectory())
+                            {
                                 String tf_name = f_target_genes_tp_hm_tf.getName();
 
                                 ArrayList<String> target_genes = new ArrayList<>();
@@ -563,11 +589,13 @@ public class COM2POSE_lib {
                                                 ".csv")));
                                 String line = br.readLine();
                                 int count = 0;
-                                while ((line = br.readLine()) != null) {
+                                while ((line = br.readLine()) != null)
+                                {
                                     String[] split = line.split("\t");
                                     target_genes.add(split[0]);
 
-                                    if (count == options_intern.plot_top_k_genes - 1) {
+                                    if (count == options_intern.plot_top_k_genes - 1)
+                                    {
                                         break;
                                     }
 
@@ -656,8 +684,10 @@ public class COM2POSE_lib {
                         options_intern.folder_out_distribution_stats_HM);
 
         HashMap<String, HashSet<String>> hm_to_important_tfs = new HashMap<>();
-        for (File fileDir_hm : f_important_tfs_per_hm.listFiles()) {
-            if (fileDir_hm.isDirectory()) {
+        for (File fileDir_hm : f_important_tfs_per_hm.listFiles())
+        {
+            if (fileDir_hm.isDirectory())
+            {
                 HashSet<String> important_tfs = new HashSet<>();
                 hm_to_important_tfs.put(fileDir_hm.getName(), important_tfs);
 
@@ -666,7 +696,8 @@ public class COM2POSE_lib {
                                 options_intern.file_suffix_distribution_analysis_plot_stats)));
                 String line = br.readLine();
                 line = br.readLine();
-                while ((line = br.readLine()) != null) {
+                while ((line = br.readLine()) != null)
+                {
                     String[] split = line.split("\t");
                     important_tfs.add(split[1]);
                 }
@@ -689,7 +720,8 @@ public class COM2POSE_lib {
                         options_intern.file_suffix_distribution_analysis_dcg);
         BufferedReader br_input_all_dcg = new BufferedReader(new FileReader(f_input_all_dcg));
         String line_input_all_dcg = br_input_all_dcg.readLine();
-        while ((line_input_all_dcg = br_input_all_dcg.readLine()) != null) {
+        while ((line_input_all_dcg = br_input_all_dcg.readLine()) != null)
+        {
             String[] split = line_input_all_dcg.split("\t");
             which_tfs.add(split[1]);
 
@@ -704,9 +736,11 @@ public class COM2POSE_lib {
 
         HashSet<Double> already_done_percentage = new HashSet<>();
 
-        for (int i = 0; i < tfs_in_order.size(); i++) {
+        for (int i = 0; i < tfs_in_order.size(); i++)
+        {
             String tf = tfs_in_order.get(i);
-            if (which_tfs.contains(tf)) {
+            if (which_tfs.contains(tf))
+            {
                 int rank = i + 1;
                 File f_output_tf = new File(f_output_root.getAbsolutePath() + File.separator + rank + "_" + tf);
                 f_output_tf.mkdir();
@@ -714,10 +748,12 @@ public class COM2POSE_lib {
                         f_output_tf.getAbsolutePath() + File.separator + options_intern.folder_out_igv_session);
                 f_out_session.mkdir();
 
-                for (String key_hm : hm_timepoint_tf_target_genes.keySet()) {
+                for (String key_hm : hm_timepoint_tf_target_genes.keySet())
+                {
                     HashMap<String, HashMap<String, ArrayList<String>>> hm = hm_timepoint_tf_target_genes.get(key_hm);
 
-                    for (String key_tp : hm.keySet()) {
+                    for (String key_tp : hm.keySet())
+                    {
                         File f_out_session_tp = new File(f_out_session.getAbsolutePath() + File.separator + key_tp);
                         f_out_session_tp.mkdir();
 
@@ -744,7 +780,8 @@ public class COM2POSE_lib {
                         }*/
                         HashMap<String, ArrayList<String>> hm_tp = hm.get(key_tp);
 
-                        if (hm_tp.containsKey(tf)) {
+                        if (hm_tp.containsKey(tf))
+                        {
 
                             String load_tf_chip_seq = "load ";
                             ArrayList<String> tf_chip_seq_files = new ArrayList<>();
@@ -752,26 +789,25 @@ public class COM2POSE_lib {
                             boolean added_prediction_data = false;
 
                             //include predictive HMs
-                            if(options_intern.igv_include_prediction_data.size()>0)
+                            if (options_intern.igv_include_prediction_data.size() > 0)
                             {
-                                File f_input =
-                                        new File(options_intern.tepic_input_directory+File.separator+key_tp);
+                                File f_input = new File(options_intern.tepic_input_directory + File.separator + key_tp);
 
-                                for(String including_hm : options_intern.igv_include_prediction_data)
+                                for (String including_hm : options_intern.igv_include_prediction_data)
                                 {
-                                    File f_hm_input = new File(f_input.getAbsolutePath()+File.separator+including_hm);
-                                    if(f_hm_input.exists())
+                                    File f_hm_input =
+                                            new File(f_input.getAbsolutePath() + File.separator + including_hm);
+                                    if (f_hm_input.exists())
                                     {
-                                        for(File f_file : f_hm_input.listFiles())
+                                        for (File f_file : f_hm_input.listFiles())
                                         {
-                                            if(added_prediction_data)
+                                            if (added_prediction_data)
                                             {
-                                                load_tf_chip_seq+="," + f_file.getAbsolutePath();
-                                            }
-                                            else
+                                                load_tf_chip_seq += "," + f_file.getAbsolutePath();
+                                            } else
                                             {
-                                                added_prediction_data=true;
-                                                load_tf_chip_seq+= f_file.getAbsolutePath();
+                                                added_prediction_data = true;
+                                                load_tf_chip_seq += f_file.getAbsolutePath();
                                             }
                                         }
                                     }
@@ -780,12 +816,18 @@ public class COM2POSE_lib {
 
 
                             File f_input_evaluation_lines_root = new File(options_intern.igv_path_to_tf_chip_seq);
-                            for (File f_evaluation_tp : f_input_evaluation_lines_root.listFiles()) {
-                                if (f_evaluation_tp.getName().equals(key_tp)) {
-                                    for (File f_evaluation_tp_tf : f_evaluation_tp.listFiles()) {
-                                        if (f_evaluation_tp_tf.isDirectory()) {
-                                            for (File f_evaluation_tp_tf_file : f_evaluation_tp_tf.listFiles()) {
-                                                if (f_evaluation_tp_tf_file.isFile()) {
+                            for (File f_evaluation_tp : f_input_evaluation_lines_root.listFiles())
+                            {
+                                if (f_evaluation_tp.getName().equals(key_tp))
+                                {
+                                    for (File f_evaluation_tp_tf : f_evaluation_tp.listFiles())
+                                    {
+                                        if (f_evaluation_tp_tf.isDirectory())
+                                        {
+                                            for (File f_evaluation_tp_tf_file : f_evaluation_tp_tf.listFiles())
+                                            {
+                                                if (f_evaluation_tp_tf_file.isFile())
+                                                {
                                                     tf_chip_seq_files.add(f_evaluation_tp_tf_file.getAbsolutePath());
                                                 }
                                             }
@@ -796,40 +838,44 @@ public class COM2POSE_lib {
                             }
 
 
-
-                            for (int j = 0; j < tf_chip_seq_files.size(); j++) {
-                                if(tf_chip_seq_files.get(j).endsWith(".idx"))
+                            for (int j = 0; j < tf_chip_seq_files.size(); j++)
+                            {
+                                if (tf_chip_seq_files.get(j).endsWith(".idx"))
                                 {
                                     continue;
                                 }
-                                if (!added_prediction_data) {
+                                if (!added_prediction_data)
+                                {
                                     load_tf_chip_seq += tf_chip_seq_files.get(j);
-                                    added_prediction_data=true;
-                                } else {
+                                    added_prediction_data = true;
+                                } else
+                                {
                                     load_tf_chip_seq += "," + tf_chip_seq_files.get(j);
                                 }
                             }
 
                             //check if ChIP-ATLAS data is available
-                            File f_chip_atlas_data =
-                                    new File(options_intern.com2pose_working_directory + File.separator+options_intern.folder_out_chip_atlas+ File.separator + options_intern.folder_out_chip_atlas_peak_files+ File.separator + rank + "_" + tf);
-                            if(f_chip_atlas_data.exists())
+                            File f_chip_atlas_data = new File(
+                                    options_intern.com2pose_working_directory + File.separator +
+                                            options_intern.folder_out_chip_atlas + File.separator +
+                                            options_intern.folder_out_chip_atlas_peak_files + File.separator + rank +
+                                            "_" + tf);
+                            if (f_chip_atlas_data.exists())
                             {
-                                for(File f_input : f_chip_atlas_data.listFiles())
+                                for (File f_input : f_chip_atlas_data.listFiles())
                                 {
-                                    if(f_input.getName().endsWith(".idx"))
+                                    if (f_input.getName().endsWith(".idx"))
                                     {
                                         continue;
                                     }
 
-                                    if(added_prediction_data)
+                                    if (added_prediction_data)
                                     {
-                                        load_tf_chip_seq+="," + f_input.getAbsolutePath();
-                                    }
-                                    else
+                                        load_tf_chip_seq += "," + f_input.getAbsolutePath();
+                                    } else
                                     {
-                                        added_prediction_data=true;
-                                        load_tf_chip_seq+= f_input.getAbsolutePath();
+                                        added_prediction_data = true;
+                                        load_tf_chip_seq += f_input.getAbsolutePath();
                                     }
                                 }
                             }
@@ -901,19 +947,24 @@ public class COM2POSE_lib {
                                             options_intern.folder_name_tepic_output_raw + File.separator + key_tp +
                                             File.separator + key_hm);
                             File f_input_regions_to_target_genes_search = new File("");
-                            if (!f_input_regions_to_target_genes.exists()) {
-                                if (!key_hm.equals(options_intern.distribution_analysis_all_name)) {
+                            if (!f_input_regions_to_target_genes.exists())
+                            {
+                                if (!key_hm.equals(options_intern.distribution_analysis_all_name))
+                                {
                                     continue;
-                                } else {
+                                } else
+                                {
                                     //could be unnecessary
-                                    for (String key_hm_to_important : hm_to_important_tfs.keySet()) {
+                                    for (String key_hm_to_important : hm_to_important_tfs.keySet())
+                                    {
                                         hm_to_important_tfs.get(key_hm_to_important).add(tf);
                                     }
                                     continue;
                                 }
                             }
 
-                            for (File f_search : f_input_regions_to_target_genes.listFiles()) {
+                            for (File f_search : f_input_regions_to_target_genes.listFiles())
+                            {
                                 f_input_regions_to_target_genes_search = f_search;
                             }
                             f_input_regions_to_target_genes_search = new File(
@@ -924,22 +975,27 @@ public class COM2POSE_lib {
                                     new BufferedReader(new FileReader(f_input_regions_to_target_genes_search));
                             String line_regions_to_target_genes = br_regions_to_target_genes.readLine();
                             String[] header_regions_to_target_genes = line_regions_to_target_genes.split("\t");
-                            while ((line_regions_to_target_genes = br_regions_to_target_genes.readLine()) != null) {
+                            while ((line_regions_to_target_genes = br_regions_to_target_genes.readLine()) != null)
+                            {
                                 String[] split = line_regions_to_target_genes.split("\t");
                                 String region = split[0];
                                 String[] split_target_genes = split[1].split(";");
 
-                                for (String key_target_gene : split_target_genes) {
+                                for (String key_target_gene : split_target_genes)
+                                {
                                     key_target_gene = key_target_gene.split("\\.")[0];
                                     key_target_gene = ensg_gene_symbol_map.get(key_target_gene);
 
-                                    if (key_target_gene == null) {
+                                    if (key_target_gene == null)
+                                    {
                                         continue;
                                     }
 
-                                    if (gene_to_regions_all.containsKey(key_target_gene)) {
+                                    if (gene_to_regions_all.containsKey(key_target_gene))
+                                    {
                                         gene_to_regions_all.get(key_target_gene).add(region);
-                                    } else {
+                                    } else
+                                    {
                                         HashSet<String> x = new HashSet<>();
                                         x.add(region);
                                         gene_to_regions_all.put(key_target_gene, x);
@@ -950,20 +1006,25 @@ public class COM2POSE_lib {
 
                             //create wides range for each possible target gene
                             HashMap<String, String> gene_to_region = new HashMap<>();
-                            for (String key_gene : gene_to_regions_all.keySet()) {
+                            for (String key_gene : gene_to_regions_all.keySet())
+                            {
                                 HashSet<String> regions_into_one = gene_to_regions_all.get(key_gene);
 
                                 String chr = "";
                                 int begin = Integer.MAX_VALUE;
                                 int end = Integer.MIN_VALUE;
 
-                                for (String position : regions_into_one) {
+                                for (String position : regions_into_one)
+                                {
                                     String[] split = position.split(":");
 
-                                    if (chr.equals("")) {
+                                    if (chr.equals(""))
+                                    {
                                         chr = split[0];
-                                    } else {
-                                        if (!chr.equals(split[0])) {
+                                    } else
+                                    {
+                                        if (!chr.equals(split[0]))
+                                        {
                                             //logger.logLine("[ERROR] DIFFERENT CHROMOSOME FOR LOOKUP?!");
                                             continue;
                                         }
@@ -973,10 +1034,12 @@ public class COM2POSE_lib {
                                     int begin_n = Integer.parseInt(split_pos[0]);
                                     int end_n = Integer.parseInt(split_pos[1]);
 
-                                    if (begin_n < begin) {
+                                    if (begin_n < begin)
+                                    {
                                         begin = begin_n;
                                     }
-                                    if (end < end_n) {
+                                    if (end < end_n)
+                                    {
                                         end = end_n;
                                     }
 
@@ -991,8 +1054,10 @@ public class COM2POSE_lib {
 
                             //create new gene ranges
                             HashMap<String, String> gene_to_coordinates_this_run = new HashMap<>(gene_to_coordinates);
-                            for (String key_gene_to_region : gene_to_region.keySet()) {
-                                if (gene_to_coordinates_this_run.containsKey(key_gene_to_region)) {
+                            for (String key_gene_to_region : gene_to_region.keySet())
+                            {
+                                if (gene_to_coordinates_this_run.containsKey(key_gene_to_region))
+                                {
                                     String position = gene_to_coordinates_this_run.get(key_gene_to_region);
                                     String region_tf = gene_to_region.get(key_gene_to_region);
 
@@ -1012,7 +1077,8 @@ public class COM2POSE_lib {
                                     int begin_r = Integer.parseInt(split_r_position[0]);
                                     int end_r = Integer.parseInt(split_r_position[1]);
 
-                                    if (!chr_p.equals(chr_r)) {
+                                    if (!chr_p.equals(chr_r))
+                                    {
                                         //logger.logLine("[ERROR]: chromosome do not match");
                                         begin_p -= 100000;
                                         end_p += 100000;
@@ -1028,14 +1094,18 @@ public class COM2POSE_lib {
                                     int begin_final = Integer.MAX_VALUE;
                                     int end_final = Integer.MIN_VALUE;
 
-                                    if (begin_r < begin_p) {
+                                    if (begin_r < begin_p)
+                                    {
                                         begin_final = begin_r;
-                                    } else {
+                                    } else
+                                    {
                                         begin_final = begin_p;
                                     }
-                                    if (end_r < end_p) {
+                                    if (end_r < end_p)
+                                    {
                                         end_final = end_p;
-                                    } else {
+                                    } else
+                                    {
                                         end_final = end_r;
                                     }
 
@@ -1083,7 +1153,8 @@ public class COM2POSE_lib {
                             //logger.logLine("[IGV] "+ response);
 
                             int count = 1;
-                            for (String targets : target_genes_for_photo_session) {
+                            for (String targets : target_genes_for_photo_session)
+                            {
                                 String snapshot_name = count + "_" + tf + "_" + targets + ".png";
 
                                 File f_output_shot = new File(f_output_tf_hm_tp.getAbsolutePath());
@@ -1112,9 +1183,12 @@ public class COM2POSE_lib {
                                 File f_snapshot_made = new File("NO");
 
                                 //search png name
-                                for (File f_snapshot : f_output_shot.listFiles()) {
-                                    if (f_snapshot.isFile()) {
-                                        if (f_snapshot.getName().startsWith("chr")) {
+                                for (File f_snapshot : f_output_shot.listFiles())
+                                {
+                                    if (f_snapshot.isFile())
+                                    {
+                                        if (f_snapshot.getName().startsWith("chr"))
+                                        {
                                             f_snapshot_made = f_snapshot;
                                             break;
                                         }
@@ -1122,10 +1196,12 @@ public class COM2POSE_lib {
                                     }
                                 }
 
-                                if (!f_snapshot_made.exists()) {
+                                if (!f_snapshot_made.exists())
+                                {
                                     //its the all overview
                                     //logger.logLine("[ERROR]: trying to move file which does not exist!");
-                                } else {
+                                } else
+                                {
 
                                     String command_mv = "mv " + f_snapshot_made.getAbsolutePath() + " " +
                                             f_snapshot_made.getParentFile().getAbsolutePath() + File.separator +
@@ -1134,7 +1210,8 @@ public class COM2POSE_lib {
 
                                     Process child = Runtime.getRuntime().exec(command_mv);
                                     int code = child.waitFor();
-                                    switch (code) {
+                                    switch (code)
+                                    {
                                         case 0:
                                             break;
                                         case 1:
@@ -1170,7 +1247,8 @@ public class COM2POSE_lib {
             String percentage_string = df.format(percentage_done);
             percentage_done = Double.parseDouble(percentage_string) * 100;
 
-            if (percentage_done % 10 == 0 && !already_done_percentage.contains(percentage_done)) {
+            if (percentage_done % 10 == 0 && !already_done_percentage.contains(percentage_done))
+            {
                 logger.logLine("[IGV] percentage of tasks done: " + percentage_done + "%");
                 already_done_percentage.add(percentage_done);
             }
@@ -1183,10 +1261,12 @@ public class COM2POSE_lib {
     /**
      * run IGV and take screenshots chr wide
      */
-    public void run_igv_chr_wide_data() throws IOException {
+    public void run_igv_chr_wide_data() throws IOException
+    {
         logger.logLine("[IGV] Take screenshots of peaks chr wide and genome wide");
 
-        if (options_intern.mix_level.equals("SAMPLE_LEVEL")) {
+        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
             File root_mix_working_dir = new File(
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
             File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
@@ -1195,7 +1275,8 @@ public class COM2POSE_lib {
             options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
         }
 
-        if (options_intern.mix_level.equals("HM_LEVEL")) {
+        if (options_intern.mix_level.equals("HM_LEVEL"))
+        {
             File root_mix_working_dir = new File(
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
             File f_output_hm = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
@@ -1205,7 +1286,8 @@ public class COM2POSE_lib {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = f_output_hm.getAbsolutePath();
         }
-        if (!options_intern.black_list_dir.equals("")) {
+        if (!options_intern.black_list_dir.equals(""))
+        {
             File output_folder = new File(options_intern.com2pose_working_directory + File.separator +
                     options_intern.folder_name_blacklisted_regions);
             File output_folder_new_input = new File(output_folder.getAbsolutePath() + File.separator +
@@ -1216,7 +1298,8 @@ public class COM2POSE_lib {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
         }
-        if (options_intern.mix_mutually_exclusive) {
+        if (options_intern.mix_mutually_exclusive)
+        {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
@@ -1247,11 +1330,16 @@ public class COM2POSE_lib {
         boolean added_prediction_data = false;
 
         //load ChIP-seq CHIPATLAS data
-        for (File f_dir_atlas : f_input_chipATLAS_data.listFiles()) {
-            if (f_dir_atlas.isDirectory()) {
-                for (File f_dir_bed : f_dir_atlas.listFiles()) {
-                    if (f_dir_bed.isFile()) {
-                        if (f_dir_bed.getName().contains("idx")) {
+        for (File f_dir_atlas : f_input_chipATLAS_data.listFiles())
+        {
+            if (f_dir_atlas.isDirectory())
+            {
+                for (File f_dir_bed : f_dir_atlas.listFiles())
+                {
+                    if (f_dir_bed.isFile())
+                    {
+                        if (f_dir_bed.getName().contains("idx"))
+                        {
                             continue;
                         }
 
@@ -1266,13 +1354,20 @@ public class COM2POSE_lib {
         }
 
         //load input ChIP-seq data
-        for (File f_tp : f_input_userInput_bedfiles.listFiles()) {
-            if (f_tp.isDirectory()) {
-                for (File f_hm : f_tp.listFiles()) {
-                    if (f_hm.isDirectory()) {
-                        for (File f_bed : f_hm.listFiles()) {
-                            if (f_bed.isFile()) {
-                                if (f_bed.getName().contains("idx")) {
+        for (File f_tp : f_input_userInput_bedfiles.listFiles())
+        {
+            if (f_tp.isDirectory())
+            {
+                for (File f_hm : f_tp.listFiles())
+                {
+                    if (f_hm.isDirectory())
+                    {
+                        for (File f_bed : f_hm.listFiles())
+                        {
+                            if (f_bed.isFile())
+                            {
+                                if (f_bed.getName().contains("idx"))
+                                {
                                     continue;
                                 }
                                 ;
@@ -1295,10 +1390,13 @@ public class COM2POSE_lib {
         File f_fasta_for_chromosomes = new File(options_intern.tepic_input_ref_genome);
         BufferedReader br_fasta = new BufferedReader(new FileReader(f_fasta_for_chromosomes));
         String line_fasta = "";
-        while ((line_fasta = br_fasta.readLine()) != null) {
-            if (line_fasta.startsWith(">")) {
+        while ((line_fasta = br_fasta.readLine()) != null)
+        {
+            if (line_fasta.startsWith(">"))
+            {
                 String[] split = line_fasta.split(">");
-                if (split[1].length() <= 3) {
+                if (split[1].length() <= 3)
+                {
                     chromosomes.add(split[1]);
                 }
             }
@@ -1306,8 +1404,10 @@ public class COM2POSE_lib {
 
         //take screenshots of all chromosomes and genome wide
 
-        for (String key_chr : chromosomes) {
-            if (!key_chr.contains("chr")) {
+        for (String key_chr : chromosomes)
+        {
+            if (!key_chr.contains("chr"))
+            {
                 key_chr = "chr" + key_chr;
             }
 
@@ -1382,7 +1482,8 @@ public class COM2POSE_lib {
     /**
      * run igv on chip atlas data
      */
-    public void run_igv_chip_atlas_data() throws Exception {
+    public void run_igv_chip_atlas_data() throws Exception
+    {
         logger.logLine("[ChIP-ATLAS-IGV] Start running ChIP Atlas evaluation data. (ChIP-ATLAS data)");
         //logger.logLine("[ChIP-ATLAS-IGV] This is as far automated as possible. If a .bed file is very big a user entry is prompted at IGV, please click GO there!");
 
@@ -1419,10 +1520,12 @@ public class COM2POSE_lib {
         BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(f_input_gene_to_coordinates));
         String line_gene_coordinates = br_gene_coordinates.readLine();
         String[] header_gene_coordinates = line_gene_coordinates.split("\t");
-        while ((line_gene_coordinates = br_gene_coordinates.readLine()) != null) {
+        while ((line_gene_coordinates = br_gene_coordinates.readLine()) != null)
+        {
             String[] split = line_gene_coordinates.split("\t");
 
-            if (split[1].startsWith("CHR")) {
+            if (split[1].startsWith("CHR"))
+            {
                 continue;
             }
 
@@ -1477,9 +1580,11 @@ public class COM2POSE_lib {
         BufferedReader br_ensg_gene_symbol =
                 new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
-        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null) {
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_gene_symbol.split("\t");
-            if (split.length > 1) {
+            if (split.length > 1)
+            {
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
@@ -1488,7 +1593,8 @@ public class COM2POSE_lib {
 
         BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
         String line_dcg = br_dcg.readLine();
-        while ((line_dcg = br_dcg.readLine()) != null) {
+        while ((line_dcg = br_dcg.readLine()) != null)
+        {
             String[] split = line_dcg.split("\t");
             ordered_tfs_dcg.add(split[1]);
         }
@@ -1496,8 +1602,10 @@ public class COM2POSE_lib {
 
         //read in all important tfs per hm
         HashMap<String, HashSet<String>> hm_to_important_tfs = new HashMap<>();
-        for (File fileDir_hm : f_important_tfs_per_hm.listFiles()) {
-            if (fileDir_hm.isDirectory()) {
+        for (File fileDir_hm : f_important_tfs_per_hm.listFiles())
+        {
+            if (fileDir_hm.isDirectory())
+            {
                 HashSet<String> important_tfs = new HashSet<>();
                 hm_to_important_tfs.put(fileDir_hm.getName(), important_tfs);
 
@@ -1506,7 +1614,8 @@ public class COM2POSE_lib {
                                 options_intern.file_suffix_distribution_analysis_plot_stats)));
                 String line = br.readLine();
                 line = br.readLine();
-                while ((line = br.readLine()) != null) {
+                while ((line = br.readLine()) != null)
+                {
                     String[] split = line.split("\t");
                     important_tfs.add(split[1]);
                 }
@@ -1522,12 +1631,14 @@ public class COM2POSE_lib {
                 new BufferedReader(new FileReader(f_input_all_hm_to_important_tfs));
         String line_input_all_hm_to_important_tfs = br_input_all_hm_to_important_tfs.readLine();
         HashSet<String> hs_input_all_hm_to_important_tfs = new HashSet<>();
-        while ((line_input_all_hm_to_important_tfs = br_input_all_hm_to_important_tfs.readLine()) != null) {
+        while ((line_input_all_hm_to_important_tfs = br_input_all_hm_to_important_tfs.readLine()) != null)
+        {
             String[] split = line_input_all_hm_to_important_tfs.split("\t");
             hs_input_all_hm_to_important_tfs.add(split[1]);
 
             //retrieve all TF targets from ALL analysis
-            for (String key_hm : hm_to_important_tfs.keySet()) {
+            for (String key_hm : hm_to_important_tfs.keySet())
+            {
                 hm_to_important_tfs.get(key_hm).add(split[1]);
 
             }
@@ -1541,10 +1652,12 @@ public class COM2POSE_lib {
         int i = 1;
         HashSet<Double> already_done_percentage = new HashSet<>();
 
-        for (String key_tf : ordered_tfs_dcg) {
+        for (String key_tf : ordered_tfs_dcg)
+        {
             File f_input_bed_test =
                     new File(f_bed_data_input_root.getAbsolutePath() + File.separator + i + "_" + key_tf);
-            if (!f_input_bed_test.exists()) {
+            if (!f_input_bed_test.exists())
+            {
                 i++;
                 continue;
             }
@@ -1552,14 +1665,18 @@ public class COM2POSE_lib {
             File f_output_igv_shots = new File(f_output_igv_root.getAbsolutePath() + File.separator + i + "_" + key_tf);
             f_output_igv_shots.mkdirs();
 
-            for (File file_dir_tp : f_target_genes_input_root.listFiles()) {
-                if (file_dir_tp.isDirectory()) {
+            for (File file_dir_tp : f_target_genes_input_root.listFiles())
+            {
+                if (file_dir_tp.isDirectory())
+                {
                     File f_output_igv_shots_tp =
                             new File(f_output_igv_shots.getAbsolutePath() + File.separator + file_dir_tp.getName());
                     f_output_igv_shots_tp.mkdirs();
 
-                    for (String key_hm : hm_to_important_tfs.keySet()) {
-                        if (hm_to_important_tfs.get(key_hm).contains(key_tf)) {
+                    for (String key_hm : hm_to_important_tfs.keySet())
+                    {
+                        if (hm_to_important_tfs.get(key_hm).contains(key_tf))
+                        {
 
                             //read in regions to target gene table
                             HashMap<String, HashSet<String>> gene_to_regions_all = new HashMap<>();
@@ -1568,19 +1685,24 @@ public class COM2POSE_lib {
                                             options_intern.folder_name_tepic_output_raw + File.separator +
                                             file_dir_tp.getName() + File.separator + key_hm);
                             File f_input_regions_to_target_genes_search = new File("");
-                            if (!f_input_regions_to_target_genes.exists()) {
-                                if (!key_hm.equals(options_intern.distribution_analysis_all_name)) {
+                            if (!f_input_regions_to_target_genes.exists())
+                            {
+                                if (!key_hm.equals(options_intern.distribution_analysis_all_name))
+                                {
                                     continue;
-                                } else {
+                                } else
+                                {
                                     //could be unnecessary
-                                    for (String key_hm_to_important : hm_to_important_tfs.keySet()) {
+                                    for (String key_hm_to_important : hm_to_important_tfs.keySet())
+                                    {
                                         hm_to_important_tfs.get(key_hm_to_important).add(key_tf);
                                     }
                                     continue;
                                 }
                             }
 
-                            for (File f_search : f_input_regions_to_target_genes.listFiles()) {
+                            for (File f_search : f_input_regions_to_target_genes.listFiles())
+                            {
                                 f_input_regions_to_target_genes_search = f_search;
                             }
                             f_input_regions_to_target_genes_search = new File(
@@ -1591,22 +1713,27 @@ public class COM2POSE_lib {
                                     new BufferedReader(new FileReader(f_input_regions_to_target_genes_search));
                             String line_regions_to_target_genes = br_regions_to_target_genes.readLine();
                             String[] header_regions_to_target_genes = line_regions_to_target_genes.split("\t");
-                            while ((line_regions_to_target_genes = br_regions_to_target_genes.readLine()) != null) {
+                            while ((line_regions_to_target_genes = br_regions_to_target_genes.readLine()) != null)
+                            {
                                 String[] split = line_regions_to_target_genes.split("\t");
                                 String region = split[0];
                                 String[] split_target_genes = split[1].split(";");
 
-                                for (String key_target_gene : split_target_genes) {
+                                for (String key_target_gene : split_target_genes)
+                                {
                                     key_target_gene = key_target_gene.split("\\.")[0];
                                     key_target_gene = ensg_gene_symbol_map.get(key_target_gene);
 
-                                    if (key_target_gene == null) {
+                                    if (key_target_gene == null)
+                                    {
                                         continue;
                                     }
 
-                                    if (gene_to_regions_all.containsKey(key_target_gene)) {
+                                    if (gene_to_regions_all.containsKey(key_target_gene))
+                                    {
                                         gene_to_regions_all.get(key_target_gene).add(region);
-                                    } else {
+                                    } else
+                                    {
                                         HashSet<String> x = new HashSet<>();
                                         x.add(region);
                                         gene_to_regions_all.put(key_target_gene, x);
@@ -1617,20 +1744,25 @@ public class COM2POSE_lib {
 
                             //create wides range for each possible target gene
                             HashMap<String, String> gene_to_region = new HashMap<>();
-                            for (String key_gene : gene_to_regions_all.keySet()) {
+                            for (String key_gene : gene_to_regions_all.keySet())
+                            {
                                 HashSet<String> regions_into_one = gene_to_regions_all.get(key_gene);
 
                                 String chr = "";
                                 int begin = Integer.MAX_VALUE;
                                 int end = Integer.MIN_VALUE;
 
-                                for (String position : regions_into_one) {
+                                for (String position : regions_into_one)
+                                {
                                     String[] split = position.split(":");
 
-                                    if (chr.equals("")) {
+                                    if (chr.equals(""))
+                                    {
                                         chr = split[0];
-                                    } else {
-                                        if (!chr.equals(split[0])) {
+                                    } else
+                                    {
+                                        if (!chr.equals(split[0]))
+                                        {
                                             //logger.logLine("[ERROR] DIFFERENT CHROMOSOME FOR LOOKUP?!");
                                             continue;
                                         }
@@ -1640,10 +1772,12 @@ public class COM2POSE_lib {
                                     int begin_n = Integer.parseInt(split_pos[0]);
                                     int end_n = Integer.parseInt(split_pos[1]);
 
-                                    if (begin_n < begin) {
+                                    if (begin_n < begin)
+                                    {
                                         begin = begin_n;
                                     }
-                                    if (end < end_n) {
+                                    if (end < end_n)
+                                    {
                                         end = end_n;
                                     }
 
@@ -1658,8 +1792,10 @@ public class COM2POSE_lib {
 
                             //create new gene ranges
                             HashMap<String, String> gene_to_coordinates_this_run = new HashMap<>(gene_to_coordinates);
-                            for (String key_gene_to_region : gene_to_region.keySet()) {
-                                if (gene_to_coordinates_this_run.containsKey(key_gene_to_region)) {
+                            for (String key_gene_to_region : gene_to_region.keySet())
+                            {
+                                if (gene_to_coordinates_this_run.containsKey(key_gene_to_region))
+                                {
                                     String position = gene_to_coordinates_this_run.get(key_gene_to_region);
                                     String region_tf = gene_to_region.get(key_gene_to_region);
 
@@ -1679,7 +1815,8 @@ public class COM2POSE_lib {
                                     int begin_r = Integer.parseInt(split_r_position[0]);
                                     int end_r = Integer.parseInt(split_r_position[1]);
 
-                                    if (!chr_p.equals(chr_r)) {
+                                    if (!chr_p.equals(chr_r))
+                                    {
                                         //logger.logLine("[ERROR]: chromosome do not match");
                                         begin_p -= 100000;
                                         end_p += 100000;
@@ -1695,14 +1832,18 @@ public class COM2POSE_lib {
                                     int begin_final = Integer.MAX_VALUE;
                                     int end_final = Integer.MIN_VALUE;
 
-                                    if (begin_r < begin_p) {
+                                    if (begin_r < begin_p)
+                                    {
                                         begin_final = begin_r;
-                                    } else {
+                                    } else
+                                    {
                                         begin_final = begin_p;
                                     }
-                                    if (end_r < end_p) {
+                                    if (end_r < end_p)
+                                    {
                                         end_final = end_p;
-                                    } else {
+                                    } else
+                                    {
                                         end_final = end_r;
                                     }
 
@@ -1727,18 +1868,21 @@ public class COM2POSE_lib {
                                     file_dir_tp.getAbsolutePath() + File.separator + key_hm + File.separator + key_tf +
                                             File.separator + key_tf + ".csv");
 
-                            if (!f_input_target_genes_file.exists()) {
+                            if (!f_input_target_genes_file.exists())
+                            {
                                 continue;
                             }
 
                             BufferedReader br = new BufferedReader(new FileReader(f_input_target_genes_file));
                             String line = br.readLine();
                             int count_target_genes = 0;
-                            while ((line = br.readLine()) != null) {
+                            while ((line = br.readLine()) != null)
+                            {
                                 String[] split = line.split("\t");
                                 target_genes.add(split[0]);
 
-                                if (count_target_genes == options_intern.plot_top_k_genes - 1) {
+                                if (count_target_genes == options_intern.plot_top_k_genes - 1)
+                                {
                                     break;
                                 }
                                 count_target_genes++;
@@ -1750,37 +1894,38 @@ public class COM2POSE_lib {
 
                             File f_input_bed = new File(
                                     f_bed_data_input_root.getAbsolutePath() + File.separator + i + "_" + key_tf);
-                            if (!f_input_bed.exists()) {
+                            if (!f_input_bed.exists())
+                            {
                                 continue;
                             }
 
                             String load_for_session_intern = "load ";
-                            String load_tf_chip_seq_1 ="load ";
-                            boolean added_prediction_data=false;
+                            String load_tf_chip_seq_1 = "load ";
+                            boolean added_prediction_data = false;
 
                             //include predictive HMs
-                            if(options_intern.igv_include_prediction_data.size()>0)
+                            if (options_intern.igv_include_prediction_data.size() > 0)
                             {
-                                File f_input =
-                                        new File(options_intern.tepic_input_directory+File.separator+file_dir_tp.getName());
+                                File f_input = new File(
+                                        options_intern.tepic_input_directory + File.separator + file_dir_tp.getName());
 
-                                for(String including_hm : options_intern.igv_include_prediction_data)
+                                for (String including_hm : options_intern.igv_include_prediction_data)
                                 {
-                                    File f_hm_input = new File(f_input.getAbsolutePath()+File.separator+including_hm);
-                                    if(f_hm_input.exists())
+                                    File f_hm_input =
+                                            new File(f_input.getAbsolutePath() + File.separator + including_hm);
+                                    if (f_hm_input.exists())
                                     {
-                                        for(File f_file : f_hm_input.listFiles())
+                                        for (File f_file : f_hm_input.listFiles())
                                         {
-                                            if(added_prediction_data)
+                                            if (added_prediction_data)
                                             {
-                                                load_tf_chip_seq_1+="," + f_file.getAbsolutePath();
-                                                load_for_session_intern+="," + f_file.getAbsolutePath();
-                                            }
-                                            else
+                                                load_tf_chip_seq_1 += "," + f_file.getAbsolutePath();
+                                                load_for_session_intern += "," + f_file.getAbsolutePath();
+                                            } else
                                             {
-                                                added_prediction_data=true;
-                                                load_tf_chip_seq_1+= f_file.getAbsolutePath();
-                                                load_for_session_intern+=f_file.getAbsolutePath();
+                                                added_prediction_data = true;
+                                                load_tf_chip_seq_1 += f_file.getAbsolutePath();
+                                                load_for_session_intern += f_file.getAbsolutePath();
                                             }
                                         }
                                     }
@@ -1792,8 +1937,10 @@ public class COM2POSE_lib {
 
                             String load_bed_files_overall = "load";
 
-                            for (File f_bed_files : f_input_bed.listFiles()) {
-                                if (f_bed_files.getName().endsWith("idx")) {
+                            for (File f_bed_files : f_input_bed.listFiles())
+                            {
+                                if (f_bed_files.getName().endsWith("idx"))
+                                {
                                     continue;
                                 }
                                 String load_tf_chip_seq = "load " + f_bed_files.getAbsolutePath();
@@ -1803,14 +1950,13 @@ public class COM2POSE_lib {
 
                                 load_bed_files_overall += " " + f_bed_files.getAbsolutePath();
 
-                                if(added_prediction_data)
+                                if (added_prediction_data)
                                 {
-                                    load_for_session_intern+="," + f_bed_files.getAbsolutePath();
-                                }
-                                else
+                                    load_for_session_intern += "," + f_bed_files.getAbsolutePath();
+                                } else
                                 {
-                                    added_prediction_data=true;
-                                    load_for_session_intern+=f_bed_files.getAbsolutePath();
+                                    added_prediction_data = true;
+                                    load_for_session_intern += f_bed_files.getAbsolutePath();
                                 }
 
                             }
@@ -1856,9 +2002,10 @@ public class COM2POSE_lib {
 
 
                             //save session
-                            File f_session_intern =
-                                    new File(f_output_igv_shots.getAbsolutePath() + File.separator +file_dir_tp.getName()+File.separator+key_hm+File.separator+
-                                    options_intern.file_suffix_session);
+                            File f_session_intern = new File(
+                                    f_output_igv_shots.getAbsolutePath() + File.separator + file_dir_tp.getName() +
+                                            File.separator + key_hm + File.separator +
+                                            options_intern.file_suffix_session);
                             igv_save_sessions(f_session_intern, load_for_session_intern, tdf_files);
 
                             Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
@@ -1887,7 +2034,8 @@ public class COM2POSE_lib {
                             }
 
 
-                            for (String key_target_gene : target_genes) {
+                            for (String key_target_gene : target_genes)
+                            {
                                 String snapshot_name = count + "_" + key_tf + "_" + key_target_gene + ".png";
 
                                 File f_output_tf_hm_tp = new File(
@@ -1933,9 +2081,12 @@ public class COM2POSE_lib {
                                 File f_snapshot_made = new File("NO");
 
                                 //search png name
-                                for (File f_snapshot : f_output_igv_shots_tp_hm.listFiles()) {
-                                    if (f_snapshot.isFile()) {
-                                        if (f_snapshot.getName().startsWith("chr")) {
+                                for (File f_snapshot : f_output_igv_shots_tp_hm.listFiles())
+                                {
+                                    if (f_snapshot.isFile())
+                                    {
+                                        if (f_snapshot.getName().startsWith("chr"))
+                                        {
                                             f_snapshot_made = f_snapshot;
                                             break;
                                         }
@@ -1943,10 +2094,12 @@ public class COM2POSE_lib {
                                     }
                                 }
 
-                                if (!f_snapshot_made.exists()) {
+                                if (!f_snapshot_made.exists())
+                                {
                                     //its the all overview
                                     //logger.logLine("[ERROR]: trying to move file which does not exist!");
-                                } else {
+                                } else
+                                {
 
                                     String command_mv = "mv " + f_snapshot_made.getAbsolutePath() + " " +
                                             f_snapshot_made.getParentFile().getAbsolutePath() + File.separator +
@@ -1955,7 +2108,8 @@ public class COM2POSE_lib {
 
                                     Process child = Runtime.getRuntime().exec(command_mv);
                                     int code = child.waitFor();
-                                    switch (code) {
+                                    switch (code)
+                                    {
                                         case 0:
                                             break;
                                         case 1:
@@ -1991,7 +2145,8 @@ public class COM2POSE_lib {
             percentage_done = Double.parseDouble(percentage_string) * 100;
             already_done_percentage.add(-1.0);
 
-            if (percentage_done % 10 == 0 && !already_done_percentage.contains(percentage_done)) {
+            if (percentage_done % 10 == 0 && !already_done_percentage.contains(percentage_done))
+            {
                 logger.logLine("[ChIP-ATLAS-IGV] percentage of tasks done: " + percentage_done + "%");
                 already_done_percentage.add(percentage_done);
             }
@@ -2003,7 +2158,8 @@ public class COM2POSE_lib {
         logger.logLine("[ChIP-ATLAS-IGV] Finished evaluation with ChIP Atlas data.");
     }
 
-    public void get_chip_atlas_data() throws Exception {
+    public void get_chip_atlas_data() throws Exception
+    {
 
         File f_output_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_chip_atlas);
@@ -2041,11 +2197,13 @@ public class COM2POSE_lib {
         String[] split_types = options_intern.chip_atlas_tissue_type.split(";");
 
         ArrayList<String> all_regex = new ArrayList<>();
-        for (String key_type : split_types) {
+        for (String key_type : split_types)
+        {
             String regex_for_this_type = "";
 
             String[] split_tissue_type = key_type.split(" ");
-            for (String s : split_tissue_type) {
+            for (String s : split_tissue_type)
+            {
                 regex_for_this_type += ".*" + s;
             }
             regex_for_this_type += ".*";
@@ -2054,56 +2212,72 @@ public class COM2POSE_lib {
             all_regex.add(regex_for_this_type);
         }
 
-        if (all_regex.size() > 1) {
+        if (all_regex.size() > 1)
+        {
             regex_tissue_type += "(";
         }
 
-        for (int i = 0; i < all_regex.size(); i++) {
-            if (i > 0) {
+        for (int i = 0; i < all_regex.size(); i++)
+        {
+            if (i > 0)
+            {
                 regex_tissue_type += "|" + all_regex.get(i);
-            } else {
+            } else
+            {
                 regex_tissue_type += all_regex.get(i);
             }
         }
 
-        if (all_regex.size() > 1) {
+        if (all_regex.size() > 1)
+        {
             regex_tissue_type += ")";
         }
 
 
-        for (int i = 0; i < split_header.length; i++) {
-            if (split_header[i].matches(options_intern.chip_atlas_column_gene_version)) {
+        for (int i = 0; i < split_header.length; i++)
+        {
+            if (split_header[i].matches(options_intern.chip_atlas_column_gene_version))
+            {
                 column_gene_version = i;
             }
-            if (split_header[i].matches(options_intern.chip_atlas_column_antigen_class)) {
+            if (split_header[i].matches(options_intern.chip_atlas_column_antigen_class))
+            {
                 column_antigen_class = i;
             }
-            if (split_header[i].matches(options_intern.chip_atlas_column_antigen)) {
+            if (split_header[i].matches(options_intern.chip_atlas_column_antigen))
+            {
                 column_antigen = i;
             }
-            if (split_header[i].matches(options_intern.chip_atlas_column_cell_type_class)) {
+            if (split_header[i].matches(options_intern.chip_atlas_column_cell_type_class))
+            {
                 column_cell_type_class = i;
             }
-            if (split_header[i].matches(options_intern.chip_atlas_column_url)) {
+            if (split_header[i].matches(options_intern.chip_atlas_column_url))
+            {
                 column_url = i;
             }
         }
 
-        while ((line = br.readLine()) != null) {
+        while ((line = br.readLine()) != null)
+        {
             String[] split = line.split(",");
-            if (!split[column_gene_version].equals(options_intern.chip_atlas_genome_version)) {
+            if (!split[column_gene_version].equals(options_intern.chip_atlas_genome_version))
+            {
                 continue;
             }
-            if (!split[column_antigen_class].equals("TFs and others")) {
+            if (!split[column_antigen_class].equals("TFs and others"))
+            {
                 continue;
             }
-            if (!split[column_cell_type_class].toUpperCase().matches(regex_tissue_type)) {
+            if (!split[column_cell_type_class].toUpperCase().matches(regex_tissue_type))
+            {
                 continue;
             }
 
             String url = split[split.length - 1];
             String tf = split[column_antigen];
-            if (!tf.equals("")) {
+            if (!tf.equals(""))
+            {
                 tf_to_url.put(tf.toUpperCase(), url);
             }
 
@@ -2124,14 +2298,17 @@ public class COM2POSE_lib {
 
         BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
         String line_dcg = br_dcg.readLine();
-        while ((line_dcg = br_dcg.readLine()) != null) {
+        while ((line_dcg = br_dcg.readLine()) != null)
+        {
             String[] split = line_dcg.split("\t");
 
             String[] split_tf = split[1].split("\\.");
 
             HashSet<String> splits = new HashSet<>();
-            for (String tf_name_chipatlas : split_tf) {
-                if (!tf_name_chipatlas.startsWith(" ")) {
+            for (String tf_name_chipatlas : split_tf)
+            {
+                if (!tf_name_chipatlas.startsWith(" "))
+                {
                     unordered_tfs_dcg.add(tf_name_chipatlas);
                 }
 
@@ -2145,54 +2322,65 @@ public class COM2POSE_lib {
         }
         br_dcg.close();
 
-        for (int i = 0; i < ordered_tfs_dcg.size(); i++) {
+        for (int i = 0; i < ordered_tfs_dcg.size(); i++)
+        {
             boolean found_tf = false;
 
             ArrayList<String> found_tfs_to_download = new ArrayList<>();
 
             HashSet<String> split_of_tfs = tf_to_splits.get(ordered_tfs_dcg.get(i).toUpperCase());
-            for (String split_tf : split_of_tfs) {
-                if (tf_to_url.containsKey(split_tf)) {
+            for (String split_tf : split_of_tfs)
+            {
+                if (tf_to_url.containsKey(split_tf))
+                {
                     found_tf = true;
                     found_tfs_to_download.add(split_tf);
                 }
             }
 
 
-            if (found_tf) {
+            if (found_tf)
+            {
                 int rank = i + 1;
 
                 File f_download_tf = new File(
                         f_output_peak_files.getAbsolutePath() + File.separator + rank + "_" + ordered_tfs_dcg.get(i));
                 f_download_tf.mkdir();
 
-                for (String tf_found_split : found_tfs_to_download) {
+                for (String tf_found_split : found_tfs_to_download)
+                {
                     File f_download_tf_file =
                             new File(f_download_tf.getAbsolutePath() + File.separator + tf_found_split + ".bed");
 
-                    if(f_download_tf_file.exists())
+                    if (f_download_tf_file.exists())
                     {
                         continue;
                     }
 
                     // Create a new trust manager that trust all certificates
-                    TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager()
+                    {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                        {
                             return null;
                         }
 
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                        {
                         }
 
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                        {
                         }
                     }};
                     // Activate the new trust manager
-                    try {
+                    try
+                    {
                         SSLContext sc = SSLContext.getInstance("SSL");
                         sc.init(null, trustAllCerts, new java.security.SecureRandom());
                         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-                    } catch (Exception e) {
+                    } catch (Exception e)
+                    {
                         //e.printStackTrace();
                     }
                     // And as before now you can use URL and URLConnection
@@ -2200,12 +2388,15 @@ public class COM2POSE_lib {
                     URLConnection connection = url.openConnection();
                     InputStream is = connection.getInputStream();
 
-                    try (OutputStream outputStream = new FileOutputStream(f_download_tf_file)) {
+                    try (OutputStream outputStream = new FileOutputStream(f_download_tf_file))
+                    {
                         IOUtils.copy(is, outputStream);
-                    } catch (FileNotFoundException e) {
+                    } catch (FileNotFoundException e)
+                    {
                         // handle exception here
                         e.printStackTrace();
-                    } catch (IOException e) {
+                    } catch (IOException e)
+                    {
                         // handle exception here
                         //e.printStackTrace();
                     }
@@ -2213,14 +2404,17 @@ public class COM2POSE_lib {
                     //check if valid bed file, if not, delete
                     Path path = Paths.get(f_download_tf_file.getAbsolutePath());
                     long size = Files.size(path);
-                    if (size < 300) {
+                    if (size < 300)
+                    {
                         f_download_tf_file.delete();
                         f_download_tf.delete();
-                    } else {
+                    } else
+                    {
                         DecimalFormat df = new DecimalFormat("0.00");
 
                         double percentage = ((i * 1.0 / ordered_tfs_dcg.size())) * 100;
-                        if (percentage <= 100) {
+                        if (percentage <= 100)
+                        {
                             logger.logLine("[ChIP-ATLAS] processed " + df.format(percentage) + "% TFs.");
                         }
                     }
@@ -2231,7 +2425,8 @@ public class COM2POSE_lib {
 
                     Process child = Runtime.getRuntime().exec(command_create_index);
                     int code = child.waitFor();
-                    switch (code) {
+                    switch (code)
+                    {
                         case 0:
                             break;
                         case 1:
@@ -2255,7 +2450,8 @@ public class COM2POSE_lib {
      *
      * @throws Exception
      */
-    public void get_chip_atlas_data_list() throws Exception {
+    public void get_chip_atlas_data_list() throws Exception
+    {
         logger.logLine("[ChIP-ATLAS] get ChIP-Atlas Data for Discounted Cumulative Gain TFs!");
         logger.logLine("[ChIP-ATLAS] Genome version: " + options_intern.chip_atlas_genome_version);
         logger.logLine("[ChIP-ATLAS] Tissue type: " + options_intern.chip_atlas_tissue_type);
@@ -2280,25 +2476,32 @@ public class COM2POSE_lib {
         logger.logLine("[ChIP-ATLAS] waiting ...");
         File f_output_list_zip = new File(
                 f_output_list.getAbsolutePath() + File.separator + options_intern.file_suffix_chip_atlas_list_zipped);
-        if (!f_output_list_zip.exists()) {
+        if (!f_output_list_zip.exists())
+        {
             // Create a new trust manager that trust all certificates
-            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager()
+            {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                {
                     return null;
                 }
 
-                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                {
                 }
 
-                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                {
                 }
             }};
             // Activate the new trust manager
-            try {
+            try
+            {
                 SSLContext sc = SSLContext.getInstance("SSL");
                 sc.init(null, trustAllCerts, new java.security.SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 e.printStackTrace();
             }
             // And as before now you can use URL and URLConnection
@@ -2306,12 +2509,15 @@ public class COM2POSE_lib {
             URLConnection connection = url.openConnection();
             InputStream is = connection.getInputStream();
 
-            try (OutputStream outputStream = new FileOutputStream(f_output_list_zip)) {
+            try (OutputStream outputStream = new FileOutputStream(f_output_list_zip))
+            {
                 IOUtils.copy(is, outputStream);
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException e)
+            {
                 // handle exception here
                 e.printStackTrace();
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 // handle exception here
                 e.printStackTrace();
             }
@@ -2320,14 +2526,16 @@ public class COM2POSE_lib {
         logger.logLine("[ChIP-ATLAS] Unzipping file: " + f_output_list.getAbsolutePath());
         File f_output_list_csv = new File(
                 f_output_list.getAbsolutePath() + File.separator + options_intern.file_suffix_chip_atlas_list_csv);
-        if (!f_output_list_csv.exists()) {
+        if (!f_output_list_csv.exists())
+        {
             //unzip file
             String command_edited =
                     "unzip " + f_output_list_zip + " -d " + f_output_list_csv.getParentFile().getAbsolutePath();
             logger.logLine("[ChIP-ATLAS] executing command: " + command_edited);
             Process child = Runtime.getRuntime().exec(command_edited);
             int code = child.waitFor();
-            switch (code) {
+            switch (code)
+            {
                 case 0:
                     break;
                 case 1:
@@ -2341,7 +2549,8 @@ public class COM2POSE_lib {
     /**
      * retrieve top k target genes of DCG found TFs
      */
-    public void get_top_k_target_genes_dcg() throws IOException {
+    public void get_top_k_target_genes_dcg() throws IOException
+    {
         logger.logLine("[EVALUATION-PREPROCESSING] retrieve top " + options_intern.plot_top_k_genes +
                 " target genes foreach discounted cumulative gain TF");
 
@@ -2363,7 +2572,8 @@ public class COM2POSE_lib {
 
         BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
         String line_dcg = br_dcg.readLine();
-        while ((line_dcg = br_dcg.readLine()) != null) {
+        while ((line_dcg = br_dcg.readLine()) != null)
+        {
             String[] split = line_dcg.split("\t");
             ordered_tfs_dcg.add(split[1]);
             unordered_tfs_dcg.add(split[1]);
@@ -2376,72 +2586,90 @@ public class COM2POSE_lib {
         BufferedReader br_ensg_gene_symbol =
                 new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
-        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null) {
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_gene_symbol.split("\t");
-            if (split.length > 1) {
+            if (split.length > 1)
+            {
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
         br_ensg_gene_symbol.close();
 
 
-        for (File file_dir_tp : f_input_affinity_values_root.listFiles()) {
-            if (file_dir_tp.isDirectory()) {
+        for (File file_dir_tp : f_input_affinity_values_root.listFiles())
+        {
+            if (file_dir_tp.isDirectory())
+            {
                 File f_output_tp =
                         new File(f_output_results_root.getAbsolutePath() + File.separator + file_dir_tp.getName());
                 f_output_tp.mkdir();
 
-                for (File file_dir_tp_hm : file_dir_tp.listFiles()) {
-                    if (file_dir_tp_hm.isDirectory()) {
+                for (File file_dir_tp_hm : file_dir_tp.listFiles())
+                {
+                    if (file_dir_tp_hm.isDirectory())
+                    {
                         File f_output_tp_hm =
                                 new File(f_output_tp.getAbsolutePath() + File.separator + file_dir_tp_hm.getName());
                         f_output_tp_hm.mkdir();
 
                         HashMap<String, TF_TargetGene_DCG> tf_to_target_genes = new HashMap<>();
-                        for (String key_tf : ordered_tfs_dcg) {
+                        for (String key_tf : ordered_tfs_dcg)
+                        {
                             TF_TargetGene_DCG dcg = new TF_TargetGene_DCG();
                             dcg.TF = key_tf;
                             tf_to_target_genes.put(key_tf, dcg);
                         }
 
-                        for (File file_dir_tp_hm_file : file_dir_tp_hm.listFiles()) {
-                            if (file_dir_tp_hm_file.isFile()) {
+                        for (File file_dir_tp_hm_file : file_dir_tp_hm.listFiles())
+                        {
+                            if (file_dir_tp_hm_file.isFile())
+                            {
                                 HashMap<Integer, String> index_to_tf = new HashMap<>();
                                 HashMap<String, Integer> tf_to_index = new HashMap<>();
 
                                 BufferedReader br = new BufferedReader(new FileReader(file_dir_tp_hm_file));
                                 String line = br.readLine();
                                 String[] split_header = line.split("\t");
-                                for (int i = 1; i < split_header.length; i++) {
+                                for (int i = 1; i < split_header.length; i++)
+                                {
                                     String name_tf = split_header[i].split("_")[0];
                                     name_tf = name_tf.replaceAll(":", "\\.");
 
-                                    if (unordered_tfs_dcg.contains(name_tf.toUpperCase())) {
+                                    if (unordered_tfs_dcg.contains(name_tf.toUpperCase()))
+                                    {
                                         index_to_tf.put(i, name_tf.toUpperCase());
                                         tf_to_index.put(name_tf.toUpperCase(), i);
                                     }
                                 }
 
-                                while ((line = br.readLine()) != null) {
+                                while ((line = br.readLine()) != null)
+                                {
                                     String[] split = line.split("\t");
 
                                     String gene_name = "";
-                                    if (ensg_gene_symbol_map.containsKey(split[0])) {
+                                    if (ensg_gene_symbol_map.containsKey(split[0]))
+                                    {
                                         gene_name = ensg_gene_symbol_map.get(split[0]).toUpperCase();
-                                    } else {
+                                    } else
+                                    {
                                         continue;
                                     }
 
-                                    for (int i = 1; i < split.length; i++) {
-                                        if (index_to_tf.containsKey(i)) {
+                                    for (int i = 1; i < split.length; i++)
+                                    {
+                                        if (index_to_tf.containsKey(i))
+                                        {
                                             String tf = index_to_tf.get(i);
 
                                             TF_TargetGene_DCG dcg = tf_to_target_genes.get(tf);
 
-                                            if (dcg.target_gene_affinity_values.containsKey(gene_name)) {
+                                            if (dcg.target_gene_affinity_values.containsKey(gene_name))
+                                            {
                                                 dcg.target_gene_affinity_values.get(gene_name).affinity_values.add(
                                                         Double.parseDouble(split[i]));
-                                            } else {
+                                            } else
+                                            {
                                                 TargetGene_DCG tdcg = new TargetGene_DCG();
                                                 tdcg.target_gene = gene_name;
                                                 tdcg.affinity_values.add(Double.parseDouble(split[i]));
@@ -2456,15 +2684,18 @@ public class COM2POSE_lib {
                         }
 
                         //calculate means
-                        for (String key_tf : tf_to_target_genes.keySet()) {
+                        for (String key_tf : tf_to_target_genes.keySet())
+                        {
                             TF_TargetGene_DCG dcg = tf_to_target_genes.get(key_tf);
-                            if (dcg.target_gene_affinity_values.isEmpty()) {
+                            if (dcg.target_gene_affinity_values.isEmpty())
+                            {
                                 continue;
                             }
 
                             ArrayList<TargetGene_DCG> tdcg_ordered = dcg.get_ordered_target_gene_list();
 
-                            if (tdcg_ordered.isEmpty()) {
+                            if (tdcg_ordered.isEmpty())
+                            {
                                 continue;
                             }
 
@@ -2475,7 +2706,8 @@ public class COM2POSE_lib {
                             StringBuilder sb = new StringBuilder();
                             sb.append("TARGET_GENE\tAFFINITY_SCORE");
                             sb.append("\n");
-                            for (TargetGene_DCG tdcg : tdcg_ordered) {
+                            for (TargetGene_DCG tdcg : tdcg_ordered)
+                            {
                                 sb.append(tdcg.target_gene);
                                 sb.append("\t");
                                 sb.append(tdcg.mean_affinity_value);
@@ -2499,7 +2731,8 @@ public class COM2POSE_lib {
     /**
      * calculate discounted cumulative gain rank for distribution analysis and set up html report for it
      */
-    public void calculate_discounted_cumulative_gain_rank_distribution_analysis() throws Exception {
+    public void calculate_discounted_cumulative_gain_rank_distribution_analysis() throws Exception
+    {
         logger.logLine("[DISTRIBUTION-ANALYSIS] Start calculate ranks overall groups.");
 
         //calculate ranks overall groups
@@ -2520,7 +2753,8 @@ public class COM2POSE_lib {
                 options_intern.folder_out_distribution_stats_HM);
 
 
-        for (File fileDir_stat : f_distr_stats_HM.listFiles()) {
+        for (File fileDir_stat : f_distr_stats_HM.listFiles())
+        {
             Analysis_distribution_stats_object current_object = get_distribution_analysis_stats_ordered(fileDir_stat);
             group_analysis_distr_stats_objects.put(fileDir_stat.getName(), current_object);
         }
@@ -2532,7 +2766,8 @@ public class COM2POSE_lib {
         int group_number = 0;
 
 
-        for (String key_group : group_analysis_distr_stats_objects.keySet()) {
+        for (String key_group : group_analysis_distr_stats_objects.keySet())
+        {
             available_modifications.add(key_group);
 
             HashMap<String, Integer> tf_to_ranks = new HashMap<>();
@@ -2541,7 +2776,8 @@ public class COM2POSE_lib {
             ArrayList<Analysis_distribution_stats> currents_tfs_to_rank =
                     group_analysis_distr_stats_objects.get(key_group).ordered_tfs;
 
-            for (Analysis_distribution_stats tf : currents_tfs_to_rank) {
+            for (Analysis_distribution_stats tf : currents_tfs_to_rank)
+            {
                 tf_to_ranks.put(tf.label, rank + 1);
                 rank++;
             }
@@ -2556,10 +2792,13 @@ public class COM2POSE_lib {
         ArrayList<Analysis_distribution_stats_cumulative_gain> fin_ranks = new ArrayList<>();
         HashSet<String> already_calculated_tfs = new HashSet<>();
 
-        for (String key_group : group_analysis_distr_stats.keySet()) {
+        for (String key_group : group_analysis_distr_stats.keySet())
+        {
             HashMap<String, Integer> current_tfs = group_analysis_distr_stats.get(key_group);
-            for (String key_tf : current_tfs.keySet()) {
-                if (already_calculated_tfs.contains(key_tf)) {
+            for (String key_tf : current_tfs.keySet())
+            {
+                if (already_calculated_tfs.contains(key_tf))
+                {
                     continue;
                 }
 
@@ -2576,12 +2815,15 @@ public class COM2POSE_lib {
                 current_group_background.put(key_group, xx.background);
 
 
-                for (String key_group_clash : group_analysis_distr_stats.keySet()) {
-                    if (key_group_clash.equals(key_group)) {
+                for (String key_group_clash : group_analysis_distr_stats.keySet())
+                {
+                    if (key_group_clash.equals(key_group))
+                    {
                         continue;
                     }
                     HashMap<String, Integer> current_tfs_clash = group_analysis_distr_stats.get(key_group_clash);
-                    if (current_tfs_clash.containsKey(key_tf)) {
+                    if (current_tfs_clash.containsKey(key_tf))
+                    {
                         HashMap<String, Integer> current_tfs_clash_x = group_analysis_distr_stats.get(key_group_clash);
 
                         Analysis_distribution_stats_object xx_clash =
@@ -2618,7 +2860,8 @@ public class COM2POSE_lib {
         StringBuilder sb_dcg = new StringBuilder();
         sb_dcg.append("RANK\tTF\tSCORE\n");
         int i_rank = 1;
-        for (Analysis_distribution_stats_cumulative_gain ac : fin_ranks) {
+        for (Analysis_distribution_stats_cumulative_gain ac : fin_ranks)
+        {
             sb_dcg.append(ac.toString(i_rank));
             sb_dcg.append("\n");
             i_rank++;
@@ -2647,25 +2890,33 @@ public class COM2POSE_lib {
         File f_input_genecounts_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_analysis_data +
                         File.separator + options_intern.folder_out_analysis_data_HM_LEVEL);
-        for (File fileDir : f_input_genecounts_root.listFiles()) {
-            if (fileDir.isDirectory()) {
-                for (File fileDir_gc : fileDir.listFiles()) {
-                    if (fileDir_gc.isFile()) {
+        for (File fileDir : f_input_genecounts_root.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
+                for (File fileDir_gc : fileDir.listFiles())
+                {
+                    if (fileDir_gc.isFile())
+                    {
                         BufferedReader br = new BufferedReader(new FileReader(fileDir_gc));
                         String line = br.readLine();
                         String[] split_header = line.split("\t");
 
-                        while ((line = br.readLine()) != null) {
+                        while ((line = br.readLine()) != null)
+                        {
                             String[] split_line = line.split("\t");
 
                             String name_tf = split_line[0];
 
-                            for (int i = 1; i < split_header.length; i++) {
+                            for (int i = 1; i < split_header.length; i++)
+                            {
                                 HashMap<String, String> tf_genecount_for_tp;
 
-                                if (tp_tf_gene_count.containsKey(split_header[i])) {
+                                if (tp_tf_gene_count.containsKey(split_header[i]))
+                                {
                                     tf_genecount_for_tp = tp_tf_gene_count.get(split_header[i]);
-                                } else {
+                                } else
+                                {
                                     tf_genecount_for_tp = new HashMap<>();
                                 }
 
@@ -2685,7 +2936,8 @@ public class COM2POSE_lib {
 
         DecimalFormat df = new DecimalFormat("0.00");
 
-        for (int i = 0; i < fin_ranks.size(); i++) {
+        for (int i = 0; i < fin_ranks.size(); i++)
+        {
             int rank_overall = i + 1;
             Analysis_distribution_stats_cumulative_gain as = fin_ranks.get(i);
             HashMap<String, Analysis_distribution_stats> group_object = as.group_object;
@@ -2713,23 +2965,27 @@ public class COM2POSE_lib {
             sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
             sb_cumulative_gain_website.append("\t\t</tr>\n");
 
-            for (String key_group : available_modifications) {
+            for (String key_group : available_modifications)
+            {
                 sb_cumulative_gain_website.append("\t\t\t<tr>\n");
 
-                if (as.group_object.containsKey(key_group)) {
+                if (as.group_object.containsKey(key_group))
+                {
                     Analysis_distribution_stats as_obj = as.group_object.get(key_group);
 
                     HashMap<String, Integer> actual_ranks = group_analysis_distr_stats.get(key_group);
 
                     sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
-                    if (key_group.equals(options_intern.distribution_analysis_all_name)) {
+                    if (key_group.equals(options_intern.distribution_analysis_all_name))
+                    {
                         sb_cumulative_gain_website.append("<a href='" + ".." + File.separator +
                                 options_intern.folder_out_website_htmls_distribution_analysis_ALL + File.separator +
                                 options_intern.html_report_home_regression_distribution_analysis_all + "#" +
                                 as.label.toUpperCase() +
                                 "' target='_blank'><button class='button' style='background-color:#67cb67;'>");
 
-                    } else {
+                    } else
+                    {
                         sb_cumulative_gain_website.append("<a href='" + ".." + File.separator +
                                 options_intern.folder_out_website_htmls_distribution_analysis_HM + File.separator +
                                 key_group + ".html#" + as.label.toUpperCase() +
@@ -2749,7 +3005,8 @@ public class COM2POSE_lib {
                     sb_cumulative_gain_website.append(
                             actual_ranks.get(as.label.toUpperCase()) + "/" + actual_ranks.size());
                     sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
-                } else {
+                } else
+                {
                     sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
                     sb_cumulative_gain_website.append(key_group);
                     sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
@@ -2791,7 +3048,8 @@ public class COM2POSE_lib {
 
             HashSet<String> tps = new HashSet<>();
 
-            for (String key : tp_tf_gene_count.keySet()) {
+            for (String key : tp_tf_gene_count.keySet())
+            {
                 sb_cumulative_gain_website.append("\t\t\t\t<th>\n");
                 sb_cumulative_gain_website.append(key);
                 sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
@@ -2804,10 +3062,12 @@ public class COM2POSE_lib {
             sb_cumulative_gain_website.append(as.label.toUpperCase());
             sb_cumulative_gain_website.append("\t\t\t\t</th>\n");
 
-            for (String key : tps) {
+            for (String key : tps)
+            {
                 String value = "0.0";
                 HashMap<String, String> current_x = tp_tf_gene_count.get(key);
-                if (current_x.containsKey(as.label.toUpperCase())) {
+                if (current_x.containsKey(as.label.toUpperCase()))
+                {
                     value = current_x.get(as.label.toUpperCase());
                 }
 
@@ -2840,7 +3100,8 @@ public class COM2POSE_lib {
 
         ArrayList<File> stat_files = new ArrayList<>();
         stat_files.add(f_distr_stats_ALL);
-        for (File fileDir_stat : f_distr_stats_HM.listFiles()) {
+        for (File fileDir_stat : f_distr_stats_HM.listFiles())
+        {
             stat_files.add(fileDir_stat);
         }
 
@@ -2856,7 +3117,8 @@ public class COM2POSE_lib {
                 "<button class=\"button_expandable\" id=\"button_regression_coefficient_analysis\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_regression_coefficient_analysis','table_regression_coefficient_analysis')\"> Regression Coefficient Analysis - OVERVIEW\n");
         sb_home_home.append(
                 "<div style=\"display: none;background-color: white;color:black;\" id=\"table_regression_coefficient_analysis\">\n");
-        for (Double d : options_intern.plot_th_coefficient) {
+        for (Double d : options_intern.plot_th_coefficient)
+        {
             sb_home_home.append(
                     write_regression_coeffecient_analysis_found_table_html(d, options_intern.html_report_levels_home));
         }
@@ -2878,7 +3140,8 @@ public class COM2POSE_lib {
     /**
      * CREATE HTML REPORT FOR DISTRIBUTION ANALYSIS
      */
-    public void create_overview_html_report_distribution() throws Exception {
+    public void create_overview_html_report_distribution() throws Exception
+    {
         logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Create HTML report.");
 
         File f_output_website_root = new File(
@@ -2928,7 +3191,8 @@ public class COM2POSE_lib {
         Process child = Runtime.getRuntime().exec(command);
         logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Copy plots for transferable html report: " + command);
         int code = child.waitFor();
-        switch (code) {
+        switch (code)
+        {
             case 0:
                 break;
             case 1:
@@ -2941,25 +3205,33 @@ public class COM2POSE_lib {
         File f_input_genecounts_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_analysis_data +
                         File.separator + options_intern.folder_out_analysis_data_HM_LEVEL);
-        for (File fileDir : f_input_genecounts_root.listFiles()) {
-            if (fileDir.isDirectory()) {
-                for (File fileDir_gc : fileDir.listFiles()) {
-                    if (fileDir_gc.isFile()) {
+        for (File fileDir : f_input_genecounts_root.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
+                for (File fileDir_gc : fileDir.listFiles())
+                {
+                    if (fileDir_gc.isFile())
+                    {
                         BufferedReader br = new BufferedReader(new FileReader(fileDir_gc));
                         String line = br.readLine();
                         String[] split_header = line.split("\t");
 
-                        while ((line = br.readLine()) != null) {
+                        while ((line = br.readLine()) != null)
+                        {
                             String[] split_line = line.split("\t");
 
                             String name_tf = split_line[0];
 
-                            for (int i = 1; i < split_header.length; i++) {
+                            for (int i = 1; i < split_header.length; i++)
+                            {
                                 HashMap<String, String> tf_genecount_for_tp;
 
-                                if (tp_tf_gene_count.containsKey(split_header[i])) {
+                                if (tp_tf_gene_count.containsKey(split_header[i]))
+                                {
                                     tf_genecount_for_tp = tp_tf_gene_count.get(split_header[i]);
-                                } else {
+                                } else
+                                {
                                     tf_genecount_for_tp = new HashMap<>();
                                 }
 
@@ -3003,7 +3275,8 @@ public class COM2POSE_lib {
         //sb_home_distribution_analysis.append("<div class='w3-row-padding w3-padding-64 w3-container w3-content'><a href='"+f_website_distr_analysis_html_folder_ALL.getAbsolutePath()+File.separator+options_intern.html_report_home_regression_distribution_analysis_all+"' target='_blank'><button class='button_expandable'>ALL</button></a></div>");
 
 
-        for (File fileDir_stat : f_distr_stats_HM.listFiles()) {
+        for (File fileDir_stat : f_distr_stats_HM.listFiles())
+        {
             File f_website_html_HM = new File(
                     f_website_distr_analysis_html_folder_HM.getAbsolutePath() + File.separator +
                             fileDir_stat.getName() + ".html");
@@ -3032,7 +3305,8 @@ public class COM2POSE_lib {
     /**
      * CREATE python scripts for plots, to only accept TFs which have a higher mean TF-TG-SCORE than the background distribution
      */
-    public void create_distribution_plots() throws Exception {
+    public void create_distribution_plots() throws Exception
+    {
         logger.logLine(
                 "[DISTRIBUTION-ANALYSIS-PLOTS] Start comparing background distribution to TF distribution and create plots for outstanding TFs");
 
@@ -3118,8 +3392,10 @@ public class COM2POSE_lib {
 
         ArrayList<File> scripts_to_execute = new ArrayList<>();
 
-        for (File fileDir_hm : f_analysis_distr_HM_level_input.listFiles()) {
-            if (fileDir_hm.isDirectory()) {
+        for (File fileDir_hm : f_analysis_distr_HM_level_input.listFiles())
+        {
+            if (fileDir_hm.isDirectory())
+            {
                 File f_output_script =
                         new File(f_root_plots_scripts_hm.getAbsolutePath() + File.separator + fileDir_hm.getName());
                 f_output_script.mkdir();
@@ -3188,14 +3464,16 @@ public class COM2POSE_lib {
 
         mann_whitneyU_plots.add(mwu);
 
-        for (File fileDir : scripts_to_execute) {
+        for (File fileDir : scripts_to_execute)
+        {
             String command_edited = "python3 " + fileDir.getAbsolutePath();
             logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Run python script: " + command_edited);
 
 
             Process child = Runtime.getRuntime().exec(command_edited);
             int code = child.waitFor();
-            switch (code) {
+            switch (code)
+            {
                 case 0:
                     break;
                 case 1:
@@ -3206,7 +3484,8 @@ public class COM2POSE_lib {
 
         //DO MANN WHITNEY U PLOTS
 
-        for (MANN_WHITNEYU_PLOTS_FILES mwu_execute : mann_whitneyU_plots) {
+        for (MANN_WHITNEYU_PLOTS_FILES mwu_execute : mann_whitneyU_plots)
+        {
             mwu_execute.write_and_execute_scripts();
         }
 
@@ -3217,7 +3496,8 @@ public class COM2POSE_lib {
     /**
      * creates data needed for distribution plots
      */
-    public void perform_distribution_analysis() throws IOException {
+    public void perform_distribution_analysis() throws IOException
+    {
         logger.logLine("[DISTRIBUTION-ANALYSIS] Calculate distributions for TFs");
 
         //search input directories and create output directories
@@ -3275,11 +3555,13 @@ public class COM2POSE_lib {
                         options_intern.folder_name_tepic_postprocessing_tfs + File.separator +
                         options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
         String line_composed_tfs = "";
-        while ((line_composed_tfs = br_composed_tfs.readLine()) != null) {
+        while ((line_composed_tfs = br_composed_tfs.readLine()) != null)
+        {
             String[] split = line_composed_tfs.split("\t");
 
             HashSet temp_set = new HashSet();
-            for (int i = 1; i < split.length; i++) {
+            for (int i = 1; i < split.length; i++)
+            {
                 composed_tfs.put(split[i], split[0]);
                 temp_set.add(split[i]);
             }
@@ -3289,13 +3571,16 @@ public class COM2POSE_lib {
 
         BufferedReader br_distinct_hms_tfs = new BufferedReader(new FileReader(f_distr_analysis_analysed_tfs_csv));
         String line_distinct_hms_tfs = br_distinct_hms_tfs.readLine();
-        while ((line_distinct_hms_tfs = br_distinct_hms_tfs.readLine()) != null) {
+        while ((line_distinct_hms_tfs = br_distinct_hms_tfs.readLine()) != null)
+        {
             String[] split = line_distinct_hms_tfs.split("\t");
             HashSet<String> current_hm_tfs;
 
-            if (distinct_hms_tfs.containsKey(split[1])) {
+            if (distinct_hms_tfs.containsKey(split[1]))
+            {
                 current_hm_tfs = distinct_hms_tfs.get(split[1]);
-            } else {
+            } else
+            {
                 current_hm_tfs = new HashSet<>();
 
                 File f_out_hms_background = new File(
@@ -3313,9 +3598,11 @@ public class COM2POSE_lib {
             distinct_hms_tfs.put(split[1], current_hm_tfs);
 
             HashSet<String> current_tf_hms;
-            if (distinct_tfs_hms.containsKey(split[0])) {
+            if (distinct_tfs_hms.containsKey(split[0]))
+            {
                 current_tf_hms = distinct_tfs_hms.get(split[0]);
-            } else {
+            } else
+            {
                 current_tf_hms = new HashSet<>();
             }
 
@@ -3326,21 +3613,26 @@ public class COM2POSE_lib {
 
         BufferedReader br_ensg_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_symbol = br_ensg_symbol.readLine();
-        while ((line_ensg_symbol = br_ensg_symbol.readLine()) != null) {
+        while ((line_ensg_symbol = br_ensg_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_symbol.split("\t");
-            if (split.length > 1) {
+            if (split.length > 1)
+            {
                 String symbol = split[1].toUpperCase();
 
-                if (composed_tfs.containsKey(symbol)) {
+                if (composed_tfs.containsKey(symbol))
+                {
                     symbol = composed_tfs.get(symbol);
                 }
 
                 ensg_symbol.put(split[0].toUpperCase(), symbol);
 
                 HashSet<String> current_ensgs;
-                if (symbol_ensg.containsKey(symbol)) {
+                if (symbol_ensg.containsKey(symbol))
+                {
                     current_ensgs = symbol_ensg.get(symbol);
-                } else {
+                } else
+                {
                     current_ensgs = new HashSet<>();
                 }
                 current_ensgs.add(split[0].toUpperCase());
@@ -3353,15 +3645,18 @@ public class COM2POSE_lib {
         File f_genecounts_root = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing + File.separator +
                 options_intern.folder_name_deseq2_preprocessing_gene_symbols);
-        for (File fileDir : f_genecounts_root.listFiles()) {
-            if (fileDir.isFile()) {
+        for (File fileDir : f_genecounts_root.listFiles())
+        {
+            if (fileDir.isFile())
+            {
                 String name_tp = fileDir.getName().split("\\.")[0];
 
                 HashMap<String, Double> ensg_genecount = new HashMap<>();
 
                 BufferedReader br_gene_counts = new BufferedReader(new FileReader(fileDir));
                 String line_gene_counts = br_gene_counts.readLine();
-                while ((line_gene_counts = br_gene_counts.readLine()) != null) {
+                while ((line_gene_counts = br_gene_counts.readLine()) != null)
+                {
                     String[] split = line_gene_counts.split("\t");
                     ensg_genecount.put(split[1].toUpperCase(), Double.parseDouble(split[2]));
                 }
@@ -3373,8 +3668,10 @@ public class COM2POSE_lib {
 
         File f_diff_gene_expr_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_deseq2_output);
-        for (File fileDir : f_diff_gene_expr_root.listFiles()) {
-            if (fileDir.isFile()) {
+        for (File fileDir : f_diff_gene_expr_root.listFiles())
+        {
+            if (fileDir.isFile())
+            {
                 String[] split_name = fileDir.getName().split("\\.")[0].split("_");
                 String name_group_clash = split_name[0] + "_" + split_name[1];
 
@@ -3382,7 +3679,8 @@ public class COM2POSE_lib {
 
                 BufferedReader br_diff_gene_expr = new BufferedReader(new FileReader(fileDir));
                 String line_diff_gene_expr = br_diff_gene_expr.readLine();
-                while ((line_diff_gene_expr = br_diff_gene_expr.readLine()) != null) {
+                while ((line_diff_gene_expr = br_diff_gene_expr.readLine()) != null)
+                {
                     String[] split = line_diff_gene_expr.split("\t");
                     current_diff_expr.put(split[0], Double.parseDouble(split[1]));
                 }
@@ -3392,22 +3690,27 @@ public class COM2POSE_lib {
             }
         }
 
-        for (String key_tf : distinct_tfs_hms.keySet()) {
+        for (String key_tf : distinct_tfs_hms.keySet())
+        {
             String name_anhaengsel = "";
-            if (symbol_ensg.containsKey(key_tf)) {
+            if (symbol_ensg.containsKey(key_tf))
+            {
                 HashSet<String> ensgs = symbol_ensg.get(key_tf);
 
                 HashMap<String, Double> tp_gene_count = new HashMap<>();
                 HashMap<String, Double> group_clash_diff_gene_expr = new HashMap<>();
 
-                for (String k_tp : timepoint_ensg_gene_counts.keySet()) {
+                for (String k_tp : timepoint_ensg_gene_counts.keySet())
+                {
                     int gene_count_total = 0;
                     int found_gene_counts = 0;
 
                     HashMap<String, Double> tp_specific_genecounts = timepoint_ensg_gene_counts.get(k_tp);
 
-                    for (String k_ensgs : ensgs) {
-                        if (tp_specific_genecounts.containsKey(k_ensgs)) {
+                    for (String k_ensgs : ensgs)
+                    {
+                        if (tp_specific_genecounts.containsKey(k_ensgs))
+                        {
                             gene_count_total += tp_specific_genecounts.get(k_ensgs);
                             found_gene_counts++;
                         }
@@ -3418,7 +3721,8 @@ public class COM2POSE_lib {
                     tp_gene_count.put(k_tp, (double) gene_count_total);
                 }
 
-                for (String k_group_clash : group_clash_diff_gene_expression.keySet()) {
+                for (String k_group_clash : group_clash_diff_gene_expression.keySet())
+                {
 
                     double diff_total = 0;
                     int diff_count = 0;
@@ -3426,8 +3730,10 @@ public class COM2POSE_lib {
                     HashMap<String, Double> tp_specific_genecounts =
                             group_clash_diff_gene_expression.get(k_group_clash);
 
-                    for (String k_ensgs : ensgs) {
-                        if (tp_specific_genecounts.containsKey(k_ensgs)) {
+                    for (String k_ensgs : ensgs)
+                    {
+                        if (tp_specific_genecounts.containsKey(k_ensgs))
+                        {
                             diff_total += tp_specific_genecounts.get(k_ensgs);
                             diff_count++;
                         }
@@ -3440,32 +3746,40 @@ public class COM2POSE_lib {
 
                 }
 
-                for (String k_group_clash : group_clash_diff_gene_expr.keySet()) {
+                for (String k_group_clash : group_clash_diff_gene_expr.keySet())
+                {
                     HashSet<String> available_hms = distinct_tfs_hms.get(key_tf);
 
-                    for (String k_hm : available_hms) {
+                    for (String k_hm : available_hms)
+                    {
                         HashSet<String> available_ensgs = new HashSet<>();
 
                         boolean found_tgene_file = true;
-                        if (!options_intern.path_tgen.equals("")) {
+                        if (!options_intern.path_tgen.equals(""))
+                        {
                             File f_tgene_input = new File(options_intern.com2pose_working_directory + File.separator +
                                     options_intern.folder_name_tgen + File.separator +
                                     options_intern.folder_name_tgen_filter_target_genes + File.separator + k_hm +
                                     File.separator + k_group_clash);
 
-                            if (!f_tgene_input.exists()) {
+                            if (!f_tgene_input.exists())
+                            {
                                 found_tgene_file = false;
                             }
-                            if (found_tgene_file) {
-                                for (File fileDir : f_tgene_input.listFiles()) {
-                                    if (fileDir.isFile()) {
+                            if (found_tgene_file)
+                            {
+                                for (File fileDir : f_tgene_input.listFiles())
+                                {
+                                    if (fileDir.isFile())
+                                    {
                                         f_tgene_input = fileDir;
                                     }
                                 }
 
                                 BufferedReader br_tgene_input = new BufferedReader(new FileReader(f_tgene_input));
                                 String line_tgene_input = br_tgene_input.readLine();
-                                while ((line_tgene_input = br_tgene_input.readLine()) != null) {
+                                while ((line_tgene_input = br_tgene_input.readLine()) != null)
+                                {
                                     String[] split = line_tgene_input.split("\t");
                                     available_ensgs.add(split[0]);
                                 }
@@ -3480,22 +3794,27 @@ public class COM2POSE_lib {
                                 options_intern.folder_out_put_DYNAMITE + File.separator + k_hm + File.separator +
                                 k_group_clash + File.separator +
                                 options_intern.file_suffix_dynamite_output_to_be_plotted);
-                        if (f_hm_tf_coeff_input.exists() && f_hm_tf_coeff_input.isFile()) {
+                        if (f_hm_tf_coeff_input.exists() && f_hm_tf_coeff_input.isFile())
+                        {
                             BufferedReader br_hm_tf_coeff = new BufferedReader(new FileReader(f_hm_tf_coeff_input));
                             String line_hm_tf_coeff = br_hm_tf_coeff.readLine();
-                            while ((line_hm_tf_coeff = br_hm_tf_coeff.readLine()) != null) {
+                            while ((line_hm_tf_coeff = br_hm_tf_coeff.readLine()) != null)
+                            {
                                 String[] split = line_hm_tf_coeff.split("\t");
 
                                 String[] split_tf_long_name = split[0].split("_");
 
                                 String tf_in_file = split_tf_long_name[0];
 
-                                if (split_tf_long_name.length > 1) {
+                                if (split_tf_long_name.length > 1)
+                                {
                                     name_anhaengsel = split_tf_long_name[1];
                                 }
 
-                                if (tf_in_file.toUpperCase().equals(key_tf.toUpperCase())) {
-                                    if (split[1].equals("0")) {
+                                if (tf_in_file.toUpperCase().equals(key_tf.toUpperCase()))
+                                {
+                                    if (split[1].equals("0"))
+                                    {
                                         break;
                                     }
                                     tf_regression_coefficient = Double.parseDouble(split[1]);
@@ -3503,11 +3822,13 @@ public class COM2POSE_lib {
                                 }
 
                             }
-                        } else {
+                        } else
+                        {
                             continue;
                         }
 
-                        if (tf_regression_coefficient == 0) {
+                        if (tf_regression_coefficient == 0)
+                        {
                             continue;
                         }
 
@@ -3518,7 +3839,8 @@ public class COM2POSE_lib {
                                 tp_gene_count.get(split_clash[0]) + tp_gene_count.get(split_clash[1]);
 
                         double current_tf_score = 1;//current_gene_counts;
-                        if (current_tf_score < 0) {
+                        if (current_tf_score < 0)
+                        {
                             current_tf_score *= -1;
                         }
 
@@ -3527,7 +3849,8 @@ public class COM2POSE_lib {
                         File f_group1_hm_tf_target_genes_root;
                         File parent_group1;
 
-                        if (options_intern.tepic_tpm_cutoff > 0) {
+                        if (options_intern.tepic_tpm_cutoff > 0)
+                        {
                             f_group1_hm_tf_target_genes_root = new File(
                                     options_intern.com2pose_working_directory + File.separator +
                                             options_intern.folder_name_tepic_postprocessing + File.separator +
@@ -3538,7 +3861,8 @@ public class COM2POSE_lib {
                                     options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm +
                                     File.separator + k_group_clash + File.separator + split_clash[0]);
 
-                        } else {
+                        } else
+                        {
                             parent_group1 = new File(options_intern.com2pose_working_directory + File.separator +
                                     options_intern.folder_name_tepic_output_raw + File.separator + group_clash_tps[0] +
                                     File.separator + k_hm + File.separator);
@@ -3547,27 +3871,35 @@ public class COM2POSE_lib {
 
                         String suffix = "";
 
-                        if (options_intern.tepic_tpm_cutoff > 0) {
+                        if (options_intern.tepic_tpm_cutoff > 0)
+                        {
                             suffix = "_Gene_View_Filtered_TPM.txt";
-                        } else {
+                        } else
+                        {
                             suffix = "_Gene_View_Filtered.txt";
                         }
 
 
                         File f_group1_hm_tf_target_genes = new File("");
 
-                        for (int j = 0; j < parent_group1.listFiles().length; j++) {
-                            if (options_intern.tepic_tpm_cutoff > 0) {
+                        for (int j = 0; j < parent_group1.listFiles().length; j++)
+                        {
+                            if (options_intern.tepic_tpm_cutoff > 0)
+                            {
                                 j = parent_group1.listFiles().length;
-                            } else {
+                            } else
+                            {
                                 f_group1_hm_tf_target_genes_root = parent_group1.listFiles()[j];
                             }
 
-                            for (File fileDir : f_group1_hm_tf_target_genes_root.listFiles()) {
-                                if (!fileDir.getName().matches(".*" + suffix + ".*")) {
+                            for (File fileDir : f_group1_hm_tf_target_genes_root.listFiles())
+                            {
+                                if (!fileDir.getName().matches(".*" + suffix + ".*"))
+                                {
                                     continue;
                                 }
-                                if (fileDir.isFile()) {
+                                if (fileDir.isFile())
+                                {
                                     f_group1_hm_tf_target_genes = fileDir;
                                     break;
                                 }
@@ -3577,7 +3909,8 @@ public class COM2POSE_lib {
                         File f_group2_hm_tf_target_genes_root;
                         File parent_group2;
 
-                        if (options_intern.tepic_tpm_cutoff > 0) {
+                        if (options_intern.tepic_tpm_cutoff > 0)
+                        {
                             f_group2_hm_tf_target_genes_root = new File(
                                     options_intern.com2pose_working_directory + File.separator +
                                             options_intern.folder_name_tepic_postprocessing + File.separator +
@@ -3588,7 +3921,8 @@ public class COM2POSE_lib {
                                     options_intern.folder_name_tepic_postprocessing_output + File.separator + k_hm +
                                     File.separator + k_group_clash + File.separator + split_clash[1]);
 
-                        } else {
+                        } else
+                        {
                             parent_group2 = new File(options_intern.com2pose_working_directory + File.separator +
                                     options_intern.folder_name_tepic_output_raw + File.separator + group_clash_tps[1] +
                                     File.separator + k_hm + File.separator);
@@ -3597,19 +3931,25 @@ public class COM2POSE_lib {
 
                         File f_group2_hm_tf_target_genes = new File("");
 
-                        for (int j = 0; j < parent_group2.listFiles().length; j++) {
-                            if (options_intern.tepic_tpm_cutoff > 0) {
+                        for (int j = 0; j < parent_group2.listFiles().length; j++)
+                        {
+                            if (options_intern.tepic_tpm_cutoff > 0)
+                            {
 
                                 j = parent_group2.listFiles().length;
-                            } else {
+                            } else
+                            {
                                 f_group2_hm_tf_target_genes_root = parent_group2.listFiles()[j];
                             }
 
-                            for (File fileDir : f_group2_hm_tf_target_genes_root.listFiles()) {
-                                if (!fileDir.getName().matches(".*" + suffix + ".*")) {
+                            for (File fileDir : f_group2_hm_tf_target_genes_root.listFiles())
+                            {
+                                if (!fileDir.getName().matches(".*" + suffix + ".*"))
+                                {
                                     continue;
                                 }
-                                if (fileDir.isFile()) {
+                                if (fileDir.isFile())
+                                {
                                     f_group2_hm_tf_target_genes = fileDir;
                                     break;
                                 }
@@ -3617,7 +3957,8 @@ public class COM2POSE_lib {
                         }
 
                         if (f_group1_hm_tf_target_genes.exists() && f_group1_hm_tf_target_genes.isFile() &&
-                                f_group2_hm_tf_target_genes.exists() && f_group2_hm_tf_target_genes.isFile()) {
+                                f_group2_hm_tf_target_genes.exists() && f_group2_hm_tf_target_genes.isFile())
+                        {
 
                             Map<String, Double> target_genes_scores_group1 = new HashMap<>();
                             Map<String, Double> target_genes_scores_group2 = new HashMap<>();
@@ -3628,21 +3969,25 @@ public class COM2POSE_lib {
 
                             String temp_key_tf = key_tf.replace(".", ":");
                             String temp_key_tf_2 = key_tf.replace(".", ":");
-                            if (!name_anhaengsel.equals("")) {
+                            if (!name_anhaengsel.equals(""))
+                            {
                                 temp_key_tf += "_" + name_anhaengsel;
                             }
 
                             int index_tf_group1_hm_tf_target_genes = -1;
                             String[] split_header_group1_hm_tf_target_gens = line_group1_hm_tf_target_genes.split("\t");
-                            for (int i = 0; i < split_header_group1_hm_tf_target_gens.length; i++) {
+                            for (int i = 0; i < split_header_group1_hm_tf_target_gens.length; i++)
+                            {
                                 if (split_header_group1_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf) ||
-                                        split_header_group1_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf_2)) {
+                                        split_header_group1_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf_2))
+                                {
                                     index_tf_group1_hm_tf_target_genes = i;
                                     break;
                                 }
                             }
 
-                            while ((line_group1_hm_tf_target_genes = br_group1_hm_tf_target_genes.readLine()) != null) {
+                            while ((line_group1_hm_tf_target_genes = br_group1_hm_tf_target_genes.readLine()) != null)
+                            {
                                 String[] split = line_group1_hm_tf_target_genes.split("\t");
                                 target_genes_scores_group1.put(split[0],
                                         Double.parseDouble(split[index_tf_group1_hm_tf_target_genes]));
@@ -3655,15 +4000,18 @@ public class COM2POSE_lib {
 
                             int index_tf_group2_hm_tf_target_genes = -1;
                             String[] split_header_group2_hm_tf_target_gens = line_group2_hm_tf_target_genes.split("\t");
-                            for (int i = 0; i < split_header_group2_hm_tf_target_gens.length; i++) {
+                            for (int i = 0; i < split_header_group2_hm_tf_target_gens.length; i++)
+                            {
                                 if (split_header_group2_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf) ||
-                                        split_header_group2_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf_2)) {
+                                        split_header_group2_hm_tf_target_gens[i].toUpperCase().equals(temp_key_tf_2))
+                                {
                                     index_tf_group2_hm_tf_target_genes = i;
                                     break;
                                 }
                             }
 
-                            while ((line_group2_hm_tf_target_genes = br_group2_hm_tf_target_genes.readLine()) != null) {
+                            while ((line_group2_hm_tf_target_genes = br_group2_hm_tf_target_genes.readLine()) != null)
+                            {
                                 String[] split = line_group2_hm_tf_target_genes.split("\t");
                                 target_genes_scores_group2.put(split[0],
                                         Double.parseDouble(split[index_tf_group2_hm_tf_target_genes]));
@@ -3676,9 +4024,11 @@ public class COM2POSE_lib {
                                     f_out_distr_analysis_tf_tg_scores_background_distr_ALL.getAbsolutePath() +
                                             File.separator +
                                             options_intern.file_suffix_distribution_analysis_distributions);
-                            if (f_out_background_ALL.exists()) {
+                            if (f_out_background_ALL.exists())
+                            {
                                 bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL, true));
-                            } else {
+                            } else
+                            {
                                 bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL));
                                 bw_background_ALL.write("##HM\tALL\n");
                                 bw_background_ALL.write("##TF\tALL\n");
@@ -3691,9 +4041,11 @@ public class COM2POSE_lib {
                                             File.separator + k_hm + File.separator +
                                             options_intern.file_suffix_distribution_analysis_distributions);
                             BufferedWriter bw_background_HM;
-                            if (f_out_background_HM.exists()) {
+                            if (f_out_background_HM.exists())
+                            {
                                 bw_background_HM = new BufferedWriter(new FileWriter(f_out_background_HM, true));
-                            } else {
+                            } else
+                            {
                                 bw_background_HM = new BufferedWriter(new FileWriter(f_out_background_HM));
                                 bw_background_HM.write("##HM\t" + k_hm + "\n");
                                 bw_background_HM.write("##TF\tALL\n");
@@ -3705,9 +4057,11 @@ public class COM2POSE_lib {
                                             key_tf + "_" +
                                             options_intern.file_suffix_distribution_analysis_distributions);
                             BufferedWriter bw_tf_ALL;
-                            if (f_out_tf_ALL.exists()) {
+                            if (f_out_tf_ALL.exists())
+                            {
                                 bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL, true));
-                            } else {
+                            } else
+                            {
                                 bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL));
                                 bw_tf_ALL.write("##HM\tALL\n");
                                 bw_tf_ALL.write("##TF\t" + key_tf + "\n");
@@ -3719,23 +4073,29 @@ public class COM2POSE_lib {
                                     f_out_distr_analysis_tf_tg_scores_tf_distr_HM.getAbsolutePath() + File.separator +
                                             k_hm + File.separator + key_tf + "_" +
                                             options_intern.file_suffix_distribution_analysis_distributions);
-                            if (f_out_tf_HM.exists()) {
+                            if (f_out_tf_HM.exists())
+                            {
                                 bw_tf_HM = new BufferedWriter(new FileWriter(f_out_tf_HM, true));
-                            } else {
+                            } else
+                            {
                                 bw_tf_HM = new BufferedWriter(new FileWriter(f_out_tf_HM));
                                 bw_tf_HM.write("##HM\t" + k_hm + "\n");
                                 bw_tf_HM.write("##TF\t" + key_tf + "\n");
                                 bw_tf_HM.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
                             }
 
-                            for (String k_target_gene : target_genes_scores_group1.keySet()) {
-                                if (!options_intern.path_tgen.equals("") && found_tgene_file) {
-                                    if (!available_ensgs.contains(k_target_gene)) {
+                            for (String k_target_gene : target_genes_scores_group1.keySet())
+                            {
+                                if (!options_intern.path_tgen.equals("") && found_tgene_file)
+                                {
+                                    if (!available_ensgs.contains(k_target_gene))
+                                    {
                                         continue;
                                     }
                                 }
 
-                                if (target_genes_scores_group2.containsKey(k_target_gene)) {
+                                if (target_genes_scores_group2.containsKey(k_target_gene))
+                                {
                                     double gene_score1 = target_genes_scores_group1.get(k_target_gene);
                                     double gene_score2 = target_genes_scores_group2.get(k_target_gene);
 
@@ -3743,36 +4103,42 @@ public class COM2POSE_lib {
                                     double genecount_2 = 0;
 
                                     double ensg_diff_gene_expr = 0;
-                                    if (timepoint_ensg_gene_counts.get(split_clash[0]).containsKey(k_target_gene)) {
+                                    if (timepoint_ensg_gene_counts.get(split_clash[0]).containsKey(k_target_gene))
+                                    {
                                         genecount_1 = timepoint_ensg_gene_counts.get(split_clash[0]).get(k_target_gene);
                                     }
 
-                                    if (timepoint_ensg_gene_counts.get(split_clash[1]).containsKey(k_target_gene)) {
+                                    if (timepoint_ensg_gene_counts.get(split_clash[1]).containsKey(k_target_gene))
+                                    {
                                         genecount_2 = timepoint_ensg_gene_counts.get(split_clash[1]).get(k_target_gene);
                                     }
 
-                                    if (group_clash_diff_gene_expr.containsKey(k_group_clash)) {
+                                    if (group_clash_diff_gene_expr.containsKey(k_group_clash))
+                                    {
                                         ensg_diff_gene_expr = group_clash_diff_gene_expr.get(k_group_clash);
                                     }
 
                                     double tg_score_1 = 0;
                                     double tg_score_2 = 0;
 
-                                    if (options_intern.plot_distribution_analysis_score_type.equals(
-                                            "EXCL_GENE_COUNTS")) {
+                                    if (options_intern.plot_distribution_analysis_score_type.equals("EXCL_GENE_COUNTS"))
+                                    {
                                         tg_score_1 = ensg_diff_gene_expr * gene_score1;
                                         tg_score_2 = ensg_diff_gene_expr * gene_score2;
                                     }
-                                    if (options_intern.plot_distribution_analysis_score_type.equals("GENE_COUNTS")) {
+                                    if (options_intern.plot_distribution_analysis_score_type.equals("GENE_COUNTS"))
+                                    {
                                         tg_score_1 = genecount_1 * ensg_diff_gene_expr * gene_score1;
                                         tg_score_2 = genecount_2 * ensg_diff_gene_expr * gene_score2;
                                     }
 
 
-                                    if (tg_score_1 < 0) {
+                                    if (tg_score_1 < 0)
+                                    {
                                         tg_score_1 *= -1;
                                     }
-                                    if (tg_score_2 < 0) {
+                                    if (tg_score_2 < 0)
+                                    {
                                         tg_score_2 *= -1;
                                     }
 
@@ -3780,7 +4146,8 @@ public class COM2POSE_lib {
 
                                     double tf_tg_score = (current_tf_score * tg_score_cumm) * tf_regression_coefficient;
 
-                                    if (tf_tg_score < 0) {
+                                    if (tf_tg_score < 0)
+                                    {
                                         tf_tg_score *= -1;
                                     }
 
@@ -3817,7 +4184,8 @@ public class COM2POSE_lib {
                         }
                     }
                 }
-            } else {
+            } else
+            {
                 continue;
             }
         }
@@ -3830,7 +4198,8 @@ public class COM2POSE_lib {
      * creates the HTML report
      * it creates also one important file (available tfs in HMs and which stages) for distribution analysis
      */
-    public void create_overview_html_report_before_distribution_analysis() throws Exception {
+    public void create_overview_html_report_before_distribution_analysis() throws Exception
+    {
         logger.logLine("[WEBSITE] Start creating overview website.");
 
         File f_website_css =
@@ -3853,7 +4222,8 @@ public class COM2POSE_lib {
         Process child = Runtime.getRuntime().exec(command);
         logger.logLine("[WEBSITE] Copy CSS files: " + command);
         int code = child.waitFor();
-        switch (code) {
+        switch (code)
+        {
             case 0:
                 break;
             case 1:
@@ -3861,7 +4231,8 @@ public class COM2POSE_lib {
                 throw new Exception(message);
         }
 
-        for (int i_dont_know = 0; i_dont_know < 2; i_dont_know++) {
+        for (int i_dont_know = 0; i_dont_know < 2; i_dont_know++)
+        {
 
             HashMap<String, HashMap<String, HashSet<String>>> distinct_tf_hm_diff_same = new HashMap<>();
 
@@ -3876,7 +4247,8 @@ public class COM2POSE_lib {
 
             threshold_folders_filled = true;
 
-            for (Double d : options_intern.plot_th_coefficient) {
+            for (Double d : options_intern.plot_th_coefficient)
+            {
                 bw_home.append(write_regression_coeffecient_analysis_found_table_html(d, "HOME"));
             }
 
@@ -3918,7 +4290,8 @@ public class COM2POSE_lib {
                         "\t\t\t\t<th>#[OPT]: set histone marks or samples will be mixed with option: UNION (all peaks of all HMs will be used), INTERSECTION (only peaks, which are in all HMs will be used)\n</th>");
                 sb_parameter.append("\t\t\t</tr>");
 
-                if (options_intern.mix_option.equals("INTERSECTION")) {
+                if (options_intern.mix_option.equals("INTERSECTION"))
+                {
                     sb_parameter.append("\t\t\t<tr>");
                     sb_parameter.append("\t\t\t\t<th>mix_occurence_intersection</th>");
                     sb_parameter.append("\t\t\t\t<th>" + options_intern.mix_occurence_intersection + "</th>");
@@ -4037,7 +4410,8 @@ public class COM2POSE_lib {
                 sb_parameter.append("\t\t\t\t<th></th>");
                 sb_parameter.append("\t\t\t</tr>");
 
-                if (!options_intern.tepic_input_prev.equals("")) {
+                if (!options_intern.tepic_input_prev.equals(""))
+                {
                     sb_parameter.append("\t\t\t<tr>");
                     sb_parameter.append("\t\t\t\t<th>tepic_input_directory [LAST FILTER]</th>");
                     sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_input_directory + "</th>");
@@ -4237,7 +4611,8 @@ public class COM2POSE_lib {
             }
 
             //TGEN parameters
-            if (!options_intern.path_tgen.equals("")) {
+            if (!options_intern.path_tgen.equals(""))
+            {
                 sb_parameter.append(
                         "<button class=\"button_expandable\" id=\"button_tgen_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_tgen_parameters','table_tgen_parameters')\"> TGene Parameters\n");
                 sb_parameter.append(
@@ -4283,7 +4658,8 @@ public class COM2POSE_lib {
                 sb_parameter.append(
                         "\t\t\t\t<th>#[REQ]: should self regulatory TFs {OPT-SELF-REG} be increased? default: false\n</th>");
                 sb_parameter.append("\t\t\t</tr>");
-                if (options_intern.tgen_self_regulatory) {
+                if (options_intern.tgen_self_regulatory)
+                {
                     sb_parameter.append("\t\t\t<tr>");
                     sb_parameter.append("\t\t\t\t<th>tgen_consensus</th>");
                     sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_consensus + "</th>");
@@ -4497,7 +4873,8 @@ public class COM2POSE_lib {
 
             HashMap<String, ArrayList<String>> tf_gene_count = new HashMap<>();
 
-            for (File fileDir : threshold_folders) {
+            for (File fileDir : threshold_folders)
+            {
                 HashSet<String> tfs_to_create_pages = new HashSet<>();
                 HashSet<String> possible_hms = new HashSet<>();
 
@@ -4516,7 +4893,8 @@ public class COM2POSE_lib {
 
                 HashSet<String> total_number_tfs = new HashSet<>();
 
-                for (File fileDir_hm : f_interactive_plots_root.listFiles()) {
+                for (File fileDir_hm : f_interactive_plots_root.listFiles())
+                {
                     HashSet<String> total_number_tfs_hm = new HashSet<>();
 
                     possible_hms.add(fileDir_hm.getName());
@@ -4580,7 +4958,8 @@ public class COM2POSE_lib {
                                     options_intern.file_suffix_analysis_plot_data_hm_level_different);
                     BufferedReader br_gc_different = new BufferedReader(new FileReader(f_gene_counts_input_different));
                     String line_gc_different = "";
-                    while ((line_gc_different = br_gc_different.readLine()) != null) {
+                    while ((line_gc_different = br_gc_different.readLine()) != null)
+                    {
                         String[] split = line_gc_different.split("\t");
                         sb_threshold.append("\t\t\t<tr>\n");
 
@@ -4590,24 +4969,30 @@ public class COM2POSE_lib {
                         ArrayList<String> tf_key_set = new ArrayList<>();
 
                         int count = 0;
-                        for (String s : split) {
-                            if (count == 0) {
+                        for (String s : split)
+                        {
+                            if (count == 0)
+                            {
                                 tf_key = s;
                             }
-                            if (count != 0) {
+                            if (count != 0)
+                            {
                                 tf_key_set.add(s);
                             }
                             sb_threshold.append("\t\t\t\t<th>");
-                            if (count != 0 || s.equals("TF")) {
+                            if (count != 0 || s.equals("TF"))
+                            {
                                 sb_threshold.append(s.toUpperCase());
-                            } else {
+                            } else
+                            {
                                 File f_try = new File(options_intern.com2pose_working_directory + File.separator +
                                         options_intern.folder_out_website + File.separator +
                                         options_intern.folder_out_website_htmls_regression_coefficients +
                                         File.separator + fileDir.getName() + File.separator +
                                         options_intern.folder_out_website_htmls_TFs + File.separator + s.toUpperCase() +
                                         ".html");
-                                if (f_try.exists()) {
+                                if (f_try.exists())
+                                {
                                     sb_threshold.append("<a href='");
                                     //sb_threshold.append(f_try.getAbsolutePath());
                                     sb_threshold.append("TFs" + File.separator + f_try.getName());
@@ -4622,17 +5007,21 @@ public class COM2POSE_lib {
 
                                     HashMap<String, HashSet<String>> current_tf_hm;
 
-                                    if (distinct_tf_hm_diff_same.containsKey(s.toUpperCase())) {
+                                    if (distinct_tf_hm_diff_same.containsKey(s.toUpperCase()))
+                                    {
                                         current_tf_hm = distinct_tf_hm_diff_same.get(s.toUpperCase());
-                                    } else {
+                                    } else
+                                    {
                                         current_tf_hm = new HashMap<>();
                                     }
 
                                     HashSet<String> current_tf_hm_stage = new HashSet<>();
 
-                                    if (current_tf_hm.containsKey(fileDir_hm.getName())) {
+                                    if (current_tf_hm.containsKey(fileDir_hm.getName()))
+                                    {
                                         current_tf_hm_stage = current_tf_hm.get(fileDir_hm.getName());
-                                    } else {
+                                    } else
+                                    {
                                         current_tf_hm_stage = new HashSet<>();
                                     }
 
@@ -4640,7 +5029,8 @@ public class COM2POSE_lib {
                                     current_tf_hm.put(fileDir_hm.getName(), current_tf_hm_stage);
                                     distinct_tf_hm_diff_same.put(s.toUpperCase(), current_tf_hm);
 
-                                } else {
+                                } else
+                                {
                                     sb_threshold.append(s.toUpperCase());
                                 }
 
@@ -4717,10 +5107,12 @@ public class COM2POSE_lib {
                                     options_intern.folder_out_analysis_data_TP_LEVEL + File.separator +
                                     fileDir_hm.getName() + File.separator + fileDir.getName() + File.separator +
                                     options_intern.file_suffix_analysis_plot_data_hm_level_same);
-                    if (f_gene_counts_input_same.exists()) {
+                    if (f_gene_counts_input_same.exists())
+                    {
                         BufferedReader br_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
                         String line_gc_same = "";
-                        while ((line_gc_same = br_gc_same.readLine()) != null) {
+                        while ((line_gc_same = br_gc_same.readLine()) != null)
+                        {
                             String[] split = line_gc_same.split("\t");
                             sb_threshold.append("\t\t\t<tr>\n");
 
@@ -4730,25 +5122,31 @@ public class COM2POSE_lib {
                             ArrayList<String> tf_key_set = new ArrayList<>();
 
                             int count = 0;
-                            for (String s : split) {
-                                if (count == 0) {
+                            for (String s : split)
+                            {
+                                if (count == 0)
+                                {
                                     tf_key = s;
                                 }
-                                if (count != 0) {
+                                if (count != 0)
+                                {
                                     tf_key_set.add(s);
                                 }
 
                                 sb_threshold.append("\t\t\t\t<th>");
-                                if (count != 0 || s.equals("TF")) {
+                                if (count != 0 || s.equals("TF"))
+                                {
                                     sb_threshold.append(s.toUpperCase());
-                                } else {
+                                } else
+                                {
                                     File f_try = new File(options_intern.com2pose_working_directory + File.separator +
                                             options_intern.folder_out_website + File.separator +
                                             options_intern.folder_out_website_htmls_regression_coefficients +
                                             File.separator + fileDir.getName() + File.separator +
                                             options_intern.folder_out_website_htmls_TFs + File.separator +
                                             s.toUpperCase() + ".html");
-                                    if (f_try.exists()) {
+                                    if (f_try.exists())
+                                    {
 
                                         sb_threshold.append("<a href='");
                                         //sb_threshold.append(f_try.getAbsolutePath());
@@ -4764,24 +5162,29 @@ public class COM2POSE_lib {
 
                                         HashMap<String, HashSet<String>> current_tf_hm;
 
-                                        if (distinct_tf_hm_diff_same.containsKey(s.toUpperCase())) {
+                                        if (distinct_tf_hm_diff_same.containsKey(s.toUpperCase()))
+                                        {
                                             current_tf_hm = distinct_tf_hm_diff_same.get(s.toUpperCase());
-                                        } else {
+                                        } else
+                                        {
                                             current_tf_hm = new HashMap<>();
                                         }
 
                                         HashSet<String> current_tf_hm_stage = new HashSet<>();
 
-                                        if (current_tf_hm.containsKey(fileDir_hm.getName())) {
+                                        if (current_tf_hm.containsKey(fileDir_hm.getName()))
+                                        {
                                             current_tf_hm_stage = current_tf_hm.get(fileDir_hm.getName());
-                                        } else {
+                                        } else
+                                        {
                                             current_tf_hm_stage = new HashSet<>();
                                         }
 
                                         current_tf_hm_stage.add("SAME_TPS");
                                         current_tf_hm.put(fileDir_hm.getName(), current_tf_hm_stage);
                                         distinct_tf_hm_diff_same.put(s.toUpperCase(), current_tf_hm);
-                                    } else {
+                                    } else
+                                    {
                                         sb_threshold.append(s.toUpperCase());
                                     }
 
@@ -4829,7 +5232,8 @@ public class COM2POSE_lib {
                             "<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_" +
                                     fileDir_hm.getName() + "_distTFs\">\n");
                     sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
-                    for (String tf_distinct : total_number_tfs_hm) {
+                    for (String tf_distinct : total_number_tfs_hm)
+                    {
                         sb_threshold.append("<tr><th><a href='TFs" + File.separator + tf_distinct.toUpperCase() +
                                 ".html' target='_blank'> <button class=\"button\">" + tf_distinct.toUpperCase() +
                                 "</button></a></th></tr>\n");
@@ -4865,7 +5269,8 @@ public class COM2POSE_lib {
                 sb_threshold.append(
                         "<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_distTFs\">\n");
                 sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
-                for (String tf_distinct : total_number_tfs) {
+                for (String tf_distinct : total_number_tfs)
+                {
                     sb_threshold.append("<tr><th><a href='TFs" + File.separator + tf_distinct.toUpperCase() +
                             ".html' target='_blank'> <button class=\"button\">" + tf_distinct.toUpperCase() +
                             "</button></a></th></tr>\n");
@@ -4904,10 +5309,12 @@ public class COM2POSE_lib {
                 File f_root_target_genes = new File(options_intern.com2pose_working_directory + File.separator +
                         options_intern.folder_out_target_genes);
 
-                for (String tf : tfs_to_create_pages) {
+                for (String tf : tfs_to_create_pages)
+                {
                     File f_output_tf_page =
                             new File(f_output_tf_root.getAbsolutePath() + File.separator + tf.toUpperCase() + ".html");
-                    if (f_output_tf_page.exists()) {
+                    if (f_output_tf_page.exists())
+                    {
                         //continue;
                     }
 
@@ -4936,7 +5343,8 @@ public class COM2POSE_lib {
                     ArrayList<String> table_header = tf_gene_count.get("TF");
                     sb_tf_page.append("\t\t\t<tr>\n");
                     sb_tf_page.append("\t\t\t\t<th>TF</th>\n");
-                    for (String s : table_header) {
+                    for (String s : table_header)
+                    {
                         sb_tf_page.append("\t\t\t\t<th>" + s + "</th>\n");
                     }
                     sb_tf_page.append("\t\t\t</tr>\n");
@@ -4944,7 +5352,8 @@ public class COM2POSE_lib {
                     ArrayList<String> table_header_tf = tf_gene_count.get(tf.toUpperCase());
                     sb_tf_page.append("\t\t\t<tr>\n");
                     sb_tf_page.append("\t\t\t\t<th>" + tf.toUpperCase() + "</th>\n");
-                    for (String s : table_header_tf) {
+                    for (String s : table_header_tf)
+                    {
 
                         sb_tf_page.append("\t\t\t\t<th>" + s + "</th>\n");
 
@@ -4953,7 +5362,8 @@ public class COM2POSE_lib {
 
                     sb_tf_page.append("</table>");
 
-                    for (String hm : possible_hms) {
+                    for (String hm : possible_hms)
+                    {
 
                         File f_interactive_plots = new File(options_intern.com2pose_working_directory + File.separator +
                                 options_intern.folder_out_website + File.separator +
@@ -4979,7 +5389,8 @@ public class COM2POSE_lib {
 
                         sb_tf_page.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
 
-                        for (File fileDir_plot : f_interactive_plots.listFiles()) {
+                        for (File fileDir_plot : f_interactive_plots.listFiles())
+                        {
                             String[] split_dot = fileDir_plot.getName().split("\\.");
                             String[] split_name = split_dot[0].split("_");
 
@@ -5012,8 +5423,10 @@ public class COM2POSE_lib {
                                 f_root_target_genes.getAbsolutePath() + File.separator + hm + File.separator +
                                         fileDir.getName() + File.separator +
                                         options_intern.folder_out_target_genes_all_different);
-                        for (File tps_different : f_consider_different.listFiles()) {
-                            if (tps_different.exists() && !already_found_tps.contains(tps_different.getName())) {
+                        for (File tps_different : f_consider_different.listFiles())
+                        {
+                            if (tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
+                            {
                                 files_to_consider.add(tps_different);
                                 already_found_tps.add(tps_different.getName());
                             }
@@ -5023,22 +5436,28 @@ public class COM2POSE_lib {
                                 f_root_target_genes.getAbsolutePath() + File.separator + hm + File.separator +
                                         fileDir.getName() + File.separator +
                                         options_intern.folder_out_target_genes_same);
-                        if (f_consider_same.exists()) {
-                            for (File tps_different : f_consider_same.listFiles()) {
-                                if (tps_different.exists() && !already_found_tps.contains(tps_different.getName())) {
+                        if (f_consider_same.exists())
+                        {
+                            for (File tps_different : f_consider_same.listFiles())
+                            {
+                                if (tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
+                                {
                                     files_to_consider.add(tps_different);
                                     already_found_tps.add(tps_different.getName());
                                 }
                             }
                             Boolean anything_to_write = false;
-                            for (File f_considered_no_tf : files_to_consider) {
+                            for (File f_considered_no_tf : files_to_consider)
+                            {
                                 File f_considered =
                                         new File(f_considered_no_tf.getAbsolutePath() + File.separator + tf + ".csv");
-                                if (f_considered.exists()) {
+                                if (f_considered.exists())
+                                {
                                     anything_to_write = true;
                                 }
                             }
-                            if (anything_to_write) {
+                            if (anything_to_write)
+                            {
                                 //tooltip
 
                                 sb_tf_page.append("<h3> Target Genes - top " + options_intern.plot_top_k_genes +
@@ -5054,10 +5473,12 @@ public class COM2POSE_lib {
                                 sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>\n");
                             }
 
-                            for (File f_considered_no_tf : files_to_consider) {
+                            for (File f_considered_no_tf : files_to_consider)
+                            {
                                 File f_considered =
                                         new File(f_considered_no_tf.getAbsolutePath() + File.separator + tf + ".csv");
-                                if (f_considered.exists()) {
+                                if (f_considered.exists())
+                                {
                                     sb_tf_page.append(
                                             "<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_" +
                                                     hm + "_" + f_considered_no_tf.getName() +
@@ -5077,31 +5498,38 @@ public class COM2POSE_lib {
                                     BufferedReader br_point_target_genes =
                                             new BufferedReader(new FileReader(f_considered));
                                     String line_point_target_getnes = "";
-                                    while ((line_point_target_getnes = br_point_target_genes.readLine()) != null) {
+                                    while ((line_point_target_getnes = br_point_target_genes.readLine()) != null)
+                                    {
                                         String[] split = line_point_target_getnes.split("\t");
 
                                         sb_tf_page.append("\t\t\t<tr>\n");
 
                                         int i = 0;
-                                        for (String xx : split) {
-                                            if (xx.equals("NOT_AVAILABLE")) {
+                                        for (String xx : split)
+                                        {
+                                            if (xx.equals("NOT_AVAILABLE"))
+                                            {
                                                 sb_tf_page.append("\t\t\t\t<th>");
                                                 sb_tf_page.append("-");
                                                 sb_tf_page.append("\t\t\t\t</th>\n");
-                                            } else {
+                                            } else
+                                            {
                                                 sb_tf_page.append("\t\t\t\t<th>");
-                                                if (i == 1 && !xx.equals("SYMBOL")) {
+                                                if (i == 1 && !xx.equals("SYMBOL"))
+                                                {
                                                     sb_tf_page.append(
                                                             "<a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene=" +
                                                                     xx.toUpperCase() +
                                                                     "' target='_blank'><button class=\"button\">" +
                                                                     xx.toUpperCase() + "</button></a>");
-                                                } else if (i == 2 && !xx.equals("AFFINITY")) {
+                                                } else if (i == 2 && !xx.equals("AFFINITY"))
+                                                {
 
                                                     DecimalFormat df = new DecimalFormat("0.00000000");
                                                     sb_tf_page.append(df.format(Double.parseDouble(xx)));
 
-                                                } else {
+                                                } else
+                                                {
                                                     sb_tf_page.append(xx.toUpperCase());
                                                 }
                                                 sb_tf_page.append("\t\t\t\t</th>\n");
@@ -5145,10 +5573,12 @@ public class COM2POSE_lib {
                 bw_distinct_tf_hm_diff_same.write("TF\tHM\tSTAGES");
                 bw_distinct_tf_hm_diff_same.newLine();
 
-                for (String key_tf : distinct_tf_hm_diff_same.keySet()) {
+                for (String key_tf : distinct_tf_hm_diff_same.keySet())
+                {
                     HashMap<String, HashSet<String>> hm_diff_stages = distinct_tf_hm_diff_same.get(key_tf);
 
-                    for (String key_hm : hm_diff_stages.keySet()) {
+                    for (String key_hm : hm_diff_stages.keySet())
+                    {
                         StringBuilder sb = new StringBuilder();
                         sb.append(key_tf);
                         sb.append("\t");
@@ -5156,10 +5586,13 @@ public class COM2POSE_lib {
                         sb.append("\t");
 
                         int i = 0;
-                        for (String stages : hm_diff_stages.get(key_hm)) {
-                            if (i == 0) {
+                        for (String stages : hm_diff_stages.get(key_hm))
+                        {
+                            if (i == 0)
+                            {
                                 sb.append(stages);
-                            } else {
+                            } else
+                            {
                                 sb.append(";");
                                 sb.append(stages);
                             }
@@ -5183,7 +5616,8 @@ public class COM2POSE_lib {
     /**
      * get target genes of tfs
      */
-    public void get_top_k_target_genes_plots() throws IOException {
+    public void get_top_k_target_genes_plots() throws IOException
+    {
         logger.logLine("[PLOTS-TARGET-GENES] Start fetching top " + options_intern.plot_top_k_genes +
                 " target genes for TFs under thresholds.");
 
@@ -5201,30 +5635,38 @@ public class COM2POSE_lib {
         BufferedReader br_ensg_gene_symbol =
                 new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
-        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null) {
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_gene_symbol.split("\t");
-            if (split.length > 1) {
+            if (split.length > 1)
+            {
                 ensg_gene_symbol_map.put(split[0], split[1]);
             }
         }
         br_ensg_gene_symbol.close();
 
-        for (File fileDir : f_input.listFiles()) {
-            if (fileDir.isDirectory()) {
+        for (File fileDir : f_input.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
                 String hm_name = fileDir.getName();
 
                 File f_output_hm = new File(f_output.getAbsolutePath() + File.separator + hm_name);
                 f_output_hm.mkdir();
 
-                for (File fileDir_th : fileDir.listFiles()) {
-                    if (fileDir_th.isDirectory()) {
+                for (File fileDir_th : fileDir.listFiles())
+                {
+                    if (fileDir_th.isDirectory())
+                    {
                         String th = fileDir_th.getName();
 
                         File f_output_hm_th = new File(f_output_hm.getAbsolutePath() + File.separator + th);
                         f_output_hm_th.mkdir();
 
-                        for (File fileDir_th_f : fileDir_th.listFiles()) {
-                            if (fileDir_th_f.isFile()) {
+                        for (File fileDir_th_f : fileDir_th.listFiles())
+                        {
+                            if (fileDir_th_f.isFile())
+                            {
                                 String file_name = fileDir_th_f.getName();
 
                                 File f_out_hm_th_file = new File(
@@ -5235,7 +5677,8 @@ public class COM2POSE_lib {
                                 String line_tf = br_tf.readLine();
                                 String[] split_header = line_tf.split(",");
                                 ArrayList<String> timepoints_in_header = new ArrayList<>();
-                                for (int i = 1; i < split_header.length; i++) {
+                                for (int i = 1; i < split_header.length; i++)
+                                {
                                     String[] split_inner = split_header[i].split("VS");
 
                                     String[] split_left_side = split_inner[0].split(":");
@@ -5244,13 +5687,16 @@ public class COM2POSE_lib {
                                     timepoints_in_header.add(split_inner[1].trim());
                                 }
 
-                                while ((line_tf = br_tf.readLine()) != null) {
+                                while ((line_tf = br_tf.readLine()) != null)
+                                {
                                     String[] split = line_tf.split(",", -1);
 
                                     ArrayList<String> timepoints_identified = new ArrayList<>();
 
-                                    for (int i = 1; i < split.length; i++) {
-                                        if (!split[i].equals("")) {
+                                    for (int i = 1; i < split.length; i++)
+                                    {
+                                        if (!split[i].equals(""))
+                                        {
                                             timepoints_identified.add(timepoints_in_header.get(i - 1));
                                             timepoints_identified.add(timepoints_in_header.get(i));
                                         }
@@ -5258,12 +5704,15 @@ public class COM2POSE_lib {
 
                                     HashSet<String> already_done_tps = new HashSet<>();
 
-                                    for (int i = 0; i < timepoints_identified.size(); i += 2) {
-                                        if (timepoints_identified.get(i).equals(timepoints_identified.get(i + 1))) {
+                                    for (int i = 0; i < timepoints_identified.size(); i += 2)
+                                    {
+                                        if (timepoints_identified.get(i).equals(timepoints_identified.get(i + 1)))
+                                        {
                                             continue;
                                         }
 
-                                        if (!already_done_tps.contains(timepoints_identified.get(i))) {
+                                        if (!already_done_tps.contains(timepoints_identified.get(i)))
+                                        {
                                             File f_input_target_genes_hm_group_clash = new File(
                                                     f_input_target_genes.getAbsolutePath() + File.separator + hm_name +
                                                             File.separator + timepoints_identified.get(i) + "_" +
@@ -5276,7 +5725,8 @@ public class COM2POSE_lib {
                                             already_done_tps.add(timepoints_identified.get(i));
                                         }
 
-                                        if (!already_done_tps.contains(timepoints_identified.get(i + 1))) {
+                                        if (!already_done_tps.contains(timepoints_identified.get(i + 1)))
+                                        {
                                             File f_input_target_genes_hm_group_clash = new File(
                                                     f_input_target_genes.getAbsolutePath() + File.separator + hm_name +
                                                             File.separator + timepoints_identified.get(i) + "_" +
@@ -5305,7 +5755,8 @@ public class COM2POSE_lib {
     /**
      * analyze joined dataframe data for interesting TFs
      */
-    public void analyze_plots_data() throws IOException {
+    public void analyze_plots_data() throws IOException
+    {
 
         logger.logLine("[PLOT-ANALYSE] Analyse plot data.");
 
@@ -5335,8 +5786,10 @@ public class COM2POSE_lib {
                 options_intern.folder_name_deseq2_preprocessing_tpm + File.separator +
                 options_intern.folder_name_deseq2_preprocessing_tpm_results);
 
-        for (File f_tpm_tp : f_input_tpms_root.listFiles()) {
-            if (f_tpm_tp.isFile()) {
+        for (File f_tpm_tp : f_input_tpms_root.listFiles())
+        {
+            if (f_tpm_tp.isFile())
+            {
                 String name_tp = f_tpm_tp.getName().split("\\.")[0].split("_")[0];
 
                 HashMap<String, Double> gene_tpm = new HashMap<>();
@@ -5344,7 +5797,8 @@ public class COM2POSE_lib {
                 BufferedReader br = new BufferedReader(new FileReader(f_tpm_tp));
                 String line = br.readLine();
                 String[] split_header = line.split("\t");
-                while ((line = br.readLine()) != null) {
+                while ((line = br.readLine()) != null)
+                {
                     String[] split = line.split("\t");
                     gene_tpm.put(split[0], Double.parseDouble(split[3]));
                 }
@@ -5358,9 +5812,11 @@ public class COM2POSE_lib {
         BufferedReader br_ensg_gene_symbol =
                 new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
-        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null) {
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_gene_symbol.split("\t");
-            if (split.length > 1) {
+            if (split.length > 1)
+            {
                 symbol_ensg_map.put(split[1].toUpperCase(), split[0].toUpperCase());
             }
         }
@@ -5379,11 +5835,13 @@ public class COM2POSE_lib {
                         options_intern.folder_name_tepic_postprocessing_tfs + File.separator +
                         options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
         String line_composed_tfs = "";
-        while ((line_composed_tfs = br_composed_tfs.readLine()) != null) {
+        while ((line_composed_tfs = br_composed_tfs.readLine()) != null)
+        {
             String[] split = line_composed_tfs.split("\t");
 
             HashSet temp_set = new HashSet();
-            for (int i = 1; i < split.length; i++) {
+            for (int i = 1; i < split.length; i++)
+            {
                 composed_tfs.put(split[i], split[0]);
                 temp_set.add(split[i]);
             }
@@ -5393,7 +5851,8 @@ public class COM2POSE_lib {
 
         HashMap<String, HashMap<String, Double>> tp_tf_gene_counts = new HashMap<>();
 
-        for (File fileDir : input_read_counts.listFiles()) {
+        for (File fileDir : input_read_counts.listFiles())
+        {
             String tp_name = fileDir.getName().split("\\.")[0];
 
             HashMap<String, Double> n_hm = new HashMap<>();
@@ -5401,20 +5860,24 @@ public class COM2POSE_lib {
 
             BufferedReader br = new BufferedReader(new FileReader(fileDir));
             String line = br.readLine();
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null)
+            {
                 String[] split = line.split("\t");
 
-                if (composed_tfs.containsKey(split[0].toUpperCase())) {
+                if (composed_tfs.containsKey(split[0].toUpperCase()))
+                {
                     String key_composed_tf = composed_tfs.get(split[0].toUpperCase());
                     double sum = 0;
 
-                    if (composed_tfs_counts.containsKey(key_composed_tf)) {
+                    if (composed_tfs_counts.containsKey(key_composed_tf))
+                    {
                         sum += composed_tfs_counts.get(key_composed_tf);
                     }
 
                     sum += Double.parseDouble(split[2]);
                     composed_tfs_counts.put(key_composed_tf, sum);
-                } else {
+                } else
+                {
                     n_hm.put(split[0].toUpperCase(), Double.parseDouble(split[2]));
                 }
             }
@@ -5429,8 +5892,10 @@ public class COM2POSE_lib {
 
         HashMap<String, HashMap<String, HashMap<String, Boolean>>> hm_th_tf_found = new HashMap<>();
 
-        for (File fileDir : input_data.listFiles()) {
-            if (fileDir.isDirectory()) {
+        for (File fileDir : input_data.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
                 String hm = fileDir.getName();
                 File output_hm = new File(output_analysis_tp_level.getAbsolutePath() + File.separator + hm);
                 output_hm.mkdir();
@@ -5440,24 +5905,31 @@ public class COM2POSE_lib {
                 output_website_overview_hm.mkdir();
 
 
-                for (File fileDirHM_th : fileDir.listFiles()) {
-                    if (fileDirHM_th.isDirectory()) {
+                for (File fileDirHM_th : fileDir.listFiles())
+                {
+                    if (fileDirHM_th.isDirectory())
+                    {
                         HashMap<String, HashMap<String, Boolean>> th_tf_found;
 
                         HashMap<String, Boolean> tf_found;
 
-                        if (hm_th_tf_found.containsKey(hm)) {
+                        if (hm_th_tf_found.containsKey(hm))
+                        {
                             th_tf_found = hm_th_tf_found.get(hm);
-                        } else {
+                        } else
+                        {
                             th_tf_found = new HashMap<>();
                         }
 
-                        if (th_tf_found.containsKey(fileDirHM_th.getName())) {
+                        if (th_tf_found.containsKey(fileDirHM_th.getName()))
+                        {
                             tf_found = th_tf_found.get(fileDirHM_th.getName());
-                        } else {
+                        } else
+                        {
                             tf_found = new HashMap<>();
 
-                            for (String s : options_intern.website_interesting_tfs) {
+                            for (String s : options_intern.website_interesting_tfs)
+                            {
                                 tf_found.put(s, false);
                             }
                             th_tf_found.put(fileDirHM_th.getName(), tf_found);
@@ -5474,34 +5946,46 @@ public class COM2POSE_lib {
                                 output_website_overview_hm.getAbsolutePath() + File.separator + fileDirHM_th.getName());
                         output_website_overview_hm_th.mkdir();
 
-                        for (File fileDir_HM_th_data : fileDirHM_th.listFiles()) {
-                            if (fileDir_HM_th_data.isFile()) {
+                        for (File fileDir_HM_th_data : fileDirHM_th.listFiles())
+                        {
+                            if (fileDir_HM_th_data.isFile())
+                            {
                                 String name = fileDir_HM_th_data.getName().split("\\.")[0];
 
                                 HashMap<String, HashMap<String, HashMap<String, Double>>> th;
                                 HashMap<String, HashMap<String, Double>> hm_intern;
 
-                                if (name.matches(".*different.*")) {
-                                    if (cutoff_hm_tf_counts_DIFFERENT.containsKey(fileDirHM_th.getName())) {
+                                if (name.matches(".*different.*"))
+                                {
+                                    if (cutoff_hm_tf_counts_DIFFERENT.containsKey(fileDirHM_th.getName()))
+                                    {
                                         th = cutoff_hm_tf_counts_DIFFERENT.get(fileDirHM_th.getName());
-                                        if (th.containsKey(hm)) {
+                                        if (th.containsKey(hm))
+                                        {
                                             hm_intern = th.get(hm);
-                                        } else {
+                                        } else
+                                        {
                                             hm_intern = new HashMap<>();
                                         }
-                                    } else {
+                                    } else
+                                    {
                                         th = new HashMap<>();
                                         hm_intern = new HashMap<>();
                                     }
-                                } else {
-                                    if (cutoff_hm_tf_counts_SAME.containsKey(fileDirHM_th.getName())) {
+                                } else
+                                {
+                                    if (cutoff_hm_tf_counts_SAME.containsKey(fileDirHM_th.getName()))
+                                    {
                                         th = cutoff_hm_tf_counts_DIFFERENT.get(fileDirHM_th.getName());
-                                        if (th.containsKey(hm)) {
+                                        if (th.containsKey(hm))
+                                        {
                                             hm_intern = th.get(hm);
-                                        } else {
+                                        } else
+                                        {
                                             hm_intern = new HashMap<>();
                                         }
-                                    } else {
+                                    } else
+                                    {
                                         th = new HashMap<>();
                                         hm_intern = new HashMap<>();
                                     }
@@ -5512,7 +5996,8 @@ public class COM2POSE_lib {
                                                 fileDir_HM_th_data.getName()));
                                 StringBuilder sb = new StringBuilder();
                                 sb.append("TF");
-                                for (String k : tp_tf_gene_counts.keySet()) {
+                                for (String k : tp_tf_gene_counts.keySet())
+                                {
                                     sb.append("\t");
                                     sb.append(k);
                                 }
@@ -5521,16 +6006,20 @@ public class COM2POSE_lib {
 
                                 BufferedReader br = new BufferedReader(new FileReader(fileDir_HM_th_data));
                                 String line = br.readLine();
-                                while ((line = br.readLine()) != null) {
+                                while ((line = br.readLine()) != null)
+                                {
                                     String[] split = line.split(",", -1);
 
-                                    if (tf_found.containsKey(split[0].toUpperCase())) {
+                                    if (tf_found.containsKey(split[0].toUpperCase()))
+                                    {
                                         tf_found.put(split[0].toUpperCase(), true);
                                     }
 
                                     int count = 0;
-                                    for (String s : split) {
-                                        if (!s.equals("")) {
+                                    for (String s : split)
+                                    {
+                                        if (!s.equals(""))
+                                        {
                                             count++;
                                         }
 
@@ -5538,15 +6027,18 @@ public class COM2POSE_lib {
 
                                     String ensg_name = symbol_ensg_map.get(split[0]);
 
-                                    if (count > options_intern.plot_cutoff_tps) {
+                                    if (count > options_intern.plot_cutoff_tps)
+                                    {
                                         HashMap<String, Double> tf_gc = new HashMap<>();
                                         //tf_gc.put(split[0],tp_tf_gene_counts.get(name).get(split[0]));
                                         StringBuilder sb_intern = new StringBuilder();
                                         sb_intern.append(split[0]);
                                         int count_row = 0;
 
-                                        for (String k : tp_tf_gene_counts.keySet()) {
-                                            if (tp_tf_gene_counts.get(k).containsKey(split[0].toUpperCase())) {
+                                        for (String k : tp_tf_gene_counts.keySet())
+                                        {
+                                            if (tp_tf_gene_counts.get(k).containsKey(split[0].toUpperCase()))
+                                            {
                                                 count_row += tp_tf_gene_counts.get(k).get(split[0].toUpperCase());
 
                                                 tf_gc.put(k, tp_tf_gene_counts.get(k).get(split[0].toUpperCase()));
@@ -5557,25 +6049,30 @@ public class COM2POSE_lib {
 
                                         double cumm_tpm = 0.0;
 
-                                        for (String key_group : tp_gene_tpm_value.keySet()) {
+                                        for (String key_group : tp_gene_tpm_value.keySet())
+                                        {
                                             HashMap<String, Double> lookup = tp_gene_tpm_value.get(key_group);
-                                            if (lookup.containsKey(ensg_name)) {
+                                            if (lookup.containsKey(ensg_name))
+                                            {
                                                 cumm_tpm += lookup.get(ensg_name);
                                             }
                                         }
 
                                         boolean passed_count_threshold = false;
 
-                                        if (count_row >= options_intern.plot_cutoff_gcs) {
+                                        if (count_row >= options_intern.plot_cutoff_gcs)
+                                        {
                                             passed_count_threshold = true;
                                         }
 
                                         boolean passed_tpm_threshold = false;
-                                        if (cumm_tpm >= options_intern.plot_cutoff_tpms) {
+                                        if (cumm_tpm >= options_intern.plot_cutoff_tpms)
+                                        {
                                             passed_tpm_threshold = true;
                                         }
 
-                                        if (passed_count_threshold && passed_tpm_threshold) {
+                                        if (passed_count_threshold && passed_tpm_threshold)
+                                        {
                                             hm_intern.put(split[0].toUpperCase(), tf_gc);
                                             //WRITE
                                             bw.write(sb_intern.toString());
@@ -5590,9 +6087,11 @@ public class COM2POSE_lib {
                                 th.put(hm, hm_intern);
 
                                 //save hashmaps correspondingly
-                                if (name.matches(".*different.*")) {
+                                if (name.matches(".*different.*"))
+                                {
                                     cutoff_hm_tf_counts_DIFFERENT.put(th_name, th);
-                                } else {
+                                } else
+                                {
                                     cutoff_hm_tf_counts_SAME.put(th_name, th);
                                 }
                             }
@@ -5603,7 +6102,8 @@ public class COM2POSE_lib {
                                         options_intern.file_suffix_website_analysis_tf_available));
                         bw_tf_key_overview.write("TF\tAVAILABLE");
                         bw_tf_key_overview.newLine();
-                        for (String tf_key : tf_found.keySet()) {
+                        for (String tf_key : tf_found.keySet())
+                        {
                             bw_tf_key_overview.write(tf_key + "\t" + tf_found.get(tf_key));
                             bw_tf_key_overview.newLine();
                         }
@@ -5614,7 +6114,8 @@ public class COM2POSE_lib {
             }
         }
 
-        for (String k : cutoff_hm_tf_counts_DIFFERENT.keySet()) {
+        for (String k : cutoff_hm_tf_counts_DIFFERENT.keySet())
+        {
             File f_out = new File(output_analysis_hm_level.getAbsolutePath() + File.separator + k);
             f_out.mkdir();
 
@@ -5623,24 +6124,30 @@ public class COM2POSE_lib {
 
             ArrayList<HashMap<String, HashMap<String, Double>>> tf_lists = new ArrayList<>();
 
-            for (String kk : available_hms.keySet()) {
+            for (String kk : available_hms.keySet())
+            {
                 tf_lists.add(available_hms.get(kk));
             }
 
             HashMap<String, HashMap<String, Double>> results = new HashMap<>();
 
-            for (int i = 0; i < tf_lists.size(); i++) {
-                for (String tf : tf_lists.get(i).keySet()) {
+            for (int i = 0; i < tf_lists.size(); i++)
+            {
+                for (String tf : tf_lists.get(i).keySet())
+                {
                     int count_hms = 0;
 
-                    for (int j = 0; j < tf_lists.size(); j++) {
+                    for (int j = 0; j < tf_lists.size(); j++)
+                    {
                         HashMap<String, HashMap<String, Double>> list = tf_lists.get(j);
-                        if (list.containsKey(tf)) {
+                        if (list.containsKey(tf))
+                        {
                             count_hms++;
                         }
                     }
 
-                    if (count_hms >= options_intern.plot_cutoff_hms) {
+                    if (count_hms >= options_intern.plot_cutoff_hms)
+                    {
                         results.put(tf, tf_lists.get(i).get(tf));
                     }
                 }
@@ -5652,7 +6159,8 @@ public class COM2POSE_lib {
             StringBuilder sb = new StringBuilder();
             ArrayList<String> tp_order = new ArrayList<>();
             sb.append("TF");
-            for (String tp : tp_tf_gene_counts.keySet()) {
+            for (String tp : tp_tf_gene_counts.keySet())
+            {
                 sb.append("\t");
                 sb.append(tp);
                 tp_order.add(tp);
@@ -5660,12 +6168,14 @@ public class COM2POSE_lib {
             bw.write(sb.toString());
             bw.newLine();
 
-            for (String tf : results.keySet()) {
+            for (String tf : results.keySet())
+            {
                 StringBuilder sb_tf = new StringBuilder();
                 sb_tf.append(tf);
                 HashMap<String, Double> tf_info = results.get(tf);
 
-                for (String order : tp_order) {
+                for (String order : tp_order)
+                {
                     sb_tf.append("\t");
                     sb_tf.append(tf_info.get(order));
                 }
@@ -5683,7 +6193,8 @@ public class COM2POSE_lib {
     /**
      * creates python Scripts for all timepoints of all histone modifications, it also creates an overview plot of all different group clashes (e.g. P_L but not L1_L10) for a set threshold plots
      */
-    public void create_tp_plots() throws Exception {
+    public void create_tp_plots() throws Exception
+    {
 
         logger.logLine("[PLOTS] start creating / running python scripts for plots");
 
@@ -5707,8 +6218,10 @@ public class COM2POSE_lib {
 
         folder_output.mkdir();
 
-        for (File fileDirHM : folder_input.listFiles()) {
-            if (fileDirHM.isDirectory()) {
+        for (File fileDirHM : folder_input.listFiles())
+        {
+            if (fileDirHM.isDirectory())
+            {
                 File folder_outputHM = new File(folder_output.getAbsolutePath() + File.separator + fileDirHM.getName());
                 folder_outputHM.mkdir();
 
@@ -5717,7 +6230,8 @@ public class COM2POSE_lib {
                 folder_out_data_HM.mkdir();
 
 
-                for (double d : options_intern.plot_th_coefficient) {
+                for (double d : options_intern.plot_th_coefficient)
+                {
                     File out_th = new File(folder_outputHM.getAbsolutePath() + File.separator + d);
                     out_th.mkdir();
 
@@ -5772,15 +6286,18 @@ public class COM2POSE_lib {
                     HashSet<String> th_group_differentpoints = new HashSet<>();
                     HashSet<String> th_group_samepoints = new HashSet<>();
 
-                    for (File fileDirHM_Group : fileDirHM.listFiles()) {
+                    for (File fileDirHM_Group : fileDirHM.listFiles())
+                    {
 
                         String[] group_split = fileDirHM_Group.getName().split("_");
                         String groupname1 = group_split[0];
                         String groupname2 = group_split[1];
 
-                        if (groupname1.charAt(0) != groupname2.charAt(0)) {
+                        if (groupname1.charAt(0) != groupname2.charAt(0))
+                        {
                             th_group_differentpoints.add(fileDirHM_Group.getName());
-                        } else {
+                        } else
+                        {
                             th_group_samepoints.add(fileDirHM_Group.getName());
                         }
                         sb.append("plt.figure(figsize=(26, 20))\n");
@@ -5882,7 +6399,8 @@ public class COM2POSE_lib {
                     sb.append("# Heatmap different stages\n");
                     //Clear Peak values
 
-                    for (String s : th_group_differentpoints) {
+                    for (String s : th_group_differentpoints)
+                    {
                         sb.append("if('Peak' in ");
                         sb.append(s);
                         sb.append(".index):\n");
@@ -5893,7 +6411,8 @@ public class COM2POSE_lib {
                         sb.append(",index='Peak')\n");
                     }
 
-                    for (String s : th_group_differentpoints) {
+                    for (String s : th_group_differentpoints)
+                    {
                         sb.append(s);
                         sb.append("=");
                         sb.append(s);
@@ -5904,10 +6423,13 @@ public class COM2POSE_lib {
 
                     sb.append("join_df_stages = pd.concat([");
                     int c = 0;
-                    for (String s : th_group_differentpoints) {
-                        if (c == 0) {
+                    for (String s : th_group_differentpoints)
+                    {
+                        if (c == 0)
+                        {
                             sb.append(s);
-                        } else {
+                        } else
+                        {
                             sb.append(", ");
                             sb.append(s);
                         }
@@ -5952,7 +6474,8 @@ public class COM2POSE_lib {
                     sb.append("plt.figure(figsize=(26, 20))\n");
 
                     sb.append("# Heatmap same stages\n");
-                    for (String s : th_group_samepoints) {
+                    for (String s : th_group_samepoints)
+                    {
                         sb.append("if('Peak' in ");
                         sb.append(s);
                         sb.append(".index):\n");
@@ -5963,7 +6486,8 @@ public class COM2POSE_lib {
                         sb.append(",index='Peak')\n");
                     }
 
-                    for (String s : th_group_samepoints) {
+                    for (String s : th_group_samepoints)
+                    {
                         sb.append(s);
                         sb.append("=");
                         sb.append(s);
@@ -5972,13 +6496,17 @@ public class COM2POSE_lib {
                         sb.append(".index.duplicated(keep='first')]\n");
                     }
 
-                    if (th_group_samepoints.size() != 0) {
+                    if (th_group_samepoints.size() != 0)
+                    {
                         sb.append("join_df_same = pd.concat([");
                         c = 0;
-                        for (String s : th_group_samepoints) {
-                            if (c == 0) {
+                        for (String s : th_group_samepoints)
+                        {
+                            if (c == 0)
+                            {
                                 sb.append(s);
-                            } else {
+                            } else
+                            {
                                 sb.append(", ");
                                 sb.append(s);
                             }
@@ -6030,7 +6558,8 @@ public class COM2POSE_lib {
                     logger.logLine("[PLOTS] run plot: " + command);
                     Process child = Runtime.getRuntime().exec(command);
                     int code = child.waitFor();
-                    switch (code) {
+                    switch (code)
+                    {
                         case 0:
                             break;
                         case 1:
@@ -6046,7 +6575,8 @@ public class COM2POSE_lib {
     /**
      * run DYNAMITE.R
      */
-    public void run_DYNAMITE() throws Exception {
+    public void run_DYNAMITE() throws Exception
+    {
         logger.logLine("[DYNAMITE] start running DYNAMITE with parameters: ");
 
         String command_base = "Rscript " + options_intern.path_to_COM2POSE + File.separator +
@@ -6062,24 +6592,31 @@ public class COM2POSE_lib {
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_put_DYNAMITE);
         folder_output.mkdir();
 
-        for (File fileDirHM : folder_input.listFiles()) {
-            if (fileDirHM.isDirectory()) {
+        for (File fileDirHM : folder_input.listFiles())
+        {
+            if (fileDirHM.isDirectory())
+            {
                 File folder_outputHM = new File(folder_output.getAbsolutePath() + File.separator + fileDirHM.getName());
                 //folder_outputHM.mkdir();
 
-                for (File fileDirHM_Group : fileDirHM.listFiles()) {
-                    if (fileDirHM_Group.isDirectory()) {
+                for (File fileDirHM_Group : fileDirHM.listFiles())
+                {
+                    if (fileDirHM_Group.isDirectory())
+                    {
                         File folder_outputHM_Group = new File(
                                 folder_outputHM.getAbsolutePath() + File.separator + fileDirHM_Group.getName());
                         //folder_outputHM_Group.mkdir();
 
                         int count_line_br = 0;
 
-                        for (File f_x : fileDirHM_Group.listFiles()) {
-                            if (f_x.isFile()) {
+                        for (File f_x : fileDirHM_Group.listFiles())
+                        {
+                            if (f_x.isFile())
+                            {
                                 BufferedReader br = new BufferedReader(new FileReader(f_x));
                                 String line = br.readLine();
-                                while ((line = br.readLine()) != null) {
+                                while ((line = br.readLine()) != null)
+                                {
                                     count_line_br++;
                                 }
 
@@ -6087,7 +6624,8 @@ public class COM2POSE_lib {
                             }
                         }
 
-                        if (count_line_br < 2) {
+                        if (count_line_br < 2)
+                        {
                             continue;
                         }
                         folder_outputHM.mkdir();
@@ -6105,7 +6643,8 @@ public class COM2POSE_lib {
                         command_edited += " --performance=" + options_intern.dynamite_performance;
                         command_edited += " --alpha=" + options_intern.dynamite_alpha;
                         command_edited += " --cores=" + options_intern.dynamite_cores;
-                        if (options_intern.dynamite_randomise) {
+                        if (options_intern.dynamite_randomise)
+                        {
                             command_edited += " --randomise=" + options_intern.dynamite_randomise;
                         }
 
@@ -6114,7 +6653,8 @@ public class COM2POSE_lib {
                         logger.logLine("[DYNAMITE] ... waiting ...");
                         Process child = Runtime.getRuntime().exec(command_edited);
                         int code = child.waitFor();
-                        switch (code) {
+                        switch (code)
+                        {
                             case 0:
                                 break;
                             case 1:
@@ -6133,7 +6673,8 @@ public class COM2POSE_lib {
     /**
      * install required R packages for DYNAMITE
      */
-    public void install_required_packages() throws Exception {
+    public void install_required_packages() throws Exception
+    {
         logger.logLine("[DYNAMITE] installing required packages... please wait ...");
         StringBuilder sb = new StringBuilder();
 
@@ -6155,7 +6696,8 @@ public class COM2POSE_lib {
 
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();
-        switch (code) {
+        switch (code)
+        {
             case 0:
                 break;
             case 1:
@@ -6168,21 +6710,26 @@ public class COM2POSE_lib {
     /**
      * run integrateData.py and prepareForClassification.R
      */
-    public void preprocess_dynamite() throws Exception {
+    public void preprocess_dynamite() throws Exception
+    {
 
         logger.logLine("[DYNAMITE]: start preprocessing data for DYNAMITE");
 
         File folder;
-        if (options_intern.path_tgen.equals("")) {
+        if (options_intern.path_tgen.equals(""))
+        {
             folder = new File(options_intern.com2pose_working_directory + File.separator +
                     options_intern.folder_name_tepic_postprocessing + File.separator +
                     options_intern.folder_name_tepic_postprocessing_output);
-        } else {
-            if (options_intern.tgen_self_regulatory) {
+        } else
+        {
+            if (options_intern.tgen_self_regulatory)
+            {
                 folder = new File(
                         options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tgen +
                                 File.separator + options_intern.folder_name_tgen_integrate);
-            } else {
+            } else
+            {
                 folder = new File(
                         options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tgen +
                                 File.separator + options_intern.folder_name_tgen_filter_target_genes);
@@ -6197,14 +6744,18 @@ public class COM2POSE_lib {
                 options_intern.folder_output_preprocessing_DYNAMITE_integrateData);
         folder_output.mkdir();
 
-        for (File fileDirHM : folder.listFiles()) {
-            if (fileDirHM.isDirectory()) {
+        for (File fileDirHM : folder.listFiles())
+        {
+            if (fileDirHM.isDirectory())
+            {
                 File folder_output_hm =
                         new File(folder_output.getAbsolutePath() + File.separator + fileDirHM.getName());
                 folder_output_hm.mkdir();
 
-                for (File fileDirGroups : fileDirHM.listFiles()) {
-                    if (fileDirGroups.isDirectory()) {
+                for (File fileDirGroups : fileDirHM.listFiles())
+                {
+                    if (fileDirGroups.isDirectory())
+                    {
                         File folder_output_group =
                                 new File(folder_output_hm.getAbsolutePath() + File.separator + fileDirGroups.getName());
                         folder_output_group.mkdir();
@@ -6214,12 +6765,14 @@ public class COM2POSE_lib {
                         String groupname2 = groups_splitted[1];
 
                         File input_ratios;
-                        if (options_intern.path_tgen.equals("")) {
+                        if (options_intern.path_tgen.equals(""))
+                        {
                             input_ratios = new File(fileDirGroups.getAbsolutePath() + File.separator +
                                     options_intern.folder_name_tepic_postprocessing_output_ratios + File.separator +
                                     options_intern.file_suffix_tepic_postprocessing_output_ratios +
                                     fileDirGroups.getName() + ".txt");
-                        } else {
+                        } else
+                        {
                             input_ratios = new File(fileDirGroups.getAbsolutePath() + File.separator +
                                     options_intern.file_suffix_tepic_postprocessing_output_ratios + groupname1 + "_" +
                                     groupname2 + ".txt");
@@ -6236,13 +6789,16 @@ public class COM2POSE_lib {
                         command += " " + input_diff_gene_expr.getAbsolutePath();
                         command += " " + folder_output_group.getAbsolutePath() + File.separator +
                                 options_intern.file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff;
-                        if (options_intern.dynamite_preprocessing_integrate_data_geneIDs != 0) {
+                        if (options_intern.dynamite_preprocessing_integrate_data_geneIDs != 0)
+                        {
                             command += " " + options_intern.dynamite_preprocessing_integrate_data_geneIDs;
                         }
-                        if (options_intern.dynamite_preprocessing_integrate_data_log2fc != 1) {
+                        if (options_intern.dynamite_preprocessing_integrate_data_log2fc != 1)
+                        {
                             command += " " + options_intern.dynamite_preprocessing_integrate_data_log2fc;
                         }
-                        if (!options_intern.dynamite_preprocessing_integrate_data_consider_geneFile.equals("")) {
+                        if (!options_intern.dynamite_preprocessing_integrate_data_consider_geneFile.equals(""))
+                        {
                             command += " " + options_intern.dynamite_preprocessing_integrate_data_consider_geneFile;
                         }
 
@@ -6250,7 +6806,8 @@ public class COM2POSE_lib {
                                 " preprocessing integrateData.py: " + command);
                         Process child = Runtime.getRuntime().exec(command);
                         int code = child.waitFor();
-                        switch (code) {
+                        switch (code)
+                        {
                             case 0:
                                 break;
                             case 1:
@@ -6267,14 +6824,18 @@ public class COM2POSE_lib {
                 folder_output_pre + File.separator + options_intern.folder_output_preprocessing_DYNAMITE_prepareClass);
         folder_output_classification.mkdir();
 
-        for (File fileDirHM : folder_output.listFiles()) {
-            if (fileDirHM.isDirectory()) {
+        for (File fileDirHM : folder_output.listFiles())
+        {
+            if (fileDirHM.isDirectory())
+            {
                 File folder_output_classificationHM =
                         new File(folder_output_classification.getAbsolutePath() + File.separator + fileDirHM.getName());
                 folder_output_classificationHM.mkdir();
 
-                for (File fileDirGroup : fileDirHM.listFiles()) {
-                    if (fileDirGroup.isDirectory()) {
+                for (File fileDirGroup : fileDirHM.listFiles())
+                {
+                    if (fileDirGroup.isDirectory())
+                    {
                         File folder_output_classificationHM_Group = new File(
                                 folder_output_classificationHM.getAbsolutePath() + File.separator +
                                         fileDirGroup.getName());
@@ -6292,7 +6853,8 @@ public class COM2POSE_lib {
                                         command);
                         Process child = Runtime.getRuntime().exec(command);
                         int code = child.waitFor();
-                        switch (code) {
+                        switch (code)
+                        {
                             case 0:
                                 break;
                             case 1:
@@ -6313,7 +6875,8 @@ public class COM2POSE_lib {
     /**
      * integrates self-regulatory TGene TFs into TEPIC data into one affinity file so preproccesing DYNAMITE can use it.
      */
-    public void integrate_self_regulatory_tgen() throws IOException {
+    public void integrate_self_regulatory_tgen() throws IOException
+    {
         logger.logLine("[TGENE-SELF-REGULATORY] Integrate self-regulatoring TFs found in TGene data into TEPIC data");
 
         File folder_output = new File(
@@ -6325,12 +6888,16 @@ public class COM2POSE_lib {
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tgen +
                         File.separator + options_intern.folder_name_tgen_filter_target_genes);
 
-        for (File firDir : folder_tepic_postprocess.listFiles()) {
-            if (firDir.isDirectory()) {
+        for (File firDir : folder_tepic_postprocess.listFiles())
+        {
+            if (firDir.isDirectory())
+            {
                 File folder_output_hm = new File(folder_output.getAbsolutePath() + File.separator + firDir.getName());
                 folder_output_hm.mkdir();
-                for (File fileDirHM : firDir.listFiles()) {
-                    if (fileDirHM.isDirectory()) {
+                for (File fileDirHM : firDir.listFiles())
+                {
+                    if (fileDirHM.isDirectory())
+                    {
                         File folder_output_HM_group =
                                 new File(folder_output_hm.getAbsolutePath() + File.separator + fileDirHM.getName());
                         folder_output_HM_group.mkdir();
@@ -6342,12 +6909,16 @@ public class COM2POSE_lib {
 
         //integrate data between TEPIC and TGENE (modifying quotients)
         //based on structure build necessary files
-        for (File folderDirHM : folder_output.listFiles()) {
-            if (folderDirHM.isDirectory()) {
+        for (File folderDirHM : folder_output.listFiles())
+        {
+            if (folderDirHM.isDirectory())
+            {
                 String hm = folderDirHM.getName();
-                for (File folderDirHM_Group : folderDirHM.listFiles()) {
+                for (File folderDirHM_Group : folderDirHM.listFiles())
+                {
 
-                    if (folderDirHM_Group.isDirectory()) {
+                    if (folderDirHM_Group.isDirectory())
+                    {
                         logger.logLine("[TGENE-SELF-REGULATORY] integrate self-regulatory TFs " + hm + ": " +
                                 folderDirHM_Group.getName());
 
@@ -6383,12 +6954,14 @@ public class COM2POSE_lib {
 
                         HashMap<String, ENSG_binary_tree> chr_binary_tree = new HashMap<>();
 
-                        for (File chr : input_map_position_ensg.listFiles()) {
+                        for (File chr : input_map_position_ensg.listFiles())
+                        {
                             ArrayList<ENSG_ranges_binary_trees> chr_region_list = new ArrayList<>();
 
                             BufferedReader br = new BufferedReader(new FileReader(chr));
                             String line = br.readLine();
-                            while ((line = br.readLine()) != null) {
+                            while ((line = br.readLine()) != null)
+                            {
                                 String[] split = line.split("\t");
 
                                 ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
@@ -6406,14 +6979,16 @@ public class COM2POSE_lib {
                             regions.put(chr.getName(), chr_region_list);
                         }
 
-                        for (String chr : regions.keySet()) {
+                        for (String chr : regions.keySet())
+                        {
                             ArrayList<ENSG_ranges_binary_trees> current_regions = regions.get(chr);
 
                             ENSG_binary_tree_node root =
                                     new ENSG_binary_tree_node(current_regions.get(0), current_regions.get(0).number);
                             ENSG_binary_tree bin_tree = new ENSG_binary_tree(root);
 
-                            for (int i = 1; i < current_regions.size(); i++) {
+                            for (int i = 1; i < current_regions.size(); i++)
+                            {
                                 bin_tree.add(current_regions.get(i).number, current_regions.get(i));
 
                             }
@@ -6427,7 +7002,8 @@ public class COM2POSE_lib {
 
                         HashMap<String, ENSG_ranges_binary_trees> ensgTargetGenes_TFs = new HashMap<>();
 
-                        while ((line_tgene = br_tgene.readLine()) != null) {
+                        while ((line_tgene = br_tgene.readLine()) != null)
+                        {
                             String split[] = line_tgene.split("\t");
 
                             String chr = split[0];
@@ -6440,31 +7016,39 @@ public class COM2POSE_lib {
 
                             ENSG_binary_tree tree;
 
-                            if (chr.startsWith("M")) {
+                            if (chr.startsWith("M"))
+                            {
                                 tree = chr_binary_tree.get("chr" + options_intern.tgen_mt_writing);
-                            } else {
+                            } else
+                            {
                                 tree = chr_binary_tree.get("chr" + chr);
                             }
 
-                            if (tree == null) {
+                            if (tree == null)
+                            {
                                 continue;
                             }
 
                             ENSG_ranges_binary_trees ensg_match = tree.containsNode(iu);
 
-                            if (ensg_match == null) {
+                            if (ensg_match == null)
+                            {
                                 continue;
                             }
 
-                            for (String k : ensg_match.ensgs) {
-                                if (ensgTargetGenes_TFs.containsKey(k)) {
+                            for (String k : ensg_match.ensgs)
+                            {
+                                if (ensgTargetGenes_TFs.containsKey(k))
+                                {
                                     ensgTargetGenes_TFs.get(k).ensgs.addAll(iu.ensgs);
-                                } else {
+                                } else
+                                {
                                     ensgTargetGenes_TFs.put(k, iu);
                                 }
                             }
 
-                            for (String k : iu.ensgs) {
+                            for (String k : iu.ensgs)
+                            {
                                 tfs_in_tgene.put(k.toUpperCase(), false);
                             }
                         }
@@ -6478,51 +7062,64 @@ public class COM2POSE_lib {
                         HashMap<String, Integer> tf_place = new HashMap<>();
 
                         ArrayList<String> header = new ArrayList<>(Arrays.asList(line_tepic.split("\t".toUpperCase())));
-                        for (int i = 0; i < header.size(); i++) {
+                        for (int i = 0; i < header.size(); i++)
+                        {
                             String key = header.get(i).split("_")[0].toUpperCase();
                             header.set(i, key);
                             String[] split_doubles = key.split("::");
-                            for (int j = 0; j < split_doubles.length; j++) {
+                            for (int j = 0; j < split_doubles.length; j++)
+                            {
                                 tf_place.put(split_doubles[j], i);
                             }
                         }
 
-                        while ((line_tepic = br_tepic.readLine()) != null) {
+                        while ((line_tepic = br_tepic.readLine()) != null)
+                        {
                             String[] split = line_tepic.split("\t");
 
                             StringBuilder sb = new StringBuilder();
                             sb.append(split[0]);
 
-                            if (ensgTargetGenes_TFs.containsKey(split[0])) {
+                            if (ensgTargetGenes_TFs.containsKey(split[0]))
+                            {
                                 HashSet<String> tgene_pref_tfs = ensgTargetGenes_TFs.get(split[0]).ensgs;
                                 HashSet<Integer> pref_positions = new HashSet<>();
 
-                                for (String k : tgene_pref_tfs) {
+                                for (String k : tgene_pref_tfs)
+                                {
                                     pref_positions.add(tf_place.get(k));
                                 }
 
-                                for (int i = 1; i < split.length; i++) {
-                                    if (pref_positions.contains(i)) {
+                                for (int i = 1; i < split.length; i++)
+                                {
+                                    if (pref_positions.contains(i))
+                                    {
                                         double score = Double.parseDouble(split[i]);
-                                        if (options_intern.tgen_consensus_calc.equals("INCREASE_TGENE_TFS")) {
+                                        if (options_intern.tgen_consensus_calc.equals("INCREASE_TGENE_TFS"))
+                                        {
                                             score = score + (score * (1 - options_intern.tgen_consensus));
 
                                         }
                                         sb.append("\t");
                                         sb.append(score);
-                                    } else {
+                                    } else
+                                    {
                                         double score = Double.parseDouble(split[i]);
-                                        if (options_intern.tgen_consensus_calc.equals("DECREASE_NOT_TGENE_TFs")) {
+                                        if (options_intern.tgen_consensus_calc.equals("DECREASE_NOT_TGENE_TFs"))
+                                        {
                                             score *= (1 - options_intern.tgen_consensus);
                                         }
                                         sb.append("\t");
                                         sb.append(score);
                                     }
                                 }
-                            } else {
-                                for (int i = 1; i < split.length; i++) {
+                            } else
+                            {
+                                for (int i = 1; i < split.length; i++)
+                                {
                                     double score = Double.parseDouble(split[i]);
-                                    if (options_intern.tgen_consensus_calc.equals("DECREASE_NOT_TGENE_TFs")) {
+                                    if (options_intern.tgen_consensus_calc.equals("DECREASE_NOT_TGENE_TFs"))
+                                    {
                                         score *= (1 - options_intern.tgen_consensus);
                                     }
                                     sb.append("\t");
@@ -6548,7 +7145,8 @@ public class COM2POSE_lib {
     /**
      * filter targetgenes of TEPIC using TGENE output
      */
-    public void filter_target_genes_tgen() throws IOException {
+    public void filter_target_genes_tgen() throws IOException
+    {
         logger.logLine("[TGENE] Start filtering target genes.");
 
         File folder_output = new File(
@@ -6567,21 +7165,27 @@ public class COM2POSE_lib {
                         options_intern.folder_name_tepic_postprocessing_tfs + File.separator +
                         options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
         String line_composed_tfs = "";
-        while ((line_composed_tfs = br_composed_tfs.readLine()) != null) {
+        while ((line_composed_tfs = br_composed_tfs.readLine()) != null)
+        {
             String[] split = line_composed_tfs.split("\t");
 
-            for (int i = 1; i < split.length; i++) {
+            for (int i = 1; i < split.length; i++)
+            {
                 composed_tfs.put(split[i], split[0]);
             }
         }
         br_composed_tfs.close();
 
-        for (File firDir : folder_tepic_postprocess.listFiles()) {
-            if (firDir.isDirectory()) {
+        for (File firDir : folder_tepic_postprocess.listFiles())
+        {
+            if (firDir.isDirectory())
+            {
                 File folder_output_hm = new File(folder_output.getAbsolutePath() + File.separator + firDir.getName());
                 folder_output_hm.mkdir();
-                for (File fileDirHM : firDir.listFiles()) {
-                    if (fileDirHM.isDirectory()) {
+                for (File fileDirHM : firDir.listFiles())
+                {
+                    if (fileDirHM.isDirectory())
+                    {
                         File folder_output_HM_group =
                                 new File(folder_output_hm.getAbsolutePath() + File.separator + fileDirHM.getName());
                         folder_output_HM_group.mkdir();
@@ -6594,23 +7198,31 @@ public class COM2POSE_lib {
         BufferedReader br_ensg_gene_symbol =
                 new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
-        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null) {
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_gene_symbol.split("\t");
-            if (split.length > 1) {
-                if (composed_tfs.containsKey(split[0])) {
+            if (split.length > 1)
+            {
+                if (composed_tfs.containsKey(split[0]))
+                {
                     ensg_gene_symbol_map.put(split[1].toUpperCase(), composed_tfs.get(split[0]));
-                } else {
+                } else
+                {
                     ensg_gene_symbol_map.put(split[1].toUpperCase(), split[0]);
                 }
             }
         }
         br_ensg_gene_symbol.close();
 
-        for (File folderDirHM : folder_output.listFiles()) {
-            if (folderDirHM.isDirectory()) {
+        for (File folderDirHM : folder_output.listFiles())
+        {
+            if (folderDirHM.isDirectory())
+            {
                 String hm = folderDirHM.getName();
-                for (File folderDirHM_Group : folderDirHM.listFiles()) {
-                    if (folderDirHM_Group.isDirectory()) {
+                for (File folderDirHM_Group : folderDirHM.listFiles())
+                {
+                    if (folderDirHM_Group.isDirectory())
+                    {
                         String group_name = folderDirHM_Group.getName();
 
                         logger.logLine("[TGENE] filter target genes " + hm + ": " + group_name);
@@ -6632,13 +7244,16 @@ public class COM2POSE_lib {
 
                         BufferedReader br_tgene = new BufferedReader(new FileReader(input_data_TGENE));
                         String line_tgene = br_tgene.readLine();
-                        while ((line_tgene = br_tgene.readLine()) != null) {
+                        while ((line_tgene = br_tgene.readLine()) != null)
+                        {
                             String[] split = line_tgene.split("\t");
 
                             String[] split_genes = split[3].split(";");
 
-                            for (String s : split_genes) {
-                                if (ensg_gene_symbol_map.containsKey(s.toUpperCase())) {
+                            for (String s : split_genes)
+                            {
+                                if (ensg_gene_symbol_map.containsKey(s.toUpperCase()))
+                                {
                                     available_target_genes.add(ensg_gene_symbol_map.get(s.toUpperCase()));
                                 }
                             }
@@ -6649,15 +7264,18 @@ public class COM2POSE_lib {
                                 folderDirHM_Group.getAbsolutePath() + File.separator + input_data_TEPIC.getName()));
                         BufferedReader br_tepic = new BufferedReader(new FileReader(input_data_TEPIC));
                         String line_tepic = br_tepic.readLine();
-                        if (line_tepic == null) {
+                        if (line_tepic == null)
+                        {
                             continue;
                         }
                         bw_tepic.write(line_tepic);
                         bw_tepic.newLine();
 
-                        while ((line_tepic = br_tepic.readLine()) != null) {
+                        while ((line_tepic = br_tepic.readLine()) != null)
+                        {
                             String[] split = line_tepic.split("\t");
-                            if (available_target_genes.contains(split[0])) {
+                            if (available_target_genes.contains(split[0]))
+                            {
                                 bw_tepic.write(line_tepic);
                                 bw_tepic.newLine();
                             }
@@ -6675,7 +7293,8 @@ public class COM2POSE_lib {
     /**
      * creates TGENE group clash so it can be merged into TEPIC
      */
-    public void create_tgen_groups() throws IOException {
+    public void create_tgen_groups() throws IOException
+    {
         logger.logLine("[TGENE] Create TGene group data");
 
         check_tepic_input_with_options();
@@ -6725,12 +7344,16 @@ public class COM2POSE_lib {
         File folder_tepic_postprocess = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_tepic_postprocessing + File.separator +
                 options_intern.folder_name_tepic_postprocessing_output);
-        for (File firDir : folder_tepic_postprocess.listFiles()) {
-            if (firDir.isDirectory()) {
+        for (File firDir : folder_tepic_postprocess.listFiles())
+        {
+            if (firDir.isDirectory())
+            {
                 File folder_output_hm = new File(folder_output.getAbsolutePath() + File.separator + firDir.getName());
                 folder_output_hm.mkdir();
-                for (File fileDirHM : firDir.listFiles()) {
-                    if (fileDirHM.isDirectory()) {
+                for (File fileDirHM : firDir.listFiles())
+                {
+                    if (fileDirHM.isDirectory())
+                    {
                         File folder_output_HM_group =
                                 new File(folder_output_hm.getAbsolutePath() + File.separator + fileDirHM.getName());
                         folder_output_HM_group.mkdir();
@@ -6740,12 +7363,16 @@ public class COM2POSE_lib {
         }
 
         //based on structure build necessary files
-        for (File folderDirHM : folder_output.listFiles()) {
-            if (folderDirHM.isDirectory()) {
+        for (File folderDirHM : folder_output.listFiles())
+        {
+            if (folderDirHM.isDirectory())
+            {
                 String hm = folderDirHM.getName();
-                for (File folderDirHM_Group : folderDirHM.listFiles()) {
+                for (File folderDirHM_Group : folderDirHM.listFiles())
+                {
 
-                    if (folderDirHM_Group.isDirectory()) {
+                    if (folderDirHM_Group.isDirectory())
+                    {
                         BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
                                 folderDirHM_Group.getAbsolutePath() + File.separator +
                                         options_intern.file_suffic_tgen_output_groups)));
@@ -6759,7 +7386,8 @@ public class COM2POSE_lib {
                         File input_group1;
                         File input_group2;
 
-                        if (!options_intern.mix_mutually_exclusive) {
+                        if (!options_intern.mix_mutually_exclusive)
+                        {
                             input_group1 = new File(
                                     folder_input.getAbsolutePath() + File.separator + group1 + File.separator + hm +
                                             File.separator + hm + "_" + group1 + ".txt");
@@ -6767,7 +7395,8 @@ public class COM2POSE_lib {
                                     folder_input.getAbsolutePath() + File.separator + group2 + File.separator + hm +
                                             File.separator + hm + "_" + group2 + ".txt");
 
-                        } else {
+                        } else
+                        {
                             input_group1 = new File(
                                     folder_input.getAbsolutePath() + File.separator + folderDirHM_Group.getName() +
                                             File.separator + hm + File.separator + hm + "_" + group1 + ".txt");
@@ -6780,7 +7409,8 @@ public class COM2POSE_lib {
 
                         BufferedReader br_group1 = new BufferedReader(new FileReader(input_group1));
                         String line_group1 = br_group1.readLine();
-                        while ((line_group1 = br_group1.readLine()) != null) {
+                        while ((line_group1 = br_group1.readLine()) != null)
+                        {
                             String[] split_group1 = line_group1.split("\t");
                             String chr = split_group1[0];
                             int left_border = Integer.parseInt(split_group1[1]);
@@ -6788,9 +7418,11 @@ public class COM2POSE_lib {
                             String ensg = split_group1[3].toUpperCase();
 
                             ArrayList<ENSG_ranges_binary_trees> current_arr_chr;
-                            if (chr_unmerged_ius.containsKey(chr)) {
+                            if (chr_unmerged_ius.containsKey(chr))
+                            {
                                 current_arr_chr = chr_unmerged_ius.get(chr);
-                            } else {
+                            } else
+                            {
                                 current_arr_chr = new ArrayList<>();
                             }
 
@@ -6807,7 +7439,8 @@ public class COM2POSE_lib {
 
                         BufferedReader br_group2 = new BufferedReader(new FileReader(input_group2));
                         String line_group2 = br_group2.readLine();
-                        while ((line_group2 = br_group2.readLine()) != null) {
+                        while ((line_group2 = br_group2.readLine()) != null)
+                        {
                             String[] split_group2 = line_group2.split("\t");
                             String chr = split_group2[0];
                             int left_border = Integer.parseInt(split_group2[1]);
@@ -6815,9 +7448,11 @@ public class COM2POSE_lib {
                             String ensg = split_group2[3].toUpperCase();
 
                             ArrayList<ENSG_ranges_binary_trees> current_arr_chr;
-                            if (chr_unmerged_ius.containsKey(chr)) {
+                            if (chr_unmerged_ius.containsKey(chr))
+                            {
                                 current_arr_chr = chr_unmerged_ius.get(chr);
-                            } else {
+                            } else
+                            {
                                 current_arr_chr = new ArrayList<>();
                             }
 
@@ -6833,7 +7468,8 @@ public class COM2POSE_lib {
                         br_group2.close();
 
                         //sort all arrays
-                        for (String s : chr_unmerged_ius.keySet()) {
+                        for (String s : chr_unmerged_ius.keySet())
+                        {
                             ArrayList<ENSG_ranges_binary_trees> x = chr_unmerged_ius.get(s);
                             Collections.sort(x);
                             chr_unmerged_ius.put(s, x);
@@ -6841,19 +7477,23 @@ public class COM2POSE_lib {
 
 
                         //remove duplicates or integrate ensgs if in overlap
-                        for (String chr : chr_unmerged_ius.keySet()) {
+                        for (String chr : chr_unmerged_ius.keySet())
+                        {
                             ArrayList<ENSG_ranges_binary_trees> unmerged = chr_unmerged_ius.get(chr);
 
                             ArrayList<ENSG_ranges_binary_trees> unmerged_temp = new ArrayList<>();
 
-                            for (int i = 1; i < unmerged.size(); i++) {
+                            for (int i = 1; i < unmerged.size(); i++)
+                            {
                                 ENSG_ranges_binary_trees iu_before = unmerged.get(i - 1);
                                 ENSG_ranges_binary_trees iu_after = unmerged.get(i);
 
-                                if (iu_before.isTheSame(iu_after)) {
+                                if (iu_before.isTheSame(iu_after))
+                                {
                                     unmerged_temp.add(iu_before);
                                     i++;
-                                } else {
+                                } else
+                                {
                                     unmerged_temp.add(iu_before);
                                 }
                             }
@@ -6862,18 +7502,22 @@ public class COM2POSE_lib {
                             unmerged_temp.clear();
 
                             //check for same_ranges but not same ENSGs and merge them
-                            for (int i = 1; i < unmerged.size(); i++) {
+                            for (int i = 1; i < unmerged.size(); i++)
+                            {
                                 ENSG_ranges_binary_trees iu_before = unmerged.get(i - 1);
                                 ENSG_ranges_binary_trees iu_after = unmerged.get(i);
 
-                                if (iu_before.isSameRange(iu_after)) {
-                                    for (String s : iu_after.ensgs) {
+                                if (iu_before.isSameRange(iu_after))
+                                {
+                                    for (String s : iu_after.ensgs)
+                                    {
                                         iu_before.ensgs.add(s);
                                     }
                                     unmerged_temp.add(iu_before);
 
                                     i++;
-                                } else {
+                                } else
+                                {
                                     unmerged_temp.add(iu_before);
                                 }
                             }
@@ -6912,7 +7556,8 @@ public class COM2POSE_lib {
                             }*/
 
 
-                            for (int i = 0; i < unmerged.size(); i++) {
+                            for (int i = 0; i < unmerged.size(); i++)
+                            {
                                 bw.write(unmerged.get(i).toString());
                                 bw.newLine();
                             }
@@ -6928,7 +7573,8 @@ public class COM2POSE_lib {
     /**
      * merge different samples of one timepoint of TGENE
      */
-    public void merge_tgen() throws IOException {
+    public void merge_tgen() throws IOException
+    {
         logger.logLine("[TGENE] Postprocessing: Merge TGene results");
 
         File folder_input = new File(
@@ -6939,13 +7585,17 @@ public class COM2POSE_lib {
                         File.separator + options_intern.folder_name_tgen_merged);
         folder_output.mkdir();
 
-        for (File fileDirTP : folder_input.listFiles()) {
-            if (fileDirTP.isDirectory()) {
+        for (File fileDirTP : folder_input.listFiles())
+        {
+            if (fileDirTP.isDirectory())
+            {
                 File output_tp = new File(folder_output.getAbsolutePath() + File.separator + fileDirTP.getName());
                 output_tp.mkdir();
 
-                for (File fileDirTP_HM : fileDirTP.listFiles()) {
-                    if (fileDirTP_HM.isDirectory()) {
+                for (File fileDirTP_HM : fileDirTP.listFiles())
+                {
+                    if (fileDirTP_HM.isDirectory())
+                    {
                         File output_tp_hm =
                                 new File(output_tp.getAbsolutePath() + File.separator + fileDirTP_HM.getName());
                         output_tp_hm.mkdir();
@@ -6960,8 +7610,10 @@ public class COM2POSE_lib {
                                 new HashMap<>();
 
 
-                        for (File fileDirTP_HM_Samples : fileDirTP_HM.listFiles()) {
-                            if (fileDirTP_HM_Samples.isDirectory()) {
+                        for (File fileDirTP_HM_Samples : fileDirTP_HM.listFiles())
+                        {
+                            if (fileDirTP_HM_Samples.isDirectory())
+                            {
                                 //this one is needed for mutually exclusive option
                                 String file_name = fileDirTP_HM_Samples.getName();
                                 HashMap<String, ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions =
@@ -6972,8 +7624,10 @@ public class COM2POSE_lib {
 
                                 BufferedReader br = new BufferedReader(new FileReader(input_data));
                                 String line = br.readLine();
-                                while ((line = br.readLine()) != null) {
-                                    if (line.startsWith("#") || line.equals("")) {
+                                while ((line = br.readLine()) != null)
+                                {
+                                    if (line.startsWith("#") || line.equals(""))
+                                    {
                                         continue;
                                     }
 
@@ -6989,24 +7643,28 @@ public class COM2POSE_lib {
                                     iu.left_border = Integer.parseInt(split_borders[0]);
                                     iu.right_border = Integer.parseInt(split_borders[1]);
 
-                                    if (tfs_to_regions.containsKey(split_chr[0])) {
+                                    if (tfs_to_regions.containsKey(split_chr[0]))
+                                    {
                                         ArrayList<ENSG_ranges_binary_trees> x = tfs_to_regions.get(split_chr[0]);
                                         x.add(iu);
                                         tfs_to_regions.put(split_chr[0], x);
 
-                                    } else {
+                                    } else
+                                    {
                                         ArrayList<ENSG_ranges_binary_trees> x = new ArrayList<>();
                                         x.add(iu);
                                         tfs_to_regions.put(split_chr[0], x);
                                     }
 
-                                    if (current_tfs_to_regions.containsKey(split_chr[0])) {
+                                    if (current_tfs_to_regions.containsKey(split_chr[0]))
+                                    {
                                         ArrayList<ENSG_ranges_binary_trees> x =
                                                 current_tfs_to_regions.get(split_chr[0]);
                                         x.add(iu);
                                         current_tfs_to_regions.put(split_chr[0], x);
 
-                                    } else {
+                                    } else
+                                    {
                                         ArrayList<ENSG_ranges_binary_trees> x = new ArrayList<>();
                                         x.add(iu);
                                         current_tfs_to_regions.put(split_chr[0], x);
@@ -7018,38 +7676,46 @@ public class COM2POSE_lib {
                         }
 
                         //sort regions
-                        for (String chr : tfs_to_regions.keySet()) {
+                        for (String chr : tfs_to_regions.keySet())
+                        {
                             Collections.sort(tfs_to_regions.get(chr));
                         }
 
-                        for (String file_name : file_tfs_to_regions.keySet()) {
+                        for (String file_name : file_tfs_to_regions.keySet())
+                        {
                             HashMap<String, ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions =
                                     file_tfs_to_regions.get(file_name);
 
-                            for (String chr : current_tfs_to_regions.keySet()) {
+                            for (String chr : current_tfs_to_regions.keySet())
+                            {
                                 Collections.sort(current_tfs_to_regions.get(chr));
                             }
                         }
 
-                        for (String chr : tfs_to_regions.keySet()) {
+                        for (String chr : tfs_to_regions.keySet())
+                        {
                             ArrayList<ENSG_ranges_binary_trees> tf_reg = tfs_to_regions.get(chr);
 
                             ArrayList<ENSG_ranges_binary_trees> tf_temp = new ArrayList<>();
-                            for (int i = 1; i < tf_reg.size(); i++) {
+                            for (int i = 1; i < tf_reg.size(); i++)
+                            {
                                 //delete all duplicates
                                 ENSG_ranges_binary_trees iu_before = tf_reg.get(i - 1);
                                 ENSG_ranges_binary_trees iu_now = tf_reg.get(i);
 
-                                if (iu_before.isTheSame(iu_now)) {
+                                if (iu_before.isTheSame(iu_now))
+                                {
                                     int temp_i = i + 1;
                                     boolean same = true;
                                     int count_same = 0;
-                                    while (temp_i < tf_reg.size() && same) {
+                                    while (temp_i < tf_reg.size() && same)
+                                    {
                                         same = false;
 
                                         ENSG_ranges_binary_trees iu_follow = tf_reg.get(temp_i);
 
-                                        if (iu_follow.isTheSame(iu_before)) {
+                                        if (iu_follow.isTheSame(iu_before))
+                                        {
                                             same = true;
                                             count_same++;
                                         }
@@ -7060,36 +7726,43 @@ public class COM2POSE_lib {
 
 
                                     tf_temp.add(iu_before);
-                                } else {
+                                } else
+                                {
                                     tf_temp.add(iu_before);
                                 }
                             }
                             tfs_to_regions.put(chr, tf_temp);
                         }
 
-                        for (String file_name : file_tfs_to_regions.keySet()) {
+                        for (String file_name : file_tfs_to_regions.keySet())
+                        {
                             HashMap<String, ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions =
                                     file_tfs_to_regions.get(file_name);
 
-                            for (String chr : current_tfs_to_regions.keySet()) {
+                            for (String chr : current_tfs_to_regions.keySet())
+                            {
                                 ArrayList<ENSG_ranges_binary_trees> tf_reg = current_tfs_to_regions.get(chr);
 
                                 ArrayList<ENSG_ranges_binary_trees> tf_temp = new ArrayList<>();
-                                for (int i = 1; i < tf_reg.size(); i++) {
+                                for (int i = 1; i < tf_reg.size(); i++)
+                                {
                                     //delete all duplicates
                                     ENSG_ranges_binary_trees iu_before = tf_reg.get(i - 1);
                                     ENSG_ranges_binary_trees iu_now = tf_reg.get(i);
 
-                                    if (iu_before.isTheSame(iu_now)) {
+                                    if (iu_before.isTheSame(iu_now))
+                                    {
                                         int temp_i = i + 1;
                                         boolean same = true;
                                         int count_same = 0;
-                                        while (temp_i < tf_reg.size() && same) {
+                                        while (temp_i < tf_reg.size() && same)
+                                        {
                                             same = false;
 
                                             ENSG_ranges_binary_trees iu_follow = tf_reg.get(temp_i);
 
-                                            if (iu_follow.isTheSame(iu_before)) {
+                                            if (iu_follow.isTheSame(iu_before))
+                                            {
                                                 same = true;
                                                 count_same++;
                                             }
@@ -7100,7 +7773,8 @@ public class COM2POSE_lib {
 
 
                                         tf_temp.add(iu_before);
-                                    } else {
+                                    } else
+                                    {
                                         tf_temp.add(iu_before);
                                     }
                                 }
@@ -7110,7 +7784,8 @@ public class COM2POSE_lib {
                         }
 
                         //CHECK TPM if TPM filter is set! -> non mutually exclusive
-                        if (options_intern.tepic_tpm_cutoff > 0) {
+                        if (options_intern.tepic_tpm_cutoff > 0)
+                        {
                                 /*command_tail += " -T " + options_intern.tepic_tpm_cutoff;
                                 command_tail += " -E " + options_intern.tepic_ensg_symbol;
                                 command_tail += " -A " + options_intern.deseq2_input_gene_id;
@@ -7133,7 +7808,8 @@ public class COM2POSE_lib {
 
                             ArrayList<Integer> gene_counts = new ArrayList<>();
 
-                            if (!options_intern.mix_mutually_exclusive) {
+                            if (!options_intern.mix_mutually_exclusive)
+                            {
                                 File f_gene_count_group1;
 
                                 f_gene_count_group1 = new File(
@@ -7145,11 +7821,13 @@ public class COM2POSE_lib {
                                 BufferedReader br_gene_counts_1 =
                                         new BufferedReader(new FileReader(f_gene_count_group1));
                                 String line_gene_count_1 = br_gene_counts_1.readLine();
-                                while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null) {
+                                while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null)
+                                {
                                     gene_counts.add(Integer.parseInt(line_gene_count_1));
                                 }
                                 br_gene_counts_1.close();
-                            } else {
+                            } else
+                            {
 
                                 String names[] = fileDirTP.getName().split("_");
 
@@ -7172,7 +7850,8 @@ public class COM2POSE_lib {
                                         new BufferedReader(new FileReader(f_gene_count_group1));
                                 int counts = 0;
                                 String line_gene_count_1 = br_gene_counts_1.readLine();
-                                while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null) {
+                                while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null)
+                                {
                                     position_counts.put(counts, Integer.parseInt(line_gene_count_1));
                                     counts++;
                                 }
@@ -7182,7 +7861,8 @@ public class COM2POSE_lib {
                                         new BufferedReader(new FileReader(f_gene_count_group2));
                                 counts = 0;
                                 String line_gene_count_2 = br_gene_counts_2.readLine();
-                                while ((line_gene_count_2 = br_gene_counts_2.readLine()) != null) {
+                                while ((line_gene_count_2 = br_gene_counts_2.readLine()) != null)
+                                {
                                     int mean_count =
                                             (position_counts.get(counts) + Integer.parseInt(line_gene_count_2)) / 2;
                                     position_counts.put(counts, mean_count);
@@ -7190,7 +7870,8 @@ public class COM2POSE_lib {
                                 }
                                 br_gene_counts_2.close();
 
-                                for (int i = 0; i < position_counts.size(); i++) {
+                                for (int i = 0; i < position_counts.size(); i++)
+                                {
                                     gene_counts.add(position_counts.get(i));
                                 }
                             }
@@ -7198,14 +7879,16 @@ public class COM2POSE_lib {
                             ArrayList<String> ensg_numbers = new ArrayList<>();
                             BufferedReader br_ensg_numbers = new BufferedReader(new FileReader(f_gene_annot_deseq2));
                             String line_ensg_numbers = br_ensg_numbers.readLine();
-                            while ((line_ensg_numbers = br_ensg_numbers.readLine()) != null) {
+                            while ((line_ensg_numbers = br_ensg_numbers.readLine()) != null)
+                            {
                                 ensg_numbers.add(line_ensg_numbers.toUpperCase());
                             }
                             br_ensg_numbers.close();
 
                             int total_number_samples = 0;
                             HashMap<String, Integer> ensg_counts = new HashMap<>();
-                            for (int i = 0; i < gene_counts.size(); i++) {
+                            for (int i = 0; i < gene_counts.size(); i++)
+                            {
                                 ensg_counts.put(ensg_numbers.get(i).toUpperCase(), gene_counts.get(i));
                                 total_number_samples++;
                             }
@@ -7214,9 +7897,11 @@ public class COM2POSE_lib {
 
                             BufferedReader br_ensg_symb = new BufferedReader(new FileReader(f_ensg_map_symbol));
                             String line_ensg_symb = br_ensg_symb.readLine();
-                            while ((line_ensg_symb = br_ensg_symb.readLine()) != null) {
+                            while ((line_ensg_symb = br_ensg_symb.readLine()) != null)
+                            {
                                 String[] split = line_ensg_symb.split("\t");
-                                if (split.length > 1) {
+                                if (split.length > 1)
+                                {
                                     ensg_symb.put(split[1].toUpperCase(), split[0]);
                                 }
                             }
@@ -7225,12 +7910,15 @@ public class COM2POSE_lib {
                             HashMap<String, Integer> gene_symbol_lengths = new HashMap<>();
                             BufferedReader br_gene_symbol_lengths = new BufferedReader(new FileReader(f_ref_genome));
                             String line_gene_symbol_lengths = "";
-                            while ((line_gene_symbol_lengths = br_gene_symbol_lengths.readLine()) != null) {
-                                if (line_gene_symbol_lengths.startsWith("#")) {
+                            while ((line_gene_symbol_lengths = br_gene_symbol_lengths.readLine()) != null)
+                            {
+                                if (line_gene_symbol_lengths.startsWith("#"))
+                                {
                                     continue;
                                 }
                                 String[] split = line_gene_symbol_lengths.split("\t");
-                                if (split[2].equals("transcript")) {
+                                if (split[2].equals("transcript"))
+                                {
                                     int start = Integer.parseInt(split[3]);
                                     int end = Integer.parseInt(split[4]);
                                     int diff = end - start + 1;
@@ -7245,18 +7933,22 @@ public class COM2POSE_lib {
 
                             double all_rpk = 0.0;
 
-                            for (String ec : ensg_counts.keySet()) {
-                                if (!ensg_counts.containsKey(ec)) {
+                            for (String ec : ensg_counts.keySet())
+                            {
+                                if (!ensg_counts.containsKey(ec))
+                                {
                                     continue;
                                 }
 
                                 int ec_count = ensg_counts.get(ec);
                                 int ec_lengths = 0;
-                                if (!gene_symbol_lengths.containsKey(ec)) {
+                                if (!gene_symbol_lengths.containsKey(ec))
+                                {
                                     continue;
                                 }
                                 ec_lengths = gene_symbol_lengths.get(ec);
-                                if (ec_lengths == 0) {
+                                if (ec_lengths == 0)
+                                {
                                     continue;
                                 }
                                 double norm_ec_lengths = ec_lengths / (1000 * 1.0);
@@ -7266,45 +7958,55 @@ public class COM2POSE_lib {
 
                             double scaling_factor = all_rpk / (1000000 * 1.0);
 
-                            for (String chr : tfs_to_regions.keySet()) {
+                            for (String chr : tfs_to_regions.keySet())
+                            {
                                 ArrayList<ENSG_ranges_binary_trees> tf_reg = tfs_to_regions.get(chr);
                                 ArrayList<ENSG_ranges_binary_trees> tf_reg_temp = new ArrayList<>();
 
-                                for (ENSG_ranges_binary_trees iu : tf_reg) {
+                                for (ENSG_ranges_binary_trees iu : tf_reg)
+                                {
                                     boolean should_write = false;
 
                                     //check if we want that TF
-                                    for (String ec : iu.ensgs) {
+                                    for (String ec : iu.ensgs)
+                                    {
                                         ec = ec.toUpperCase();
 
-                                        if (ensg_symb.containsKey(ec)) {
+                                        if (ensg_symb.containsKey(ec))
+                                        {
                                             ec = ensg_symb.get(ec);
-                                        } else {
+                                        } else
+                                        {
                                             continue;
                                         }
 
-                                        if (!ensg_counts.containsKey(ec)) {
+                                        if (!ensg_counts.containsKey(ec))
+                                        {
                                             continue;
                                         }
 
                                         int ec_count = ensg_counts.get(ec);
                                         int ec_lengths = 0;
-                                        if (!gene_symbol_lengths.containsKey(ec)) {
+                                        if (!gene_symbol_lengths.containsKey(ec))
+                                        {
                                             continue;
                                         }
                                         ec_lengths = gene_symbol_lengths.get(ec);
-                                        if (ec_lengths == 0) {
+                                        if (ec_lengths == 0)
+                                        {
                                             continue;
                                         }
                                         double norm_ec_lengths = ec_lengths / (1000 * 1.0);
                                         double current_rpk = ec_count / (norm_ec_lengths * 1.0);
 
-                                        if (current_rpk >= scaling_factor) {
+                                        if (current_rpk >= scaling_factor)
+                                        {
                                             should_write = true;
                                         }
                                     }
 
-                                    if (should_write) {
+                                    if (should_write)
+                                    {
                                         tf_reg_temp.add(iu);
                                     }
                                 }
@@ -7314,11 +8016,13 @@ public class COM2POSE_lib {
                         }
 
                         //CHECK TPM if TPM filter is set! -> mutually exclusive
-                        for (String file_name : file_tfs_to_regions.keySet()) {
+                        for (String file_name : file_tfs_to_regions.keySet())
+                        {
                             HashMap<String, ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions =
                                     file_tfs_to_regions.get(file_name);
 
-                            if (options_intern.tepic_tpm_cutoff > 0) {
+                            if (options_intern.tepic_tpm_cutoff > 0)
+                            {
                                 /*command_tail += " -T " + options_intern.tepic_tpm_cutoff;
                                 command_tail += " -E " + options_intern.tepic_ensg_symbol;
                                 command_tail += " -A " + options_intern.deseq2_input_gene_id;
@@ -7339,7 +8043,8 @@ public class COM2POSE_lib {
 
                                 ArrayList<Integer> gene_counts = new ArrayList<>();
 
-                                if (!options_intern.mix_mutually_exclusive) {
+                                if (!options_intern.mix_mutually_exclusive)
+                                {
                                     File f_gene_count_group1;
 
                                     f_gene_count_group1 = new File(
@@ -7351,11 +8056,13 @@ public class COM2POSE_lib {
                                     BufferedReader br_gene_counts_1 =
                                             new BufferedReader(new FileReader(f_gene_count_group1));
                                     String line_gene_count_1 = br_gene_counts_1.readLine();
-                                    while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null) {
+                                    while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null)
+                                    {
                                         gene_counts.add(Integer.parseInt(line_gene_count_1));
                                     }
                                     br_gene_counts_1.close();
-                                } else {
+                                } else
+                                {
 
                                     String names[] = fileDirTP.getName().split("_");
 
@@ -7378,7 +8085,8 @@ public class COM2POSE_lib {
                                             new BufferedReader(new FileReader(f_gene_count_group1));
                                     int counts = 0;
                                     String line_gene_count_1 = br_gene_counts_1.readLine();
-                                    while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null) {
+                                    while ((line_gene_count_1 = br_gene_counts_1.readLine()) != null)
+                                    {
                                         position_counts.put(counts, Integer.parseInt(line_gene_count_1));
                                         counts++;
                                     }
@@ -7388,7 +8096,8 @@ public class COM2POSE_lib {
                                             new BufferedReader(new FileReader(f_gene_count_group2));
                                     counts = 0;
                                     String line_gene_count_2 = br_gene_counts_2.readLine();
-                                    while ((line_gene_count_2 = br_gene_counts_2.readLine()) != null) {
+                                    while ((line_gene_count_2 = br_gene_counts_2.readLine()) != null)
+                                    {
                                         int mean_count =
                                                 (position_counts.get(counts) + Integer.parseInt(line_gene_count_2)) / 2;
                                         position_counts.put(counts, mean_count);
@@ -7396,7 +8105,8 @@ public class COM2POSE_lib {
                                     }
                                     br_gene_counts_2.close();
 
-                                    for (int i = 0; i < position_counts.size(); i++) {
+                                    for (int i = 0; i < position_counts.size(); i++)
+                                    {
                                         gene_counts.add(position_counts.get(i));
                                     }
                                 }
@@ -7405,14 +8115,16 @@ public class COM2POSE_lib {
                                 BufferedReader br_ensg_numbers =
                                         new BufferedReader(new FileReader(f_gene_annot_deseq2));
                                 String line_ensg_numbers = br_ensg_numbers.readLine();
-                                while ((line_ensg_numbers = br_ensg_numbers.readLine()) != null) {
+                                while ((line_ensg_numbers = br_ensg_numbers.readLine()) != null)
+                                {
                                     ensg_numbers.add(line_ensg_numbers.toUpperCase());
                                 }
                                 br_ensg_numbers.close();
 
                                 int total_number_samples = 0;
                                 HashMap<String, Integer> ensg_counts = new HashMap<>();
-                                for (int i = 0; i < gene_counts.size(); i++) {
+                                for (int i = 0; i < gene_counts.size(); i++)
+                                {
                                     ensg_counts.put(ensg_numbers.get(i).toUpperCase(), gene_counts.get(i));
                                     total_number_samples++;
                                 }
@@ -7421,9 +8133,11 @@ public class COM2POSE_lib {
 
                                 BufferedReader br_ensg_symb = new BufferedReader(new FileReader(f_ensg_map_symbol));
                                 String line_ensg_symb = br_ensg_symb.readLine();
-                                while ((line_ensg_symb = br_ensg_symb.readLine()) != null) {
+                                while ((line_ensg_symb = br_ensg_symb.readLine()) != null)
+                                {
                                     String[] split = line_ensg_symb.split("\t");
-                                    if (split.length > 1) {
+                                    if (split.length > 1)
+                                    {
                                         ensg_symb.put(split[1].toUpperCase(), split[0]);
                                     }
                                 }
@@ -7433,12 +8147,15 @@ public class COM2POSE_lib {
                                 BufferedReader br_gene_symbol_lengths =
                                         new BufferedReader(new FileReader(f_ref_genome));
                                 String line_gene_symbol_lengths = "";
-                                while ((line_gene_symbol_lengths = br_gene_symbol_lengths.readLine()) != null) {
-                                    if (line_gene_symbol_lengths.startsWith("#")) {
+                                while ((line_gene_symbol_lengths = br_gene_symbol_lengths.readLine()) != null)
+                                {
+                                    if (line_gene_symbol_lengths.startsWith("#"))
+                                    {
                                         continue;
                                     }
                                     String[] split = line_gene_symbol_lengths.split("\t");
-                                    if (split[2].equals("transcript")) {
+                                    if (split[2].equals("transcript"))
+                                    {
                                         int start = Integer.parseInt(split[3]);
                                         int end = Integer.parseInt(split[4]);
                                         int diff = end - start + 1;
@@ -7453,18 +8170,22 @@ public class COM2POSE_lib {
 
                                 double all_rpk = 0.0;
 
-                                for (String ec : ensg_counts.keySet()) {
-                                    if (!ensg_counts.containsKey(ec)) {
+                                for (String ec : ensg_counts.keySet())
+                                {
+                                    if (!ensg_counts.containsKey(ec))
+                                    {
                                         continue;
                                     }
 
                                     int ec_count = ensg_counts.get(ec);
                                     int ec_lengths = 0;
-                                    if (!gene_symbol_lengths.containsKey(ec)) {
+                                    if (!gene_symbol_lengths.containsKey(ec))
+                                    {
                                         continue;
                                     }
                                     ec_lengths = gene_symbol_lengths.get(ec);
-                                    if (ec_lengths == 0) {
+                                    if (ec_lengths == 0)
+                                    {
                                         continue;
                                     }
                                     double norm_ec_lengths = ec_lengths / (1000 * 1.0);
@@ -7474,45 +8195,55 @@ public class COM2POSE_lib {
 
                                 double scaling_factor = all_rpk / (1000000 * 1.0);
 
-                                for (String chr : current_tfs_to_regions.keySet()) {
+                                for (String chr : current_tfs_to_regions.keySet())
+                                {
                                     ArrayList<ENSG_ranges_binary_trees> tf_reg = current_tfs_to_regions.get(chr);
                                     ArrayList<ENSG_ranges_binary_trees> tf_reg_temp = new ArrayList<>();
 
-                                    for (ENSG_ranges_binary_trees iu : tf_reg) {
+                                    for (ENSG_ranges_binary_trees iu : tf_reg)
+                                    {
                                         boolean should_write = false;
 
                                         //check if we want that TF
-                                        for (String ec : iu.ensgs) {
+                                        for (String ec : iu.ensgs)
+                                        {
                                             ec = ec.toUpperCase();
 
-                                            if (ensg_symb.containsKey(ec)) {
+                                            if (ensg_symb.containsKey(ec))
+                                            {
                                                 ec = ensg_symb.get(ec);
-                                            } else {
+                                            } else
+                                            {
                                                 continue;
                                             }
 
-                                            if (!ensg_counts.containsKey(ec)) {
+                                            if (!ensg_counts.containsKey(ec))
+                                            {
                                                 continue;
                                             }
 
                                             int ec_count = ensg_counts.get(ec);
                                             int ec_lengths = 0;
-                                            if (!gene_symbol_lengths.containsKey(ec)) {
+                                            if (!gene_symbol_lengths.containsKey(ec))
+                                            {
                                                 continue;
                                             }
                                             ec_lengths = gene_symbol_lengths.get(ec);
-                                            if (ec_lengths == 0) {
+                                            if (ec_lengths == 0)
+                                            {
                                                 continue;
                                             }
                                             double norm_ec_lengths = ec_lengths / (1000 * 1.0);
                                             double current_rpk = ec_count / (norm_ec_lengths * 1.0);
 
-                                            if (current_rpk >= scaling_factor) {
+                                            if (current_rpk >= scaling_factor)
+                                            {
                                                 should_write = true;
                                             }
                                         }
 
-                                        if (should_write) {
+                                        if (should_write)
+                                        {
                                             tf_reg_temp.add(iu);
                                         }
                                     }
@@ -7525,22 +8256,27 @@ public class COM2POSE_lib {
                         }
 
 
-                        if (!options_intern.mix_mutually_exclusive) {
+                        if (!options_intern.mix_mutually_exclusive)
+                        {
                             BufferedWriter bw = new BufferedWriter(new FileWriter(
                                     new File(output_tp_hm.getAbsolutePath() + File.separator + name_output + ".txt")));
                             bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG");
                             bw.newLine();
-                            for (String chr : tfs_to_regions.keySet()) {
+                            for (String chr : tfs_to_regions.keySet())
+                            {
                                 ArrayList<ENSG_ranges_binary_trees> tf_reg = tfs_to_regions.get(chr);
-                                for (ENSG_ranges_binary_trees iu : tf_reg) {
+                                for (ENSG_ranges_binary_trees iu : tf_reg)
+                                {
                                     bw.write(iu.toString());
                                     bw.newLine();
                                 }
 
                             }
                             bw.close();
-                        } else {
-                            for (String file_name : file_tfs_to_regions.keySet()) {
+                        } else
+                        {
+                            for (String file_name : file_tfs_to_regions.keySet())
+                            {
                                 HashMap<String, ArrayList<ENSG_ranges_binary_trees>> current_tfs_to_regions =
                                         file_tfs_to_regions.get(file_name);
 
@@ -7550,9 +8286,11 @@ public class COM2POSE_lib {
                                         output_tp_hm.getAbsolutePath() + File.separator + name_output + ".txt")));
                                 bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG");
                                 bw.newLine();
-                                for (String chr : current_tfs_to_regions.keySet()) {
+                                for (String chr : current_tfs_to_regions.keySet())
+                                {
                                     ArrayList<ENSG_ranges_binary_trees> tf_reg = current_tfs_to_regions.get(chr);
-                                    for (ENSG_ranges_binary_trees iu : tf_reg) {
+                                    for (ENSG_ranges_binary_trees iu : tf_reg)
+                                    {
                                         bw.write(iu.toString());
                                         bw.newLine();
                                     }
@@ -7580,19 +8318,23 @@ public class COM2POSE_lib {
                             HashMap<String, ArrayList<ENSG_ranges_binary_trees>> updated_tfs_to_region_list =
                                     new HashMap<>();
 
-                            for (String chr : tfs_to_regions.keySet()) {
+                            for (String chr : tfs_to_regions.keySet())
+                            {
                                 ArrayList<ENSG_ranges_binary_trees> old_chr_tfs_to_region_list =
                                         tfs_to_regions.get(chr);
                                 ArrayList<ENSG_ranges_binary_trees> updated_chr_tfs_to_region_list = new ArrayList<>();
 
                                 //merge same ranges
                                 ENSG_ranges_binary_trees iu = old_chr_tfs_to_region_list.get(0);
-                                for (int i = 1; i < old_chr_tfs_to_region_list.size(); i++) {
+                                for (int i = 1; i < old_chr_tfs_to_region_list.size(); i++)
+                                {
                                     ENSG_ranges_binary_trees current_iu = old_chr_tfs_to_region_list.get(i);
 
-                                    if (iu.isSameRange(current_iu)) {
+                                    if (iu.isSameRange(current_iu))
+                                    {
                                         iu.ensgs.addAll(current_iu.ensgs);
-                                    } else {
+                                    } else
+                                    {
                                         updated_chr_tfs_to_region_list.add(iu);
                                         iu = current_iu;
                                     }
@@ -7606,9 +8348,11 @@ public class COM2POSE_lib {
                                             options_intern.file_suffic_tgen_output_groups)));
                             bw.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSGS");
                             bw.newLine();
-                            for (String chr : updated_tfs_to_region_list.keySet()) {
+                            for (String chr : updated_tfs_to_region_list.keySet())
+                            {
                                 ArrayList<ENSG_ranges_binary_trees> tf_reg = updated_tfs_to_region_list.get(chr);
-                                for (ENSG_ranges_binary_trees iu : tf_reg) {
+                                for (ENSG_ranges_binary_trees iu : tf_reg)
+                                {
                                     bw.write(iu.toString());
                                     bw.newLine();
                                 }
@@ -7627,7 +8371,8 @@ public class COM2POSE_lib {
     /**
      * run tgene for all samples
      */
-    public void run_tgen() throws Exception {
+    public void run_tgen() throws Exception
+    {
         logger.logLine("[TGENE] Run TGene");
 
         check_tepic_input_with_options();
@@ -7676,19 +8421,25 @@ public class COM2POSE_lib {
         output_tgen.mkdir();
 
         File folder = new File(options_intern.tepic_input_directory);
-        for (File fileDirTP : folder.listFiles()) {
-            if (fileDirTP.isDirectory()) {
+        for (File fileDirTP : folder.listFiles())
+        {
+            if (fileDirTP.isDirectory())
+            {
                 File output_tgen_tp = new File(output_tgen.getAbsolutePath() + File.separator + fileDirTP.getName());
                 output_tgen_tp.mkdir();
 
-                for (File fileDirTP_HM : fileDirTP.listFiles()) {
-                    if (fileDirTP_HM.isDirectory()) {
+                for (File fileDirTP_HM : fileDirTP.listFiles())
+                {
+                    if (fileDirTP_HM.isDirectory())
+                    {
                         File output_tgen_tp_hm =
                                 new File(output_tgen_tp.getAbsolutePath() + File.separator + fileDirTP_HM.getName());
                         output_tgen_tp_hm.mkdir();
 
-                        for (File fileDir_data : fileDirTP_HM.listFiles()) {
-                            if (!fileDir_data.isDirectory()) {
+                        for (File fileDir_data : fileDirTP_HM.listFiles())
+                        {
+                            if (!fileDir_data.isDirectory())
+                            {
                                 String[] name_split = fileDir_data.getName().split("\\.");
 
                                 File output_tgen_tp_hm_sample =
@@ -7704,15 +8455,18 @@ public class COM2POSE_lib {
                                         options_intern.folder_name_tgen_preprocessing_gtf);
                                 File gtf = new File("");
 
-                                for (File gtf_dirDir : gtf_dir.listFiles()) {
+                                for (File gtf_dirDir : gtf_dir.listFiles())
+                                {
                                     if (gtf_dirDir.getName()
-                                            .matches(".*" + options_intern.file_suffix_tgen_preprocess_gtf)) {
+                                            .matches(".*" + options_intern.file_suffix_tgen_preprocess_gtf))
+                                    {
                                         gtf = gtf_dirDir;
                                         break;
                                     }
                                 }
 
-                                if (gtf.getName().equals("")) {
+                                if (gtf.getName().equals(""))
+                                {
                                     logger.logLine("[TGENE] could not find preprocessed GTF.");
                                     System.exit(1);
                                 }
@@ -7721,10 +8475,12 @@ public class COM2POSE_lib {
 
                                 command_execute += " -oc " + output_tgen_tp_hm_sample;
 
-                                if (options_intern.tgen_no_closest_locus) {
+                                if (options_intern.tgen_no_closest_locus)
+                                {
                                     command_execute += " --no-closest-locus";
                                 }
-                                if (options_intern.tgen_no_closest_tss) {
+                                if (options_intern.tgen_no_closest_tss)
+                                {
                                     command_execute += " --no-closest-tss";
                                 }
 
@@ -7735,7 +8491,8 @@ public class COM2POSE_lib {
                                 logger.logLine("[TGENE] execute TGENE with command line: " + command_execute);
                                 Process child = Runtime.getRuntime().exec(command_execute);
                                 int code = child.waitFor();
-                                switch (code) {
+                                switch (code)
+                                {
                                     case 0:
                                         break;
                                     case 1:
@@ -7756,7 +8513,8 @@ public class COM2POSE_lib {
     /**
      * preprocess data for tgen run
      */
-    public void preprocess_tgen() throws IOException {
+    public void preprocess_tgen() throws IOException
+    {
         logger.logLine("[TGENE] Consensus approach with TGen is used. Preprocessing ...");
 
         check_tepic_input_with_options();
@@ -7835,11 +8593,14 @@ public class COM2POSE_lib {
         String[] gtf_name_split_dir = options_intern.tepic_gene_annot.split(File.separator);
         String[] gtf_name_split = gtf_name_split_dir[gtf_name_split_dir.length - 1].split("\\.");
         String gtf_name = "";
-        for (int i = 0; i < gtf_name_split.length - 1; i++) {
-            if (i > 0) {
+        for (int i = 0; i < gtf_name_split.length - 1; i++)
+        {
+            if (i > 0)
+            {
                 gtf_name += ".";
                 gtf_name += gtf_name_split[i];
-            } else {
+            } else
+            {
                 gtf_name += gtf_name_split[i];
 
             }
@@ -7852,24 +8613,32 @@ public class COM2POSE_lib {
                         options_intern.file_suffix_tgen_preprocess_gtf)));
 
         String line_gtf_transcripts = "";
-        while ((line_gtf_transcripts = br_gtf_transcripts.readLine()) != null) {
-            if (line_gtf_transcripts.startsWith("#")) {
+        while ((line_gtf_transcripts = br_gtf_transcripts.readLine()) != null)
+        {
+            if (line_gtf_transcripts.startsWith("#"))
+            {
                 continue;
             }
             String[] split = line_gtf_transcripts.split("\t");
-            if (split[2].equals("transcript")) {
-                if (split[0].matches(".*M.*")) {
+            if (split[2].equals("transcript"))
+            {
+                if (split[0].matches(".*M.*"))
+                {
                     String line = options_intern.tgen_mt_writing;
-                    for (int i = 1; i < split.length; i++) {
+                    for (int i = 1; i < split.length; i++)
+                    {
                         line += "\t" + split[i];
                     }
                     bw_gtf_transcripts.write(line);
                     bw_gtf_transcripts.newLine();
-                } else {
-                    if (split[0].matches("chr.*")) {
+                } else
+                {
+                    if (split[0].matches("chr.*"))
+                    {
                         bw_gtf_transcripts.write(line_gtf_transcripts.substring(3));
                         bw_gtf_transcripts.newLine();
-                    } else {
+                    } else
+                    {
                         bw_gtf_transcripts.write(line_gtf_transcripts);
                         bw_gtf_transcripts.newLine();
                     }
@@ -7890,17 +8659,21 @@ public class COM2POSE_lib {
         int count = 0;
 
         String line_gtf_bin_tree = "";
-        while ((line_gtf_bin_tree = br_gtf_bin_tree.readLine()) != null) {
-            if (line_gtf_bin_tree.startsWith("#")) {
+        while ((line_gtf_bin_tree = br_gtf_bin_tree.readLine()) != null)
+        {
+            if (line_gtf_bin_tree.startsWith("#"))
+            {
                 continue;
             }
             String[] split = line_gtf_bin_tree.split("\t");
-            if (split[2].equals("transcript")) {
+            if (split[2].equals("transcript"))
+            {
                 String[] split_line = split[8].split(";");
 
                 String chr = split[0];
 
-                if (!current_chr.equals(chr)) {
+                if (!current_chr.equals(chr))
+                {
                     bw_gtf_bin_tree.close();
                     count = 0;
                     bw_gtf_bin_tree = new BufferedWriter(new FileWriter(new File(
@@ -7914,8 +8687,10 @@ public class COM2POSE_lib {
                 String start_pos = split[3];
                 String end_pos = split[4];
 
-                for (int i = 0; i < split_line.length; i++) {
-                    if (split_line[i].startsWith("gene_id")) {
+                for (int i = 0; i < split_line.length; i++)
+                {
+                    if (split_line[i].startsWith("gene_id"))
+                    {
                         String[] split_x = split_line[i].split("\"");
                         ensg = split_x[1].substring(0, split_x[1].length()).split("\\.")[0];
                         break;
@@ -7945,11 +8720,14 @@ public class COM2POSE_lib {
 
         ArrayList<ENSG_ranges_binary_trees> unmerged_intervalls = new ArrayList<>();
 
-        for (File fileDir : f_TGEN_preprocess_binary_trees_unmerged.listFiles()) {
-            if (!fileDir.isDirectory() && !fileDir.getName().equals("test.txt")) {
+        for (File fileDir : f_TGEN_preprocess_binary_trees_unmerged.listFiles())
+        {
+            if (!fileDir.isDirectory() && !fileDir.getName().equals("test.txt"))
+            {
                 BufferedReader br = new BufferedReader(new FileReader(fileDir));
                 String line = br.readLine();
-                while ((line = br.readLine()) != null) {
+                while ((line = br.readLine()) != null)
+                {
                     String[] split = line.split("\t");
 
                     ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
@@ -7968,7 +8746,8 @@ public class COM2POSE_lib {
                 //merge intervalls with same ENSG list!
                 int count_same_ENSG = 0;
                 boolean last_one_merged = false;
-                for (int i = 1; i < unmerged_intervalls.size(); i++) {
+                for (int i = 1; i < unmerged_intervalls.size(); i++)
+                {
                     ENSG_ranges_binary_trees iu_before = unmerged_intervalls.get(i - 1);
                     ENSG_ranges_binary_trees iu_now = unmerged_intervalls.get(i);
 
@@ -7977,25 +8756,31 @@ public class COM2POSE_lib {
 
                     boolean all_in = true;
 
-                    for (String s : ensgs_before) {
-                        if (!ensgs_now.contains(s)) {
+                    for (String s : ensgs_before)
+                    {
+                        if (!ensgs_now.contains(s))
+                        {
                             all_in = false;
                         }
                     }
-                    for (String s : ensgs_now) {
-                        if (!ensgs_before.contains(s)) {
+                    for (String s : ensgs_now)
+                    {
+                        if (!ensgs_before.contains(s))
+                        {
                             all_in = false;
                         }
                     }
 
-                    if (all_in) {
+                    if (all_in)
+                    {
                         //now merge!
 
                         //look for further intervalls with same ensg
                         boolean found_furthers = true;
                         int counter_further = 0;
                         int temp_i = i;
-                        while (found_furthers && temp_i < unmerged_intervalls.size()) {
+                        while (found_furthers && temp_i < unmerged_intervalls.size())
+                        {
                             found_furthers = false;
 
                             HashSet<String> ensgs_further = unmerged_intervalls.get(temp_i).ensgs;
@@ -8003,27 +8788,34 @@ public class COM2POSE_lib {
 
                             boolean all_in_further = true;
 
-                            for (String s : ensgs_further) {
-                                if (!ensgs_before.contains(s)) {
+                            for (String s : ensgs_further)
+                            {
+                                if (!ensgs_before.contains(s))
+                                {
                                     all_in_further = false;
                                 }
                             }
 
-                            for (String s : ensgs_before) {
-                                if (!ensgs_further.contains(s)) {
+                            for (String s : ensgs_before)
+                            {
+                                if (!ensgs_further.contains(s))
+                                {
                                     all_in_further = false;
                                 }
                             }
 
-                            if (all_in_further) {
+                            if (all_in_further)
+                            {
                                 found_furthers = true;
                                 iu_now = unmerged_intervalls.get(temp_i);
-                            } else {
+                            } else
+                            {
                                 found_furthers = false;
                                 break;
                             }
 
-                            if (all_in_further && temp_i == unmerged_intervalls.size() - 1) {
+                            if (all_in_further && temp_i == unmerged_intervalls.size() - 1)
+                            {
                                 last_one_merged = true;
                             }
 
@@ -8043,14 +8835,16 @@ public class COM2POSE_lib {
                         unmerged_intervalls_temp_list.add(iu);
 
                         count_same_ENSG++;
-                    } else {
+                    } else
+                    {
                         iu_before.number = count_same_ENSG;
                         unmerged_intervalls_temp_list.add(iu_before);
                         count_same_ENSG++;
                     }
                 }
 
-                if (!last_one_merged) {
+                if (!last_one_merged)
+                {
                     ENSG_ranges_binary_trees iu = unmerged_intervalls.get(unmerged_intervalls.size() - 1);
                     iu.number = unmerged_intervalls_temp_list.size();
                     unmerged_intervalls_temp_list.add(iu);
@@ -8064,7 +8858,8 @@ public class COM2POSE_lib {
 
                 unmerged_intervalls.get(0).left_border = 0;
 
-                for (int i = 1; i < unmerged_intervalls.size(); i++) {
+                for (int i = 1; i < unmerged_intervalls.size(); i++)
+                {
                     ENSG_ranges_binary_trees iu_before = unmerged_intervalls.get(i - 1);
                     ENSG_ranges_binary_trees iu_current = unmerged_intervalls.get(i);
 
@@ -8073,14 +8868,16 @@ public class COM2POSE_lib {
 
                 Collections.sort(unmerged_intervalls);
 
-                for (int i = 0; i < unmerged_intervalls.size(); i++) {
+                for (int i = 0; i < unmerged_intervalls.size(); i++)
+                {
                     unmerged_intervalls.get(i).number = i;
                 }
 
                 BufferedWriter bw = new BufferedWriter(new FileWriter(
                         new File(f_TGEN_preprocess_binary_trees_merged + File.separator + fileDir.getName())));
                 bw.write("#\tPOS_START\tPOS_END\tENSG\n");
-                for (int i = 1; i < unmerged_intervalls.size(); i++) {
+                for (int i = 1; i < unmerged_intervalls.size(); i++)
+                {
                     ENSG_ranges_binary_trees iu = unmerged_intervalls.get(i);
                     StringBuilder sb = new StringBuilder();
                     sb.append(iu.number);
@@ -8104,8 +8901,10 @@ public class COM2POSE_lib {
 
         logger.logLine("[TGENE] Preparing chromosomes for binary search.");
 
-        for (File fileDir : f_TGEN_preprocess_binary_trees_merged.listFiles()) {
-            if (!fileDir.isDirectory()) {
+        for (File fileDir : f_TGEN_preprocess_binary_trees_merged.listFiles())
+        {
+            if (!fileDir.isDirectory())
+            {
 
                 ArrayList<ENSG_ranges_binary_trees> regions = new ArrayList<>();
 
@@ -8113,7 +8912,8 @@ public class COM2POSE_lib {
                 String header = br.readLine();
                 String line = "";
 
-                while ((line = br.readLine()) != null) {
+                while ((line = br.readLine()) != null)
+                {
                     String[] split = line.split("\t");
                     ENSG_ranges_binary_trees iu = new ENSG_ranges_binary_trees();
                     iu.number = Integer.parseInt(split[0]);
@@ -8131,12 +8931,14 @@ public class COM2POSE_lib {
                 newly_ordered.add(median);
 
                 ArrayList<ENSG_ranges_binary_trees> region_left = new ArrayList<>();
-                for (int i = 0; i < regions.size() / 2; i++) {
+                for (int i = 0; i < regions.size() / 2; i++)
+                {
                     region_left.add(regions.get(i));
                 }
 
                 ArrayList<ENSG_ranges_binary_trees> region_right = new ArrayList<>();
-                for (int i = regions.size() / 2 + 1; i < regions.size(); i++) {
+                for (int i = regions.size() / 2 + 1; i < regions.size(); i++)
+                {
                     region_right.add(regions.get(i));
                 }
 
@@ -8148,7 +8950,8 @@ public class COM2POSE_lib {
                 bw.write(header);
                 bw.newLine();
 
-                for (int i = 0; i < newly_ordered.size(); i++) {
+                for (int i = 0; i < newly_ordered.size(); i++)
+                {
                     bw.write(newly_ordered.get(i).toString_binary());
                     bw.newLine();
                 }
@@ -8165,16 +8968,19 @@ public class COM2POSE_lib {
     /**
      * postprocesses the TEPIC output (checks for TPM filter and copies files into a structure where preprocessing of DYNAMITE can happen
      */
-    public void postprocess_tepic_output() throws Exception {
+    public void postprocess_tepic_output() throws Exception
+    {
         logger.logLine("Start postprocessing of TEPIC output");
 
         HashMap<String, HashMap<String, HashSet<String>>> groups_to_compare = checkGroupsTEPIC();
 
         String suffix = "";
 
-        if (options_intern.tepic_tpm_cutoff > 0) {
+        if (options_intern.tepic_tpm_cutoff > 0)
+        {
             suffix = "_Gene_View_Filtered_TPM.txt";
-        } else {
+        } else
+        {
             suffix = "_Gene_View_Filtered.txt";
         }
 
@@ -8196,42 +9002,55 @@ public class COM2POSE_lib {
         String seperator = "";
 
         //generate input structure and copy files
-        for (String s : groups_to_compare.keySet()) {
+        for (String s : groups_to_compare.keySet())
+        {
             File f_input_tp_folders = new File(folder_pp_input.getAbsolutePath() + File.separator + s);
             f_input_tp_folders.mkdir();
             HashMap<String, HashSet<String>> hm = groups_to_compare.get(s);
-            for (String ss : hm.keySet()) {
+            for (String ss : hm.keySet())
+            {
                 available_hms.add(ss);
                 File f_input_hm_folders = new File(f_input_tp_folders.getAbsolutePath() + File.separator + ss);
                 f_input_hm_folders.mkdir();
 
                 //move coresponding sample outputs to these folders
                 File f_input_samples;
-                if (options_intern.tepic_randomize_tf_gene_matrix) {
+                if (options_intern.tepic_randomize_tf_gene_matrix)
+                {
                     f_input_samples = new File(options_intern.com2pose_working_directory + File.separator +
-                            options_intern.folder_name_tepic_output_raw_shuffle + File.separator + File.separator + s +
-                            File.separator + ss);
-                } else {
+                            options_intern.folder_name_tepic_output_raw_shuffle + File.separator + s + File.separator +
+                            ss);
+                } else
+                {
                     f_input_samples = new File(options_intern.com2pose_working_directory + File.separator +
                             options_intern.folder_name_tepic_output_raw + File.separator + s + File.separator + ss);
                 }
 
-                for (File fileDir : f_input_samples.listFiles()) {
-                    if (fileDir.isDirectory()) {
-                        for (File fileDir2 : fileDir.listFiles()) {
-                            if (!fileDir2.isDirectory()) {
+                for (File fileDir : f_input_samples.listFiles())
+                {
+                    if (fileDir.isDirectory())
+                    {
+                        for (File fileDir2 : fileDir.listFiles())
+                        {
+                            if (!fileDir2.isDirectory())
+                            {
                                 String name = fileDir2.getName();
-                                if (name.matches(".*" + suffix)) {
+                                if (name.matches(".*" + suffix))
+                                {
                                     //check tfs
                                     BufferedReader br = new BufferedReader(new FileReader(fileDir2));
                                     String line = br.readLine();
                                     String[] split = line.split("\t");
-                                    for (String st : split) {
-                                        if (st.matches(".*::.*") || st.matches(".*[.][.].*")) {
+                                    for (String st : split)
+                                    {
+                                        if (st.matches(".*::.*") || st.matches(".*[.][.].*"))
+                                        {
                                             check_tfs.add(st);
-                                            if (st.matches(".*::.*")) {
+                                            if (st.matches(".*::.*"))
+                                            {
                                                 seperator = "::";
-                                            } else {
+                                            } else
+                                            {
                                                 seperator = "[.][.]";
                                             }
                                         }
@@ -8246,7 +9065,8 @@ public class COM2POSE_lib {
                                     Process child = Runtime.getRuntime().exec(command);
                                     logger.logLine("[TEPIC] Copy files: " + command);
                                     int code = child.waitFor();
-                                    switch (code) {
+                                    switch (code)
+                                    {
                                         case 0:
                                             break;
                                         case 1:
@@ -8266,21 +9086,26 @@ public class COM2POSE_lib {
         f_out_tfs.mkdir();
         BufferedWriter bw_check_tfs = new BufferedWriter(new FileWriter(f_out_tfs.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
-        for (String key_tfs : check_tfs) {
+        for (String key_tfs : check_tfs)
+        {
             String[] split = key_tfs.split(seperator);
 
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < split.length; i++) {
-                if (i < 1) {
+            for (int i = 0; i < split.length; i++)
+            {
+                if (i < 1)
+                {
                     sb.append(split[i].toUpperCase());
-                } else {
+                } else
+                {
                     sb.append("..");
                     sb.append(split[i].toUpperCase());
                 }
             }
 
-            for (int i = 0; i < split.length; i++) {
+            for (int i = 0; i < split.length; i++)
+            {
                 sb.append("\t");
                 sb.append(split[i].toUpperCase());
             }
@@ -8292,7 +9117,8 @@ public class COM2POSE_lib {
         //generate output structure
         //HMs
         HashMap<String, File> pp_output_hms_files = new HashMap<>();
-        for (String s : available_hms) {
+        for (String s : available_hms)
+        {
             File f = new File(folder_pp_output.getAbsolutePath() + File.separator + s);
             f.mkdir();
             pp_output_hms_files.put(s, f);
@@ -8302,14 +9128,18 @@ public class COM2POSE_lib {
         //group1_vs_group2
         HashMap<String, File> pp_output_clashedGroups = new HashMap<>();
         HashSet<String> already_checked_groups = new HashSet<>();
-        for (String s : groups_to_compare.keySet()) {
-            for (String ss : groups_to_compare.keySet()) {
-                if (s.equals(ss)) {
+        for (String s : groups_to_compare.keySet())
+        {
+            for (String ss : groups_to_compare.keySet())
+            {
+                if (s.equals(ss))
+                {
                     continue;
                 }
                 String key1 = s + "_" + ss;
                 String key2 = ss + "_" + s;
-                if (already_checked_groups.contains(key1) || already_checked_groups.contains(key2)) {
+                if (already_checked_groups.contains(key1) || already_checked_groups.contains(key2))
+                {
                     continue;
                 }
                 already_checked_groups.add(key1);
@@ -8317,9 +9147,12 @@ public class COM2POSE_lib {
                 HashMap<String, HashSet<String>> group1_hms = groups_to_compare.get(s);
                 HashMap<String, HashSet<String>> group2_hms = groups_to_compare.get(ss);
 
-                for (String k : group1_hms.keySet()) {
-                    if (group2_hms.containsKey(k)) {
-                        if (!options_intern.mix_mutually_exclusive) {
+                for (String k : group1_hms.keySet())
+                {
+                    if (group2_hms.containsKey(k))
+                    {
+                        if (!options_intern.mix_mutually_exclusive)
+                        {
                             File f = new File(pp_output_hms_files.get(k).getAbsolutePath() + File.separator + key1);
                             f.mkdir();
                         }
@@ -8328,11 +9161,14 @@ public class COM2POSE_lib {
             }
         }
 
-        if (options_intern.mix_mutually_exclusive) {
-            for (String key_groupClash : groups_to_compare.keySet()) {
+        if (options_intern.mix_mutually_exclusive)
+        {
+            for (String key_groupClash : groups_to_compare.keySet())
+            {
                 HashMap<String, HashSet<String>> hms = groups_to_compare.get(key_groupClash);
 
-                for (String hm : hms.keySet()) {
+                for (String hm : hms.keySet())
+                {
                     File f = new File(
                             folder_pp_output.getAbsolutePath() + File.separator + hm + File.separator + key_groupClash);
                     f.mkdir();
@@ -8346,10 +9182,14 @@ public class COM2POSE_lib {
 
         HashSet<String> all_tfs = new HashSet<>();
 
-        for (File fileDir : folder_pp_output.listFiles()) {
-            if (fileDir.isDirectory()) {
-                for (File fileDir2 : fileDir.listFiles()) {
-                    if (fileDir2.isDirectory()) {
+        for (File fileDir : folder_pp_output.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
+                for (File fileDir2 : fileDir.listFiles())
+                {
+                    if (fileDir2.isDirectory())
+                    {
                         String current_HM = fileDir.getName();
                         String current_group_clash = fileDir2.getName();
                         logger.logLine("[TEPIC] Postprocess: " + current_HM + " - " + current_group_clash);
@@ -8358,23 +9198,29 @@ public class COM2POSE_lib {
                         String group1 = group_clash_split[0];
                         String group2 = group_clash_split[1];
 
-                        if (group_clash_split.length > 2) {
+                        if (group_clash_split.length > 2)
+                        {
                             int found_non = -1;
 
-                            for (int i = 0; i < group_clash_split.length; i++) {
-                                if (group_clash_split[i].equals("non") || group_clash_split[i].equals("Non")) {
+                            for (int i = 0; i < group_clash_split.length; i++)
+                            {
+                                if (group_clash_split[i].equals("non") || group_clash_split[i].equals("Non"))
+                                {
                                     found_non = i;
                                 }
                             }
                             //group1= group_clash_split[0].substring(0, 1).toUpperCase() + group_clash_split[0].substring(1);
                             //group2= group_clash_split[1].substring(0, 1).toUpperCase() + group_clash_split[1].substring(1);
 
-                            if (found_non != -1) {
-                                if (found_non == 0) {
+                            if (found_non != -1)
+                            {
+                                if (found_non == 0)
+                                {
                                     group1 = group_clash_split[0] + "_" + group_clash_split[1];
                                     group2 = group_clash_split[2];
                                 }
-                                if (found_non == 1) {
+                                if (found_non == 1)
+                                {
                                     group1 = group_clash_split[0];
                                     group2 = group_clash_split[1] + "_" + group_clash_split[2];
                                 }
@@ -8388,14 +9234,16 @@ public class COM2POSE_lib {
                         File folder_group1_check_tfs;
                         File folder_group2_check_tfs;
 
-                        if (!options_intern.mix_mutually_exclusive) {
+                        if (!options_intern.mix_mutually_exclusive)
+                        {
                             folder_group1_check_tfs = new File(
                                     folder_pp_input.getAbsolutePath() + File.separator + group1 + File.separator +
                                             current_HM);
                             folder_group2_check_tfs = new File(
                                     folder_pp_input.getAbsolutePath() + File.separator + group2 + File.separator +
                                             current_HM);
-                        } else {
+                        } else
+                        {
                             folder_group1_check_tfs = new File(
                                     folder_pp_input.getAbsolutePath() + File.separator + current_group_clash +
                                             File.separator + current_HM);
@@ -8407,7 +9255,8 @@ public class COM2POSE_lib {
                         File[] samples_group1_check_tfs = folder_group1_check_tfs.listFiles();
                         File[] samples_group2_check_tfs = folder_group2_check_tfs.listFiles();
 
-                        if (!options_intern.mix_mutually_exclusive) {
+                        if (!options_intern.mix_mutually_exclusive)
+                        {
                             BufferedReader br_group1_check_tfs =
                                     new BufferedReader(new FileReader((samples_group1_check_tfs[0])));
                             String header_group1_check_tfs = br_group1_check_tfs.readLine();
@@ -8419,7 +9268,8 @@ public class COM2POSE_lib {
                             String header_group2_check_tfs = br_group2_check_tfs.readLine();
                             all_tfs.addAll(Arrays.asList(header_group2_check_tfs.split("\t")));
                             br_group2_check_tfs.close();
-                        } else {
+                        } else
+                        {
                             BufferedReader br_group1_check_tfs =
                                     new BufferedReader(new FileReader((samples_group1_check_tfs[0])));
                             String header_group1_check_tfs = br_group1_check_tfs.readLine();
@@ -8435,7 +9285,8 @@ public class COM2POSE_lib {
 
 
                         //if TPM filter was used we need to postprocess the TPM files. otherwise it will not work!
-                        if (options_intern.tepic_tpm_cutoff > 0) {
+                        if (options_intern.tepic_tpm_cutoff > 0)
+                        {
                             logger.logLine("[TEPIC] TPM filter > 0, start postprocessing of TPM filtered scores");
                             File output_post_group1 = new File(
                                     folder_pp_output + File.separator + current_HM + File.separator +
@@ -8453,7 +9304,8 @@ public class COM2POSE_lib {
                             File[] samples_group1;
                             File[] samples_group2;
 
-                            if (!options_intern.mix_mutually_exclusive) {
+                            if (!options_intern.mix_mutually_exclusive)
+                            {
                                 folder_group1 = new File(
                                         folder_pp_input.getAbsolutePath() + File.separator + group1 + File.separator +
                                                 current_HM);
@@ -8463,7 +9315,8 @@ public class COM2POSE_lib {
 
                                 samples_group1 = folder_group1.listFiles();
                                 samples_group2 = folder_group2.listFiles();
-                            } else {
+                            } else
+                            {
                                 folder_group1 = new File(
                                         folder_pp_input.getAbsolutePath() + File.separator + current_group_clash +
                                                 File.separator + current_HM);
@@ -8496,23 +9349,31 @@ public class COM2POSE_lib {
                             header_group2_set = new HashSet<>(Arrays.asList(line_group2_check.split("\t")));
                             br_group2_check.close();
 
-                            for (int i = 0; i < header_group1.size(); i++) {
-                                if (header_group2_set.contains(header_group1.get(i))) {
+                            for (int i = 0; i < header_group1.size(); i++)
+                            {
+                                if (header_group2_set.contains(header_group1.get(i)))
+                                {
                                     write_group1.add(true);
-                                } else {
+                                } else
+                                {
                                     write_group1.add(false);
                                 }
                             }
-                            for (int i = 0; i < header_group2.size(); i++) {
-                                if (header_group1_set.contains(header_group2.get(i))) {
+                            for (int i = 0; i < header_group2.size(); i++)
+                            {
+                                if (header_group1_set.contains(header_group2.get(i)))
+                                {
                                     write_group2.add(true);
-                                } else {
+                                } else
+                                {
                                     write_group2.add(false);
                                 }
                             }
 
-                            for (File f : folder_group1.listFiles()) {
-                                if (options_intern.mix_mutually_exclusive) {
+                            for (File f : folder_group1.listFiles())
+                            {
+                                if (options_intern.mix_mutually_exclusive)
+                                {
                                     f = folder_group1.listFiles()[0];
                                 }
 
@@ -8521,16 +9382,21 @@ public class COM2POSE_lib {
                                         new File(output_post_group1.getAbsolutePath() + File.separator + f.getName())));
 
                                 String line_group1 = "";
-                                while ((line_group1 = br_group1.readLine()) != null) {
+                                while ((line_group1 = br_group1.readLine()) != null)
+                                {
                                     String[] split_line_group1 = line_group1.split("\t");
                                     StringBuilder sb = new StringBuilder();
 
-                                    for (int i = 0; i < split_line_group1.length; i++) {
-                                        if (write_group1.get(i)) {
-                                            if (i > 0) {
+                                    for (int i = 0; i < split_line_group1.length; i++)
+                                    {
+                                        if (write_group1.get(i))
+                                        {
+                                            if (i > 0)
+                                            {
                                                 sb.append("\t");
                                                 sb.append(split_line_group1[i]);
-                                            } else {
+                                            } else
+                                            {
                                                 sb.append(split_line_group1[i]);
                                             }
                                         }
@@ -8540,14 +9406,17 @@ public class COM2POSE_lib {
                                 }
                                 bw_group1.close();
                                 br_group1.close();
-                                if (options_intern.mix_mutually_exclusive) {
+                                if (options_intern.mix_mutually_exclusive)
+                                {
                                     break;
                                 }
                             }
 
 
-                            for (File f : folder_group2.listFiles()) {
-                                if (options_intern.mix_mutually_exclusive) {
+                            for (File f : folder_group2.listFiles())
+                            {
+                                if (options_intern.mix_mutually_exclusive)
+                                {
                                     f = folder_group1.listFiles()[1];
                                 }
 
@@ -8556,16 +9425,21 @@ public class COM2POSE_lib {
                                         new File(output_post_group2.getAbsolutePath() + File.separator + f.getName())));
 
                                 String line_group2 = "";
-                                while ((line_group2 = br_group2.readLine()) != null) {
+                                while ((line_group2 = br_group2.readLine()) != null)
+                                {
                                     String[] split_line_group2 = line_group2.split("\t");
                                     StringBuilder sb = new StringBuilder();
 
-                                    for (int i = 0; i < split_line_group2.length; i++) {
-                                        if (write_group2.get(i)) {
-                                            if (i > 0) {
+                                    for (int i = 0; i < split_line_group2.length; i++)
+                                    {
+                                        if (write_group2.get(i))
+                                        {
+                                            if (i > 0)
+                                            {
                                                 sb.append("\t");
                                                 sb.append(split_line_group2[i]);
-                                            } else {
+                                            } else
+                                            {
                                                 sb.append(split_line_group2[i]);
                                             }
                                         }
@@ -8575,7 +9449,8 @@ public class COM2POSE_lib {
                                 }
                                 bw_group2.close();
                                 br_group2.close();
-                                if (options_intern.mix_mutually_exclusive) {
+                                if (options_intern.mix_mutually_exclusive)
+                                {
                                     break;
                                 }
                             }
@@ -8584,17 +9459,21 @@ public class COM2POSE_lib {
                             //set to postprocessed TMP filtered data
                             group1_input_dir = output_post_group1.getAbsolutePath();
                             group2_input_dir = output_post_group2.getAbsolutePath();
-                        } else {
-                            if (!options_intern.mix_mutually_exclusive) {
+                        } else
+                        {
+                            if (!options_intern.mix_mutually_exclusive)
+                            {
                                 group1_input_dir =
                                         folder_pp_input.getAbsolutePath() + File.separator + group1 + File.separator +
                                                 current_HM;
                                 group2_input_dir =
                                         folder_pp_input.getAbsolutePath() + File.separator + group2 + File.separator +
                                                 current_HM;
-                            } else {
+                            } else
+                            {
                                 //NOTE: THIS IS NOT TESTED AND COULD CAUSE TROUBLE WITH NO TPM + MUTUALLY EXCLUSIVE OPTION
-                                if (options_intern.mix_mutually_exclusive) {
+                                if (options_intern.mix_mutually_exclusive)
+                                {
                                     File f_group1_file = new File(
                                             folder_pp_input.getAbsolutePath() + File.separator + current_group_clash +
                                                     File.separator + current_HM + File.separator +
@@ -8621,7 +9500,8 @@ public class COM2POSE_lib {
                                             "[TEPIC] Moving file due to mutually exclusive option: " + command_edited);
                                     Process child = Runtime.getRuntime().exec(command_edited);
                                     int code = child.waitFor();
-                                    switch (code) {
+                                    switch (code)
+                                    {
                                         case 0:
                                             break;
                                         case 1:
@@ -8636,7 +9516,8 @@ public class COM2POSE_lib {
                                             command_edited_2);
                                     Process child2 = Runtime.getRuntime().exec(command_edited_2);
                                     int code2 = child2.waitFor();
-                                    switch (code2) {
+                                    switch (code2)
+                                    {
                                         case 0:
                                             break;
                                         case 1:
@@ -8646,7 +9527,8 @@ public class COM2POSE_lib {
 
                                     group1_input_dir = f_group1_file.getAbsolutePath();
                                     group2_input_dir = f_group2_file.getAbsolutePath();
-                                } else {
+                                } else
+                                {
                                     group1_input_dir = folder_pp_input.getAbsolutePath() + File.separator + group1 +
                                             File.separator + current_HM;
                                     group2_input_dir = folder_pp_input.getAbsolutePath() + File.separator + group2 +
@@ -8683,7 +9565,8 @@ public class COM2POSE_lib {
                         files_to_create.add(output_mean_affinities_group2);
                         files_to_create.add(output_ratios_group1_group2);
 
-                        for (File f : files_to_create) {
+                        for (File f : files_to_create)
+                        {
                             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
                             bw.write("");
                             bw.close();
@@ -8700,19 +9583,25 @@ public class COM2POSE_lib {
 
                         String command_tail = "";
 
-                        if (options_intern.tepic_original_decay) {
+                        if (options_intern.tepic_original_decay)
+                        {
                             command_tail += " True";
-                        } else {
+                        } else
+                        {
                             command_tail += " False";
                         }
-                        if (options_intern.tepic_not_generated) {
+                        if (options_intern.tepic_not_generated)
+                        {
                             command_tail += " True";
-                        } else {
+                        } else
+                        {
                             command_tail += " False";
                         }
-                        if (options_intern.tepic_tpm_cutoff > 0) {
+                        if (options_intern.tepic_tpm_cutoff > 0)
+                        {
                             command_tail += " True";
-                        } else {
+                        } else
+                        {
                             command_tail += " False";
                         }
 
@@ -8722,7 +9611,8 @@ public class COM2POSE_lib {
                                 "[TEPIC] execute computeMeanRatioTFAffinities.py with command line: " + command_edited);
                         Process child = Runtime.getRuntime().exec(command_edited);
                         int code = child.waitFor();
-                        switch (code) {
+                        switch (code)
+                        {
                             case 0:
                                 break;
                             case 1:
@@ -8737,7 +9627,8 @@ public class COM2POSE_lib {
         BufferedWriter bw_all_tfs = new BufferedWriter(new FileWriter(new File(
                 folder_postprocessing.getAbsolutePath() + File.separator +
                         options_intern.file_suffix_tepic_postprocessing_all_tfs)));
-        for (String k : all_tfs) {
+        for (String k : all_tfs)
+        {
             bw_all_tfs.write(k);
             bw_all_tfs.newLine();
         }
@@ -8750,7 +9641,8 @@ public class COM2POSE_lib {
      *
      * @throws IOException
      */
-    public void create_open_regions_violin_plots() throws Exception {
+    public void create_open_regions_violin_plots() throws Exception
+    {
         logger.logLine("[TEPIC-ANALYSIS] Create Violine Plots of lengths of Peaks");
 
         //create R dataformat
@@ -8773,30 +9665,40 @@ public class COM2POSE_lib {
 
         HashMap<String, ArrayList<Integer>> hm_to_open_chr_lengths = new HashMap<>();
 
-        for (File f_tp : f_input_root.listFiles()) {
-            if (f_tp.isDirectory()) {
-                for (File f_hm : f_tp.listFiles()) {
-                    if (f_hm.isDirectory()) {
+        for (File f_tp : f_input_root.listFiles())
+        {
+            if (f_tp.isDirectory())
+            {
+                for (File f_hm : f_tp.listFiles())
+                {
+                    if (f_hm.isDirectory())
+                    {
                         String hm_name = f_hm.getName();
                         ArrayList<Integer> hm_lengths = new ArrayList<>();
-                        if (hm_to_open_chr_lengths.containsKey(hm_name)) {
+                        if (hm_to_open_chr_lengths.containsKey(hm_name))
+                        {
                             hm_lengths = hm_to_open_chr_lengths.get(hm_name);
                         }
                         hm_to_open_chr_lengths.put(hm_name, hm_lengths);
 
-                        for (File f_sample : f_hm.listFiles()) {
-                            if (f_sample.isDirectory()) {
-                                for (File f_regions_to_targets : f_sample.listFiles()) {
-                                    if (f_regions_to_targets.isFile()) {
+                        for (File f_sample : f_hm.listFiles())
+                        {
+                            if (f_sample.isDirectory())
+                            {
+                                for (File f_regions_to_targets : f_sample.listFiles())
+                                {
+                                    if (f_regions_to_targets.isFile())
+                                    {
                                         if (f_regions_to_targets.getName()
-                                                .equals(options_intern.file_suffix_tepic_output_regions_to_target_genes)) {
+                                                .equals(options_intern.file_suffix_tepic_output_regions_to_target_genes))
+                                        {
 
                                             BufferedReader br_regions_to_targets =
                                                     new BufferedReader(new FileReader(f_regions_to_targets));
                                             String line_regions_to_targets = br_regions_to_targets.readLine();
                                             String[] header_regions_to_targets = line_regions_to_targets.split("\t");
-                                            while ((line_regions_to_targets = br_regions_to_targets.readLine()) !=
-                                                    null) {
+                                            while ((line_regions_to_targets = br_regions_to_targets.readLine()) != null)
+                                            {
                                                 String[] split = line_regions_to_targets.split("\t");
                                                 String[] split_chr = split[0].split(":");
                                                 String[] split_position = split_chr[1].split("-");
@@ -8823,8 +9725,10 @@ public class COM2POSE_lib {
                 options_intern.file_suffix_tepic_postprocessing_violin_plots_data);
         BufferedWriter bw_data_file = new BufferedWriter(new FileWriter(f_data_file));
         bw_data_file.write("HM\tLENGTH\n");
-        for (String hm : hm_to_open_chr_lengths.keySet()) {
-            for (Integer length : hm_to_open_chr_lengths.get(hm)) {
+        for (String hm : hm_to_open_chr_lengths.keySet())
+        {
+            for (Integer length : hm_to_open_chr_lengths.get(hm))
+            {
                 bw_data_file.write(hm + "\t" + length + "\n");
             }
         }
@@ -8859,7 +9763,8 @@ public class COM2POSE_lib {
         logger.logLine("[TEPIC-ANALYSIS] execute Rscript for violin plot: " + command_execute);
         Process child = Runtime.getRuntime().exec(command_execute);
         int code = child.waitFor();
-        switch (code) {
+        switch (code)
+        {
             case 0:
                 break;
             case 1:
@@ -8876,7 +9781,8 @@ public class COM2POSE_lib {
      *
      * @throws IOException
      */
-    public void randomize_tepic() throws IOException {
+    public void randomize_tepic() throws IOException
+    {
         logger.logLine("[TEPIC] Randomize output start.");
 
         File f_input_root = new File(options_intern.com2pose_working_directory + File.separator +
@@ -8886,37 +9792,46 @@ public class COM2POSE_lib {
                 options_intern.folder_name_tepic_output_raw_shuffle);
         f_output_root.mkdir();
 
-        for (File fileDir_tp : f_input_root.listFiles()) {
+        for (File fileDir_tp : f_input_root.listFiles())
+        {
             File f_output_tp = new File(f_output_root.getAbsolutePath() + File.separator + fileDir_tp.getName());
             f_output_tp.mkdir();
 
-            for (File fileDir_hm : fileDir_tp.listFiles()) {
+            for (File fileDir_hm : fileDir_tp.listFiles())
+            {
                 File f_output_tp_hm = new File(f_output_tp.getAbsolutePath() + File.separator + fileDir_hm.getName());
                 f_output_tp_hm.mkdir();
 
-                for (File fileDir_sample : fileDir_hm.listFiles()) {
+                for (File fileDir_sample : fileDir_hm.listFiles())
+                {
                     File f_output_tp_hm_sample =
                             new File(f_output_tp_hm.getAbsolutePath() + File.separator + fileDir_sample.getName());
                     f_output_tp_hm_sample.mkdir();
 
                     ArrayList<File> affinity_files = new ArrayList<>();
 
-                    for (File fileDir_affinity : fileDir_sample.listFiles()) {
-                        if (fileDir_affinity.getName().matches(".*_Affinity_Gene_View_Filtered.*")) {
+                    for (File fileDir_affinity : fileDir_sample.listFiles())
+                    {
+                        if (fileDir_affinity.getName().matches(".*_Affinity_Gene_View_Filtered.*"))
+                        {
                             affinity_files.add(fileDir_affinity);
                         }
                     }
 
                     File file_to_shuffle = new File("");
 
-                    if (affinity_files.size() == 2) {
-                        for (File f : affinity_files) {
-                            if (f.getName().matches(".*TPM.*")) {
+                    if (affinity_files.size() == 2)
+                    {
+                        for (File f : affinity_files)
+                        {
+                            if (f.getName().matches(".*TPM.*"))
+                            {
                                 file_to_shuffle = f;
                                 break;
                             }
                         }
-                    } else {
+                    } else
+                    {
                         file_to_shuffle = affinity_files.get(0);
                     }
 
@@ -8935,22 +9850,26 @@ public class COM2POSE_lib {
                     which_column_writes_which.add(0);
 
                     ArrayList<Integer> not_shuffled = new ArrayList<>();
-                    for (int i = 1; i < split_header.length; i++) {
+                    for (int i = 1; i < split_header.length; i++)
+                    {
                         not_shuffled.add(i);
                     }
 
                     Collections.shuffle(not_shuffled);
                     which_column_writes_which.addAll(not_shuffled);
 
-                    while ((line = br.readLine()) != null) {
+                    while ((line = br.readLine()) != null)
+                    {
                         String[] split = line.split("\t");
 
                         StringBuilder sb = new StringBuilder();
 
                         int c = 0;
-                        for (Integer i : which_column_writes_which) {
+                        for (Integer i : which_column_writes_which)
+                        {
                             sb.append(split[i]);
-                            if (c < which_column_writes_which.size() - 1) {
+                            if (c < which_column_writes_which.size() - 1)
+                            {
                                 sb.append("\t");
                             }
                             c++;
@@ -8976,7 +9895,8 @@ public class COM2POSE_lib {
      *
      * @throws Exception
      */
-    public void run_tepic() throws Exception {
+    public void run_tepic() throws Exception
+    {
         logger.logLine("Start TEPIC.sh");
 
         check_tepic_input_with_options();
@@ -9025,72 +9945,94 @@ public class COM2POSE_lib {
 
 
         String command_tail = "";
-        if (options_intern.tepic_cores > 1) {
+        if (options_intern.tepic_cores > 1)
+        {
             command_tail += " -c " + options_intern.tepic_cores;
         }
-        if (!options_intern.tepic_bed_chr_sign.equals("")) {
+        if (!options_intern.tepic_bed_chr_sign.equals(""))
+        {
             command_tail += " -d " + options_intern.tepic_bed_chr_sign;
         }
-        if (options_intern.tepic_column_bedfile != -1) {
+        if (options_intern.tepic_column_bedfile != -1)
+        {
             command_tail += " -n " + options_intern.tepic_column_bedfile;
         }
-        if (!options_intern.tepic_gene_annot.equals("")) {
+        if (!options_intern.tepic_gene_annot.equals(""))
+        {
             command_tail += " -a " + options_intern.tepic_gene_annot;
         }
-        if (options_intern.tepic_window_size != 50000) {
+        if (options_intern.tepic_window_size != 50000)
+        {
             command_tail += " -w " + options_intern.tepic_window_size;
 
         }
-        if (!options_intern.tepic_onlyDNasePeaks.equals("")) {
+        if (!options_intern.tepic_onlyDNasePeaks.equals(""))
+        {
             command_tail += " -f " + options_intern.tepic_onlyDNasePeaks;
         }
-        if (options_intern.tepic_exponential_decay) {
+        if (options_intern.tepic_exponential_decay)
+        {
             command_tail += " -e TRUE";
         }
-        if (options_intern.tepic_not_norm_peak_length) {
+        if (options_intern.tepic_not_norm_peak_length)
+        {
             command_tail += " -l TRUE";
         }
-        if (options_intern.tepic_not_generated) {
+        if (options_intern.tepic_not_generated)
+        {
             command_tail += " -u TRUE";
         }
-        if (options_intern.tepic_original_decay) {
+        if (options_intern.tepic_original_decay)
+        {
             command_tail += " -x TRUE";
         }
-        if (!options_intern.tepic_psems_length.equals("")) {
+        if (!options_intern.tepic_psems_length.equals(""))
+        {
             command_tail += " -m " + options_intern.tepic_psems_length;
         }
-        if (options_intern.tepic_entire_gene_body) {
+        if (options_intern.tepic_entire_gene_body)
+        {
             command_tail += " -y TRUE";
         }
-        if (options_intern.tepic_zipped) {
+        if (options_intern.tepic_zipped)
+        {
             command_tail += " -z TRUE";
         }
-        if (!options_intern.tepic_2bit.equals("")) {
+        if (!options_intern.tepic_2bit.equals(""))
+        {
             command_tail += " -r " + options_intern.tepic_2bit;
         }
-        if (options_intern.tepic_pvalue != 0.05) {
+        if (options_intern.tepic_pvalue != 0.05)
+        {
             command_tail += " -v " + options_intern.tepic_pvalue;
 
         }
-        if (options_intern.tepic_minutes_per_chr != 3) {
+        if (options_intern.tepic_minutes_per_chr != 3)
+        {
             command_tail += " -i " + options_intern.tepic_minutes_per_chr;
         }
-        if (options_intern.tepic_chr_prefix) {
+        if (options_intern.tepic_chr_prefix)
+        {
             command_tail += " -j TRUE";
         }
-        if (options_intern.tepic_transcript_based) {
+        if (options_intern.tepic_transcript_based)
+        {
             command_tail += " -t TRUE";
         }
-        if (!options_intern.tepic_loop_list.equals("")) {
+        if (!options_intern.tepic_loop_list.equals(""))
+        {
             command_tail += " -h " + options_intern.tepic_loop_list;
         }
-        if (options_intern.tepic_loop_windows != 5000) {
+        if (options_intern.tepic_loop_windows != 5000)
+        {
             command_tail += " -s " + options_intern.tepic_loop_windows;
         }
-        if (options_intern.tepic_only_peak_features) {
+        if (options_intern.tepic_only_peak_features)
+        {
             command_tail += " -q TRUE";
         }
-        if (options_intern.tepic_tpm_cutoff > 0) {
+        if (options_intern.tepic_tpm_cutoff > 0)
+        {
             command_tail += " -T " + options_intern.tepic_tpm_cutoff;
             command_tail += " -E " + options_intern.tepic_ensg_symbol;
             command_tail += " -A " + options_intern.deseq2_input_gene_id;
@@ -9104,20 +10046,24 @@ public class COM2POSE_lib {
 
 
         File folder = new File(options_intern.tepic_input_directory);
-        for (File dirGroup : folder.listFiles()) {
-            if (dirGroup.isDirectory()) {
+        for (File dirGroup : folder.listFiles())
+        {
+            if (dirGroup.isDirectory())
+            {
                 File output_TEPIC_group =
                         new File(output_TEPIC.getAbsolutePath() + File.separator + dirGroup.getName());
                 output_TEPIC_group.mkdir();
 
                 logger.logLine("[TEPIC] Start group " + dirGroup.getName());
-                for (File dirHM : dirGroup.listFiles()) {
+                for (File dirHM : dirGroup.listFiles())
+                {
                     File output_TEPIC_group_hm =
                             new File(output_TEPIC_group.getAbsolutePath() + File.separator + dirHM.getName());
                     output_TEPIC_group_hm.mkdir();
 
                     logger.logLine("[TEPIC] Start histone modification: " + dirHM.getName());
-                    for (File sample : dirHM.listFiles()) {
+                    for (File sample : dirHM.listFiles())
+                    {
                         logger.logLine("[TEPIC] Start sample " + sample.getName());
 
                         File output_sample =
@@ -9133,16 +10079,19 @@ public class COM2POSE_lib {
                         command_sample += " -o " + output_dir_combined;
 
                         String command_tail_sample = new String(command_tail);
-                        if (options_intern.tepic_tpm_cutoff > 0) {
+                        if (options_intern.tepic_tpm_cutoff > 0)
+                        {
                             String n_dir = "";
 
-                            if (!options_intern.mix_mutually_exclusive) {
+                            if (!options_intern.mix_mutually_exclusive)
+                            {
                                 n_dir = options_intern.com2pose_working_directory + File.separator +
                                         options_intern.folder_name_deseq2_preprocessing + File.separator +
                                         options_intern.folder_name_deseq2_preprocessing_single + File.separator +
                                         dirGroup.getName() + options_intern.file_suffix_deseq2_preprocessing_meanCounts;
 
-                            } else {
+                            } else
+                            {
                                 String[] names_sample = sample.getName().split("_");
                                 String name_sample = names_sample[0];
                                 n_dir = options_intern.com2pose_working_directory + File.separator +
@@ -9156,16 +10105,25 @@ public class COM2POSE_lib {
                             command_tail_sample += " -G " + n_dir;
                         }
 
-                        if (!options_intern.path_tgen.equals("") && options_intern.tepic_tgene_target_genes) {
+                        if (!options_intern.path_tgen.equals("") && options_intern.tepic_tgene_target_genes)
+                        {
                             File f_tgene_input;
 
-                            if (!options_intern.mix_mutually_exclusive) {
+                            if (!options_intern.mix_mutually_exclusive)
+                            {
+                                String sample_name = sample.getName();
+
+                                if (sample_name.contains("."))
+                                {
+                                    sample_name = sample_name.substring(0, sample_name.lastIndexOf("."));
+                                }
                                 f_tgene_input = new File(options_intern.com2pose_working_directory + File.separator +
                                         options_intern.folder_name_tgen + File.separator +
                                         options_intern.folder_name_tgen_output + File.separator + dirGroup.getName() +
-                                        File.separator + dirHM.getName() + File.separator + dirGroup.getName() + "_" +
-                                        dirHM.getName() + File.separator + options_intern.file_suffix_tgen_output);
-                            } else {
+                                        File.separator + dirHM.getName() + File.separator + sample_name +
+                                        File.separator + options_intern.file_suffix_tgen_output);
+                            } else
+                            {
                                 String[] names_sample = sample.getName().split("_");
                                 String name_sample = names_sample[0];
 
@@ -9186,7 +10144,8 @@ public class COM2POSE_lib {
                         logger.logLine("[TEPIC] execute TEPIC with command line: " + command_execute);
                         Process child = Runtime.getRuntime().exec(command_execute);
                         int code = child.waitFor();
-                        switch (code) {
+                        switch (code)
+                        {
                             case 0:
                                 break;
                             case 1:
@@ -9203,20 +10162,24 @@ public class COM2POSE_lib {
     /**
      * run created DESeq2 scripts and postprocess for input into DYNAMITE
      */
-    public void run_and_postprocess_DESeq2() throws Exception {
+    public void run_and_postprocess_DESeq2() throws Exception
+    {
 
         logger.logLine("Start running DESeq2 RScripts");
 
         File folder = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_R_scripts);
 
-        for (File dir : folder.listFiles()) {
-            if (!dir.isDirectory()) {
+        for (File dir : folder.listFiles())
+        {
+            if (!dir.isDirectory())
+            {
                 String command = "Rscript " + dir.getAbsolutePath();
                 logger.logLine("[DESEQ2] Running script " + dir.getName() + ": " + command);
                 Process child = Runtime.getRuntime().exec(command);
                 int code = child.waitFor();
-                switch (code) {
+                switch (code)
+                {
                     case 0:
                         break;
                     case 1:
@@ -9236,8 +10199,10 @@ public class COM2POSE_lib {
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_deseq2_output);
         output_file.mkdir();
 
-        for (File res : folder_results.listFiles()) {
-            if (!res.isDirectory()) {
+        for (File res : folder_results.listFiles())
+        {
+            if (!res.isDirectory())
+            {
                 String name_res = res.getName();
                 String[] split_name_res = name_res.split("_");
                 String name_out =
@@ -9252,9 +10217,11 @@ public class COM2POSE_lib {
 
                 String line = br.readLine();
 
-                while ((line = br.readLine()) != null) {
+                while ((line = br.readLine()) != null)
+                {
                     String[] split = line.split("\t");
-                    if (!split[2].equals("NA")) {
+                    if (!split[2].equals("NA"))
+                    {
                         StringBuilder sb = new StringBuilder();
                         sb.append(split[0].substring(1, split[0].length() - 1));
                         sb.append("\t");
@@ -9279,7 +10246,8 @@ public class COM2POSE_lib {
     /**
      * edit input files if TPM filter is set
      */
-    public void preprocess_deseq2_input_tpm() throws IOException {
+    public void preprocess_deseq2_input_tpm() throws IOException
+    {
         logger.logLine("[DESEQ2-PREP-TPM] Filter genes with TPM under cutoff.");
 
         //read in TPMs
@@ -9290,11 +10258,14 @@ public class COM2POSE_lib {
                 options_intern.folder_name_deseq2_preprocessing_tpm + File.separator +
                 options_intern.folder_name_deseq2_preprocessing_tpm_results);
 
-        for (File f_tpm_tp : f_input_tpms_root.listFiles()) {
-            if (f_tpm_tp.isFile()) {
+        for (File f_tpm_tp : f_input_tpms_root.listFiles())
+        {
+            if (f_tpm_tp.isFile())
+            {
                 String name_tp = f_tpm_tp.getName().split("\\.")[0].replace("_tpms", "");
 
-                if (name_tp.split("_").length > 1) {
+                if (name_tp.split("_").length > 1)
+                {
                     String[] split = name_tp.split("_");
                     name_tp = split[0].substring(0, 1).toUpperCase() + split[0].substring(1) +
                             split[1].substring(0, 1).toUpperCase() + split[1].substring(1);
@@ -9305,9 +10276,11 @@ public class COM2POSE_lib {
                 BufferedReader br = new BufferedReader(new FileReader(f_tpm_tp));
                 String line = br.readLine();
                 String[] split_header = line.split("\t");
-                while ((line = br.readLine()) != null) {
+                while ((line = br.readLine()) != null)
+                {
                     String[] split = line.split("\t");
-                    if (split[3].equals("NA")) {
+                    if (split[3].equals("NA"))
+                    {
                         continue;
                     }
                     gene_tpm.put(split[0], Double.parseDouble(split[3]));
@@ -9327,17 +10300,22 @@ public class COM2POSE_lib {
                 options_intern.folder_name_deseq2_preprocessing_combined_original);
         f_output_copy.mkdirs();
 
-        for (File f_input : f_combined_root.listFiles()) {
-            if (f_input.isDirectory()) {
+        for (File f_input : f_combined_root.listFiles())
+        {
+            if (f_input.isDirectory())
+            {
                 String[] groups = f_input.getName().split("_");
                 String name1 = groups[0];
                 String name2 = groups[1];
 
-                if (groups.length > 2) {
+                if (groups.length > 2)
+                {
                     int found_non = -1;
 
-                    for (int i = 0; i < groups.length; i++) {
-                        if (groups[i].equals("non") || groups[i].equals("Non")) {
+                    for (int i = 0; i < groups.length; i++)
+                    {
+                        if (groups[i].equals("non") || groups[i].equals("Non"))
+                        {
                             found_non = i;
                         }
                     }
@@ -9345,11 +10323,13 @@ public class COM2POSE_lib {
                     name1 = groups[0].substring(0, 1).toUpperCase() + groups[0].substring(1);
                     name2 = groups[1].substring(0, 1).toUpperCase() + groups[1].substring(1);
 
-                    if (found_non == 0) {
+                    if (found_non == 0)
+                    {
                         name1 = groups[0].substring(0, 1).toUpperCase() + groups[0].substring(1) +
                                 groups[1].substring(0, 1).toUpperCase() + groups[1].substring(1);
                         name2 = groups[2].substring(0, 1).toUpperCase() + groups[2].substring(1);
-                    } else if (found_non == 1) {
+                    } else if (found_non == 1)
+                    {
                         name1 = groups[0].substring(0, 1).toUpperCase() + groups[0].substring(1);
                         name2 = groups[1].substring(0, 1).toUpperCase() + groups[1].substring(1) +
                                 groups[2].substring(0, 1).toUpperCase() + groups[2].substring(1);
@@ -9362,8 +10342,10 @@ public class COM2POSE_lib {
                         new File(f_output_copy.getAbsolutePath() + File.separator + f_input.getName());
                 f_output_copy_group.mkdirs();
 
-                for (File f_input_read : f_input.listFiles()) {
-                    if (f_input_read.isFile()) {
+                for (File f_input_read : f_input.listFiles())
+                {
+                    if (f_input_read.isFile())
+                    {
                         StringBuilder sb_copy = new StringBuilder();
 
                         StringBuilder sb_tpm_filtered = new StringBuilder();
@@ -9379,16 +10361,20 @@ public class COM2POSE_lib {
 
                         String[] header = line.split("\t");
 
-                        for (int i = 1; i < header.length; i++) {
-                            if (header[i].matches(name1 + ".*")) {
+                        for (int i = 1; i < header.length; i++)
+                        {
+                            if (header[i].matches(name1 + ".*"))
+                            {
                                 header[i] = name1;
                             }
-                            if (header[i].matches(name2 + ".*")) {
+                            if (header[i].matches(name2 + ".*"))
+                            {
                                 header[i] = name2;
                             }
                         }
 
-                        while ((line = br.readLine()) != null) {
+                        while ((line = br.readLine()) != null)
+                        {
                             sb_copy.append(line);
                             sb_copy.append("\n");
 
@@ -9400,18 +10386,22 @@ public class COM2POSE_lib {
 
                             StringBuilder changer = new StringBuilder();
 
-                            for (int i = 1; i < split.length; i++) {
+                            for (int i = 1; i < split.length; i++)
+                            {
                                 String group_name = header[i];
                                 HashMap<String, Double> lookup = new HashMap<>();
 
-                                if (tp_gene_tpm_value.containsKey(group_name)) {
+                                if (tp_gene_tpm_value.containsKey(group_name))
+                                {
                                     lookup = tp_gene_tpm_value.get(group_name);
-                                } else {
+                                } else
+                                {
                                     System.out.println("X");
                                 }
 
 
-                                if (!lookup.containsKey(split[0])) {
+                                if (!lookup.containsKey(split[0]))
+                                {
                                     changer.append("\t");
                                     changer.append("0");
                                     one_changed = true;
@@ -9419,27 +10409,32 @@ public class COM2POSE_lib {
                                 }
 
                                 double tpm_value = lookup.get(split[0]);
-                                if (tpm_value < options_intern.deseq2_tpm_filter) {
+                                if (tpm_value < options_intern.deseq2_tpm_filter)
+                                {
                                     changer.append("\t");
                                     changer.append("0");
                                     one_changed = true;
-                                } else {
+                                } else
+                                {
                                     changer.append("\t");
                                     changer.append(split[i]);
                                 }
                             }
                             changer.append("\n");
 
-                            if (one_changed) {
+                            if (one_changed)
+                            {
                                 StringBuilder sb_complete_changer = new StringBuilder();
-                                for (int i = 1; i < split.length; i++) {
+                                for (int i = 1; i < split.length; i++)
+                                {
                                     sb_complete_changer.append("\t0");
                                 }
                                 sb_complete_changer.append("\n");
 
                                 sb_tpm_filtered.append(sb_complete_changer.toString());
 
-                            } else {
+                            } else
+                            {
                                 sb_tpm_filtered.append(changer.toString());
                             }
 
@@ -9465,9 +10460,11 @@ public class COM2POSE_lib {
     /**
      * created a chromosome and position mapping from biomart
      */
-    public void create_gene_positions() throws Exception {
+    public void create_gene_positions() throws Exception
+    {
 
-        if (!options_intern.calculcate_gene_positions) {
+        if (!options_intern.calculcate_gene_positions)
+        {
             return;
         }
 
@@ -9487,7 +10484,6 @@ public class COM2POSE_lib {
                 options_intern.file_suffix_deseq2_preprocessing_gene_positions_data_prev);
         File f_data_version = new File(f_output_positions_root.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_deseq2_preprocessing_gene_positions_data_prev_version);
-
 
 
         logger.logLine("[PREP] Create gene positions for all RNA-seq data.");
@@ -9531,12 +10527,11 @@ public class COM2POSE_lib {
                 "    #check which genome version we have in biomart\n" + "    \n" +
                 "    ensembl <- useEnsembl(biomart = \"genes\")\n" + "    datasets <- listDatasets(ensembl)\n" +
                 "    used_dataset=searchDatasets(mart = ensembl, pattern = \"mmusculus_gene_ensembl\")\n" +
-                "    version=used_dataset[,3]\n" + "    version=as.character(version)\n" +
-                "    fileConn<-file(\""+f_data_version.getAbsolutePath()+"\")\n" +
-                "    writeLines(version, fileConn)\n" + "    \n" + "    not_done=FALSE\n" +
-                "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" + "    print(w)\n" +
-                "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" + "    print(e)\n" +
-                "  }, finally = {\n" + "  })\n" + "}\n\n");
+                "    version=used_dataset[,3]\n" + "    version=as.character(version)\n" + "    fileConn<-file(\"" +
+                f_data_version.getAbsolutePath() + "\")\n" + "    writeLines(version, fileConn)\n" + "    \n" +
+                "    not_done=FALSE\n" + "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" +
+                "    print(w)\n" + "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" +
+                "    print(e)\n" + "  }, finally = {\n" + "  })\n" + "}\n\n");
 
         BufferedWriter bw_script = new BufferedWriter(new FileWriter(f_script));
         bw_script.write(sb_script.toString());
@@ -9547,7 +10542,8 @@ public class COM2POSE_lib {
 
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();
-        switch (code) {
+        switch (code)
+        {
             case 0:
                 break;
             case 1:
@@ -9575,11 +10571,10 @@ public class COM2POSE_lib {
                 "    second = converter.convert_coordinate(c, int(y),s)\n" + "\n" +
                 "    if(first is None or second is None):\n" + "        return None, None\n" + "\n" +
                 "    if len(first) == 0 or len(second) == 0:\n" + "        return None, None\n" + "\n" +
-                "    return str(first[0][1]), str(second[0][1])\n" + "\n" + "def main():\n" +
-                "    path_to_X = \""+f_data_prev.getAbsolutePath()+"\"\n" +
-                "    path_to_version =\""+f_data_version.getAbsolutePath()+"\"\n" +
-                "    path_to_newSave = \""+f_data.getAbsolutePath()+"\"\n" +
-                "\n" + "    version_of_our_dat=\""+options_intern.igv_species_ref_genome+"\"\n" + "\n" +
+                "    return str(first[0][1]), str(second[0][1])\n" + "\n" + "def main():\n" + "    path_to_X = \"" +
+                f_data_prev.getAbsolutePath() + "\"\n" + "    path_to_version =\"" + f_data_version.getAbsolutePath() +
+                "\"\n" + "    path_to_newSave = \"" + f_data.getAbsolutePath() + "\"\n" + "\n" +
+                "    version_of_our_dat=\"" + options_intern.igv_species_ref_genome + "\"\n" + "\n" +
                 "    version_of_our_dat_n= re.findall(r'\\d+', version_of_our_dat)\n" +
                 "    version_of_our_dat_n=version_of_our_dat_n.__getitem__(0)\n" +
                 "    name=version_of_our_dat.split(version_of_our_dat_n)\n" + "    name=name.__getitem__(0)\n" + "\n" +
@@ -9608,8 +10603,7 @@ public class COM2POSE_lib {
                 "\n" + "        #string_converted = chromosome+\":\"+x_converted+\"-\"+y_converted\n" +
                 "        #print(\"X\")\n" + "\n" +
                 "    df_converted = pd.DataFrame(data_output, columns=column_names)\n" +
-                "    df_converted.to_csv(path_to_newSave,sep=\"\\t\",index=False)\n\n" +
-                "main()\n\n");
+                "    df_converted.to_csv(path_to_newSave,sep=\"\\t\",index=False)\n\n" + "main()\n\n");
 
         BufferedWriter bw_pyuplift = new BufferedWriter(new FileWriter(f_uplift_script));
         bw_pyuplift.write(sb_pyuplift.toString());
@@ -9617,21 +10611,20 @@ public class COM2POSE_lib {
 
         logger.logLine("[PREP] Uplift positions to correct genome version");
 
-        String command_pyuplift = "python3 "+ f_uplift_script.getAbsolutePath();
+        String command_pyuplift = "python3 " + f_uplift_script.getAbsolutePath();
 
         logger.logLine("[PREP] executing command: " + command_pyuplift);
 
         Process child_pyuplift = Runtime.getRuntime().exec(command_pyuplift);
         int code_pyuplift = child_pyuplift.waitFor();
-        switch (code_pyuplift) {
+        switch (code_pyuplift)
+        {
             case 0:
                 break;
             case 1:
                 String message = child_pyuplift.getErrorStream().toString();
                 throw new Exception(message);
         }
-
-
 
         logger.logLine("[PREP] Finished creating gene positions for all RNA-seq data.");
 
@@ -9641,7 +10634,8 @@ public class COM2POSE_lib {
     /**
      * creates a mapping for TPM values for all RNA-seq genes
      */
-    public void create_TPM_mappings() throws Exception {
+    public void create_TPM_mappings() throws Exception
+    {
         logger.logLine("[PREP] Create TPM values for all RNA-seq data.");
 
         File f_output_ot = new File(options_intern.com2pose_working_directory + File.separator +
@@ -9666,7 +10660,8 @@ public class COM2POSE_lib {
         logger.logLine("[PREP] waiting ...");
 
 
-        if (options_intern.calculate_tpm_lengths) {
+        if (options_intern.calculate_tpm_lengths)
+        {
             StringBuilder sb_lengths = new StringBuilder();
             sb_lengths.append("if(!\"EDASeq\" %in% rownames(installed.packages()))\n" + "{\n" +
                     "  if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" + "  {\n" +
@@ -9742,7 +10737,8 @@ public class COM2POSE_lib {
 
             Process child = Runtime.getRuntime().exec(command);
             int code = child.waitFor();
-            switch (code) {
+            switch (code)
+            {
                 case 0:
                     break;
                 case 1:
@@ -9754,7 +10750,8 @@ public class COM2POSE_lib {
                             "[PREP-TPM] Afterwards, add paramter -a to com2pose command line, so this script wont be started again.");
                     throw new Exception(message);
             }
-        } else {
+        } else
+        {
             logger.logLine(
                     "[PREP-TPM] -a is set, get gene_lengths script is not executed, as it was executed manually.");
         }
@@ -9775,8 +10772,10 @@ public class COM2POSE_lib {
 
         HashSet<File> files_to_execute = new HashSet<>();
 
-        for (File f_rnaseq : f_input_rna_seq_root.listFiles()) {
-            if (f_rnaseq.isFile()) {
+        for (File f_rnaseq : f_input_rna_seq_root.listFiles())
+        {
+            if (f_rnaseq.isFile())
+            {
                 File f_output_script = new File(f_output_scripts_rna_seq.getAbsolutePath() + File.separator +
                         f_rnaseq.getName().split("\\.")[0] +
                         options_intern.file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_script);
@@ -9834,7 +10833,8 @@ public class COM2POSE_lib {
 
                 Process child_intern = Runtime.getRuntime().exec(command_intern);
                 int code_intern = child_intern.waitFor();
-                switch (code_intern) {
+                switch (code_intern)
+                {
                     case 0:
                         break;
                     case 1:
@@ -9851,7 +10851,8 @@ public class COM2POSE_lib {
     /**
      * create DESeq2 scripts based on input directory for DESeq2 - each group against each group, save intermediate steps and R Scripts
      */
-    public void create_DESeq2_scripts() throws IOException {
+    public void create_DESeq2_scripts() throws IOException
+    {
 
         logger.logLine("Start preprocessing nfcore RNA-seq for DESeq2 input");
         HashMap<Integer, String> row_ensg_name = new HashMap<>();
@@ -9861,7 +10862,8 @@ public class COM2POSE_lib {
         String line_ensg_per_line = "";
         line_ensg_per_line = br_ensg_per_line.readLine();
         int count_ensg_lines = 0;
-        while ((line_ensg_per_line = br_ensg_per_line.readLine()) != null) {
+        while ((line_ensg_per_line = br_ensg_per_line.readLine()) != null)
+        {
             row_ensg_name.put(count_ensg_lines, line_ensg_per_line);
             count_ensg_lines++;
         }
@@ -9869,7 +10871,8 @@ public class COM2POSE_lib {
 
         File output_intermediate_steps = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing);
-        if (output_intermediate_steps.exists()) {
+        if (output_intermediate_steps.exists())
+        {
             //logger.logLine("Working directory was already used - please us another one or empty this one completely");
             //TODO: after debugging use system exit !!!
             //System.exit(1);
@@ -9894,9 +10897,11 @@ public class COM2POSE_lib {
         HashMap<String, String> ensg_symbol = new HashMap<>();
         BufferedReader br_ensg_symbol = new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
         String line_ensg_symbol = br_ensg_symbol.readLine();
-        while ((line_ensg_symbol = br_ensg_symbol.readLine()) != null) {
+        while ((line_ensg_symbol = br_ensg_symbol.readLine()) != null)
+        {
             String[] split = line_ensg_symbol.split("\t");
-            if (split.length > 1) {
+            if (split.length > 1)
+            {
                 ensg_symbol.put(split[0], split[1]);
             }
         }
@@ -9906,8 +10911,10 @@ public class COM2POSE_lib {
         HashMap<String, HashSet<String>> timepoints_samples = new HashMap<>();
 
         //CREATE SINGLES
-        for (File fileDir : folder.listFiles()) {
-            if (fileDir.isDirectory()) {
+        for (File fileDir : folder.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
                 HashMap<Integer, Integer> mean_line_counts = new HashMap<>();
                 int count_samples = 0;
                 File group = new File(output_inter_steps_single.getAbsolutePath() + File.separator + fileDir.getName());
@@ -9915,7 +10922,8 @@ public class COM2POSE_lib {
 
                 HashSet<String> x = new HashSet<>();
                 timepoints_samples.put(group.getName(), x);
-                for (File sample : fileDir.listFiles()) {
+                for (File sample : fileDir.listFiles())
+                {
                     String name = sample.getName();
                     timepoints_samples.get(group.getName()).add(name);
 
@@ -9926,20 +10934,24 @@ public class COM2POSE_lib {
                     bw.write(line);
                     bw.newLine();
                     int count = 0;
-                    while ((line = br.readLine()) != null) {
+                    while ((line = br.readLine()) != null)
+                    {
                         bw.write(row_ensg_name.get(count) + "\t" + line);
                         bw.newLine();
                         int count_line = Integer.parseInt(line);
-                        if (mean_line_counts.containsKey(count)) {
+                        if (mean_line_counts.containsKey(count))
+                        {
                             int z = mean_line_counts.get(count);
                             z += count_line;
                             mean_line_counts.put(count, z);
-                        } else {
+                        } else
+                        {
                             mean_line_counts.put(count, count_line);
                         }
                         count++;
                     }
-                    if (count != count_ensg_lines) {
+                    if (count != count_ensg_lines)
+                    {
                         logger.logLine("Error in nfcore RNA-seq data: File " + sample.getName() +
                                 " has not the same number of rows as in File " + ensg_names.getName());
                         System.exit(1);
@@ -9955,7 +10967,8 @@ public class COM2POSE_lib {
                                 options_intern.file_suffix_deseq2_preprocessing_meanCounts)));
                 bw_means.write(group.getName() + "_MEANS");
                 bw_means.newLine();
-                for (int i = 0; i < count_ensg_lines; i++) {
+                for (int i = 0; i < count_ensg_lines; i++)
+                {
                     int mean_count = mean_line_counts.get(i) / count_samples;
                     bw_means.write("" + mean_count);
                     bw_means.newLine();
@@ -9974,13 +10987,15 @@ public class COM2POSE_lib {
                 String line = br_ensg.readLine();
 
                 int i = 0;
-                while ((line = br_ensg.readLine()) != null) {
+                while ((line = br_ensg.readLine()) != null)
+                {
                     StringBuilder sb = new StringBuilder();
 
                     int mean_count = mean_line_counts.get(i) / count_samples;
                     String gene_symbol_name = "NO_SYMBOL";
 
-                    if (ensg_symbol.containsKey(line)) {
+                    if (ensg_symbol.containsKey(line))
+                    {
                         gene_symbol_name = ensg_symbol.get(line);
                     }
 
@@ -10003,12 +11018,15 @@ public class COM2POSE_lib {
         }
         //CREATE ALL COMBINED FILES
         HashSet<String> already_combined = new HashSet<>();
-        for (String k : timepoints_samples.keySet()) {
-            for (String kk : timepoints_samples.keySet()) {
+        for (String k : timepoints_samples.keySet())
+        {
+            for (String kk : timepoints_samples.keySet())
+            {
                 String key1 = k + "_" + kk;
                 String key2 = kk + "_" + k;
 
-                if (already_combined.contains(key1) || already_combined.contains(key2) || k.equals(kk)) {
+                if (already_combined.contains(key1) || already_combined.contains(key2) || k.equals(kk))
+                {
                     continue;
                 }
 
@@ -10024,7 +11042,8 @@ public class COM2POSE_lib {
                 sb_header.append("geneID");
 
                 ArrayList<BufferedReader> bufferedReaders = new ArrayList<>();
-                for (String s : samples_group1) {
+                for (String s : samples_group1)
+                {
                     sb_header.append("\t");
                     sb_header.append(s);
                     BufferedReader br = new BufferedReader(new FileReader(
@@ -10033,7 +11052,8 @@ public class COM2POSE_lib {
                     bufferedReaders.add(br);
                 }
 
-                for (String s : samples_group2) {
+                for (String s : samples_group2)
+                {
                     sb_header.append("\t");
                     sb_header.append(s);
                     BufferedReader br = new BufferedReader(new FileReader(
@@ -10051,10 +11071,12 @@ public class COM2POSE_lib {
                         new BufferedReader(new FileReader(new File(options_intern.deseq2_input_gene_id)));
                 String line = "";
                 br_ensg.readLine();
-                while ((line = br_ensg.readLine()) != null) {
+                while ((line = br_ensg.readLine()) != null)
+                {
                     StringBuilder sb = new StringBuilder();
                     sb.append(line);
-                    for (BufferedReader br : bufferedReaders) {
+                    for (BufferedReader br : bufferedReaders)
+                    {
                         String line_intern = br.readLine();
 
                         String[] split = line_intern.split("\t");
@@ -10076,8 +11098,10 @@ public class COM2POSE_lib {
         File r_scripts = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_R_scripts);
         r_scripts.mkdir();
-        for (File dir : output_inter_steps_combined.listFiles()) {
-            if (dir.isDirectory()) {
+        for (File dir : output_inter_steps_combined.listFiles())
+        {
+            if (dir.isDirectory())
+            {
                 String name_rscript = dir.getName() + ".R";
 
                 String group1 = dir.getName().split("_")[0];
@@ -10105,7 +11129,8 @@ public class COM2POSE_lib {
                 ArrayList<String> samples = new ArrayList<>();
 
                 String[] split_header = line_header.split("\t");
-                for (int i = 1; i < split_header.length; i++) {
+                for (int i = 1; i < split_header.length; i++)
+                {
                     String[] split_samples = split_header[i].split("-");
                     String[] split_groups = split_samples[0].split("_");
 
@@ -10115,10 +11140,13 @@ public class COM2POSE_lib {
 
                 sb.append("metadata_df<-data.frame(sample_id = c(");
                 int count_s = 0;
-                for (String s : samples) {
-                    if (count_s > 0) {
+                for (String s : samples)
+                {
+                    if (count_s > 0)
+                    {
                         sb.append(" ,\"");
-                    } else {
+                    } else
+                    {
                         sb.append("\"");
                     }
                     sb.append(s);
@@ -10127,10 +11155,13 @@ public class COM2POSE_lib {
                 }
                 sb.append("), group = c(");
                 count_s = 0;
-                for (String s : groups) {
-                    if (count_s > 0) {
+                for (String s : groups)
+                {
+                    if (count_s > 0)
+                    {
                         sb.append(" ,\"");
-                    } else {
+                    } else
+                    {
                         sb.append("\"");
                     }
                     sb.append(s);
@@ -10161,7 +11192,8 @@ public class COM2POSE_lib {
                 sb.append("                              colData=metadata_df, \n");
                 sb.append("                              design=~group)\n");
 
-                if (options_intern.deseq2_count_threshold > 0) {
+                if (options_intern.deseq2_count_threshold > 0)
+                {
                     sb.append("threshold = ");
                     sb.append(options_intern.deseq2_count_threshold);
                     sb.append("\n");
@@ -10195,7 +11227,8 @@ public class COM2POSE_lib {
 
     }
 
-    public void get_ensg_symbol_mapping() throws Exception {
+    public void get_ensg_symbol_mapping() throws Exception
+    {
 
         File script_output_dir = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing);
@@ -10264,7 +11297,8 @@ public class COM2POSE_lib {
         Process child = Runtime.getRuntime().exec(command);
         logger.logLine("[DESEQ2] Running script " + script_output.getName() + ": " + command);
         int code = child.waitFor();
-        switch (code) {
+        switch (code)
+        {
             case 0:
                 break;
             case 1:
@@ -10284,7 +11318,8 @@ public class COM2POSE_lib {
 
     }
 
-    public void mix_mutually_exclusive_peaks() throws IOException {
+    public void mix_mutually_exclusive_peaks() throws IOException
+    {
         logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Start mutually exclusive peaks calculation.");
         logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Preprocessing mutually exclusive peaks for binary tree comparison.");
 
@@ -10296,7 +11331,8 @@ public class COM2POSE_lib {
                         File.separator + options_intern.folder_name_mix_option_preprocessing_check_chr);
         options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
 
-        if (options_intern.mix_level.equals("SAMPLE_LEVEL")) {
+        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
             File root_mix_working_dir = new File(
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
             File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
@@ -10305,7 +11341,8 @@ public class COM2POSE_lib {
             options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
         }
 
-        if (options_intern.mix_level.equals("HM_LEVEL")) {
+        if (options_intern.mix_level.equals("HM_LEVEL"))
+        {
             File root_mix_working_dir = new File(
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
             File f_output_hm = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
@@ -10316,7 +11353,8 @@ public class COM2POSE_lib {
             options_intern.tepic_input_directory = f_output_hm.getAbsolutePath();
         }
 
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN")) {
+        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
@@ -10324,7 +11362,8 @@ public class COM2POSE_lib {
 
         }
 
-        if (!options_intern.black_list_dir.equals("")) {
+        if (!options_intern.black_list_dir.equals(""))
+        {
             File output_folder = new File(options_intern.com2pose_working_directory + File.separator +
                     options_intern.folder_name_blacklisted_regions);
             File output_folder_new_input = new File(output_folder.getAbsolutePath() + File.separator +
@@ -10359,12 +11398,16 @@ public class COM2POSE_lib {
 
         File f_input_peaks = new File(options_intern.tepic_input_directory);
 
-        for (File fileDir_tp : f_input_peaks.listFiles()) {
-            if (fileDir_tp.isDirectory()) {
+        for (File fileDir_tp : f_input_peaks.listFiles())
+        {
+            if (fileDir_tp.isDirectory())
+            {
                 HashSet<String> hms;
-                if (tps_to_hms.containsKey(fileDir_tp.getName())) {
+                if (tps_to_hms.containsKey(fileDir_tp.getName()))
+                {
                     hms = tps_to_hms.get(fileDir_tp.getName());
-                } else {
+                } else
+                {
                     hms = new HashSet<>();
                 }
 
@@ -10373,15 +11416,18 @@ public class COM2POSE_lib {
                                 fileDir_tp.getName());
                 output_tp.mkdir();
 
-                for (File fileDir_hm : fileDir_tp.listFiles()) {
-                    if (fileDir_hm.isDirectory()) {
+                for (File fileDir_hm : fileDir_tp.listFiles())
+                {
+                    if (fileDir_hm.isDirectory())
+                    {
                         hms.add(fileDir_hm.getName());
 
                         File output_hm = new File(output_tp.getAbsolutePath() + File.separator + fileDir_hm.getName());
                         output_hm.mkdir();
 
                         //we can only use this option with one input file
-                        if (fileDir_hm.listFiles().length > 1) {
+                        if (fileDir_hm.listFiles().length > 1)
+                        {
                             logger.logLine(
                                     "[MUTUALLY-EXCLUSIVE-PEAKS] A UNION OVER SAMPLES MUST BE MADE! Start MIX-OPTION now");
                             logger.logLine(
@@ -10391,7 +11437,8 @@ public class COM2POSE_lib {
                             options_intern.mix_level = "SAMPLE_LEVEL";
 
                             mix_option();
-                            if (!options_intern.black_list_dir.equals("")) {
+                            if (!options_intern.black_list_dir.equals(""))
+                            {
                                 logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Redo blacklist on unioned samples");
                                 preprocess_blacklist();
                                 filter_blacklist();
@@ -10404,11 +11451,14 @@ public class COM2POSE_lib {
                         String current_chr = "-1";
                         int position = 0;
                         ArrayList<BL_ranges_binary_tree> current_chr_ranges = new ArrayList<>();
-                        while ((line_peaks = br_peaks.readLine()) != null) {
+                        while ((line_peaks = br_peaks.readLine()) != null)
+                        {
                             String[] split = line_peaks.split("\t");
 
-                            if (!current_chr.equals(split[0])) {
-                                if (!current_chr.equals("-1")) {
+                            if (!current_chr.equals(split[0]))
+                            {
+                                if (!current_chr.equals("-1"))
+                                {
                                     ArrayList<BL_ranges_binary_tree> newly_ordered = new ArrayList<>();
                                     //recursive_split
                                     current_chr_ranges = recursive_split_BL(current_chr_ranges, newly_ordered);
@@ -10417,7 +11467,8 @@ public class COM2POSE_lib {
                                             output_hm.getAbsolutePath() + File.separator + current_chr + ".txt")));
                                     bw_peaks.append("#\tCHR\tLEFT_BORDER\tRIGHT_BORDER\tPEAK_SCORE");
                                     bw_peaks.newLine();
-                                    for (BL_ranges_binary_tree bl : newly_ordered) {
+                                    for (BL_ranges_binary_tree bl : newly_ordered)
+                                    {
                                         bw_peaks.write(bl.toString());
                                         bw_peaks.newLine();
                                     }
@@ -10428,7 +11479,8 @@ public class COM2POSE_lib {
                                     current_chr_ranges = new ArrayList<>();
                                     position = 0;
                                     continue;
-                                } else {
+                                } else
+                                {
                                     current_chr = split[0];
                                 }
                             }
@@ -10456,7 +11508,8 @@ public class COM2POSE_lib {
                                 new File(output_hm.getAbsolutePath() + File.separator + current_chr + ".txt")));
                         bw_peaks.append("#\tCHR\tLEFT_BORDER\tRIGHT_BORDER");
                         bw_peaks.newLine();
-                        for (BL_ranges_binary_tree bl : newly_ordered) {
+                        for (BL_ranges_binary_tree bl : newly_ordered)
+                        {
                             bw_peaks.write(bl.toString());
                             bw_peaks.newLine();
                         }
@@ -10470,18 +11523,23 @@ public class COM2POSE_lib {
 
         HashSet<String> already_worked_tp_groups = new HashSet<>();
 
-        for (String key_tp_1 : tps_to_hms.keySet()) {
-            for (String key_tp_2 : tps_to_hms.keySet()) {
-                if (key_tp_1.equals(key_tp_2)) {
+        for (String key_tp_1 : tps_to_hms.keySet())
+        {
+            for (String key_tp_2 : tps_to_hms.keySet())
+            {
+                if (key_tp_1.equals(key_tp_2))
+                {
                     continue;
                 }
 
                 String key_clash1 = key_tp_1 + "_" + key_tp_2;
                 String key_clash2 = key_tp_2 + "_" + key_tp_1;
 
-                if (already_worked_tp_groups.contains(key_clash1) || already_worked_tp_groups.contains(key_clash2)) {
+                if (already_worked_tp_groups.contains(key_clash1) || already_worked_tp_groups.contains(key_clash2))
+                {
                     continue;
-                } else {
+                } else
+                {
                     already_worked_tp_groups.add(key_clash1);
                 }
 
@@ -10493,8 +11551,10 @@ public class COM2POSE_lib {
                 HashSet<String> hms_tp1 = tps_to_hms.get(key_tp_1);
                 HashSet<String> hms_tp2 = tps_to_hms.get(key_tp_2);
 
-                for (String key_hm : hms_tp1) {
-                    if (hms_tp2.contains(key_hm)) {
+                for (String key_hm : hms_tp1)
+                {
+                    if (hms_tp2.contains(key_hm))
+                    {
                         File clash_output_hm = new File(clash_output.getAbsolutePath() + File.separator + key_hm);
                         clash_output_hm.mkdir();
 
@@ -10512,15 +11572,18 @@ public class COM2POSE_lib {
                         File input_folder_tp1 = new File(
                                 f_output_mix_option_mutually_exclusive_preprocessing.getAbsolutePath() +
                                         File.separator + key_tp_1 + File.separator + key_hm);
-                        for (File fileChr : input_folder_tp1.listFiles()) {
-                            if (fileChr.isFile()) {
+                        for (File fileChr : input_folder_tp1.listFiles())
+                        {
+                            if (fileChr.isFile())
+                            {
                                 String name = fileChr.getName().split("\\.")[0];
 
                                 ArrayList<BL_ranges_binary_tree> region = new ArrayList<>();
 
                                 BufferedReader br_chr = new BufferedReader(new FileReader(fileChr));
                                 String line_chr = br_chr.readLine();
-                                while ((line_chr = br_chr.readLine()) != null) {
+                                while ((line_chr = br_chr.readLine()) != null)
+                                {
                                     String[] split = line_chr.split("\t");
 
                                     BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
@@ -10538,7 +11601,8 @@ public class COM2POSE_lib {
                                 BL_binary_tree_node root = new BL_binary_tree_node(region.get(0), region.get(0).number);
                                 BL_binary_tree tree = new BL_binary_tree(root);
 
-                                for (int i = 1; i < region.size(); i++) {
+                                for (int i = 1; i < region.size(); i++)
+                                {
                                     tree.add(region.get(i).number, region.get(i));
                                     tree.peak_signals.add(region.get(i).peak_score);
                                 }
@@ -10556,7 +11620,8 @@ public class COM2POSE_lib {
                         BufferedReader br_tp2 = new BufferedReader(new FileReader(f_input_tp2));
                         String line_tp2 = "";
                         int count_line_tp_2 = 0;
-                        while ((line_tp2 = br_tp2.readLine()) != null) {
+                        while ((line_tp2 = br_tp2.readLine()) != null)
+                        {
                             String[] split = line_tp2.split("\t");
 
                             String chr = split[0];
@@ -10567,15 +11632,18 @@ public class COM2POSE_lib {
                             iu.right_border = Integer.parseInt(split[2]);
                             iu.peak_score = Double.parseDouble(split[4]);
 
-                            if (!chr_tree_tp1.containsKey(chr)) {
+                            if (!chr_tree_tp1.containsKey(chr))
+                            {
                                 count_line_tp_2++;
                                 continue;
                             }
                             BL_binary_tree tree = chr_tree_tp1.get(chr);
 
-                            if (options_intern.mix_mutually_exclusive_diff_peak_signals) {
+                            if (options_intern.mix_mutually_exclusive_diff_peak_signals)
+                            {
                                 BL_ranges_binary_tree current_match = tree.containsNode(iu);
-                                if (current_match == null) {
+                                if (current_match == null)
+                                {
                                     //this peak is mutually exclusive
                                     bw_tp2.write(line_tp2);
                                     bw_tp2.newLine();
@@ -10584,17 +11652,21 @@ public class COM2POSE_lib {
 
                                 double peak_difference = current_match.peak_score - iu.peak_score;
 
-                                if (peak_difference < 0) {
+                                if (peak_difference < 0)
+                                {
                                     peak_difference *= -1;
                                 }
 
-                                if (peak_difference > tree.average_peak_score) {
+                                if (peak_difference > tree.average_peak_score)
+                                {
                                     //this peak is mutually exclusive in peak score
                                     bw_tp2.write(line_tp2);
                                     bw_tp2.newLine();
                                 }
-                            } else {
-                                if (tree.containsNode(iu) == null) {
+                            } else
+                            {
+                                if (tree.containsNode(iu) == null)
+                                {
                                     //this peak is mutually exclusive
                                     bw_tp2.write(line_tp2);
                                     bw_tp2.newLine();
@@ -10611,15 +11683,18 @@ public class COM2POSE_lib {
                         File input_folder_tp2 = new File(
                                 f_output_mix_option_mutually_exclusive_preprocessing.getAbsolutePath() +
                                         File.separator + key_tp_2 + File.separator + key_hm);
-                        for (File fileChr : input_folder_tp2.listFiles()) {
-                            if (fileChr.isFile()) {
+                        for (File fileChr : input_folder_tp2.listFiles())
+                        {
+                            if (fileChr.isFile())
+                            {
                                 String name = fileChr.getName().split("\\.")[0];
 
                                 ArrayList<BL_ranges_binary_tree> region = new ArrayList<>();
 
                                 BufferedReader br_chr = new BufferedReader(new FileReader(fileChr));
                                 String line_chr = br_chr.readLine();
-                                while ((line_chr = br_chr.readLine()) != null) {
+                                while ((line_chr = br_chr.readLine()) != null)
+                                {
                                     String[] split = line_chr.split("\t");
 
                                     BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
@@ -10637,7 +11712,8 @@ public class COM2POSE_lib {
                                 BL_binary_tree_node root = new BL_binary_tree_node(region.get(0), region.get(0).number);
                                 BL_binary_tree tree = new BL_binary_tree(root);
 
-                                for (int i = 1; i < region.size(); i++) {
+                                for (int i = 1; i < region.size(); i++)
+                                {
                                     tree.add(region.get(i).number, region.get(i));
                                     tree.peak_signals.add(region.get(i).peak_score);
                                 }
@@ -10655,7 +11731,8 @@ public class COM2POSE_lib {
                         BufferedReader br_tp1 = new BufferedReader(new FileReader(f_input_tp1));
                         String line_tp1 = "";
                         int count_line_tp_1 = 0;
-                        while ((line_tp1 = br_tp1.readLine()) != null) {
+                        while ((line_tp1 = br_tp1.readLine()) != null)
+                        {
                             String[] split = line_tp1.split("\t");
 
                             String chr = split[0];
@@ -10666,16 +11743,19 @@ public class COM2POSE_lib {
                             iu.right_border = Integer.parseInt(split[2]);
                             iu.peak_score = Double.parseDouble(split[4]);
 
-                            if (!chr_tree_tp1.containsKey(chr)) {
+                            if (!chr_tree_tp1.containsKey(chr))
+                            {
                                 count_line_tp_2++;
                                 continue;
                             }
                             BL_binary_tree tree = chr_tree_tp2.get(chr);
 
-                            if (options_intern.mix_mutually_exclusive_diff_peak_signals) {
+                            if (options_intern.mix_mutually_exclusive_diff_peak_signals)
+                            {
                                 BL_ranges_binary_tree current_match = tree.containsNode(iu);
 
-                                if (current_match == null) {
+                                if (current_match == null)
+                                {
                                     //this peak is mutually exclusive
                                     bw_tp1.write(line_tp1);
                                     bw_tp1.newLine();
@@ -10684,17 +11764,21 @@ public class COM2POSE_lib {
 
                                 double peak_difference = current_match.peak_score - iu.peak_score;
 
-                                if (peak_difference < 0) {
+                                if (peak_difference < 0)
+                                {
                                     peak_difference *= -1;
                                 }
 
-                                if (peak_difference > tree.average_peak_score) {
+                                if (peak_difference > tree.average_peak_score)
+                                {
                                     //this peak is mutually exclusive
                                     bw_tp1.write(line_tp1);
                                     bw_tp1.newLine();
                                 }
-                            } else {
-                                if (tree.containsNode(iu) == null) {
+                            } else
+                            {
+                                if (tree.containsNode(iu) == null)
+                                {
                                     //this peak is mutually exclusive
                                     bw_tp1.write(line_tp1);
                                     bw_tp1.newLine();
@@ -10715,7 +11799,8 @@ public class COM2POSE_lib {
     /**
      * Filter TEPIC input files for blacklisted regions
      */
-    public void filter_blacklist() throws IOException {
+    public void filter_blacklist() throws IOException
+    {
 
         options_intern.tepic_input_prev = options_intern.tepic_input_directory;
         File f_annotation_check = new File(
@@ -10723,7 +11808,8 @@ public class COM2POSE_lib {
                         File.separator + options_intern.folder_name_mix_option_preprocessing_check_chr);
         options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
 
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN")) {
+        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
@@ -10752,15 +11838,18 @@ public class COM2POSE_lib {
                 options_intern.folder_name_blacklisted_regions + File.separator +
                 options_intern.folder_name_blacklisted_regions_preprocessing + File.separator +
                 options_intern.folder_name_blacklisted_regions_preprocessing_sorted);
-        for (File fileChr : input_folder_chr.listFiles()) {
-            if (fileChr.isFile()) {
+        for (File fileChr : input_folder_chr.listFiles())
+        {
+            if (fileChr.isFile())
+            {
                 String name = fileChr.getName().split("\\.")[0];
 
                 ArrayList<BL_ranges_binary_tree> region = new ArrayList<>();
 
                 BufferedReader br_chr = new BufferedReader(new FileReader(fileChr));
                 String line_chr = br_chr.readLine();
-                while ((line_chr = br_chr.readLine()) != null) {
+                while ((line_chr = br_chr.readLine()) != null)
+                {
                     String[] split = line_chr.split("\t");
 
                     BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
@@ -10777,7 +11866,8 @@ public class COM2POSE_lib {
                 BL_binary_tree_node root = new BL_binary_tree_node(region.get(0), region.get(0).number);
                 BL_binary_tree tree = new BL_binary_tree(root);
 
-                for (int i = 1; i < region.size(); i++) {
+                for (int i = 1; i < region.size(); i++)
+                {
                     tree.add(region.get(i).number, region.get(i));
                 }
 
@@ -10790,20 +11880,26 @@ public class COM2POSE_lib {
         //now filter all files
         int count_matched = 0;
 
-        for (File fileDirTP : folder_input.listFiles()) {
-            if (fileDirTP.isDirectory()) {
+        for (File fileDirTP : folder_input.listFiles())
+        {
+            if (fileDirTP.isDirectory())
+            {
                 File output_folder_new_input_TP =
                         new File(output_folder_new_input.getAbsolutePath() + File.separator + fileDirTP.getName());
                 output_folder_new_input_TP.mkdir();
 
-                for (File fileDirTP_HM : fileDirTP.listFiles()) {
-                    if (fileDirTP_HM.isDirectory()) {
+                for (File fileDirTP_HM : fileDirTP.listFiles())
+                {
+                    if (fileDirTP_HM.isDirectory())
+                    {
                         File output_folder_new_input_TP_HM = new File(
                                 output_folder_new_input_TP.getAbsolutePath() + File.separator + fileDirTP_HM.getName());
                         output_folder_new_input_TP_HM.mkdir();
 
-                        for (File filrDirTP_HM_sample : fileDirTP_HM.listFiles()) {
-                            if (filrDirTP_HM_sample.isFile()) {
+                        for (File filrDirTP_HM_sample : fileDirTP_HM.listFiles())
+                        {
+                            if (filrDirTP_HM_sample.isFile())
+                            {
                                 logger.logLine(
                                         "[BLACKLIST] Filter: " + fileDirTP.getName() + ": " + fileDirTP_HM.getName() +
                                                 " - " + filrDirTP_HM_sample.getName());
@@ -10815,11 +11911,13 @@ public class COM2POSE_lib {
                                 BufferedReader br = new BufferedReader(new FileReader(filrDirTP_HM_sample));
                                 String line = "";
                                 int count_line = 0;
-                                while ((line = br.readLine()) != null) {
+                                while ((line = br.readLine()) != null)
+                                {
                                     String[] split = line.split("\t");
 
                                     String chr = split[0];
-                                    if (!chr.matches(".*chr.*")) {
+                                    if (!chr.matches(".*chr.*"))
+                                    {
                                         chr = "chr" + chr;
                                     }
 
@@ -10828,16 +11926,19 @@ public class COM2POSE_lib {
                                     iu.left_border = Integer.parseInt(split[1]);
                                     iu.right_border = Integer.parseInt(split[2]);
 
-                                    if (!chr_tree.containsKey(chr)) {
+                                    if (!chr_tree.containsKey(chr))
+                                    {
                                         count_line++;
                                         continue;
                                     }
 
                                     BL_binary_tree tree = chr_tree.get(chr);
-                                    if (tree.containsNode(iu) == null) {
+                                    if (tree.containsNode(iu) == null)
+                                    {
                                         bw.write(line);
                                         bw.newLine();
-                                    } else {
+                                    } else
+                                    {
                                         count_matched++;
                                     }
                                     count_line++;
@@ -10856,7 +11957,8 @@ public class COM2POSE_lib {
     /**
      * preprocesses the blacklist file for binary search
      */
-    public void preprocess_blacklist() throws IOException {
+    public void preprocess_blacklist() throws IOException
+    {
 
         logger.logLine("[BLACKLIST] start preprocessing blacklist");
 
@@ -10870,7 +11972,8 @@ public class COM2POSE_lib {
                 options_intern.folder_name_blacklisted_regions_preprocessing_perChr);
         f_blacklist_pre_chr.mkdir();
 
-        if (options_intern.mix_option.equals("SAMPLE_LEVEL")) {
+        if (options_intern.mix_option.equals("SAMPLE_LEVEL"))
+        {
             File root_mix_working_dir = new File(
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
             File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
@@ -10879,7 +11982,8 @@ public class COM2POSE_lib {
             options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
         }
 
-        if (options_intern.mix_option.equals("HM_LEVEL")) {
+        if (options_intern.mix_option.equals("HM_LEVEL"))
+        {
             File root_mix_working_dir = new File(
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
             File f_output_hm = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
@@ -10897,16 +12001,19 @@ public class COM2POSE_lib {
         String current_chr = "";
         BufferedWriter bw_chr = new BufferedWriter(
                 new FileWriter(new File(f_blacklist_pre_chr.getAbsolutePath() + File.separator + "test.txt")));
-        while ((line_chr = br_chr.readLine()) != null) {
+        while ((line_chr = br_chr.readLine()) != null)
+        {
             String[] split = line_chr.split("\t");
 
             String chr = split[0];
-            if (!chr.equals(current_chr)) {
+            if (!chr.equals(current_chr))
+            {
                 Collections.sort(chr_ius);
 
                 int i = 0;
 
-                for (BL_ranges_binary_tree iu : chr_ius) {
+                for (BL_ranges_binary_tree iu : chr_ius)
+                {
                     iu.number = i;
                     bw_chr.write(iu.toString());
                     bw_chr.newLine();
@@ -10915,7 +12022,8 @@ public class COM2POSE_lib {
 
                 chr_ius.clear();
 
-                if (!chr.matches(".*chr.*")) {
+                if (!chr.matches(".*chr.*"))
+                {
                     chr = "chr" + chr;
                 }
 
@@ -10933,7 +12041,8 @@ public class COM2POSE_lib {
             iu.right_border = Integer.parseInt(split[2]);
             iu.signal = split[3].replace(' ', '_').toUpperCase();
 
-            if (options_intern.black_list_signals.contains(iu.signal)) {
+            if (options_intern.black_list_signals.contains(iu.signal))
+            {
                 chr_ius.add(iu);
             }
         }
@@ -10942,7 +12051,8 @@ public class COM2POSE_lib {
 
         int i = 0;
 
-        for (BL_ranges_binary_tree iu : chr_ius) {
+        for (BL_ranges_binary_tree iu : chr_ius)
+        {
             iu.number = i;
             bw_chr.write(iu.toString());
             bw_chr.newLine();
@@ -10958,15 +12068,18 @@ public class COM2POSE_lib {
                 options_intern.folder_name_blacklisted_regions_preprocessing_sorted);
         f_blacklist_pre_sorted.mkdir();
 
-        for (File fileDir : f_blacklist_pre_chr.listFiles()) {
-            if (fileDir.isFile() && !fileDir.getName().equals("test.txt")) {
+        for (File fileDir : f_blacklist_pre_chr.listFiles())
+        {
+            if (fileDir.isFile() && !fileDir.getName().equals("test.txt"))
+            {
                 ArrayList<BL_ranges_binary_tree> current_ius = new ArrayList<>();
                 String header;
 
                 BufferedReader br_sort = new BufferedReader(new FileReader(fileDir));
                 header = br_sort.readLine();
                 String line_sort = "";
-                while ((line_sort = br_sort.readLine()) != null) {
+                while ((line_sort = br_sort.readLine()) != null)
+                {
                     String[] split = line_sort.split("\t");
 
                     BL_ranges_binary_tree iu = new BL_ranges_binary_tree();
@@ -10989,7 +12102,8 @@ public class COM2POSE_lib {
                 bw_sort.write(header);
                 bw_sort.newLine();
 
-                for (int j = 0; j < newly_ordered.size(); j++) {
+                for (int j = 0; j < newly_ordered.size(); j++)
+                {
                     bw_sort.write(newly_ordered.get(j).toString());
                     bw_sort.newLine();
                 }
@@ -11009,7 +12123,8 @@ public class COM2POSE_lib {
      *
      * @throws IOException
      */
-    public void create_footprints_between_peaks() throws IOException {
+    public void create_footprints_between_peaks() throws IOException
+    {
         logger.logLine(
                 "[FOOTPRINTS] OPTION tepic_tf_binding_site_search=\"" + options_intern.tepic_tf_binding_site_search +
                         "\" was set!");
@@ -11028,7 +12143,8 @@ public class COM2POSE_lib {
                 options_intern.folder_name_mix_option_sample_mix);
         f_sample_mix_output.mkdir();
 
-        if (options_intern.mix_level.equals("SAMPLE_LEVEL")) {
+        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
         }
@@ -11054,20 +12170,26 @@ public class COM2POSE_lib {
         options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
 
 
-        for (File f_tp : folder_input.listFiles()) {
-            if (f_tp.isDirectory()) {
+        for (File f_tp : folder_input.listFiles())
+        {
+            if (f_tp.isDirectory())
+            {
                 String key_tp = f_tp.getName();
                 File f_output_tp = new File(output_folder_new_input.getAbsolutePath() + File.separator + key_tp);
                 f_output_tp.mkdir();
 
-                for (File f_hm : f_tp.listFiles()) {
-                    if (f_hm.isDirectory()) {
+                for (File f_hm : f_tp.listFiles())
+                {
+                    if (f_hm.isDirectory())
+                    {
                         String key_hm = f_hm.getName();
                         File f_output_tp_hm = new File(f_output_tp.getAbsolutePath() + File.separator + key_hm);
                         f_output_tp_hm.mkdir();
 
-                        for (File f_sample : f_hm.listFiles()) {
-                            if (f_sample.isFile()) {
+                        for (File f_sample : f_hm.listFiles())
+                        {
+                            if (f_sample.isFile())
+                            {
                                 File f_output_peak_file = new File(
                                         f_output_tp_hm.getAbsolutePath() + File.separator + f_sample.getName());
 
@@ -11076,11 +12198,14 @@ public class COM2POSE_lib {
 
                                 BufferedReader br_input_regions_chr = new BufferedReader(new FileReader(f_sample));
                                 String line_input_regions_chr = "";
-                                while ((line_input_regions_chr = br_input_regions_chr.readLine()) != null) {
+                                while ((line_input_regions_chr = br_input_regions_chr.readLine()) != null)
+                                {
                                     String[] split = line_input_regions_chr.split("\t");
-                                    if (chr_regions.containsKey(split[0])) {
+                                    if (chr_regions.containsKey(split[0]))
+                                    {
                                         continue;
-                                    } else {
+                                    } else
+                                    {
                                         ArrayList<Footprint_Interval> fp_al = new ArrayList<>();
                                         chr_regions.put(split[0], fp_al);
                                     }
@@ -11090,7 +12215,8 @@ public class COM2POSE_lib {
 
                                 BufferedReader br_input_regions = new BufferedReader(new FileReader(f_sample));
                                 String line_input_regions = "";
-                                while ((line_input_regions = br_input_regions.readLine()) != null) {
+                                while ((line_input_regions = br_input_regions.readLine()) != null)
+                                {
                                     String[] split = line_input_regions.split("\t");
 
                                     String chromosome = split[0];
@@ -11112,26 +12238,32 @@ public class COM2POSE_lib {
                                 br_input_regions.close();
 
                                 //sort region array lists per chromosome
-                                for (String key_chr : chr_regions.keySet()) {
+                                for (String key_chr : chr_regions.keySet())
+                                {
                                     Collections.sort(chr_regions.get(key_chr));
                                 }
 
                                 //determine chromosome order
                                 ArrayList<String> chromosome_ordered = new ArrayList<>();
-                                for (int i = 0; i < 100; i++) {
+                                for (int i = 0; i < 100; i++)
+                                {
                                     String search_chr = "" + i;
-                                    if (chr_regions.containsKey(search_chr)) {
+                                    if (chr_regions.containsKey(search_chr))
+                                    {
                                         chromosome_ordered.add(search_chr);
                                     }
                                 }
                                 ArrayList<String> character_chromosomes = new ArrayList<>();
-                                for (String key_chr : chr_regions.keySet()) {
-                                    if (!chromosome_ordered.contains(key_chr)) {
+                                for (String key_chr : chr_regions.keySet())
+                                {
+                                    if (!chromosome_ordered.contains(key_chr))
+                                    {
                                         character_chromosomes.add(key_chr);
                                     }
                                 }
                                 Collections.sort(character_chromosomes);
-                                if (character_chromosomes.get(0).matches(".*M.*")) {
+                                if (character_chromosomes.get(0).matches(".*M.*"))
+                                {
                                     String mt_chr = character_chromosomes.get(0);
                                     character_chromosomes.remove(0);
                                     character_chromosomes.add(mt_chr);
@@ -11141,13 +12273,16 @@ public class COM2POSE_lib {
 
                                 //see if gaps between Footprint Intervals are < tepic_between_max_bps if so connect to one region for TEPIC
 
-                                if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN")) {
-                                    for (String key_chr : chr_regions.keySet()) {
+                                if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+                                {
+                                    for (String key_chr : chr_regions.keySet())
+                                    {
                                         ArrayList<Footprint_Interval> intervals = chr_regions.get(key_chr);
 
                                         ArrayList<Footprint_Interval> intervals_combined = new ArrayList<>();
 
-                                        for (int i = 0; i < intervals.size(); i++) {
+                                        for (int i = 0; i < intervals.size(); i++)
+                                        {
                                             int start_i = i;
                                             int end_i = i;
 
@@ -11164,8 +12299,10 @@ public class COM2POSE_lib {
 
                                             boolean include_next_peak = true;
 
-                                            while (include_next_peak) {
-                                                if (end_i + 1 >= intervals.size()) {
+                                            while (include_next_peak)
+                                            {
+                                                if (end_i + 1 >= intervals.size())
+                                                {
                                                     break;
                                                 }
 
@@ -11174,7 +12311,8 @@ public class COM2POSE_lib {
 
                                                 int distance = start_position_next - end_position;
 
-                                                if (distance < options_intern.tepic_between_max_bps) {
+                                                if (distance < options_intern.tepic_between_max_bps)
+                                                {
                                                     include_next_peak = true;
                                                     end_position = end_position_next;
                                                     name += ";" + intervals.get(end_i + 1).name;
@@ -11188,14 +12326,17 @@ public class COM2POSE_lib {
 
 
                                                     end_i += 1;
-                                                } else {
+                                                } else
+                                                {
                                                     include_next_peak = false;
                                                 }
                                             }
 
-                                            if (start_i == end_i) {
+                                            if (start_i == end_i)
+                                            {
                                                 intervals_combined.add(intervals.get(i));
-                                            } else {
+                                            } else
+                                            {
                                                 i = end_i + 1;
 
                                                 int quotient = end_i - start_i + 1;
@@ -11218,13 +12359,16 @@ public class COM2POSE_lib {
                                     }
                                 }
 
-                                if (options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN")) {
-                                    for (String key_chr : chr_regions.keySet()) {
+                                if (options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
+                                {
+                                    for (String key_chr : chr_regions.keySet())
+                                    {
                                         ArrayList<Footprint_Interval> intervals = chr_regions.get(key_chr);
 
                                         ArrayList<Footprint_Interval> intervals_combined = new ArrayList<>();
 
-                                        for (int i = 0; i < intervals.size(); i++) {
+                                        for (int i = 0; i < intervals.size(); i++)
+                                        {
                                             int start_i = i;
                                             int end_i = i;
 
@@ -11238,16 +12382,19 @@ public class COM2POSE_lib {
                                             double pValue = intervals.get(i).pValue;
                                             double qValue = intervals.get(i).qValue;
 
-                                            if (end_i + 1 >= intervals.size()) {
+                                            if (end_i + 1 >= intervals.size())
+                                            {
                                                 intervals_combined.add(intervals.get(i));
                                                 break;
-                                            } else {
+                                            } else
+                                            {
                                                 int start_position_next = intervals.get(end_i + 1).start;
                                                 int end_position_next = intervals.get(end_i + 1).end;
 
                                                 int distance = start_position_next - end_position;
 
-                                                if (distance < options_intern.tepic_between_max_bps) {
+                                                if (distance < options_intern.tepic_between_max_bps)
+                                                {
                                                     start_position = end_position;
                                                     end_position = start_position_next;
 
@@ -11266,9 +12413,11 @@ public class COM2POSE_lib {
                                                 }
                                             }
 
-                                            if (start_i == end_i) {
+                                            if (start_i == end_i)
+                                            {
                                                 intervals_combined.add(intervals.get(i));
-                                            } else {
+                                            } else
+                                            {
                                                 i = end_i + 1;
 
                                                 int quotient = end_i - start_i + 1;
@@ -11296,10 +12445,12 @@ public class COM2POSE_lib {
 
                                 BufferedWriter bw_out = new BufferedWriter(new FileWriter(f_output_peak_file));
 
-                                for (String key_chr : chromosome_ordered) {
+                                for (String key_chr : chromosome_ordered)
+                                {
                                     ArrayList<Footprint_Interval> footprints = chr_regions.get(key_chr);
 
-                                    for (Footprint_Interval fpi : footprints) {
+                                    for (Footprint_Interval fpi : footprints)
+                                    {
                                         bw_out.write(fpi.line);
                                         bw_out.newLine();
                                     }
@@ -11321,7 +12472,8 @@ public class COM2POSE_lib {
     /**
      * preprocess mix histones, search for same peaks and use either the union or the intersection of all
      */
-    public void mix_option() throws IOException {
+    public void mix_option() throws IOException
+    {
 
         options_intern.tepic_input_prev = options_intern.tepic_input_directory;
         File f_annotation_check = new File(
@@ -11344,35 +12496,44 @@ public class COM2POSE_lib {
 
         logger.logLine("[MIX] Used data: " + options_intern.tepic_input_directory);
 
-        if (options_intern.mix_level.equals("SAMPLE_LEVEL")) {
+        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
         }
 
         logger.logLine("[MIX] Preprocess input data for sample mix - split chromosomes.");
 
-        for (File fileDir : file_root_input.listFiles()) {
-            if (fileDir.isDirectory()) {
+        for (File fileDir : file_root_input.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
                 String timepoint = fileDir.getName();
                 File file_output_tp = new File(f_sample_mix_preprocess + File.separator + timepoint);
                 file_output_tp.mkdir();
 
-                for (File fileDirHM : fileDir.listFiles()) {
-                    if (fileDirHM.isDirectory()) {
+                for (File fileDirHM : fileDir.listFiles())
+                {
+                    if (fileDirHM.isDirectory())
+                    {
                         File file_output_tp_hm =
                                 new File(file_output_tp.getAbsolutePath() + File.separator + fileDirHM.getName());
                         file_output_tp_hm.mkdir();
 
-                        for (File fileDirHM_sample : fileDirHM.listFiles()) {
-                            if (fileDirHM_sample.isFile()) {
+                        for (File fileDirHM_sample : fileDirHM.listFiles())
+                        {
+                            if (fileDirHM_sample.isFile())
+                            {
                                 BufferedWriter bw = new BufferedWriter(new FileWriter(
                                         new File(file_output_tp_hm.getAbsolutePath() + File.separator + "test.txt")));
                                 BufferedReader br = new BufferedReader(new FileReader(fileDirHM_sample));
                                 String line = "";
                                 String currentChr = "";
-                                while ((line = br.readLine()) != null) {
+                                while ((line = br.readLine()) != null)
+                                {
                                     String[] split = line.split("\t");
-                                    if (!split[0].equals(currentChr)) {
+                                    if (!split[0].equals(currentChr))
+                                    {
                                         bw.close();
                                         currentChr = split[0];
                                         File f_output_chr = new File(
@@ -11396,15 +12557,19 @@ public class COM2POSE_lib {
 
         logger.logLine("[MIX] Create " + options_intern.mix_option + " of samples");
 
-        for (File fileDir : f_sample_mix_preprocess.listFiles()) {
-            if (fileDir.isDirectory()) {
+        for (File fileDir : f_sample_mix_preprocess.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
                 String timepoint = fileDir.getName();
                 File f_output_union_samples_tp =
                         new File(f_sample_mix_output.getAbsolutePath() + File.separator + timepoint);
                 f_output_union_samples_tp.mkdir();
 
-                for (File fileDirHM : fileDir.listFiles()) {
-                    if (fileDirHM.isDirectory()) {
+                for (File fileDirHM : fileDir.listFiles())
+                {
+                    if (fileDirHM.isDirectory())
+                    {
                         String hm = fileDirHM.getName();
                         File f_output_union_samples_tp_hm =
                                 new File(f_output_union_samples_tp.getAbsolutePath() + File.separator + hm);
@@ -11416,22 +12581,27 @@ public class COM2POSE_lib {
                         ArrayList<Integer> chr_alpha = new ArrayList<>();
                         ArrayList<String> chr_str = new ArrayList<>();
 
-                        for (File fileDirHM_Chr : fileDirHM.listFiles()) {
-                            if (fileDirHM_Chr.isDirectory()) {
+                        for (File fileDirHM_Chr : fileDirHM.listFiles())
+                        {
+                            if (fileDirHM_Chr.isDirectory())
+                            {
                                 String chr = fileDirHM_Chr.getName();
 
                                 ArrayList<MIX_Interval> all_intervals = new ArrayList<>();
 
                                 int sample_number = 0;
 
-                                for (File fileDirHM_Chr_sample : fileDirHM_Chr.listFiles()) {
-                                    if (fileDirHM_Chr_sample.isFile()) {
+                                for (File fileDirHM_Chr_sample : fileDirHM_Chr.listFiles())
+                                {
+                                    if (fileDirHM_Chr_sample.isFile())
+                                    {
                                         String[] f_ending = fileDirHM_Chr_sample.getName().split("\\.");
                                         file_ending = f_ending[f_ending.length - 1];
                                         //build array of a union of all peaks
                                         BufferedReader br = new BufferedReader(new FileReader(fileDirHM_Chr_sample));
                                         String line = "";
-                                        while ((line = br.readLine()) != null) {
+                                        while ((line = br.readLine()) != null)
+                                        {
                                             String[] split = line.split("\t");
 
                                             MIX_Interval_Object mio =
@@ -11494,26 +12664,34 @@ public class COM2POSE_lib {
                                 ArrayList<MIX_Interval> chr_unions = new ArrayList<>();
 
                                 int min_occurence = 0;
-                                if (options_intern.mix_occurence_intersection == -1) {
+                                if (options_intern.mix_occurence_intersection == -1)
+                                {
                                     min_occurence = sample_number;
-                                } else {
-                                    if (sample_number < options_intern.mix_occurence_intersection) {
+                                } else
+                                {
+                                    if (sample_number < options_intern.mix_occurence_intersection)
+                                    {
                                         min_occurence = sample_number;
 
-                                    } else {
+                                    } else
+                                    {
                                         min_occurence = options_intern.mix_occurence_intersection;
                                     }
                                 }
 
-                                while (!stack_union.isEmpty()) {
+                                while (!stack_union.isEmpty())
+                                {
                                     MIX_Interval t = stack_union.pop();
                                     t.calculate_mean("SAMPLE_LEVEL");
 
-                                    if (options_intern.mix_option.equals("INTERSECTION")) {
-                                        if (t.merged_intervals.size() >= min_occurence) {
+                                    if (options_intern.mix_option.equals("INTERSECTION"))
+                                    {
+                                        if (t.merged_intervals.size() >= min_occurence)
+                                        {
                                             chr_unions.add(t);
                                         }
-                                    } else {
+                                    } else
+                                    {
                                         chr_unions.add(t);
                                     }
                                 }
@@ -11522,9 +12700,11 @@ public class COM2POSE_lib {
 
                                 all_chromosomes.put(chr, chr_unions);
 
-                                try {
+                                try
+                                {
                                     chr_alpha.add(Integer.parseInt(chr));
-                                } catch (Exception e) {
+                                } catch (Exception e)
+                                {
                                     chr_str.add(chr);
                                 }
                             }
@@ -11541,18 +12721,22 @@ public class COM2POSE_lib {
 
                         int peak_counter = 1;
 
-                        for (int chr : chr_alpha) {
+                        for (int chr : chr_alpha)
+                        {
                             ArrayList<MIX_Interval> x = all_chromosomes.get("" + chr);
-                            for (int i = 0; i < x.size(); i++) {
+                            for (int i = 0; i < x.size(); i++)
+                            {
                                 bw.write(x.get(i).meanToString(peak_counter));
                                 bw.newLine();
                                 peak_counter++;
                             }
                         }
 
-                        for (String chr : chr_str) {
+                        for (String chr : chr_str)
+                        {
                             ArrayList<MIX_Interval> x = all_chromosomes.get(chr);
-                            for (int i = 0; i < x.size(); i++) {
+                            for (int i = 0; i < x.size(); i++)
+                            {
                                 bw.write(x.get(i).meanToString(peak_counter));
                                 bw.newLine();
                                 peak_counter++;
@@ -11566,7 +12750,8 @@ public class COM2POSE_lib {
             }
         }
 
-        if (options_intern.mix_level.equals("HM_LEVEL")) {
+        if (options_intern.mix_level.equals("HM_LEVEL"))
+        {
 
             logger.logLine("[MIX] Preprocess sample unions for HM mix");
 
@@ -11588,13 +12773,17 @@ public class COM2POSE_lib {
             HashSet<String> available_hms = new HashSet<>();
 
             //identify possible timepoints
-            for (File fileDir : f_sample_mix_output.listFiles()) {
-                if (fileDir.isDirectory()) {
+            for (File fileDir : f_sample_mix_output.listFiles())
+            {
+                if (fileDir.isDirectory())
+                {
                     String timepoint = fileDir.getName();
                     ArrayList hm = new ArrayList();
 
-                    for (File fileDirHM : fileDir.listFiles()) {
-                        if (fileDirHM.isDirectory()) {
+                    for (File fileDirHM : fileDir.listFiles())
+                    {
+                        if (fileDirHM.isDirectory())
+                        {
                             hm.add(fileDirHM.getName());
                             available_hms.add(fileDirHM.getName());
                         }
@@ -11604,21 +12793,26 @@ public class COM2POSE_lib {
             }
 
 
-            for (String tp : timepoints_histone_modifications.keySet()) {
-                if (timepoints_histone_modifications.get(tp).size() < available_hms.size()) {
+            for (String tp : timepoints_histone_modifications.keySet())
+            {
+                if (timepoints_histone_modifications.get(tp).size() < available_hms.size())
+                {
                     deleted_tps.put(tp, timepoints_histone_modifications.get(tp));
                     timepoints_histone_modifications.remove(tp);
                     continue;
                 }
 
                 boolean all_in = true;
-                for (String hm : available_hms) {
-                    if (!timepoints_histone_modifications.get(tp).contains(hm)) {
+                for (String hm : available_hms)
+                {
+                    if (!timepoints_histone_modifications.get(tp).contains(hm))
+                    {
                         all_in = false;
                     }
                 }
 
-                if (!all_in) {
+                if (!all_in)
+                {
                     deleted_tps.put(tp, timepoints_histone_modifications.get(tp));
                     timepoints_histone_modifications.remove(tp);
                 }
@@ -11626,17 +12820,20 @@ public class COM2POSE_lib {
 
             StringBuilder sb_found_mixing_tps = new StringBuilder();
             sb_found_mixing_tps.append("[MIX] Can perform complete mix for HMs (");
-            for (String hm : available_hms) {
+            for (String hm : available_hms)
+            {
                 sb_found_mixing_tps.append(hm);
                 sb_found_mixing_tps.append(" ");
             }
             sb_found_mixing_tps.append(") in timepoints (");
-            for (String tp : timepoints_histone_modifications.keySet()) {
+            for (String tp : timepoints_histone_modifications.keySet())
+            {
                 sb_found_mixing_tps.append(tp);
                 sb_found_mixing_tps.append(" ");
             }
             sb_found_mixing_tps.append("). Can perform part-mix or no-mix for timepoints (");
-            for (String tp : deleted_tps.keySet()) {
+            for (String tp : deleted_tps.keySet())
+            {
                 sb_found_mixing_tps.append(tp);
                 sb_found_mixing_tps.append(" ");
             }
@@ -11644,30 +12841,38 @@ public class COM2POSE_lib {
             logger.logLine(sb_found_mixing_tps.toString());
 
 
-            for (File fileDir : f_sample_mix_output.listFiles()) {
-                if (fileDir.isDirectory()) {
+            for (File fileDir : f_sample_mix_output.listFiles())
+            {
+                if (fileDir.isDirectory())
+                {
                     String timepoint = fileDir.getName();
                     File f_output_hm_prepro =
                             new File(f_output_preprocessing_hm.getAbsolutePath() + File.separator + timepoint);
                     f_output_hm_prepro.mkdir();
 
-                    for (File fileDirHM : fileDir.listFiles()) {
-                        if (fileDirHM.isDirectory()) {
+                    for (File fileDirHM : fileDir.listFiles())
+                    {
+                        if (fileDirHM.isDirectory())
+                        {
                             String hm = fileDirHM.getName();
                             File f_output_hm_prepro_hm =
                                     new File(f_output_hm_prepro.getAbsolutePath() + File.separator + "MIX");
                             f_output_hm_prepro_hm.mkdir();
 
-                            for (File fileDirHM_samples : fileDirHM.listFiles()) {
-                                if (fileDirHM_samples.isFile()) {
+                            for (File fileDirHM_samples : fileDirHM.listFiles())
+                            {
+                                if (fileDirHM_samples.isFile())
+                                {
                                     BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
                                             f_output_hm_prepro_hm.getAbsolutePath() + File.separator + "test.txt")));
                                     BufferedReader br = new BufferedReader(new FileReader(fileDirHM_samples));
                                     String line = "";
                                     String currentChr = "";
-                                    while ((line = br.readLine()) != null) {
+                                    while ((line = br.readLine()) != null)
+                                    {
                                         String[] split = line.split("\t");
-                                        if (!split[0].equals(currentChr)) {
+                                        if (!split[0].equals(currentChr))
+                                        {
                                             bw.close();
                                             currentChr = split[0];
                                             File f_output_chr = new File(
@@ -11692,15 +12897,19 @@ public class COM2POSE_lib {
 
             logger.logLine("[MIX] Create " + options_intern.mix_option + " of HMs");
 
-            for (File fileDir : f_output_preprocessing_hm.listFiles()) {
-                if (fileDir.isDirectory()) {
+            for (File fileDir : f_output_preprocessing_hm.listFiles())
+            {
+                if (fileDir.isDirectory())
+                {
                     String timepoint = fileDir.getName();
                     File f_output_union_samples_tp =
                             new File(f_output_hm.getAbsolutePath() + File.separator + timepoint);
                     f_output_union_samples_tp.mkdir();
 
-                    for (File fileDirHM : fileDir.listFiles()) {
-                        if (fileDirHM.isDirectory()) {
+                    for (File fileDirHM : fileDir.listFiles())
+                    {
+                        if (fileDirHM.isDirectory())
+                        {
                             String hm = fileDirHM.getName();
                             File f_output_union_samples_tp_hm =
                                     new File(f_output_union_samples_tp.getAbsolutePath() + File.separator + hm);
@@ -11712,23 +12921,28 @@ public class COM2POSE_lib {
                             ArrayList<Integer> chr_alpha = new ArrayList<>();
                             ArrayList<String> chr_str = new ArrayList<>();
 
-                            for (File fileDirHM_Chr : fileDirHM.listFiles()) {
-                                if (fileDirHM_Chr.isDirectory()) {
+                            for (File fileDirHM_Chr : fileDirHM.listFiles())
+                            {
+                                if (fileDirHM_Chr.isDirectory())
+                                {
                                     String chr = fileDirHM_Chr.getName();
 
                                     ArrayList<MIX_Interval> all_intervals = new ArrayList<>();
 
                                     int sample_number = 0;
 
-                                    for (File fileDirHM_Chr_sample : fileDirHM_Chr.listFiles()) {
-                                        if (fileDirHM_Chr_sample.isFile()) {
+                                    for (File fileDirHM_Chr_sample : fileDirHM_Chr.listFiles())
+                                    {
+                                        if (fileDirHM_Chr_sample.isFile())
+                                        {
                                             String[] f_ending = fileDirHM_Chr_sample.getName().split("\\.");
                                             file_ending = f_ending[f_ending.length - 1];
                                             //build array of a union of all peaks
                                             BufferedReader br =
                                                     new BufferedReader(new FileReader(fileDirHM_Chr_sample));
                                             String line = "";
-                                            while ((line = br.readLine()) != null) {
+                                            while ((line = br.readLine()) != null)
+                                            {
                                                 String[] split = line.split("\t");
 
                                                 MIX_Interval_Object mio =
@@ -11792,26 +13006,34 @@ public class COM2POSE_lib {
                                     ArrayList<MIX_Interval> chr_unions = new ArrayList<>();
 
                                     int min_occurence = 0;
-                                    if (options_intern.mix_occurence_intersection == -1) {
+                                    if (options_intern.mix_occurence_intersection == -1)
+                                    {
                                         min_occurence = sample_number;
-                                    } else {
-                                        if (sample_number < options_intern.mix_occurence_intersection) {
+                                    } else
+                                    {
+                                        if (sample_number < options_intern.mix_occurence_intersection)
+                                        {
                                             min_occurence = sample_number;
 
-                                        } else {
+                                        } else
+                                        {
                                             min_occurence = options_intern.mix_occurence_intersection;
                                         }
                                     }
 
-                                    while (!stack_union.isEmpty()) {
+                                    while (!stack_union.isEmpty())
+                                    {
                                         MIX_Interval t = stack_union.pop();
                                         t.calculate_mean("HM_LEVEL");
 
-                                        if (options_intern.mix_option.equals("INTERSECTION")) {
-                                            if (t.merged_intervals.size() >= min_occurence) {
+                                        if (options_intern.mix_option.equals("INTERSECTION"))
+                                        {
+                                            if (t.merged_intervals.size() >= min_occurence)
+                                            {
                                                 chr_unions.add(t);
                                             }
-                                        } else {
+                                        } else
+                                        {
                                             chr_unions.add(t);
                                         }
                                     }
@@ -11820,9 +13042,11 @@ public class COM2POSE_lib {
 
                                     all_chromosomes.put(chr, chr_unions);
 
-                                    try {
+                                    try
+                                    {
                                         chr_alpha.add(Integer.parseInt(chr));
-                                    } catch (Exception e) {
+                                    } catch (Exception e)
+                                    {
                                         chr_str.add(chr);
                                     }
                                 }
@@ -11839,18 +13063,22 @@ public class COM2POSE_lib {
 
                             int peak_counter = 1;
 
-                            for (int chr : chr_alpha) {
+                            for (int chr : chr_alpha)
+                            {
                                 ArrayList<MIX_Interval> x = all_chromosomes.get("" + chr);
-                                for (int i = 0; i < x.size(); i++) {
+                                for (int i = 0; i < x.size(); i++)
+                                {
                                     bw.write(x.get(i).meanToString(peak_counter));
                                     bw.newLine();
                                     peak_counter++;
                                 }
                             }
 
-                            for (String chr : chr_str) {
+                            for (String chr : chr_str)
+                            {
                                 ArrayList<MIX_Interval> x = all_chromosomes.get(chr);
-                                for (int i = 0; i < x.size(); i++) {
+                                for (int i = 0; i < x.size(); i++)
+                                {
                                     bw.write(x.get(i).meanToString(peak_counter));
                                     bw.newLine();
                                     peak_counter++;
@@ -11869,7 +13097,8 @@ public class COM2POSE_lib {
      *
      * @throws IOException
      */
-    public void check_chromosomes() throws IOException {
+    public void check_chromosomes() throws IOException
+    {
         logger.logLine("[CHECK CHROMOSOMES] Check chromosome for naming convention and alter if necessary!");
 
         File file_root_input = new File(options_intern.tepic_input_directory);
@@ -11885,36 +13114,45 @@ public class COM2POSE_lib {
         options_intern.tepic_input_prev = options_intern.tepic_input_directory;
         options_intern.tepic_input_directory = chr_annotation_output.getAbsolutePath();
 
-        for (File fileDir : file_root_input.listFiles()) {
-            if (fileDir.isDirectory()) {
+        for (File fileDir : file_root_input.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
                 String timepoint = fileDir.getName();
                 File file_output_tp = new File(chr_annotation_output.getAbsolutePath() + File.separator + timepoint);
                 file_output_tp.mkdir();
 
-                for (File fileDirHM : fileDir.listFiles()) {
-                    if (fileDirHM.isDirectory()) {
+                for (File fileDirHM : fileDir.listFiles())
+                {
+                    if (fileDirHM.isDirectory())
+                    {
                         File file_output_tp_hm =
                                 new File(file_output_tp.getAbsolutePath() + File.separator + fileDirHM.getName());
                         file_output_tp_hm.mkdir();
 
-                        for (File fileDirHM_sample : fileDirHM.listFiles()) {
-                            if (fileDirHM_sample.isFile()) {
+                        for (File fileDirHM_sample : fileDirHM.listFiles())
+                        {
+                            if (fileDirHM_sample.isFile())
+                            {
                                 BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
                                         file_output_tp_hm.getAbsolutePath() + File.separator +
                                                 fileDirHM_sample.getName())));
                                 BufferedReader br = new BufferedReader(new FileReader(fileDirHM_sample));
                                 String line = "";
-                                while ((line = br.readLine()) != null) {
+                                while ((line = br.readLine()) != null)
+                                {
                                     String[] split = line.split("\t");
 
-                                    if (split[0].startsWith("chr")) {
+                                    if (split[0].startsWith("chr"))
+                                    {
                                         String[] split_chr = split[0].split("chr");
                                         String chr_name = split_chr[1];
 
                                         StringBuilder sb_line = new StringBuilder();
                                         sb_line.append(chr_name);
 
-                                        for (int i = 1; i < split.length; i++) {
+                                        for (int i = 1; i < split.length; i++)
+                                        {
                                             sb_line.append("\t");
                                             sb_line.append(split[i]);
                                         }
@@ -11922,7 +13160,8 @@ public class COM2POSE_lib {
                                         bw.write(sb_line.toString());
                                         bw.newLine();
 
-                                    } else {
+                                    } else
+                                    {
                                         bw.write(line);
                                         bw.newLine();
                                     }
@@ -11941,19 +13180,22 @@ public class COM2POSE_lib {
      *
      * @param check_options should options be checked for validity? Should be true if pipeline is run, should be false if analyse programms are run
      */
-    public void read_config_file(boolean check_options) throws IOException {
+    public void read_config_file(boolean check_options) throws IOException
+    {
 
         logger.logLine("Start reading config file at " + options_intern.config_data_path);
 
         File f_check_config = new File(options_intern.config_data_path);
-        if (!f_check_config.exists()) {
+        if (!f_check_config.exists())
+        {
             logger.logLine("[CHECK] config file does not exist. Please check path!");
             logger.logLine("[CHECK] " + options_intern.config_data_path);
             System.exit(1);
         }
 
         File f_check_working_dir = new File(options_intern.com2pose_working_directory);
-        if (!f_check_working_dir.exists()) {
+        if (!f_check_working_dir.exists())
+        {
             logger.logLine("[CHECK] working directory does not exist. Please check path!");
             logger.logLine("[CHECK] " + options_intern.com2pose_working_directory);
             System.exit(1);
@@ -11961,14 +13203,17 @@ public class COM2POSE_lib {
 
         BufferedReader br = new BufferedReader(new FileReader(new File(options_intern.config_data_path)));
         String line = "";
-        while ((line = br.readLine()) != null) {
-            if (line.startsWith("#")) {
+        while ((line = br.readLine()) != null)
+        {
+            if (line.startsWith("#"))
+            {
                 continue;
             }
 
             String[] split = line.split("=");
 
-            switch (split[0]) {
+            switch (split[0])
+            {
                 case "mix_level":
                     options_intern.mix_level = split[1].substring(1, split[1].length() - 1);
                     break;
@@ -12167,7 +13412,8 @@ public class COM2POSE_lib {
                 case "plot_th_coefficient":
                     String[] split_coefficient_ths = split[1].split(";");
                     options_intern.plot_th_coefficient.clear();
-                    for (String s : split_coefficient_ths) {
+                    for (String s : split_coefficient_ths)
+                    {
                         options_intern.plot_th_coefficient.add(Double.parseDouble(s));
                     }
                     break;
@@ -12240,14 +13486,17 @@ public class COM2POSE_lib {
         }
         br.close();
 
-        if (check_options) {
+        if (check_options)
+        {
             boolean all_set = checkOptions();
             logger.logLine("Check config file parameters for validity");
-            if (!all_set) {
+            if (!all_set)
+            {
                 logger.logLine("Not all [REQ]uired options set. Please set them in config file");
                 logger.logLine("Aborting COM2POSE");
                 System.exit(1);
-            } else {
+            } else
+            {
                 logger.logLine("Parameters in config file valid");
             }
         }
@@ -12258,7 +13507,8 @@ public class COM2POSE_lib {
 
     }
 
-    private boolean checkOptions() throws IOException {
+    private boolean checkOptions() throws IOException
+    {
 
         boolean all_set = true;
 
@@ -12266,12 +13516,15 @@ public class COM2POSE_lib {
          * mix histone options
          */
 
-        if (!options_intern.mix_level.equals("")) {
-            if (!options_intern.mix_level.equals("HM_LEVEL") && !options_intern.mix_level.equals("SAMPLE_LEVEL")) {
+        if (!options_intern.mix_level.equals(""))
+        {
+            if (!options_intern.mix_level.equals("HM_LEVEL") && !options_intern.mix_level.equals("SAMPLE_LEVEL"))
+            {
                 logger.logLine("[MIX]: mix_level parameter must be either HM_LEVEL or SAMPLE_LEVEL");
                 all_set = false;
             }
-            if (!options_intern.mix_option.equals("UNION") && !options_intern.mix_option.equals("INTERSECTION")) {
+            if (!options_intern.mix_option.equals("UNION") && !options_intern.mix_option.equals("INTERSECTION"))
+            {
                 logger.logLine("[MIX]: mix_option parameter must be either UNION or INTERSECTION");
                 all_set = false;
             }
@@ -12281,18 +13534,22 @@ public class COM2POSE_lib {
          * black list options
          */
 
-        if (!options_intern.black_list_dir.equals("")) {
+        if (!options_intern.black_list_dir.equals(""))
+        {
             File f = new File(options_intern.black_list_dir);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[BLACKLIST] blacklist path does not exist!");
                 all_set = false;
             }
-            if (f.isDirectory()) {
+            if (f.isDirectory())
+            {
                 logger.logLine("[BLACKLIST] blacklist path is a directory but must be a file");
                 all_set = false;
             }
 
-            if (options_intern.black_list_signals.isEmpty()) {
+            if (options_intern.black_list_signals.isEmpty())
+            {
                 logger.logLine("[BLACKLIST] signals must not be empty");
                 all_set = false;
             }
@@ -12302,34 +13559,42 @@ public class COM2POSE_lib {
          * DESEQ2 options
          */
 
-        if (options_intern.deseq2_input_directory.equals("")) {
+        if (options_intern.deseq2_input_directory.equals(""))
+        {
             logger.logLine("[DESEQ2] input directory is not given");
             all_set = false;
-        } else {
+        } else
+        {
             File f = new File(options_intern.deseq2_input_directory);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[DESEQ2] input path does not exist!");
                 all_set = false;
             }
         }
 
-        if (options_intern.deseq2_input_gene_id.equals("")) {
+        if (options_intern.deseq2_input_gene_id.equals(""))
+        {
             logger.logLine("[DESEQ2] gene ID file from nfcore RNA-seq is not given");
             all_set = false;
-        } else {
+        } else
+        {
             File f = new File(options_intern.deseq2_input_gene_id);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[DESEQ2] gene ID file from nfcore RNA-seq path does not exist!");
                 all_set = false;
             }
         }
 
-        if (options_intern.deseq2_biomart_dataset_species.equals("") && options_intern.tepic_ensg_symbol.equals("")) {
+        if (options_intern.deseq2_biomart_dataset_species.equals("") && options_intern.tepic_ensg_symbol.equals(""))
+        {
             logger.logLine("[DESEQ2] deseq2_biomart_dataset_species must be filled if tepic_ensg_symbol is empty!");
             all_set = false;
         }
 
-        if (!options_intern.deseq2_biomart_dataset_species.equals("")) {
+        if (!options_intern.deseq2_biomart_dataset_species.equals(""))
+        {
             options_intern.tepic_ensg_symbol = options_intern.com2pose_working_directory + File.separator +
                     options_intern.folder_name_deseq2_preprocessing + File.separator +
                     options_intern.file_suffix_deseq2_mapping;
@@ -12339,58 +13604,74 @@ public class COM2POSE_lib {
         /**
          * TEPIC options
          */
-        if (options_intern.tepic_input_ref_genome.equals("")) {
+        if (options_intern.tepic_input_ref_genome.equals(""))
+        {
             logger.logLine("[TEPIC] Reference genome path is not given");
             all_set = false;
-        } else {
+        } else
+        {
             File f = new File(options_intern.tepic_input_ref_genome);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[TEPIC] Reference genome path does not exist!");
                 all_set = false;
             }
         }
 
-        if (options_intern.tepic_gene_annot.equals("")) {
+        if (options_intern.tepic_gene_annot.equals(""))
+        {
             logger.logLine("[TEPIC] Gene annotation path is not given");
             all_set = false;
-        } else {
+        } else
+        {
             File f = new File(options_intern.tepic_gene_annot);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[TEPIC] Gene annotation path does not exist!");
                 all_set = false;
             }
         }
 
-        if (options_intern.tepic_input_directory.equals("")) {
+        if (options_intern.tepic_input_directory.equals(""))
+        {
             logger.logLine("[TEPIC] nfcore ChIP-seq data directory is not given");
             all_set = false;
-        } else {
+        } else
+        {
             File f = new File(options_intern.tepic_input_directory);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[TEPIC] nfcore ChIP-seq data path does not exist!");
                 all_set = false;
             }
         }
 
-        if (options_intern.tepic_path_pwms.equals("")) {
+        if (options_intern.tepic_path_pwms.equals(""))
+        {
             logger.logLine("[TEPIC] position specific energy matrix directory is not given");
             all_set = false;
-        } else {
+        } else
+        {
             File f = new File(options_intern.tepic_path_pwms);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[TEPIC] position specific energy matrix path does not exist!");
                 all_set = false;
             }
         }
 
-        if (options_intern.tepic_tpm_cutoff > 0) {
+        if (options_intern.tepic_tpm_cutoff > 0)
+        {
             //check for gene annotation
-            if (options_intern.tepic_gene_annot.equals("")) {
+            if (options_intern.tepic_gene_annot.equals(""))
+            {
                 logger.logLine("[TEPIC] TPM cutoff set, but no annotation file is given");
                 all_set = false;
-            } else {
+            } else
+            {
                 File f = new File(options_intern.tepic_gene_annot);
-                if (!f.exists()) {
+                if (!f.exists())
+                {
                     logger.logLine("[TEPIC] TPM cutoff set and gene annotation file path does not exist!");
                     all_set = false;
                 }
@@ -12400,13 +13681,14 @@ public class COM2POSE_lib {
         if (options_intern.tepic_tf_binding_site_search.equals("") ||
                 !(options_intern.tepic_tf_binding_site_search.equals("INSIDE") ||
                         options_intern.tepic_tf_binding_site_search.equals("BETWEEN") ||
-                        options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))) {
+                        options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN")))
+        {
             //check tf_binding_site_search option
             logger.logLine("[TEPIC] tepic_tf_binding_site_search must be either INSIDE or BETWEEN or EXCL_BETWEEN");
             all_set = false;
         }
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") &&
-                options_intern.tepic_between_max_bps <= 0) {
+        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") && options_intern.tepic_between_max_bps <= 0)
+        {
             logger.logLine(
                     "[TEPIC] tepic_tf_binding_site_search is set to 'BETWEEN', tepic_between_max_bps must be set > 0");
             all_set = false;
@@ -12416,45 +13698,56 @@ public class COM2POSE_lib {
         /**
          *check for map ensg symbol
          */
-        if (options_intern.tepic_ensg_symbol.equals("") && options_intern.deseq2_biomart_dataset_species.equals("")) {
+        if (options_intern.tepic_ensg_symbol.equals("") && options_intern.deseq2_biomart_dataset_species.equals(""))
+        {
             logger.logLine("[TEPIC] No map of ENSG to Gene Symbol is given!");
-        } else if (options_intern.deseq2_biomart_dataset_species.equals("")) {
+        } else if (options_intern.deseq2_biomart_dataset_species.equals(""))
+        {
             File f = new File(options_intern.tepic_ensg_symbol);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[TEPIC] Map of ENSG to Gene Symbol file path does not exist!");
                 all_set = false;
             }
         }
 
-        if (!options_intern.tepic_background_seq.equals("") && !options_intern.tepic_2bit.equals("")) {
+        if (!options_intern.tepic_background_seq.equals("") && !options_intern.tepic_2bit.equals(""))
+        {
             logger.logLine("[TEPIC] parameters: tepic_background_seq and tepic_2bit are mutually exclusive");
             all_set = false;
         }
 
-        if (options_intern.tepic_column_bedfile != -1 && !options_intern.tepic_bed_chr_sign.equals("")) {
+        if (options_intern.tepic_column_bedfile != -1 && !options_intern.tepic_bed_chr_sign.equals(""))
+        {
             logger.logLine("[TEPIC] parameters: tepic_column_bedfile and tepic_bed_chr_sign are mutually exclusive");
             all_set = false;
         }
 
-        if (!options_intern.tepic_bed_chr_sign.equals("")) {
+        if (!options_intern.tepic_bed_chr_sign.equals(""))
+        {
             File f = new File(options_intern.tepic_bed_chr_sign);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[TEPIC] tepic_bed_chr_sign file path does not exists!");
                 all_set = false;
             }
         }
 
-        if (!options_intern.tepic_psems_length.equals("")) {
+        if (!options_intern.tepic_psems_length.equals(""))
+        {
             File f = new File(options_intern.tepic_psems_length);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[TEPIC] tepic_psems_length file path does not exists!");
                 all_set = false;
             }
         }
 
-        if (!options_intern.tepic_loop_list.equals("")) {
+        if (!options_intern.tepic_loop_list.equals(""))
+        {
             File f = new File(options_intern.tepic_loop_list);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[TEPIC] tepic_loop_list file path does not exists!");
                 all_set = false;
             }
@@ -12463,33 +13756,40 @@ public class COM2POSE_lib {
         /**
          * TGEN options
          */
-        if (!options_intern.path_tgen.equals("")) {
+        if (!options_intern.path_tgen.equals(""))
+        {
             File file_tgen = new File(options_intern.path_tgen);
-            if (!file_tgen.exists() || !file_tgen.isDirectory()) {
+            if (!file_tgen.exists() || !file_tgen.isDirectory())
+            {
                 logger.logLine("[TGENE] TGene file directory does not exist or is not a directory!");
                 all_set = false;
             }
 
             File tgene_dir = new File(options_intern.path_tgen + File.separator + "bin");
 
-            if (!tgene_dir.exists()) {
+            if (!tgene_dir.exists())
+            {
                 logger.logLine("[TGENE] TGene binary directory cannot be found: " + tgene_dir.getAbsolutePath());
                 all_set = false;
             }
 
-            if (options_intern.tgen_mt_writing.equals("")) {
+            if (options_intern.tgen_mt_writing.equals(""))
+            {
                 logger.logLine("[TGENE] Please specify spelling of Mitochondrial DNA, e.g. M or MT (default: MT)");
                 all_set = false;
             }
 
-            if (options_intern.tgen_consensus == 0.0) {
+            if (options_intern.tgen_consensus == 0.0)
+            {
                 logger.logLine(
                         "[TGENE] tgen_consensus must be in range ]0.0,1.0], it cannot be 0.0, if you do not want to use consensus set path_tgen=\"\"");
                 all_set = false;
             }
 
-            if (options_intern.tgen_self_regulatory) {
-                if (options_intern.tgen_consensus_calc.equals("")) {
+            if (options_intern.tgen_self_regulatory)
+            {
+                if (options_intern.tgen_consensus_calc.equals(""))
+                {
                     logger.logLine("[TGENE] tgen_consensus_calc must be set.");
                     all_set = false;
                 }
@@ -12499,9 +13799,11 @@ public class COM2POSE_lib {
         /**
          * DYNAMITE OPTIONS
          */
-        if (!options_intern.dynamite_preprocessing_integrate_data_consider_geneFile.equals("")) {
+        if (!options_intern.dynamite_preprocessing_integrate_data_consider_geneFile.equals(""))
+        {
             File f = new File(options_intern.dynamite_preprocessing_integrate_data_consider_geneFile);
-            if (!f.exists()) {
+            if (!f.exists())
+            {
                 logger.logLine("[DYNAMITE] preprocessing consider genes file for integrateData.py does not exist!");
                 all_set = false;
             }
@@ -12510,41 +13812,50 @@ public class COM2POSE_lib {
         /**
          * PLOT OPTIONS
          */
-        if (options_intern.plot_th_coefficient.isEmpty()) {
+        if (options_intern.plot_th_coefficient.isEmpty())
+        {
             logger.logLine("[PLOTS] plot th coefficients is empty, please use at least one coefficient.");
             all_set = false;
         }
-        if (options_intern.plot_cutoff_tps < 1) {
+        if (options_intern.plot_cutoff_tps < 1)
+        {
             logger.logLine("[PLOTS] plot_cutoff_tps must be >= 1");
             all_set = false;
         }
-        if (options_intern.plot_cutoff_hms < 1) {
+        if (options_intern.plot_cutoff_hms < 1)
+        {
             logger.logLine("[PLOTS] plot_cutoff_hms must be >= 1");
             all_set = false;
         }
-        if (options_intern.plot_cutoff_gcs < 0) {
+        if (options_intern.plot_cutoff_gcs < 0)
+        {
             logger.logLine("[PLOTS] plot_cutoff_gcs must be >= 0");
             all_set = false;
         }
-        if (options_intern.plot_cutoff_tpms < 0) {
+        if (options_intern.plot_cutoff_tpms < 0)
+        {
             logger.logLine("[PLOTS] plot_cutoff_tpms must be >= 0.0");
             all_set = false;
         }
-        if (options_intern.plot_top_k_genes < 1) {
+        if (options_intern.plot_top_k_genes < 1)
+        {
             logger.logLine("[PLOTS] plot_top_k_genes must be >= 1");
             all_set = false;
         }
-        if (options_intern.plot_mann_whitneyU_pvalue_cutoff <= 0) {
+        if (options_intern.plot_mann_whitneyU_pvalue_cutoff <= 0)
+        {
             logger.logLine("[PLOTS] Mann WhitneyU pvalue cutoff must be > 0");
             all_set = false;
         }
-        if (options_intern.plot_distribution_analysis_score_type.equals("")) {
+        if (options_intern.plot_distribution_analysis_score_type.equals(""))
+        {
             logger.logLine(
                     "[PLOTS] plot_distribution_analysis_score_type must be either set to GENE_COUNTS or EXCL_GENE_COUNTS");
             all_set = false;
         }
         if (!options_intern.plot_distribution_analysis_score_type.equals("GENE_COUNTS") &&
-                !options_intern.plot_distribution_analysis_score_type.equals("EXCL_GENE_COUNTS")) {
+                !options_intern.plot_distribution_analysis_score_type.equals("EXCL_GENE_COUNTS"))
+        {
             logger.logLine(
                     "[PLOTS] plot_distribution_analysis_score_type must be either set to GENE_COUNTS or EXCL_GENE_COUNTS");
             all_set = false;
@@ -12553,41 +13864,50 @@ public class COM2POSE_lib {
         /**
          * ChIP ATLAS OPTIONS
          */
-        if (!options_intern.chip_atlas_genome_version.equals("") && !options_intern.chip_atlas_tissue_type.equals("")) {
+        if (!options_intern.chip_atlas_genome_version.equals("") && !options_intern.chip_atlas_tissue_type.equals(""))
+        {
             options_intern.chip_atlas_activated_chip_atlas = true;
         }
-        if (options_intern.chip_atlas_tissue_type.equals("") && !options_intern.chip_atlas_genome_version.equals("")) {
+        if (options_intern.chip_atlas_tissue_type.equals("") && !options_intern.chip_atlas_genome_version.equals(""))
+        {
             logger.logLine(
                     "[ChIP-ATLAS] Genome version specified, but no tissue type specified. (chip_atlas_tissue_type).");
             all_set = false;
         }
-        if (options_intern.chip_atlas_tissue_type.equals("") && !options_intern.chip_atlas_genome_version.equals("")) {
+        if (options_intern.chip_atlas_tissue_type.equals("") && !options_intern.chip_atlas_genome_version.equals(""))
+        {
             logger.logLine(
                     "[ChIP-ATLAS] Tissue type specified, but no genome version specified. (chip_atlas_genome_version).");
             all_set = false;
         }
-        if (options_intern.chip_atlas_activated_chip_atlas) {
-            if (options_intern.igv_path_to_igv.equals("")) {
+        if (options_intern.chip_atlas_activated_chip_atlas)
+        {
+            if (options_intern.igv_path_to_igv.equals(""))
+            {
                 logger.logLine("[ChIP-ATLAS-IGV] ChIP-ATLAS activated, but no IGV path set.");
                 all_set = false;
             }
-            if (options_intern.igv_species_ref_genome.equals("")) {
+            if (options_intern.igv_species_ref_genome.equals(""))
+            {
                 logger.logLine("[ChIP-ATLAS-IGV] ChIP-ATLAS activated, but no IGV ref genome set set.");
                 all_set = false;
             }
 
-            try {
+            try
+            {
                 Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out.println("genome " + options_intern.igv_species_ref_genome);
                 String response = in.readLine();
-                if (!response.equals("OK")) {
+                if (!response.equals("OK"))
+                {
                     logger.logLine("[IGV] igv_species_ref_genome not OK!");
                     all_set = false;
                 }
                 socket.close();
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 logger.logLine(
                         "[IGV] IGV option is used, but IGV is not started. Please start IGV, so COM2POSE can listen to its port: " +
                                 options_intern.igv_port_number);
@@ -12599,27 +13919,33 @@ public class COM2POSE_lib {
         /**
          * IGV OPTIONS
          */
-        if (!options_intern.igv_path_to_igv.equals("")) {
-            if (!options_intern.igv_path_to_tf_chip_seq.equals("")) {
+        if (!options_intern.igv_path_to_igv.equals(""))
+        {
+            if (!options_intern.igv_path_to_tf_chip_seq.equals(""))
+            {
                 File f = new File(options_intern.igv_path_to_tf_chip_seq);
-                if (!f.exists()) {
+                if (!f.exists())
+                {
                     logger.logLine("[IGV] path to TF ChIP-seq data does not exist!");
                     all_set = false;
                 }
             }
 
-            if (options_intern.igv_path_to_tf_chip_seq.equals("") && !options_intern.chip_atlas_activated_chip_atlas) {
+            if (options_intern.igv_path_to_tf_chip_seq.equals("") && !options_intern.chip_atlas_activated_chip_atlas)
+            {
                 logger.logLine("[IGV] path to IGV set, but no TF ChIP-seq data provided.");
                 all_set = false;
             }
 
-            if (options_intern.igv_species_ref_genome.equals("")) {
+            if (options_intern.igv_species_ref_genome.equals(""))
+            {
                 logger.logLine("[IGV] reference genome not provided!");
                 all_set = false;
             }
 
             File f_igv_tools = new File(options_intern.igv_path_to_igv + File.separator + "igvtools");
-            if (!f_igv_tools.exists()) {
+            if (!f_igv_tools.exists())
+            {
                 all_set = false;
                 logger.logLine(
                         "[IGV] igvtools does not exists. Please make sure that you download the full installation of IGV");
@@ -12630,24 +13956,25 @@ public class COM2POSE_lib {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.println("genome " + options_intern.igv_species_ref_genome);
             String response = in.readLine();
-            if (!response.equals("OK")) {
+            if (!response.equals("OK"))
+            {
                 logger.logLine("[IGV] igv_species_ref_genome not OK!");
                 all_set = false;
             }
             socket.close();
         }
 
-        if(options_intern.igv_include_prediction_data.size()!=0)
+        if (options_intern.igv_include_prediction_data.size() != 0)
         {
             HashSet<String> available_hms = new HashSet<>();
 
             //get all histone marks
             File f_input = new File(options_intern.tepic_input_directory);
-            for(File f_tp : f_input.listFiles())
+            for (File f_tp : f_input.listFiles())
             {
-                if(f_tp.isDirectory())
+                if (f_tp.isDirectory())
                 {
-                    for(File f_hm : f_tp.listFiles())
+                    for (File f_hm : f_tp.listFiles())
                     {
                         available_hms.add(f_hm.getName());
                     }
@@ -12655,11 +13982,11 @@ public class COM2POSE_lib {
             }
 
 
-            for(String s : options_intern.igv_include_prediction_data)
+            for (String s : options_intern.igv_include_prediction_data)
             {
-                if(!available_hms.contains(s))
+                if (!available_hms.contains(s))
                 {
-                    all_set=false;
+                    all_set = false;
                     logger.logLine("[IGV] ERROR in igv_include_prediction_data");
                     logger.logLine("[IGV] Histone Modification " + s + " does not exist, please check in config file");
                 }
@@ -12682,7 +14009,8 @@ public class COM2POSE_lib {
          * CHECK NAMING CONVENTIONS
          */
 
-        if (!all_set) {
+        if (!all_set)
+        {
             return all_set;
         }
 
@@ -12695,7 +14023,8 @@ public class COM2POSE_lib {
     /**
      * CHECK naming conventions between RNA-seq and ChIP-seq/ATAC-seq data
      */
-    private boolean check_naming_conventions() throws IOException {
+    private boolean check_naming_conventions() throws IOException
+    {
         boolean all_set = true;
 
         HashSet<String> chipseq_tp_names = new HashSet<>();
@@ -12705,13 +14034,17 @@ public class COM2POSE_lib {
 
 
         File f_chipseq_root = new File(options_intern.tepic_input_directory);
-        for (File f_tp : f_chipseq_root.listFiles()) {
-            if (f_tp.isDirectory()) {
+        for (File f_tp : f_chipseq_root.listFiles())
+        {
+            if (f_tp.isDirectory())
+            {
                 String tp_name = f_tp.getName();
                 chipseq_tp_names.add(tp_name);
 
-                for (File f_hm : f_tp.listFiles()) {
-                    if (f_hm.isDirectory()) {
+                for (File f_hm : f_tp.listFiles())
+                {
+                    if (f_hm.isDirectory())
+                    {
                         String hm_name = f_hm.getName();
                         chipseq_hm_names.add(hm_name);
                     }
@@ -12721,13 +14054,17 @@ public class COM2POSE_lib {
 
         File f_rnaseq_root = new File(options_intern.deseq2_input_directory);
 
-        for (File f_tp : f_rnaseq_root.listFiles()) {
-            if (f_tp.isDirectory()) {
+        for (File f_tp : f_rnaseq_root.listFiles())
+        {
+            if (f_tp.isDirectory())
+            {
                 String tp_name = f_tp.getName();
                 rnaseq_tp_names.add(tp_name);
 
-                for (File f_hm : f_tp.listFiles()) {
-                    if (f_hm.isDirectory()) {
+                for (File f_hm : f_tp.listFiles())
+                {
+                    if (f_hm.isDirectory())
+                    {
                         String hm_name = f_hm.getName();
                         rna_seq_hm_names.add(hm_name);
                     }
@@ -12758,8 +14095,10 @@ public class COM2POSE_lib {
             }
         }*/
 
-        for (String control_tp : chipseq_tp_names) {
-            if (!rnaseq_tp_names.contains(control_tp)) {
+        for (String control_tp : chipseq_tp_names)
+        {
+            if (!rnaseq_tp_names.contains(control_tp))
+            {
                 all_set = false;
                 logger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_tp);
                 logger.logLine(
@@ -12768,8 +14107,10 @@ public class COM2POSE_lib {
             }
         }
 
-        for (String control_tp : rnaseq_tp_names) {
-            if (!chipseq_tp_names.contains(control_tp)) {
+        for (String control_tp : rnaseq_tp_names)
+        {
+            if (!chipseq_tp_names.contains(control_tp))
+            {
                 all_set = false;
                 logger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_tp);
                 logger.logLine(
@@ -12782,24 +14123,30 @@ public class COM2POSE_lib {
         return all_set;
     }
 
-    private HashMap<String, HashMap<String, HashSet<String>>> checkGroupsTEPIC() {
+    private HashMap<String, HashMap<String, HashSet<String>>> checkGroupsTEPIC()
+    {
         HashMap<String, HashMap<String, HashSet<String>>> groups = new HashMap<>();
 
         File folder = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_tepic_output_raw);
 
-        for (File fileDir : folder.listFiles()) {
-            if (fileDir.isDirectory()) {
+        for (File fileDir : folder.listFiles())
+        {
+            if (fileDir.isDirectory())
+            {
                 HashMap<String, HashSet<String>> n_timepoint = new HashMap<>();
                 String n_tp_name = fileDir.getName();
-                for (File fileDir2 : fileDir.listFiles()) {
+                for (File fileDir2 : fileDir.listFiles())
+                {
                     String n_hm_name = "";
                     HashSet<String> n_hm = new HashSet<>();
                     n_hm_name = fileDir2.getName();
 
-                    for (File fileDir3 : fileDir2.listFiles()) {
+                    for (File fileDir3 : fileDir2.listFiles())
+                    {
                         //samples
-                        if (fileDir3.isDirectory()) {
+                        if (fileDir3.isDirectory())
+                        {
                             n_hm.add(fileDir3.getName());
                         }
                     }
@@ -12816,18 +14163,22 @@ public class COM2POSE_lib {
      * BLACKLIST preprocessing - creates binary tree friendly files of chromosomes
      */
     private ArrayList<BL_ranges_binary_tree> recursive_split_BL(ArrayList<BL_ranges_binary_tree> region,
-                                                                ArrayList<BL_ranges_binary_tree> newly_ordered) {
-        if (region.size() > 0) {
+                                                                ArrayList<BL_ranges_binary_tree> newly_ordered)
+    {
+        if (region.size() > 0)
+        {
             BL_ranges_binary_tree median = region.get(region.size() / 2);
             newly_ordered.add(median);
 
             ArrayList<BL_ranges_binary_tree> region_left = new ArrayList<>();
 
-            for (int i = 0; i < region.size() / 2; i++) {
+            for (int i = 0; i < region.size() / 2; i++)
+            {
                 region_left.add(region.get(i));
             }
             ArrayList<BL_ranges_binary_tree> region_right = new ArrayList<>();
-            for (int i = region.size() / 2 + 1; i < region.size(); i++) {
+            for (int i = region.size() / 2 + 1; i < region.size(); i++)
+            {
                 region_right.add(region.get(i));
             }
 
@@ -12842,17 +14193,21 @@ public class COM2POSE_lib {
      * TGENE preprocessing - creates binary tree friendly files of chromosomes
      */
     private ArrayList<ENSG_ranges_binary_trees> recursive_split(ArrayList<ENSG_ranges_binary_trees> region,
-                                                                ArrayList<ENSG_ranges_binary_trees> newly_ordered) {
-        if (region.size() > 0) {
+                                                                ArrayList<ENSG_ranges_binary_trees> newly_ordered)
+    {
+        if (region.size() > 0)
+        {
             ENSG_ranges_binary_trees median = region.get(region.size() / 2);
             newly_ordered.add(median);
 
             ArrayList<ENSG_ranges_binary_trees> region_left = new ArrayList<>();
-            for (int i = 0; i < region.size() / 2; i++) {
+            for (int i = 0; i < region.size() / 2; i++)
+            {
                 region_left.add(region.get(i));
             }
             ArrayList<ENSG_ranges_binary_trees> region_right = new ArrayList<>();
-            for (int i = region.size() / 2 + 1; i < region.size(); i++) {
+            for (int i = region.size() / 2 + 1; i < region.size(); i++)
+            {
                 region_right.add(region.get(i));
             }
 
@@ -12866,25 +14221,31 @@ public class COM2POSE_lib {
     /**
      * mixes the samples of one folder into one file, based on mix_option (UNION or INTERSECTION)
      */
-    private static Stack<MIX_Interval> mergeIntervals(ArrayList<MIX_Interval> interval) {
+    private static Stack<MIX_Interval> mergeIntervals(ArrayList<MIX_Interval> interval)
+    {
         Stack<MIX_Interval> stack = new Stack<>();
 
-        if (stack.empty()) {
+        if (stack.empty())
+        {
             stack.push(interval.get(0));
         }
 
-        for (int i = 1; i < interval.size(); i++) {
+        for (int i = 1; i < interval.size(); i++)
+        {
             MIX_Interval top = stack.peek();
 
-            if (top.end < interval.get(i).start) {
+            if (top.end < interval.get(i).start)
+            {
                 stack.push(interval.get(i));
-            } else if (top.end < interval.get(i).end) {
+            } else if (top.end < interval.get(i).end)
+            {
                 top.end = interval.get(i).end;
                 top.merged_intervals.addAll(interval.get(i).merged_intervals);
 
                 stack.pop();
                 stack.push(top);
-            } else {
+            } else
+            {
                 top.merged_intervals.addAll(interval.get(i).merged_intervals);
 
                 stack.pop();
@@ -12896,17 +14257,20 @@ public class COM2POSE_lib {
 
     private void write_target_genes_of_tf(File f_input_target_genes_hm_group_clash, String timepoint,
                                           File f_out_hm_th_file, String tf,
-                                          HashMap<String, String> ensg_gene_symbol_map) throws IOException {
+                                          HashMap<String, String> ensg_gene_symbol_map) throws IOException
+    {
 
         File f_output = new File(f_out_hm_th_file + File.separator + timepoint);
         f_output.mkdir();
 
-        if (!f_input_target_genes_hm_group_clash.exists()) {
+        if (!f_input_target_genes_hm_group_clash.exists())
+        {
             String[] split = f_input_target_genes_hm_group_clash.getName().split("_");
 
             String[] split_slashes = f_input_target_genes_hm_group_clash.getAbsolutePath().split(File.separator);
             String path = "";
-            for (int i = 0; i < split_slashes.length - 1; i++) {
+            for (int i = 0; i < split_slashes.length - 1; i++)
+            {
                 path += File.separator + split_slashes[i];
             }
             path += File.separator + split[1] + "_" + split[0];
@@ -12917,10 +14281,12 @@ public class COM2POSE_lib {
         File f_input;
         File parent;
 
-        if (options_intern.tepic_tpm_cutoff > 0) {
+        if (options_intern.tepic_tpm_cutoff > 0)
+        {
             f_input = new File(f_input_target_genes_hm_group_clash.getAbsolutePath() + File.separator + timepoint);
             parent = new File(f_input_target_genes_hm_group_clash.getAbsolutePath() + File.separator + timepoint);
-        } else {
+        } else
+        {
             parent = new File(options_intern.com2pose_working_directory + File.separator +
                     options_intern.folder_name_tepic_output_raw + File.separator + timepoint + File.separator +
                     f_input_target_genes_hm_group_clash.getParentFile().getName() + File.separator);
@@ -12929,48 +14295,61 @@ public class COM2POSE_lib {
 
         String suffix = "";
 
-        if (options_intern.tepic_tpm_cutoff > 0) {
+        if (options_intern.tepic_tpm_cutoff > 0)
+        {
             suffix = "_Gene_View_Filtered_TPM.txt";
-        } else {
+        } else
+        {
             suffix = "_Gene_View_Filtered.txt";
         }
 
-        for (int j = 0; j < parent.listFiles().length; j++) {
-            if (options_intern.tepic_tpm_cutoff > 0) {
+        for (int j = 0; j < parent.listFiles().length; j++)
+        {
+            if (options_intern.tepic_tpm_cutoff > 0)
+            {
                 j = parent.listFiles().length;
-            } else {
+            } else
+            {
                 f_input = parent.listFiles()[j];
             }
 
-            for (File fileDir : f_input.listFiles()) {
-                if (!fileDir.getName().matches(".*" + suffix + ".*")) {
+            for (File fileDir : f_input.listFiles())
+            {
+                if (!fileDir.getName().matches(".*" + suffix + ".*"))
+                {
                     continue;
                 }
-                if (fileDir.isFile()) {
+                if (fileDir.isFile())
+                {
                     BufferedReader br = new BufferedReader(new FileReader(fileDir));
                     String line = br.readLine();
 
                     int interesting_column = -1;
 
                     String[] header = line.split("\t");
-                    for (int i = 0; i < header.length; i++) {
-                        if (header[i].toUpperCase().matches(".*" + tf.toUpperCase() + ".*")) {
+                    for (int i = 0; i < header.length; i++)
+                    {
+                        if (header[i].toUpperCase().matches(".*" + tf.toUpperCase() + ".*"))
+                        {
                             interesting_column = i;
                         }
                     }
 
-                    if (interesting_column == -1) {
+                    if (interesting_column == -1)
+                    {
                         return;
                     }
 
                     ArrayList<Gene_Affinity_Value> all_affinities = new ArrayList<>();
 
-                    while ((line = br.readLine()) != null) {
+                    while ((line = br.readLine()) != null)
+                    {
                         String[] split = line.split("\t");
 
                         Gene_Affinity_Value gav = new Gene_Affinity_Value();
                         gav.gene_name = split[0];
-                        if (ensg_gene_symbol_map.containsKey(gav.gene_name)) {
+                        if (ensg_gene_symbol_map.containsKey(gav.gene_name))
+                        {
                             gav.gene_symbol = ensg_gene_symbol_map.get(gav.gene_name);
                         }
                         gav.affinity_value = Double.parseDouble(split[interesting_column]);
@@ -12986,8 +14365,10 @@ public class COM2POSE_lib {
                     bw.write("ENSG\tSYMBOL\tAFFINITY");
                     bw.newLine();
 
-                    for (int i = 0; i < options_intern.plot_top_k_genes; i++) {
-                        if (all_affinities.size() > i) {
+                    for (int i = 0; i < options_intern.plot_top_k_genes; i++)
+                    {
+                        if (all_affinities.size() > i)
+                        {
                             bw.write(all_affinities.get(i).toString());
                             bw.newLine();
                         }
@@ -13002,7 +14383,8 @@ public class COM2POSE_lib {
 
     }
 
-    private String write_regression_coeffecient_analysis_found_table_html(Double d, String level) throws IOException {
+    private String write_regression_coeffecient_analysis_found_table_html(Double d, String level) throws IOException
+    {
 
         File input_dir_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_analysis_data +
@@ -13012,7 +14394,8 @@ public class COM2POSE_lib {
 
         String hm = "";
 
-        for (File fileDir : input_dir_root.listFiles()) {
+        for (File fileDir : input_dir_root.listFiles())
+        {
             HashMap<String, Boolean> tf_found = new HashMap<>();
 
             File f = new File(fileDir.getAbsolutePath() + File.separator + d + File.separator +
@@ -13020,7 +14403,8 @@ public class COM2POSE_lib {
             //hm_file.put(fileDir.getName(),f);
             BufferedReader br = new BufferedReader(new FileReader(f));
             String line = br.readLine();
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null)
+            {
                 String[] split = line.split("\t");
                 tf_found.put(split[0], Boolean.parseBoolean(split[1]));
             }
@@ -13042,7 +14426,8 @@ public class COM2POSE_lib {
         sb.append("TF");
         sb.append("\t\t\t\t</th>\n");
 
-        for (String hms_key : hm_tf_found.keySet()) {
+        for (String hms_key : hm_tf_found.keySet())
+        {
             sb.append("\t\t\t\t<th>");
             sb.append(hms_key);
             sb.append("\t\t\t\t</th>\n");
@@ -13050,25 +14435,30 @@ public class COM2POSE_lib {
         }
         sb.append("\t\t\t</tr>\n");
 
-        for (String tf : first.keySet()) {
+        for (String tf : first.keySet())
+        {
             sb.append("\t\t\t<tr>\n");
 
             sb.append("\t\t\t\t<th>");
             sb.append(tf);
             sb.append("\t\t\t\t</th>\n");
 
-            for (String key_hm : hm_tf_found.keySet()) {
+            for (String key_hm : hm_tf_found.keySet())
+            {
                 HashMap<String, Boolean> current_tf_list = hm_tf_found.get(key_hm);
-                if (current_tf_list.get(tf)) {
+                if (current_tf_list.get(tf))
+                {
                     sb.append("\t\t\t\t<th>");
-                    if (level.equals(options_intern.html_report_levels_home)) {
+                    if (level.equals(options_intern.html_report_levels_home))
+                    {
                         sb.append("<img src=\"" + options_intern.folder_out_website_basics + File.separator +
                                 options_intern.folder_out_website_basics_website + File.separator +
                                 options_intern.folder_out_website_basics_website_images + File.separator +
                                 "is_available.png" + "\" style=\"width:50px;height:50px;\"/>");
 
                     }
-                    if (level.equals(options_intern.html_report_levels_3_steps)) {
+                    if (level.equals(options_intern.html_report_levels_3_steps))
+                    {
                         sb.append("<img src=\".." + File.separator + ".." + File.separator +
                                 options_intern.folder_out_website_basics + File.separator +
                                 options_intern.folder_out_website_basics_website + File.separator +
@@ -13076,16 +14466,19 @@ public class COM2POSE_lib {
                                 "is_available.png" + "\" style=\"width:50px;height:50px;\"/>");
                     }
                     sb.append("\t\t\t\t</th>\n");
-                } else {
+                } else
+                {
                     sb.append("\t\t\t\t<th>");
-                    if (level.equals(options_intern.html_report_levels_home)) {
+                    if (level.equals(options_intern.html_report_levels_home))
+                    {
                         sb.append("<img src=\"" + options_intern.folder_out_website_basics + File.separator +
                                 options_intern.folder_out_website_basics_website + File.separator +
                                 options_intern.folder_out_website_basics_website_images + File.separator +
                                 "not_available.png" + "\" style=\"width:50px;height:50px;\"/>");
 
                     }
-                    if (level.equals(options_intern.html_report_levels_3_steps)) {
+                    if (level.equals(options_intern.html_report_levels_3_steps))
+                    {
                         sb.append("<img src=\".." + File.separator + ".." + File.separator +
                                 options_intern.folder_out_website_basics + File.separator +
                                 options_intern.folder_out_website_basics_website + File.separator +
@@ -13104,7 +14497,8 @@ public class COM2POSE_lib {
         return sb.toString();
     }
 
-    private String get_header_html(String level, String which_analysis) {
+    private String get_header_html(String level, String which_analysis)
+    {
 
         File f_website_css = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_website +
@@ -13131,15 +14525,19 @@ public class COM2POSE_lib {
                 "  y.style.display = \"block\"\n" + "  } else {\n" + "  y.style.display = \"none\"\n" + "  }\n" +
                 "  }\n" + "</script>\n</head>\n");
 
-        for (File fileDir : f_website_css.listFiles()) {
-            if (fileDir.isFile()) {
+        for (File fileDir : f_website_css.listFiles())
+        {
+            if (fileDir.isFile())
+            {
                 sb_home_front.append("<link rel=\"stylesheet\" href=\"");
-                if (level.equals(options_intern.html_report_levels_home)) {
+                if (level.equals(options_intern.html_report_levels_home))
+                {
                     sb_home_front.append(options_intern.folder_out_website_basics + File.separator +
                             options_intern.folder_out_website_basics_website + File.separator +
                             options_intern.folder_out_website_basics_website_css + File.separator + fileDir.getName());
                 }
-                if (level.equals(options_intern.html_report_levels_2_steps)) {
+                if (level.equals(options_intern.html_report_levels_2_steps))
+                {
                     sb_home_front.append(
                             ".." + File.separator + options_intern.folder_out_website_basics + File.separator +
                                     options_intern.folder_out_website_basics_website + File.separator +
@@ -13147,7 +14545,8 @@ public class COM2POSE_lib {
                                     fileDir.getName());
 
                 }
-                if (level.equals(options_intern.html_report_levels_3_steps)) {
+                if (level.equals(options_intern.html_report_levels_3_steps))
+                {
                     sb_home_front.append(
                             ".." + File.separator + ".." + File.separator + options_intern.folder_out_website_basics +
                                     File.separator + options_intern.folder_out_website_basics_website + File.separator +
@@ -13155,7 +14554,8 @@ public class COM2POSE_lib {
                                     fileDir.getName());
 
                 }
-                if (level.equals(options_intern.html_report_levels_4_steps)) {
+                if (level.equals(options_intern.html_report_levels_4_steps))
+                {
                     sb_home_front.append(".." + File.separator + ".." + File.separator + ".." + File.separator +
                             options_intern.folder_out_website_basics + File.separator +
                             options_intern.folder_out_website_basics_website + File.separator +
@@ -13166,35 +14566,43 @@ public class COM2POSE_lib {
         }
 
         String rel_path = "";
-        if (level.equals(options_intern.html_report_levels_home)) {
+        if (level.equals(options_intern.html_report_levels_home))
+        {
             rel_path = options_intern.html_report_home_regression_coefficient_analysis;
         }
-        if (level.equals(options_intern.html_report_levels_2_steps)) {
+        if (level.equals(options_intern.html_report_levels_2_steps))
+        {
             rel_path = ".." + File.separator + options_intern.html_report_home_regression_coefficient_analysis;
         }
-        if (level.equals(options_intern.html_report_levels_3_steps)) {
+        if (level.equals(options_intern.html_report_levels_3_steps))
+        {
             rel_path = ".." + File.separator + ".." + File.separator +
                     options_intern.html_report_home_regression_coefficient_analysis;
         }
-        if (level.equals(options_intern.html_report_levels_4_steps)) {
+        if (level.equals(options_intern.html_report_levels_4_steps))
+        {
             rel_path = ".." + File.separator + ".." + File.separator + ".." + File.separator +
                     options_intern.html_report_home_regression_coefficient_analysis;
         }
 
 
         String rel_path_distribution_analysis = "";
-        if (level.equals(options_intern.html_report_levels_home)) {
+        if (level.equals(options_intern.html_report_levels_home))
+        {
             rel_path_distribution_analysis = options_intern.html_report_home_distribution_analysis;
         }
-        if (level.equals(options_intern.html_report_levels_2_steps)) {
+        if (level.equals(options_intern.html_report_levels_2_steps))
+        {
             rel_path_distribution_analysis =
                     ".." + File.separator + options_intern.html_report_home_distribution_analysis;
         }
-        if (level.equals(options_intern.html_report_levels_3_steps)) {
+        if (level.equals(options_intern.html_report_levels_3_steps))
+        {
             rel_path_distribution_analysis = ".." + File.separator + ".." + File.separator +
                     options_intern.html_report_home_distribution_analysis;
         }
-        if (level.equals(options_intern.html_report_levels_4_steps)) {
+        if (level.equals(options_intern.html_report_levels_4_steps))
+        {
             rel_path_distribution_analysis = ".." + File.separator + ".." + File.separator + ".." + File.separator +
                     options_intern.html_report_home_distribution_analysis;
         }
@@ -13215,16 +14623,20 @@ public class COM2POSE_lib {
                 "' target='_blank'><button class=\"button\">HOME distribution analysis</button></a>\n");
 
         String rel_path_parameter = "";
-        if (level.equals(options_intern.html_report_levels_home)) {
+        if (level.equals(options_intern.html_report_levels_home))
+        {
             rel_path_parameter = "PARAMETERS.html";
         }
-        if (level.equals(options_intern.html_report_levels_2_steps)) {
+        if (level.equals(options_intern.html_report_levels_2_steps))
+        {
             rel_path_parameter = ".." + File.separator + "PARAMETERS.html";
         }
-        if (level.equals(options_intern.html_report_levels_3_steps)) {
+        if (level.equals(options_intern.html_report_levels_3_steps))
+        {
             rel_path_parameter = ".." + File.separator + ".." + File.separator + "PARAMETERS.html";
         }
-        if (level.equals(options_intern.html_report_levels_4_steps)) {
+        if (level.equals(options_intern.html_report_levels_4_steps))
+        {
             rel_path_parameter =
                     ".." + File.separator + ".." + File.separator + ".." + File.separator + "PARAMETERS.html";
         }
@@ -13234,17 +14646,20 @@ public class COM2POSE_lib {
 
         sb_home_front.append("  <h1 class=\"w3-margin w3-jumbo\">COM2POSE: <i>results overview</i></h1>\n" + "  \n");
 
-        if (which_analysis.equals(options_intern.analysis_types_distribution_analysis)) {
+        if (which_analysis.equals(options_intern.analysis_types_distribution_analysis))
+        {
             sb_home_front.append(
                     "  <h2 class=\"w3-center\" style='margin-left:27%'><i>TF-TG Score Distribution Analysis</i></h2>\n");
         }
         if (!which_analysis.equals(options_intern.analysis_types_distribution_analysis) &&
-                !which_analysis.equals(options_intern.analysis_types_regression_coefficient_analysis)) {
+                !which_analysis.equals(options_intern.analysis_types_regression_coefficient_analysis))
+        {
             sb_home_front.append(
                     "  <h2 class=\"w3-center\" style='margin-left:27%'><i>" + which_analysis + "</i></h2>\n");
         }
 
-        if (which_analysis.equals(options_intern.analysis_types_regression_coefficient_analysis)) {
+        if (which_analysis.equals(options_intern.analysis_types_regression_coefficient_analysis))
+        {
             sb_home_front.append(
                     "  <h2 class=\"w3-center\" style='margin-left:27%'><i>Regression Coefficient Analysis</i></h2>\n");
 
@@ -13252,27 +14667,33 @@ public class COM2POSE_lib {
                     "  <button class=\"dropbtn\">Threshold</button>\n" + "  <div class=\"dropdown-content\">\n");
 
 
-            for (Double d : options_intern.plot_th_coefficient) {
+            for (Double d : options_intern.plot_th_coefficient)
+            {
                 File f_output_website_htmls_th =
                         new File(f_output_website_htmls.getAbsolutePath() + File.separator + d);
                 f_output_website_htmls_th.mkdir();
 
-                if (!threshold_folders_filled) {
+                if (!threshold_folders_filled)
+                {
                     threshold_folders.add(f_output_website_htmls_th);
                 }
 
                 String rel_path_2 = "";
-                if (level.equals(options_intern.html_report_levels_home)) {
+                if (level.equals(options_intern.html_report_levels_home))
+                {
                     rel_path_2 = options_intern.folder_out_website_htmls_regression_coefficients + File.separator + d +
                             File.separator + "threshold_" + d + "_overview.html";
                 }
-                if (level.equals(options_intern.html_report_levels_2_steps)) {
+                if (level.equals(options_intern.html_report_levels_2_steps))
+                {
                     rel_path_2 = d + File.separator + "threshold_" + d + "_overview.html";
                 }
-                if (level.equals(options_intern.html_report_levels_3_steps)) {
+                if (level.equals(options_intern.html_report_levels_3_steps))
+                {
                     rel_path_2 = ".." + File.separator + d + File.separator + "threshold_" + d + "_overview.html";
                 }
-                if (level.equals(options_intern.html_report_levels_4_steps)) {
+                if (level.equals(options_intern.html_report_levels_4_steps))
+                {
                     rel_path_2 = ".." + File.separator + ".." + File.separator + d + File.separator + "threshold_" + d +
                             "_overview.html";
                 }
@@ -13294,7 +14715,8 @@ public class COM2POSE_lib {
 
     private void write_python_script_distribution_analysis(File input_background_file, File input_tf_root,
                                                            File output_plots, File output_script_file,
-                                                           File output_stats) throws IOException {
+                                                           File output_stats) throws IOException
+    {
         HashMap<String, String> composed_tfs = new HashMap<>();
         HashMap<String, HashSet<String>> composed_tfs_tfs = new HashMap<>();
 
@@ -13304,11 +14726,13 @@ public class COM2POSE_lib {
                         options_intern.folder_name_tepic_postprocessing_tfs + File.separator +
                         options_intern.file_suffix_tepic_postprocessing_tfs_tfs));
         String line_composed_tfs = "";
-        while ((line_composed_tfs = br_composed_tfs.readLine()) != null) {
+        while ((line_composed_tfs = br_composed_tfs.readLine()) != null)
+        {
             String[] split = line_composed_tfs.split("\t");
 
             HashSet temp_set = new HashSet();
-            for (int i = 1; i < split.length; i++) {
+            for (int i = 1; i < split.length; i++)
+            {
                 composed_tfs.put(split[i], split[0]);
                 temp_set.add(split[i]);
             }
@@ -13348,11 +14772,13 @@ public class COM2POSE_lib {
                 "df_interesting_stats.loc[0]=['background',background_sum,background_length,background_mean,background_median,background_quantile,background_quantile_99]\n" +
                 "row_counter=1" + "\n\n\n");
 
-        for (File fileDir : input_tf_root.listFiles()) {
+        for (File fileDir : input_tf_root.listFiles())
+        {
             String name_tf = fileDir.getName().split("\\.")[0].split("_")[0];
             String name_composed = "";
 
-            if (composed_tfs.containsKey(name_tf)) {
+            if (composed_tfs.containsKey(name_tf))
+            {
                 name_composed = composed_tfs.get(name_tf);
             }
 
@@ -13380,20 +14806,24 @@ public class COM2POSE_lib {
                     "    background_" + name_tf + " = pd.concat([background," + name_tf + "],axis=0)\n" + "    ax_" +
                             name_tf + " = sns.boxplot(x=\"label\", y=\"TF_TG_SCORE\",data=background_" + name_tf +
                             ",palette=\"Set3\")\n" + "    ax_" + name_tf + ".set_yscale(\"log\")\n");
-            if (name_composed.equals("")) {
+            if (name_composed.equals(""))
+            {
                 sb_all.append(
                         "    plt.savefig(f'" + output_plots.getAbsolutePath() + File.separator + name_tf + ".png')\n");
-            } else {
+            } else
+            {
                 sb_all.append("    plt.savefig(f'" + output_plots.getAbsolutePath() + File.separator + name_composed +
                         ".png')\n");
             }
             sb_all.append("    del background_" + name_tf + "\n" + "    plt.clf()\n");
-            if (name_composed.equals("")) {
+            if (name_composed.equals(""))
+            {
                 sb_all.append(
                         "    df_interesting_stats.loc[row_counter]=['" + name_tf + "'," + name_tf + "_sum," + name_tf +
                                 "_length," + name_tf + "_mean," + name_tf + "_median," + name_tf + "_quantile_95," +
                                 name_tf + "_quantile]\n");
-            } else {
+            } else
+            {
                 sb_all.append(
                         "    df_interesting_stats.loc[row_counter]=['" + name_composed + "'," + name_tf + "_sum," +
                                 name_tf + "_length," + name_tf + "_mean," + name_tf + "_median," + name_tf +
@@ -13424,7 +14854,8 @@ public class COM2POSE_lib {
 
     private void write_html_distribution_analysis_plots_hm_page(File f_website_html_hm, File fileDir_stat, String level,
                                                                 HashMap<String, HashMap<String, String>> tp_tf_gene_count)
-            throws IOException {
+            throws IOException
+    {
 
         Analysis_distribution_stats_object stats_object = get_distribution_analysis_stats_ordered(fileDir_stat);
 
@@ -13478,7 +14909,8 @@ public class COM2POSE_lib {
         //write stats table inc. comparison to background
 
         int rank = 1;
-        for (Analysis_distribution_stats as : all_considered_tfs) {
+        for (Analysis_distribution_stats as : all_considered_tfs)
+        {
             sb.append("<div id='" + as.label.toUpperCase() + "' class='w3-content'>\n");
             sb.append("<h2>" + rank + ". <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene=" +
                     as.label.toUpperCase() + "' target='_blank'><button class='button'>" + as.label.toUpperCase() +
@@ -13497,7 +14929,8 @@ public class COM2POSE_lib {
             sb.append("TF");
             sb.append("\t\t\t\t</th>\n");
 
-            for (String key : tp_tf_gene_count.keySet()) {
+            for (String key : tp_tf_gene_count.keySet())
+            {
                 sb.append("\t\t\t\t<th>\n");
                 sb.append(key);
                 sb.append("\t\t\t\t</th>\n");
@@ -13510,10 +14943,12 @@ public class COM2POSE_lib {
             sb.append(as.label.toUpperCase());
             sb.append("\t\t\t\t</th>\n");
 
-            for (String key : tps) {
+            for (String key : tps)
+            {
                 String value = "0.0";
                 HashMap<String, String> current_x = tp_tf_gene_count.get(key);
-                if (current_x.containsKey(as.label.toUpperCase())) {
+                if (current_x.containsKey(as.label.toUpperCase()))
+                {
                     value = current_x.get(as.label.toUpperCase());
                 }
 
@@ -13529,10 +14964,12 @@ public class COM2POSE_lib {
             String rel_path = ".." + File.separator + ".." + File.separator +
                     options_intern.folder_out_website_plots_distribution_analysis + File.separator +
                     options_intern.folder_out_distribution_plots;
-            if (level.equals("HM")) {
+            if (level.equals("HM"))
+            {
                 rel_path += File.separator + options_intern.folder_out_distribution_plots_HM + File.separator +
                         fileDir_stat.getName() + File.separator + as.label.toUpperCase() + ".png";
-            } else {
+            } else
+            {
                 rel_path += File.separator + options_intern.folder_out_distribution_plots_ALL + File.separator +
                         as.label.toUpperCase() + ".png";
 
@@ -13556,14 +14993,15 @@ public class COM2POSE_lib {
     }
 
     private String get_html_table_found_tfs_in_distribution_analysis(ArrayList<File> files_stat, String level,
-                                                                     HashMap<String, Integer> fin_rank)
-            throws Exception {
+                                                                     HashMap<String, Integer> fin_rank) throws Exception
+    {
         StringBuilder sb_table = new StringBuilder();
 
         HashMap<String, ArrayList<Analysis_distribution_stats>> hm_distribution_stats = new HashMap<>();
         ArrayList<String> hm_names_order = new ArrayList<>();
 
-        for (File fileDir_hm : files_stat) {
+        for (File fileDir_hm : files_stat)
+        {
             String name = fileDir_hm.getName();
 
             //File stats_file = new File(fileDir_hm.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_plot_stats);
@@ -13581,7 +15019,8 @@ public class COM2POSE_lib {
         sb_table.append("\t\t\t\t<th>\n");
         sb_table.append("TF");
         sb_table.append("\t\t\t\t</th>\n");
-        for (String hms : hm_names_order) {
+        for (String hms : hm_names_order)
+        {
             sb_table.append("\t\t\t\t<th>\n");
             sb_table.append(hms);
             sb_table.append("\t\t\t\t</th>\n");
@@ -13598,22 +15037,26 @@ public class COM2POSE_lib {
         sb_table.append("\t\t</tr>\n");
 
         String rel_path = "";
-        if (level.equals(options_intern.html_report_levels_home)) {
+        if (level.equals(options_intern.html_report_levels_home))
+        {
             rel_path += options_intern.folder_out_website_basics + File.separator +
                     options_intern.folder_out_website_basics_website + File.separator +
                     options_intern.folder_out_website_basics_website_images;
         }
-        if (level.equals(options_intern.html_report_levels_2_steps)) {
+        if (level.equals(options_intern.html_report_levels_2_steps))
+        {
             rel_path += ".." + File.separator + options_intern.folder_out_website_basics + File.separator +
                     options_intern.folder_out_website_basics_website + File.separator +
                     options_intern.folder_out_website_basics_website_images;
         }
-        if (level.equals(options_intern.html_report_levels_3_steps)) {
+        if (level.equals(options_intern.html_report_levels_3_steps))
+        {
             rel_path += ".." + File.separator + ".." + File.separator + options_intern.folder_out_website_basics +
                     File.separator + options_intern.folder_out_website_basics_website + File.separator +
                     options_intern.folder_out_website_basics_website_images;
         }
-        if (level.equals(options_intern.html_report_levels_4_steps)) {
+        if (level.equals(options_intern.html_report_levels_4_steps))
+        {
             rel_path += ".." + File.separator + ".." + File.separator + ".." + File.separator +
                     options_intern.folder_out_website_basics + File.separator +
                     options_intern.folder_out_website_basics_website + File.separator +
@@ -13625,20 +15068,24 @@ public class COM2POSE_lib {
 
         hm_sample_size.put("DISCOUNTED CUMULATIVE GAIN", fin_rank.size());
 
-        for (String k_tf : options_intern.website_interesting_tfs) {
+        for (String k_tf : options_intern.website_interesting_tfs)
+        {
             sb_table.append("\t\t\t<tr>\n");
             sb_table.append("\t\t\t\t<th>\n");
             sb_table.append(k_tf);
             sb_table.append("\t\t\t\t</th>\n");
 
-            for (String hms : hm_names_order) {
+            for (String hms : hm_names_order)
+            {
                 ArrayList<Analysis_distribution_stats> temp_stats = hm_distribution_stats.get(hms);
 
                 int rank_intern = -1;
                 int rank_max = 1;
 
-                for (int i = 0; i < temp_stats.size(); i++) {
-                    if (temp_stats.get(i).label.equals(k_tf)) {
+                for (int i = 0; i < temp_stats.size(); i++)
+                {
+                    if (temp_stats.get(i).label.equals(k_tf))
+                    {
                         rank_intern = i + 1;
                     }
                     rank_max++;
@@ -13647,7 +15094,8 @@ public class COM2POSE_lib {
                 hm_sample_size.put(hms, rank_max);
 
 
-                if (rank_intern != -1) {
+                if (rank_intern != -1)
+                {
                     sb_table.append("\t\t\t\t<th>\n");
                     sb_table.append("<img src=\"" + rel_path + File.separator +
                             "is_available.png\" style=\"width:50px;height:50px;\"/>");
@@ -13657,14 +15105,17 @@ public class COM2POSE_lib {
                     sb_table.append("\t\t\t\t</th>\n");
 
                     HashSet<String> drawn_white_balls;
-                    if (hm_drawn_white_balls.containsKey(hms)) {
+                    if (hm_drawn_white_balls.containsKey(hms))
+                    {
                         drawn_white_balls = hm_drawn_white_balls.get(hms);
-                    } else {
+                    } else
+                    {
                         drawn_white_balls = new HashSet<>();
                     }
                     drawn_white_balls.add(k_tf);
                     hm_drawn_white_balls.put(hms, drawn_white_balls);
-                } else {
+                } else
+                {
                     sb_table.append("\t\t\t\t<th>\n");
                     sb_table.append("<img src=\"" + rel_path + File.separator +
                             "not_available.png\" style=\"width:50px;height:50px;\"/>");
@@ -13675,7 +15126,8 @@ public class COM2POSE_lib {
                 }
 
             }
-            if (fin_rank.containsKey(k_tf)) {
+            if (fin_rank.containsKey(k_tf))
+            {
                 sb_table.append("\t\t\t\t<th>\n");
                 sb_table.append("<img src=\"" + rel_path + File.separator +
                         "is_available.png\" style=\"width:50px;height:50px;\"/>");
@@ -13685,14 +15137,17 @@ public class COM2POSE_lib {
                 sb_table.append("\t\t\t\t</th>\n");
 
                 HashSet<String> drawn_white_balls;
-                if (hm_drawn_white_balls.containsKey("DISCOUNTED CUMULATIVE GAIN")) {
+                if (hm_drawn_white_balls.containsKey("DISCOUNTED CUMULATIVE GAIN"))
+                {
                     drawn_white_balls = hm_drawn_white_balls.get("DISCOUNTED CUMULATIVE GAIN");
-                } else {
+                } else
+                {
                     drawn_white_balls = new HashSet<>();
                 }
                 drawn_white_balls.add(k_tf);
                 hm_drawn_white_balls.put("DISCOUNTED CUMULATIVE GAIN", drawn_white_balls);
-            } else {
+            } else
+            {
                 sb_table.append("\t\t\t\t<th>\n");
                 sb_table.append("<img src=\"" + rel_path + File.separator +
                         "not_available.png\" style=\"width:50px;height:50px;\"/>");
@@ -13717,7 +15172,8 @@ public class COM2POSE_lib {
                 options_intern.file_suffix_tepic_postprocessing_all_tfs);
         BufferedReader br_all_tfs = new BufferedReader(new FileReader(f_input_all_tfs));
         String line_all_tfs = "";
-        while ((line_all_tfs = br_all_tfs.readLine()) != null) {
+        while ((line_all_tfs = br_all_tfs.readLine()) != null)
+        {
             all_tfs.add(line_all_tfs);
         }
         br_all_tfs.close();
@@ -13738,12 +15194,15 @@ public class COM2POSE_lib {
 
         sb_rscript_hypergeometric_test.append("results<-data.frame(Name=character(),p_value=double())\n");
 
-        for (String key_hm : hm_sample_size.keySet()) {
-            if (!hm_drawn_white_balls.containsKey(key_hm)) {
+        for (String key_hm : hm_sample_size.keySet())
+        {
+            if (!hm_drawn_white_balls.containsKey(key_hm))
+            {
                 continue;
             }
             String name = key_hm.replace(" ", "_");
-            if (name.startsWith("01")) {
+            if (name.startsWith("01"))
+            {
                 name = name.substring(3);
             }
             sb_rscript_hypergeometric_test.append(name + "_name<-");
@@ -13778,7 +15237,8 @@ public class COM2POSE_lib {
         logger.logLine("[DISTRIBUTION ANALYSIS] Perform hypergeometric test: " + command);
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();
-        switch (code) {
+        switch (code)
+        {
             case 0:
                 break;
             case 1:
@@ -13789,7 +15249,8 @@ public class COM2POSE_lib {
         HashMap<String, Double> results_hypergeometric_test = new HashMap<>();
         BufferedReader br_results_hyp_geo_test = new BufferedReader(new FileReader(f_out_hypergeometric_test_results));
         String line_results_hyp_geo_test = br_results_hyp_geo_test.readLine();
-        while ((line_results_hyp_geo_test = br_results_hyp_geo_test.readLine()) != null) {
+        while ((line_results_hyp_geo_test = br_results_hyp_geo_test.readLine()) != null)
+        {
             line_results_hyp_geo_test = line_results_hyp_geo_test.replace("\"", "");
             String[] split = line_results_hyp_geo_test.split(",");
             results_hypergeometric_test.put(split[1], Double.parseDouble(split[2]));
@@ -13802,8 +15263,10 @@ public class COM2POSE_lib {
         sb_table.append("\t\t\t\t<th>\n");
         sb_table.append("HYP.GEO.TEST p_value");
         sb_table.append("\t\t\t\t</th>\n");
-        for (String key_hm : hm_names_order) {
-            if (!results_hypergeometric_test.containsKey(key_hm)) {
+        for (String key_hm : hm_names_order)
+        {
+            if (!results_hypergeometric_test.containsKey(key_hm))
+            {
                 sb_table.append("\t\t\t\t<th>\n");
                 sb_table.append("-");
                 sb_table.append("\t\t\t\t</th>\n");
@@ -13812,9 +15275,11 @@ public class COM2POSE_lib {
                 continue;
             }
             sb_table.append("\t\t\t\t<th>\n");
-            if (results_hypergeometric_test.containsKey(key_hm)) {
+            if (results_hypergeometric_test.containsKey(key_hm))
+            {
                 sb_table.append(df.format(results_hypergeometric_test.get(key_hm)));
-            } else {
+            } else
+            {
                 sb_table.append("NOT PERFORMED");
             }
             sb_table.append("\t\t\t\t</th>\n");
@@ -13823,9 +15288,11 @@ public class COM2POSE_lib {
         }
         sb_table.append("\t\t\t\t<th>\n");
         String key_hypergeometric_test = "DISCOUNTED CUMULATIVE GAIN";
-        if (results_hypergeometric_test.containsKey(key_hypergeometric_test)) {
+        if (results_hypergeometric_test.containsKey(key_hypergeometric_test))
+        {
             sb_table.append(df.format(results_hypergeometric_test.get(key_hypergeometric_test)));
-        } else {
+        } else
+        {
             sb_table.append("NOT PERFORMED");
         }
         sb_table.append("\t\t\t\t</th>\n");
@@ -13843,7 +15310,8 @@ public class COM2POSE_lib {
     }
 
     private Analysis_distribution_stats_object get_distribution_analysis_stats_ordered(File fileDir_stat)
-            throws IOException {
+            throws IOException
+    {
 
         Analysis_distribution_stats background = new Analysis_distribution_stats();
 
@@ -13864,7 +15332,8 @@ public class COM2POSE_lib {
         background.quantile_95 = Double.parseDouble(split_background[6]);
         background.quantile_99 = Double.parseDouble(split_background[7]);
 
-        while ((line = br.readLine()) != null) {
+        while ((line = br.readLine()) != null)
+        {
             String[] split = line.split("\t");
 
             Analysis_distribution_stats tf = new Analysis_distribution_stats();
@@ -13890,14 +15359,16 @@ public class COM2POSE_lib {
         return ret_obj;
     }
 
-    private void check_tepic_input_with_options() {
+    private void check_tepic_input_with_options()
+    {
         options_intern.tepic_input_prev = options_intern.tepic_input_directory;
         File f_annotation_check = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
                         File.separator + options_intern.folder_name_mix_option_preprocessing_check_chr);
         options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
 
-        if (options_intern.mix_level.equals("SAMPLE_LEVEL")) {
+        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
             File root_mix_working_dir = new File(
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
             File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
@@ -13906,7 +15377,8 @@ public class COM2POSE_lib {
             options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
         }
 
-        if (options_intern.mix_level.equals("HM_LEVEL")) {
+        if (options_intern.mix_level.equals("HM_LEVEL"))
+        {
             File root_mix_working_dir = new File(
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
             File f_output_hm = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
@@ -13916,14 +15388,16 @@ public class COM2POSE_lib {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = f_output_hm.getAbsolutePath();
         }
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN")) {
+        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
                             File.separator + options_intern.folder_name_mix_options_footprints_between_peaks;
 
         }
-        if (!options_intern.black_list_dir.equals("")) {
+        if (!options_intern.black_list_dir.equals(""))
+        {
             File output_folder = new File(options_intern.com2pose_working_directory + File.separator +
                     options_intern.folder_name_blacklisted_regions);
             File output_folder_new_input = new File(output_folder.getAbsolutePath() + File.separator +
@@ -13935,7 +15409,8 @@ public class COM2POSE_lib {
             options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
         }
 
-        if (options_intern.mix_mutually_exclusive) {
+        if (options_intern.mix_mutually_exclusive)
+        {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =
                     options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
@@ -13944,7 +15419,8 @@ public class COM2POSE_lib {
         }
     }
 
-    private void igv_save_sessions(File f_output_file, String load_command, ArrayList<File> tdf_files) throws IOException {
+    private void igv_save_sessions(File f_output_file, String load_command, ArrayList<File> tdf_files) throws IOException
+    {
         //save sessions
 
         File f_session_tp_name = f_output_file;

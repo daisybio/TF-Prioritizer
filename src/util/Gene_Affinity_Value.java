@@ -1,12 +1,14 @@
 package util;
 
-public class Gene_Affinity_Value implements Comparable {
+public class Gene_Affinity_Value implements Comparable
+{
 
     public String gene_name = "";
     public String gene_symbol = "NOT_AVAILABLE";
     public double affinity_value = 0.0;
 
-    public String toString() {
+    public String toString()
+    {
         String res = "";
         res += gene_name;
         res += "\t";
@@ -18,14 +20,18 @@ public class Gene_Affinity_Value implements Comparable {
     }
 
 
-    @Override public int compareTo(Object o) {
+    @Override public int compareTo(Object o)
+    {
         double compare = ((Gene_Affinity_Value) o).affinity_value;
 
-        if (compare < this.affinity_value) {
+        if (compare < this.affinity_value)
+        {
             return -1;
-        } else if (compare > this.affinity_value) {
+        } else if (compare > this.affinity_value)
+        {
             return 1;
-        } else {
+        } else
+        {
             return 0;
         }
     }

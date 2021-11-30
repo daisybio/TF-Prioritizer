@@ -2,7 +2,8 @@ package util;
 
 import java.util.ArrayList;
 
-public class MIX_Interval implements Comparable {
+public class MIX_Interval implements Comparable
+{
     public int start;
     public int end;
 
@@ -10,12 +11,14 @@ public class MIX_Interval implements Comparable {
 
     public MIX_Interval_Object means;
 
-    public MIX_Interval(int start, int end) {
+    public MIX_Interval(int start, int end)
+    {
         this.start = start;
         this.end = end;
     }
 
-    public void calculate_mean(String level) {
+    public void calculate_mean(String level)
+    {
         means = new MIX_Interval_Object();
 
         means.start = start;
@@ -23,19 +26,25 @@ public class MIX_Interval implements Comparable {
         means.chr = merged_intervals.get(0).chr;
 
         String description_pre = merged_intervals.get(0).description;
-        if (level.equals("SAMPLE_LEVEL")) {
+        if (level.equals("SAMPLE_LEVEL"))
+        {
             String[] split = description_pre.split("_");
-            if (split.length > 4) {
+            if (split.length > 4)
+            {
                 description_pre = split[0] + "_" + split[1] + "_" + split[2] + "_SMIX_" + split[4] + "_";
-            } else {
+            } else
+            {
                 description_pre = description_pre;
             }
         }
-        if (level.equals("HM_LEVEL")) {
+        if (level.equals("HM_LEVEL"))
+        {
             String[] split = description_pre.split("_");
-            if (split.length > 4) {
+            if (split.length > 4)
+            {
                 description_pre = split[0] + "_" + split[1] + "_HMMIX_" + split[3] + "_" + split[4] + "_";
-            } else {
+            } else
+            {
                 description_pre = description_pre;
             }
         }
@@ -47,7 +56,8 @@ public class MIX_Interval implements Comparable {
         double val4_mean = 0;
         double val5_mean = 0;
 
-        for (int i = 0; i < merged_intervals.size(); i++) {
+        for (int i = 0; i < merged_intervals.size(); i++)
+        {
             val1_mean += merged_intervals.get(i).val1;
             val3_mean += merged_intervals.get(i).val3;
             val4_mean += merged_intervals.get(i).val4;
@@ -65,7 +75,8 @@ public class MIX_Interval implements Comparable {
         means.val5 = val5_mean;
     }
 
-    public String meanToString(int peak) {
+    public String meanToString(int peak)
+    {
         StringBuilder sb = new StringBuilder();
 
         sb.append(means.chr);
@@ -90,7 +101,8 @@ public class MIX_Interval implements Comparable {
         return sb.toString();
     }
 
-    @Override public int compareTo(Object o) {
+    @Override public int compareTo(Object o)
+    {
         int compare = ((MIX_Interval) o).start;
 
         return this.start - compare;

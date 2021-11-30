@@ -5,7 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class MANN_WHITNEYU_PLOTS_FILES {
+public class MANN_WHITNEYU_PLOTS_FILES
+{
 
     public Options_intern options_intern;
 
@@ -17,7 +18,8 @@ public class MANN_WHITNEYU_PLOTS_FILES {
 
     public boolean hm = false;
 
-    public void write_and_execute_scripts() throws IOException {
+    public void write_and_execute_scripts() throws IOException
+    {
         StringBuilder script = new StringBuilder();
         script.append("library(ggplot2)\n" + "library(plyr)\n" + "library(dplyr)\n\n");
         script.append("setwd(\"" + f_output_plot.getAbsolutePath() + "\")\n");
@@ -27,7 +29,8 @@ public class MANN_WHITNEYU_PLOTS_FILES {
         script.append("background_scores <- background %>% select(TF_TG_SCORE)\n");
         script.append("background_ecdf <- ecdf(background_scores$TF_TG_SCORE)\n");
         script.append("\n");
-        for (File tf : tf_data.listFiles()) {
+        for (File tf : tf_data.listFiles())
+        {
             String tf_name = tf.getName().split("\\.")[0].split("_")[0];
 
             script.append("#######################################################################\n");
