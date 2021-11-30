@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="TEPIC">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ext/TEPIC/TEPIC.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
