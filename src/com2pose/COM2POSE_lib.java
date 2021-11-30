@@ -173,6 +173,7 @@ public class COM2POSE_lib {
                                 {
                                     added_prediction_data=true;
                                     load_tf_chip_seq+= f_file.getAbsolutePath();
+
                                 }
                             }
                         }
@@ -251,13 +252,49 @@ public class COM2POSE_lib {
                     }
                 }
 
+                ArrayList<File> tdf_files = new ArrayList<>();
+
+                //add TDF if available
+                if(!options_intern.igv_path_to_tdf.equals(""))
+                {
+                    File f_input_tdfs = new File(options_intern.igv_path_to_tdf);
+                    File f_input_tdf_current_tp = new File(f_input_tdfs.getAbsolutePath()+File.separator+key_tp);
+                    if (f_input_tdf_current_tp.exists())
+                    {
+                        for(File f_hm_tdf : f_input_tdf_current_tp.listFiles())
+                        {
+                            if(f_hm_tdf.isDirectory())
+                            {
+                                for(File f_hm_tdf_file : f_hm_tdf.listFiles())
+                                {
+                                    if(f_hm_tdf_file.isFile())
+                                    {
+                                        if(added_prediction_data)
+                                        {
+                                            load_tf_chip_seq+="," + f_hm_tdf_file.getAbsolutePath();
+                                            tdf_files.add(f_hm_tdf_file);
+                                        }
+                                        else
+                                        {
+                                            added_prediction_data=true;
+                                            load_tf_chip_seq+= f_hm_tdf_file.getAbsolutePath();
+                                            tdf_files.add(f_hm_tdf_file);
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if(!added_prediction_data)
                     continue;
 
                 //save session
                 File f_save_session =
                         new File(f_output_tf_hm_tp.getAbsolutePath()+File.separator+options_intern.file_suffix_session);
-                igv_save_sessions(f_save_session,load_tf_chip_seq);
+                igv_save_sessions(f_save_session,load_tf_chip_seq, tdf_files);
 
                 Socket socket_session = new Socket("127.0.0.1", options_intern.igv_port_number);
                 PrintWriter out_session = new PrintWriter(socket_session.getOutputStream(), true);
@@ -269,6 +306,23 @@ public class COM2POSE_lib {
                 //logger.logLine("[IGV] " + load_tf_chip_seq);
                 out_session.println(load_tf_chip_seq);
                 String response_load_sessoin = in_session.readLine();
+
+                //remodel tdf files if available
+                if(tdf_files.size()>0)
+                {
+                    String response_session_tdf = "";
+
+                    for(File f_tdf : tdf_files)
+                    {
+                        out_session.println("setLogScale " + f_tdf.getName());
+                        response_session_tdf = in_session.readLine();
+                        out_session.println("setDataRange auto " + f_tdf.getName());
+                        response_session_tdf = in_session.readLine();
+                        out_session.println("setTrackHeight " + f_tdf.getName() + " 60");
+                        response_session_tdf = in_session.readLine();
+                    }
+
+                }
 
                 //do pics of important loci
                 for(String locus: options_intern.igv_important_locus_all_prio_tf)
@@ -780,10 +834,48 @@ public class COM2POSE_lib {
                                 }
                             }
 
+                            //add TDF if available
+
+                            ArrayList<File> tdf_files = new ArrayList<>();
+
+                            if(!options_intern.igv_path_to_tdf.equals(""))
+                            {
+                                File f_input_tdfs = new File(options_intern.igv_path_to_tdf);
+                                File f_input_tdf_current_tp =
+                                        new File(f_input_tdfs.getAbsolutePath()+File.separator+key_tp);
+                                if (f_input_tdf_current_tp.exists())
+                                {
+                                    for(File f_hm_tdf : f_input_tdf_current_tp.listFiles())
+                                    {
+                                        if(f_hm_tdf.isDirectory())
+                                        {
+                                            for(File f_hm_tdf_file : f_hm_tdf.listFiles())
+                                            {
+                                                if(f_hm_tdf_file.isFile())
+                                                {
+                                                    if(added_prediction_data)
+                                                    {
+                                                        load_tf_chip_seq+="," + f_hm_tdf_file.getAbsolutePath();
+                                                        tdf_files.add(f_hm_tdf_file);
+                                                    }
+                                                    else
+                                                    {
+                                                        added_prediction_data=true;
+                                                        load_tf_chip_seq+= f_hm_tdf_file.getAbsolutePath();
+                                                        tdf_files.add(f_hm_tdf_file);
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             //save sessions
                             File f_session_tp_name = new File(f_out_session_tp.getAbsolutePath() + File.separator +
                                     options_intern.file_suffix_session);
-                            igv_save_sessions(f_session_tp_name, load_tf_chip_seq);
+                            igv_save_sessions(f_session_tp_name, load_tf_chip_seq, tdf_files);
 
                             /*out.println("genome "+options_intern.igv_species_ref_genome);
                             String response = in.readLine();
@@ -967,6 +1059,24 @@ public class COM2POSE_lib {
                             String response_load = in.readLine();
                             //logger.logLine("[IGV] " + response_load);
 
+                            //remodel tdf files if available
+                            if(tdf_files.size()>0)
+                            {
+                                String response_session_tdf = "";
+
+                                for(File f_tdf : tdf_files)
+                                {
+                                    out.println("setLogScale " + f_tdf.getName());
+                                    response_session_tdf = in.readLine();
+                                    out.println("setDataRange auto " + f_tdf.getName());
+                                    response_session_tdf = in.readLine();
+                                    out.println("setTrackHeight " + f_tdf.getName() + " 60");
+                                    response_session_tdf = in.readLine();
+                                }
+
+                            }
+
+
                             //logger.logLine("[IGV] "+ "genome "+options_intern.igv_species_ref_genome);
                             out.println("genome " + options_intern.igv_species_ref_genome);
                             String response = in.readLine();
@@ -1134,6 +1244,7 @@ public class COM2POSE_lib {
         String response = in.readLine();
 
         String load_chipatlas_overall = "load ";
+        boolean added_prediction_data = false;
 
         //load ChIP-seq CHIPATLAS data
         for (File f_dir_atlas : f_input_chipATLAS_data.listFiles()) {
@@ -1148,6 +1259,7 @@ public class COM2POSE_lib {
                         String response_load = in.readLine();
 
                         load_chipatlas_overall += " " + f_dir_bed.getAbsolutePath();
+                        added_prediction_data=true;
                     }
                 }
             }
@@ -1169,13 +1281,16 @@ public class COM2POSE_lib {
                                 String response_load = in.readLine();
 
                                 load_chipatlas_overall += " " + f_bed.getAbsolutePath();
+                                added_prediction_data = true;
                             }
                         }
                     }
                 }
             }
-
         }
+
+        //add empty TDF if available
+        ArrayList<File> tdf_files = new ArrayList<>();
 
         File f_fasta_for_chromosomes = new File(options_intern.tepic_input_ref_genome);
         BufferedReader br_fasta = new BufferedReader(new FileReader(f_fasta_for_chromosomes));
@@ -1253,10 +1368,12 @@ public class COM2POSE_lib {
         //logger.logLine("[IGV] " + response);
         socket.close();
 
+
+
         //save session
         File f_output_session =
                 new File(f_output_shot.getAbsolutePath() + File.separator + options_intern.file_suffix_session);
-        igv_save_sessions(f_output_session, load_chipatlas_overall);
+        igv_save_sessions(f_output_session, load_chipatlas_overall, tdf_files);
 
         logger.logLine("[IGV] Finished taking screenshots of peaks chr wide");
 
@@ -1698,11 +1815,51 @@ public class COM2POSE_lib {
 
                             }
 
+                            //add TDF if available
+
+                            ArrayList<File> tdf_files = new ArrayList<>();
+
+                            if(!options_intern.igv_path_to_tdf.equals(""))
+                            {
+                                File f_input_tdfs = new File(options_intern.igv_path_to_tdf);
+                                File f_input_tdf_current_tp =
+                                        new File(f_input_tdfs.getAbsolutePath()+File.separator+file_dir_tp.getName());
+                                if (f_input_tdf_current_tp.exists())
+                                {
+                                    for(File f_hm_tdf : f_input_tdf_current_tp.listFiles())
+                                    {
+                                        if(f_hm_tdf.isDirectory())
+                                        {
+                                            for(File f_hm_tdf_file : f_hm_tdf.listFiles())
+                                            {
+                                                if(f_hm_tdf_file.isFile())
+                                                {
+                                                    if(added_prediction_data)
+                                                    {
+                                                        load_for_session_intern+="," + f_hm_tdf_file.getAbsolutePath();
+                                                        tdf_files.add(f_hm_tdf_file);
+                                                    }
+                                                    else
+                                                    {
+                                                        added_prediction_data=true;
+                                                        load_for_session_intern+= f_hm_tdf_file.getAbsolutePath();
+                                                        tdf_files.add(f_hm_tdf_file);
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+
                             //save session
                             File f_session_intern =
                                     new File(f_output_igv_shots.getAbsolutePath() + File.separator +file_dir_tp.getName()+File.separator+key_hm+File.separator+
                                     options_intern.file_suffix_session);
-                            igv_save_sessions(f_session_intern, load_for_session_intern);
+                            igv_save_sessions(f_session_intern, load_for_session_intern, tdf_files);
 
                             Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
                             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -1711,6 +1868,23 @@ public class COM2POSE_lib {
                             //load again
                             out.println(load_for_session_intern);
                             String response_load_2 = in.readLine();
+
+                            //remodel tdf files if available
+                            if(tdf_files.size()>0)
+                            {
+                                String response_session_tdf = "";
+
+                                for(File f_tdf : tdf_files)
+                                {
+                                    out.println("setLogScale " + f_tdf.getName());
+                                    response_session_tdf = in.readLine();
+                                    out.println("setDataRange auto " + f_tdf.getName());
+                                    response_session_tdf = in.readLine();
+                                    out.println("setTrackHeight " + f_tdf.getName() + " 60");
+                                    response_session_tdf = in.readLine();
+                                }
+
+                            }
 
 
                             for (String key_target_gene : target_genes) {
@@ -1804,7 +1978,7 @@ public class COM2POSE_lib {
                             //save session
                             File f_session = new File(f_output_igv_shots.getAbsolutePath() + File.separator +
                                     options_intern.file_suffix_session);
-                            igv_save_sessions(f_session, load_bed_files_overall);
+                            igv_save_sessions(f_session, load_bed_files_overall, tdf_files);
 
                         }
                     }
@@ -12048,6 +12222,9 @@ public class COM2POSE_lib {
                     String[] split_loci_of_interest = loci_of_interest.split(";");
                     options_intern.igv_important_locus_all_prio_tf.addAll(Arrays.asList(split_loci_of_interest));
                     break;
+                case "igv_path_to_tdf":
+                    options_intern.igv_path_to_tdf = split[1].substring(1, split[1].length() - 1);
+                    break;
                 case "igv_port_number":
                     options_intern.igv_port_number = Integer.parseInt(split[1]);
                     break;
@@ -12486,9 +12663,19 @@ public class COM2POSE_lib {
                     logger.logLine("[IGV] ERROR in igv_include_prediction_data");
                     logger.logLine("[IGV] Histone Modification " + s + " does not exist, please check in config file");
                 }
-
             }
+        }
 
+        if(!options_intern.igv_path_to_tdf.equals(""))
+        {
+            File f_igv_path_to_tdf = new File(options_intern.igv_path_to_tdf);
+            if(!f_igv_path_to_tdf.exists())
+            {
+                all_set=false;
+                logger.logLine("[IGV] ERROR in igv_path_to_tdf. File path does not exist! Needs to follow " +
+                        "structure of " +
+                        "tepic_input_directory.");
+            }
         }
 
         /**
@@ -13757,7 +13944,7 @@ public class COM2POSE_lib {
         }
     }
 
-    private void igv_save_sessions(File f_output_file, String load_command) throws IOException {
+    private void igv_save_sessions(File f_output_file, String load_command, ArrayList<File> tdf_files) throws IOException {
         //save sessions
 
         File f_session_tp_name = f_output_file;
@@ -13772,6 +13959,24 @@ public class COM2POSE_lib {
         //logger.logLine("[IGV] " + load_tf_chip_seq);
         out_session.println(load_command);
         String response_load_sessoin = in_session.readLine();
+
+        //remodel tdf files if available
+        if(tdf_files.size()>0)
+        {
+            String response_session_tdf = "";
+
+            for(File f_tdf : tdf_files)
+            {
+                out_session.println("setLogScale " + f_tdf.getName());
+                response_session_tdf = in_session.readLine();
+                out_session.println("setDataRange auto " + f_tdf.getName());
+                response_session_tdf = in_session.readLine();
+                out_session.println("setTrackHeight " + f_tdf.getName() + " 60");
+                response_session_tdf = in_session.readLine();
+            }
+
+        }
+
         //logger.logLine("[IGV] " + response_load);
 
         //logger.logLine("[IGV] "+ "genome "+options_intern.igv_species_ref_genome);

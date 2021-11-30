@@ -432,6 +432,8 @@ public class Options_intern {
     public ArrayList<String> igv_important_locus_all_prio_tf= new ArrayList<>();
     //#[OPT]: path to tf chip_seq data, of which you want to take images for target genes to see peaks
     public String igv_path_to_tf_chip_seq = "";
+    //#[OPT]: path to bigWig files (same structure as ChIP-seq or ATAC-seq)
+    public String igv_path_to_tdf="";
     //#[OPT] port number of igv, default = 60151
     public int igv_port_number = 60151;
     //#[OPT] igv species name for reference genome
