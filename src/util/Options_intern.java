@@ -19,6 +19,11 @@ public class Options_intern
     public boolean calculate_tpm_lengths = true;
     public boolean calculcate_gene_positions = true;
 
+    public String folder_ext = "ext";
+    public String folder_enhancerDB = "Enhancers_DB";
+    public String enhancerDB_bed_format="chrom\tchromStart\tchromEnd\tname\treference_genome";
+    public String enhancerDB_bed_suffix=".bed";
+
     /**
      * COM2POSE private options - cannot be set from the outside
      */
@@ -49,6 +54,7 @@ public class Options_intern
     public String folder_name_deseq2_preprocessing_gene_symbols = "symbols_ensg_mean_counts";
     public String folder_name_deseq2_preprocessing_tpm = "tpm_mapping";
     public String folder_name_deseq2_preprocessing_gene_positions = "gene_positions";
+    public String folder_name_deseq2_preprocessing_gene_positions_enhancerDBs = "enhancerDBs_prev";
     public String folder_name_deseq2_preprocessing_tpm_scripts = "01_scripts";
     public String folder_name_deseq2_preprocessing_tpm_results = "02_tpm_mappings";
     public String folder_name_deseq2_output_raw = "02_B_DESeq2_output_raw";
@@ -152,6 +158,8 @@ public class Options_intern
     public String file_suffix_deseq2_preprocessing_gene_positions_data_prev = "gene_positions_prev.csv";
     public String file_suffix_deseq2_preprocessing_gene_positions_data_prev_version = "version.csv";
     public String file_suffix_deseq2_preprocessing_gene_positions_data_upliftpy = "uplift_positions.py";
+    public String file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs =
+            "mergedEnhancerDBs"+enhancerDB_bed_suffix;
     public String file_suffix_deseq2_preprocessing_gene_positions_data = "gene_positions.csv";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_output_regions_to_target_genes = "regions_to_target_genes.csv";
@@ -201,7 +209,7 @@ public class Options_intern
     public String analysis_types_regression_coefficient_analysis = "REGRESSION_COEFFICIENT";
 
 
-    public String directory_for_tepic_scripts = "ext" + File.separator + "TEPIC" + File.separator + "TEPIC";
+    public String directory_for_tepic_scripts = folder_ext+ File.separator + "TEPIC" + File.separator + "TEPIC";
     public String directory_for_tepic_scripts_code = directory_for_tepic_scripts + File.separator + "Code";
     public String directory_for_tepic_scripts_code_tepic_sh =
             directory_for_tepic_scripts_code + File.separator + "TEPIC.sh";
@@ -432,6 +440,11 @@ public class Options_intern
     public String igv_path_to_tf_chip_seq = "";
     //#[OPT]: path to bigWig files (same structure as ChIP-seq or ATAC-seq)
     public String igv_path_to_tdf="";
+    //#[OPT]: Enhancer Database Names, are shown as region of interestens in igv
+    //#we provide ENdb, however you can include more databases - need to be the same format as ENdb.txt in ext/Enhancers_DB
+    //#you need to add your file there and the txt name here
+    //#(e.g., "ENdb;otherDatabase")
+    public ArrayList<String> igv_enhancer_databases= new ArrayList<>();
     //#[OPT] dictionary of GRC to synonyms (e.g., GRCh38=hg19 or GRCm39=mm39), GRCh and GRCm are already included
     //#format= "GRCx1=symbol1;GRCx2=symbol2"
     public HashMap<String,String> igv_GRC_synonym_dict= new HashMap<>();

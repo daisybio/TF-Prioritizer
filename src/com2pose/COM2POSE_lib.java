@@ -329,7 +329,23 @@ public class COM2POSE_lib
                         out_session.println("setTrackHeight " + f_tdf.getName() + " 60");
                         response_session_tdf = in_session.readLine();
                     }
+                }
 
+                //include enhancer regions of interest if available
+                if(options_intern.igv_enhancer_databases.size()>0)
+                {
+                    File f_merged_databases =
+                            new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+
+                    BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
+                    String line_mergedDB = br_mergedDB.readLine();
+                    while((line_mergedDB= br_mergedDB.readLine())!=null)
+                    {
+                        String[] split = line_mergedDB.split("\t");
+
+                        out_session.println("region " + split[0] + " " + split[1] + " " + split[2]);
+                        String response_region = in_session.readLine();
+                    }
                 }
 
                 //do pics of important loci
@@ -1151,6 +1167,23 @@ public class COM2POSE_lib
                             out.println("genome " + options_intern.igv_species_ref_genome);
                             String response = in.readLine();
                             //logger.logLine("[IGV] "+ response);
+
+                            //include enhancer regions of interest if available
+                            if(options_intern.igv_enhancer_databases.size()>0)
+                            {
+                                File f_merged_databases =
+                                        new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+
+                                BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
+                                String line_mergedDB = br_mergedDB.readLine();
+                                while((line_mergedDB= br_mergedDB.readLine())!=null)
+                                {
+                                    String[] split = line_mergedDB.split("\t");
+
+                                    out.println("region " + split[0] + " " + split[1] + " " + split[2]);
+                                    String response_region = in.readLine();
+                                }
+                            }
 
                             int count = 1;
                             for (String targets : target_genes_for_photo_session)
@@ -2031,6 +2064,23 @@ public class COM2POSE_lib
                                     response_session_tdf = in.readLine();
                                 }
 
+                            }
+
+                            //include enhancer regions of interest if available
+                            if(options_intern.igv_enhancer_databases.size()>0)
+                            {
+                                File f_merged_databases =
+                                        new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+
+                                BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
+                                String line_mergedDB = br_mergedDB.readLine();
+                                while((line_mergedDB= br_mergedDB.readLine())!=null)
+                                {
+                                    String[] split = line_mergedDB.split("\t");
+
+                                    out.println("region " + split[0] + " " + split[1] + " " + split[2]);
+                                    String response_region = in.readLine();
+                                }
                             }
 
 
@@ -10485,7 +10535,6 @@ public class COM2POSE_lib
         File f_data_version = new File(f_output_positions_root.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_deseq2_preprocessing_gene_positions_data_prev_version);
 
-
         logger.logLine("[PREP] Create gene positions for all RNA-seq data.");
         logger.logLine("[PREP] Get gene lengths ...");
 
@@ -10633,6 +10682,178 @@ public class COM2POSE_lib
                 String message = child_pyuplift.getErrorStream().toString();
                 throw new Exception(message);
         }
+
+        if(options_intern.igv_enhancer_databases.size()>0)
+        {
+            logger.logLine("[ENHANCER] Check reference genomes of Enhances DBs to currently used genomes and uplift " +
+                    "if necessary.");
+
+            String igv_species_symbol = options_intern.igv_species_ref_genome.replaceAll("[^A-Za-z]", "");
+
+
+            File f_output_enhancer_dbs =
+                    new File(f_output_positions_root.getAbsolutePath()+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions_enhancerDBs);
+            f_output_enhancer_dbs.mkdir();
+
+            File f_input_enhancerdbs_root =
+                    new File(options_intern.path_to_COM2POSE+File.separator+options_intern.folder_ext+File.separator+options_intern.folder_enhancerDB);
+
+            StringBuilder sb_merged_dbs = new StringBuilder();
+            sb_merged_dbs.append(options_intern.enhancerDB_bed_format+"\n");
+
+            for(String enhancer_db : options_intern.igv_enhancer_databases)
+            {
+                File f_input_enhancerdbs_DB =
+                        new File(f_input_enhancerdbs_root.getAbsolutePath()+File.separator+enhancer_db+options_intern.enhancerDB_bed_suffix);
+
+                File f_output_filtered_db =
+                        new File(f_output_enhancer_dbs.getAbsolutePath()+File.separator+enhancer_db+"_prev" +
+                                options_intern.enhancerDB_bed_suffix);
+
+                StringBuilder sb_specific_db = new StringBuilder();
+                sb_specific_db.append(options_intern.enhancerDB_bed_format+"\n");
+
+                boolean needUplift = true;
+
+
+                BufferedReader br_db = new BufferedReader(new FileReader(f_input_enhancerdbs_DB));
+                String line_db = br_db.readLine();
+                String[] split_header = line_db.split("\t");
+
+                String ref_genome_before = "";
+
+                while ((line_db= br_db.readLine())!=null)
+                {
+                    String[] split = line_db.split("\t");
+                    String species_refgenome = split[4];
+                    String species_code = species_refgenome.replaceAll("[^A-Za-z]", "");
+
+                    if(species_code.equals(igv_species_symbol))
+                    {
+                        if(species_refgenome.equals(options_intern.igv_species_ref_genome))
+                        {
+                            sb_merged_dbs.append(line_db);
+                            sb_merged_dbs.append("\n");
+                            needUplift=false;
+                            continue;
+                        }
+
+                        if(ref_genome_before.equals(""))
+                        {
+                            ref_genome_before=species_refgenome;
+                        }
+
+                        if(!species_refgenome.equals(ref_genome_before))
+                        {
+                            continue;
+                        }
+
+                        sb_specific_db.append(line_db);
+                        sb_specific_db.append("\n");
+                    }
+                }
+                br_db.close();
+
+                if(needUplift)
+                {
+                    BufferedWriter bw_out_not_uplifted = new BufferedWriter(new FileWriter(f_output_filtered_db));
+                    bw_out_not_uplifted.write(sb_specific_db.toString());
+                    bw_out_not_uplifted.close();
+
+                    File f_not_upliftedDB = new File(f_output_enhancer_dbs.getAbsolutePath()+File.separator+enhancer_db+
+                            "_prev"+options_intern.enhancerDB_bed_suffix);
+
+                    File f_upliftedDB = new File(f_output_enhancer_dbs.getAbsolutePath()+File.separator+enhancer_db+options_intern.enhancerDB_bed_suffix);
+
+                    File f_uplift_script_enhancer =
+                            new File(f_output_enhancer_dbs.getAbsolutePath() + File.separator + enhancer_db+"_"+
+                            options_intern.file_suffix_deseq2_preprocessing_gene_positions_data_upliftpy);
+
+                    StringBuilder sb_pyuplift_db = new StringBuilder();
+
+                    sb_pyuplift_db.append("import pip\n" + "\n" + "def import_or_install(package):\n" + "    try:\n" +
+                            "        __import__(package)\n" + "    except ImportError:\n" +
+                            "        pip.main(['install', package])\n" + "\n" + "import_or_install(\"pyliftover\")\n" +
+                            "import_or_install(\"pandas\")\n" + "import_or_install(\"re\")\n" + "\n" + "import re\n" +
+                            "import pandas as pd\n" + "from pyliftover import LiftOver\n" + "\n" +
+                            "def convert(c, x, y, converter):\n" +
+                            "    first = converter.convert_coordinate(c, int(x))\n" +
+                            "    second = converter.convert_coordinate(c, int(y))\n" + "\n" +
+                            "    if(first is None or second is None):\n" + "        return None, None\n" + "\n" +
+                            "    if len(first) == 0 or len(second) == 0:\n" + "        return None, None\n" + "\n" +
+                            "    return str(first[0][1]), str(second[0][1])\n" + "\n" + "def main():\n" +
+                            "    path_to_X = \""+f_output_filtered_db.getAbsolutePath()+"\"\n" +
+                            "    path_to_newSave = \""+f_upliftedDB.getAbsolutePath()+"\"\n" +
+                            "\n" + "    version_of_our_dat=\""+options_intern.igv_species_ref_genome+"\"\n" +
+                            "    version_of_their_dat" + "=\""+ref_genome_before+"\"\n" + "\n" +
+                            "    please_convert = True\n" + "    if(version_of_our_dat == version_of_their_dat):\n" +
+                            "        please_convert=False\n" + "\n" + "\n" +
+                            "    df = pd.read_csv(path_to_X, sep=\"\\t\")\n" + "\n" + "    data_output = []\n" + "\n" +
+                            "    column_names=[]\n" + "\n" + "    for col in df.columns:\n" +
+                            "        column_names.append(col)\n" + "\n" +
+                            "    converter = LiftOver(version_of_their_dat, version_of_our_dat)\n" + "\n" +
+                            "    for index, row in df.iterrows():\n" +
+                            "        mgi_symbol = row[column_names.__getitem__(3)]\n" +
+                            "        #chromosome_not_edited=str(row[column_names.__getitem__(0)])\n" +
+                            "        chromosome = str(row[column_names.__getitem__(0)])\n" +
+                            "        start_position = row[column_names.__getitem__(1)]\n" +
+                            "        end_position = row[column_names.__getitem__(2)]\n" + "\n" +
+                            "        ref_genome = row[column_names.__getitem__(4)]\n" + "\n" +
+                            "        search_string = chromosome+\":\"+str(start_position)+\"-\"+str(end_position)\n" +
+                            "        x_converted=start_position\n" + "        y_converted=end_position\n" + "\n" +
+                            "        if please_convert:\n" +
+                            "            x_converted, y_converted = convert(chromosome, start_position, end_position, converter)\n" +
+                            "            if(x_converted is None or y_converted is None):\n" +
+                            "                continue\n" + "\n" + "        start_position=x_converted\n" +
+                            "        end_position=y_converted\n" + "\n" +
+                            "        data_output.append([chromosome,start_position,end_position,mgi_symbol,'"+options_intern.igv_species_ref_genome+"'])\n" +
+                            "\n" + "        #string_converted = chromosome+\":\"+x_converted+\"-\"+y_converted\n" +
+                            "        #print(\"X\")\n" + "\n" +
+                            "    df_converted = pd.DataFrame(data_output, columns=column_names)\n" +
+                            "    df_converted.to_csv(path_to_newSave,sep=\"\\t\",index=False)\n" + "\n" + "main()\n");
+
+
+                    BufferedWriter bw_pyuplift_db = new BufferedWriter(new FileWriter(f_uplift_script_enhancer));
+                    bw_pyuplift_db.write(sb_pyuplift_db.toString());
+                    bw_pyuplift_db.close();
+
+                    logger.logLine("[ENHANCER] Uplift db "+enhancer_db+" positions to correct genome version");
+
+                    String command_pyuplift_db = "python3 " + f_uplift_script_enhancer.getAbsolutePath();
+
+                    logger.logLine("[ENHANCER] executing command: " + command_pyuplift_db);
+
+                    Process child_pyuplift_db = Runtime.getRuntime().exec(command_pyuplift_db);
+                    int code_pyuplift_db = child_pyuplift_db.waitFor();
+                    switch (code_pyuplift_db)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            String message = child_pyuplift_db.getErrorStream().toString();
+                            throw new Exception(message);
+                    }
+
+                    BufferedReader br_input_uplifted_names =
+                            new BufferedReader(new FileReader(f_upliftedDB.getAbsolutePath()));
+                    String line_input_uplifted_names = br_input_uplifted_names.readLine();
+                    while((line_input_uplifted_names= br_input_uplifted_names.readLine())!=null)
+                    {
+                        sb_merged_dbs.append(line_input_uplifted_names);
+                        sb_merged_dbs.append("\n");
+                    }
+                    br_input_uplifted_names.close();
+                }
+            }
+
+            File f_dbs_merged =
+                    new File(f_output_positions_root.getAbsolutePath()+File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+
+            BufferedWriter bw_merged_enhancer_dbs = new BufferedWriter(new FileWriter(f_dbs_merged));
+            bw_merged_enhancer_dbs.append(sb_merged_dbs.toString());
+            bw_merged_enhancer_dbs.close();
+        }
+
 
         logger.logLine("[PREP] Finished creating gene positions for all RNA-seq data.");
 
@@ -13486,6 +13707,14 @@ public class COM2POSE_lib
                 case "igv_path_to_tdf":
                     options_intern.igv_path_to_tdf = split[1].substring(1, split[1].length() - 1);
                     break;
+                case "igv_enhancer_databases":
+                    String input_db= split[1].substring(1, split[1].length() - 1);
+                    if(input_db.length()<1)
+                        continue;
+
+                    String[] enhancer_databases = input_db.split(";");
+                    options_intern.igv_enhancer_databases.addAll(Arrays.asList(enhancer_databases));
+                    break;
                 case "igv_GRC_synonym_dict":
                     String input= split[1].substring(1, split[1].length() - 1);
                     if(input.length()<3)
@@ -13496,7 +13725,7 @@ public class COM2POSE_lib
                     for(String g : groups)
                     {
                         String[] split_groups = g.split("=");
-                        if(split_groups.length>2)
+                        if(split_groups.length>=2)
                         {
                             options_intern.igv_GRC_synonym_dict.put(split_groups[0],split_groups[1]);
                         }
@@ -14033,6 +14262,39 @@ public class COM2POSE_lib
                 logger.logLine("[IGV] ERROR in igv_path_to_tdf. File path does not exist! Needs to follow " +
                         "structure of " +
                         "tepic_input_directory.");
+            }
+        }
+
+        if(options_intern.igv_enhancer_databases.size()>0)
+        {
+            //check if database files exists
+            //check if format is correct
+            File f_input_root =
+                    new File(options_intern.path_to_COM2POSE+File.separator+options_intern.folder_ext+File.separator+options_intern.folder_enhancerDB);
+            for(String db : options_intern.igv_enhancer_databases)
+            {
+                File f_input_db = new File(f_input_root.getAbsolutePath()+File.separator+db+".bed");
+                if(!f_input_db.exists())
+                {
+                    all_set=false;
+                    logger.logLine("[ENHANCER] BED for database does not exist in "+options_intern.folder_ext+File.separator+options_intern.folder_enhancerDB+
+                            ": " + db);
+                }
+                else
+                {
+                    BufferedReader br = new BufferedReader(new FileReader(f_input_db));
+                    String line = br.readLine();;
+                    br.close();
+
+                    if(!line.equals(options_intern.enhancerDB_bed_format))
+                    {
+                        all_set=false;
+                        logger.logLine("[ENHANCER] BED format corrupted. Needs to have this format: ");
+                        logger.logLine("[ENHANCER] " + options_intern.enhancerDB_bed_format);
+                    }
+
+                }
+
             }
         }
 
@@ -15482,6 +15744,23 @@ public class COM2POSE_lib
                 response_session_tdf = in_session.readLine();
             }
 
+        }
+
+        //include enhancer regions of interest if available
+        if(options_intern.igv_enhancer_databases.size()>0)
+        {
+            File f_merged_databases =
+                    new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+
+            BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
+            String line_mergedDB = br_mergedDB.readLine();
+            while((line_mergedDB= br_mergedDB.readLine())!=null)
+            {
+                String[] split = line_mergedDB.split("\t");
+
+                out_session.println("region " + split[0] + " " + split[1] + " " + split[2]);
+                String response_region = in_session.readLine();
+            }
         }
 
         //logger.logLine("[IGV] " + response_load);

@@ -136,6 +136,7 @@ public class COM2POSE
             com2pose_lib.run_igv_own_data();
         }
 
+
         if (options_intern.igv_important_locus_all_prio_tf.size() > 0)
         {
             com2pose_lib.run_igv_on_important_loci();
