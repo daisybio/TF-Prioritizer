@@ -2,11 +2,28 @@ package util;
 
 public class Report
 {
-    public void generate()
+    private final Logger logger;
+    private final Options_intern options_intern;
+
+    public Report(Options_intern options_intern) throws Exception
     {
-        System.out.println("[REPORT] Start generating report");
+        this.options_intern = options_intern;
+        logger = new Logger(true, options_intern.com2pose_working_directory);
+    }
 
+    public void generate() throws Exception
+    {
+        logger.logLine("[REPORT] Start generating report");
+        generateHome();
 
-        System.out.println("[REPORT] Finished generating report");
+        logger.logLine("[REPORT] Finished generating report");
+    }
+
+    private void generateHome() throws Exception
+    {
+        logger.logLine("[REPORT] Start generating report home page");
+        logger.logLine(options_intern.com2pose_working_directory);
+
+        logger.logLine("[REPORT] Finished generating report home page");
     }
 }
