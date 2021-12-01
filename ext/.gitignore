@@ -15,9 +15,9 @@
 !/TEPIC/TEPIC/*/*/*/*/*/*/*/*
 !/TEPIC/TEPIC/*/*/*/*/*/*/*/*/*
 !/TEPIC/TEPIC/*/*/*/*/*/*/*/*/*/*
-!WEBSITE_CSS/*
-!WEBSITE/CSS/*
-!WEBSITE/images/*
+!REPORT/*
+!REPORT/*/*
+!REPORT/*/*/*
 !Enhancers_DB
 !Enhancers_DB/*
 !Enhancers_DB/ENdb.bed
