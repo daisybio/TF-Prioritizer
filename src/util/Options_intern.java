@@ -276,6 +276,13 @@ public class Options_intern
             d_report_resources_parameters + File.separator + "TOOL.html";
     public String f_report_resources_parameters_parameter_html =
             d_report_resources_parameters + File.separator + "PARAMETER.html";
+    public String d_report_resources_validation = d_report_resources + File.separator + "VALIDATION";
+    public String f_report_resources_validation_validation_html = d_report_resources_validation + "VALIDATION.html";
+    public String d_report_resources_distribution = d_report_resources + File.separator + "DISTRIBUTION";
+    public String f_report_resources_distribution_distribution_html =
+            d_report_resources_validation + "DISTRIBUTION" + ".html";
+    public String d_report_resources_regression = d_report_resources + File.separator + "REGRESSION";
+    public String f_report_resources_regression_regression_html = d_report_resources_validation + "REGRESSION.html";
 
     /*#################################
       ##PREPROCESSING MIX OPTIONS######
