@@ -8,7 +8,7 @@
     border: none;
     outline: none;
     transition: 0.4s;
-    grid-column: 1 / span 2;
+    grid-column: 1 / -1;
 }
 
 body {
@@ -31,19 +31,20 @@ body {
     display: none;
     grid-template-columns: auto auto auto auto;
     overflow: hidden;
-    grid-column: 1 / span 2;
+    grid-column: 1 / -1;
 }
 
-.h1 {
+h1 {
     font-size: 40px;
 }
 
-.h2, .accordion {
+h2, .accordion {
     font-size: 25px;
 }
 
-.h3 {
+h3 {
     font-size: 15px;
+    grid-column: 1 / -1;
 }
 
 .button {
