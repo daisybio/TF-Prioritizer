@@ -67,6 +67,8 @@ public class Report
                     options_intern.folder_name_deseq2_preprocessing + File.separator +
                     options_intern.file_suffix_deseq2_mapping);
 
+            int i = 1;
+
             while (scanner.hasNextLine())
             {
                 String line = scanner.nextLine();
@@ -94,9 +96,10 @@ public class Report
                         }
                     }
                 }
-                tf_string = tf_string.replace("{TF_NAME}", gene_symbol);
+                tf_string = tf_string.replace("{TF_NAME}", i + ". " + gene_symbol);
                 tf_string = tf_string.replace("{CONTENT}", ensg_symbol);
                 sb_tfs.append(tf_string);
+                i++;
             }
             home = home.replace("{TFS}", sb_tfs.toString());
         }
