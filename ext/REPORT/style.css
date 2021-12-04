@@ -28,7 +28,8 @@ body {
 .panel {
     padding: 0 18px;
     background-color: white;
-    display: none;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
     overflow: hidden;
     grid-column: 1 / span 2;
 }
