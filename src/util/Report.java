@@ -21,8 +21,27 @@ public class Report
 
         generateHome();
         styleAndScript();
+        generateParameters();
 
         logger.logLine("[REPORT] Finished generating report");
+    }
+
+    private void generateParameters() throws IOException
+    {
+        logger.logLine("[REPORT] Start generating report parameters page");
+        String parameters = loadFrame();
+        parameters = parameters.replace("{BODY}", loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_parameters_parameters_html));
+        parameters = parameters.replace("{TITLE}", "Parameters");
+        parameters = parameters.replace("{TOOLS}", loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_parameters_tool_html));
+        parameters = parameters.replace("{PARAMETERS}", loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_parameters_parameter_html));
+
+
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_parameters,
+                parameters);
+        logger.logLine("[REPORT] Finished generating report parameters page");
     }
 
     private void generateHome() throws Exception

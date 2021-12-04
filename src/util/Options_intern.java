@@ -258,6 +258,7 @@ public class Options_intern
     // REPORT options
     public String d_out_report = "REPORT";
     public String f_out_report_home = d_out_report + File.separator + "HOME.html";
+    public String f_out_report_parameters = d_out_report + File.separator + "PARAMETERS.html";
     public String f_out_report_style = d_out_report + File.separator + "style.css";
     public String f_out_report_script = d_out_report + File.separator + "script.js";
 
@@ -268,6 +269,13 @@ public class Options_intern
     public String f_report_resources_frame_html = d_report_resources + File.separator + "FRAME.html";
     public String f_report_resources_style = d_report_resources + File.separator + "style.css";
     public String f_report_resources_script = d_report_resources + File.separator + "script.js";
+    public String d_report_resources_parameters = d_report_resources + File.separator + "PARAMETERS";
+    public String f_report_resources_parameters_parameters_html =
+            d_report_resources_parameters + File.separator + "PARAMETERS.html";
+    public String f_report_resources_parameters_tool_html =
+            d_report_resources_parameters + File.separator + "TOOL.html";
+    public String f_report_resources_parameters_parameter_html =
+            d_report_resources_parameters + File.separator + "PARAMETER.html";
 
     /*#################################
       ##PREPROCESSING MIX OPTIONS######
