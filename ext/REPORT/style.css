@@ -41,7 +41,7 @@ body {
 
 .keyvaluepaircontainer {
     display: grid;
-    gap: 1rem;
+    gap: 5px;
     grid-template-columns: auto auto;
 }
 
@@ -58,7 +58,7 @@ h3 {
     grid-column: 1 / -1;
 }
 
-.button {
+.button, .button-top {
     background-color: #555555;
     border: none;
     color: white;
@@ -67,7 +67,18 @@ h3 {
     font-size: 16px;
     border-radius: 8px;
     padding: 10px 15px;
+    margin: 10px 10px;
+    align-self: center;
+    justify-self: center;
+}
+
+.button-top {
     display: flex;
     justify-self: right;
     align-self: center;
+}
+
+.tf-buttonbar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
 }
