@@ -3,6 +3,7 @@ package util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Scanner;
 
 public class Report
 {
@@ -51,8 +52,32 @@ public class Report
         home = home.replace("{BODY}", loadFile(
                 options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_home_home_html));
         home = home.replace("{TITLE}", "Overview");
-        home = home.replace("{TFS}", loadFile(
-                options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_home_tf_html));
+
+        File tf_file = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_dcg + File.separator +
+                        options_intern.file_suffix_distribution_analysis_dcg);
+
+        try (Scanner scanner = new Scanner(tf_file))
+        {
+            StringBuilder sb_tfs = new StringBuilder();
+            boolean firstLine = true;
+
+            while (scanner.hasNextLine())
+            {
+                String line = scanner.nextLine();
+                if (firstLine)
+                {
+                    firstLine = false;
+                    continue;
+                }
+                String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                        options_intern.f_report_resources_home_tf_html);
+                tf_string = tf_string.replace("{TF_NAME}", line.split("\t")[1]);
+                sb_tfs.append(tf_string);
+            }
+            home = home.replace("{TFS}", sb_tfs.toString());
+        }
 
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_home, home);
