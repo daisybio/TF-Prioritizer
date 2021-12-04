@@ -255,6 +255,20 @@ public class Options_intern
             directory_for_tepic_scripts + File.separator + "MachineLearningPipelines" + File.separator + "DYNAMITE" +
                     File.separator + "Scripts";
 
+    // REPORT options
+    public String d_out_report = "REPORT";
+    public String f_out_report_home = d_out_report + File.separator + "HOME.html";
+    public String f_out_report_style = d_out_report + File.separator + "style.css";
+    public String f_out_report_script = d_out_report + File.separator + "script.js";
+
+    public String d_report_resources = folder_ext + File.separator + "REPORT";
+    public String d_report_resources_home = d_report_resources + File.separator + "HOME";
+    public String f_report_resources_home_home_html = d_report_resources_home + File.separator + "HOME.html";
+    public String f_report_resources_home_tf_html = d_report_resources_home + File.separator + "TF.html";
+    public String f_report_resources_frame_html = d_report_resources + File.separator + "FRAME.html";
+    public String f_report_resources_style = d_report_resources + File.separator + "style.css";
+    public String f_report_resources_script = d_report_resources + File.separator + "script.js";
+
     /*#################################
       ##PREPROCESSING MIX OPTIONS######
       #################################*/
