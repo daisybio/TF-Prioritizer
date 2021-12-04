@@ -113,8 +113,8 @@ public class Report
                                 double log2fc =
                                         Double.parseDouble(findValueInTable(ensg_symbol, 0, 1, entry, "\t", false));
                                 sb_log2fc.append(
-                                        "<p>" + group1 + " -> " + group2 + "</p><p>" + formatter.format(log2fc) +
-                                                "</p>");
+                                        "<div class=\"keyvaluepair\"><p>" + group1 + " -> " + group2 + ":</p><p>" +
+                                                formatter.format(log2fc) + "</p></div>");
                             } catch (NoSuchFieldException ignored)
                             {
                             }
@@ -141,7 +141,9 @@ public class Report
                             {
                                 double tpm =
                                         Double.parseDouble(findValueInTable(ensg_symbol, 0, 3, entry, "\t", false));
-                                sb_tpm.append("<p>" + group + "</p><p>" + formatter.format(tpm) + "</p>");
+                                sb_tpm.append(
+                                        "<div class=\"keyvaluepair\"><p>" + group + "</p><p>" + formatter.format(tpm) +
+                                                "</p></div>");
                             } catch (NoSuchFieldException ignored)
                             {
                             }
@@ -166,7 +168,8 @@ public class Report
                             try
                             {
                                 int exp = Integer.parseInt(findValueInTable(ensg_symbol, 1, 2, entry, "\t", false));
-                                sb_normex.append("<p>" + group + "</p><p>" + exp + "</p>");
+                                sb_normex.append("<div class=\"keyvaluepair\"><p>" + group + "</p><p>" + exp + "</p" +
+                                        "></div>");
                             } catch (NoSuchFieldException ignored)
                             {
                             }

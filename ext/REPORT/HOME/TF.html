@@ -1,11 +1,19 @@
 <button class="accordion">{TF_NAME}</button>
 <div class="panel">
-    <p>GeneID:</p>
-    <p>{GENEID}</p>
+    <div class="keyvaluepair" style="grid-column: 1 / -1;">
+        <p>GeneID:</p>
+        <p>{GENEID}</p>
+    </div>
     <h3>LOG2FC</h3>
-    {LOG2FC}
+    <div class="keyvaluepaircontainer">
+        {LOG2FC}
+    </div>
     <h3>Norm. expressions</h3>
-    {NORMEX}
+    <div class="keyvaluepaircontainer">
+        {NORMEX}
+    </div>
     <h3>TPM</h3>
-    {TPM}
+    <div class="keyvaluepaircontainer">
+        {TPM}
+    </div>
 </div>
