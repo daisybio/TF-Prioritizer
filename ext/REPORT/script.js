@@ -10,10 +10,10 @@ function accordion() {
 
             /* Toggle between hiding and showing the active panel */
             let panel = this.nextElementSibling;
-            if (panel.style.display === "block") {
+            if (panel.style.display === "grid") {
                 panel.style.display = "none";
             } else {
-                panel.style.display = "block";
+                panel.style.display = "grid";
             }
         });
     }
