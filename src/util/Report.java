@@ -150,6 +150,31 @@ public class Report
                     tf_string = tf_string.replace("{TPM}", sb_tpm.toString());
                 }   //TPM
 
+                {   //Normalized expression
+                    File d_normex = new File(options_intern.com2pose_working_directory + File.separator +
+                            options_intern.folder_name_deseq2_preprocessing + File.separator +
+                            options_intern.folder_name_deseq2_preprocessing_gene_symbols);
+
+                    StringBuilder sb_normex = new StringBuilder();
+
+                    for (File entry : Objects.requireNonNull(d_normex.listFiles()))
+                    {
+                        if (entry.isFile() && entry.getName().endsWith(".csv"))
+                        {
+                            String group = entry.getName().split("\\.")[0];
+
+                            try
+                            {
+                                int exp = Integer.parseInt(findValueInTable(ensg_symbol, 1, 2, entry, "\t", false));
+                                sb_normex.append("<p>" + group + "</p><p>" + exp + "</p>");
+                            } catch (NoSuchFieldException ignored)
+                            {
+                            }
+                        }
+                    }
+                    tf_string = tf_string.replace("{NORMEX}", sb_normex.toString());
+                }   //Normalized expression
+
                 tf_string = tf_string.replace("{GENEID}", ensg_symbol);
                 sb_tfs.append(tf_string);
                 i++;
