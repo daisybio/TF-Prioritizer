@@ -2,7 +2,6 @@ import com2pose.COM2POSE_lib;
 import org.apache.commons.cli.*;
 
 import util.Options_intern;
-import util.Report;
 
 
 public class COM2POSE
