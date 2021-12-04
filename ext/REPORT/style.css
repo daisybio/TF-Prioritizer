@@ -38,6 +38,14 @@ body {
     font-size: 40px;
 }
 
+.h2, .accordion {
+    font-size: 25px;
+}
+
+.h3 {
+    font-size: 15px;
+}
+
 .button {
     background-color: #555555;
     border: none;
