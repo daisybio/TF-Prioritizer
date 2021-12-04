@@ -11,6 +11,10 @@
     grid-column: 1 / span 2;
 }
 
+body {
+    font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+}
+
 .active,
 .accordion:hover {
     background-color: #ccc;
