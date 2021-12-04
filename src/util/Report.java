@@ -63,6 +63,10 @@ public class Report
             StringBuilder sb_tfs = new StringBuilder();
             boolean firstLine = true;
 
+            File gene_symbol_map = new File(options_intern.com2pose_working_directory + File.separator +
+                    options_intern.folder_name_deseq2_preprocessing + File.separator +
+                    options_intern.file_suffix_deseq2_mapping);
+
             while (scanner.hasNextLine())
             {
                 String line = scanner.nextLine();
@@ -73,7 +77,25 @@ public class Report
                 }
                 String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
                         options_intern.f_report_resources_home_tf_html);
-                tf_string = tf_string.replace("{TF_NAME}", line.split("\t")[1]);
+                String gene_symbol = line.split("\t")[1];
+                String ensg_symbol = "";
+
+                try (Scanner mapScanner = new Scanner(gene_symbol_map))
+                {
+                    while (mapScanner.hasNextLine())
+                    {
+                        String translation = mapScanner.nextLine();
+                        if (translation.split("\t").length == 2)
+                        {
+                            if (gene_symbol.equalsIgnoreCase(translation.split("\t")[1]))
+                            {
+                                ensg_symbol = translation.split("\t")[0];
+                            }
+                        }
+                    }
+                }
+                tf_string = tf_string.replace("{TF_NAME}", gene_symbol);
+                tf_string = tf_string.replace("{CONTENT}", ensg_symbol);
                 sb_tfs.append(tf_string);
             }
             home = home.replace("{TFS}", sb_tfs.toString());
