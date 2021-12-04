@@ -19,9 +19,7 @@ public class Logger
         if (write_to_file)
         {
             logfile = new File(working_dir + File.separator + "logfile.txt");
-            BufferedWriter bw = new BufferedWriter(new FileWriter(logfile));
-            bw.write("");
-            bw.close();
+            logLine("[LOGGER] Initialised logger");
         }
 
     }
@@ -36,10 +34,17 @@ public class Logger
 
         if (write_to_file)
         {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(logfile, true));
-            bw.write(line);
-            bw.newLine();
-            bw.close();
+            if (!logfile.isFile())
+            {
+                logfile.createNewFile();
+            }
+            if (logfile.canWrite())
+            {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(logfile, true));
+                bw.write(line);
+                bw.newLine();
+                bw.close();
+            }
         }
     }
 }
