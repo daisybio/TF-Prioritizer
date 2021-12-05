@@ -13,7 +13,7 @@ public class Report
     private final Options_intern options_intern;
     private final ArrayList<Map<String, String>> transcriptionFactors = new ArrayList<>();
 
-    public Report(Options_intern options_intern) throws Exception
+    public Report(Options_intern options_intern) throws IOException
     {
         this.options_intern = options_intern;
         logger = new Logger(true, options_intern.com2pose_working_directory);
@@ -57,7 +57,7 @@ public class Report
         }
     }
 
-    public void generate() throws Exception
+    public void generate() throws IOException
     {
         logger.logLine("[REPORT] Start generating report");
 
@@ -90,7 +90,7 @@ public class Report
         logger.logLine("[REPORT] Finished generating report parameters page");
     }
 
-    private void generateHome() throws Exception
+    private void generateHome() throws IOException
     {
         logger.logLine("[REPORT] Start generating report home page");
         String home = loadFrame();
