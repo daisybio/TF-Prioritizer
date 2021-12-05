@@ -64,6 +64,7 @@ public class Report
         generateHome();
         styleAndScript();
         generateParameters();
+        generateValidation();
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -105,7 +106,7 @@ public class Report
         {
             String tf_string = loadFile(
                     options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_home_tf_html);
-            String gene_symbol = tfMap.get("GeneSymbol");
+            String gene_symbol = tfMap.get("GeneSymbol").toUpperCase();
             String ensg_symbol = tfMap.get("ENSG");
 
             tf_string = tf_string.replace("{TF_NAME}", i + ". " + gene_symbol);
@@ -191,6 +192,9 @@ public class Report
             }   //Normalized expression
 
             tf_string = tf_string.replace("{GENEID}", ensg_symbol);
+
+            tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + gene_symbol + ".html");
+
             sb_tfs.append(tf_string);
             i++;
         }
@@ -199,6 +203,29 @@ public class Report
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_home, home);
         logger.logLine("[REPORT] Finished generating report home page");
+    }
+
+    private void generateValidation() throws IOException
+    {
+
+        File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_validation_validation_html);
+
+
+        for (Map<String, String> entry : transcriptionFactors)
+        {
+            StringBuilder sb_validation = new StringBuilder();
+            String validation = loadFile(templateFile.getAbsolutePath());
+            String ensgSymbol = entry.get("ENSG").toUpperCase();
+            String tfName = entry.get("GeneSymbol");
+
+            validation = validation.replace("{TFNAME}", ensgSymbol);
+
+            sb_validation.append(validation);
+
+            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                    File.separator + tfName + ".html", sb_validation.toString());
+        }
     }
 
     private String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
@@ -258,6 +285,7 @@ public class Report
 
     private String loadFile(String path) throws IOException
     {
+        System.out.println(path);
         File source = new File(path);
         return Files.readString(source.toPath());
     }

@@ -261,6 +261,7 @@ public class Options_intern
     public String f_out_report_parameters = d_out_report + File.separator + "PARAMETERS.html";
     public String f_out_report_style = d_out_report + File.separator + "style.css";
     public String f_out_report_script = d_out_report + File.separator + "script.js";
+    public String d_out_validation = d_out_report + File.separator + "VALIDATION";
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
     public String d_report_resources_home = d_report_resources + File.separator + "HOME";
@@ -277,7 +278,8 @@ public class Options_intern
     public String f_report_resources_parameters_parameter_html =
             d_report_resources_parameters + File.separator + "PARAMETER.html";
     public String d_report_resources_validation = d_report_resources + File.separator + "VALIDATION";
-    public String f_report_resources_validation_validation_html = d_report_resources_validation + "VALIDATION.html";
+    public String f_report_resources_validation_validation_html =
+            d_report_resources_validation + File.separator + "VALIDATION" + ".html";
     public String d_report_resources_distribution = d_report_resources + File.separator + "DISTRIBUTION";
     public String f_report_resources_distribution_distribution_html =
             d_report_resources_validation + "DISTRIBUTION" + ".html";
