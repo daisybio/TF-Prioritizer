@@ -262,6 +262,8 @@ public class Options_intern
     public String f_out_report_style = d_out_report + File.separator + "style.css";
     public String f_out_report_script = d_out_report + File.separator + "script.js";
     public String d_out_validation = d_out_report + File.separator + "VALIDATION";
+    public String d_out_distribution = d_out_report + File.separator + "DISTRIBUTION";
+    public String d_out_regression = d_out_report + File.separator + "REGRESSION";
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
     public String d_report_resources_home = d_report_resources + File.separator + "HOME";
@@ -282,9 +284,10 @@ public class Options_intern
             d_report_resources_validation + File.separator + "VALIDATION" + ".html";
     public String d_report_resources_distribution = d_report_resources + File.separator + "DISTRIBUTION";
     public String f_report_resources_distribution_distribution_html =
-            d_report_resources_validation + "DISTRIBUTION" + ".html";
+            d_report_resources_distribution + File.separator + "DISTRIBUTION" + ".html";
     public String d_report_resources_regression = d_report_resources + File.separator + "REGRESSION";
-    public String f_report_resources_regression_regression_html = d_report_resources_validation + "REGRESSION.html";
+    public String f_report_resources_regression_regression_html =
+            d_report_resources_regression + File.separator + "REGRESSION" + ".html";
 
     /*#################################
       ##PREPROCESSING MIX OPTIONS######

@@ -18,7 +18,6 @@ public class Report
         this.options_intern = options_intern;
         logger = new Logger(true, options_intern.com2pose_working_directory);
         loadTFs();
-        System.out.println(transcriptionFactors.toArray().length);
     }
 
     private void loadTFs() throws FileNotFoundException
@@ -48,8 +47,8 @@ public class Report
                 {
                     String geneID = findValueInTable(tf_name, 1, 0, geneIDFile, "\t", true);
                     Map<String, String> hashMap = new HashMap<>();
-                    hashMap.put("ENSG", geneID);
-                    hashMap.put("GeneSymbol", tf_name);
+                    hashMap.put("ENSG", geneID.toUpperCase());
+                    hashMap.put("GeneSymbol", tf_name.toUpperCase());
                     transcriptionFactors.add(hashMap);
                 } catch (NoSuchFieldException ignore)
                 {
@@ -66,6 +65,8 @@ public class Report
         styleAndScript();
         generateParameters();
         generateValidation();
+        generateDistribution();
+        generateRegression();
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -82,6 +83,7 @@ public class Report
         parameters = parameters.replace("{PARAMETERS}", loadFile(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_parameters_parameter_html));
 
+        parameters = relativate(parameters, 0);
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_parameters,
                 parameters);
@@ -195,11 +197,15 @@ public class Report
             tf_string = tf_string.replace("{GENEID}", ensg_symbol);
 
             tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + gene_symbol + ".html");
+            tf_string = tf_string.replace("{DISTRIBUTION}", "DISTRIBUTION/" + gene_symbol + ".html");
+            tf_string = tf_string.replace("{REGRESSION}", "REGRESSION/" + gene_symbol + ".html");
 
             sb_tfs.append(tf_string);
             i++;
         }
         home = home.replace("{TFS}", sb_tfs.toString());
+
+        home = relativate(home, 0);
 
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_home, home);
@@ -208,24 +214,70 @@ public class Report
 
     private void generateValidation() throws IOException
     {
-
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_validation_html);
 
 
         for (Map<String, String> entry : transcriptionFactors)
         {
-            StringBuilder sb_validation = new StringBuilder();
+            String frame = loadFrame();
             String validation = loadFile(templateFile.getAbsolutePath());
-            String ensgSymbol = entry.get("ENSG").toUpperCase();
             String tfName = entry.get("GeneSymbol");
 
-            validation = validation.replace("{TFNAME}", ensgSymbol);
+            validation = validation.replace("{TFNAME}", tfName);
 
-            sb_validation.append(validation);
+            frame = frame.replace("{BODY}", validation);
+
+            frame = relativate(frame, 1);
 
             writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                    File.separator + tfName + ".html", sb_validation.toString());
+                    File.separator + tfName + ".html", frame);
+        }
+    }
+
+    private void generateDistribution() throws IOException
+    {
+        File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_distribution_distribution_html);
+
+
+        for (Map<String, String> entry : transcriptionFactors)
+        {
+            String frame = loadFrame();
+            String distribution = loadFile(templateFile.getAbsolutePath());
+            String tfName = entry.get("GeneSymbol");
+
+            distribution = distribution.replace("{TFNAME}", tfName);
+
+            frame = frame.replace("{BODY}", distribution);
+
+            frame = relativate(frame, 1);
+
+            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
+                    File.separator + tfName + ".html", frame);
+        }
+    }
+
+    private void generateRegression() throws IOException
+    {
+        File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_regression_regression_html);
+
+
+        for (Map<String, String> entry : transcriptionFactors)
+        {
+            String frame = loadFrame();
+            String regression = loadFile(templateFile.getAbsolutePath());
+            String tfName = entry.get("GeneSymbol");
+
+            regression = regression.replace("{TFNAME}", tfName);
+
+            frame = frame.replace("{BODY}", regression);
+
+            frame = relativate(frame, 1);
+
+            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
+                    File.separator + tfName + ".html", frame);
         }
     }
 
@@ -252,6 +304,12 @@ public class Report
             }
         }
         throw new NoSuchFieldException();
+    }
+
+    private String relativate(String content, int depth)
+    {
+        content = content.replace("{RELATIVATION}", (".." + File.separator).repeat(depth));
+        return content;
     }
 
     private void styleAndScript() throws IOException
