@@ -18,9 +18,10 @@ public class Report
         this.options_intern = options_intern;
         logger = new Logger(true, options_intern.com2pose_working_directory);
         loadTFs();
+        System.out.println(transcriptionFactors.toArray().length);
     }
 
-    private void loadTFs() throws FileNotFoundException, NoSuchFieldException
+    private void loadTFs() throws FileNotFoundException
     {
         File tf_file = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
@@ -30,8 +31,6 @@ public class Report
         File geneIDFile = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing + File.separator +
                 options_intern.file_suffix_deseq2_mapping);
-
-        System.out.println(tf_file);
 
         try (Scanner scanner = new Scanner(tf_file))
         {
@@ -45,15 +44,17 @@ public class Report
                     continue;
                 }
                 String tf_name = line.split("\t")[1];
-
-                String geneID = findValueInTable(tf_name, 1, 0, geneIDFile, "\t", true);
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("ENSG", geneID);
-                hashMap.put("GeneSymbol", tf_name);
-                transcriptionFactors.add(hashMap);
+                try
+                {
+                    String geneID = findValueInTable(tf_name, 1, 0, geneIDFile, "\t", true);
+                    Map<String, String> hashMap = new HashMap<>();
+                    hashMap.put("ENSG", geneID);
+                    hashMap.put("GeneSymbol", tf_name);
+                    transcriptionFactors.add(hashMap);
+                } catch (NoSuchFieldException ignore)
+                {
+                }
             }
-        } catch (NoSuchFieldException ignore)
-        {
         }
     }
 
@@ -285,7 +286,6 @@ public class Report
 
     private String loadFile(String path) throws IOException
     {
-        System.out.println(path);
         File source = new File(path);
         return Files.readString(source.toPath());
     }
