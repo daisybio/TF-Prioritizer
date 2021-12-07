@@ -10513,11 +10513,6 @@ public class COM2POSE_lib
     public void create_gene_positions() throws Exception
     {
 
-        if (!options_intern.calculcate_gene_positions)
-        {
-            return;
-        }
-
         File f_output_positions_root = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing + File.separator +
                 options_intern.folder_name_deseq2_preprocessing_gene_positions);
@@ -10543,7 +10538,7 @@ public class COM2POSE_lib
         logger.logLine("[PREP] 2. Please run script manually in RStudio.");
         logger.logLine("[PREP] Script path: " + f_script.getAbsolutePath());
         logger.logLine(
-                "[PREP] 3. Afterwards add paramter -a to com2pose command line, so this script wont be started again.");
+                "[PREP] 3. Afterwards add paramter -b to com2pose command line, so this script wont be started again.");
         logger.logLine("[PREP] 4. restart com2pose");
         logger.logLine("[PREP] waiting ...");
 
@@ -10575,7 +10570,7 @@ public class COM2POSE_lib
         sb_script.append("not_done=TRUE\n" + "while (not_done) {\n" + "  tryCatch({\n" +
                 "    #check which genome version we have in biomart\n" + "    \n" +
                 "    ensembl <- useEnsembl(biomart = \"genes\")\n" + "    datasets <- listDatasets(ensembl)\n" +
-                "    used_dataset=searchDatasets(mart = ensembl, pattern = \"mmusculus_gene_ensembl\")\n" +
+                "    used_dataset=searchDatasets(mart = ensembl, pattern = \""+options_intern.deseq2_biomart_dataset_species+"\")\n" +
                 "    version=used_dataset[,3]\n" + "    version=as.character(version)\n" + "    fileConn<-file(\"" +
                 f_data_version.getAbsolutePath() + "\")\n" + "    writeLines(version, fileConn)\n" + "    \n" +
                 "    not_done=FALSE\n" + "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" +
@@ -10589,22 +10584,28 @@ public class COM2POSE_lib
         String command = "Rscript " + f_script;
         logger.logLine("[PREP] run R script: " + command);
 
-
-        Process child = Runtime.getRuntime().exec(command);
-        int code = child.waitFor();
-        switch (code)
+        if (options_intern.calculcate_gene_positions)
         {
-            case 0:
-                break;
-            case 1:
-                String message = child.getErrorStream().toString();
-                logger.logLine(
-                        "[PREP-TPM] Script failed due to bioMart connection error. Please run script manually in RStudio.");
-                logger.logLine("[PREP-TPM] Script path: " + f_script.getAbsolutePath());
-                logger.logLine(
-                        "[PREP-TPM] Afterwards, add paramter -b to com2pose command line, so this script wont be started again.");
-                throw new Exception(message);
+            Process child = Runtime.getRuntime().exec(command);
+            int code = child.waitFor();
+            switch (code)
+            {
+                case 0:
+                    break;
+                case 1:
+                    String message = child.getErrorStream().toString();
+                    logger.logLine(
+                            "[PREP-TPM] Script failed due to bioMart connection error. Please run script manually in RStudio.");
+                    logger.logLine("[PREP-TPM] Script path: " + f_script.getAbsolutePath());
+                    logger.logLine(
+                            "[PREP-TPM] Afterwards, add paramter -b to com2pose command line, so this script wont be started again.");
+                    throw new Exception(message);
+            }
         }
+
+        logger.logLine(" [PREP] -b was set. Skipping. " + command);
+
+
 
         File f_data = new File(f_output_positions_root.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
@@ -10641,8 +10642,10 @@ public class COM2POSE_lib
             "=False" +
             "\n" + "\n" +
                 "\n" + "    df = pd.read_csv(path_to_X, sep=\"\\t\")\n" + "\n" + "    data_output = []\n" + "\n" +
-                "    column_names=[]\n" + "\n" + "    for col in df.columns:\n" + "        column_names.append(col)\n" +
-                "\n" + "    converter = LiftOver(version_convert_from, version_of_our_dat)\n" + "\n" +
+                "    column_names=[]\n" + "\n" + "    for col in df.columns:\n" + "        column_names.append(col)\n");
+        sb_pyuplift.append(
+                "    if please_convert:\n" + "        converter = LiftOver(version_convert_from, version_of_our_dat)" +
+                        "\n" +
                 "    for index, row in df.iterrows():\n" + "        mgi_symbol = row[column_names.__getitem__(0)]\n" +
                 "        chromosome_not_edited=str(row[column_names.__getitem__(1)])\n" +
                 "        chromosome = \"chr\" + str(row[column_names.__getitem__(1)])\n" +
@@ -10666,7 +10669,30 @@ public class COM2POSE_lib
         bw_pyuplift.write(sb_pyuplift.toString());
         bw_pyuplift.close();
 
+        BufferedReader br_biomart_version = new BufferedReader(new FileReader(f_data_version));
+        String line_biomart_version = br_biomart_version.readLine();
+        br_biomart_version.close();
+
+        line_biomart_version = line_biomart_version.split("\\.")[0];
+
         logger.logLine("[PREP] Uplift positions to correct genome version");
+        logger.logLine("[PREP] Our genome: " +options_intern.igv_species_ref_genome);
+        if(options_intern.igv_GRC_synonym_dict.containsKey(line_biomart_version))
+        {
+            logger.logLine("[PREP] Genome got from biomaRt: " + line_biomart_version + " = " + options_intern.igv_GRC_synonym_dict.get(line_biomart_version));
+
+            if(options_intern.igv_species_ref_genome.equals(options_intern.igv_GRC_synonym_dict.get(line_biomart_version)))
+            {
+                logger.logLine("[PREP] equal genome versions. No uplifted needed. Skipping this step.");
+            }
+        }
+        else
+        {
+            logger.logLine("[ERROR] Do not have "+line_biomart_version+" in memory. Please add at igv_GRC_synonym_dict");
+            System.exit(1);
+        }
+
+
 
         String command_pyuplift = "python3 " + f_uplift_script.getAbsolutePath();
 

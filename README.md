@@ -94,6 +94,7 @@ geneX_name
 ```
 
 Please do not have any other folders or files in ROOT_RNA_SEQ. This could cause trouble with the TF-Prioritizer framework.
+The filenames need to be named: group_R1.txt
 Important notice: the timepoint names of ROOT_RNA_SEQ and ROOT_CHIP_SEQ must be exactly similar. 
 
 ### nfcore ChIP-seq data or ATAC-seq data
@@ -123,6 +124,30 @@ Important notice: the histone modification names in ROOT_CHIP_SEQ must be exactl
 
 If you want to use automatic IGV snapshot for validation of the predicted TFs, you need to open IGV before you start COM2POSE.
 The evaluation input directory has to be in this format:
+```
+                                                 +-- sample 1
+                   +-- timepoint 1 --+-- TF1 1 --+-- ...
+                   |                 |           +-- sample n
+                   |                 +--  ...
+                   |                 |          +-- sample 1
+                   |                 +-- TF n --+-- ...
+                   |                            +-- sample n
+----ROOT_CHIP_SEQ--+--  ...
+                   |
+                   |                            +-- sample 1
+                   +-- timepoint n --+-- TF 1 --+-- ...
+                                     |          +-- sample n
+                                     +--  ...
+                                     |          +-- sample 1
+                                     +-- TF n --+-- ...
+                                                +-- sample n
+```
+
+### inclusion of HM signals
+
+If you want to include HM signals in the IGV shots please include a directory at igv_path_to_tdf with the following 
+structure. The samples need to be in .tdf format.
+
 ```
                                                  +-- sample 1
                    +-- timepoint 1 --+-- TF1 1 --+-- ...
