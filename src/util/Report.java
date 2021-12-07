@@ -228,6 +228,8 @@ public class Report
 
             frame = frame.replace("{BODY}", validation);
 
+            frame = frame.replace("{TITLE}", tfName + " - Validation");
+
             frame = relativate(frame, 1);
 
             writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
@@ -251,6 +253,8 @@ public class Report
 
             frame = frame.replace("{BODY}", distribution);
 
+            frame = frame.replace("{TITLE}", tfName + " - Distribution");
+
             frame = relativate(frame, 1);
 
             writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
@@ -273,6 +277,8 @@ public class Report
             regression = regression.replace("{TFNAME}", tfName);
 
             frame = frame.replace("{BODY}", regression);
+
+            frame = frame.replace("{TITLE}", tfName + " - Regression");
 
             frame = relativate(frame, 1);
 
