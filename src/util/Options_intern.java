@@ -266,6 +266,7 @@ public class Options_intern
     public String d_out_regression = d_out_report + File.separator + "REGRESSION";
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
+    public String f_report_resources_basicdata_html = d_report_resources + File.separator + "BASICDATA.html";
     public String d_report_resources_home = d_report_resources + File.separator + "HOME";
     public String f_report_resources_home_home_html = d_report_resources_home + File.separator + "HOME.html";
     public String f_report_resources_home_tf_html = d_report_resources_home + File.separator + "TF.html";
