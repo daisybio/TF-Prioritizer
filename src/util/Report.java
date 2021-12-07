@@ -12,6 +12,7 @@ public class Report
     private final Logger logger;
     private final Options_intern options_intern;
     private final ArrayList<Map<String, String>> transcriptionFactors = new ArrayList<>();
+    private final DecimalFormat formatter = new DecimalFormat("0.000");
 
     public Report(Options_intern options_intern) throws IOException
     {
@@ -64,7 +65,6 @@ public class Report
         generateHome();
         styleAndScript();
         generateParameters();
-        generateValidation();
         generateDistribution();
         generateRegression();
 
@@ -100,7 +100,6 @@ public class Report
 
 
         StringBuilder sb_tfs = new StringBuilder();
-        DecimalFormat formatter = new DecimalFormat("0.000");
 
 
         int i = 1;
@@ -111,6 +110,10 @@ public class Report
                     options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_home_tf_html);
             String gene_symbol = tfMap.get("GeneSymbol").toUpperCase();
             String ensg_symbol = tfMap.get("ENSG");
+
+            Map<String, Double> log2fc = new HashMap<String, Double>();
+            Map<String, Double> tpm = new HashMap<String, Double>();
+            Map<String, Integer> normex = new HashMap<String, Integer>();
 
             tf_string = tf_string.replace("{TF_NAME}", i + ". " + gene_symbol);
 
@@ -129,14 +132,18 @@ public class Report
 
                         try
                         {
-                            double log2fc = Double.parseDouble(findValueInTable(ensg_symbol, 0, 1, entry, "\t", false));
-                            sb_log2fc.append("<div class=\"keyvaluepair\"><p>" + group1 + " -> " + group2 + ":</p><p>" +
-                                    formatter.format(log2fc) + "</p></div>");
+                            double log2fc_value =
+                                    Double.parseDouble(findValueInTable(ensg_symbol, 0, 1, entry, "\t", false));
+                            String name = group1 + " -> " + group2;
+                            sb_log2fc.append("<div class=\"keyvaluepair\"><p>" + name + ":</p><p>" +
+                                    formatter.format(log2fc_value) + "</p></div>");
+                            log2fc.put(name, log2fc_value);
                         } catch (NoSuchFieldException ignored)
                         {
                         }
                     }
                 }
+
                 tf_string = tf_string.replace("{LOG2FC}", sb_log2fc.toString());
             }   //LOG2FC
 
@@ -156,10 +163,11 @@ public class Report
 
                         try
                         {
-                            double tpm = Double.parseDouble(findValueInTable(ensg_symbol, 0, 3, entry, "\t", false));
-                            sb_tpm.append(
-                                    "<div class=\"keyvaluepair\"><p>" + group + "</p><p>" + formatter.format(tpm) +
-                                            "</p></div>");
+                            double tpm_value =
+                                    Double.parseDouble(findValueInTable(ensg_symbol, 0, 3, entry, "\t", false));
+                            tpm.put(group, tpm_value);
+                            sb_tpm.append("<div class=\"keyvaluepair\"><p>" + group + "</p><p>" +
+                                    formatter.format(tpm_value) + "</p></div>");
                         } catch (NoSuchFieldException ignored)
                         {
                         }
@@ -183,9 +191,10 @@ public class Report
 
                         try
                         {
-                            int exp = Integer.parseInt(findValueInTable(ensg_symbol, 1, 2, entry, "\t", false));
-                            sb_normex.append(
-                                    "<div class=\"keyvaluepair\"><p>" + group + "</p><p>" + exp + "</p" + "></div>");
+                            int exp_value = Integer.parseInt(findValueInTable(ensg_symbol, 1, 2, entry, "\t", false));
+                            sb_normex.append("<div class=\"keyvaluepair\"><p>" + group + "</p><p>" + exp_value + "</p" +
+                                    "></div>");
+                            normex.put(group, exp_value);
                         } catch (NoSuchFieldException ignored)
                         {
                         }
@@ -193,6 +202,8 @@ public class Report
                 }
                 tf_string = tf_string.replace("{NORMEX}", sb_normex.toString());
             }   //Normalized expression
+
+            generateValidation(tfMap, log2fc, tpm, normex);
 
             tf_string = tf_string.replace("{GENEID}", ensg_symbol);
 
@@ -212,29 +223,58 @@ public class Report
         logger.logLine("[REPORT] Finished generating report home page");
     }
 
-    private void generateValidation() throws IOException
+    private void generateValidation(Map<String, String> tf, Map<String, Double> log2fc, Map<String, Double> tpm,
+                                    Map<String, Integer> normex) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_validation_html);
 
 
-        for (Map<String, String> entry : transcriptionFactors)
-        {
-            String frame = loadFrame();
-            String validation = loadFile(templateFile.getAbsolutePath());
-            String tfName = entry.get("GeneSymbol");
+        String frame = loadFrame();
+        String validation = loadFile(templateFile.getAbsolutePath());
+        String tfName = tf.get("GeneSymbol");
 
-            validation = validation.replace("{TFNAME}", tfName);
+        validation = validation.replace("{TFNAME}", tfName);
 
-            frame = frame.replace("{BODY}", validation);
+        frame = frame.replace("{TITLE}", tfName + " - Validation");
 
-            frame = frame.replace("{TITLE}", tfName + " - Validation");
+        {   //log2fc
+            StringBuilder sb_log2fc = new StringBuilder();
+            for (Map.Entry<String, Double> entry : log2fc.entrySet())
+            {
+                sb_log2fc.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" +
+                        formatter.format(entry.getValue()) + "</p></div>");
+            }
+            validation = validation.replace("{LOG2FC}", sb_log2fc.toString());
+        }   //log2fc
 
-            frame = relativate(frame, 1);
+        {   //tpm
+            StringBuilder sb_tpm = new StringBuilder();
+            for (Map.Entry<String, Double> entry : log2fc.entrySet())
+            {
+                sb_tpm.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" +
+                        formatter.format(entry.getValue()) + "</p></div>");
+            }
+            validation = validation.replace("{TPM}", sb_tpm.toString());
+        }   //tpm
 
-            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                    File.separator + tfName + ".html", frame);
-        }
+        {   //normex
+            StringBuilder sb_normex = new StringBuilder();
+            for (Map.Entry<String, Double> entry : log2fc.entrySet())
+            {
+                sb_normex.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" +
+                        formatter.format(entry.getValue()) + "</p></div>");
+            }
+            validation = validation.replace("{NORMEX}", sb_normex.toString());
+        }   //normex
+
+        frame = frame.replace("{BODY}", validation);
+
+        frame = relativate(frame, 1);
+
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                File.separator + tfName + ".html", frame);
+
     }
 
     private void generateDistribution() throws IOException

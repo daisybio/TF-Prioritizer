@@ -20,7 +20,6 @@ body {
 .header {
     display: grid;
     grid-template-columns: auto min-content min-content min-content;
-    grid-column-gap: 0px;
 }
 
 .keyvaluepair {
