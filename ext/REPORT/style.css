@@ -6,6 +6,16 @@
     --c5: #e0e1dd;
 }
 
+.accordion, .button-selection, .button-top, .button {
+    transition: 0.4s;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    margin: 1px;
+    text-decoration: none;
+    color: white;
+}
+
 .accordion {
     background-color: var(--c3);
     color: white;
@@ -13,11 +23,6 @@
     padding: 18px;
     width: 100%;
     text-align: left;
-    border: none;
-    outline: none;
-    transition: 0.4s;
-    border-radius: 8px;
-    margin: 1px;
 }
 
 .accordion:hover {
@@ -75,30 +80,24 @@ h3 {
     align-content: stretch;
 }
 
-.button-selection {
+.button, .button-selection {
     background-color: var(--c4);
     text-align: center;
     color: white;
-    text-decoration: none;
     font-size: 16px;
     padding: 10px 15px;
     flex-grow: 1;
-    margin: 1px;
-    border-radius: 8px;
 }
 
-.button-selection:hover {
+.button-selection:hover, .button:hover {
     background-color: var(--c3);
 }
 
-.button, .button-top {
+.button-top {
     background-color: var(--c2);
-    border: none;
-    color: white;
     text-align: center;
     text-decoration: none;
     font-size: 16px;
-    border-radius: 8px;
     padding: 10px 15px;
     margin: 5px;
     align-self: center;
