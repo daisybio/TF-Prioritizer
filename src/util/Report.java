@@ -287,8 +287,8 @@ public class Report
                 for (String hisoneModification : transcriptionFactor.histoneModifications)
                 {
                     sb_histoneModifications.append(
-                            "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button-selection\">" +
-                                    hisoneModification + "</a>");
+                            "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + hisoneModification +
+                                    "</a>");
                 }
 
                 frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
@@ -299,8 +299,9 @@ public class Report
 
                 for (Map.Entry<String, Double> group : transcriptionFactor.log2fc().entrySet())
                 {
-                    sb_groups.append("<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button-selection\">" +
-                            group.getKey() + "</a>");
+                    sb_groups.append(
+                            "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + group.getKey() +
+                                    "</a>");
                 }
 
                 frame = frame.replace("{GROUPS}", sb_groups.toString());
