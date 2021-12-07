@@ -5,6 +5,7 @@ import util.Options_intern;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -17,7 +18,113 @@ public class RNA_seq_conversion
 
         parseArguments(args, options_intern);
 
-        convert_all_together_to_seperate_gene_symbols(options_intern);
+        if(options_intern.rna_seq_input_format.equals("ALL_IN_ONE"))
+        {
+            convert_all_together_to_seperate_gene_symbols(options_intern);
+        }
+        if(options_intern.rna_seq_input_format.equals("SALMON"))
+        {
+            convert_to_TF_PRIO_input(options_intern);
+        }
+    }
+
+    private static void convert_to_TF_PRIO_input(Options_intern options_intern) throws IOException
+    {
+        File f_input = new File(options_intern.rna_seq_conversion_input);
+        File f_output_root = new File(f_input.getParentFile().getAbsolutePath());
+
+        //read in file
+        ArrayList<String> ENSG_order = new ArrayList<>();
+        ArrayList<String> sample_order = new ArrayList<>();
+        HashMap<String,HashMap<String,Double>> sample_ensg_count= new HashMap<>();
+
+        BufferedReader br_salmon_file =
+                new BufferedReader(new FileReader(f_input));
+        String line_salmon_file = br_salmon_file.readLine();
+        String[] split_header_salmon_file = line_salmon_file.split("\t");
+        for(int i = 2; i < split_header_salmon_file.length; i++)
+        {
+            HashMap<String,Double> sample_group = new HashMap<>();
+            sample_ensg_count.put(split_header_salmon_file[i],sample_group);
+
+            sample_order.add(split_header_salmon_file[i]);
+        }
+        while((line_salmon_file= br_salmon_file.readLine())!=null)
+        {
+            String[] split = line_salmon_file.split("\t");
+
+            ENSG_order.add(split[0]);
+
+            int position_in_sample_order_diff = -2;
+
+            for(int i = 2; i < split.length; i++)
+            {
+                int position_in_sample_order = i + position_in_sample_order_diff;
+                String sample_name = sample_order.get(position_in_sample_order);
+
+                HashMap<String,Double> sample_hash = sample_ensg_count.get(sample_name);
+                sample_hash.put(split[0],Double.parseDouble(split[i]));
+            }
+        }
+
+        br_salmon_file.close();
+
+        //create output directory
+        File f_output_out_root = new File(f_output_root.getAbsolutePath()+File.separator+"formatted_input");
+        f_output_out_root.mkdir();
+
+        BufferedWriter bw_gene_list =
+                new BufferedWriter(new FileWriter(new File(f_output_out_root.getAbsolutePath()+File.separator+
+                        "Gene_id.txt")));
+        bw_gene_list.write("Geneid\n");
+        for(String key_ensg:ENSG_order)
+        {
+            bw_gene_list.write(key_ensg+"\n");
+        }
+        bw_gene_list.close();
+
+        for(String key_group : options_intern.rna_seq_groups)
+        {
+            File f_out_group = new File(f_output_out_root.getAbsolutePath()+File.separator+key_group);
+            f_out_group.mkdir();
+
+            for(String key_sample : sample_ensg_count.keySet())
+            {
+                if(key_sample.matches(".*"+key_group+".*"))
+                {
+                    HashMap<String,Double> sample_to_counts = sample_ensg_count.get(key_sample);
+
+                    BufferedWriter bw_group_counts =
+                            new BufferedWriter(new FileWriter(f_out_group.getAbsolutePath()+File.separator+key_sample+".txt"));
+                    bw_group_counts.write(key_sample+"\n");
+
+                    for(String key_ensg: ENSG_order)
+                    {
+                        double count = sample_to_counts.get(key_ensg);
+                        int count_i = 0;
+
+                        if(options_intern.rna_seq_cut_to_integer)
+                        {
+                            count = Math.round(count);
+                            count_i = (int) count;
+                            bw_group_counts.write(count_i+"\n");
+                        }
+                        else
+                        {
+                            bw_group_counts.write(count+"\n");
+                        }
+
+                    }
+                    bw_group_counts.close();
+                }
+            }
+
+
+
+        }
+
+        System.out.println("X");
+
     }
 
     private static void convert_all_together_to_seperate_gene_symbols(Options_intern options_intern) throws Exception
@@ -278,6 +385,20 @@ public class RNA_seq_conversion
         opt_working_dir.setRequired(true);
         options.addOption(opt_working_dir);
 
+        Option opt_input_format = new Option("f","format",true,"[REQ]: ALL_IN_ONE if first column in gene and the " +
+                "rest is just one sample after another, SALMON if you provide salmon.merged.gene_counts.tsv from " +
+                "nfcore or salmon");
+        opt_input_format.setRequired(true);
+        options.addOption(opt_input_format);
+
+        Option opt_groups = new Option("g","groups",true,"[REQ for SALMON format]: write groups like that: untreated;" +
+                "IFNb");
+        options.addOption(opt_groups);
+
+        Option opt_cut_to_integer = new Option("I","cut-to-integer",false,"[OPT]: gene counts are cut on their " +
+                "decimal to integers. Needed for DESeq2.");
+        options.addOption(opt_cut_to_integer);
+
         Option opt_biomart_species = new Option("s", "biomart-species", true,
                 "[OPT]: if biomart-species is set, automatic transfer to ENSG will be performed, NOTE: must be set if gene names are in SYMBOL form");
         //opt_biomart_species.setRequired(true);
@@ -297,14 +418,28 @@ public class RNA_seq_conversion
 
 
             options_intern.rna_seq_conversion_input = cmd.getOptionValue("file-directory");
+            options_intern.rna_seq_input_format = cmd.getOptionValue("format");
             options_intern.rna_seq_conversion_biomart_species_name = cmd.getOptionValue("biomart-species", "");
             options_intern.rna_seq_conversion_biomart_column = cmd.getOptionValue("biomart-column", "");
+
+            if (cmd.hasOption("cut-to-integer"))
+            {
+                options_intern.rna_seq_cut_to_integer = true;
+            }
+
+            if (cmd.hasOption("groups"))
+            {
+                String groups = cmd.getOptionValue("groups");
+                String[] split_groups = groups.split(";");
+                Collections.addAll(options_intern.rna_seq_groups, split_groups);
+            }
 
 
         } catch (ParseException e)
         {
             System.out.println(e.getMessage());
-            formatter.printHelp("-i <file-directory> [-s <biomart-species>] [-c <biomart-column>]", options);
+            formatter.printHelp("-i <file-directory> -f <format> [-I] [-s <biomart-species>] [-c <biomart-column>]",
+                    options);
             System.exit(1);
         }
 

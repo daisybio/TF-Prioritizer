@@ -478,6 +478,9 @@ public class Options_intern
     ####################################*/
 
     public String rna_seq_conversion_input = "";
+    public String rna_seq_input_format ="";
+    public ArrayList<String> rna_seq_groups = new ArrayList<>();
+    public boolean rna_seq_cut_to_integer = false;
     public String rna_seq_conversion_biomart_species_name = "";
     public String rna_seq_conversion_biomart_column = "";
 
