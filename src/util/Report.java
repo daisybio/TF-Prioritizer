@@ -83,7 +83,7 @@ public class Report
                                 {
                                     double log2fc_value =
                                             Double.parseDouble(findValueInTable(geneID, 0, 1, entry, "\t", false));
-                                    String name = group1 + " -> " + group2;
+                                    String name = group1 + " | " + group2;
                                     log2fc.put(name, log2fc_value);
                                 } catch (NoSuchFieldException ignored)
                                 {
@@ -280,6 +280,17 @@ public class Report
             frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Validation");
 
             frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
+
+            StringBuilder sb_histoneModifications = new StringBuilder();
+
+            for (String hisoneModification : transcriptionFactor.histoneModifications)
+            {
+                sb_histoneModifications.append(
+                        "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button-selection\">" +
+                                hisoneModification + "</a>");
+            }
+
+            frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
 
             frame = relativate(frame, 1);
 
