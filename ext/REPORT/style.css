@@ -6,20 +6,8 @@
     --c5: #e0e1dd;
 }
 
-.accordion, .button-selection, .button-top, .button {
-    transition: 0.4s;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    margin: 1px;
-    text-decoration: none;
-    color: white;
-}
-
 .accordion {
     background-color: var(--c3);
-    color: white;
-    cursor: pointer;
     padding: 18px;
     width: 100%;
     text-align: left;
@@ -43,8 +31,11 @@ body {
 }
 
 .header {
-    display: grid;
-    grid-template-columns: auto min-content min-content min-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-content: center;
 }
 
 .keyvaluepaircontainer {
@@ -61,6 +52,8 @@ body {
 
 h1 {
     font-size: 40px;
+    justify-self: left;
+    margin-right: auto;
 }
 
 h2, .accordion {
@@ -72,15 +65,18 @@ h3 {
     grid-column: 1 / -1;
 }
 
-.selector {
-    display: flex;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-    flex-direction: row;
-    align-content: stretch;
+.accordion, .button {
+    cursor: pointer;
+    transition: 0.4s;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    margin: 1px;
+    text-decoration: none;
+    color: white;
 }
 
-.button, .button-selection {
+.button {
     background-color: var(--c4);
     text-align: center;
     color: white;
@@ -89,11 +85,7 @@ h3 {
     flex-grow: 1;
 }
 
-.button-selection:hover, .button:hover {
-    background-color: var(--c3);
-}
-
-.button-top {
+.header .button {
     background-color: var(--c2);
     text-align: center;
     text-decoration: none;
@@ -101,20 +93,23 @@ h3 {
     padding: 10px 15px;
     margin: 5px;
     align-self: center;
-    justify-self: center;
-}
-
-.button-top {
     display: flex;
     justify-self: right;
-    align-self: center;
+    flex-grow: 0;
 }
 
-.button-top:hover, button:hover {
+.button:hover {
     background-color: var(--c1);
 }
 
-.tf-buttonbar {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+.buttonbar .button:hover {
+    background-color: var(--c3);
+}
+
+.buttonbar {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: stretch;
 }
