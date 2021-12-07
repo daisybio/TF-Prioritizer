@@ -283,14 +283,28 @@ public class Report
 
             StringBuilder sb_histoneModifications = new StringBuilder();
 
-            for (String hisoneModification : transcriptionFactor.histoneModifications)
-            {
-                sb_histoneModifications.append(
-                        "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button-selection\">" +
-                                hisoneModification + "</a>");
-            }
+            {   // Histone modifications
+                for (String hisoneModification : transcriptionFactor.histoneModifications)
+                {
+                    sb_histoneModifications.append(
+                            "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button-selection\">" +
+                                    hisoneModification + "</a>");
+                }
 
-            frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
+                frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
+            }   // Histone modifications
+
+            {   // Groups
+                StringBuilder sb_groups = new StringBuilder();
+
+                for (Map.Entry<String, Double> group : transcriptionFactor.log2fc().entrySet())
+                {
+                    sb_groups.append("<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button-selection\">" +
+                            group.getKey() + "</a>");
+                }
+
+                frame = frame.replace("{GROUPS}", sb_groups.toString());
+            }   // Groups
 
             frame = relativate(frame, 1);
 
