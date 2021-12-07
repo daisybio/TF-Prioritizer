@@ -146,8 +146,6 @@ public class Report
         generateHome();
         styleAndScript();
         generateParameters();
-        generateDistribution();
-        generateRegression();
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -194,6 +192,8 @@ public class Report
 
 
             generateValidation(transcriptionFactor);
+            generateDistribution(transcriptionFactor);
+            generateRegression(transcriptionFactor);
 
             tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
@@ -277,52 +277,47 @@ public class Report
 
     }
 
-    private void generateDistribution() throws IOException
+    private void generateDistribution(TranscriptionFactor transcriptionFactor) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_distribution_distribution_html);
 
+        String frame = loadFrame();
+        String distribution = loadFile(templateFile.getAbsolutePath());
 
-        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
-        {
-            String frame = loadFrame();
-            String distribution = loadFile(templateFile.getAbsolutePath());
+        distribution = distribution.replace("{TFNAME}", transcriptionFactor.name);
+        distribution = distribution.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
-            distribution = distribution.replace("{TFNAME}", transcriptionFactor.name);
+        frame = frame.replace("{BODY}", distribution);
 
-            frame = frame.replace("{BODY}", distribution);
+        frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Distribution");
 
-            frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Distribution");
+        frame = relativate(frame, 1);
 
-            frame = relativate(frame, 1);
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
+                File.separator + transcriptionFactor.name + ".html", frame);
 
-            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
-                    File.separator + transcriptionFactor.name + ".html", frame);
-        }
     }
 
-    private void generateRegression() throws IOException
+    private void generateRegression(TranscriptionFactor transcriptionFactor) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_regression_regression_html);
 
+        String frame = loadFrame();
+        String regression = loadFile(templateFile.getAbsolutePath());
 
-        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
-        {
-            String frame = loadFrame();
-            String regression = loadFile(templateFile.getAbsolutePath());
+        regression = regression.replace("{TFNAME}", transcriptionFactor.name);
 
-            regression = regression.replace("{TFNAME}", transcriptionFactor.name);
+        frame = frame.replace("{BODY}", regression);
 
-            frame = frame.replace("{BODY}", regression);
+        frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Regression");
 
-            frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Regression");
+        frame = relativate(frame, 1);
 
-            frame = relativate(frame, 1);
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
+                File.separator + transcriptionFactor.name + ".html", frame);
 
-            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
-                    File.separator + transcriptionFactor.name + ".html", frame);
-        }
     }
 
     private String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
