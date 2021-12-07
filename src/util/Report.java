@@ -22,7 +22,7 @@ public class Report
     }
 
     private record TranscriptionFactor(String geneID, String name, Map<String, Double> log2fc, Map<String, Double> tpm,
-                                       Map<String, Integer> normex)
+                                       Map<String, Integer> normex, ArrayList<String> histoneModifications)
     {
     }
 
@@ -36,6 +36,16 @@ public class Report
         File geneIDFile = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing + File.separator +
                 options_intern.file_suffix_deseq2_mapping);
+
+        File d_plots =
+                new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_plots);
+
+        ArrayList<String> histoneModifications = new ArrayList<>();
+
+        for (File f_histoneModification : Objects.requireNonNull(d_plots.listFiles()))
+        {
+            histoneModifications.add(f_histoneModification.getName());
+        }
 
         try (Scanner scanner = new Scanner(tf_file))
         {
@@ -130,7 +140,8 @@ public class Report
                         }
                     }   //Normalized expression
 
-                    TranscriptionFactor tf = new TranscriptionFactor(geneID, tf_name, log2fc, tpm, normex);
+                    TranscriptionFactor tf =
+                            new TranscriptionFactor(geneID, tf_name, log2fc, tpm, normex, histoneModifications);
                     transcriptionFactors.add(tf);
                 } catch (NoSuchFieldException ignore)
                 {
