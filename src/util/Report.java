@@ -250,7 +250,7 @@ public class Report
 
         {   //tpm
             StringBuilder sb_tpm = new StringBuilder();
-            for (Map.Entry<String, Double> entry : log2fc.entrySet())
+            for (Map.Entry<String, Double> entry : tpm.entrySet())
             {
                 sb_tpm.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" +
                         formatter.format(entry.getValue()) + "</p></div>");
@@ -260,10 +260,10 @@ public class Report
 
         {   //normex
             StringBuilder sb_normex = new StringBuilder();
-            for (Map.Entry<String, Double> entry : log2fc.entrySet())
+            for (Map.Entry<String, Integer> entry : normex.entrySet())
             {
-                sb_normex.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" +
-                        formatter.format(entry.getValue()) + "</p></div>");
+                sb_normex.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" + entry.getValue() +
+                        "</p></div>");
             }
             validation = validation.replace("{NORMEX}", sb_normex.toString());
         }   //normex
