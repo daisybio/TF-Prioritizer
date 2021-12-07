@@ -144,6 +144,9 @@ public class Report
         logger.logLine("[REPORT] Start generating report");
 
         generateHome();
+        generateRegression();
+        generateDistribution();
+        generateValidation();
         styleAndScript();
         generateParameters();
 
@@ -189,11 +192,6 @@ public class Report
                     options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_home_tf_html);
 
             tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.name);
-
-
-            generateValidation(transcriptionFactor);
-            generateDistribution(transcriptionFactor);
-            generateRegression(transcriptionFactor);
 
             tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
@@ -253,71 +251,78 @@ public class Report
         return template;
     }
 
-    private void generateValidation(TranscriptionFactor transcriptionFactor) throws IOException
+    private void generateValidation() throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_validation_html);
 
+        String templateFrame = loadFrame();
+        templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        String frame = loadFrame();
-        String validation = loadFile(templateFile.getAbsolutePath());
+        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
+        {
+            String frame = templateFrame;
+            String validation = loadFile(templateFile.getAbsolutePath());
 
-        validation = validation.replace("{TFNAME}", transcriptionFactor.name);
+            frame = frame.replace("{TFNAME}", transcriptionFactor.name);
 
-        frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Validation");
+            frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Validation");
 
-        validation = validation.replace("{BASICDATA}", getBasicData(transcriptionFactor));
+            frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
-        frame = frame.replace("{BODY}", validation);
+            frame = relativate(frame, 1);
 
-        frame = relativate(frame, 1);
-
-        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                File.separator + transcriptionFactor.name + ".html", frame);
+            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                    File.separator + transcriptionFactor.name + ".html", frame);
+        }
 
     }
 
-    private void generateDistribution(TranscriptionFactor transcriptionFactor) throws IOException
+    private void generateDistribution() throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_distribution_distribution_html);
 
-        String frame = loadFrame();
-        String distribution = loadFile(templateFile.getAbsolutePath());
+        String templateFrame = loadFrame();
+        templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        distribution = distribution.replace("{TFNAME}", transcriptionFactor.name);
-        distribution = distribution.replace("{BASICDATA}", getBasicData(transcriptionFactor));
+        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
+        {
+            String frame = templateFrame;
 
-        frame = frame.replace("{BODY}", distribution);
+            frame = frame.replace("{TFNAME}", transcriptionFactor.name);
+            frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
-        frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Distribution");
+            frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Distribution");
 
-        frame = relativate(frame, 1);
+            frame = relativate(frame, 1);
 
-        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
-                File.separator + transcriptionFactor.name + ".html", frame);
-
+            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
+                    File.separator + transcriptionFactor.name + ".html", frame);
+        }
     }
 
-    private void generateRegression(TranscriptionFactor transcriptionFactor) throws IOException
+    private void generateRegression() throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_regression_regression_html);
 
-        String frame = loadFrame();
-        String regression = loadFile(templateFile.getAbsolutePath());
+        String templateFrame = loadFrame();
+        templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        regression = regression.replace("{TFNAME}", transcriptionFactor.name);
+        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
+        {
+            String frame = templateFrame;
 
-        frame = frame.replace("{BODY}", regression);
+            frame = frame.replace("{TFNAME}", transcriptionFactor.name);
 
-        frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Regression");
+            frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Regression");
 
-        frame = relativate(frame, 1);
+            frame = relativate(frame, 1);
 
-        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
-                File.separator + transcriptionFactor.name + ".html", frame);
-
+            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
+                    File.separator + transcriptionFactor.name + ".html", frame);
+        }
     }
 
     private String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
