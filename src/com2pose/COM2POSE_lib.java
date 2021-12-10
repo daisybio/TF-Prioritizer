@@ -404,6 +404,7 @@ public class COM2POSE_lib
                     //do pics overall genes now
                     for(int i = 0; i < regulated_genes.size(); i++)
                     {
+                        int rank = i+1;
                         String locus = regulated_genes.get(i).ensg_name;
 
                         if (!gene_to_coordinates.containsKey(locus))
@@ -411,7 +412,7 @@ public class COM2POSE_lib
                             continue;
                         }
 
-                        String snapshot_name = locus + ".png";
+                        String snapshot_name = rank+"_"+locus + ".png";
                         String response ="";
 
                         File f_output_shot = new File(f_output_this_one.getAbsolutePath());
