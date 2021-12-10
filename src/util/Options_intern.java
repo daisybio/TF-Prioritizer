@@ -146,6 +146,9 @@ public class Options_intern
     public String folder_out_igv_chip_atlas_data = "02_chip_atlas_tf_data";
     public String folder_out_igv_chipAtlas_chrWide_genomeWide_views = "03_chip_atlas_chrWide_genomeWide_views";
     public String folder_out_igv_important_loci = "04_important_loci";
+    public String folder_out_igv_top_log2fc = "05_top_log2fc";
+    public String folder_out_igv_top_log2fc_upregulated = "01_upregulated";
+    public String folder_out_igv_top_log2fc_downregulated = "02_downregulated";
 
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
@@ -252,7 +255,7 @@ public class Options_intern
     //#[OPT]:
     public String deseq2_biomart_dataset_species = "";
     //#[REQ]: biomart dataset column for gene symbols (e.g. human: hgnc_symbol, mouse: mgi_symbol)
-    public String deseq2_biomart_dataset_symbol_column = "mgi_symbol";
+    public String deseq2_biomart_dataset_symbol_column = "";
     //#[OPT]: minimum count over all samples of two timepoints for DESeq2, default: 0
     public int deseq2_count_threshold = 0;
     //#[OPT]: TPM filter for RNA-seq data, default: 0.0
@@ -430,6 +433,8 @@ public class Options_intern
         #########################*/
     //#[OPT]: path to igv.sh, if not set no images of the top target genes of the discounted cumulative gain TFs will be taken
     public String igv_path_to_igv = "";
+    //#[OPT] shot pics of most differentially expressed genes (top log2fc +/-) (default: 15, meaning 30 pics per group)
+    public int igv_top_log2fc=15;
     //#[OPT] ChIP-seq names, which should be included in own ChIP-seq data defined in tepic_input_directory
     //#e.g., "H3K27ac;Pol2"
     public ArrayList<String> igv_include_prediction_data = new ArrayList<>();

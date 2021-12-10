@@ -61,6 +61,442 @@ public class COM2POSE_lib
         logger.logLine("COM2POSE path set to: " + options_intern.path_to_COM2POSE);
     }
 
+    /**
+     * runs IGV on top up and down regulated genes
+     */
+    public void run_igv_top_log2gc() throws Exception
+    {
+        logger.logLine("[IGV] run IGV on top upregulated and downregulated genes");
+
+        check_tepic_input_with_options();
+
+        HashMap<String, String> gene_to_coordinates = new HashMap<>();
+
+        HashMap<String, String> ensg_gene_symbol_map = new HashMap<>();
+        BufferedReader br_ensg_gene_symbol =
+                new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
+            String[] split = line_ensg_gene_symbol.split("\t");
+            if (split.length > 1)
+            {
+                ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
+            }
+        }
+        br_ensg_gene_symbol.close();
+
+        File f_input_gene_to_coordinates = new File(options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                options_intern.folder_name_deseq2_preprocessing_gene_positions + File.separator +
+                options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
+
+        ArrayList<String> gene_symbols = new ArrayList<>();
+
+        BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(f_input_gene_to_coordinates));
+        String line_gene_coordinates = br_gene_coordinates.readLine();
+        String[] header_gene_coordinates = line_gene_coordinates.split("\t");
+        while ((line_gene_coordinates = br_gene_coordinates.readLine()) != null)
+        {
+            String[] split = line_gene_coordinates.split("\t");
+
+            if (split[1].startsWith("CHR"))
+            {
+                continue;
+            }
+
+            String gene_name = "";
+            if(split[0].equals(""))
+            {
+                gene_name=split[6];
+            }
+            else
+            {
+                gene_name=split[0];
+            }
+
+            String chr = "chr" + split[1];
+            int begin = Integer.parseInt(split[2]);
+            int end = Integer.parseInt(split[3]);
+
+            begin -= 50000;
+            end += 50000;
+
+            String position_string = chr + ":" + begin + "-" + end;
+            gene_to_coordinates.put(gene_name.toUpperCase(), position_string);
+
+            gene_symbols.add(gene_name.toUpperCase());
+        }
+
+        File f_output_root =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_top_log2fc);
+        f_output_root.mkdirs();
+
+        //input
+        File f_input_root =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_output);
+
+        for(File f_deseq2_result : f_input_root.listFiles())
+        {
+            if(f_deseq2_result.isFile())
+            {
+                String name_f_deseq2 = f_deseq2_result.getName();
+                String[] split_name_f_deseq2 = name_f_deseq2.split("_");
+                String tp1 = split_name_f_deseq2[0];
+                String tp2 = split_name_f_deseq2[1];
+                String folder_name = tp1 + "_" + tp2;
+
+                File f_output_log2fc = new File(f_output_root.getAbsolutePath()+File.separator+folder_name);
+                f_output_log2fc.mkdirs();
+
+                //create IGV load for both tps
+                String load_tf_chip_seq = "load ";
+                boolean added_prediction_data=false;
+                ArrayList<File> tdf_files = new ArrayList<>();
+
+                for(String key_tp: split_name_f_deseq2)
+                {
+                    //include predictive HMs
+                    if(options_intern.igv_include_prediction_data.size()>0)
+                    {
+                        File f_input =
+                                new File(options_intern.tepic_input_directory+File.separator + key_tp);
+
+                        for(String including_hm : options_intern.igv_include_prediction_data)
+                        {
+                            File f_hm_input = new File(f_input.getAbsolutePath()+File.separator+including_hm);
+                            if(f_hm_input.exists())
+                            {
+                                for(File f_file : f_hm_input.listFiles())
+                                {
+                                    if(added_prediction_data)
+                                    {
+                                        load_tf_chip_seq+="," + f_file.getAbsolutePath();
+                                    }
+                                    else
+                                    {
+                                        added_prediction_data=true;
+                                        load_tf_chip_seq+= f_file.getAbsolutePath();
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //add all own TF ChIP-seq if available
+                    if(!options_intern.igv_path_to_tf_chip_seq.equals(""))
+                    {
+                        File f_input_tf_chip_seq = new File(options_intern.igv_path_to_tf_chip_seq);
+                        File f_input_tf_chip_seq_for_now =
+                                new File(f_input_tf_chip_seq.getAbsolutePath()+File.separator+ key_tp);
+                        if(f_input_tf_chip_seq_for_now.exists())
+                        {
+                            if(f_input_tf_chip_seq_for_now.isDirectory())
+                            {
+                                for(File f_tf_chipseq : f_input_tf_chip_seq_for_now.listFiles())
+                                {
+                                    if(f_tf_chipseq.isDirectory())
+                                    {
+
+                                        for(File f_tf_chipseq_TF_file:f_tf_chipseq.listFiles() )
+                                        {
+                                            if(f_tf_chipseq_TF_file.isFile())
+                                            {
+                                                if(added_prediction_data)
+                                                {
+                                                    load_tf_chip_seq+="," + f_tf_chipseq_TF_file.getAbsolutePath();
+                                                }
+                                                else
+                                                {
+                                                    added_prediction_data=true;
+                                                    load_tf_chip_seq+= f_tf_chipseq_TF_file.getAbsolutePath();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+                    //add TDF if available
+                    if(!options_intern.igv_path_to_tdf.equals(""))
+                    {
+                        File f_input_tdfs = new File(options_intern.igv_path_to_tdf);
+                        File f_input_tdf_current_tp = new File(f_input_tdfs.getAbsolutePath()+File.separator+key_tp);
+                        if (f_input_tdf_current_tp.exists())
+                        {
+                            for(File f_hm_tdf : f_input_tdf_current_tp.listFiles())
+                            {
+                                if(f_hm_tdf.isDirectory())
+                                {
+                                    for(File f_hm_tdf_file : f_hm_tdf.listFiles())
+                                    {
+                                        if(f_hm_tdf_file.isFile())
+                                        {
+                                            if(added_prediction_data)
+                                            {
+                                                load_tf_chip_seq+="," + f_hm_tdf_file.getAbsolutePath();
+                                                tdf_files.add(f_hm_tdf_file);
+                                            }
+                                            else
+                                            {
+                                                added_prediction_data=true;
+                                                load_tf_chip_seq+= f_hm_tdf_file.getAbsolutePath();
+                                                tdf_files.add(f_hm_tdf_file);
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if(!added_prediction_data)
+                        continue;
+                }
+
+
+                //add all ChIP-ATLAS ChIP-seq if available
+                File f_chip_atlas_tf_chipseq_data_root =
+                        new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas+File.separator+options_intern.folder_out_chip_atlas_peak_files);
+
+                if(f_chip_atlas_tf_chipseq_data_root.exists())
+                {
+                    for(File f_tf : f_chip_atlas_tf_chipseq_data_root.listFiles())
+                    {
+                        if(f_tf.isDirectory())
+                        {
+
+                            for(File f_tf_file : f_tf.listFiles())
+                            {
+                                if(f_tf_file.isFile())
+                                {
+                                    String file_name = f_tf_file.getName();
+                                    if(file_name.endsWith("idx"))
+                                        continue;
+
+                                    if(added_prediction_data)
+                                    {
+                                        load_tf_chip_seq+="," + f_tf_file.getAbsolutePath();
+                                    }
+                                    else
+                                    {
+                                        added_prediction_data=true;
+                                        load_tf_chip_seq+= f_tf_file.getAbsolutePath();
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                //save session
+                File f_save_session =
+                        new File(f_output_log2fc.getAbsolutePath()+File.separator+options_intern.file_suffix_session);
+                igv_save_sessions(f_save_session,load_tf_chip_seq, tdf_files);
+
+                //read in and sort genes
+                ArrayList<DESeq2_gene_object> log2fc = new ArrayList<>();
+                BufferedReader br_input_log2fc = new BufferedReader(new FileReader(f_deseq2_result));
+                String line_input_log2fc = br_input_log2fc.readLine();
+                while((line_input_log2fc=br_input_log2fc.readLine())!=null)
+                {
+                    String[] split = line_input_log2fc.split("\t");
+                    DESeq2_gene_object ds = new DESeq2_gene_object();
+                    ds.ensg_name = split[0];
+                    ds.log2fc = Double.parseDouble(split[1]);
+                    log2fc.add(ds);
+                }
+                Collections.sort(log2fc);
+
+                ArrayList<String> updown = new ArrayList<>();
+                updown.add(options_intern.folder_out_igv_top_log2fc_upregulated);
+                updown.add(options_intern.folder_out_igv_top_log2fc_downregulated);
+
+                for(String updown_mode : updown)
+                {
+                    File f_output_this_one = new File("");
+                    ArrayList<DESeq2_gene_object> regulated_genes = new ArrayList<>();
+
+                    if(updown_mode.equals(options_intern.folder_out_igv_top_log2fc_upregulated))
+                    {
+                        f_output_this_one =
+                                new File(f_output_log2fc.getAbsolutePath()+File.separator+options_intern.folder_out_igv_top_log2fc_upregulated);
+
+                        for(int i = 0; i < options_intern.igv_top_log2fc; i++)
+                        {
+                            regulated_genes.add(log2fc.get(i));
+                        }
+                    }
+                    if(updown_mode.equals(options_intern.folder_out_igv_top_log2fc_downregulated))
+                    {
+                        f_output_this_one =
+                                new File(f_output_log2fc.getAbsolutePath()+File.separator+options_intern.folder_out_igv_top_log2fc_downregulated);
+                        for(int i = log2fc.size() -1; i > log2fc.size() - options_intern.igv_top_log2fc  -1; i--)
+                        {
+                            regulated_genes.add(log2fc.get(i));
+                        }
+                    }
+
+                    f_output_this_one.mkdirs();
+
+                    //replace ENSG with gene symbol
+                    for(int i = 0; i< regulated_genes.size(); i++)
+                    {
+                        String ensg = regulated_genes.get(i).ensg_name;
+
+                        if(ensg_gene_symbol_map.containsKey(ensg))
+                        {
+                            regulated_genes.get(i).ensg_name = ensg_gene_symbol_map.get(ensg);
+                        }
+                    }
+
+                    Socket socket_session = new Socket("127.0.0.1", options_intern.igv_port_number);
+                    PrintWriter out_session = new PrintWriter(socket_session.getOutputStream(), true);
+                    BufferedReader in_session = new BufferedReader(new InputStreamReader(socket_session.getInputStream()));
+
+                    out_session.println("genome " + options_intern.igv_species_ref_genome);
+                    String response_session = in_session.readLine();
+
+                    //logger.logLine("[IGV] " + load_tf_chip_seq);
+                    out_session.println(load_tf_chip_seq);
+                    String response_load_sessoin = in_session.readLine();
+
+                    //remodel tdf files if available
+                    if(tdf_files.size()>0)
+                    {
+                        String response_session_tdf = "";
+
+                        for(File f_tdf : tdf_files)
+                        {
+                            out_session.println("setLogScale " + f_tdf.getName());
+                            response_session_tdf = in_session.readLine();
+                            out_session.println("setDataRange auto " + f_tdf.getName());
+                            response_session_tdf = in_session.readLine();
+                            out_session.println("setTrackHeight " + f_tdf.getName() + " 60");
+                            response_session_tdf = in_session.readLine();
+                        }
+                    }
+
+                    //include enhancer regions of interest if available
+                    if(options_intern.igv_enhancer_databases.size()>0)
+                    {
+                        File f_merged_databases =
+                                new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+
+                        BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
+                        String line_mergedDB = br_mergedDB.readLine();
+                        while((line_mergedDB= br_mergedDB.readLine())!=null)
+                        {
+                            String[] split = line_mergedDB.split("\t");
+
+                            out_session.println("region " + split[0] + " " + split[1] + " " + split[2]);
+                            String response_region = in_session.readLine();
+                        }
+                    }
+
+                    //do pics overall genes now
+                    for(int i = 0; i < regulated_genes.size(); i++)
+                    {
+                        String locus = regulated_genes.get(i).ensg_name;
+
+                        if (!gene_to_coordinates.containsKey(locus))
+                        {
+                            continue;
+                        }
+
+                        String snapshot_name = locus + ".png";
+                        String response ="";
+
+                        File f_output_shot = new File(f_output_this_one.getAbsolutePath());
+                        f_output_shot.mkdir();
+                        //logger.logLine("[IGV] "+ "snapshotDirectory "+f_output_shot.getAbsolutePath());
+                        out_session.println("snapshotDirectory " + f_output_shot.getAbsolutePath());
+                        response = in_session.readLine();
+                        //logger.logLine("[IGV] " + response);
+                        //logger.logLine("[IGV] "+ "goto " + gene_to_coordinates.get(targets));
+                        out_session.println("goto " + gene_to_coordinates.get(locus));
+                        response = in_session.readLine();
+                        //logger.logLine("[IGV] " + response);
+                        //logger.logLine("[IGV] "+ "sort");
+                        //out.println("sort");
+                        //response=in.readLine();
+                        //logger.logLine("[IGV] " + response);
+                        //logger.logLine("[IGV] "+ "collapse");
+                        //out.println("collapse");
+                        //response=in.readLine();
+                        //logger.logLine("[IGV] " + response);
+                        //logger.logLine("[IGV] "+ "snapshot");
+                        out_session.println("snapshot");
+                        response = in_session.readLine();
+                        //logger.logLine("[IGV] " + response);
+
+                        File f_snapshot_made = new File("NO");
+
+                        //search png name
+                        for (File f_snapshot : f_output_shot.listFiles()) {
+                            if (f_snapshot.isFile()) {
+                                if (f_snapshot.getName().startsWith("chr")) {
+                                    f_snapshot_made = f_snapshot;
+                                    break;
+                                }
+
+                            }
+                        }
+
+                        if (!f_snapshot_made.exists()) {
+                            //its the all overview
+                            //logger.logLine("[ERROR]: trying to move file which does not exist!");
+                        } else {
+
+                            String command_mv = "mv " + f_snapshot_made.getAbsolutePath() + " " +
+                                    f_snapshot_made.getParentFile().getAbsolutePath() + File.separator +
+                                    snapshot_name;
+
+
+                            Process child = Runtime.getRuntime().exec(command_mv);
+                            int code = child.waitFor();
+                            switch (code) {
+                                case 0:
+                                    break;
+                                case 1:
+                                    String message = child.getErrorStream().toString();
+                                    throw new Exception(message);
+                            }
+
+
+                        }
+
+
+                    }
+
+                    out_session.println("new");
+                    response_session = in_session.readLine();
+
+                    socket_session.close();
+
+                }
+
+            }
+
+        }
+
+
+
+        logger.logLine("[IGV] finished IGV on top upregulated and downregulated genes");
+    }
+
+
+    /**
+     * runs IGV on specified loci
+     * @throws Exception
+     */
     public void run_igv_on_important_loci() throws Exception
     {
         logger.logLine("[IGV] Run IGV on important loci.");
@@ -10546,6 +10982,35 @@ public class COM2POSE_lib
         //get biomart gene positions
 
         StringBuilder sb_script = new StringBuilder();
+
+        sb_script.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                "  install.packages(\"BiocManager\")\n" + "\n" +
+                "if (!requireNamespace(\"biomaRt\", quietly = TRUE))\n" + "  BiocManager::install(\"biomaRt\")\n" +
+                "\n" + "library('biomaRt')\n" + "httr::set_config(httr::config(ssl_verifypeer = FALSE))\n" + "\n" +
+                "input<-read.csv('"+f_data_input.getAbsolutePath()+"', sep = '\\t')\n" +
+                "input_ensg<-input$ensembl_gene_id\n" + "not_done=TRUE\n" + "\n" + "G_list= data.frame()\n" + "\n" +
+                "while(not_done)\n" + "{\n" + "  tryCatch({\n" +
+                "    mart <- useDataset(\""+options_intern.deseq2_biomart_dataset_species+"\", useMart(\"ensembl\"))" +
+                "\n" + "    #df$id <- NA\n" +
+                "    G_list_intern <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\",\"band\"),values=input_ensg,mart= mart)\n" +
+                "    G_list=rbind(G_list,G_list_intern)\n" + "    not_done=FALSE\n" + "  }, warning = function(w) {\n" +
+                "    print(\"WARNING SECTION\")\n" + "    print(w)\n" + "  }, error = function(e) {\n" +
+                "    print(\"ERROR SECTION\")\n" + "    print(e)\n" + "  }, finally = {\n" + "  })\n" + "}\n" + "\n" +
+                "G_list<-merge(G_list, input, by.x = \"ensembl_gene_id\", by.y = \"ensembl_gene_id\")\n" +
+                "G_list<-G_list[,c(7,2,3,4,5,6,1)]\n" +
+                "write.table(G_list,\""+f_data_prev.getAbsolutePath()+"\", row.names = FALSE, quote = F, sep=\"\\t\")" +
+                "\n" +
+                "not_done=TRUE\n" + "while (not_done) {\n" + "  tryCatch({\n" +
+                "    #check which genome version we have in biomart\n" + "    \n" +
+                "    ensembl <- useEnsembl(biomart = \"genes\")\n" + "    datasets <- listDatasets(ensembl)\n" +
+                "    used_dataset=searchDatasets(mart = ensembl, pattern = \""+options_intern.deseq2_biomart_dataset_species+"\")\n" +
+                "    version=used_dataset[,3]\n" + "    version=as.character(version)\n" +
+                "    fileConn<-file(\""+f_data_version.getAbsolutePath()+"\")\n" +
+                "    writeLines(version, fileConn)\n" + "    \n" + "    not_done=FALSE\n" +
+                "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" + "    print(w)\n" +
+                "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" + "    print(e)\n" +
+                "  }, finally = {\n" + "  })\n" + "}\n" + "\n");
+/*
         sb_script.append(
                 "if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" + "  install.packages(\"BiocManager\")\n" +
                         "\n" + "if (!requireNamespace(\"biomaRt\", quietly = TRUE))\n" +
@@ -10575,7 +11040,7 @@ public class COM2POSE_lib
                 f_data_version.getAbsolutePath() + "\")\n" + "    writeLines(version, fileConn)\n" + "    \n" +
                 "    not_done=FALSE\n" + "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" +
                 "    print(w)\n" + "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" +
-                "    print(e)\n" + "  }, finally = {\n" + "  })\n" + "}\n\n");
+                "    print(e)\n" + "  }, finally = {\n" + "  })\n" + "}\n\n");*/
 
         BufferedWriter bw_script = new BufferedWriter(new FileWriter(f_script));
         bw_script.write(sb_script.toString());
@@ -10653,13 +11118,15 @@ public class COM2POSE_lib
                 "        end_position = row[column_names.__getitem__(3)]\n" +
                 "        strand = row[column_names.__getitem__(4)]\n" +
                 "        band = row[column_names.__getitem__(5)]\n" + "\n" +
+                "        ensg = row[column_names.__getitem__(6)]\n" + "\n" +
                 "        search_string = chromosome+\":\"+str(start_position)+\"-\"+str(end_position)\n" +
                 "        x_converted=start_position\n" + "        y_converted=end_position\n" + "\n" +
                 "        if please_convert:\n" +
                 "            x_converted, y_converted = convert(chromosome, start_position, end_position, strand, converter)\n" +
                 "            if(x_converted is None or y_converted is None):\n" + "                continue\n" + "\n" +
                 "        start_position=x_converted\n" + "        end_position=y_converted\n" + "\n" +
-                "        data_output.append([mgi_symbol,chromosome_not_edited,start_position,end_position,strand,band])\n" +
+                "        data_output.append([mgi_symbol,chromosome_not_edited,start_position,end_position,strand," +
+                        "band,ensg])\n" +
                 "\n" + "        #string_converted = chromosome+\":\"+x_converted+\"-\"+y_converted\n" +
                 "        #print(\"X\")\n" + "\n" +
                 "    df_converted = pd.DataFrame(data_output, columns=column_names)\n" +
@@ -13717,6 +14184,9 @@ public class COM2POSE_lib
                 case "igv_path_to_igv":
                     options_intern.igv_path_to_igv = split[1].substring(1, split[1].length() - 1);
                     break;
+                case "igv_top_log2fc":
+                    options_intern.igv_top_log2fc = Integer.parseInt(split[1]);
+                    break;
                 case "igv_path_to_tf_chip_seq":
                     options_intern.igv_path_to_tf_chip_seq = split[1].substring(1, split[1].length() - 1);
                     break;
@@ -14323,6 +14793,7 @@ public class COM2POSE_lib
 
             }
         }
+
 
         /**
          * CHECK NAMING CONVENTIONS

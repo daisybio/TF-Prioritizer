@@ -142,6 +142,11 @@ public class COM2POSE
             com2pose_lib.run_igv_on_important_loci();
         }
 
+        if(options_intern.igv_top_log2fc > 0)
+        {
+            com2pose_lib.run_igv_top_log2gc();
+        }
+
         System.out.println("X");
     }
 
