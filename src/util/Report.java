@@ -11,7 +11,8 @@ public class Report
 {
     private final Logger logger;
     private final Options_intern options_intern;
-    private final HashMap<String, ArrayList<TranscriptionFactor>> transcriptionFactorGroups = new HashMap<>();
+    private final LinkedHashMap<String, ArrayList<TranscriptionFactor>> transcriptionFactorGroups =
+            new LinkedHashMap<>();
     private final DecimalFormat formatter = new DecimalFormat("0.000");
 
     public Report(Options_intern options_intern) throws IOException
