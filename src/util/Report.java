@@ -11,7 +11,7 @@ public class Report
 {
     private final Logger logger;
     private final Options_intern options_intern;
-    private final ArrayList<TranscriptionFactor> transcriptionFactors = new ArrayList<>();
+    private final HashMap<String, ArrayList<TranscriptionFactor>> transcriptionFactorGroups = new HashMap<>();
     private final DecimalFormat formatter = new DecimalFormat("0.000");
 
     public Report(Options_intern options_intern) throws IOException
@@ -52,100 +52,106 @@ public class Report
             boolean firstLine = true;
             while (scanner.hasNextLine())
             {
+                ArrayList<TranscriptionFactor> tf_group = new ArrayList<>();
                 String line = scanner.nextLine();
                 if (firstLine)
                 {
                     firstLine = false;
                     continue;
                 }
-                String tf_name = line.split("\t")[1];
-                try
+                String tfGroupName = line.split("\t")[1];
+
+                for (String tf_name : tfGroupName.split("\\.\\."))
                 {
+                    try
+                    {
+                        String geneID = findValueInTable(tf_name, 1, 0, geneIDFile, "\t", true);
+                        Map<String, Double> log2fc = new HashMap<>();
+                        Map<String, Double> tpm = new HashMap<>();
+                        Map<String, Integer> normex = new HashMap<>();
 
-                    String geneID = findValueInTable(tf_name, 1, 0, geneIDFile, "\t", true);
-                    Map<String, Double> log2fc = new HashMap<>();
-                    Map<String, Double> tpm = new HashMap<>();
-                    Map<String, Integer> normex = new HashMap<>();
 
+                        {   //LOG2FC
+                            File d_log2fs = new File(options_intern.com2pose_working_directory + File.separator +
+                                    options_intern.folder_name_deseq2_output);
 
-                    {   //LOG2FC
-                        File d_log2fs = new File(options_intern.com2pose_working_directory + File.separator +
-                                options_intern.folder_name_deseq2_output);
-
-                        for (File entry : Objects.requireNonNull(d_log2fs.listFiles()))
-                        {
-                            if (entry.isFile())
+                            for (File entry : Objects.requireNonNull(d_log2fs.listFiles()))
                             {
-                                String group1 = entry.getName().split("_")[0];
-                                String group2 = entry.getName().split("_")[1];
+                                if (entry.isFile())
+                                {
+                                    String group1 = entry.getName().split("_")[0];
+                                    String group2 = entry.getName().split("_")[1];
 
-                                try
-                                {
-                                    double log2fc_value =
-                                            Double.parseDouble(findValueInTable(geneID, 0, 1, entry, "\t", false));
-                                    String name = group1 + " | " + group2;
-                                    log2fc.put(name, log2fc_value);
-                                } catch (NoSuchFieldException ignored)
-                                {
+                                    try
+                                    {
+                                        double log2fc_value =
+                                                Double.parseDouble(findValueInTable(geneID, 0, 1, entry, "\t", false));
+                                        String name = group1 + " | " + group2;
+                                        log2fc.put(name, log2fc_value);
+                                    } catch (NoSuchFieldException ignored)
+                                    {
+                                    }
                                 }
                             }
-                        }
-                    }   //LOG2FC
+                        }   //LOG2FC
 
-                    {   //TPM
-                        File d_tpm = new File(options_intern.com2pose_working_directory + File.separator +
-                                options_intern.folder_name_deseq2_preprocessing + File.separator +
-                                options_intern.folder_name_deseq2_preprocessing_tpm + File.separator +
-                                options_intern.folder_name_deseq2_preprocessing_tpm_results);
+                        {   //TPM
+                            File d_tpm = new File(options_intern.com2pose_working_directory + File.separator +
+                                    options_intern.folder_name_deseq2_preprocessing + File.separator +
+                                    options_intern.folder_name_deseq2_preprocessing_tpm + File.separator +
+                                    options_intern.folder_name_deseq2_preprocessing_tpm_results);
 
-                        for (File entry : Objects.requireNonNull(d_tpm.listFiles()))
-                        {
-                            if (entry.isFile() && entry.getName().endsWith(".csv"))
+                            for (File entry : Objects.requireNonNull(d_tpm.listFiles()))
                             {
-                                String group = entry.getName().split("_")[0];
+                                if (entry.isFile() && entry.getName().endsWith(".csv"))
+                                {
+                                    String group = entry.getName().split("_")[0];
 
-                                try
-                                {
-                                    double tpm_value =
-                                            Double.parseDouble(findValueInTable(geneID, 0, 3, entry, "\t", false));
-                                    tpm.put(group, tpm_value);
-                                } catch (NoSuchFieldException ignored)
-                                {
+                                    try
+                                    {
+                                        double tpm_value =
+                                                Double.parseDouble(findValueInTable(geneID, 0, 3, entry, "\t", false));
+                                        tpm.put(group, tpm_value);
+                                    } catch (NoSuchFieldException ignored)
+                                    {
+                                    }
                                 }
                             }
-                        }
-                    }   //TPM
+                        }   //TPM
 
-                    {   //Normalized expression
-                        File d_normex = new File(options_intern.com2pose_working_directory + File.separator +
-                                options_intern.folder_name_deseq2_preprocessing + File.separator +
-                                options_intern.folder_name_deseq2_preprocessing_gene_symbols);
+                        {   //Normalized expression
+                            File d_normex = new File(options_intern.com2pose_working_directory + File.separator +
+                                    options_intern.folder_name_deseq2_preprocessing + File.separator +
+                                    options_intern.folder_name_deseq2_preprocessing_gene_symbols);
 
 
-                        for (File entry : Objects.requireNonNull(d_normex.listFiles()))
-                        {
-                            if (entry.isFile() && entry.getName().endsWith(".csv"))
+                            for (File entry : Objects.requireNonNull(d_normex.listFiles()))
                             {
-                                String group = entry.getName().split("\\.")[0];
+                                if (entry.isFile() && entry.getName().endsWith(".csv"))
+                                {
+                                    String group = entry.getName().split("\\.")[0];
 
-                                try
-                                {
-                                    int exp_value =
-                                            Integer.parseInt(findValueInTable(geneID, 1, 2, entry, "\t", false));
-                                    normex.put(group, exp_value);
-                                } catch (NoSuchFieldException ignored)
-                                {
+                                    try
+                                    {
+                                        int exp_value =
+                                                Integer.parseInt(findValueInTable(geneID, 1, 2, entry, "\t", false));
+                                        normex.put(group, exp_value);
+                                    } catch (NoSuchFieldException ignored)
+                                    {
+                                    }
                                 }
                             }
-                        }
-                    }   //Normalized expression
+                        }   //Normalized expression
 
-                    TranscriptionFactor tf =
-                            new TranscriptionFactor(geneID, tf_name, log2fc, tpm, normex, histoneModifications);
-                    transcriptionFactors.add(tf);
-                } catch (NoSuchFieldException ignore)
-                {
+                        TranscriptionFactor tf =
+                                new TranscriptionFactor(geneID, tf_name, log2fc, tpm, normex, histoneModifications);
+                        tf_group.add(tf);
+                    } catch (NoSuchFieldException ignore)
+                    {
+                        System.out.println("Not found: " + tf_name);
+                    }
                 }
+                transcriptionFactorGroups.put(tfGroupName, tf_group);
             }
         }
     }
@@ -197,23 +203,26 @@ public class Report
 
         int i = 1;
 
-        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
+        for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
         {
-            String tf_string = loadFile(
-                    options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_home_tf_html);
+            for (TranscriptionFactor transcriptionFactor : transcriptionFactorGroups.get(transcriptionFactorGroupName))
+            {
+                String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                        options_intern.f_report_resources_home_tf_html);
 
-            tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.name);
+                tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.name);
 
-            tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
+                tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
-            tf_string = tf_string.replace("{GENEID}", transcriptionFactor.geneID);
+                tf_string = tf_string.replace("{GENEID}", transcriptionFactor.geneID);
 
-            tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + transcriptionFactor.name + ".html");
-            tf_string = tf_string.replace("{DISTRIBUTION}", "DISTRIBUTION/" + transcriptionFactor.name + ".html");
-            tf_string = tf_string.replace("{REGRESSION}", "REGRESSION/" + transcriptionFactor.name + ".html");
+                tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + transcriptionFactor.name + ".html");
+                tf_string = tf_string.replace("{DISTRIBUTION}", "DISTRIBUTION/" + transcriptionFactor.name + ".html");
+                tf_string = tf_string.replace("{REGRESSION}", "REGRESSION/" + transcriptionFactor.name + ".html");
 
-            sb_tfs.append(tf_string);
-            i++;
+                sb_tfs.append(tf_string);
+                i++;
+            }
         }
         home = home.replace("{TFS}", sb_tfs.toString());
 
@@ -270,49 +279,51 @@ public class Report
         String templateFrame = loadFrame();
         templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
+        for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
         {
-            String frame = templateFrame;
-            String validation = loadFile(templateFile.getAbsolutePath());
+            for (TranscriptionFactor transcriptionFactor : transcriptionFactorGroups.get(transcriptionFactorGroupName))
+            {
+                String frame = templateFrame;
+                String validation = loadFile(templateFile.getAbsolutePath());
 
-            frame = frame.replace("{TFNAME}", transcriptionFactor.name);
+                frame = frame.replace("{TFNAME}", transcriptionFactor.name);
 
-            frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Validation");
+                frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Validation");
 
-            frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
+                frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
-            StringBuilder sb_histoneModifications = new StringBuilder();
+                StringBuilder sb_histoneModifications = new StringBuilder();
 
-            {   // Histone modifications
-                for (String hisoneModification : transcriptionFactor.histoneModifications)
-                {
-                    sb_histoneModifications.append(
-                            "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + hisoneModification +
-                                    "</a>");
-                }
+                {   // Histone modifications
+                    for (String hisoneModification : transcriptionFactor.histoneModifications)
+                    {
+                        sb_histoneModifications.append(
+                                "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" +
+                                        hisoneModification + "</a>");
+                    }
 
-                frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
-            }   // Histone modifications
+                    frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
+                }   // Histone modifications
 
-            {   // Groups
-                StringBuilder sb_groups = new StringBuilder();
+                {   // Groups
+                    StringBuilder sb_groups = new StringBuilder();
 
-                for (Map.Entry<String, Double> group : transcriptionFactor.log2fc().entrySet())
-                {
-                    sb_groups.append(
-                            "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + group.getKey() +
-                                    "</a>");
-                }
+                    for (Map.Entry<String, Double> group : transcriptionFactor.log2fc().entrySet())
+                    {
+                        sb_groups.append(
+                                "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + group.getKey() +
+                                        "</a>");
+                    }
 
-                frame = frame.replace("{GROUPS}", sb_groups.toString());
-            }   // Groups
+                    frame = frame.replace("{GROUPS}", sb_groups.toString());
+                }   // Groups
 
-            frame = relativate(frame, 1);
+                frame = relativate(frame, 1);
 
-            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                    File.separator + transcriptionFactor.name + ".html", frame);
+                writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                        File.separator + transcriptionFactor.name + ".html", frame);
+            }
         }
-
     }
 
     private void generateDistribution() throws IOException
@@ -323,19 +334,23 @@ public class Report
         String templateFrame = loadFrame();
         templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
+        for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
         {
-            String frame = templateFrame;
+            for (TranscriptionFactor transcriptionFactor : transcriptionFactorGroups.get(transcriptionFactorGroupName))
+            {
+                String frame = templateFrame;
 
-            frame = frame.replace("{TFNAME}", transcriptionFactor.name);
-            frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
+                frame = frame.replace("{TFNAME}", transcriptionFactor.name);
+                frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
-            frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Distribution");
+                frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Distribution");
 
-            frame = relativate(frame, 1);
+                frame = relativate(frame, 1);
 
-            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
-                    File.separator + transcriptionFactor.name + ".html", frame);
+                writeFile(
+                        options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
+                                File.separator + transcriptionFactor.name + ".html", frame);
+            }
         }
     }
 
@@ -347,18 +362,21 @@ public class Report
         String templateFrame = loadFrame();
         templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        for (TranscriptionFactor transcriptionFactor : transcriptionFactors)
+        for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
         {
-            String frame = templateFrame;
+            for (TranscriptionFactor transcriptionFactor : transcriptionFactorGroups.get(transcriptionFactorGroupName))
+            {
+                String frame = templateFrame;
 
-            frame = frame.replace("{TFNAME}", transcriptionFactor.name);
+                frame = frame.replace("{TFNAME}", transcriptionFactor.name);
 
-            frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Regression");
+                frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Regression");
 
-            frame = relativate(frame, 1);
+                frame = relativate(frame, 1);
 
-            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
-                    File.separator + transcriptionFactor.name + ".html", frame);
+                writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
+                        File.separator + transcriptionFactor.name + ".html", frame);
+            }
         }
     }
 
