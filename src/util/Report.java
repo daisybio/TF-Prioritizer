@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 public class Report
 {
     private final Logger logger;
@@ -375,12 +377,12 @@ public class Report
 
     private String getButtonBar(TranscriptionFactor tf) throws IOException
     {
-        return getButtonBar(tf.name, tf.hasIGV, true, false);
+        return getButtonBar(tf.name, tf.hasIGV, true, true);
     }
 
     private String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        return getButtonBar(tfGroup.name, tfGroup.hasIGV, true, false);
+        return getButtonBar(tfGroup.name, tfGroup.hasIGV, true, true);
     }
 
     private String getButtonBar(String name, boolean hasValidation, boolean hasDistribution, boolean hasRegression)
@@ -389,9 +391,10 @@ public class Report
         String buttonbar = loadFile(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_home_buttonbar_html);
 
-        buttonbar = buttonbar.replace("{VALIDATION}", "VALIDATION/" + name + ".html");
-        buttonbar = buttonbar.replace("{DISTRIBUTION}", "DISTRIBUTION/" + name + ".html");
-        buttonbar = buttonbar.replace("{REGRESSION}", "REGRESSION/" + name + ".html");
+        buttonbar = buttonbar.replace("{VALIDATION}", "VALIDATION" + File.separator + name + ".html");
+        buttonbar = buttonbar.replace("{DISTRIBUTION}",
+                "DISTRIBUTION" + File.separator + name + File.separator + name + ".html");
+        buttonbar = buttonbar.replace("{REGRESSION}", "REGRESSION" + File.separator + name + ".html");
 
         buttonbar = buttonbar.replace("{HASVALIDATION}", hasValidation ? "" : "disabled");
         buttonbar = buttonbar.replace("{HASREGRESSION}", hasRegression ? "" : "disabled");
@@ -436,11 +439,11 @@ public class Report
         StringBuilder sb_histoneModifications = new StringBuilder();
 
         {   // Histone modifications
-            for (String hisoneModification : histoneModifications)
+            for (String histoneModification : histoneModifications)
             {
                 sb_histoneModifications.append(
-                        "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + hisoneModification +
-                                "</a>");
+                        "<button onclick=\"window.location.href='{RELATIVATION}PARAMETERS.html';\">" +
+                                histoneModification + "</a>");
             }
 
             frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
@@ -452,7 +455,8 @@ public class Report
             for (Map.Entry<String, Number> group : log2fc.entrySet())
             {
                 sb_groups.append(
-                        "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + group.getKey() + "</a>");
+                        "<button onclick=\"window.location.href='{RELATIVATION}PARAMETERS.html';\">" + group.getKey() +
+                                "</button>");
             }
 
             frame = frame.replace("{GROUPS}", sb_groups.toString());
@@ -483,21 +487,58 @@ public class Report
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_distribution_distribution_html);
 
-        String templateFrame = loadFrame();
-        templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
+        File d_distribution_output = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
+                        File.separator + name);
 
+        ArrayList<String> existingHMs = new ArrayList<>();
 
-        String frame = templateFrame;
+        File d_plots = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_plots + File.separator +
+                        options_intern.folder_out_distribution_plots_HM);
+
+        for (File d_hm : d_plots.listFiles())
+        {
+            for (File f_plot : d_hm.listFiles())
+            {
+                if (f_plot.getName().split("\\.")[0].equals(name))
+                {
+                    existingHMs.add(d_hm.getName());
+                    copyFile(f_plot, new File(
+                            d_distribution_output.getAbsolutePath() + File.separator + d_hm.getName() + ".png"));
+                    break;
+                }
+            }
+        }
+
+        if (existingHMs.size() == 0)
+        {
+            return;
+        }
+
+        String frame = loadFrame();
+        frame = frame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
         frame = frame.replace("{TFNAME}", name);
         frame = frame.replace("{BASICDATA}", basicData);
 
         frame = frame.replace("{TITLE}", name + " - Distribution");
 
-        frame = relativate(frame, 1);
+        StringBuilder sb_histoneModifications = new StringBuilder();
 
-        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
-                File.separator + name + ".html", frame);
+        for (String histoneModification : existingHMs)
+        {
+            sb_histoneModifications.append(
+                    "<button onclick=\"window.location.href='{RELATIVATION}PARAMETERS.html';\">" + histoneModification +
+                            "</button>");
+        }
+
+        frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
+
+        frame = relativate(frame, 2);
+
+        writeFile(d_distribution_output + File.separator + name + ".html", frame);
     }
 
     private void generateRegression(TranscriptionFactorGroup tfGroup) throws IOException
@@ -576,6 +617,19 @@ public class Report
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_style, css);
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_script,
                 script);
+    }
+
+    private void copyFile(File source, File target) throws IOException
+    {
+        if (source.exists())
+        {
+            if (!target.getParentFile().exists())
+            {
+                target.getParentFile().mkdirs();
+            }
+
+            Files.copy(source.toPath(), target.toPath(), REPLACE_EXISTING);
+        }
     }
 
     private void writeFile(String path, String content) throws IOException
