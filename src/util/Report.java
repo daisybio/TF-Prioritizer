@@ -11,8 +11,7 @@ public class Report
 {
     private final Logger logger;
     private final Options_intern options_intern;
-    private final LinkedHashMap<String, ArrayList<TranscriptionFactor>> transcriptionFactorGroups =
-            new LinkedHashMap<>();
+    private final ArrayList<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
     private final DecimalFormat formatter = new DecimalFormat("0.###");
 
     public Report(Options_intern options_intern) throws IOException
@@ -23,7 +22,13 @@ public class Report
     }
 
     private record TranscriptionFactor(String geneID, String name, Map<String, Number> log2fc, Map<String, Number> tpm,
-                                       Map<String, Number> normex, ArrayList<String> histoneModifications)
+                                       Map<String, Number> normex, ArrayList<String> histoneModifications,
+                                       boolean hasIGV)
+    {
+    }
+
+    private record TranscriptionFactorGroup(String name, ArrayList<TranscriptionFactor> transcriptionFactors,
+                                            boolean realGroup, boolean hasIGV)
     {
     }
 
@@ -70,7 +75,7 @@ public class Report
                         Map<String, Number> log2fc = new HashMap<>();
                         Map<String, Number> tpm = new HashMap<>();
                         Map<String, Number> normex = new HashMap<>();
-
+                        boolean hasIGV = false;
 
                         {   //LOG2FC
                             File d_log2fs = new File(options_intern.com2pose_working_directory + File.separator +
@@ -144,15 +149,69 @@ public class Report
                             }
                         }   //Normalized expression
 
+                        {   //Check if TF has IGV
+                            File d_igv_screenshots = new File(
+                                    options_intern.com2pose_working_directory + File.separator +
+                                            options_intern.folder_out_igv);
+
+                            if (d_igv_screenshots.isDirectory())
+                            {
+                                File d_tf_igv = new File(
+                                        d_igv_screenshots + File.separator + options_intern.folder_out_igv_own_data);
+
+                                for (File entry : Objects.requireNonNull(d_tf_igv.listFiles()))
+                                {
+                                    String name = entry.getName().split("_")[1];
+                                    if (name.equals(tf_name))
+                                    {
+                                        hasIGV = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }   //Check if TF has IGV
+
                         TranscriptionFactor tf =
-                                new TranscriptionFactor(geneID, tf_name, log2fc, tpm, normex, histoneModifications);
+                                new TranscriptionFactor(geneID, tf_name, log2fc, tpm, normex, histoneModifications,
+                                        hasIGV);
                         tf_group.add(tf);
                     } catch (NoSuchFieldException ignore)
                     {
                         System.out.println("Not found: " + tf_name);
                     }
                 }
-                transcriptionFactorGroups.put(tfGroupName, tf_group);
+
+                boolean groupHasIGV = false;
+
+                if (tf_group.size() > 1)
+                {
+                    {   //Check if TF has IGV
+                        File d_igv_screenshots = new File(options_intern.com2pose_working_directory + File.separator +
+                                options_intern.folder_out_igv);
+
+                        if (d_igv_screenshots.isDirectory())
+                        {
+                            File d_tf_igv = new File(
+                                    d_igv_screenshots + File.separator + options_intern.folder_out_igv_own_data);
+
+                            for (File entry : Objects.requireNonNull(d_tf_igv.listFiles()))
+                            {
+                                String name = entry.getName().split("_")[1];
+                                if (name.equals(tfGroupName))
+                                {
+                                    groupHasIGV = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }   //Check if TF has IGV
+                }
+
+                if (tf_group.size() > 0)
+                {
+                    transcriptionFactorGroups.add(
+                            new TranscriptionFactorGroup(tfGroupName, tf_group, tf_group.size() > 1, groupHasIGV));
+                }
             }
         }
     }
@@ -162,11 +221,15 @@ public class Report
         logger.logLine("[REPORT] Start generating report");
 
         generateHome();
-        generateRegression();
-        generateDistribution();
-        generateValidation();
         styleAndScript();
         generateParameters();
+
+        for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
+        {
+            generateValidation(tfGroup);
+            generateDistribution(tfGroup);
+            generateRegression(tfGroup);
+        }
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -204,16 +267,18 @@ public class Report
 
         int i = 1;
 
-        for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
+        for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
         {
-            ArrayList<TranscriptionFactor> tfList = transcriptionFactorGroups.get(transcriptionFactorGroupName);
+            ArrayList<TranscriptionFactor> tfList = tfGroup.transcriptionFactors;
 
-            if (tfList.size() == 1)
+            if (!tfGroup.realGroup)
             {
                 for (TranscriptionFactor transcriptionFactor : tfList)
                 {
                     String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
                             options_intern.f_report_resources_home_tf_html);
+
+                    tf_string = tf_string.replace("{BUTTONBAR}", getButtonBar(transcriptionFactor));
 
                     tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.name);
 
@@ -221,45 +286,22 @@ public class Report
 
                     tf_string = tf_string.replace("{GENEID}", transcriptionFactor.geneID);
 
-                    tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + transcriptionFactor.name + ".html");
-                    tf_string =
-                            tf_string.replace("{DISTRIBUTION}", "DISTRIBUTION/" + transcriptionFactor.name + ".html");
-                    tf_string = tf_string.replace("{REGRESSION}", "REGRESSION/" + transcriptionFactor.name + ".html");
+                    tf_string = tf_string.replace("{HASVALIDATION}", transcriptionFactor.hasIGV ? "" : "disabled");
+                    tf_string = tf_string.replace("{HASDISTRIBUTION}", "disabled");
+                    tf_string = tf_string.replace("{HASREGRESSION}", "");
 
                     sb_tfs.append(tf_string);
                 }
-            }
-            if (tfList.size() > 1)
+            } else
             {
-                String tfGroup = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                String tfGroupString = loadFile(options_intern.path_to_COM2POSE + File.separator +
                         options_intern.f_report_resources_home_tfGroup_html);
 
-                tfGroup = tfGroup.replace("{TF_NAME}", i + ". " + transcriptionFactorGroupName);
+                tfGroupString = tfGroupString.replace("{TF_NAME}", i + ". " + tfGroup.name);
+                tfGroupString = tfGroupString.replace("{BUTTONBAR}", getButtonBar(tfGroup));
+                tfGroupString = tfGroupString.replace("{SINGLE_TFS}", getBasicData(tfGroup));
 
-                StringBuilder sb_singleTFs = new StringBuilder();
-
-                for (TranscriptionFactor transcriptionFactor : tfList)
-                {
-                    String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
-                            options_intern.f_report_resources_home_tf_html);
-
-                    tf_string = tf_string.replace("{TF_NAME}", transcriptionFactor.name);
-
-                    tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
-
-                    tf_string = tf_string.replace("{GENEID}", transcriptionFactor.geneID);
-
-                    tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + transcriptionFactor.name + ".html");
-                    tf_string =
-                            tf_string.replace("{DISTRIBUTION}", "DISTRIBUTION/" + transcriptionFactor.name + ".html");
-                    tf_string = tf_string.replace("{REGRESSION}", "REGRESSION/" + transcriptionFactor.name + ".html");
-
-                    sb_singleTFs.append(tf_string);
-                }
-
-                tfGroup = tfGroup.replace("{SINGLE_TFS}", sb_singleTFs.toString());
-
-                sb_tfs.append(tfGroup);
+                sb_tfs.append(tfGroupString);
             }
 
             i++;
@@ -313,7 +355,68 @@ public class Report
         return template;
     }
 
-    private void generateValidation() throws IOException
+    private String getBasicData(TranscriptionFactorGroup tfGroup) throws IOException
+    {
+        StringBuilder basicData = new StringBuilder();
+        String tfTemplate = loadFile(
+                options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_home_tf_html);
+
+        for (TranscriptionFactor tf : tfGroup.transcriptionFactors)
+        {
+            String tfString = tfTemplate.replace("{BASICDATA}", getBasicData(tf));
+            tfString = tfString.replace("{GENEID}", tf.geneID);
+            tfString = tfString.replace("{BUTTONBAR}", "");
+            tfString = tfString.replace("{TF_NAME}", tf.name);
+            basicData.append(tfString);
+        }
+
+        return basicData.toString();
+    }
+
+    private String getButtonBar(TranscriptionFactor tf) throws IOException
+    {
+        return getButtonBar(tf.name, tf.hasIGV, true, false);
+    }
+
+    private String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
+    {
+        return getButtonBar(tfGroup.name, tfGroup.hasIGV, true, false);
+    }
+
+    private String getButtonBar(String name, boolean hasValidation, boolean hasDistribution, boolean hasRegression)
+            throws IOException
+    {
+        String buttonbar = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_home_buttonbar_html);
+
+        buttonbar = buttonbar.replace("{VALIDATION}", "VALIDATION/" + name + ".html");
+        buttonbar = buttonbar.replace("{DISTRIBUTION}", "DISTRIBUTION/" + name + ".html");
+        buttonbar = buttonbar.replace("{REGRESSION}", "REGRESSION/" + name + ".html");
+
+        buttonbar = buttonbar.replace("{HASVALIDATION}", hasValidation ? "" : "disabled");
+        buttonbar = buttonbar.replace("{HASREGRESSION}", hasRegression ? "" : "disabled");
+        buttonbar = buttonbar.replace("{HASDISTRIBUTION}", hasDistribution ? "" : "disabled");
+
+        return buttonbar;
+    }
+
+
+    private void generateValidation(TranscriptionFactorGroup tfGroup) throws IOException
+    {
+        if (tfGroup.realGroup)
+        {
+            generateValidation(tfGroup.name, getBasicData(tfGroup), new ArrayList<String>(),
+                    new HashMap<String, Number>());
+        } else
+        {
+            TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
+
+            generateValidation(tf.name, getBasicData(tf), tf.histoneModifications, tf.log2fc);
+        }
+    }
+
+    private void generateValidation(String name, String basicData, ArrayList<String> histoneModifications,
+                                    Map<String, Number> log2fc) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_validation_html);
@@ -321,54 +424,61 @@ public class Report
         String templateFrame = loadFrame();
         templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
-        {
-            for (TranscriptionFactor transcriptionFactor : transcriptionFactorGroups.get(transcriptionFactorGroupName))
+
+        String frame = templateFrame;
+
+        frame = frame.replace("{TFNAME}", name);
+
+        frame = frame.replace("{TITLE}", name + " - Validation");
+
+        frame = frame.replace("{BASICDATA}", basicData);
+
+        StringBuilder sb_histoneModifications = new StringBuilder();
+
+        {   // Histone modifications
+            for (String hisoneModification : histoneModifications)
             {
-                String frame = templateFrame;
-                String validation = loadFile(templateFile.getAbsolutePath());
-
-                frame = frame.replace("{TFNAME}", transcriptionFactor.name);
-
-                frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Validation");
-
-                frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
-
-                StringBuilder sb_histoneModifications = new StringBuilder();
-
-                {   // Histone modifications
-                    for (String hisoneModification : transcriptionFactor.histoneModifications)
-                    {
-                        sb_histoneModifications.append(
-                                "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" +
-                                        hisoneModification + "</a>");
-                    }
-
-                    frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
-                }   // Histone modifications
-
-                {   // Groups
-                    StringBuilder sb_groups = new StringBuilder();
-
-                    for (Map.Entry<String, Number> group : transcriptionFactor.log2fc().entrySet())
-                    {
-                        sb_groups.append(
-                                "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + group.getKey() +
-                                        "</a>");
-                    }
-
-                    frame = frame.replace("{GROUPS}", sb_groups.toString());
-                }   // Groups
-
-                frame = relativate(frame, 1);
-
-                writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                        File.separator + transcriptionFactor.name + ".html", frame);
+                sb_histoneModifications.append(
+                        "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + hisoneModification +
+                                "</a>");
             }
+
+            frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
+        }   // Histone modifications
+
+        {   // Groups
+            StringBuilder sb_groups = new StringBuilder();
+
+            for (Map.Entry<String, Number> group : log2fc.entrySet())
+            {
+                sb_groups.append(
+                        "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + group.getKey() + "</a>");
+            }
+
+            frame = frame.replace("{GROUPS}", sb_groups.toString());
+        }   // Groups
+
+        frame = relativate(frame, 1);
+
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                File.separator + name + ".html", frame);
+
+    }
+
+    private void generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException
+    {
+        if (tfGroup.realGroup)
+        {
+            generateDistribution(tfGroup.name, getBasicData(tfGroup));
+        } else
+        {
+            TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
+
+            generateDistribution(tf.name, getBasicData(tf));
         }
     }
 
-    private void generateDistribution() throws IOException
+    private void generateDistribution(String name, String basicData) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_distribution_distribution_html);
@@ -376,27 +486,34 @@ public class Report
         String templateFrame = loadFrame();
         templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
+
+        String frame = templateFrame;
+
+        frame = frame.replace("{TFNAME}", name);
+        frame = frame.replace("{BASICDATA}", basicData);
+
+        frame = frame.replace("{TITLE}", name + " - Distribution");
+
+        frame = relativate(frame, 1);
+
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
+                File.separator + name + ".html", frame);
+    }
+
+    private void generateRegression(TranscriptionFactorGroup tfGroup) throws IOException
+    {
+        if (tfGroup.realGroup)
         {
-            for (TranscriptionFactor transcriptionFactor : transcriptionFactorGroups.get(transcriptionFactorGroupName))
-            {
-                String frame = templateFrame;
+            generateRegression(tfGroup.name);
+        } else
+        {
+            TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
 
-                frame = frame.replace("{TFNAME}", transcriptionFactor.name);
-                frame = frame.replace("{BASICDATA}", getBasicData(transcriptionFactor));
-
-                frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Distribution");
-
-                frame = relativate(frame, 1);
-
-                writeFile(
-                        options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
-                                File.separator + transcriptionFactor.name + ".html", frame);
-            }
+            generateRegression(tf.name);
         }
     }
 
-    private void generateRegression() throws IOException
+    private void generateRegression(String name) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_regression_regression_html);
@@ -404,22 +521,17 @@ public class Report
         String templateFrame = loadFrame();
         templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
-        {
-            for (TranscriptionFactor transcriptionFactor : transcriptionFactorGroups.get(transcriptionFactorGroupName))
-            {
-                String frame = templateFrame;
+        String frame = templateFrame;
 
-                frame = frame.replace("{TFNAME}", transcriptionFactor.name);
+        frame = frame.replace("{TFNAME}", name);
 
-                frame = frame.replace("{TITLE}", transcriptionFactor.name + " - Regression");
+        frame = frame.replace("{TITLE}", name + " - Regression");
 
-                frame = relativate(frame, 1);
+        frame = relativate(frame, 1);
 
-                writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
-                        File.separator + transcriptionFactor.name + ".html", frame);
-            }
-        }
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
+                File.separator + name + ".html", frame);
+
     }
 
     private String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
