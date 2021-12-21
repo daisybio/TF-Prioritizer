@@ -28,5 +28,16 @@
 </div>
 <button class="accordion">Validation</button>
 <div class="panel">
-
+    <div class="buttonbar">
+        {VALIDATION_HMS}
+    </div>
+    <div class="buttonbar">
+        {VALIDATION_GROUPS}
+    </div>
+    <select name="gene" id="select-gene" oninput="update_image()"></select>
+    <img id="validation-plot">
 </div>
+
+<script>hm_selector()</script>
+<script>group_selector()</script>
+<script>init()</script>
