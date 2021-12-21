@@ -270,6 +270,7 @@ public class Options_intern
     public String d_report_resources_home = d_report_resources + File.separator + "HOME";
     public String f_report_resources_home_home_html = d_report_resources_home + File.separator + "HOME.html";
     public String f_report_resources_home_tf_html = d_report_resources_home + File.separator + "TF.html";
+    public String f_report_resources_home_tfGroup_html = d_report_resources_home + File.separator + "TF_GROUP.html";
     public String f_report_resources_frame_html = d_report_resources + File.separator + "FRAME.html";
     public String f_report_resources_style = d_report_resources + File.separator + "style.css";
     public String f_report_resources_script = d_report_resources + File.separator + "script.js";
