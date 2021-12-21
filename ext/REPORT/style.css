@@ -23,7 +23,9 @@
     background-color: var(--c2);
 }
 
-.selector.active {
+.selector.active,
+.hm-selector.active,
+.group-selector.active {
     background-color: var(--c3);
 }
 

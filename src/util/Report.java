@@ -377,7 +377,7 @@ public class Report
 
     private String getButtonBar(TranscriptionFactor tf) throws IOException
     {
-        return getButtonBar(tf.name, tf.hasIGV, true, true);
+        return getButtonBar(tf.name, tf.hasIGV, false, true);
     }
 
     private String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
@@ -391,7 +391,8 @@ public class Report
         String buttonbar = loadFile(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_home_buttonbar_html);
 
-        buttonbar = buttonbar.replace("{VALIDATION}", "VALIDATION" + File.separator + name + ".html");
+        buttonbar = buttonbar.replace("{VALIDATION}",
+                "VALIDATION" + File.separator + name + File.separator + name + ".html");
         buttonbar = buttonbar.replace("{DISTRIBUTION}",
                 "DISTRIBUTION" + File.separator + name + File.separator + name + ".html");
         buttonbar = buttonbar.replace("{REGRESSION}", "REGRESSION" + File.separator + name + ".html");
@@ -408,27 +409,29 @@ public class Report
     {
         if (tfGroup.realGroup)
         {
-            generateValidation(tfGroup.name, getBasicData(tfGroup), new ArrayList<String>(),
-                    new HashMap<String, Number>());
+            generateValidation(tfGroup.name, getBasicData(tfGroup));
         } else
         {
             TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
 
-            generateValidation(tf.name, getBasicData(tf), tf.histoneModifications, tf.log2fc);
+            generateValidation(tf.name, getBasicData(tf));
         }
     }
 
-    private void generateValidation(String name, String basicData, ArrayList<String> histoneModifications,
-                                    Map<String, Number> log2fc) throws IOException
+    private void generateValidation(String name, String basicData) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_validation_html);
 
-        String templateFrame = loadFrame();
-        templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
+        File d_igv_screenshots = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv +
+                        File.separator + options_intern.folder_out_igv_own_data);
 
+        File d_out_validation =
+                new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation);
 
-        String frame = templateFrame;
+        String frame = loadFrame();
+        frame = frame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
         frame = frame.replace("{TFNAME}", name);
 
@@ -436,37 +439,112 @@ public class Report
 
         frame = frame.replace("{BASICDATA}", basicData);
 
-        StringBuilder sb_histoneModifications = new StringBuilder();
+        HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
+        HashSet<String> existingHMs = new HashSet<>();
+        HashSet<String> existingGroups = new HashSet<>();
 
-        {   // Histone modifications
-            for (String histoneModification : histoneModifications)
+        if (d_igv_screenshots.isDirectory())
+        {
+            for (File d_tf : d_igv_screenshots.listFiles())
             {
-                sb_histoneModifications.append(
-                        "<button onclick=\"window.location.href='{RELATIVATION}PARAMETERS.html';\">" +
-                                histoneModification + "</a>");
+                if (d_tf.getName().split("_")[1].equals(name))
+                {
+                    for (File d_hm : d_tf.listFiles())
+                    {
+                        if (d_hm.getName().equals("A_SESSIONS"))
+                        {
+                            continue;
+                        }
+
+                        combinations.put(d_hm.getName(), new HashMap<>());
+                        existingHMs.add(d_hm.getName());
+
+                        for (File d_groups : d_hm.listFiles())
+                        {
+                            combinations.get(d_hm.getName()).put(d_groups.getName(), new ArrayList<>());
+                            existingGroups.add(d_groups.getName());
+
+                            for (File f_plot : d_groups.listFiles())
+                            {
+                                String name_string = f_plot.getName().substring(0, f_plot.getName().lastIndexOf("."));
+                                name_string = name_string.split("_")[2];
+                                combinations.get(d_hm.getName()).get(d_groups.getName()).add(name_string);
+
+                                File target = new File(
+                                        d_out_validation.getAbsolutePath() + File.separator + name + File.separator +
+                                                d_hm.getName() + File.separator + d_groups.getName() + File.separator +
+                                                name_string + ".png");
+
+                                copyFile(f_plot, target);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        StringBuilder sb_hms = new StringBuilder();
+
+        for (String histoneModification : existingHMs)
+        {
+            sb_hms.append(
+                    "<button class=\"hm-selector\" name=\"validation-plot\" value=\"" + histoneModification + "\">" +
+                            histoneModification + "</button>");
+        }
+        frame = frame.replace("{VALIDATION_HMS}", sb_hms.toString());
+
+        StringBuilder sb_groups = new StringBuilder();
+        for (String group : existingGroups)
+        {
+            sb_groups.append(
+                    "<button class=\"group-selector\" name=\"validation-plot\" value=\"" + group + "\">" + group +
+                            "</button>");
+        }
+
+        String combinations_js = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_validation_combinations_js);
+
+        frame = frame.replace("{VALIDATION_GROUPS}", sb_groups.toString());
+
+        frame = frame.replace("{ADDHEAD}", "<script src=\"COMBINATIONS.js\"></script>");
+
+        frame = relativate(frame, 2);
+
+        String json;
+        {
+            HashMap<String, HashMap<String, String>> lv1 = new HashMap<>();
+            HashMap<String, String> lv2 = new HashMap<>();
+
+            for (String hm : combinations.keySet())
+            {
+                lv1.put(hm, new HashMap<>());
+                for (String group : combinations.get(hm).keySet())
+                {
+                    StringBuilder sb_genes = new StringBuilder("[");
+                    for (String gene : combinations.get(hm).get(group))
+                    {
+                        sb_genes.append("\"");
+                        sb_genes.append(gene);
+                        sb_genes.append("\",");
+                    }
+                    sb_genes.setLength(sb_genes.length() - 1);
+                    sb_genes.append("]");
+                    lv1.get(hm).put(group, sb_genes.toString());
+                }
+                lv2.put(hm, mapToJson(lv1.get(hm)));
             }
 
-            frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
-        }   // Histone modifications
+            json = mapToJson(lv2);
+        }
 
-        {   // Groups
-            StringBuilder sb_groups = new StringBuilder();
-
-            for (Map.Entry<String, Number> group : log2fc.entrySet())
-            {
-                sb_groups.append(
-                        "<button onclick=\"window.location.href='{RELATIVATION}PARAMETERS.html';\">" + group.getKey() +
-                                "</button>");
-            }
-
-            frame = frame.replace("{GROUPS}", sb_groups.toString());
-        }   // Groups
-
-        frame = relativate(frame, 1);
+        combinations_js = combinations_js.replace("{COMBINATIONS}", json);
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                File.separator + name + ".html", frame);
+                File.separator + name + File.separator + name + ".html", frame);
 
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                File.separator + name + File.separator + "COMBINATIONS.js", combinations_js);
     }
 
     private void generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException
@@ -625,6 +703,11 @@ public class Report
 
     private void copyFile(File source, File target) throws IOException
     {
+        if (target.exists())
+        {
+            return;
+        }
+
         if (source.exists())
         {
             if (!target.getParentFile().exists())
@@ -638,6 +721,7 @@ public class Report
 
     private void writeFile(String path, String content) throws IOException
     {
+        content = content.replace("{ADDHEAD}", "");
         File target = new File(path);
         if (!target.exists())
         {
@@ -657,5 +741,33 @@ public class Report
     {
         File source = new File(path);
         return Files.readString(source.toPath());
+    }
+
+    private String mapToJson(Map<String, String> map)
+    {
+        StringBuilder sb_output = new StringBuilder("{");
+
+        for (Map.Entry<String, String> entry : map.entrySet())
+        {
+            boolean valueIsJson = (entry.getValue().startsWith("{") && entry.getValue().endsWith("}")) ||
+                    (entry.getValue().startsWith("[") && entry.getValue().endsWith("]"));
+            sb_output.append("\"");
+            sb_output.append(entry.getKey());
+            sb_output.append("\":");
+            if (!valueIsJson)
+            {
+                sb_output.append("\"");
+            }
+            sb_output.append(entry.getValue());
+            if (!valueIsJson)
+            {
+                sb_output.append("\"");
+            }
+            sb_output.append(",");
+        }
+        sb_output.setLength(sb_output.length() - 1);
+        sb_output.append("}");
+
+        return sb_output.toString();
     }
 }
