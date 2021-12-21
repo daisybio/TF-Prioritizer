@@ -205,24 +205,63 @@ public class Report
 
         for (String transcriptionFactorGroupName : transcriptionFactorGroups.keySet())
         {
-            for (TranscriptionFactor transcriptionFactor : transcriptionFactorGroups.get(transcriptionFactorGroupName))
+            ArrayList<TranscriptionFactor> tfList = transcriptionFactorGroups.get(transcriptionFactorGroupName);
+
+            if (tfList.size() == 1)
             {
-                String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
-                        options_intern.f_report_resources_home_tf_html);
+                for (TranscriptionFactor transcriptionFactor : tfList)
+                {
+                    String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                            options_intern.f_report_resources_home_tf_html);
 
-                tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.name);
+                    tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.name);
 
-                tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
+                    tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
-                tf_string = tf_string.replace("{GENEID}", transcriptionFactor.geneID);
+                    tf_string = tf_string.replace("{GENEID}", transcriptionFactor.geneID);
 
-                tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + transcriptionFactor.name + ".html");
-                tf_string = tf_string.replace("{DISTRIBUTION}", "DISTRIBUTION/" + transcriptionFactor.name + ".html");
-                tf_string = tf_string.replace("{REGRESSION}", "REGRESSION/" + transcriptionFactor.name + ".html");
+                    tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + transcriptionFactor.name + ".html");
+                    tf_string =
+                            tf_string.replace("{DISTRIBUTION}", "DISTRIBUTION/" + transcriptionFactor.name + ".html");
+                    tf_string = tf_string.replace("{REGRESSION}", "REGRESSION/" + transcriptionFactor.name + ".html");
 
-                sb_tfs.append(tf_string);
-                i++;
+                    sb_tfs.append(tf_string);
+                }
             }
+            if (tfList.size() > 1)
+            {
+                String tfGroup = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                        options_intern.f_report_resources_home_tfGroup_html);
+
+                tfGroup = tfGroup.replace("{TF_NAME}", i + ". " + transcriptionFactorGroupName);
+
+                StringBuilder sb_singleTFs = new StringBuilder();
+
+                for (TranscriptionFactor transcriptionFactor : tfList)
+                {
+                    String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                            options_intern.f_report_resources_home_tf_html);
+
+                    tf_string = tf_string.replace("{TF_NAME}", transcriptionFactor.name);
+
+                    tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
+
+                    tf_string = tf_string.replace("{GENEID}", transcriptionFactor.geneID);
+
+                    tf_string = tf_string.replace("{VALIDATION}", "VALIDATION/" + transcriptionFactor.name + ".html");
+                    tf_string =
+                            tf_string.replace("{DISTRIBUTION}", "DISTRIBUTION/" + transcriptionFactor.name + ".html");
+                    tf_string = tf_string.replace("{REGRESSION}", "REGRESSION/" + transcriptionFactor.name + ".html");
+
+                    sb_singleTFs.append(tf_string);
+                }
+
+                tfGroup = tfGroup.replace("{SINGLE_TFS}", sb_singleTFs.toString());
+
+                sb_tfs.append(tfGroup);
+            }
+
+            i++;
         }
         home = home.replace("{TFS}", sb_tfs.toString());
 

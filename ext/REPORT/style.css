@@ -13,6 +13,10 @@
     text-align: left;
 }
 
+.panel .accordion {
+    background-color: var(--c4);
+}
+
 .accordion:hover {
     background-color: var(--c2);
 }
