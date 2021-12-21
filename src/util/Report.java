@@ -13,7 +13,7 @@ public class Report
     private final Options_intern options_intern;
     private final LinkedHashMap<String, ArrayList<TranscriptionFactor>> transcriptionFactorGroups =
             new LinkedHashMap<>();
-    private final DecimalFormat formatter = new DecimalFormat("0.000");
+    private final DecimalFormat formatter = new DecimalFormat("0.###");
 
     public Report(Options_intern options_intern) throws IOException
     {
@@ -22,8 +22,8 @@ public class Report
         loadTFs();
     }
 
-    private record TranscriptionFactor(String geneID, String name, Map<String, Double> log2fc, Map<String, Double> tpm,
-                                       Map<String, Integer> normex, ArrayList<String> histoneModifications)
+    private record TranscriptionFactor(String geneID, String name, Map<String, Number> log2fc, Map<String, Number> tpm,
+                                       Map<String, Number> normex, ArrayList<String> histoneModifications)
     {
     }
 
@@ -67,9 +67,9 @@ public class Report
                     try
                     {
                         String geneID = findValueInTable(tf_name, 1, 0, geneIDFile, "\t", true);
-                        Map<String, Double> log2fc = new HashMap<>();
-                        Map<String, Double> tpm = new HashMap<>();
-                        Map<String, Integer> normex = new HashMap<>();
+                        Map<String, Number> log2fc = new HashMap<>();
+                        Map<String, Number> tpm = new HashMap<>();
+                        Map<String, Number> normex = new HashMap<>();
 
 
                         {   //LOG2FC
@@ -273,40 +273,42 @@ public class Report
         logger.logLine("[REPORT] Finished generating report home page");
     }
 
+    private String getBasicDataEntry(String name, Map<String, Number> data) throws IOException
+    {
+        if (data.size() == 0)
+        {
+            return "";
+        }
+
+        String template = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_basicdata_entry_html);
+
+        template = template.replace("{NAME}", name);
+
+        StringBuilder sb_data = new StringBuilder();
+
+        for (Map.Entry<String, Number> kvPair : data.entrySet())
+        {
+            sb_data.append("<div class=\"keyvaluepair\"><p>" + kvPair.getKey() + "</p><p>" +
+                    formatter.format(kvPair.getValue()) + "</p></div>");
+        }
+
+        template = template.replace("{DATA}", sb_data.toString());
+
+        return template;
+    }
+
     private String getBasicData(TranscriptionFactor transcriptionFactor) throws IOException
     {
         String template = loadFile(
                 options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_basicdata_html);
 
-        {   //log2fc
-            StringBuilder sb_log2fc = new StringBuilder();
-            for (Map.Entry<String, Double> entry : transcriptionFactor.log2fc.entrySet())
-            {
-                sb_log2fc.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" +
-                        formatter.format(entry.getValue()) + "</p></div>");
-            }
-            template = template.replace("{LOG2FC}", sb_log2fc.toString());
-        }   //log2fc
 
-        {   //tpm
-            StringBuilder sb_tpm = new StringBuilder();
-            for (Map.Entry<String, Double> entry : transcriptionFactor.tpm.entrySet())
-            {
-                sb_tpm.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" +
-                        formatter.format(entry.getValue()) + "</p></div>");
-            }
-            template = template.replace("{TPM}", sb_tpm.toString());
-        }   //tpm
+        template = template.replace("{LOG2FC}", getBasicDataEntry("LOG2FC", transcriptionFactor.log2fc));
 
-        {   //normex
-            StringBuilder sb_normex = new StringBuilder();
-            for (Map.Entry<String, Integer> entry : transcriptionFactor.normex.entrySet())
-            {
-                sb_normex.append("<div class=\"keyvaluepair\"><p>" + entry.getKey() + "</p><p>" + entry.getValue() +
-                        "</p></div>");
-            }
-            template = template.replace("{NORMEX}", sb_normex.toString());
-        }   //normex
+        template = template.replace("{TPM}", getBasicDataEntry("TPM", transcriptionFactor.tpm));
+
+        template = template.replace("{NORMEX}", getBasicDataEntry("Norm. expression", transcriptionFactor.normex));
 
         return template;
     }
@@ -348,7 +350,7 @@ public class Report
                 {   // Groups
                     StringBuilder sb_groups = new StringBuilder();
 
-                    for (Map.Entry<String, Double> group : transcriptionFactor.log2fc().entrySet())
+                    for (Map.Entry<String, Number> group : transcriptionFactor.log2fc().entrySet())
                     {
                         sb_groups.append(
                                 "<a href=\"{RELATIVATION}PARAMETERS.html\" " + "class=\"button\">" + group.getKey() +
