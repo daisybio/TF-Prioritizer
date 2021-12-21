@@ -527,14 +527,18 @@ public class Report
 
         StringBuilder sb_histoneModifications = new StringBuilder();
 
+        boolean first = true;
+
         for (String histoneModification : existingHMs)
         {
             sb_histoneModifications.append(
-                    "<button onclick=\"window.location.href='{RELATIVATION}PARAMETERS.html';\">" + histoneModification +
-                            "</button>");
+                    "<button class=\"selector" + (first ? " active" : "") + "\" name=\"distribution-plot\" value=\"" +
+                            histoneModification + "\">" + histoneModification + "</button>");
+            first = false;
         }
 
         frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
+        frame = frame.replace("{DISTRIBUTION-PLOT-PATH}", existingHMs.get(0) + ".png");
 
         frame = relativate(frame, 2);
 

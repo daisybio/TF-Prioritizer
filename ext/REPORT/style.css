@@ -12,6 +12,7 @@
     padding: 18px;
     width: 100%;
     text-align: left;
+    transition: 0.2s ease-out;
 }
 
 .panel .accordion {
@@ -22,10 +23,19 @@
     background-color: var(--c2);
 }
 
+.selector.active {
+    background-color: var(--c3);
+}
+
 .panel {
     padding: 0 18px;
     overflow: visible;
     display: none;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .dataset {
