@@ -31,7 +31,7 @@
 
 .panel {
     padding: 0 18px;
-    overflow: visible;
+    overflow: hidden;
     display: none;
 }
 
@@ -89,7 +89,7 @@ h3 {
     grid-column: 1 / -1;
 }
 
-.accordion, button {
+.accordion, button, select {
     cursor: pointer;
     transition: 0.4s;
     border-radius: 8px;
@@ -100,13 +100,15 @@ h3 {
     color: white;
 }
 
-button {
+button, select {
     background-color: var(--c4);
     text-align: center;
     color: white;
     font-size: 16px;
     padding: 10px 15px;
     flex-grow: 1;
+    border-radius: 8px;
+    border-width: 0;
 }
 
 
@@ -148,4 +150,18 @@ button:disabled:hover,
 button[disabled]:hover {
     background-color: var(--disabledbutton);
     cursor: not-allowed;
+}
+
+select {
+    max-width: max-content;
+    justify-self: center;
+}
+
+option {
+    background-color: var(--c4);
+}
+
+select:hover {
+    background-color: var(--c3);
+    cursor: pointer;
 }
