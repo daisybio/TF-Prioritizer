@@ -154,7 +154,6 @@ button[disabled]:hover {
 
 select {
     max-width: max-content;
-    justify-self: center;
 }
 
 option {
@@ -164,4 +163,12 @@ option {
 select:hover {
     background-color: var(--c3);
     cursor: pointer;
+}
+
+button.narrow {
+    max-width: max-content;
+}
+
+.buttonbar.centered {
+    justify-content: center;
 }
