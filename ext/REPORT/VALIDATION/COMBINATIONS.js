@@ -93,6 +93,30 @@ function select_group(element) {
     update_image();
 }
 
+function moveGene(delta) {
+    let dropdown = document.getElementById("select-gene");
+    let options = dropdown.children;
+    let i;
+
+    for (i = 0; i < options.length; i++) {
+        if (options[i].value === document.getElementById("select-gene").value) {
+            break;
+        }
+    }
+
+    i += delta;
+
+    if (i >= options.length) {
+        i = 0;
+    }
+    if (i < 0) {
+        i = options.length - 1;
+    }
+
+    dropdown.value = options[i].value;
+    update_image();
+}
+
 function update_image() {
     activeHm = get_active_element("hm-selector").value;
     activeGroup = get_active_element("group-selector").value;

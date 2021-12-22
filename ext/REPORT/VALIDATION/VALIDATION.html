@@ -34,7 +34,11 @@
     <div class="buttonbar">
         {VALIDATION_GROUPS}
     </div>
-    <select name="gene" id="select-gene" oninput="update_image()"></select>
+    <div class="buttonbar centered">
+        <button class="narrow" onclick="moveGene(-1)">&lt;</button>
+        <select name="gene" id="select-gene" oninput="update_image()"></select>
+        <button class="narrow" onclick="moveGene(1)">&gt;</button>
+    </div>
     <img id="validation-plot">
 </div>
 
