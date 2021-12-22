@@ -498,8 +498,8 @@ public class Report
         for (String group : existingGroups)
         {
             sb_groups.append(
-                    "<button class=\"group-selector\" name=\"validation-plot\" value=\"" + group + "\">" + group +
-                            "</button>");
+                    "<button class=\"group-selector\" onclick=\"select_group(this)\" name=\"validation-plot\" " +
+                            "value=\"" + group + "\">" + group + "</button>");
         }
 
         String combinations_js = loadFile(options_intern.path_to_COM2POSE + File.separator +

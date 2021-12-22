@@ -15,7 +15,7 @@ function select_first_possible_group() {
 
     for (i = 0; i < group_selectors.length; i++) {
         if (!group_selectors[i].disabled) {
-            group_selectors[i].click();
+            select_group(group_selectors[i]);
             break;
         }
     }
@@ -50,50 +50,47 @@ function hm_selector() {
             if (!(typeof activeGroup === 'undefined')) {
                 if (!possibleGroups.includes(activeGroup.value)) {
                     select_first_possible_group();
+                } else {
+                    select_group(activeGroup);
                 }
             }
         });
     }
 }
 
-function group_selector() {
+function select_group(element) {
     let group_selectors = document.getElementsByClassName("group-selector");
-    let i;
 
-    for (i = 0; i < group_selectors.length; i++) {
-        group_selectors[i].addEventListener("click", function () {
-            if (this.classList.contains("active")) return;
+    if (!element.classList.contains("active")) {
+        let inactive = !element.classList.contains("active");
+        setClass(group_selectors, "active", "remove");
 
-            let setClasses = !this.classList.contains("active");
-            setClass(group_selectors, "active", "remove");
-
-            if (setClasses) {
-                this.classList.toggle("active");
-            }
-
-
-            let activeHm = get_active_element("hm-selector");
-
-            let possibleGenes = combinations[activeHm.value][this.value];
-
-            let dropdown = document.getElementById("select-gene");
-            let l, k = dropdown.options.length - 1;
-
-            for (l = k; l >= 0; l--) {
-                dropdown.remove(l);
-            }
-
-            let m;
-            for (m = 0; m < possibleGenes.length; m++) {
-                let option = document.createElement("option");
-                option.value = possibleGenes[m];
-                option.textContent = possibleGenes[m];
-                dropdown.appendChild(option);
-            }
-
-            update_image();
-        });
+        if (inactive) {
+            element.classList.toggle("active");
+        }
     }
+
+
+    let activeHm = get_active_element("hm-selector");
+
+    let possibleGenes = combinations[activeHm.value][element.value];
+
+    let dropdown = document.getElementById("select-gene");
+    let l, k = dropdown.options.length - 1;
+
+    for (l = k; l >= 0; l--) {
+        dropdown.remove(l);
+    }
+
+    let m;
+    for (m = 0; m < possibleGenes.length; m++) {
+        let option = document.createElement("option");
+        option.value = possibleGenes[m];
+        option.textContent = possibleGenes[m];
+        dropdown.appendChild(option);
+    }
+
+    update_image();
 }
 
 function update_image() {
