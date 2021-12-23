@@ -35,11 +35,25 @@
         {VALIDATION_GROUPS}
     </div>
     <div class="buttonbar centered">
+        <button onclick="openModal('modal')">Zoom in</button>
         <button class="narrow" onclick="moveGene(-1)">&lt;</button>
         <select name="gene" id="select-gene" oninput="update_image()"></select>
         <button class="narrow" onclick="moveGene(1)">&gt;</button>
+        <button onclick="openImageInTab('validation-plot')">Open in new tab</button>
     </div>
-    <img id="validation-plot">
+    <img id="validation-plot" onclick="openModal('modal')" class="modal source">
+</div>
+
+<div id="modal" class="modal background">
+    <div class="buttonbar centered">
+        <div id="validation-plot-modal-caption" class="modal caption"></div>
+        <button class="modal button close" onclick="closeModal('modal')">&times;</button>
+    </div>
+    <div class="buttonbar">
+        <button class="modal button" onclick="moveGene(-1)">&lt;</button>
+        <img class="modal content" id="validation-plot-modal-image">
+        <button class="modal button" onclick="moveGene(1)">&gt;</button>
+    </div>
 </div>
 
 <script>hm_selector()</script>

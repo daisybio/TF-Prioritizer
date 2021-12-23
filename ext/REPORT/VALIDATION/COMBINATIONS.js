@@ -86,7 +86,7 @@ function select_group(element) {
     for (m = 0; m < possibleGenes.length; m++) {
         let option = document.createElement("option");
         option.value = possibleGenes[m];
-        option.textContent = possibleGenes[m];
+        option.textContent = (m + 1) + ". " + possibleGenes[m];
         dropdown.appendChild(option);
     }
 
@@ -118,12 +118,19 @@ function moveGene(delta) {
 }
 
 function update_image() {
-    activeHm = get_active_element("hm-selector").value;
-    activeGroup = get_active_element("group-selector").value;
-    activeGene = document.getElementById("select-gene").value;
+    let activeHm = get_active_element("hm-selector").value;
+    let activeGroup = get_active_element("group-selector").value;
+    let selectedGeneName = document.getElementById("select-gene").value;
 
     let image = document.getElementById("validation-plot");
-    image.src = activeHm + "/" + activeGroup + "/" + activeGene + ".png";
+    image.src = activeHm + "/" + activeGroup + "/" + selectedGeneName + ".png";
+
+    let modal_image = document.getElementById("validation-plot-modal-image");
+    modal_image.src = activeHm + "/" + activeGroup + "/" + selectedGeneName + ".png";
+
+    let possibleGenes = combinations[activeHm][activeGroup];
+    let modal_caption = document.getElementById("validation-plot-modal-caption");
+    modal_caption.innerHTML = (possibleGenes.indexOf(selectedGeneName) + 1) + ". " + selectedGeneName;
 }
 
 function get_active_element(className) {
