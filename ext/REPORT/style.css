@@ -111,6 +111,10 @@ button, select {
     border-width: 0;
 }
 
+select {
+    appearance: none;
+}
+
 
 .header button {
     background-color: var(--c2);
@@ -171,4 +175,84 @@ button.narrow {
 
 .buttonbar.centered {
     justify-content: center;
+}
+
+/* Style the Image Used to Trigger the Modal */
+.modal.source {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.modal.source:hover {
+    opacity: 0.7;
+}
+
+/* The Modal (background) */
+.modal.background {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vw;
+    overflow: hidden;
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (Image) */
+.modal.content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    position: center;
+}
+
+/* Caption of Modal Image (Image Text) - Same Width as the Image */
+.modal.caption {
+    font-size: 40px;
+    display: block;
+    color: #ccc;
+    padding: 10px 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Add Animation - Zoom in the Modal */
+.modal.content {
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+    from {
+        transform: scale(0)
+    }
+    to {
+        transform: scale(1)
+    }
+}
+
+.modal.button {
+    background-color: transparent;
+    font-size: 60px;
+    border-radius: 0;
+    margin: 0;
+}
+
+.modal.button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal.close {
+    justify-self: right;
+    margin-left: auto;
+    max-width: 10%;
+    color: #f1f1f1;
+    font-weight: bold;
+    transition: 0.3s;
+    padding: 0;
 }

@@ -36,6 +36,21 @@ function selector() {
     }
 }
 
+function openImageInTab(id) {
+    let image = document.getElementById(id);
+    window.open(image.src);
+}
+
+function openModal(modal_id) {
+    let modal = document.getElementById(modal_id);
+    modal.style.display = "block";
+}
+
+function closeModal(modal_id) {
+    let modal = document.getElementById(modal_id);
+    modal.style.display = "none";
+}
+
 function setClass(els, className, fnName) {
     for (let i = 0; i < els.length; i++) {
         els[i].classList[fnName](className);
