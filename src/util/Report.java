@@ -23,9 +23,9 @@ public class Report
         loadTFs();
     }
 
-    private record TranscriptionFactor(String geneID, String name, Map<String, Number> log2fc, Map<String, Number> tpm,
-                                       Map<String, Number> normex, ArrayList<String> histoneModifications,
-                                       boolean hasIGV)
+    private record TranscriptionFactor(String geneID, String name, Map<String, Map<String, Number>> log2fc,
+                                       Map<String, Number> tpm, Map<String, Number> normex,
+                                       ArrayList<String> histoneModifications, boolean hasIGV)
     {
     }
 
@@ -74,7 +74,7 @@ public class Report
                     try
                     {
                         String geneID = findValueInTable(tf_name, 1, 0, geneIDFile, "\t", true);
-                        Map<String, Number> log2fc = new HashMap<>();
+                        Map<String, Map<String, Number>> log2fc = new HashMap<>();
                         Map<String, Number> tpm = new HashMap<>();
                         Map<String, Number> normex = new HashMap<>();
                         boolean hasIGV = false;
@@ -94,8 +94,18 @@ public class Report
                                     {
                                         double log2fc_value =
                                                 Double.parseDouble(findValueInTable(geneID, 0, 1, entry, "\t", false));
-                                        String name = group1 + " | " + group2;
-                                        log2fc.put(name, log2fc_value);
+
+                                        if (!log2fc.containsKey(group1))
+                                        {
+                                            log2fc.put(group1, new HashMap<>());
+                                        }
+                                        if (!log2fc.containsKey(group2))
+                                        {
+                                            log2fc.put(group2, new HashMap<>());
+                                        }
+
+                                        log2fc.get(group1).put(group2, log2fc_value);
+                                        log2fc.get(group2).put(group1, log2fc_value);
                                     } catch (NoSuchFieldException ignored)
                                     {
                                     }
@@ -342,13 +352,66 @@ public class Report
         return template;
     }
 
+    private String getBasicDataLog2fc(Map<String, Map<String, Number>> log2fc) throws IOException
+    {
+        if (log2fc.size() == 0)
+        {
+            return "";
+        }
+
+        String template = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_basicdata_entry_html);
+
+        template = template.replace("{NAME}", "LOG2FC");
+
+        StringBuilder sb_data = new StringBuilder();
+
+        List<String> groups = new ArrayList<>(log2fc.keySet());
+        Collections.sort(groups);
+
+        sb_data.append("<tr>");
+        sb_data.append("<th></th>");
+        for (String group : groups)
+        {
+            sb_data.append("<th>");
+            sb_data.append(group);
+            sb_data.append("</th>");
+        }
+        sb_data.append("</tr>");
+
+        for (String group : groups)
+        {
+            sb_data.append("<tr>");
+
+            sb_data.append("<th>");
+            sb_data.append(group);
+            sb_data.append("</th>");
+
+            for (String match : groups)
+            {
+                sb_data.append("<td>");
+                if (!match.equals(group))
+                {
+                    sb_data.append(formatter.format(log2fc.get(group).get(match)));
+                }
+                sb_data.append("</td>");
+            }
+
+            sb_data.append("</tr>");
+        }
+
+        template = template.replace("{DATA}", sb_data.toString());
+
+        return template;
+    }
+
     private String getBasicData(TranscriptionFactor transcriptionFactor) throws IOException
     {
         String template = loadFile(
                 options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_basicdata_html);
 
 
-        template = template.replace("{LOG2FC}", getBasicDataEntry("LOG2FC", transcriptionFactor.log2fc));
+        template = template.replace("{LOG2FC}", getBasicDataLog2fc(transcriptionFactor.log2fc));
 
         template = template.replace("{TPM}", getBasicDataEntry("TPM", transcriptionFactor.tpm));
 
@@ -377,7 +440,7 @@ public class Report
 
     private String getButtonBar(TranscriptionFactor tf) throws IOException
     {
-        return getButtonBar(tf.name, tf.hasIGV, false, true);
+        return getButtonBar(tf.name, tf.hasIGV, true, true);
     }
 
     private String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
