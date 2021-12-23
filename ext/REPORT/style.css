@@ -47,6 +47,10 @@ img {
     margin: 5px;
 }
 
+.datatable {
+    
+}
+
 body {
     font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
     max-width: 700px;
@@ -114,7 +118,6 @@ button, select {
 select {
     appearance: none;
 }
-
 
 .header button {
     background-color: var(--c2);
