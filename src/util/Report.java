@@ -341,18 +341,22 @@ public class Report
 
         StringBuilder sb_data = new StringBuilder();
 
+        sb_data.append("<div class='keyvaluepaircontainer'>");
+
         for (Map.Entry<String, Number> kvPair : data.entrySet())
         {
-            sb_data.append("<div class=\"keyvaluepair\"><p>" + kvPair.getKey() + "</p><p>" +
+            sb_data.append("<div class=\"keyvaluepair\"><h4>" + kvPair.getKey() + "</h4><p>" +
                     formatter.format(kvPair.getValue()) + "</p></div>");
         }
+
+        sb_data.append("</div>");
 
         template = template.replace("{DATA}", sb_data.toString());
 
         return template;
     }
 
-    private String getBasicDataLog2fc(Map<String, Map<String, Number>> log2fc) throws IOException
+    private String getBasicDataLog2fc(String tfName, Map<String, Map<String, Number>> log2fc) throws IOException
     {
         if (log2fc.size() == 0)
         {
@@ -369,12 +373,13 @@ public class Report
         List<String> groups = new ArrayList<>(log2fc.keySet());
         Collections.sort(groups);
 
+        sb_data.append("<table>");
         sb_data.append("<tr>");
         sb_data.append("<th></th>");
         int i = 0;
         for (String group : groups)
         {
-            sb_data.append("<th id='col").append(i).append("'>");
+            sb_data.append("<th id='").append(tfName).append("-col-").append(i).append("'>");
             sb_data.append(group);
             sb_data.append("</th>");
             i++;
@@ -386,16 +391,16 @@ public class Report
         {
             sb_data.append("<tr>");
 
-            sb_data.append("<th id='row").append(i).append("'>");
+            sb_data.append("<th id='").append(tfName).append("-row-").append(i).append("'>");
             sb_data.append(group);
             sb_data.append("</th>");
 
             int j = 0;
             for (String match : groups)
             {
-                String coordinates = j + ", " + i;
-                sb_data.append("<td onmouseover='tableMouseOver(").append(coordinates)
-                        .append(")' onmouseout" + "='tableMouseOut(").append(coordinates).append(")'>");
+                String parameters = "\"" + tfName + "\", " + j + ", " + i;
+                sb_data.append("<td onmouseover='tableMouseOver(").append(parameters)
+                        .append(")' onmouseout" + "='tableMouseOut(").append(parameters).append(")'>");
                 if (!match.equals(group))
                 {
                     sb_data.append(formatter.format(log2fc.get(group).get(match)));
@@ -410,6 +415,8 @@ public class Report
             i++;
         }
 
+        sb_data.append("</table>");
+
         template = template.replace("{DATA}", sb_data.toString());
 
         return template;
@@ -421,7 +428,8 @@ public class Report
                 options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_basicdata_html);
 
 
-        template = template.replace("{LOG2FC}", getBasicDataLog2fc(transcriptionFactor.log2fc));
+        template =
+                template.replace("{LOG2FC}", getBasicDataLog2fc(transcriptionFactor.name, transcriptionFactor.log2fc));
 
         template = template.replace("{TPM}", getBasicDataEntry("TPM", transcriptionFactor.tpm));
 

@@ -86,14 +86,18 @@ body {
 
 .keyvaluepaircontainer {
     display: flex;
-    gap: 5px;
+    flex-direction: row;
+    gap: 20px;
     justify-content: left;
     flex-wrap: wrap;
 }
 
 .keyvaluepair {
+    width: min-content;
     display: grid;
-    grid-template-columns: 110px 70px;
+    grid-template-columns: min-content;
+    grid-template-rows: min-content min-content;
+    text-align: center;
 }
 
 h1 {
@@ -108,7 +112,11 @@ h2, .accordion {
 
 h3 {
     font-size: 15px;
-    grid-column: 1 / -1;
+    text-align: left;
+}
+
+.dataset h4, .dataset th {
+    font-size: 15px;
 }
 
 .accordion, button, select {
