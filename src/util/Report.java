@@ -371,33 +371,43 @@ public class Report
 
         sb_data.append("<tr>");
         sb_data.append("<th></th>");
+        int i = 0;
         for (String group : groups)
         {
-            sb_data.append("<th>");
+            sb_data.append("<th id='col").append(i).append("'>");
             sb_data.append(group);
             sb_data.append("</th>");
+            i++;
         }
         sb_data.append("</tr>");
 
+        i = 0;
         for (String group : groups)
         {
             sb_data.append("<tr>");
 
-            sb_data.append("<th>");
+            sb_data.append("<th id='row").append(i).append("'>");
             sb_data.append(group);
             sb_data.append("</th>");
 
+            int j = 0;
             for (String match : groups)
             {
-                sb_data.append("<td>");
+                String coordinates = j + ", " + i;
+                sb_data.append("<td onmouseover='tableMouseOver(").append(coordinates)
+                        .append(")' onmouseout" + "='tableMouseOut(").append(coordinates).append(")'>");
                 if (!match.equals(group))
                 {
                     sb_data.append(formatter.format(log2fc.get(group).get(match)));
                 }
                 sb_data.append("</td>");
+
+                j++;
             }
 
             sb_data.append("</tr>");
+
+            i++;
         }
 
         template = template.replace("{DATA}", sb_data.toString());
