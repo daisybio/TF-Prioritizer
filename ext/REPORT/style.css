@@ -25,8 +25,8 @@
 }
 
 .selector.active,
-.hm-selector.active,
-.group-selector.active {
+.group-selector.active,
+.subgroup-selector.active {
     background-color: var(--c3);
 }
 
@@ -235,7 +235,8 @@ button.narrow {
 .modal.content {
     margin: auto;
     display: block;
-    width: 80%;
+    max-width: 80vw;
+    max-height: 90vh;
     position: center;
 }
 

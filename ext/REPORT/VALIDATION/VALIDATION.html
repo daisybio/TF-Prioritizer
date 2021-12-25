@@ -5,8 +5,8 @@
     <button onclick="window.location.href='{RELATIVATION}PARAMETERS.html';">
         GeneCards
     </button>
-    <button onclick="window.location.href='{RELATIVATION}PARAMETERS.html';">
-        DistibutionAnalysis
+    <button onclick="window.location.href='{RELATIVATION}DISTRIBUTION/{TFNAME}/{TFNAME}.html';">
+        Distibution Analysis
     </button>
     <button onclick="window.location.href='{RELATIVATION}PARAMETERS.html';">
         Parameters
@@ -19,12 +19,7 @@
 
 <button class="accordion">Differential gene expression analysis</button>
 <div class="panel">
-    <div class="buttonbar">
-        {HISTONEMODIFICATIONS}
-    </div>
-    <div class="buttonbar">
-        {GROUPS}
-    </div>
+    NYI
 </div>
 <button class="accordion">Validation</button>
 <div class="panel">
@@ -35,26 +30,25 @@
         {VALIDATION_GROUPS}
     </div>
     <div class="buttonbar centered">
-        <button onclick="openModal('modal')">Zoom in</button>
-        <button class="narrow" onclick="moveGene(-1)">&lt;</button>
-        <select name="gene" id="select-gene" oninput="update_image()"></select>
-        <button class="narrow" onclick="moveGene(1)">&gt;</button>
-        <button onclick="openImageInTab('validation-plot')">Open in new tab</button>
+        <button onclick="openModal('{VALIDATION-PLOT-ID}-modal')">Zoom in</button>
+        <button class="narrow" onclick="move_dropdown('{VALIDATION-PLOT-ID}', -1)">&lt;</button>
+        <select name="gene" id="{VALIDATION-PLOT-ID}-dropdown" oninput="update_image('{VALIDATION-PLOT-ID}')"></select>
+        <button class="narrow" onclick="move_dropdown('{VALIDATION-PLOT-ID}', 1)">&gt;</button>
+        <button onclick="openImageInTab('{VALIDATION-PLOT-ID}-image')">Open in new tab</button>
     </div>
-    <img id="validation-plot" onclick="openModal('modal')" class="modal source">
+    <img id="{VALIDATION-PLOT-ID}-image" onclick="openModal('{VALIDATION-PLOT-ID}-modal')" class="modal source">
 </div>
 
-<div id="modal" class="modal background">
+<div id="{VALIDATION-PLOT-ID}-modal" class="modal background">
     <div class="buttonbar centered">
-        <div id="validation-plot-modal-caption" class="modal caption"></div>
-        <button class="modal button close" onclick="closeModal('modal')">&times;</button>
+        <div id="{VALIDATION-PLOT-ID}-modal-caption" class="modal caption"></div>
+        <button class="modal button close" onclick="closeModal('{VALIDATION-PLOT-ID}-modal')">&times;</button>
     </div>
     <div class="buttonbar">
-        <button class="modal button" onclick="moveGene(-1)">&lt;</button>
-        <img class="modal content" id="validation-plot-modal-image">
-        <button class="modal button" onclick="moveGene(1)">&gt;</button>
+        <button class="modal button" onclick="move_dropdown('{VALIDATION-PLOT-ID}', -1)">&lt;</button>
+        <img class="modal content" id="{VALIDATION-PLOT-ID}-modal-image">
+        <button class="modal button" onclick="move_dropdown('{VALIDATION-PLOT-ID}', 1)">&gt;</button>
     </div>
 </div>
 
-<script>hm_selector()</script>
-<script>init()</script>
+<script>init_selection("{VALIDATION-PLOT-ID}")</script>

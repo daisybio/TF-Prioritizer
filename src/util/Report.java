@@ -570,24 +570,25 @@ public class Report
 
         for (String histoneModification : existingHMs)
         {
-            sb_hms.append(
-                    "<button class=\"hm-selector\" name=\"validation-plot\" value=\"" + histoneModification + "\">" +
-                            histoneModification + "</button>");
+            sb_hms.append("<button class=\"{VALIDATION-PLOT-ID} group-selector\" onclick=\"select_group" +
+                    "('{VALIDATION-PLOT-ID}', this)\" value=\"" + histoneModification + "\">" + histoneModification +
+                    "</button>");
         }
         frame = frame.replace("{VALIDATION_HMS}", sb_hms.toString());
 
         StringBuilder sb_groups = new StringBuilder();
         for (String group : existingGroups)
         {
-            sb_groups.append(
-                    "<button class=\"group-selector\" onclick=\"select_group(this)\" name=\"validation-plot\" " +
-                            "value=\"" + group + "\">" + group + "</button>");
+            sb_groups.append("<button class=\"{VALIDATION-PLOT-ID} subgroup-selector\" onclick=\"select_subgroup" +
+                    "('{VALIDATION-PLOT-ID}', this)\" " + "value=\"" + group + "\">" + group + "</button>");
         }
 
         String combinations_js = loadFile(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_combinations_js);
 
         frame = frame.replace("{VALIDATION_GROUPS}", sb_groups.toString());
+
+        frame = frame.replace("{VALIDATION-PLOT-ID}", "validation-plot");
 
         frame = frame.replace("{ADDHEAD}", "<script src=\"COMBINATIONS.js\"></script>");
 
@@ -742,6 +743,8 @@ public class Report
         HashSet<String> existingHMs = new HashSet<>();
         HashSet<String> existingThresholds = new HashSet<>();
 
+        boolean first = true;
+
         if (d_in_plots.isDirectory())
         {
             for (File d_hm : Objects.requireNonNull(d_in_plots.listFiles()))
@@ -756,6 +759,11 @@ public class Report
 
                     for (File f_plot : d_threshold.listFiles())
                     {
+                        if (f_plot.getName().endsWith(".py"))
+                        {
+                            continue;
+                        }
+
                         String name_string = f_plot.getName().substring(0, f_plot.getName().lastIndexOf("."));
                         name_string = name_string.replace("threshold", "");
                         name_string = name_string.replace(d_threshold.getName(), "");
@@ -788,24 +796,25 @@ public class Report
 
         for (String histoneModification : existingHMs)
         {
-            sb_hms.append(
-                    "<button class=\"hm-selector\" name=\"validation-plot\" value=\"" + histoneModification + "\">" +
-                            histoneModification + "</button>");
+            sb_hms.append("<button class=\"{REGRESSION-PLOT-ID} group-selector\" onclick=\"select_group" +
+                    "('{REGRESSION-PLOT-ID}', this)\" value=\"" + histoneModification + "\">" + histoneModification +
+                    "</button>");
         }
         frame = frame.replace("{HISTONEMODIFICATIONS}", sb_hms.toString());
 
         StringBuilder sb_thresholds = new StringBuilder();
         for (String threshold : existingThresholds)
         {
-            sb_thresholds.append(
-                    "<button class=\"group-selector\" onclick=\"select_group(this)\" name=\"validation-plot\" " +
-                            "value=\"" + threshold + "\">" + threshold + "</button>");
+            sb_thresholds.append("<button class=\"{REGRESSION-PLOT-ID} subgroup-selector\" onclick=\"select_subgroup" +
+                    "('{REGRESSION-PLOT-ID}', this)\" value=\"" + threshold + "\">" + threshold + "</button>");
         }
 
         String combinations_js = loadFile(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_combinations_js);
 
         frame = frame.replace("{THRESHOLDS}", sb_thresholds.toString());
+
+        frame = frame.replace("{REGRESSION-PLOT-ID}", "regression-plot");
 
         frame = frame.replace("{ADDHEAD}", "<script src=\"COMBINATIONS.js\"></script>");
 
