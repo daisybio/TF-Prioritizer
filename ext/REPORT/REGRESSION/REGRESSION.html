@@ -6,3 +6,23 @@
         Parameters
     </button>
 </div>
+<button class="accordion">Heatmaps</button>
+<div class="panel">
+    <div class="buttonbar">
+        {HISTONEMODIFICATIONS}
+    </div>
+    <div class="buttonbar">
+        {THRESHOLDS}
+    </div>
+    <div class="buttonbar centered">
+        <button onclick="openModal('modal')">Zoom in</button>
+        <button class="narrow" onclick="moveGene(-1)">&lt;</button>
+        <select name="gene" id="select-gene" oninput="update_image()"></select>
+        <button class="narrow" onclick="moveGene(1)">&gt;</button>
+        <button onclick="openImageInTab('validation-plot')">Open in new tab</button>
+    </div>
+    <img id="validation-plot" onclick="openModal('modal')" class="modal source">
+</div>
+
+<script>hm_selector()</script>
+<script>init()</script>

@@ -476,7 +476,8 @@ public class Report
                 "VALIDATION" + File.separator + name + File.separator + name + ".html");
         buttonbar = buttonbar.replace("{DISTRIBUTION}",
                 "DISTRIBUTION" + File.separator + name + File.separator + name + ".html");
-        buttonbar = buttonbar.replace("{REGRESSION}", "REGRESSION" + File.separator + name + ".html");
+        buttonbar = buttonbar.replace("{REGRESSION}",
+                "REGRESSION" + File.separator + name + File.separator + name + ".html");
 
         buttonbar = buttonbar.replace("{HASVALIDATION}", hasValidation ? "" : "disabled");
         buttonbar = buttonbar.replace("{HASREGRESSION}", hasRegression ? "" : "disabled");
@@ -719,23 +720,131 @@ public class Report
 
     private void generateRegression(String name) throws IOException
     {
+
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_regression_regression_html);
 
-        String templateFrame = loadFrame();
-        templateFrame = templateFrame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
+        File d_in_plots =
+                new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_plots);
 
-        String frame = templateFrame;
+        File d_out_regression =
+                new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression);
+
+        String frame = loadFrame();
+
+        frame = frame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
         frame = frame.replace("{TFNAME}", name);
 
         frame = frame.replace("{TITLE}", name + " - Regression");
 
-        frame = relativate(frame, 1);
+        HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
+        HashSet<String> existingHMs = new HashSet<>();
+        HashSet<String> existingThresholds = new HashSet<>();
+
+        if (d_in_plots.isDirectory())
+        {
+            for (File d_hm : Objects.requireNonNull(d_in_plots.listFiles()))
+            {
+                combinations.put(d_hm.getName(), new HashMap<>());
+                existingHMs.add(d_hm.getName());
+
+                for (File d_threshold : d_hm.listFiles())
+                {
+                    combinations.get(d_hm.getName()).put(d_threshold.getName(), new ArrayList<>());
+                    existingThresholds.add(d_threshold.getName());
+
+                    for (File f_plot : d_threshold.listFiles())
+                    {
+                        String name_string = f_plot.getName().substring(0, f_plot.getName().lastIndexOf("."));
+                        name_string = name_string.replace("threshold", "");
+                        name_string = name_string.replace(d_threshold.getName(), "");
+                        name_string = name_string.replace(d_hm.getName(), "");
+
+                        while (name_string.startsWith("_"))
+                        {
+                            name_string = name_string.substring(1);
+                        }
+
+                        while (name_string.endsWith("_"))
+                        {
+                            name_string = name_string.substring(0, name_string.length() - 1);
+                        }
+
+                        combinations.get(d_hm.getName()).get(d_threshold.getName()).add(name_string);
+
+                        File target = new File(
+                                d_out_regression.getAbsolutePath() + File.separator + name + File.separator +
+                                        d_hm.getName() + File.separator + d_threshold.getName() + File.separator +
+                                        name_string + ".png");
+
+                        copyFile(f_plot, target);
+                    }
+                }
+            }
+        }
+
+        StringBuilder sb_hms = new StringBuilder();
+
+        for (String histoneModification : existingHMs)
+        {
+            sb_hms.append(
+                    "<button class=\"hm-selector\" name=\"validation-plot\" value=\"" + histoneModification + "\">" +
+                            histoneModification + "</button>");
+        }
+        frame = frame.replace("{HISTONEMODIFICATIONS}", sb_hms.toString());
+
+        StringBuilder sb_thresholds = new StringBuilder();
+        for (String threshold : existingThresholds)
+        {
+            sb_thresholds.append(
+                    "<button class=\"group-selector\" onclick=\"select_group(this)\" name=\"validation-plot\" " +
+                            "value=\"" + threshold + "\">" + threshold + "</button>");
+        }
+
+        String combinations_js = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_validation_combinations_js);
+
+        frame = frame.replace("{THRESHOLDS}", sb_thresholds.toString());
+
+        frame = frame.replace("{ADDHEAD}", "<script src=\"COMBINATIONS.js\"></script>");
+
+        frame = relativate(frame, 2);
+
+        String json;
+        {
+            HashMap<String, HashMap<String, String>> lv1 = new HashMap<>();
+            HashMap<String, String> lv2 = new HashMap<>();
+
+            for (String hm : combinations.keySet())
+            {
+                lv1.put(hm, new HashMap<>());
+                for (String threshold : combinations.get(hm).keySet())
+                {
+                    StringBuilder sb_genes = new StringBuilder("[");
+                    for (String gene : combinations.get(hm).get(threshold))
+                    {
+                        sb_genes.append("\"");
+                        sb_genes.append(gene);
+                        sb_genes.append("\",");
+                    }
+                    sb_genes.setLength(sb_genes.length() - 1);
+                    sb_genes.append("]");
+                    lv1.get(hm).put(threshold, sb_genes.toString());
+                }
+                lv2.put(hm, mapToJson(lv1.get(hm)));
+            }
+
+            json = mapToJson(lv2);
+        }
+
+        combinations_js = combinations_js.replace("{COMBINATIONS}", json);
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
-                File.separator + name + ".html", frame);
+                File.separator + name + File.separator + name + ".html", frame);
 
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
+                File.separator + name + File.separator + "COMBINATIONS.js", combinations_js);
     }
 
     private String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
