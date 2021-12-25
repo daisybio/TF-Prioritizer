@@ -57,17 +57,17 @@ function setClass(els, className, fnName) {
     }
 }
 
-function tableMouseOver(col, row) {
-    colHead = document.getElementById("col" + col);
-    rowHead = document.getElementById("row" + row);
+function tableMouseOver(gene, col, row) {
+    colHead = document.getElementById(gene + "-col-" + col);
+    rowHead = document.getElementById(gene + "-row-" + row);
 
     colHead.style.backgroundColor = "rgba(var(--black), 0.1)";
     rowHead.style.backgroundColor = "rgba(var(--black), 0.1)";
 }
 
-function tableMouseOut(col, row) {
-    colHead = document.getElementById("col" + col);
-    rowHead = document.getElementById("row" + row);
+function tableMouseOut(gene, col, row) {
+    colHead = document.getElementById(gene + "-col-" + col);
+    rowHead = document.getElementById(gene + "-row-" + row);
 
     colHead.style.backgroundColor = "initial";
     rowHead.style.backgroundColor = "initial";
