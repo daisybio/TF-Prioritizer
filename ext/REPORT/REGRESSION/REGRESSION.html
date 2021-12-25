@@ -15,14 +15,24 @@
         {THRESHOLDS}
     </div>
     <div class="buttonbar centered">
-        <button onclick="openModal('modal')">Zoom in</button>
-        <button class="narrow" onclick="moveGene(-1)">&lt;</button>
-        <select name="gene" id="select-gene" oninput="update_image()"></select>
-        <button class="narrow" onclick="moveGene(1)">&gt;</button>
-        <button onclick="openImageInTab('validation-plot')">Open in new tab</button>
+        <button onclick="openModal('{REGRESSION-PLOT-ID}-modal')">Zoom in</button>
+        <button class="narrow" onclick="move_dropdown('{REGRESSION-PLOT-ID}', -1)">&lt;</button>
+        <select id="{REGRESSION-PLOT-ID}-dropdown" oninput="update_image('{REGRESSION-PLOT-ID}')"></select>
+        <button class="narrow" onclick="move_dropdown('{REGRESSION-PLOT-ID}', 1)">&gt;</button>
+        <button onclick="openImageInTab('{REGRESSION-PLOT-ID}-image')">Open in new tab</button>
     </div>
-    <img id="validation-plot" onclick="openModal('modal')" class="modal source">
+    <img id="{REGRESSION-PLOT-ID}-image" onclick="openModal('{REGRESSION-PLOT-ID}-modal')" class="modal source">
+</div>
+<div id="{REGRESSION-PLOT-ID}-modal" class="modal background">
+    <div class="buttonbar centered">
+        <div id="{REGRESSION-PLOT-ID}-modal-caption" class="modal caption"></div>
+        <button class="modal button close" onclick="closeModal('{REGRESSION-PLOT-ID}-modal')">&times;</button>
+    </div>
+    <div class="buttonbar">
+        <button class="modal button" onclick="move_dropdown('{REGRESSION-PLOT-ID}', -1)">&lt;</button>
+        <img class="modal content" id="{REGRESSION-PLOT-ID}-modal-image">
+        <button class="modal button" onclick="move_dropdown('{REGRESSION-PLOT-ID}', 1)">&gt;</button>
+    </div>
 </div>
 
-<script>hm_selector()</script>
-<script>init()</script>
+<script>init_selection('{REGRESSION-PLOT-ID}')</script>

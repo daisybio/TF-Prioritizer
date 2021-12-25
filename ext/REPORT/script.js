@@ -73,66 +73,61 @@ function tableMouseOut(gene, col, row) {
     rowHead.style.backgroundColor = "initial";
 }
 
-function init() {
-    let hm_selectors = document.getElementsByClassName("hm-selector");
-    hm_selectors[0].click();
+function init_selection(selection) {
+    let group_selectors = document.getElementsByClassName(selection + " group-selector");
+    select_group(selection, group_selectors[0]);
 
-    select_first_possible_group();
+    select_first_possible_subgroup(selection);
 
-    update_image();
+    update_image(selection);
 }
 
-function select_first_possible_group() {
-    let group_selectors = document.getElementsByClassName("group-selector");
+function select_first_possible_subgroup(selection) {
+    let subgroups = document.getElementsByClassName(selection + " subgroup-selector");
     let i;
 
-    for (i = 0; i < group_selectors.length; i++) {
-        if (!group_selectors[i].disabled) {
-            select_group(group_selectors[i]);
+    for (i = 0; i < subgroups.length; i++) {
+        if (!subgroups[i].disabled) {
+            select_subgroup(selection, subgroups[i]);
             break;
         }
     }
 }
 
-function hm_selector() {
-    let hm_selectors = document.getElementsByClassName("hm-selector");
-    let i;
+function select_group(selection, element) {
+    let groups = document.getElementsByClassName(selection + " group-selector");
+    let subgroups = document.getElementsByClassName(selection + " subgroup-selector")
 
-    for (i = 0; i < hm_selectors.length; i++) {
-        hm_selectors[i].addEventListener("click", function () {
-            if (this.classList.contains("active")) return;
+    if (element.classList.contains("active")) return;
 
-            let setClasses = !this.classList.contains("active");
-            setClass(hm_selectors, "active", "remove");
+    let inactive = !element.classList.contains("active");
+    setClass(groups, "active", "remove");
 
-            if (setClasses) {
-                this.classList.toggle("active");
-            }
+    if (inactive) {
+        element.classList.toggle("active");
+    }
 
-            let possibleGroups = Object.keys(combinations[this.value]);
+    let possible_subgroups = Object.keys(combinations[element.value]);
 
-            let group_selectors = document.getElementsByClassName("group-selector");
-            let j;
+    let j;
 
-            for (j = 0; j < group_selectors.length; j++) {
-                group_selectors[j].disabled = !possibleGroups.includes(group_selectors[j].value);
-            }
+    for (j = 0; j < subgroups.length; j++) {
+        subgroups[j].disabled = !possible_subgroups.includes(subgroups[j].value);
+    }
 
-            let activeGroup = get_active_element("group-selector");
+    let active_subgroup = get_active_element(selection + " group-selector");
 
-            if (!(typeof activeGroup === 'undefined')) {
-                if (!possibleGroups.includes(activeGroup.value)) {
-                    select_first_possible_group();
-                } else {
-                    select_group(activeGroup);
-                }
-            }
-        });
+    if (!(typeof active_subgroup === 'undefined')) {
+        if (!possible_subgroups.includes(active_subgroup.value)) {
+            select_first_possible_subgroup(selection);
+        } else {
+            select_subgroup(selection, active_subgroup);
+        }
     }
 }
 
-function select_group(element) {
-    let group_selectors = document.getElementsByClassName("group-selector");
+function select_subgroup(selection, element) {
+    let group_selectors = document.getElementsByClassName(selection + " subgroup-selector");
 
     if (!element.classList.contains("active")) {
         let inactive = !element.classList.contains("active");
@@ -144,11 +139,11 @@ function select_group(element) {
     }
 
 
-    let activeHm = get_active_element("hm-selector");
+    let active_group = get_active_element(selection + " group-selector");
 
-    let possibleGenes = combinations[activeHm.value][element.value];
+    let possible_dropdown_values = combinations[active_group.value][element.value];
 
-    let dropdown = document.getElementById("select-gene");
+    let dropdown = document.getElementById(selection + "-dropdown");
     let l, k = dropdown.options.length - 1;
 
     for (l = k; l >= 0; l--) {
@@ -156,23 +151,23 @@ function select_group(element) {
     }
 
     let m;
-    for (m = 0; m < possibleGenes.length; m++) {
+    for (m = 0; m < possible_dropdown_values.length; m++) {
         let option = document.createElement("option");
-        option.value = possibleGenes[m];
-        option.textContent = (m + 1) + ". " + possibleGenes[m];
+        option.value = possible_dropdown_values[m];
+        option.textContent = (m + 1) + ". " + possible_dropdown_values[m];
         dropdown.appendChild(option);
     }
 
-    update_image();
+    update_image(selection);
 }
 
-function moveGene(delta) {
-    let dropdown = document.getElementById("select-gene");
+function move_dropdown(selection, delta) {
+    let dropdown = document.getElementById(selection + "-dropdown");
     let options = dropdown.children;
     let i;
 
     for (i = 0; i < options.length; i++) {
-        if (options[i].value === document.getElementById("select-gene").value) {
+        if (options[i].value === dropdown.value) {
             break;
         }
     }
@@ -187,23 +182,23 @@ function moveGene(delta) {
     }
 
     dropdown.value = options[i].value;
-    update_image();
+    update_image(selection);
 }
 
-function update_image() {
-    let activeHm = get_active_element("hm-selector").value;
-    let activeGroup = get_active_element("group-selector").value;
-    let selectedGeneName = document.getElementById("select-gene").value;
+function update_image(selection) {
+    let active_group = get_active_element(selection + " group-selector").value;
+    let active_subgroup = get_active_element(selection + " subgroup-selector").value;
+    let active_dropdown = document.getElementById(selection + "-dropdown").value;
 
-    let image = document.getElementById("validation-plot");
-    image.src = activeHm + "/" + activeGroup + "/" + selectedGeneName + ".png";
+    let image = document.getElementById(selection + "-image");
+    image.src = active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
 
-    let modal_image = document.getElementById("validation-plot-modal-image");
-    modal_image.src = activeHm + "/" + activeGroup + "/" + selectedGeneName + ".png";
+    let modal_image = document.getElementById(selection + "-modal-image");
+    modal_image.src = active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
 
-    let possibleGenes = combinations[activeHm][activeGroup];
-    let modal_caption = document.getElementById("validation-plot-modal-caption");
-    modal_caption.innerHTML = (possibleGenes.indexOf(selectedGeneName) + 1) + ". " + selectedGeneName;
+    let possibleGenes = combinations[active_group][active_subgroup];
+    let modal_caption = document.getElementById(selection + "-modal-caption");
+    modal_caption.innerHTML = (possibleGenes.indexOf(active_dropdown) + 1) + ". " + active_dropdown;
 }
 
 function get_active_element(className) {
