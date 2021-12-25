@@ -56,3 +56,19 @@ function setClass(els, className, fnName) {
         els[i].classList[fnName](className);
     }
 }
+
+function tableMouseOver(col, row) {
+    colHead = document.getElementById("col" + col);
+    rowHead = document.getElementById("row" + row);
+
+    colHead.style.backgroundColor = "rgba(var(--black), 0.1)";
+    rowHead.style.backgroundColor = "rgba(var(--black), 0.1)";
+}
+
+function tableMouseOut(col, row) {
+    colHead = document.getElementById("col" + col);
+    rowHead = document.getElementById("row" + row);
+
+    colHead.style.backgroundColor = "initial";
+    rowHead.style.backgroundColor = "initial";
+}
