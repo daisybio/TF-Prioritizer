@@ -22,33 +22,4 @@
     NYI
 </div>
 <button class="accordion">Validation: Own TF ChIP-seq data</button>
-<div class="panel">
-    <div class="buttonbar">
-        {VALIDATION_HMS}
-    </div>
-    <div class="buttonbar">
-        {VALIDATION_GROUPS}
-    </div>
-    <div class="buttonbar centered">
-        <button onclick="openModal('{VALIDATION-PLOT-ID}-modal')">Zoom in</button>
-        <button class="narrow" onclick="move_dropdown('{VALIDATION-PLOT-ID}', -1)">&lt;</button>
-        <select name="gene" id="{VALIDATION-PLOT-ID}-dropdown" oninput="update_image('{VALIDATION-PLOT-ID}')"></select>
-        <button class="narrow" onclick="move_dropdown('{VALIDATION-PLOT-ID}', 1)">&gt;</button>
-        <button onclick="openImageInTab('{VALIDATION-PLOT-ID}-image')">Open in new tab</button>
-    </div>
-    <img id="{VALIDATION-PLOT-ID}-image" onclick="openModal('{VALIDATION-PLOT-ID}-modal')" class="modal source">
-</div>
-
-<div id="{VALIDATION-PLOT-ID}-modal" class="modal background">
-    <div class="buttonbar centered">
-        <div id="{VALIDATION-PLOT-ID}-modal-caption" class="modal caption"></div>
-        <button class="modal button close" onclick="closeModal('{VALIDATION-PLOT-ID}-modal')">&times;</button>
-    </div>
-    <div class="buttonbar">
-        <button class="modal button" onclick="move_dropdown('{VALIDATION-PLOT-ID}', -1)">&lt;</button>
-        <img class="modal content" id="{VALIDATION-PLOT-ID}-modal-image">
-        <button class="modal button" onclick="move_dropdown('{VALIDATION-PLOT-ID}', 1)">&gt;</button>
-    </div>
-</div>
-
-<script>init_selection("{VALIDATION-PLOT-ID}")</script>
+{VALIDATION_OWN_TF}

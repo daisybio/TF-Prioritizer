@@ -1,0 +1,30 @@
+<div class="panel">
+    <div class="buttonbar">
+        {GROUPS}
+    </div>
+    <div class="buttonbar">
+        {SUBGROUPS}
+    </div>
+    <div class="buttonbar centered">
+        <button onclick="openModal('{ID}-modal')">Zoom in</button>
+        <button class="narrow" onclick="move_dropdown('{ID}', -1)">&lt;</button>
+        <select name="gene" id="{ID}-dropdown" oninput="update_image('{ID}')"></select>
+        <button class="narrow" onclick="move_dropdown('{ID}', 1)">&gt;</button>
+        <button onclick="openImageInTab('{ID}-image')">Open in new tab</button>
+    </div>
+    <img id="{ID}-image" onclick="openModal('{ID}-modal')" class="modal source">
+</div>
+
+<div id="{ID}-modal" class="modal background">
+    <div class="buttonbar centered">
+        <div id="{ID}-modal-caption" class="modal caption"></div>
+        <button class="modal button close" onclick="closeModal('{ID}-modal')">&times;</button>
+    </div>
+    <div class="buttonbar">
+        <button class="modal button" onclick="move_dropdown('{ID}', -1)">&lt;</button>
+        <img class="modal content" id="{ID}-modal-image">
+        <button class="modal button" onclick="move_dropdown('{ID}', 1)">&gt;</button>
+    </div>
+</div>
+
+<script>init_selection("{ID}")</script>
