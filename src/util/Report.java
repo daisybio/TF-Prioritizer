@@ -25,13 +25,23 @@ public class Report
 
     private record TranscriptionFactor(String geneID, String name, Map<String, Map<String, Number>> log2fc,
                                        Map<String, Number> tpm, Map<String, Number> normex,
-                                       ArrayList<String> histoneModifications, boolean hasIGV)
+                                       ArrayList<String> histoneModifications)
     {
     }
 
-    private record TranscriptionFactorGroup(String name, ArrayList<TranscriptionFactor> transcriptionFactors,
-                                            boolean realGroup, boolean hasIGV)
+    private static class TranscriptionFactorGroup
     {
+        boolean hasValidation, hasDistribution, hasRegression;
+        private final String name;
+        private final ArrayList<TranscriptionFactor> transcriptionFactors;
+        boolean realGroup;
+
+        TranscriptionFactorGroup(String name, ArrayList<TranscriptionFactor> transcriptionFactors, boolean realGroup)
+        {
+            this.name = name;
+            this.transcriptionFactors = transcriptionFactors;
+            this.realGroup = realGroup;
+        }
     }
 
     private void loadTFs() throws FileNotFoundException
@@ -77,7 +87,6 @@ public class Report
                         Map<String, Map<String, Number>> log2fc = new HashMap<>();
                         Map<String, Number> tpm = new HashMap<>();
                         Map<String, Number> normex = new HashMap<>();
-                        boolean hasIGV = false;
 
                         {   //LOG2FC
                             File d_log2fs = new File(options_intern.com2pose_working_directory + File.separator +
@@ -161,31 +170,8 @@ public class Report
                             }
                         }   //Normalized expression
 
-                        {   //Check if TF has IGV
-                            File d_igv_screenshots = new File(
-                                    options_intern.com2pose_working_directory + File.separator +
-                                            options_intern.folder_out_igv);
-
-                            if (d_igv_screenshots.isDirectory())
-                            {
-                                File d_tf_igv = new File(
-                                        d_igv_screenshots + File.separator + options_intern.folder_out_igv_own_data);
-
-                                for (File entry : Objects.requireNonNull(d_tf_igv.listFiles()))
-                                {
-                                    String name = entry.getName().split("_")[1];
-                                    if (name.equals(tf_name))
-                                    {
-                                        hasIGV = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }   //Check if TF has IGV
-
                         TranscriptionFactor tf =
-                                new TranscriptionFactor(geneID, tf_name, log2fc, tpm, normex, histoneModifications,
-                                        hasIGV);
+                                new TranscriptionFactor(geneID, tf_name, log2fc, tpm, normex, histoneModifications);
                         tf_group.add(tf);
                     } catch (NoSuchFieldException ignore)
                     {
@@ -193,36 +179,10 @@ public class Report
                     }
                 }
 
-                boolean groupHasIGV = false;
-
-                if (tf_group.size() > 1)
-                {
-                    {   //Check if TF has IGV
-                        File d_igv_screenshots = new File(options_intern.com2pose_working_directory + File.separator +
-                                options_intern.folder_out_igv);
-
-                        if (d_igv_screenshots.isDirectory())
-                        {
-                            File d_tf_igv = new File(
-                                    d_igv_screenshots + File.separator + options_intern.folder_out_igv_own_data);
-
-                            for (File entry : Objects.requireNonNull(d_tf_igv.listFiles()))
-                            {
-                                String name = entry.getName().split("_")[1];
-                                if (name.equals(tfGroupName))
-                                {
-                                    groupHasIGV = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }   //Check if TF has IGV
-                }
-
                 if (tf_group.size() > 0)
                 {
                     transcriptionFactorGroups.add(
-                            new TranscriptionFactorGroup(tfGroupName, tf_group, tf_group.size() > 1, groupHasIGV));
+                            new TranscriptionFactorGroup(tfGroupName, tf_group, tf_group.size() > 1));
                 }
             }
         }
@@ -232,16 +192,17 @@ public class Report
     {
         logger.logLine("[REPORT] Start generating report");
 
-        generateHome();
         styleAndScript();
         generateParameters();
 
         for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
         {
-            generateValidation(tfGroup);
-            generateDistribution(tfGroup);
-            generateRegression(tfGroup);
+            tfGroup.hasValidation = generateValidation(tfGroup);
+            tfGroup.hasDistribution = generateDistribution(tfGroup);
+            tfGroup.hasRegression = generateRegression(tfGroup);
         }
+
+        generateHome();
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -281,16 +242,14 @@ public class Report
 
         for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
         {
-            ArrayList<TranscriptionFactor> tfList = tfGroup.transcriptionFactors;
-
             if (!tfGroup.realGroup)
             {
-                for (TranscriptionFactor transcriptionFactor : tfList)
+                for (TranscriptionFactor transcriptionFactor : tfGroup.transcriptionFactors)
                 {
                     String tf_string = loadFile(options_intern.path_to_COM2POSE + File.separator +
                             options_intern.f_report_resources_home_tf_html);
 
-                    tf_string = tf_string.replace("{BUTTONBAR}", getButtonBar(transcriptionFactor));
+                    tf_string = tf_string.replace("{BUTTONBAR}", getButtonBar(tfGroup));
 
                     tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.name);
 
@@ -298,9 +257,9 @@ public class Report
 
                     tf_string = tf_string.replace("{GENEID}", transcriptionFactor.geneID);
 
-                    tf_string = tf_string.replace("{HASVALIDATION}", transcriptionFactor.hasIGV ? "" : "disabled");
-                    tf_string = tf_string.replace("{HASDISTRIBUTION}", "disabled");
-                    tf_string = tf_string.replace("{HASREGRESSION}", "");
+                    tf_string = tf_string.replace("{HASVALIDATION}", tfGroup.hasValidation ? "" : "disabled");
+                    tf_string = tf_string.replace("{HASDISTRIBUTION}", tfGroup.hasDistribution ? "" : "disabled");
+                    tf_string = tf_string.replace("{HASREGRESSION}", tfGroup.hasRegression ? "" : "disabled");
 
                     sb_tfs.append(tf_string);
                 }
@@ -345,8 +304,8 @@ public class Report
 
         for (Map.Entry<String, Number> kvPair : data.entrySet())
         {
-            sb_data.append("<div class=\"keyvaluepair\"><h4>" + kvPair.getKey() + "</h4><p>" +
-                    formatter.format(kvPair.getValue()) + "</p></div>");
+            sb_data.append("<div class=\"keyvaluepair\"><h4>").append(kvPair.getKey()).append("</h4><p>")
+                    .append(formatter.format(kvPair.getValue())).append("</p></div>");
         }
 
         sb_data.append("</div>");
@@ -456,14 +415,9 @@ public class Report
         return basicData.toString();
     }
 
-    private String getButtonBar(TranscriptionFactor tf) throws IOException
-    {
-        return getButtonBar(tf.name, tf.hasIGV, true, true);
-    }
-
     private String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        return getButtonBar(tfGroup.name, tfGroup.hasIGV, true, true);
+        return getButtonBar(tfGroup.name, tfGroup.hasValidation, tfGroup.hasDistribution, tfGroup.hasRegression);
     }
 
     private String getButtonBar(String name, boolean hasValidation, boolean hasDistribution, boolean hasRegression)
@@ -487,20 +441,20 @@ public class Report
     }
 
 
-    private void generateValidation(TranscriptionFactorGroup tfGroup) throws IOException
+    private boolean generateValidation(TranscriptionFactorGroup tfGroup) throws IOException
     {
         if (tfGroup.realGroup)
         {
-            generateValidation(tfGroup.name, getBasicData(tfGroup));
+            return generateValidation(tfGroup.name, getBasicData(tfGroup));
         } else
         {
             TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
 
-            generateValidation(tf.name, getBasicData(tf));
+            return generateValidation(tf.name, getBasicData(tf));
         }
     }
 
-    private void generateValidation(String name, String basicData) throws IOException
+    private boolean generateValidation(String name, String basicData) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_validation_html);
@@ -525,7 +479,7 @@ public class Report
                     d_igv_screenshots.getAbsolutePath() + File.separator + options_intern.folder_out_igv_own_data);
             File source = null;
 
-            for (File entry : d_own_tf.listFiles())
+            for (File entry : Objects.requireNonNull(d_own_tf.listFiles()))
             {
                 String entryName = entry.getName();
                 entryName = entryName.split("_")[1];
@@ -546,7 +500,7 @@ public class Report
                     options_intern.folder_out_igv_chip_atlas_data);
             File source = null;
 
-            for (File entry : d_chip_atlas.listFiles())
+            for (File entry : Objects.requireNonNull(d_chip_atlas.listFiles()))
             {
                 String entryName = entry.getName();
 
@@ -571,6 +525,7 @@ public class Report
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
                 File.separator + name + File.separator + name + ".html", frame);
 
+        return true;
     }
 
     private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir) throws IOException
@@ -716,20 +671,20 @@ public class Report
         return three_level_image_selector;
     }
 
-    private void generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException
+    private boolean generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException
     {
         if (tfGroup.realGroup)
         {
-            generateDistribution(tfGroup.name, getBasicData(tfGroup));
+            return generateDistribution(tfGroup.name, getBasicData(tfGroup));
         } else
         {
             TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
 
-            generateDistribution(tf.name, getBasicData(tf));
+            return generateDistribution(tf.name, getBasicData(tf));
         }
     }
 
-    private void generateDistribution(String name, String basicData) throws IOException
+    private boolean generateDistribution(String name, String basicData) throws IOException
     {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_distribution_distribution_html);
@@ -749,7 +704,7 @@ public class Report
         {
             for (File f_plot : d_hm.listFiles())
             {
-                if (f_plot.getName().split("\\.")[0].equals(name))
+                if (f_plot.getName().substring(0, f_plot.getName().lastIndexOf(".")).equals(name))
                 {
                     existingHMs.add(d_hm.getName());
                     copyFile(f_plot, new File(
@@ -759,9 +714,9 @@ public class Report
             }
         }
 
-        if (existingHMs.size() == 0)
+        if (existingHMs.isEmpty())
         {
-            return;
+            return false;
         }
 
         String frame = loadFrame();
@@ -792,22 +747,24 @@ public class Report
         frame = relativate(frame, 2);
 
         writeFile(d_distribution_output + File.separator + name + ".html", frame);
+
+        return true;
     }
 
-    private void generateRegression(TranscriptionFactorGroup tfGroup) throws IOException
+    private boolean generateRegression(TranscriptionFactorGroup tfGroup) throws IOException
     {
         if (tfGroup.realGroup)
         {
-            generateRegression(tfGroup.name);
+            return generateRegression(tfGroup.name);
         } else
         {
             TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
 
-            generateRegression(tf.name);
+            return generateRegression(tf.name);
         }
     }
 
-    private void generateRegression(String name) throws IOException
+    private boolean generateRegression(String name) throws IOException
     {
 
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
@@ -838,6 +795,8 @@ public class Report
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
                 File.separator + name + File.separator + name + ".html", frame);
+
+        return true;
     }
 
     private String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
