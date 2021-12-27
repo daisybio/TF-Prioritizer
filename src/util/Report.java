@@ -522,8 +522,6 @@ public class Report
         frame = frame.replace("{BASICDATA}", basicData);
 
         HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
-        HashSet<String> existingHMs = new HashSet<>();
-        HashSet<String> existingGroups = new HashSet<>();
 
         if (d_igv_screenshots.isDirectory())
         {
@@ -539,12 +537,10 @@ public class Report
                         }
 
                         combinations.put(d_hm.getName(), new HashMap<>());
-                        existingHMs.add(d_hm.getName());
 
                         for (File d_groups : d_hm.listFiles())
                         {
                             combinations.get(d_hm.getName()).put(d_groups.getName(), new ArrayList<>());
-                            existingGroups.add(d_groups.getName());
 
                             for (File f_plot : d_groups.listFiles())
                             {
@@ -566,37 +562,47 @@ public class Report
             }
         }
 
-        String three_level_image_selector = loadFile(options_intern.f_report_resources_three_level_image_selector_html);
-
-        StringBuilder sb_hms = new StringBuilder();
-
-        for (String histoneModification : existingHMs)
-        {
-            sb_hms.append("<button class=\"{ID} group-selector\" onclick=\"select_group" + "('{ID}', this)\" value=\"" +
-                    histoneModification + "\">" + histoneModification + "</button>");
-        }
-        three_level_image_selector = three_level_image_selector.replace("{GROUPS}", sb_hms.toString());
-
-        StringBuilder sb_groups = new StringBuilder();
-        for (String group : existingGroups)
-        {
-            sb_groups.append(
-                    "<button class=\"{ID} subgroup-selector\" onclick=\"select_subgroup" + "('{ID}', this)\" " +
-                            "value=\"" + group + "\">" + group + "</button>");
-        }
-
-        String combinations_js = loadFile(options_intern.path_to_COM2POSE + File.separator +
-                options_intern.f_report_resources_validation_combinations_js);
-
-        three_level_image_selector = three_level_image_selector.replace("{SUBGROUPS}", sb_groups.toString());
-
-        three_level_image_selector = three_level_image_selector.replace("{ID}", "validation-plot");
+        String three_level_image_selector = generateThreeLevelImageSelector("validationPlot", combinations);
 
         frame = frame.replace("{VALIDATION_OWN_TF}", three_level_image_selector);
 
-        frame = frame.replace("{ADDHEAD}", "<script src=\"COMBINATIONS.js\"></script>");
-
         frame = relativate(frame, 2);
+
+        frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
+
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                File.separator + name + File.separator + name + ".html", frame);
+    }
+
+    private String generateThreeLevelImageSelector(String name,
+                                                   HashMap<String, HashMap<String, ArrayList<String>>> combinations)
+            throws IOException
+    {
+        String three_level_image_selector = loadFile(options_intern.f_report_resources_three_level_image_selector_html);
+
+        Set<String> groups = combinations.keySet();
+        Set<String> subgroups = new HashSet<>();
+
+        StringBuilder sb_groups = new StringBuilder();
+
+        for (String group : groups)
+        {
+            subgroups.addAll(combinations.get(group).keySet());
+
+            sb_groups.append("<button class=\"{ID} group-selector\" onclick=\"select_group" + "('{ID}', this, " +
+                    "{ID}Combinations)\" " + "value=\"" + group + "\">" + group + "</button>");
+        }
+        three_level_image_selector = three_level_image_selector.replace("{GROUPS}", sb_groups.toString());
+
+        StringBuilder sb_subgroups = new StringBuilder();
+        for (String subgroup : subgroups)
+        {
+            sb_subgroups.append(
+                    "<button class=\"{ID} subgroup-selector\" onclick=\"select_subgroup" + "('{ID}', " + "this, " +
+                            "{ID}Combinations)\" " + "value=\"" + subgroup + "\">" + subgroup + "</button>");
+        }
+
+        three_level_image_selector = three_level_image_selector.replace("{SUBGROUPS}", sb_subgroups.toString());
 
         String json;
         {
@@ -625,15 +631,11 @@ public class Report
             json = mapToJson(lv2);
         }
 
-        frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
+        three_level_image_selector = three_level_image_selector.replace("{ID}", name);
 
-        combinations_js = combinations_js.replace("{COMBINATIONS}", json);
+        three_level_image_selector = three_level_image_selector.replace("{COMBINATIONS}", json);
 
-        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                File.separator + name + File.separator + name + ".html", frame);
-
-        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                File.separator + name + File.separator + "COMBINATIONS.js", combinations_js);
+        return three_level_image_selector;
     }
 
     private void generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException
@@ -748,20 +750,16 @@ public class Report
         frame = frame.replace("{TITLE}", name + " - Regression");
 
         HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
-        HashSet<String> existingHMs = new HashSet<>();
-        HashSet<String> existingThresholds = new HashSet<>();
 
         if (d_in_plots.isDirectory())
         {
             for (File d_hm : Objects.requireNonNull(d_in_plots.listFiles()))
             {
                 combinations.put(d_hm.getName(), new HashMap<>());
-                existingHMs.add(d_hm.getName());
 
                 for (File d_threshold : d_hm.listFiles())
                 {
                     combinations.get(d_hm.getName()).put(d_threshold.getName(), new ArrayList<>());
-                    existingThresholds.add(d_threshold.getName());
 
                     for (File f_plot : d_threshold.listFiles())
                     {
@@ -798,31 +796,8 @@ public class Report
             }
         }
 
-        String three_level_image_selector = loadFile(options_intern.f_report_resources_three_level_image_selector_html);
 
-        StringBuilder sb_hms = new StringBuilder();
-
-        for (String histoneModification : existingHMs)
-        {
-            sb_hms.append("<button class=\"{ID} group-selector\" onclick=\"select_group" + "('{ID}', this)\" value=\"" +
-                    histoneModification + "\">" + histoneModification + "</button>");
-        }
-        three_level_image_selector = three_level_image_selector.replace("{GROUPS}", sb_hms.toString());
-
-        StringBuilder sb_thresholds = new StringBuilder();
-        for (String threshold : existingThresholds)
-        {
-            sb_thresholds.append(
-                    "<button class=\"{ID} subgroup-selector\" onclick=\"select_subgroup" + "('{ID}', this)\" value=\"" +
-                            threshold + "\">" + threshold + "</button>");
-        }
-
-        String combinations_js = loadFile(options_intern.path_to_COM2POSE + File.separator +
-                options_intern.f_report_resources_validation_combinations_js);
-
-        three_level_image_selector = three_level_image_selector.replace("{SUBGROUPS}", sb_thresholds.toString());
-
-        three_level_image_selector = three_level_image_selector.replace("{ID}", "regression-plot");
+        String three_level_image_selector = generateThreeLevelImageSelector("regressionPlot", combinations);
 
         frame = frame.replace("{HEATMAPS}", three_level_image_selector);
 
@@ -830,40 +805,8 @@ public class Report
 
         frame = relativate(frame, 2);
 
-        String json;
-        {
-            HashMap<String, HashMap<String, String>> lv1 = new HashMap<>();
-            HashMap<String, String> lv2 = new HashMap<>();
-
-            for (String hm : combinations.keySet())
-            {
-                lv1.put(hm, new HashMap<>());
-                for (String threshold : combinations.get(hm).keySet())
-                {
-                    StringBuilder sb_genes = new StringBuilder("[");
-                    for (String gene : combinations.get(hm).get(threshold))
-                    {
-                        sb_genes.append("\"");
-                        sb_genes.append(gene);
-                        sb_genes.append("\",");
-                    }
-                    sb_genes.setLength(sb_genes.length() - 1);
-                    sb_genes.append("]");
-                    lv1.get(hm).put(threshold, sb_genes.toString());
-                }
-                lv2.put(hm, mapToJson(lv1.get(hm)));
-            }
-
-            json = mapToJson(lv2);
-        }
-
-        combinations_js = combinations_js.replace("{COMBINATIONS}", json);
-
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
                 File.separator + name + File.separator + name + ".html", frame);
-
-        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
-                File.separator + name + File.separator + "COMBINATIONS.js", combinations_js);
     }
 
     private String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
