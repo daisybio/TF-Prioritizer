@@ -505,9 +505,8 @@ public class Report
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_validation_html);
 
-        File d_igv_screenshots = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv +
-                        File.separator + options_intern.folder_out_igv_own_data);
+        File d_igv_screenshots =
+                new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv);
 
         File d_out_validation =
                 new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation);
@@ -521,35 +520,57 @@ public class Report
 
         frame = frame.replace("{BASICDATA}", basicData);
 
-        File source = null;
-
-        for (File entry : d_igv_screenshots.listFiles())
         {
-            String entryName = entry.getName();
-            entryName = entryName.split("_")[1];
-            if (entryName.equals(name))
+            File d_own_tf = new File(
+                    d_igv_screenshots.getAbsolutePath() + File.separator + options_intern.folder_out_igv_own_data);
+            File source = null;
+
+            for (File entry : d_own_tf.listFiles())
             {
-                source = entry;
-                break;
+                String entryName = entry.getName();
+                entryName = entryName.split("_")[1];
+                if (entryName.equals(name))
+                {
+                    source = entry;
+                    break;
+                }
             }
+
+            File target = new File(d_out_validation.getAbsolutePath() + File.separator + name);
+            frame = frame.replace("{VALIDATION_OWN_TF}", (source == null) ? "" :
+                    generateThreeLevelImageSelector("validationOwnTF", source, target, new ArrayList<>(List.of(name))));
         }
 
-        File target = new File(d_out_validation.getAbsolutePath() + File.separator + name);
-
-        if (!(source == null))
         {
-            String three_level_image_selector =
-                    generateThreeLevelImageSelector("validationPlot", source, target, new ArrayList<>(List.of(name)));
+            File d_chip_atlas = new File(d_igv_screenshots.getAbsolutePath() + File.separator +
+                    options_intern.folder_out_igv_chip_atlas_data);
+            File source = null;
 
-            frame = frame.replace("{VALIDATION_OWN_TF}", three_level_image_selector);
+            for (File entry : d_chip_atlas.listFiles())
+            {
+                String entryName = entry.getName();
 
-            frame = relativate(frame, 2);
+                if (entryName.matches("[0-9]+_" + name))
+                {
+                    source = entry;
+                    break;
+                }
+            }
 
-            frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
-
-            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                    File.separator + name + File.separator + name + ".html", frame);
+            File target = new File(d_out_validation.getAbsolutePath() + File.separator + name);
+            frame = frame.replace("{VALIDATION_CHIP_ATLAS}", (source == null) ? "" :
+                    generateThreeLevelImageSelector("validationChipAtlas", source, target,
+                            new ArrayList<>(List.of(name))));
         }
+
+
+        frame = relativate(frame, 2);
+
+        frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
+
+        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                File.separator + name + File.separator + name + ".html", frame);
+
     }
 
     private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir) throws IOException
