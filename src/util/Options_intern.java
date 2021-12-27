@@ -267,6 +267,8 @@ public class Options_intern
     public String d_out_regression = d_out_report + File.separator + "REGRESSION";
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
+    public String f_report_resources_three_level_image_selector_html =
+            d_report_resources + File.separator + "THREE_LEVEL_IMAGE_SELECTOR.html";
     public String d_report_resources_basicdata = d_report_resources + File.separator + "BASICDATA";
     public String f_report_resources_basicdata_html = d_report_resources_basicdata + File.separator + "BASICDATA.html";
     public String f_report_resources_basicdata_entry_html =
