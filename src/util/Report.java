@@ -621,6 +621,8 @@ public class Report
             json = mapToJson(lv2);
         }
 
+        frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
+
         combinations_js = combinations_js.replace("{COMBINATIONS}", json);
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
@@ -701,6 +703,8 @@ public class Report
         frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
         frame = frame.replace("{DISTRIBUTION-PLOT-PATH}", existingHMs.get(0) + ".png");
 
+        frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
+
         frame = relativate(frame, 2);
 
         writeFile(d_distribution_output + File.separator + name + ".html", frame);
@@ -742,8 +746,6 @@ public class Report
         HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
         HashSet<String> existingHMs = new HashSet<>();
         HashSet<String> existingThresholds = new HashSet<>();
-
-        boolean first = true;
 
         if (d_in_plots.isDirectory())
         {

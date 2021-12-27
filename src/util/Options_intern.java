@@ -256,6 +256,7 @@ public class Options_intern
                     File.separator + "Scripts";
 
     // REPORT options
+    public String link_report_genecards = "https://www.genecards.org/cgi-bin/carddisp.pl?gene={GENE}";
     public String d_out_report = "REPORT";
     public String f_out_report_home = d_out_report + File.separator + "HOME.html";
     public String f_out_report_parameters = d_out_report + File.separator + "PARAMETERS.html";
