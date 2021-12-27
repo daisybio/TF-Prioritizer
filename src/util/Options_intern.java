@@ -291,8 +291,6 @@ public class Options_intern
     public String d_report_resources_validation = d_report_resources + File.separator + "VALIDATION";
     public String f_report_resources_validation_validation_html =
             d_report_resources_validation + File.separator + "VALIDATION.html";
-    public String f_report_resources_validation_combinations_js =
-            d_report_resources_validation + File.separator + "COMBINATIONS.js";
     public String d_report_resources_distribution = d_report_resources + File.separator + "DISTRIBUTION";
     public String f_report_resources_distribution_distribution_html =
             d_report_resources_distribution + File.separator + "DISTRIBUTION" + ".html";

@@ -73,28 +73,28 @@ function tableMouseOut(gene, col, row) {
     rowHead.style.backgroundColor = "initial";
 }
 
-function init_selection(selection) {
+function init_selection(selection, combinations) {
     let group_selectors = document.getElementsByClassName(selection + " group-selector");
-    select_group(selection, group_selectors[0]);
+    select_group(selection, group_selectors[0], combinations);
 
-    select_first_possible_subgroup(selection);
+    select_first_possible_subgroup(selection, combinations);
 
-    update_image(selection);
+    update_image(selection, combinations);
 }
 
-function select_first_possible_subgroup(selection) {
+function select_first_possible_subgroup(selection, combinations) {
     let subgroups = document.getElementsByClassName(selection + " subgroup-selector");
     let i;
 
     for (i = 0; i < subgroups.length; i++) {
         if (!subgroups[i].disabled) {
-            select_subgroup(selection, subgroups[i]);
+            select_subgroup(selection, subgroups[i], combinations);
             break;
         }
     }
 }
 
-function select_group(selection, element) {
+function select_group(selection, element, combinations) {
     let groups = document.getElementsByClassName(selection + " group-selector");
     let subgroups = document.getElementsByClassName(selection + " subgroup-selector")
 
@@ -115,18 +115,18 @@ function select_group(selection, element) {
         subgroups[j].disabled = !possible_subgroups.includes(subgroups[j].value);
     }
 
-    let active_subgroup = get_active_element(selection + " group-selector");
+    let active_subgroup = get_active_element(selection + " subgroup-selector");
 
     if (!(typeof active_subgroup === 'undefined')) {
         if (!possible_subgroups.includes(active_subgroup.value)) {
-            select_first_possible_subgroup(selection);
+            select_first_possible_subgroup(selection, combinations);
         } else {
-            select_subgroup(selection, active_subgroup);
+            select_subgroup(selection, active_subgroup, combinations);
         }
     }
 }
 
-function select_subgroup(selection, element) {
+function select_subgroup(selection, element, combinations) {
     let group_selectors = document.getElementsByClassName(selection + " subgroup-selector");
 
     if (!element.classList.contains("active")) {
@@ -158,10 +158,10 @@ function select_subgroup(selection, element) {
         dropdown.appendChild(option);
     }
 
-    update_image(selection);
+    update_image(selection, combinations);
 }
 
-function move_dropdown(selection, delta) {
+function move_dropdown(selection, delta, combinations) {
     let dropdown = document.getElementById(selection + "-dropdown");
     let options = dropdown.children;
     let i;
@@ -182,10 +182,10 @@ function move_dropdown(selection, delta) {
     }
 
     dropdown.value = options[i].value;
-    update_image(selection);
+    update_image(selection, combinations);
 }
 
-function update_image(selection) {
+function update_image(selection, combinations) {
     let active_group = get_active_element(selection + " group-selector").value;
     let active_subgroup = get_active_element(selection + " subgroup-selector").value;
     let active_dropdown = document.getElementById(selection + "-dropdown").value;
