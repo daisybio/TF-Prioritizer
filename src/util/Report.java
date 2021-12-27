@@ -521,63 +521,120 @@ public class Report
 
         frame = frame.replace("{BASICDATA}", basicData);
 
+        File source = null;
+
+        for (File entry : d_igv_screenshots.listFiles())
+        {
+            String entryName = entry.getName();
+            entryName = entryName.split("_")[1];
+            if (entryName.equals(name))
+            {
+                source = entry;
+                break;
+            }
+        }
+
+        File target = new File(d_out_validation.getAbsolutePath() + File.separator + name);
+
+        if (!(source == null))
+        {
+            String three_level_image_selector =
+                    generateThreeLevelImageSelector("validationPlot", source, target, new ArrayList<>(List.of(name)));
+
+            frame = frame.replace("{VALIDATION_OWN_TF}", three_level_image_selector);
+
+            frame = relativate(frame, 2);
+
+            frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
+
+            writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                    File.separator + name + File.separator + name + ".html", frame);
+        }
+    }
+
+    private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir) throws IOException
+    {
+        return generateThreeLevelImageSelector(name, sourceDir, targetDir, new ArrayList<>());
+    }
+
+    private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir,
+                                                   ArrayList<String> specialRemovables) throws IOException
+    {
+        String suffix = ".png";
         HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
 
-        if (d_igv_screenshots.isDirectory())
+        for (File group_dir : Objects.requireNonNull(sourceDir.listFiles()))
         {
-            for (File d_tf : d_igv_screenshots.listFiles())
+            if (group_dir.isFile())
             {
-                if (d_tf.getName().split("_")[1].equals(name))
+                continue;
+            }
+
+            String group = group_dir.getName();
+
+            if (group.equals("A_SESSIONS"))
+            {
+                continue;
+            }
+
+            combinations.put(group, new HashMap<>());
+
+            for (File subgroup_dir : Objects.requireNonNull(group_dir.listFiles()))
+            {
+                if (subgroup_dir.isFile())
                 {
-                    for (File d_hm : d_tf.listFiles())
+                    continue;
+                }
+
+                String subgroup = subgroup_dir.getName();
+
+                if (subgroup.split("_").length > 1)
+                {
+                    subgroup = subgroup.split("_")[1];
+                }
+
+                combinations.get(group).put(subgroup, new ArrayList<>());
+
+                for (File image_file : Objects.requireNonNull(subgroup_dir.listFiles()))
+                {
+                    ArrayList<String> removables = new ArrayList<>(List.of(group, subgroup, suffix, "threshold"));
+                    removables.addAll(specialRemovables);
+
+                    if (image_file.isDirectory() || !image_file.getName().endsWith(suffix))
                     {
-                        if (d_hm.getName().equals("A_SESSIONS"))
-                        {
-                            continue;
-                        }
-
-                        combinations.put(d_hm.getName(), new HashMap<>());
-
-                        for (File d_groups : d_hm.listFiles())
-                        {
-                            combinations.get(d_hm.getName()).put(d_groups.getName(), new ArrayList<>());
-
-                            for (File f_plot : d_groups.listFiles())
-                            {
-                                String name_string = f_plot.getName().substring(0, f_plot.getName().lastIndexOf("."));
-                                name_string = name_string.split("_")[2];
-                                combinations.get(d_hm.getName()).get(d_groups.getName()).add(name_string);
-
-                                File target = new File(
-                                        d_out_validation.getAbsolutePath() + File.separator + name + File.separator +
-                                                d_hm.getName() + File.separator + d_groups.getName() + File.separator +
-                                                name_string + ".png");
-
-                                copyFile(f_plot, target);
-                            }
-                        }
+                        continue;
                     }
-                    break;
+
+                    String relevantFileName = image_file.getName();
+
+                    for (String entry : removables)
+                    {
+                        relevantFileName = relevantFileName.replace(entry, "");
+                    }
+
+                    if (relevantFileName.matches("[0-9]+_.*_.*")) // Check for validation only
+                    {
+                        relevantFileName = relevantFileName.replaceAll("[0-9]+_", "");
+                    }
+
+                    while (relevantFileName.endsWith("_"))
+                    {
+                        relevantFileName = relevantFileName.substring(0, relevantFileName.length() - 1);
+                    }
+                    while (relevantFileName.startsWith("_"))
+                    {
+                        relevantFileName = relevantFileName.substring(1);
+                    }
+
+                    copyFile(image_file, new File(
+                            targetDir.getAbsolutePath() + File.separator + group + File.separator + subgroup +
+                                    File.separator + relevantFileName + suffix));
+
+                    combinations.get(group).get(subgroup).add(relevantFileName);
                 }
             }
         }
 
-        String three_level_image_selector = generateThreeLevelImageSelector("validationPlot", combinations);
-
-        frame = frame.replace("{VALIDATION_OWN_TF}", three_level_image_selector);
-
-        frame = relativate(frame, 2);
-
-        frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
-
-        writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                File.separator + name + File.separator + name + ".html", frame);
-    }
-
-    private String generateThreeLevelImageSelector(String name,
-                                                   HashMap<String, HashMap<String, ArrayList<String>>> combinations)
-            throws IOException
-    {
         String three_level_image_selector = loadFile(options_intern.f_report_resources_three_level_image_selector_html);
 
         Set<String> groups = combinations.keySet();
@@ -749,55 +806,8 @@ public class Report
 
         frame = frame.replace("{TITLE}", name + " - Regression");
 
-        HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
-
-        if (d_in_plots.isDirectory())
-        {
-            for (File d_hm : Objects.requireNonNull(d_in_plots.listFiles()))
-            {
-                combinations.put(d_hm.getName(), new HashMap<>());
-
-                for (File d_threshold : d_hm.listFiles())
-                {
-                    combinations.get(d_hm.getName()).put(d_threshold.getName(), new ArrayList<>());
-
-                    for (File f_plot : d_threshold.listFiles())
-                    {
-                        if (f_plot.getName().endsWith(".py"))
-                        {
-                            continue;
-                        }
-
-                        String name_string = f_plot.getName().substring(0, f_plot.getName().lastIndexOf("."));
-                        name_string = name_string.replace("threshold", "");
-                        name_string = name_string.replace(d_threshold.getName(), "");
-                        name_string = name_string.replace(d_hm.getName(), "");
-
-                        while (name_string.startsWith("_"))
-                        {
-                            name_string = name_string.substring(1);
-                        }
-
-                        while (name_string.endsWith("_"))
-                        {
-                            name_string = name_string.substring(0, name_string.length() - 1);
-                        }
-
-                        combinations.get(d_hm.getName()).get(d_threshold.getName()).add(name_string);
-
-                        File target = new File(
-                                d_out_regression.getAbsolutePath() + File.separator + name + File.separator +
-                                        d_hm.getName() + File.separator + d_threshold.getName() + File.separator +
-                                        name_string + ".png");
-
-                        copyFile(f_plot, target);
-                    }
-                }
-            }
-        }
-
-
-        String three_level_image_selector = generateThreeLevelImageSelector("regressionPlot", combinations);
+        File target = new File(d_out_regression.getAbsolutePath() + File.separator + name);
+        String three_level_image_selector = generateThreeLevelImageSelector("regressionPlot", d_in_plots, target);
 
         frame = frame.replace("{HEATMAPS}", three_level_image_selector);
 
