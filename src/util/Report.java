@@ -882,6 +882,11 @@ public class Report
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_style, css);
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_script,
                 script);
+
+        copyFile(
+                new File(options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_logo_png),
+                new File(options_intern.com2pose_working_directory + File.separator +
+                        options_intern.f_out_report_logo_png));
     }
 
     private void copyFile(File source, File target) throws IOException
