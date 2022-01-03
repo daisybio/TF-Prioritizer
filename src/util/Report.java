@@ -579,6 +579,9 @@ public class Report
             }
 
             File target = new File(d_out_validation.getAbsolutePath() + File.separator + name);
+
+            frame = frame.replace("{VALIDATION_CHIP_ATLAS_DISABLED}", (source == null) ? "disabled" : "");
+
             frame = frame.replace("{VALIDATION_CHIP_ATLAS}", (source == null) ? "" :
                     generateThreeLevelImageSelector("validationChipAtlas", source, target,
                             new ArrayList<>(List.of(name))));
