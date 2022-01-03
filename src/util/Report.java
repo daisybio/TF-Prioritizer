@@ -34,17 +34,59 @@ public class Report
         boolean hasValidation, hasDistribution, hasRegression;
         private final String name;
         private final ArrayList<TranscriptionFactor> transcriptionFactors;
+        Map<String, Map<String, Number>> regressionCoefficients;
         boolean realGroup;
 
-        TranscriptionFactorGroup(String name, ArrayList<TranscriptionFactor> transcriptionFactors, boolean realGroup)
+        TranscriptionFactorGroup(String name, ArrayList<TranscriptionFactor> transcriptionFactors,
+                                 Map<String, Map<String, Number>> regressionCoefficients, boolean realGroup)
         {
             this.name = name;
             this.transcriptionFactors = transcriptionFactors;
+            this.regressionCoefficients = regressionCoefficients;
             this.realGroup = realGroup;
         }
     }
 
-    private void loadTFs() throws FileNotFoundException
+    private Map<String, Map<String, Map<String, Double>>> loadRegressionCoefficients() throws IOException
+    {
+        Map<String, Map<String, Map<String, Double>>> coefficients = new HashMap<>();
+
+        File parentDir = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_put_DYNAMITE);
+
+        for (File hm_dir : Objects.requireNonNull(parentDir.listFiles()))
+        {
+            coefficients.put(hm_dir.getName(), new HashMap<>());
+
+            for (File groups_dir : Objects.requireNonNull(hm_dir.listFiles()))
+            {
+                coefficients.get(hm_dir.getName()).put(groups_dir.getName(), new HashMap<>());
+
+                File f_data = new File(
+                        groups_dir + File.separator + options_intern.file_suffix_dynamite_output_to_be_plotted);
+
+                String data = loadFile(f_data.getAbsolutePath());
+
+                boolean first = true;
+                for (String line : data.split("\n"))
+                {
+                    if (first)
+                    {
+                        first = false;
+                        continue;
+                    }
+                    String tf = line.split("\t")[0];
+                    double value = Double.parseDouble(line.split("\t")[1]);
+
+                    coefficients.get(hm_dir.getName()).get(groups_dir.getName()).put(tf.toUpperCase(), value);
+                }
+            }
+        }
+
+        return coefficients;
+    }
+
+    private void loadTFs() throws IOException
     {
         File tf_file = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
@@ -57,6 +99,8 @@ public class Report
 
         File d_plots =
                 new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_plots);
+
+        Map<String, Map<String, Map<String, Double>>> allRegressionCoefficients = loadRegressionCoefficients();
 
         ArrayList<String> histoneModifications = new ArrayList<>();
 
@@ -179,10 +223,27 @@ public class Report
                     }
                 }
 
+                Map<String, Map<String, Number>> regressionCoefficients = new HashMap<>();
+
+                for (String hm : allRegressionCoefficients.keySet())
+                {
+                    regressionCoefficients.put(hm, new HashMap<>());
+
+                    for (String group : allRegressionCoefficients.get(hm).keySet())
+                    {
+                        if (allRegressionCoefficients.get(hm).get(group).containsKey(tfGroupName.toUpperCase()))
+                        {
+                            regressionCoefficients.get(hm).put(group,
+                                    allRegressionCoefficients.get(hm).get(group).get(tfGroupName.toUpperCase()));
+                        }
+                    }
+                }
+
                 if (tf_group.size() > 0)
                 {
                     transcriptionFactorGroups.add(
-                            new TranscriptionFactorGroup(tfGroupName, tf_group, tf_group.size() > 1));
+                            new TranscriptionFactorGroup(tfGroupName, tf_group, regressionCoefficients,
+                                    tf_group.size() > 1));
                 }
             }
         }
@@ -315,54 +376,55 @@ public class Report
         return template;
     }
 
-    private String getBasicDataLog2fc(String tfName, Map<String, Map<String, Number>> log2fc) throws IOException
+    private String getTabularData(String id, Map<String, Map<String, Number>> data)
     {
-        if (log2fc.size() == 0)
+        if (data.size() == 0)
         {
             return "";
         }
 
-        String template = loadFile(options_intern.path_to_COM2POSE + File.separator +
-                options_intern.f_report_resources_basicdata_entry_html);
-
-        template = template.replace("{NAME}", "LOG2FC");
-
         StringBuilder sb_data = new StringBuilder();
 
-        List<String> groups = new ArrayList<>(log2fc.keySet());
-        Collections.sort(groups);
+        List<String> columns = new ArrayList<>(data.keySet());
+        Set<String> rowsSet = new HashSet<>();
+        Collections.sort(columns);
 
         sb_data.append("<table>");
         sb_data.append("<tr>");
         sb_data.append("<th></th>");
         int i = 0;
-        for (String group : groups)
+        for (String column : columns)
         {
-            sb_data.append("<th id='").append(tfName).append("-col-").append(i).append("'>");
-            sb_data.append(group);
+            sb_data.append("<th id='").append(id).append("-col-").append(i).append("'>");
+            sb_data.append(column);
             sb_data.append("</th>");
             i++;
+
+            rowsSet.addAll(data.get(column).keySet());
         }
         sb_data.append("</tr>");
 
+        List<String> rows = new ArrayList<>(rowsSet);
+        Collections.sort(rows);
+
         i = 0;
-        for (String group : groups)
+        for (String row : rows)
         {
             sb_data.append("<tr>");
 
-            sb_data.append("<th id='").append(tfName).append("-row-").append(i).append("'>");
-            sb_data.append(group);
+            sb_data.append("<th id='").append(id).append("-row-").append(i).append("'>");
+            sb_data.append(row);
             sb_data.append("</th>");
 
             int j = 0;
-            for (String match : groups)
+            for (String column : columns)
             {
-                String parameters = "\"" + tfName + "\", " + j + ", " + i;
+                String parameters = "\"" + id + "\", " + j + ", " + i;
                 sb_data.append("<td onmouseover='tableMouseOver(").append(parameters)
                         .append(")' onmouseout" + "='tableMouseOut(").append(parameters).append(")'>");
-                if (!match.equals(group))
+                if (!column.equals(row) && data.get(column).get(row) != null)
                 {
-                    sb_data.append(formatter.format(log2fc.get(group).get(match)));
+                    sb_data.append(formatter.format(data.get(column).get(row)));
                 }
                 sb_data.append("</td>");
 
@@ -376,9 +438,7 @@ public class Report
 
         sb_data.append("</table>");
 
-        template = template.replace("{DATA}", sb_data.toString());
-
-        return template;
+        return sb_data.toString();
     }
 
     private String getBasicData(TranscriptionFactor transcriptionFactor) throws IOException
@@ -387,8 +447,15 @@ public class Report
                 options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_basicdata_html);
 
 
-        template =
-                template.replace("{LOG2FC}", getBasicDataLog2fc(transcriptionFactor.name, transcriptionFactor.log2fc));
+        String log2fcTemplate = loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_basicdata_entry_html);
+
+        log2fcTemplate = log2fcTemplate.replace("{NAME}", "LOG2FC");
+
+        log2fcTemplate =
+                log2fcTemplate.replace("{DATA}", getTabularData(transcriptionFactor.name, transcriptionFactor.log2fc));
+
+        template = template.replace("{LOG2FC}", log2fcTemplate);
 
         template = template.replace("{TPM}", getBasicDataEntry("TPM", transcriptionFactor.tpm));
 
@@ -755,16 +822,17 @@ public class Report
     {
         if (tfGroup.realGroup)
         {
-            return generateRegression(tfGroup.name);
+            return generateRegression(tfGroup.name, tfGroup.regressionCoefficients);
         } else
         {
             TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
 
-            return generateRegression(tf.name);
+            return generateRegression(tf.name, tfGroup.regressionCoefficients);
         }
     }
 
-    private boolean generateRegression(String name) throws IOException
+    private boolean generateRegression(String name, Map<String, Map<String, Number>> regressionCoefficients)
+            throws IOException
     {
 
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
@@ -786,6 +854,8 @@ public class Report
 
         File target = new File(d_out_regression.getAbsolutePath() + File.separator + name);
         String three_level_image_selector = generateThreeLevelImageSelector("regressionPlot", d_in_plots, target);
+
+        frame = frame.replace("{COEFFICIENTS}", getTabularData("regressionCoefficients", regressionCoefficients));
 
         frame = frame.replace("{HEATMAPS}", three_level_image_selector);
 
