@@ -120,6 +120,9 @@ public class COM2POSE
         //get target genes of TFs based on dcg analysis
         com2pose_lib.get_top_k_target_genes_dcg();
 
+        //create energy motifs of dcg genes
+        com2pose_lib.create_tf_binding_logos();
+
         //check for ChIP-seq data for TFs on ChIP-Atlas
         if (options_intern.chip_atlas_activated_chip_atlas)
         {

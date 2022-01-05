@@ -24,6 +24,12 @@ public class Options_intern
     public String enhancerDB_bed_format="chrom\tchromStart\tchromEnd\tname\treference_genome";
     public String enhancerDB_bed_suffix=".bed";
 
+    public String bin_bash = "#!/bin/bash";
+    public String jaspar_download_url = "https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_redundant_pfms_jaspar.txt";
+    public String jaspar_api_call_front = "https://jaspar.genereg.net/api/v1/matrix/";
+    public String jaspar_api_call_end = " -H 'Accept: application/json'";
+    public String jaspar_logo_download_url = "https://jaspar.genereg.net/static/logos/all/svg/";
+
     /**
      * COM2POSE private options - cannot be set from the outside
      */
@@ -122,6 +128,11 @@ public class Options_intern
     public String folder_out_distribution_mwu_scripts = "07_SCRIPTS_MANN_WHITNEYU_PLOTS";
     public String folder_out_distribution_mwu_plots = "08_PLOTS_MANN_WHITNEYU_PLOTS";
     public String folder_out_distribution_dcg = "09_DISCOUNTED_CUMULATIVE_GAIN";
+    public String folder_out_distribution_logos = "10_LOGOS";
+    public String folder_out_distribution_logos_biophysiscal_model = "01_BIOPHYSICAL_MODEL";
+    public String folder_out_distribution_logos_TF_sequence = "02_TF_SEQUENCE";
+    public String folder_out_distribution_logos_TF_sequence_jaspar = "00_JASPAR";
+    public String folder_out_distribution_logos_binding_sequence ="03_TF_BINDING_SEQUENCE";
     public String folder_out_website = "Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -194,6 +205,13 @@ public class Options_intern
     public String file_suffix_distribution_analysis_hypergeometric_test_output = "STATS.csv";
     public String file_suffix_distribution_analysis_mann_whitneyU_plot_scripts = "mann_whitneyU_plots.R";
     public String file_suffix_distribution_analysis_dcg = "dcg_stats.csv";
+    public String file_suffix_distribution_analysis_energymatrix = "_energy_matrix.csv";
+    public String file_suffix_distribution_analysis_energymatrix_logo_py = "_create_biophysical_model.py";
+    public String file_suffix_distribution_analysis_energymatrix_logo_png = "_biophysical_model.png";
+    public String file_suffix_distribution_analysis_energymatrix_logo_jaspar = "jaspar_pfms.txt";
+    public String file_suffix_distribution_analysis_energymatrix_logo_jaspar_bash = "_curl.sh";
+    public String file_suffix_distribution_analysis_energymatrix_logo_jaspar_json = ".json";
+    public String file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg = ".svg";
     public String file_suffix_chip_atlas_list_zipped = "chip_atlas_file_list.zip";
     public String file_suffix_chip_atlas_list_csv = "chip_atlas_file_list.csv";
     public String file_suffix_session = "session.xml";
@@ -433,8 +451,10 @@ public class Options_intern
         #########################*/
     //#[OPT]: path to igv.sh, if not set no images of the top target genes of the discounted cumulative gain TFs will be taken
     public String igv_path_to_igv = "";
-    //#[OPT] shot pics of most differentially expressed genes (top log2fc +/-) (default: 15, meaning 30 pics per group)
+    //#[OPT]: include extra lncRNA, pseudogenes, etc. in top_log2fc (default: true)
     public int igv_top_log2fc=15;
+    //#[OPT] shot pics of most differentially expressed genes (top log2fc +/-) (default: 15, meaning 30 pics per group)
+    public boolean igv_top_log2fc_include_lncRNA_pseudogenes=true;
     //#[OPT] ChIP-seq names, which should be included in own ChIP-seq data defined in tepic_input_directory
     //#e.g., "H3K27ac;Pol2"
     public ArrayList<String> igv_include_prediction_data = new ArrayList<>();

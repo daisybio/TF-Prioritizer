@@ -81,6 +81,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
@@ -126,6 +129,97 @@ public class COM2POSE_lib
             gene_to_coordinates.put(gene_name.toUpperCase(), position_string);
 
             gene_symbols.add(gene_name.toUpperCase());
+        }
+
+        //read in gene descriptions
+        File f_input_gene_descriptions =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.file_suffix_deseq2_mapping);
+        HashMap<String,String> ensg_class = new HashMap<>();
+        HashMap<String,String> symbol_class = new HashMap<>();
+
+        BufferedReader br_input_gene_descriptions = new BufferedReader(new FileReader(f_input_gene_descriptions));
+        String line_input_gene_descriptions = br_input_gene_descriptions.readLine();
+        while((line_input_gene_descriptions= br_input_gene_descriptions.readLine())!=null)
+        {
+            String[] split = line_input_gene_descriptions.split("\t");
+
+            if(split.length<3)
+                continue;
+
+            String other_class = "";
+            if(split[2].matches("(?i).*lncRNA.*"))
+                other_class="lncRNA";
+            if(split[2].matches("(?i).*pseudogene.*"))
+                other_class="pseudogene";
+            if(split[2].matches("(?i).*miRNA.*"))
+                other_class="miRNA";
+            /*if(split[2].matches("(?i).*rRNA.*"))
+                other_class="rRNA";
+            if(split[2].matches("(?i).*tRNA.*"))
+                other_class="tRNA";
+            if(split[2].matches("(?i).*tmRNA.*"))
+                other_class="tmRNA";
+            if(split[2].matches("(?i).*snRNA.*"))
+                other_class="snRNA";
+            if(split[2].matches("(?i).*snoRNA.*"))
+                other_class="snoRNA";
+            if(split[2].matches("(?i).*aRNA.*"))
+                other_class="aRNA";
+            if(split[2].matches("(?i).*asRNA.*"))
+                other_class="asRNA";
+            if(split[2].matches("(?i).*cisRNA.*"))
+                other_class="cisRNA";
+            if(split[2].matches("(?i).*piRNA.*"))
+                other_class="piRNA";
+            if(split[2].matches("(?i).*siRNA.*"))
+                other_class="siRNA";
+            if(split[2].matches("(?i).*shRNA.*"))
+                other_class="shRNA";
+            if(split[2].matches("(?i).*tasiRNA.*"))
+                other_class="tasiRNA";
+            if(split[2].matches("(?i).*rasiRNA.*"))
+                other_class="rasiRNA";
+            if(split[2].matches("(?i).*eRNA.*"))
+                other_class="eRNA";
+            if(split[2].matches("(?i).*ncRNA.*"))
+                other_class="ncRNA";
+            if(split[2].matches("(?i).*nmRNA.*"))
+                other_class="nmRNA";
+            if(split[2].matches("(?i).*sRNA.*"))
+                other_class="sRNA";
+            if(split[2].matches("(?i).*tracrRNA.*"))
+                other_class="tracrRNA";
+            if(split[2].matches("(?i).*pRNA.*"))
+                other_class="pRNA";
+            if(split[2].matches("(?i).*cRNA.*"))
+                other_class="cRNA";
+            if(split[2].matches("(?i).*diRNA.*"))
+                other_class="diRNA";
+            if(split[2].matches("(?i).*hc-sriRNA.*"))
+                other_class="hc-sriRNA";
+            if(split[2].matches("(?i).*hcsriRNA.*"))
+                other_class="hcsriRNA";
+            if(split[2].matches("(?i).*dsRNA.*"))
+                other_class="dsRNA";
+            if(split[2].matches("(?i).*exRNA.*"))
+                other_class="exRNA";
+            if(split[2].matches("(?i).*gRNA.*"))
+                other_class="gRNA";
+            if(split[2].matches("(?i).*lincRNA.*"))
+                other_class="lincRNA";
+            if(split[2].matches("(?i).*hnRNA.*"))
+                other_class="hnRNA";
+            if(split[2].matches("(?i).*circRNA.*"))
+                other_class="circRNA";
+            if(split[2].matches("(?i).*preRNA.*"))
+                other_class="preRNA";*/
+
+            if(!other_class.equals(""))
+            {
+                ensg_class.put(split[0],other_class);
+                if(!split[1].equals(""))
+                    symbol_class.put(split[1],other_class);
+            }
         }
 
         File f_output_root =
@@ -278,6 +372,8 @@ public class COM2POSE_lib
                                     String file_name = f_tf_file.getName();
                                     if(file_name.endsWith("idx"))
                                         continue;
+                                    if(file_name.endsWith("bam"))
+                                        continue;
 
                                     if(added_prediction_data)
                                     {
@@ -310,6 +406,7 @@ public class COM2POSE_lib
                     String[] split = line_input_log2fc.split("\t");
                     DESeq2_gene_object ds = new DESeq2_gene_object();
                     ds.ensg_name = split[0];
+                    ds.display_name = split[0];
                     ds.log2fc = Double.parseDouble(split[1]);
                     log2fc.add(ds);
                 }
@@ -329,18 +426,109 @@ public class COM2POSE_lib
                         f_output_this_one =
                                 new File(f_output_log2fc.getAbsolutePath()+File.separator+options_intern.folder_out_igv_top_log2fc_upregulated);
 
-                        for(int i = 0; i < options_intern.igv_top_log2fc; i++)
+                        int igv_top_log2fc_copy = options_intern.igv_top_log2fc;
+
+                        for(int i = 0; i < igv_top_log2fc_copy; i++)
                         {
-                            regulated_genes.add(log2fc.get(i));
+                            DESeq2_gene_object gene_object = log2fc.get(i);
+
+                            String now_class = "";
+                            boolean changed_igv_top_log2fc = false;
+                            if(ensg_class.containsKey(gene_object.ensg_name))
+                            {
+                                now_class = ensg_class.get(gene_object.ensg_name);
+                                changed_igv_top_log2fc=true;
+                                igv_top_log2fc_copy++;
+                            }
+
+                            if(ensg_gene_symbol_map.containsKey(gene_object.ensg_name))
+                            {
+                                if(now_class.equals(""))
+                                {
+                                    gene_object.display_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
+                                    gene_object.ensg_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
+                                }
+                                else
+                                {
+                                    gene_object.display_name =
+                                            now_class.toUpperCase() + "_" + ensg_gene_symbol_map.get(gene_object.ensg_name);
+                                    gene_object.ensg_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
+
+                                }
+                                regulated_genes.add(log2fc.get(i));
+
+                            }
+                            else
+                            {
+                                if(options_intern.igv_top_log2fc_include_lncRNA_pseudogenes)
+                                {
+                                    if(!now_class.equals(""))
+                                    {
+                                        log2fc.get(i).display_name =
+                                                now_class.toUpperCase() + "_" + log2fc.get(i).ensg_name;
+                                    }
+
+                                    regulated_genes.add(log2fc.get(i));
+                                    if(!changed_igv_top_log2fc)
+                                        igv_top_log2fc_copy++;
+                                }
+                            }
                         }
                     }
                     if(updown_mode.equals(options_intern.folder_out_igv_top_log2fc_downregulated))
                     {
                         f_output_this_one =
                                 new File(f_output_log2fc.getAbsolutePath()+File.separator+options_intern.folder_out_igv_top_log2fc_downregulated);
-                        for(int i = log2fc.size() -1; i > log2fc.size() - options_intern.igv_top_log2fc  -1; i--)
+
+
+                        int igv_top_log2fc_copy = log2fc.size() - options_intern.igv_top_log2fc;
+
+                        for(int i = log2fc.size() -1; i > igv_top_log2fc_copy  -1; i--)
                         {
-                            regulated_genes.add(log2fc.get(i));
+                            DESeq2_gene_object gene_object = log2fc.get(i);
+
+                            String now_class = "";
+                            boolean changed_igv_top_log2fc = false;
+                            if(ensg_class.containsKey(gene_object.ensg_name))
+                            {
+                                now_class = ensg_class.get(gene_object.ensg_name);
+                                changed_igv_top_log2fc=true;
+                                igv_top_log2fc_copy--;
+                            }
+
+                            if(ensg_gene_symbol_map.containsKey(gene_object.ensg_name))
+                            {
+                                if(now_class.equals(""))
+                                {
+                                    gene_object.display_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
+                                    gene_object.ensg_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
+                                }
+                                else
+                                {
+                                    gene_object.display_name =
+                                            now_class.toUpperCase() + "_" + ensg_gene_symbol_map.get(gene_object.ensg_name);
+                                    gene_object.ensg_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
+
+                                }
+                                regulated_genes.add(log2fc.get(i));
+
+                            }
+                            else
+                            {
+                                if(options_intern.igv_top_log2fc_include_lncRNA_pseudogenes)
+                                {
+                                    if(!now_class.equals(""))
+                                    {
+                                        log2fc.get(i).display_name =
+                                                now_class.toUpperCase() + "_" + log2fc.get(i).ensg_name;
+                                    }
+
+                                    regulated_genes.add(log2fc.get(i));
+                                    if(!changed_igv_top_log2fc)
+                                        igv_top_log2fc_copy--;
+                                }
+                            }
+
                         }
                     }
 
@@ -412,7 +600,7 @@ public class COM2POSE_lib
                             continue;
                         }
 
-                        String snapshot_name = rank+"_"+locus + ".png";
+                        String snapshot_name = rank+"_"+regulated_genes.get(i).display_name + ".png";
                         String response ="";
 
                         File f_output_shot = new File(f_output_this_one.getAbsolutePath());
@@ -515,6 +703,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
@@ -678,6 +869,8 @@ public class COM2POSE_lib
                                 {
                                     String file_name = f_tf_file.getName();
                                     if(file_name.endsWith("idx"))
+                                        continue;
+                                    if(file_name.endsWith("bam"))
                                         continue;
 
                                     if(added_prediction_data)
@@ -893,6 +1086,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
@@ -1297,6 +1493,9 @@ public class COM2POSE_lib
                                 {
                                     continue;
                                 }
+                                if(tf_chip_seq_files.get(j).endsWith("bam"))
+                                    continue;
+
                                 if (!added_prediction_data)
                                 {
                                     load_tf_chip_seq += tf_chip_seq_files.get(j);
@@ -1321,6 +1520,8 @@ public class COM2POSE_lib
                                     {
                                         continue;
                                     }
+                                    if(f_input.getName().endsWith("bam"))
+                                        continue;
 
                                     if (added_prediction_data)
                                     {
@@ -1812,6 +2013,8 @@ public class COM2POSE_lib
                         {
                             continue;
                         }
+                        if(f_dir_bed.getName().contains("bam"))
+                            continue;
 
                         out.println("load " + f_dir_bed.getAbsolutePath());
                         String response_load = in.readLine();
@@ -1840,7 +2043,8 @@ public class COM2POSE_lib
                                 {
                                     continue;
                                 }
-                                ;
+                                if(f_bed.getName().contains("bam"))
+                                    continue;
 
                                 out.println("load " + f_bed.getAbsolutePath());
                                 String response_load = in.readLine();
@@ -2055,6 +2259,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
@@ -2413,6 +2620,8 @@ public class COM2POSE_lib
                                 {
                                     continue;
                                 }
+                                if(f_bed_files.getName().endsWith("bam"))
+                                    continue;
                                 String load_tf_chip_seq = "load " + f_bed_files.getAbsolutePath();
 
                                 //out.println(load_tf_chip_seq);
@@ -3034,6 +3243,344 @@ public class COM2POSE_lib
     }
 
     /**
+     * preprocesses the binding energy data and create energy logos
+     * creates tf sequences logos
+     * create tf binding sequence logos (from TRAP extracted sequences)
+     */
+    public void create_tf_binding_logos() throws Exception
+    {
+        logger.logLine("[LOGOS] Creating logos of TFs.");
+
+        File f_logos_root =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+ File.separator+options_intern.folder_out_distribution_logos);
+        f_logos_root.mkdirs();
+
+        File f_logos_biophysical_root =
+                new File(f_logos_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_biophysiscal_model);
+        f_logos_biophysical_root.mkdirs();
+
+        File f_logos_tf_sequence_root =
+                new File(f_logos_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_TF_sequence);
+
+        f_logos_tf_sequence_root.mkdirs();
+
+        File f_logos_tf_binding_sequence_root =
+                new File(f_logos_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_binding_sequence);
+        f_logos_tf_binding_sequence_root.mkdirs();
+
+        //retrieve ordered tfs
+        File f_input_dcg_result = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_dcg + File.separator +
+                        options_intern.file_suffix_distribution_analysis_dcg);
+        ArrayList<String> ordered_tfs_dcg = new ArrayList<>();
+        HashSet<String> unordered_tfs_dcg = new HashSet<>();
+
+        BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
+        String line_dcg = br_dcg.readLine();
+        while ((line_dcg = br_dcg.readLine()) != null)
+        {
+            String[] split = line_dcg.split("\t");
+            ordered_tfs_dcg.add(split[1]);
+            unordered_tfs_dcg.add(split[1]);
+        }
+        br_dcg.close();
+
+        logger.logLine("[LOGOS] Preparing energies of biophysicial model for logo creation");
+
+        //retrieve binding energy
+        File f_binding_energy = new File(options_intern.tepic_path_pwms);
+        HashMap<String,ArrayList<String>> tf_to_binding_profile = new HashMap<>();
+        BufferedReader br_binding_energy = new BufferedReader(new FileReader(f_binding_energy));
+        String line_binding_energy = br_binding_energy.readLine();
+        String temp_name_tf = "";
+        ArrayList<String> temp_arrL_binding_energy = new ArrayList<>();
+
+        while((line_binding_energy= br_binding_energy.readLine())!=null)
+        {
+            if(line_binding_energy.startsWith(">"))
+            {
+                if(!temp_name_tf.equals(""))
+                {
+                    tf_to_binding_profile.put(temp_name_tf,temp_arrL_binding_energy);
+                    temp_arrL_binding_energy=new ArrayList<>();
+                    temp_name_tf="";
+                }
+                temp_name_tf = line_binding_energy.split("\t")[1].split("_")[0].toUpperCase().replace(":",".");
+            }
+            else
+            {
+                temp_arrL_binding_energy.add(line_binding_energy);
+            }
+
+        }
+        br_binding_energy.close();
+
+        for(int i = 0; i < ordered_tfs_dcg.size(); i++)
+        {
+            int rank = i+1;
+            String tf_name = ordered_tfs_dcg.get(i);
+
+            File f_tf =
+                    new File(f_logos_biophysical_root.getAbsolutePath()+File.separator+rank+"_"+tf_name);
+            f_tf.mkdirs();
+
+            ArrayList<String> tf_binding_energies = tf_to_binding_profile.get(tf_name);
+
+            File f_output_binding_energy =
+                    new File(f_tf.getAbsolutePath()+File.separator+tf_name+options_intern.file_suffix_distribution_analysis_energymatrix);
+            BufferedWriter bw_binding_energies = new BufferedWriter(new FileWriter(f_output_binding_energy));
+            for(String line_energy : tf_binding_energies)
+            {
+                bw_binding_energies.write(line_energy);
+                bw_binding_energies.newLine();
+            }
+            bw_binding_energies.close();
+
+            File f_tf_script =
+                    new File(f_tf.getAbsolutePath()+File.separator+tf_name+options_intern.file_suffix_distribution_analysis_energymatrix_logo_py);
+
+            File f_tf_png =
+                    new File(f_tf.getAbsolutePath()+File.separator+tf_name+options_intern.file_suffix_distribution_analysis_energymatrix_logo_png);
+
+            if(f_tf_png.exists())
+                continue;
+
+            StringBuilder sb_script = new StringBuilder();
+            sb_script.append("import pip\n" + "\n" + "def import_or_install(package):\n" + "    try:\n" +
+                    "        __import__(package)\n" + "    except ImportError:\n" +
+                    "        pip.main(['install', package])\n\n");
+
+            sb_script.append("import io\n" + "from base64 import b64encode\n" +
+                    "import_or_install(\"logomaker\")\n");
+            sb_script.append("import numpy as np\n");
+
+            sb_script.append("import logomaker\n" + "import pandas as pd\n" + "import matplotlib.pyplot as plt\n");
+            sb_script.append("motif = pd.read_csv(\""+f_output_binding_energy.getAbsolutePath()+"\",sep=\"\\t\",header=None)\n" +
+                    "motif = motif.set_axis(['A','C','G','T'], axis=1, inplace=False)\n");
+            sb_script.append("motif.index = np.arange(1, len(motif) + 1)\n");
+            sb_script.append("crp_logo = logomaker.Logo(motif,\n" + "                          shade_below=.5,\n" +
+                    "                          fade_below=.5)\n" + "# style using Logo methods\n" +
+                    "crp_logo.style_spines(visible=False)\n" +
+                    "crp_logo.style_spines(spines=['left', 'bottom'], visible=True)\n" +
+                    "crp_logo.style_xticks(rotation=90, fmt='%d', anchor=0)\n" + "\n" + "# style using Axes methods\n" +
+                    "crp_logo.ax.set_ylabel(\"Binding Energy\", labelpad=-1)\n" +
+                    "crp_logo.ax.xaxis.set_ticks_position('none')\n" + "crp_logo.ax.xaxis.set_tick_params(pad=-1)\n\n");
+            sb_script.append("plt.savefig(\""+f_tf_png.getAbsolutePath()+"\")\n");
+
+            BufferedWriter bw_tf_script = new BufferedWriter(new FileWriter(f_tf_script));
+            bw_tf_script.write(sb_script.toString());
+            bw_tf_script.close();
+
+            String command = "python3 " + f_tf_script.getAbsolutePath();
+
+            Process child = Runtime.getRuntime().exec(command);
+            int code = child.waitFor();
+            switch (code)
+            {
+                case 0:
+                    break;
+                case 1:
+                    String message = child.getErrorStream().toString();
+                    throw new Exception(message);
+            }
+        }
+        logger.logLine("[LOGOS] Finished biophyisical logos.");
+        logger.logLine("[LOGOS] Starting sequence logos.");
+        logger.logLine("[LOGOS] Download JASPAR matrix ids from: " + options_intern.jaspar_download_url);
+        logger.logLine("[LOGOS] waiting ...");
+        //download JASPAR txt
+        File f_jaspar =
+                new File(f_logos_tf_sequence_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_TF_sequence_jaspar);
+        f_jaspar.mkdirs();
+
+        File f_output_jaspar_downloaded = new File(
+                f_jaspar.getAbsolutePath() + File.separator + options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar);
+        if (!f_output_jaspar_downloaded.exists())
+        {
+            // Create a new trust manager that trust all certificates
+            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager()
+            {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                {
+                    return null;
+                }
+
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                {
+                }
+
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                {
+                }
+            }};
+            // Activate the new trust manager
+            try
+            {
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            // And as before now you can use URL and URLConnection
+            URL url = new URL(options_intern.jaspar_download_url);
+            URLConnection connection = url.openConnection();
+            InputStream is = connection.getInputStream();
+
+            try (OutputStream outputStream = new FileOutputStream(f_output_jaspar_downloaded))
+            {
+                IOUtils.copy(is, outputStream);
+            } catch (FileNotFoundException e)
+            {
+                // handle exception here
+                e.printStackTrace();
+            } catch (IOException e)
+            {
+                // handle exception here
+                e.printStackTrace();
+            }
+        }
+        logger.logLine("[LOGOS] JASPAR matrix id download complete.");
+
+        HashMap<String,HashSet<String>> tf_to_matrixID = new HashMap<>();
+        BufferedReader br_jaspar_input = new BufferedReader(new FileReader(f_output_jaspar_downloaded));
+        String line_jaspar = "";
+        while((line_jaspar= br_jaspar_input.readLine())!=null)
+        {
+            if(line_jaspar.startsWith(">"))
+            {
+                String[] split = line_jaspar.split("\t");
+                String matrixID = split[0].substring(1);
+                String tf = split[1].toUpperCase();
+
+                if(tf_to_matrixID.containsKey(tf))
+                {
+                    tf_to_matrixID.get(tf).add(matrixID);
+                }
+                else
+                {
+                    HashSet<String> x = new HashSet<>();
+                    x.add(matrixID);
+                    tf_to_matrixID.put(tf,x);
+                }
+            }
+        }
+        br_jaspar_input.close();
+
+        logger.logLine("[LOGOS] Retrieve additional information from JASPAR API: " +options_intern.jaspar_api_call_front);
+        logger.logLine("[LOGOS] Retrieve sequence logos from JASPAR: " + options_intern.jaspar_logo_download_url);
+
+        for(int i = 0; i < ordered_tfs_dcg.size(); i++)
+        {
+            int rank = i + 1;
+            String tf_name = ordered_tfs_dcg.get(i);
+
+            File f_tf = new File(f_logos_tf_sequence_root.getAbsolutePath() + File.separator + rank + "_" + tf_name);
+            f_tf.mkdirs();
+
+            if(tf_to_matrixID.containsKey(tf_name))
+            {
+                HashSet<String> matrix_ids = tf_to_matrixID.get(tf_name);
+
+                for(String key_matrix : matrix_ids)
+                {
+                    //get json via curls
+                    String curl =
+                            "curl '"+options_intern.jaspar_api_call_front+key_matrix+"/'"+options_intern.jaspar_api_call_end + " -o " + f_tf.getAbsolutePath()+File.separator+key_matrix+options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_json;
+                    File f_curl = new File(f_tf.getAbsolutePath()+File.separator+key_matrix+options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_bash);
+                    BufferedWriter bw_curl = new BufferedWriter(new FileWriter(f_curl));
+                    bw_curl.write("bin_bash");
+                    bw_curl.newLine();
+                    bw_curl.write(curl);
+                    bw_curl.close();
+
+                    //change permissions
+                    String command_permissions = "chmod u+x " + f_curl.getAbsolutePath();
+
+                    Process child_permission = Runtime.getRuntime().exec(command_permissions);
+                    int code_permission = child_permission.waitFor();
+                    switch (code_permission)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            String message = child_permission.getErrorStream().toString();
+                            throw new Exception(message);
+                    }
+
+                    String command = f_curl.getAbsolutePath();
+
+                    Process child = Runtime.getRuntime().exec(command);
+                    int code = child.waitFor();
+                    switch (code)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            String message = child.getErrorStream().toString();
+                            throw new Exception(message);
+                    }
+
+                    //get logos via static file download
+                    // Create a new trust manager that trust all certificates
+                    File f_matrix_svg = new File(f_tf.getAbsolutePath()+File.separator+key_matrix+options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg);
+                    String matrix_svg_download_url = options_intern.jaspar_logo_download_url+key_matrix+options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg;
+                    if(!f_matrix_svg.exists())
+                    {
+                        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager()
+                        {
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                            {
+                                return null;
+                            }
+
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                            {
+                            }
+
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+                            {
+                            }
+                        }};
+                        // Activate the new trust manager
+                        try
+                        {
+                            SSLContext sc = SSLContext.getInstance("SSL");
+                            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                        } catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                        // And as before now you can use URL and URLConnection
+                        URL url = new URL(matrix_svg_download_url);
+                        URLConnection connection = url.openConnection();
+                        InputStream is = connection.getInputStream();
+
+                        try (OutputStream outputStream = new FileOutputStream(f_matrix_svg))
+                        {
+                            IOUtils.copy(is, outputStream);
+                        } catch (FileNotFoundException e)
+                        {
+                            // handle exception here
+                            e.printStackTrace();
+                        } catch (IOException e)
+                        {
+                            // handle exception here
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        logger.logLine("[LOGOS] Finished sequence logos");
+    }
+
+    /**
      * retrieve top k target genes of DCG found TFs
      */
     public void get_top_k_target_genes_dcg() throws IOException
@@ -3078,6 +3625,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
         }
@@ -4105,6 +4655,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 String symbol = split[1].toUpperCase();
 
                 if (composed_tfs.containsKey(symbol))
@@ -6127,6 +6680,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 ensg_gene_symbol_map.put(split[0], split[1]);
             }
         }
@@ -6304,6 +6860,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 symbol_ensg_map.put(split[1].toUpperCase(), split[0].toUpperCase());
             }
         }
@@ -7690,6 +8249,9 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
+
                 if (composed_tfs.containsKey(split[0]))
                 {
                     ensg_gene_symbol_map.put(split[1].toUpperCase(), composed_tfs.get(split[0]));
@@ -8389,6 +8951,9 @@ public class COM2POSE_lib
                                 String[] split = line_ensg_symb.split("\t");
                                 if (split.length > 1)
                                 {
+                                    if(split[1].equals(""))
+                                        continue;
+
                                     ensg_symb.put(split[1].toUpperCase(), split[0]);
                                 }
                             }
@@ -8625,6 +9190,9 @@ public class COM2POSE_lib
                                     String[] split = line_ensg_symb.split("\t");
                                     if (split.length > 1)
                                     {
+                                        if(split[1].equals(""))
+                                            continue;
+
                                         ensg_symb.put(split[1].toUpperCase(), split[0]);
                                     }
                                 }
@@ -11625,6 +12193,8 @@ public class COM2POSE_lib
             String[] split = line_ensg_symbol.split("\t");
             if (split.length > 1)
             {
+                if(split[1].equals(""))
+                    continue;
                 ensg_symbol.put(split[0], split[1]);
             }
         }
@@ -11983,7 +12553,7 @@ public class COM2POSE_lib
                         "    mart <- useDataset(\"" + options_intern.deseq2_biomart_dataset_species +
                         "\", useMart(\"ensembl\"))\n" + "    df$id <- NA\n" +
                         "    G_list_intern <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\"" +
-                        options_intern.deseq2_biomart_dataset_symbol_column + "\"),values=df$Geneid,mart= mart)\n" +
+                        options_intern.deseq2_biomart_dataset_symbol_column + "\",\"description\"),values=df$Geneid,mart= mart)\n" +
                         "    G_list=rbind(G_list,G_list_intern)\n" + "    not_done=FALSE\n" +
                         "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" + "    print(w)\n" +
                         "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" + "    print(e)\n" +
@@ -14187,6 +14757,9 @@ public class COM2POSE_lib
                     break;
                 case "igv_top_log2fc":
                     options_intern.igv_top_log2fc = Integer.parseInt(split[1]);
+                    break;
+                case "igv_top_log2fc_include_lncRNA_pseudogenes":
+                    options_intern.igv_top_log2fc_include_lncRNA_pseudogenes = Boolean.parseBoolean(split[1]);
                     break;
                 case "igv_path_to_tf_chip_seq":
                     options_intern.igv_path_to_tf_chip_seq = split[1].substring(1, split[1].length() - 1);

@@ -3,6 +3,7 @@ package util;
 public class DESeq2_gene_object implements Comparable
 {
     public String ensg_name ="";
+    public String display_name ="";
     public double log2fc = 0;
 
 

@@ -18,6 +18,9 @@
 !WEBSITE_CSS/*
 !WEBSITE/CSS/*
 !WEBSITE/images/*
+!Enhancers_DB
+!Enhancers_DB/*
+!Enhancers_DB/ENdb.bed
 # etc...
 
 # ...even if they are in subdirectories
