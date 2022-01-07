@@ -681,7 +681,6 @@ public class COM2POSE_lib
         logger.logLine("[IGV] finished IGV on top upregulated and downregulated genes");
     }
 
-
     /**
      * runs IGV on specified loci
      * @throws Exception
@@ -10998,7 +10997,6 @@ public class COM2POSE_lib
         command += " -g " + options_intern.tepic_input_ref_genome;
         command += " -p " + options_intern.tepic_path_pwms;
 
-
         String command_tail = "";
         if (options_intern.tepic_cores > 1)
         {
@@ -11194,6 +11192,8 @@ public class COM2POSE_lib
                             logger.logLine(
                                     "[TEPIC-TGENE] using only tgene linked target genes for TF-Gene score calculation.");
                         }
+
+                        command_tail_sample += " -S " + output_sample.getAbsolutePath() + File.separator + options_intern.file_suffix_tepic_output_trap_sequences;
 
                         String command_execute = command_sample + command_tail_sample;
                         logger.logLine("[TEPIC] execute TEPIC with command line: " + command_execute);
@@ -13101,7 +13101,14 @@ public class COM2POSE_lib
                         File.separator + options_intern.folder_name_mix_option_preprocessing_check_chr);
         options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
 
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
+        {
+            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
+            options_intern.tepic_input_directory = options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
+                    File.separator + options_intern.folder_name_mix_option_sample_mix;
+        }
+
+        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") || options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =
@@ -13109,6 +13116,7 @@ public class COM2POSE_lib
                             File.separator + options_intern.folder_name_mix_options_footprints_between_peaks;
 
         }
+
         File folder_input = new File(options_intern.tepic_input_directory);
         File output_folder = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_blacklisted_regions);
@@ -13436,6 +13444,11 @@ public class COM2POSE_lib
                 options_intern.folder_name_mix_option_sample_mix);
         f_sample_mix_output.mkdir();
 
+        File f_annotation_check = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
+                        File.separator + options_intern.folder_name_mix_option_preprocessing_check_chr);
+        options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
+
         if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
@@ -13445,10 +13458,7 @@ public class COM2POSE_lib
         logger.logLine("[FOOTPRINTS] Used data: " + options_intern.tepic_input_directory);
 
         options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-        File f_annotation_check = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
-                        File.separator + options_intern.folder_name_mix_option_preprocessing_check_chr);
-        options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
+
 
         File folder_input = new File(options_intern.tepic_input_directory);
 
@@ -16752,7 +16762,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = f_output_hm.getAbsolutePath();
         }
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN"))
+        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") || options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =

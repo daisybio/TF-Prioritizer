@@ -64,7 +64,7 @@ ensg_sym_map="NOT_SET"
 tpm_cutoff=-1.0
 tgene_file="NOT_SET"
 #Parsing command line
-while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjtG:T:A:E:L:B:" o;
+while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjtG:T:A:E:L:B:S:" o;
 do
 case $o in
 	g)	genome=$OPTARG;;
@@ -99,6 +99,7 @@ case $o in
   E) ensg_sym_map=$OPTARG;;
   L) tgene_file=$OPTARG;;
   B) between_gaps=$OPTARG;;
+  S) trap_sequences=$OPTARG;;
 esac
 done
 
@@ -369,12 +370,15 @@ fi
 affinity=${prefix}_Affinity.txt
 
 echo "Starting TRAP"
-${working_dir}/TRAPmulti $pwms ${prefix}-FilteredSequences.fa $cores > ${affinity}_temp 
-rm ${prefix}-FilteredSequences.fa
+echo "${working_dir}/TRAP/TRAPmulti $pwms ${prefix}-FilteredSequences.fa $cores $trap_sequences > ${affinity}_temp"
+${working_dir}/TRAP/TRAPmulti $pwms ${prefix}-FilteredSequences.fa $cores $trap_sequences > ${affinity}_temp
+#rm ${prefix}-FilteredSequences.fa
 if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 then
-${working_dir}/TRAPmulti $pwms ${prefix}-Random-FilteredSequences.fa $cores > ${affinity}_Random 
-rm ${prefix}-Random-FilteredSequences.fa
+echo "${working_dir}/TRAP/TRAPmulti $pwms ${prefix}-FilteredSequences.fa $cores $trap_sequences > ${affinity}_temp"
+${working_dir}/TRAP/TRAPmulti $pwms ${prefix}-Random-FilteredSequences.fa $cores $trap_sequences >
+${affinity}_Random
+#rm ${prefix}-Random-FilteredSequences.fa
 fi
 
 if [ ${chrPrefix} == "TRUE" ];

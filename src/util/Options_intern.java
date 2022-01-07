@@ -177,6 +177,7 @@ public class Options_intern
     public String file_suffix_deseq2_preprocessing_gene_positions_data = "gene_positions.csv";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_output_regions_to_target_genes = "regions_to_target_genes.csv";
+    public String file_suffix_tepic_output_trap_sequences = "trap_sequences.csv";
     public String file_suffix_tepic_postprocessing_all_tfs = "ALL_TFs.csv";
     public String file_suffix_tepic_postprocessing_output_mean_affinities = "Mean_Affinities_";
     public String file_suffix_tepic_postprocessing_output_ratios = "Ratio_Affinities_";
