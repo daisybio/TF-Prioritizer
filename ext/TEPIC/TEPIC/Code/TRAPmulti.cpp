@@ -6,6 +6,9 @@
 //Cluster of Excellence on Multimodal Computing and Interaction and Max Planck Insitute for Informatics - Saarbruecken
 //DATE: 17/11/2016
 
+//Modified by Markus Hoffmann
+//DATE 07/01/2022
+
 #include<stdio.h>
 #include <stdlib.h>
 #include<cmath>

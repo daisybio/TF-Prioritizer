@@ -26,9 +26,10 @@ Optional parameters:\n
 [-s size of the loop window used around a genes promoter to link chromatin loops to genes (default 5000)]\n
 [-q parameter to be set if only peak features should be computed (default FALSE)]\n
 [-G input genes count file, if set, default TPM is 1]\n
-[-T set (T)ranscripts (P)er (M)illion cutoff must be in float form (e.g. 1.0)]
-[-A input gene annotation desq2 file, required for TPM filter]
-[-E input ensg to gene symbol file, required for TPM filter]\n"
+[-T set (T)ranscripts (P)er (M)illion cutoff must be in float form (e.g. 1.0)]\n
+[-A input gene annotation desq2 file, required for TPM filter]\n
+[-E input ensg to gene symbol file, required for TPM filter]\n
+[-S trap predicted sequences output]\n"
 
 #Initialising parameters
 genome=""
@@ -63,6 +64,7 @@ gene_annot_desq2="NOT_SET"
 ensg_sym_map="NOT_SET"
 tpm_cutoff=-1.0
 tgene_file="NOT_SET"
+trap_sequences=""
 #Parsing command line
 while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjtG:T:A:E:L:B:S:" o;
 do
@@ -376,8 +378,7 @@ ${working_dir}/TRAP/TRAPmulti $pwms ${prefix}-FilteredSequences.fa $cores $trap_
 if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 then
 echo "${working_dir}/TRAP/TRAPmulti $pwms ${prefix}-FilteredSequences.fa $cores $trap_sequences > ${affinity}_temp"
-${working_dir}/TRAP/TRAPmulti $pwms ${prefix}-Random-FilteredSequences.fa $cores $trap_sequences >
-${affinity}_Random
+${working_dir}/TRAP/TRAPmulti $pwms ${prefix}-Random-FilteredSequences.fa $cores $trap_sequences > ${affinity}_Random
 #rm ${prefix}-Random-FilteredSequences.fa
 fi
 
