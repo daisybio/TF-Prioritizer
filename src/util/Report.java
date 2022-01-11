@@ -469,6 +469,11 @@ public class Report
 
     private String getBasicData(TranscriptionFactorGroup tfGroup) throws IOException
     {
+        if (!tfGroup.realGroup)
+        {
+            return getBasicData(tfGroup.transcriptionFactors.get(0));
+        }
+
         StringBuilder basicData = new StringBuilder();
         String tfTemplate = loadFile(
                 options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_home_tf_html);
@@ -510,22 +515,10 @@ public class Report
         return buttonbar;
     }
 
-
     private boolean generateValidation(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        if (tfGroup.realGroup)
-        {
-            return generateValidation(tfGroup.name, getBasicData(tfGroup));
-        } else
-        {
-            TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
+        String basicData = getBasicData(tfGroup);
 
-            return generateValidation(tf.name, getBasicData(tf));
-        }
-    }
-
-    private boolean generateValidation(String name, String basicData) throws IOException
-    {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_validation_validation_html);
 
@@ -538,9 +531,9 @@ public class Report
         String frame = loadFrame();
         frame = frame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        frame = frame.replace("{TFNAME}", name);
+        frame = frame.replace("{TFNAME}", tfGroup.name);
 
-        frame = frame.replace("{TITLE}", name + " - Validation");
+        frame = frame.replace("{TITLE}", tfGroup.name + " - Validation");
 
         frame = frame.replace("{BASICDATA}", basicData);
 
@@ -553,16 +546,17 @@ public class Report
             {
                 String entryName = entry.getName();
                 entryName = entryName.split("_")[1];
-                if (entryName.equals(name))
+                if (entryName.equals(tfGroup.name))
                 {
                     source = entry;
                     break;
                 }
             }
 
-            File target = new File(d_out_validation.getAbsolutePath() + File.separator + name);
+            File target = new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name);
             frame = frame.replace("{VALIDATION_OWN_TF}", (source == null) ? "" :
-                    generateThreeLevelImageSelector("validationOwnTF", source, target, new ArrayList<>(List.of(name))));
+                    generateThreeLevelImageSelector("validationOwnTF", source, target,
+                            new ArrayList<>(List.of(tfGroup.name))));
         }
 
         {
@@ -574,29 +568,40 @@ public class Report
             {
                 String entryName = entry.getName();
 
-                if (entryName.matches("[0-9]+_" + name))
+                if (entryName.matches("[0-9]+_" + tfGroup.name))
                 {
                     source = entry;
                     break;
                 }
             }
 
-            File target = new File(d_out_validation.getAbsolutePath() + File.separator + name);
+            File target = new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name);
 
             frame = frame.replace("{VALIDATION_CHIP_ATLAS_DISABLED}", (source == null) ? "disabled" : "");
 
             frame = frame.replace("{VALIDATION_CHIP_ATLAS}", (source == null) ? "" :
                     generateThreeLevelImageSelector("validationChipAtlas", source, target,
-                            new ArrayList<>(List.of(name))));
+                            new ArrayList<>(List.of(tfGroup.name))));
         }
 
 
         frame = relativate(frame, 2);
 
-        frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
+        {
+            StringBuilder sb_actions = new StringBuilder();
+
+            for (TranscriptionFactor tf : tfGroup.transcriptionFactors)
+            {
+                String command =
+                        "window.open('" + options_intern.link_report_genecards.replace("{GENE}", tf.name) + "');\n";
+                sb_actions.append(command);
+            }
+
+            frame = frame.replace("{GENECARD_BUTTON_ACTION}", sb_actions.toString());
+        }
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
-                File.separator + name + File.separator + name + ".html", frame);
+                File.separator + tfGroup.name + File.separator + tfGroup.name + ".html", frame);
 
         return true;
     }
@@ -746,25 +751,14 @@ public class Report
 
     private boolean generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        if (tfGroup.realGroup)
-        {
-            return generateDistribution(tfGroup.name, getBasicData(tfGroup));
-        } else
-        {
-            TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
+        String basicData = getBasicData(tfGroup);
 
-            return generateDistribution(tf.name, getBasicData(tf));
-        }
-    }
-
-    private boolean generateDistribution(String name, String basicData) throws IOException
-    {
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_distribution_distribution_html);
 
         File d_distribution_output = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.d_out_distribution +
-                        File.separator + name);
+                        File.separator + tfGroup.name);
 
         ArrayList<String> existingHMs = new ArrayList<>();
 
@@ -777,7 +771,7 @@ public class Report
         {
             for (File f_plot : d_hm.listFiles())
             {
-                if (f_plot.getName().substring(0, f_plot.getName().lastIndexOf(".")).equals(name))
+                if (f_plot.getName().substring(0, f_plot.getName().lastIndexOf(".")).equals(tfGroup.name))
                 {
                     existingHMs.add(d_hm.getName());
                     copyFile(f_plot, new File(
@@ -795,10 +789,10 @@ public class Report
         String frame = loadFrame();
         frame = frame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        frame = frame.replace("{TFNAME}", name);
+        frame = frame.replace("{TFNAME}", tfGroup.name);
         frame = frame.replace("{BASICDATA}", basicData);
 
-        frame = frame.replace("{TITLE}", name + " - Distribution");
+        frame = frame.replace("{TITLE}", tfGroup.name + " - Distribution");
 
         StringBuilder sb_histoneModifications = new StringBuilder();
 
@@ -815,11 +809,22 @@ public class Report
         frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
         frame = frame.replace("{DISTRIBUTION-PLOT-PATH}", existingHMs.get(0) + ".png");
 
-        frame = frame.replace("{GENECARD}", options_intern.link_report_genecards.replace("{GENE}", name));
+        {
+            StringBuilder sb_actions = new StringBuilder();
+
+            for (TranscriptionFactor tf : tfGroup.transcriptionFactors)
+            {
+                String command =
+                        "window.open('" + options_intern.link_report_genecards.replace("{GENE}", tf.name) + "');\n";
+                sb_actions.append(command);
+            }
+
+            frame = frame.replace("{GENECARD_BUTTON_ACTION}", sb_actions.toString());
+        }
 
         frame = relativate(frame, 2);
 
-        writeFile(d_distribution_output + File.separator + name + ".html", frame);
+        writeFile(d_distribution_output + File.separator + tfGroup.name + ".html", frame);
 
         return true;
     }
