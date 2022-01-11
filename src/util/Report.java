@@ -425,6 +425,9 @@ public class Report
                 if (!column.equals(row) && data.get(column).get(row) != null)
                 {
                     sb_data.append(formatter.format(data.get(column).get(row)));
+                } else
+                {
+                    sb_data.append("-");
                 }
                 sb_data.append("</td>");
 
