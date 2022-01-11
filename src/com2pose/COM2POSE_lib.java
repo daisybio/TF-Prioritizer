@@ -1,6 +1,5 @@
 package com2pose;
 
-import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import util.*;
 
@@ -9,12 +8,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.*;
-import java.lang.annotation.Target;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -3242,11 +3238,329 @@ public class COM2POSE_lib
     }
 
     /**
+     *postprocess predicted binding site sequences and create frequencies and sequences logos
+     */
+    public void create_tf_binding_logos_predicted_binding_sites() throws Exception
+    {
+        logger.logLine("[LOGOS] start predicted binding site logos");
+        logger.logLine("[LOGOS] prepare predicted binding sites per TF");
+
+        //retrieve ordered tfs
+        File f_input_dcg_result = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_dcg + File.separator +
+                        options_intern.file_suffix_distribution_analysis_dcg);
+        ArrayList<String> ordered_tfs_dcg = new ArrayList<>();
+        HashSet<String> unordered_tfs_dcg = new HashSet<>();
+
+        BufferedReader br_dcg = new BufferedReader(new FileReader(f_input_dcg_result));
+        String line_dcg = br_dcg.readLine();
+        while ((line_dcg = br_dcg.readLine()) != null)
+        {
+            String[] split = line_dcg.split("\t");
+            ordered_tfs_dcg.add(split[1]);
+            unordered_tfs_dcg.add(split[1]);
+        }
+        br_dcg.close();
+
+        File f_input_sequences_root =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw);
+
+        File f_output_root =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_logos+File.separator+options_intern.folder_out_distribution_logos_binding_sequence);
+        File f_output_data_root =
+                new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_binding_sequence_data);
+        f_output_data_root.mkdirs();
+
+        int rank = 1;
+        for(String dcg_tf : ordered_tfs_dcg)
+        {
+            File f_output_data_tf = new File(f_output_data_root.getAbsolutePath()+File.separator+rank+"_"+dcg_tf);
+            f_output_data_tf.mkdirs();
+
+            File f_output_tf_logo = new File(f_output_root.getAbsolutePath()+File.separator+rank+"_"+dcg_tf);
+            f_output_tf_logo.mkdir();
+
+            //create necessary bufferedwriters
+            HashMap<String,BufferedWriter> bufferedWriters = new HashMap<>();
+            File f_all_fasta = new File(f_output_data_tf.getAbsolutePath()+File.separator+"ALL" +
+                    options_intern.file_suffix_distribution_analysis_predictedSequences_logo_fasta);
+            bufferedWriters.put("ALL",
+                    new BufferedWriter(new FileWriter(f_all_fasta)));
+            HashMap<String,Integer> bufferedWriters_sequencesNumbers = new HashMap<>();
+            bufferedWriters_sequencesNumbers.put("ALL",0);
+
+            HashMap<String,File> hm_files = new HashMap<>();
+            hm_files.put("ALL",f_all_fasta);
+
+            HashMap<String,File> hm_files_frequencies = new HashMap<>();
+
+            //HashMap<String,HashMap<Integer,ArrayList<String>>> hm_alphabet_frequencies = new HashMap<>();
+
+            //create ALL container
+            //HashMap<Integer,ArrayList<String>> all_alphabet_frequencies = new HashMap<>();
+            //hm_alphabet_frequencies.put("ALL",all_alphabet_frequencies);
+
+
+            //run through directories to see which writers we need
+            for(File f_tp : f_input_sequences_root.listFiles())
+            {
+                if(f_tp.isDirectory())
+                {
+                    for(File f_hm : f_tp.listFiles())
+                    {
+                        if(f_hm.isDirectory())
+                        {
+                            String hm_name = f_hm.getName();
+
+                            if(!bufferedWriters.containsKey(hm_name))
+                            {
+                                File f_hm_fasta = new File(f_output_data_tf.getAbsolutePath()+File.separator+hm_name +
+                                        options_intern.file_suffix_distribution_analysis_predictedSequences_logo_fasta);
+                                bufferedWriters.put(hm_name,
+                                        new BufferedWriter(new FileWriter(f_hm_fasta)));
+                                bufferedWriters_sequencesNumbers.put(hm_name,0);
+                                hm_files.put(hm_name,f_hm_fasta);
+
+                                //HashMap<Integer,ArrayList<String>> hm_name_alphabet_frequencies = new HashMap<>();
+                                //hm_alphabet_frequencies.put(hm_name,hm_name_alphabet_frequencies);
+                            }
+                        }
+                    }
+                }
+            }
+            //run through all runs and add sequences to fasta
+            for(File f_tp : f_input_sequences_root.listFiles())
+            {
+                if (f_tp.isDirectory())
+                {
+                    for (File f_hm : f_tp.listFiles())
+                    {
+                        if (f_hm.isDirectory())
+                        {
+                            String hm_name = f_hm.getName();
+
+                            for(File f_sample : f_hm.listFiles())
+                            {
+                                if(f_sample.isDirectory())
+                                {
+                                    //search for correct file
+                                    for(File f_sample_file : f_sample.listFiles())
+                                    {
+                                        if(f_sample_file.isFile())
+                                        {
+                                            String name_file = f_sample_file.getName();
+                                            if(name_file.equals(options_intern.file_suffix_tepic_output_trap_sequences))
+                                            {
+                                                BufferedReader br_input =
+                                                        new BufferedReader(new FileReader(f_sample_file));
+                                                String line = "";
+                                                while((line= br_input.readLine())!=null)
+                                                {
+                                                    if(line.startsWith("#") || line.startsWith("TF\tAFFINITY_VALUE"))
+                                                        continue;
+
+                                                    String[] split = line.split("\t");
+
+                                                    String name_tf = split[0].split("_")[0].toUpperCase().replace(
+                                                            ":",".");
+
+                                                    if(dcg_tf.equals(name_tf))
+                                                    {
+                                                        //check affinity value
+                                                        double affinity = Double.parseDouble(split[1]);
+                                                        if(affinity < options_intern.plot_trap_predicted_sequence_logos_affinity_cutoff)
+                                                            continue;
+                                                        String sequence = split[5];
+                                                        /*
+                                                        //add to frequencies
+                                                        HashMap<Integer,ArrayList<String>> all_name_alphabet_frequencies=
+                                                                hm_alphabet_frequencies.get("ALL");
+                                                        HashMap<Integer,ArrayList<String>> hm_name_alphabet_frequencies= hm_alphabet_frequencies.get(hm_name);
+
+
+                                                        if(all_name_alphabet_frequencies.isEmpty())
+                                                        {
+                                                            //create as many ArrayLists as needed
+                                                            for(int i = 0; i < sequence.length();i++)
+                                                            {
+                                                                ArrayList<String> container = new ArrayList<>();
+                                                                all_name_alphabet_frequencies.put(i,container);
+                                                            }
+                                                        }
+                                                        if(hm_name_alphabet_frequencies.isEmpty())
+                                                        {
+                                                            //create as many ArrayLists as needed
+                                                            for(int i = 0; i < sequence.length();i++)
+                                                            {
+                                                                ArrayList<String> container = new ArrayList<>();
+                                                                hm_name_alphabet_frequencies.put(i,container);
+                                                            }
+                                                        }
+
+                                                        for(int i = 0; i < sequence.length(); i++)
+                                                        {
+                                                            all_name_alphabet_frequencies.get(i).add(
+                                                                    String.valueOf(sequence.charAt(i)));
+                                                            hm_name_alphabet_frequencies.get(i).add(
+                                                                    String.valueOf(sequence.charAt(i)));
+                                                        }*/
+                                                        //add to all file
+                                                        BufferedWriter bw_all = bufferedWriters.get("ALL");
+                                                        int all_seqNumb = bufferedWriters_sequencesNumbers.get("ALL");
+                                                        bw_all.write(">" + all_seqNumb);
+                                                        bw_all.newLine();
+                                                        bw_all.write(sequence);
+                                                        bw_all.newLine();
+                                                        all_seqNumb++;
+                                                        bufferedWriters_sequencesNumbers.put("ALL",
+                                                                all_seqNumb);
+
+                                                        //add to hm file
+                                                        BufferedWriter bw_hm = bufferedWriters.get(hm_name);
+                                                        int hm_seqNumb = bufferedWriters_sequencesNumbers.get(hm_name);
+                                                        bw_hm.write(">"+hm_seqNumb);
+                                                        bw_hm.newLine();
+                                                        bw_hm.write(sequence);
+                                                        bw_hm.newLine();
+                                                        hm_seqNumb++;
+                                                        bufferedWriters_sequencesNumbers.put(hm_name,
+                                                                hm_seqNumb);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for(String bws_key : bufferedWriters.keySet())
+            {
+                BufferedWriter bws = bufferedWriters.get(bws_key);
+                bws.close();
+            }
+
+            //create frequencies
+
+            StringBuilder sb_script_freq = new StringBuilder();
+            sb_script_freq.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
+                    "    install.packages(\"BiocManager\")\n" + "\n" +
+                    "BiocManager::install(\"DiffLogo\")\n" +
+                    "BiocManager::install(\"seqLogo\")\n"+
+                    "library(DiffLogo)\n" +
+                    "library(seqLogo)\n");
+
+            for(String key_hm : hm_files.keySet())
+            {
+                File f_logo_hm =
+                        new File(f_output_tf_logo.getAbsolutePath()+File.separator+dcg_tf+"_"+key_hm+options_intern.file_suffix_distribution_analysis_energymatrix_logo_png);
+
+
+                File f_input = hm_files.get(key_hm);
+                File f_output =
+                        new File(f_input.getParentFile().getAbsolutePath()+File.separator+key_hm+options_intern.file_suffix_distribution_analysis_predictedSequences_logo_frequencies);
+
+                hm_files_frequencies.put(key_hm,f_output);
+
+                sb_script_freq.append("file_"+key_hm+"=\'"+f_input.getAbsolutePath()+"'\n");
+                sb_script_freq.append("pwm_"+key_hm+"=getPwmFromFastaFile(file_"+key_hm+")\n");
+                sb_script_freq.append("pwm_"+key_hm+"=seqLogo::makePWM(pwm_"+key_hm+")\n");
+                sb_script_freq.append("png(file='"+f_logo_hm.getAbsolutePath()+"')\n");
+                sb_script_freq.append("seqLogo::seqLogo(pwm_"+key_hm+",fill=c(A=\"#4daf4a\", C=\"#377eb8\", " +
+                                "G=\"#ffd92f\", T=\"#e41a1c\"))\n");
+                sb_script_freq.append("dev.off()\n");
+                sb_script_freq.append("pwm_"+key_hm+"=t(pwm(pwm_"+key_hm+"))\n");
+                sb_script_freq.append("write.table(pwm_"+key_hm+",'"+f_output.getAbsolutePath()+"', row.names = " +
+                        "FALSE, col.names=FALSE, quote = F, sep=\"\\t\")\n");
+            }
+
+            File f_script = new File(f_output_data_tf.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_predictedSequences_logo_frequencies_script);
+            BufferedWriter bw_freq_script = new BufferedWriter(new FileWriter(f_script));
+            bw_freq_script.write(sb_script_freq.toString());
+            bw_freq_script.close();
+
+            String command_frequencies = "Rscript " + f_script.getAbsolutePath();
+
+            logger.logLine("[LOGOS] Create Logos for TF "+dcg_tf+"- running Rscript: " + command_frequencies);
+
+            Process child_frequencies = Runtime.getRuntime().exec(command_frequencies);
+            int code_frequencies = child_frequencies.waitFor();
+            switch (code_frequencies)
+            {
+                case 0:
+                    break;
+                case 1:
+                    String message = child_frequencies.getErrorStream().toString();
+                    throw new Exception(message);
+            }
+
+            //logger.logLine("[LOGOS] Create logos of frequencies ... ");
+            //Create logos with logomaker
+            /*
+            for(String key_hm : hm_files_frequencies.keySet())
+            {
+                File f_input = hm_files_frequencies.get(key_hm);
+                File f_logo_hm =
+                        new File(f_output_tf_logo.getAbsolutePath()+File.separator+dcg_tf+"_"+key_hm+options_intern.file_suffix_distribution_analysis_energymatrix_logo_png);
+                File f_script_hm = new File(f_output_tf_logo.getAbsolutePath()+File.separator+dcg_tf+"_"+key_hm+".py");
+
+                StringBuilder sb_logomakerpy = new StringBuilder();
+                sb_logomakerpy.append("import pip\n" + "\n" + "def import_or_install(package):\n" + "    try:\n" +
+                        "        __import__(package)\n" + "    except ImportError:\n" +
+                        "        pip.main(['install', package])\n" + "\n" + "import io\n" +
+                        "from base64 import b64encode\n" + "import_or_install(\"logomaker\")\n" +
+                        "import numpy as np\n" + "import logomaker\n" + "import pandas as pd\n" +
+                        "import matplotlib.pyplot as plt\n");
+
+                sb_logomakerpy.append("motif = pd.read_csv(\""+f_input.getAbsolutePath()+"\",sep=\"\\t\",header=None)" +
+                                "\n");
+                sb_logomakerpy.append("motif = motif.set_axis(['A','C','G','T'], axis=1, inplace=False)\n" +
+                        "motif.index = np.arange(1, len(motif) + 1)\n" + "crp_logo = logomaker.Logo(motif,\n" +
+                        "                          shade_below=.5,\n" + "                          fade_below=.5)\n" +
+                        "# style using Logo methods\n" + "crp_logo.style_spines(visible=False)\n" +
+                        "crp_logo.style_spines(spines=['left', 'bottom'], visible=True)\n" +
+                        "crp_logo.style_xticks(rotation=90, fmt='%d', anchor=0)\n" + "\n" +
+                        "# style using Axes methods\n" + "crp_logo.ax.set_ylabel(\"Binding Energy\", labelpad=-1)\n" +
+                        "crp_logo.ax.xaxis.set_ticks_position('none')\n" + "crp_logo.ax.xaxis.set_tick_params(pad=-1)" +
+                                "\n");
+                sb_logomakerpy.append("plt.savefig(\""+f_logo_hm.getAbsolutePath()+"\")");
+
+                BufferedWriter bw_script = new BufferedWriter(new FileWriter(f_script_hm));
+                bw_script.write(sb_logomakerpy.toString());
+                bw_script.close();
+
+                String command_logo = "python3 " + f_script_hm.getAbsolutePath();
+
+                logger.logLine("[LOGOS] Create logo for TF "+dcg_tf+" in "+key_hm+"- running: " + command_logo);
+
+                Process child_logo = Runtime.getRuntime().exec(command_frequencies);
+                int code_logo = child_logo.waitFor();
+                switch (code_logo)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        String message = child_logo.getErrorStream().toString();
+                        throw new Exception(message);
+                }
+            }*/
+            rank++;
+        }
+
+        logger.logLine("[LOGOS] finished predicted binding site logos");
+
+    }
+
+    /**
      * preprocesses the binding energy data and create energy logos
      * creates tf sequences logos
      * create tf binding sequence logos (from TRAP extracted sequences)
      */
-    public void create_tf_binding_logos() throws Exception
+    public void create_tf_binding_logos_biophysical_tfSequence() throws Exception
     {
         logger.logLine("[LOGOS] Creating logos of TFs.");
 
@@ -14745,6 +15059,8 @@ public class COM2POSE_lib
                 case "plot_distribution_analysis_score_type":
                     options_intern.plot_distribution_analysis_score_type = split[1].substring(1, split[1].length() - 1);
                     break;
+                case "plot_trap_predicted_sequence_logos_affinity_cutoff":
+                    options_intern.plot_trap_predicted_sequence_logos_affinity_cutoff = Double.parseDouble(split[1]);
                 case "website_interesting_tfs":
                     String[] split_interesting_tfs = split[1].substring(1, split[1].length() - 1).split(";");
                     options_intern.website_interesting_tfs.addAll(Arrays.asList(split_interesting_tfs));

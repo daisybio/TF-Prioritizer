@@ -69,7 +69,6 @@ public class COM2POSE
             com2pose_lib.merge_tgen();
         }
 
-
         //TEPIC
         com2pose_lib.run_tepic();
         if (options_intern.tepic_randomize_tf_gene_matrix)
@@ -121,7 +120,8 @@ public class COM2POSE
         com2pose_lib.get_top_k_target_genes_dcg();
 
         //create energy motifs of dcg genes
-        com2pose_lib.create_tf_binding_logos();
+        com2pose_lib.create_tf_binding_logos_biophysical_tfSequence();
+        com2pose_lib.create_tf_binding_logos_predicted_binding_sites();
 
         //check for ChIP-seq data for TFs on ChIP-Atlas
         if (options_intern.chip_atlas_activated_chip_atlas)

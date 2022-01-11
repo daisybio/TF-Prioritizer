@@ -133,6 +133,7 @@ public class Options_intern
     public String folder_out_distribution_logos_TF_sequence = "02_TF_SEQUENCE";
     public String folder_out_distribution_logos_TF_sequence_jaspar = "00_JASPAR";
     public String folder_out_distribution_logos_binding_sequence ="03_TF_BINDING_SEQUENCE";
+    public String folder_out_distribution_logos_binding_sequence_data ="01_DATA";
     public String folder_out_website = "Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -213,6 +214,9 @@ public class Options_intern
     public String file_suffix_distribution_analysis_energymatrix_logo_jaspar_bash = "_curl.sh";
     public String file_suffix_distribution_analysis_energymatrix_logo_jaspar_json = ".json";
     public String file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg = ".svg";
+    public String file_suffix_distribution_analysis_predictedSequences_logo_fasta = ".fa";
+    public String file_suffix_distribution_analysis_predictedSequences_logo_frequencies_script = "calc_frequencies.R";
+    public String file_suffix_distribution_analysis_predictedSequences_logo_frequencies ="_frequencies.motif";
     public String file_suffix_chip_atlas_list_zipped = "chip_atlas_file_list.zip";
     public String file_suffix_chip_atlas_list_csv = "chip_atlas_file_list.csv";
     public String file_suffix_session = "session.xml";
@@ -421,6 +425,9 @@ public class Options_intern
     public double plot_mann_whitneyU_pvalue_cutoff = 0.01;
     //#[OPT]: score type: either including gene counts (more biased to biology) or excluding gene counts (more statistically) options: GENE_COUNTS, EXCL_GENE_COUNTS (default: EXCL_GENE_COUTNS)
     public String plot_distribution_analysis_score_type = "EXCL_GENE_COUNTS";
+    //#[OPT]: TRAP predicted sequence logos affinity cutoff (default: 0.05) must be set - do not try to leave this
+    // one blank!
+    public double plot_trap_predicted_sequence_logos_affinity_cutoff=0.05;
 
     /*#########################
       ####WEBSITE parameters###
