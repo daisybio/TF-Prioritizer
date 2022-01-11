@@ -9,7 +9,7 @@ preprocessing_path <- "{PREPROCESSING_PATH}"
 heatmap_dir <- "{HEATMAP_DIR}"
 number_of_genes_to_select <- { NUMBER_OF_GENES }
 map <- read.csv(map_path, sep = "\t")
-map$mgi_symbol <- toupper(map$mgi_symbol)
+map[, 2] <- toupper(map[, 2])
 
 for (group in list.files(path = target_genes_path)) {
   hms <- list.files(paste(target_genes_path, group, sep = "/"))
@@ -20,7 +20,7 @@ for (group in list.files(path = target_genes_path)) {
                                  sep =
                                    "\t")
       selected_genes <- head(selected_genes, number_of_genes_to_select)
-      selected_genes <- transform(selected_genes, ENSEMBL_GENE_ID = map$ensembl_gene_id[match(TARGET_GENE, map$mgi_symbol)])
+      selected_genes <- transform(selected_genes, ENSEMBL_GENE_ID = map$ensembl_gene_id[match(TARGET_GENE, map[, 2])])
 
       group_pairings <- list.files(preprocessing_path)
       target_dir <- paste(heatmap_dir, group, hm, gene, sep = "/")
@@ -54,7 +54,7 @@ for (group in list.files(path = target_genes_path)) {
         read_counts <- subset(chosen, select = -c(geneID))
 
         # Add geneSymbols to data
-        chosen <- transform(chosen, geneSymbol = map$mgi_symbol[match(geneID, map$ensembl_gene_id)])
+        chosen <- transform(chosen, geneSymbol = map[, 2][match(geneID, map$ensembl_gene_id)])
 
         # Store data
         write.csv(chosen, target_file, row.names = FALSE)
