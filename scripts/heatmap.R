@@ -23,7 +23,7 @@ for (group in list.files(path = target_genes_path)) {
       selected_genes <- transform(selected_genes, ENSEMBL_GENE_ID = map$ensembl_gene_id[match(TARGET_GENE, map[, 2])])
 
       group_pairings <- list.files(preprocessing_path)
-      target_dir <- paste(heatmap_dir, group, hm, gene, sep = "/")
+      target_dir <- paste(heatmap_dir, gene, hm, group, sep = "/")
 
       if (!file.exists(target_dir))
       {
