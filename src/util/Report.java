@@ -528,6 +528,9 @@ public class Report
         File d_out_validation =
                 new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation);
 
+        File d_heatmaps = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_heatmap);
+
         String frame = loadFrame();
         frame = frame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
@@ -536,6 +539,25 @@ public class Report
         frame = frame.replace("{TITLE}", tfGroup.name + " - Validation");
 
         frame = frame.replace("{BASICDATA}", basicData);
+
+        {
+            File source = null;
+
+            for (File entry : Objects.requireNonNull(d_heatmaps.listFiles()))
+            {
+                String entryName = entry.getName();
+                if (entryName.equals(tfGroup.name))
+                {
+                    source = entry;
+                    break;
+                }
+            }
+            String id = "validationHeatmaps";
+            File target =
+                    new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
+            frame = frame.replace("{VALIDATION_HEATMAP}", (source == null) ? "" :
+                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), true));
+        }
 
         {
             File d_own_tf = new File(
@@ -553,10 +575,11 @@ public class Report
                 }
             }
 
-            File target = new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name);
+            String id = "validationOwnTF";
+            File target =
+                    new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
             frame = frame.replace("{VALIDATION_OWN_TF}", (source == null) ? "" :
-                    generateThreeLevelImageSelector("validationOwnTF", source, target,
-                            new ArrayList<>(List.of(tfGroup.name))));
+                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false));
         }
 
         {
@@ -575,13 +598,15 @@ public class Report
                 }
             }
 
-            File target = new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name);
+
+            String id = "validationChipAtlas";
+            File target =
+                    new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
 
             frame = frame.replace("{VALIDATION_CHIP_ATLAS_DISABLED}", (source == null) ? "disabled" : "");
 
             frame = frame.replace("{VALIDATION_CHIP_ATLAS}", (source == null) ? "" :
-                    generateThreeLevelImageSelector("validationChipAtlas", source, target,
-                            new ArrayList<>(List.of(tfGroup.name))));
+                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false));
         }
 
 
@@ -606,13 +631,15 @@ public class Report
         return true;
     }
 
-    private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir) throws IOException
+    private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir,
+                                                   boolean keepFileNameAsIs) throws IOException
     {
-        return generateThreeLevelImageSelector(name, sourceDir, targetDir, new ArrayList<>());
+        return generateThreeLevelImageSelector(name, sourceDir, targetDir, new ArrayList<>(), keepFileNameAsIs);
     }
 
     private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir,
-                                                   ArrayList<String> specialRemovables) throws IOException
+                                                   ArrayList<String> specialRemovables, boolean keepFileNameAsIs)
+            throws IOException
     {
         String suffix = ".png";
         HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
@@ -651,7 +678,7 @@ public class Report
 
                 for (File image_file : Objects.requireNonNull(subgroup_dir.listFiles()))
                 {
-                    ArrayList<String> removables = new ArrayList<>(List.of(group, subgroup, suffix, "threshold"));
+                    ArrayList<String> removables = new ArrayList<>(List.of(group, subgroup, "threshold"));
                     removables.addAll(specialRemovables);
 
                     if (image_file.isDirectory() || !image_file.getName().endsWith(suffix))
@@ -660,24 +687,29 @@ public class Report
                     }
 
                     String relevantFileName = image_file.getName();
+                    relevantFileName = relevantFileName.replace(suffix, "");
 
-                    for (String entry : removables)
+                    if (!keepFileNameAsIs)
                     {
-                        relevantFileName = relevantFileName.replace(entry, "");
-                    }
+                        for (String entry : removables)
+                        {
+                            relevantFileName = relevantFileName.replace(entry, "");
+                        }
 
-                    if (relevantFileName.matches("[0-9]+_.*_.*")) // Check for validation only
-                    {
-                        relevantFileName = relevantFileName.replaceAll("[0-9]+_", "");
-                    }
+                        if (relevantFileName.matches("[0-9]+_.*_.*")) // Check for validation only
+                        {
+                            relevantFileName = relevantFileName.replaceAll("[0-9]+_", "");
+                        }
 
-                    while (relevantFileName.endsWith("_"))
-                    {
-                        relevantFileName = relevantFileName.substring(0, relevantFileName.length() - 1);
-                    }
-                    while (relevantFileName.startsWith("_"))
-                    {
-                        relevantFileName = relevantFileName.substring(1);
+                        while (relevantFileName.endsWith("_"))
+                        {
+                            relevantFileName = relevantFileName.substring(0, relevantFileName.length() - 1);
+                        }
+
+                        while (relevantFileName.startsWith("_"))
+                        {
+                            relevantFileName = relevantFileName.substring(1);
+                        }
                     }
 
                     copyFile(image_file, new File(
@@ -863,8 +895,9 @@ public class Report
 
         frame = frame.replace("{TITLE}", name + " - Regression");
 
-        File target = new File(d_out_regression.getAbsolutePath() + File.separator + name);
-        String three_level_image_selector = generateThreeLevelImageSelector("regressionPlot", d_in_plots, target);
+        String id = "regressionPlot";
+        File target = new File(d_out_regression.getAbsolutePath() + File.separator + name + File.separator + id);
+        String three_level_image_selector = generateThreeLevelImageSelector(id, d_in_plots, target, false);
 
         frame = frame.replace("{COEFFICIENTS}", getTabularData("regressionCoefficients", regressionCoefficients));
 
