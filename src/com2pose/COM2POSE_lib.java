@@ -77,8 +77,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
@@ -105,13 +107,12 @@ public class COM2POSE_lib
             }
 
             String gene_name = "";
-            if(split[0].equals(""))
+            if (split[0].equals(""))
             {
-                gene_name=split[6];
-            }
-            else
+                gene_name = split[6];
+            } else
             {
-                gene_name=split[0];
+                gene_name = split[0];
             }
 
             String chr = "chr" + split[1];
@@ -128,27 +129,36 @@ public class COM2POSE_lib
         }
 
         //read in gene descriptions
-        File f_input_gene_descriptions =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.file_suffix_deseq2_mapping);
-        HashMap<String,String> ensg_class = new HashMap<>();
-        HashMap<String,String> symbol_class = new HashMap<>();
+        File f_input_gene_descriptions = new File(options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                options_intern.file_suffix_deseq2_mapping);
+        HashMap<String, String> ensg_class = new HashMap<>();
+        HashMap<String, String> symbol_class = new HashMap<>();
 
         BufferedReader br_input_gene_descriptions = new BufferedReader(new FileReader(f_input_gene_descriptions));
         String line_input_gene_descriptions = br_input_gene_descriptions.readLine();
-        while((line_input_gene_descriptions= br_input_gene_descriptions.readLine())!=null)
+        while ((line_input_gene_descriptions = br_input_gene_descriptions.readLine()) != null)
         {
             String[] split = line_input_gene_descriptions.split("\t");
 
-            if(split.length<3)
+            if (split.length < 3)
+            {
                 continue;
+            }
 
             String other_class = "";
-            if(split[2].matches("(?i).*lncRNA.*"))
-                other_class="lncRNA";
-            if(split[2].matches("(?i).*pseudogene.*"))
-                other_class="pseudogene";
-            if(split[2].matches("(?i).*miRNA.*"))
-                other_class="miRNA";
+            if (split[2].matches("(?i).*lncRNA.*"))
+            {
+                other_class = "lncRNA";
+            }
+            if (split[2].matches("(?i).*pseudogene.*"))
+            {
+                other_class = "pseudogene";
+            }
+            if (split[2].matches("(?i).*miRNA.*"))
+            {
+                other_class = "miRNA";
+            }
             /*if(split[2].matches("(?i).*rRNA.*"))
                 other_class="rRNA";
             if(split[2].matches("(?i).*tRNA.*"))
@@ -210,25 +220,28 @@ public class COM2POSE_lib
             if(split[2].matches("(?i).*preRNA.*"))
                 other_class="preRNA";*/
 
-            if(!other_class.equals(""))
+            if (!other_class.equals(""))
             {
-                ensg_class.put(split[0],other_class);
-                if(!split[1].equals(""))
-                    symbol_class.put(split[1],other_class);
+                ensg_class.put(split[0], other_class);
+                if (!split[1].equals(""))
+                {
+                    symbol_class.put(split[1], other_class);
+                }
             }
         }
 
-        File f_output_root =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_top_log2fc);
+        File f_output_root = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv +
+                        File.separator + options_intern.folder_out_igv_top_log2fc);
         f_output_root.mkdirs();
 
         //input
-        File f_input_root =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_deseq2_output);
+        File f_input_root = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_deseq2_output);
 
-        for(File f_deseq2_result : f_input_root.listFiles())
+        for (File f_deseq2_result : f_input_root.listFiles())
         {
-            if(f_deseq2_result.isFile())
+            if (f_deseq2_result.isFile())
             {
                 String name_f_deseq2 = f_deseq2_result.getName();
                 String[] split_name_f_deseq2 = name_f_deseq2.split("_");
@@ -236,37 +249,35 @@ public class COM2POSE_lib
                 String tp2 = split_name_f_deseq2[1];
                 String folder_name = tp1 + "_" + tp2;
 
-                File f_output_log2fc = new File(f_output_root.getAbsolutePath()+File.separator+folder_name);
+                File f_output_log2fc = new File(f_output_root.getAbsolutePath() + File.separator + folder_name);
                 f_output_log2fc.mkdirs();
 
                 //create IGV load for both tps
                 String load_tf_chip_seq = "load ";
-                boolean added_prediction_data=false;
+                boolean added_prediction_data = false;
                 ArrayList<File> tdf_files = new ArrayList<>();
 
-                for(String key_tp: split_name_f_deseq2)
+                for (String key_tp : split_name_f_deseq2)
                 {
                     //include predictive HMs
-                    if(options_intern.igv_include_prediction_data.size()>0)
+                    if (options_intern.igv_include_prediction_data.size() > 0)
                     {
-                        File f_input =
-                                new File(options_intern.tepic_input_directory+File.separator + key_tp);
+                        File f_input = new File(options_intern.tepic_input_directory + File.separator + key_tp);
 
-                        for(String including_hm : options_intern.igv_include_prediction_data)
+                        for (String including_hm : options_intern.igv_include_prediction_data)
                         {
-                            File f_hm_input = new File(f_input.getAbsolutePath()+File.separator+including_hm);
-                            if(f_hm_input.exists())
+                            File f_hm_input = new File(f_input.getAbsolutePath() + File.separator + including_hm);
+                            if (f_hm_input.exists())
                             {
-                                for(File f_file : f_hm_input.listFiles())
+                                for (File f_file : f_hm_input.listFiles())
                                 {
-                                    if(added_prediction_data)
+                                    if (added_prediction_data)
                                     {
-                                        load_tf_chip_seq+="," + f_file.getAbsolutePath();
-                                    }
-                                    else
+                                        load_tf_chip_seq += "," + f_file.getAbsolutePath();
+                                    } else
                                     {
-                                        added_prediction_data=true;
-                                        load_tf_chip_seq+= f_file.getAbsolutePath();
+                                        added_prediction_data = true;
+                                        load_tf_chip_seq += f_file.getAbsolutePath();
 
                                     }
                                 }
@@ -275,32 +286,31 @@ public class COM2POSE_lib
                     }
 
                     //add all own TF ChIP-seq if available
-                    if(!options_intern.igv_path_to_tf_chip_seq.equals(""))
+                    if (!options_intern.igv_path_to_tf_chip_seq.equals(""))
                     {
                         File f_input_tf_chip_seq = new File(options_intern.igv_path_to_tf_chip_seq);
                         File f_input_tf_chip_seq_for_now =
-                                new File(f_input_tf_chip_seq.getAbsolutePath()+File.separator+ key_tp);
-                        if(f_input_tf_chip_seq_for_now.exists())
+                                new File(f_input_tf_chip_seq.getAbsolutePath() + File.separator + key_tp);
+                        if (f_input_tf_chip_seq_for_now.exists())
                         {
-                            if(f_input_tf_chip_seq_for_now.isDirectory())
+                            if (f_input_tf_chip_seq_for_now.isDirectory())
                             {
-                                for(File f_tf_chipseq : f_input_tf_chip_seq_for_now.listFiles())
+                                for (File f_tf_chipseq : f_input_tf_chip_seq_for_now.listFiles())
                                 {
-                                    if(f_tf_chipseq.isDirectory())
+                                    if (f_tf_chipseq.isDirectory())
                                     {
 
-                                        for(File f_tf_chipseq_TF_file:f_tf_chipseq.listFiles() )
+                                        for (File f_tf_chipseq_TF_file : f_tf_chipseq.listFiles())
                                         {
-                                            if(f_tf_chipseq_TF_file.isFile())
+                                            if (f_tf_chipseq_TF_file.isFile())
                                             {
-                                                if(added_prediction_data)
+                                                if (added_prediction_data)
                                                 {
-                                                    load_tf_chip_seq+="," + f_tf_chipseq_TF_file.getAbsolutePath();
-                                                }
-                                                else
+                                                    load_tf_chip_seq += "," + f_tf_chipseq_TF_file.getAbsolutePath();
+                                                } else
                                                 {
-                                                    added_prediction_data=true;
-                                                    load_tf_chip_seq+= f_tf_chipseq_TF_file.getAbsolutePath();
+                                                    added_prediction_data = true;
+                                                    load_tf_chip_seq += f_tf_chipseq_TF_file.getAbsolutePath();
                                                 }
                                             }
                                         }
@@ -312,29 +322,29 @@ public class COM2POSE_lib
 
 
                     //add TDF if available
-                    if(!options_intern.igv_path_to_tdf.equals(""))
+                    if (!options_intern.igv_path_to_tdf.equals(""))
                     {
                         File f_input_tdfs = new File(options_intern.igv_path_to_tdf);
-                        File f_input_tdf_current_tp = new File(f_input_tdfs.getAbsolutePath()+File.separator+key_tp);
+                        File f_input_tdf_current_tp =
+                                new File(f_input_tdfs.getAbsolutePath() + File.separator + key_tp);
                         if (f_input_tdf_current_tp.exists())
                         {
-                            for(File f_hm_tdf : f_input_tdf_current_tp.listFiles())
+                            for (File f_hm_tdf : f_input_tdf_current_tp.listFiles())
                             {
-                                if(f_hm_tdf.isDirectory())
+                                if (f_hm_tdf.isDirectory())
                                 {
-                                    for(File f_hm_tdf_file : f_hm_tdf.listFiles())
+                                    for (File f_hm_tdf_file : f_hm_tdf.listFiles())
                                     {
-                                        if(f_hm_tdf_file.isFile())
+                                        if (f_hm_tdf_file.isFile())
                                         {
-                                            if(added_prediction_data)
+                                            if (added_prediction_data)
                                             {
-                                                load_tf_chip_seq+="," + f_hm_tdf_file.getAbsolutePath();
+                                                load_tf_chip_seq += "," + f_hm_tdf_file.getAbsolutePath();
                                                 tdf_files.add(f_hm_tdf_file);
-                                            }
-                                            else
+                                            } else
                                             {
-                                                added_prediction_data=true;
-                                                load_tf_chip_seq+= f_hm_tdf_file.getAbsolutePath();
+                                                added_prediction_data = true;
+                                                load_tf_chip_seq += f_hm_tdf_file.getAbsolutePath();
                                                 tdf_files.add(f_hm_tdf_file);
                                             }
 
@@ -345,40 +355,47 @@ public class COM2POSE_lib
                         }
                     }
 
-                    if(!added_prediction_data)
+                    if (!added_prediction_data)
+                    {
                         continue;
+                    }
                 }
 
 
                 //add all ChIP-ATLAS ChIP-seq if available
-                File f_chip_atlas_tf_chipseq_data_root =
-                        new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas+File.separator+options_intern.folder_out_chip_atlas_peak_files);
+                File f_chip_atlas_tf_chipseq_data_root = new File(
+                        options_intern.com2pose_working_directory + File.separator +
+                                options_intern.folder_out_chip_atlas + File.separator +
+                                options_intern.folder_out_chip_atlas_peak_files);
 
-                if(f_chip_atlas_tf_chipseq_data_root.exists())
+                if (f_chip_atlas_tf_chipseq_data_root.exists())
                 {
-                    for(File f_tf : f_chip_atlas_tf_chipseq_data_root.listFiles())
+                    for (File f_tf : f_chip_atlas_tf_chipseq_data_root.listFiles())
                     {
-                        if(f_tf.isDirectory())
+                        if (f_tf.isDirectory())
                         {
 
-                            for(File f_tf_file : f_tf.listFiles())
+                            for (File f_tf_file : f_tf.listFiles())
                             {
-                                if(f_tf_file.isFile())
+                                if (f_tf_file.isFile())
                                 {
                                     String file_name = f_tf_file.getName();
-                                    if(file_name.endsWith("idx"))
-                                        continue;
-                                    if(file_name.endsWith("bam"))
-                                        continue;
-
-                                    if(added_prediction_data)
+                                    if (file_name.endsWith("idx"))
                                     {
-                                        load_tf_chip_seq+="," + f_tf_file.getAbsolutePath();
+                                        continue;
                                     }
-                                    else
+                                    if (file_name.endsWith("bam"))
                                     {
-                                        added_prediction_data=true;
-                                        load_tf_chip_seq+= f_tf_file.getAbsolutePath();
+                                        continue;
+                                    }
+
+                                    if (added_prediction_data)
+                                    {
+                                        load_tf_chip_seq += "," + f_tf_file.getAbsolutePath();
+                                    } else
+                                    {
+                                        added_prediction_data = true;
+                                        load_tf_chip_seq += f_tf_file.getAbsolutePath();
                                     }
 
                                 }
@@ -389,15 +406,15 @@ public class COM2POSE_lib
                 }
 
                 //save session
-                File f_save_session =
-                        new File(f_output_log2fc.getAbsolutePath()+File.separator+options_intern.file_suffix_session);
-                igv_save_sessions(f_save_session,load_tf_chip_seq, tdf_files);
+                File f_save_session = new File(
+                        f_output_log2fc.getAbsolutePath() + File.separator + options_intern.file_suffix_session);
+                igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
 
                 //read in and sort genes
                 ArrayList<DESeq2_gene_object> log2fc = new ArrayList<>();
                 BufferedReader br_input_log2fc = new BufferedReader(new FileReader(f_deseq2_result));
                 String line_input_log2fc = br_input_log2fc.readLine();
-                while((line_input_log2fc=br_input_log2fc.readLine())!=null)
+                while ((line_input_log2fc = br_input_log2fc.readLine()) != null)
                 {
                     String[] split = line_input_log2fc.split("\t");
                     DESeq2_gene_object ds = new DESeq2_gene_object();
@@ -412,116 +429,116 @@ public class COM2POSE_lib
                 updown.add(options_intern.folder_out_igv_top_log2fc_upregulated);
                 updown.add(options_intern.folder_out_igv_top_log2fc_downregulated);
 
-                for(String updown_mode : updown)
+                for (String updown_mode : updown)
                 {
                     File f_output_this_one = new File("");
                     ArrayList<DESeq2_gene_object> regulated_genes = new ArrayList<>();
 
-                    if(updown_mode.equals(options_intern.folder_out_igv_top_log2fc_upregulated))
+                    if (updown_mode.equals(options_intern.folder_out_igv_top_log2fc_upregulated))
                     {
-                        f_output_this_one =
-                                new File(f_output_log2fc.getAbsolutePath()+File.separator+options_intern.folder_out_igv_top_log2fc_upregulated);
+                        f_output_this_one = new File(f_output_log2fc.getAbsolutePath() + File.separator +
+                                options_intern.folder_out_igv_top_log2fc_upregulated);
 
                         int igv_top_log2fc_copy = options_intern.igv_top_log2fc;
 
-                        for(int i = 0; i < igv_top_log2fc_copy; i++)
+                        for (int i = 0; i < igv_top_log2fc_copy; i++)
                         {
                             DESeq2_gene_object gene_object = log2fc.get(i);
 
                             String now_class = "";
                             boolean changed_igv_top_log2fc = false;
-                            if(ensg_class.containsKey(gene_object.ensg_name))
+                            if (ensg_class.containsKey(gene_object.ensg_name))
                             {
                                 now_class = ensg_class.get(gene_object.ensg_name);
-                                changed_igv_top_log2fc=true;
+                                changed_igv_top_log2fc = true;
                                 igv_top_log2fc_copy++;
                             }
 
-                            if(ensg_gene_symbol_map.containsKey(gene_object.ensg_name))
+                            if (ensg_gene_symbol_map.containsKey(gene_object.ensg_name))
                             {
-                                if(now_class.equals(""))
+                                if (now_class.equals(""))
                                 {
                                     gene_object.display_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
                                     gene_object.ensg_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
-                                }
-                                else
+                                } else
                                 {
-                                    gene_object.display_name =
-                                            now_class.toUpperCase() + "_" + ensg_gene_symbol_map.get(gene_object.ensg_name);
+                                    gene_object.display_name = now_class.toUpperCase() + "_" +
+                                            ensg_gene_symbol_map.get(gene_object.ensg_name);
                                     gene_object.ensg_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
 
                                 }
                                 regulated_genes.add(log2fc.get(i));
 
-                            }
-                            else
+                            } else
                             {
-                                if(options_intern.igv_top_log2fc_include_lncRNA_pseudogenes)
+                                if (options_intern.igv_top_log2fc_include_lncRNA_pseudogenes)
                                 {
-                                    if(!now_class.equals(""))
+                                    if (!now_class.equals(""))
                                     {
                                         log2fc.get(i).display_name =
                                                 now_class.toUpperCase() + "_" + log2fc.get(i).ensg_name;
                                     }
 
                                     regulated_genes.add(log2fc.get(i));
-                                    if(!changed_igv_top_log2fc)
+                                    if (!changed_igv_top_log2fc)
+                                    {
                                         igv_top_log2fc_copy++;
+                                    }
                                 }
                             }
                         }
                     }
-                    if(updown_mode.equals(options_intern.folder_out_igv_top_log2fc_downregulated))
+                    if (updown_mode.equals(options_intern.folder_out_igv_top_log2fc_downregulated))
                     {
-                        f_output_this_one =
-                                new File(f_output_log2fc.getAbsolutePath()+File.separator+options_intern.folder_out_igv_top_log2fc_downregulated);
+                        f_output_this_one = new File(f_output_log2fc.getAbsolutePath() + File.separator +
+                                options_intern.folder_out_igv_top_log2fc_downregulated);
 
 
                         int igv_top_log2fc_copy = log2fc.size() - options_intern.igv_top_log2fc;
 
-                        for(int i = log2fc.size() -1; i > igv_top_log2fc_copy  -1; i--)
+                        for (int i = log2fc.size() - 1; i > igv_top_log2fc_copy - 1; i--)
                         {
                             DESeq2_gene_object gene_object = log2fc.get(i);
 
                             String now_class = "";
                             boolean changed_igv_top_log2fc = false;
-                            if(ensg_class.containsKey(gene_object.ensg_name))
+                            if (ensg_class.containsKey(gene_object.ensg_name))
                             {
                                 now_class = ensg_class.get(gene_object.ensg_name);
-                                changed_igv_top_log2fc=true;
+                                changed_igv_top_log2fc = true;
                                 igv_top_log2fc_copy--;
                             }
 
-                            if(ensg_gene_symbol_map.containsKey(gene_object.ensg_name))
+                            if (ensg_gene_symbol_map.containsKey(gene_object.ensg_name))
                             {
-                                if(now_class.equals(""))
+                                if (now_class.equals(""))
                                 {
                                     gene_object.display_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
                                     gene_object.ensg_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
-                                }
-                                else
+                                } else
                                 {
-                                    gene_object.display_name =
-                                            now_class.toUpperCase() + "_" + ensg_gene_symbol_map.get(gene_object.ensg_name);
+                                    gene_object.display_name = now_class.toUpperCase() + "_" +
+                                            ensg_gene_symbol_map.get(gene_object.ensg_name);
                                     gene_object.ensg_name = ensg_gene_symbol_map.get(gene_object.ensg_name);
 
                                 }
                                 regulated_genes.add(log2fc.get(i));
 
-                            }
-                            else
+                            } else
                             {
-                                if(options_intern.igv_top_log2fc_include_lncRNA_pseudogenes)
+                                if (options_intern.igv_top_log2fc_include_lncRNA_pseudogenes)
                                 {
-                                    if(!now_class.equals(""))
+                                    if (!now_class.equals(""))
                                     {
                                         log2fc.get(i).display_name =
                                                 now_class.toUpperCase() + "_" + log2fc.get(i).ensg_name;
                                     }
 
                                     regulated_genes.add(log2fc.get(i));
-                                    if(!changed_igv_top_log2fc)
+                                    if (!changed_igv_top_log2fc)
+                                    {
                                         igv_top_log2fc_copy--;
+                                    }
                                 }
                             }
 
@@ -531,11 +548,11 @@ public class COM2POSE_lib
                     f_output_this_one.mkdirs();
 
                     //replace ENSG with gene symbol
-                    for(int i = 0; i< regulated_genes.size(); i++)
+                    for (int i = 0; i < regulated_genes.size(); i++)
                     {
                         String ensg = regulated_genes.get(i).ensg_name;
 
-                        if(ensg_gene_symbol_map.containsKey(ensg))
+                        if (ensg_gene_symbol_map.containsKey(ensg))
                         {
                             regulated_genes.get(i).ensg_name = ensg_gene_symbol_map.get(ensg);
                         }
@@ -543,7 +560,8 @@ public class COM2POSE_lib
 
                     Socket socket_session = new Socket("127.0.0.1", options_intern.igv_port_number);
                     PrintWriter out_session = new PrintWriter(socket_session.getOutputStream(), true);
-                    BufferedReader in_session = new BufferedReader(new InputStreamReader(socket_session.getInputStream()));
+                    BufferedReader in_session =
+                            new BufferedReader(new InputStreamReader(socket_session.getInputStream()));
 
                     out_session.println("genome " + options_intern.igv_species_ref_genome);
                     String response_session = in_session.readLine();
@@ -553,11 +571,11 @@ public class COM2POSE_lib
                     String response_load_sessoin = in_session.readLine();
 
                     //remodel tdf files if available
-                    if(tdf_files.size()>0)
+                    if (tdf_files.size() > 0)
                     {
                         String response_session_tdf = "";
 
-                        for(File f_tdf : tdf_files)
+                        for (File f_tdf : tdf_files)
                         {
                             out_session.println("setLogScale " + f_tdf.getName());
                             response_session_tdf = in_session.readLine();
@@ -569,14 +587,16 @@ public class COM2POSE_lib
                     }
 
                     //include enhancer regions of interest if available
-                    if(options_intern.igv_enhancer_databases.size()>0)
+                    if (options_intern.igv_enhancer_databases.size() > 0)
                     {
-                        File f_merged_databases =
-                                new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+                        File f_merged_databases = new File(options_intern.com2pose_working_directory + File.separator +
+                                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                                options_intern.folder_name_deseq2_preprocessing_gene_positions + File.separator +
+                                options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
 
                         BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
                         String line_mergedDB = br_mergedDB.readLine();
-                        while((line_mergedDB= br_mergedDB.readLine())!=null)
+                        while ((line_mergedDB = br_mergedDB.readLine()) != null)
                         {
                             String[] split = line_mergedDB.split("\t");
 
@@ -586,9 +606,9 @@ public class COM2POSE_lib
                     }
 
                     //do pics overall genes now
-                    for(int i = 0; i < regulated_genes.size(); i++)
+                    for (int i = 0; i < regulated_genes.size(); i++)
                     {
-                        int rank = i+1;
+                        int rank = i + 1;
                         String locus = regulated_genes.get(i).ensg_name;
 
                         if (!gene_to_coordinates.containsKey(locus))
@@ -596,8 +616,8 @@ public class COM2POSE_lib
                             continue;
                         }
 
-                        String snapshot_name = rank+"_"+regulated_genes.get(i).display_name + ".png";
-                        String response ="";
+                        String snapshot_name = rank + "_" + regulated_genes.get(i).display_name + ".png";
+                        String response = "";
 
                         File f_output_shot = new File(f_output_this_one.getAbsolutePath());
                         f_output_shot.mkdir();
@@ -625,9 +645,12 @@ public class COM2POSE_lib
                         File f_snapshot_made = new File("NO");
 
                         //search png name
-                        for (File f_snapshot : f_output_shot.listFiles()) {
-                            if (f_snapshot.isFile()) {
-                                if (f_snapshot.getName().startsWith("chr")) {
+                        for (File f_snapshot : f_output_shot.listFiles())
+                        {
+                            if (f_snapshot.isFile())
+                            {
+                                if (f_snapshot.getName().startsWith("chr"))
+                                {
                                     f_snapshot_made = f_snapshot;
                                     break;
                                 }
@@ -635,19 +658,21 @@ public class COM2POSE_lib
                             }
                         }
 
-                        if (!f_snapshot_made.exists()) {
+                        if (!f_snapshot_made.exists())
+                        {
                             //its the all overview
                             //logger.logLine("[ERROR]: trying to move file which does not exist!");
-                        } else {
+                        } else
+                        {
 
                             String command_mv = "mv " + f_snapshot_made.getAbsolutePath() + " " +
-                                    f_snapshot_made.getParentFile().getAbsolutePath() + File.separator +
-                                    snapshot_name;
+                                    f_snapshot_made.getParentFile().getAbsolutePath() + File.separator + snapshot_name;
 
 
                             Process child = Runtime.getRuntime().exec(command_mv);
                             int code = child.waitFor();
-                            switch (code) {
+                            switch (code)
+                            {
                                 case 0:
                                     break;
                                 case 1:
@@ -673,12 +698,12 @@ public class COM2POSE_lib
         }
 
 
-
         logger.logLine("[IGV] finished IGV on top upregulated and downregulated genes");
     }
 
     /**
      * runs IGV on specified loci
+     *
      * @throws Exception
      */
     public void run_igv_on_important_loci() throws Exception
@@ -698,8 +723,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
@@ -744,13 +771,13 @@ public class COM2POSE_lib
         ArrayList<String> remove_from_important_loci = new ArrayList<>();
 
         //check if symbol is available, if not check if similar one is there
-        for(String locus : options_intern.igv_important_locus_all_prio_tf)
+        for (String locus : options_intern.igv_important_locus_all_prio_tf)
         {
-            if(!gene_to_coordinates.containsKey(locus))
+            if (!gene_to_coordinates.containsKey(locus))
             {
-                for(String loci : gene_symbols)
+                for (String loci : gene_symbols)
                 {
-                    if(loci.matches(".*"+locus+".*"))
+                    if (loci.matches(".*" + locus + ".*"))
                     {
                         add_to_important_loci.add(loci);
                     }
@@ -776,34 +803,31 @@ public class COM2POSE_lib
             {
                 String key_tp = f_tp.getName();
 
-                File f_output_tf_hm_tp =
-                        new File(f_output_root.getAbsolutePath() + File.separator + key_tp);
+                File f_output_tf_hm_tp = new File(f_output_root.getAbsolutePath() + File.separator + key_tp);
                 f_output_tf_hm_tp.mkdir();
 
                 String load_tf_chip_seq = "load ";
-                boolean added_prediction_data=false;
+                boolean added_prediction_data = false;
 
                 //include predictive HMs
-                if(options_intern.igv_include_prediction_data.size()>0)
+                if (options_intern.igv_include_prediction_data.size() > 0)
                 {
-                    File f_input =
-                            new File(options_intern.tepic_input_directory+File.separator + key_tp);
+                    File f_input = new File(options_intern.tepic_input_directory + File.separator + key_tp);
 
-                    for(String including_hm : options_intern.igv_include_prediction_data)
+                    for (String including_hm : options_intern.igv_include_prediction_data)
                     {
-                        File f_hm_input = new File(f_input.getAbsolutePath()+File.separator+including_hm);
-                        if(f_hm_input.exists())
+                        File f_hm_input = new File(f_input.getAbsolutePath() + File.separator + including_hm);
+                        if (f_hm_input.exists())
                         {
-                            for(File f_file : f_hm_input.listFiles())
+                            for (File f_file : f_hm_input.listFiles())
                             {
-                                if(added_prediction_data)
+                                if (added_prediction_data)
                                 {
-                                    load_tf_chip_seq+="," + f_file.getAbsolutePath();
-                                }
-                                else
+                                    load_tf_chip_seq += "," + f_file.getAbsolutePath();
+                                } else
                                 {
-                                    added_prediction_data=true;
-                                    load_tf_chip_seq+= f_file.getAbsolutePath();
+                                    added_prediction_data = true;
+                                    load_tf_chip_seq += f_file.getAbsolutePath();
 
                                 }
                             }
@@ -812,32 +836,31 @@ public class COM2POSE_lib
                 }
 
                 //add all own TF ChIP-seq if available
-                if(!options_intern.igv_path_to_tf_chip_seq.equals(""))
+                if (!options_intern.igv_path_to_tf_chip_seq.equals(""))
                 {
                     File f_input_tf_chip_seq = new File(options_intern.igv_path_to_tf_chip_seq);
                     File f_input_tf_chip_seq_for_now =
-                            new File(f_input_tf_chip_seq.getAbsolutePath()+File.separator+ key_tp);
-                    if(f_input_tf_chip_seq_for_now.exists())
+                            new File(f_input_tf_chip_seq.getAbsolutePath() + File.separator + key_tp);
+                    if (f_input_tf_chip_seq_for_now.exists())
                     {
-                        if(f_input_tf_chip_seq_for_now.isDirectory())
+                        if (f_input_tf_chip_seq_for_now.isDirectory())
                         {
-                            for(File f_tf_chipseq : f_input_tf_chip_seq_for_now.listFiles())
+                            for (File f_tf_chipseq : f_input_tf_chip_seq_for_now.listFiles())
                             {
-                                if(f_tf_chipseq.isDirectory())
+                                if (f_tf_chipseq.isDirectory())
                                 {
 
-                                    for(File f_tf_chipseq_TF_file:f_tf_chipseq.listFiles() )
+                                    for (File f_tf_chipseq_TF_file : f_tf_chipseq.listFiles())
                                     {
-                                        if(f_tf_chipseq_TF_file.isFile())
+                                        if (f_tf_chipseq_TF_file.isFile())
                                         {
-                                            if(added_prediction_data)
+                                            if (added_prediction_data)
                                             {
-                                                load_tf_chip_seq+="," + f_tf_chipseq_TF_file.getAbsolutePath();
-                                            }
-                                            else
+                                                load_tf_chip_seq += "," + f_tf_chipseq_TF_file.getAbsolutePath();
+                                            } else
                                             {
-                                                added_prediction_data=true;
-                                                load_tf_chip_seq+= f_tf_chipseq_TF_file.getAbsolutePath();
+                                                added_prediction_data = true;
+                                                load_tf_chip_seq += f_tf_chipseq_TF_file.getAbsolutePath();
                                             }
                                         }
                                     }
@@ -848,34 +871,39 @@ public class COM2POSE_lib
                 }
 
                 //add all ChIP-ATLAS ChIP-seq if available
-                File f_chip_atlas_tf_chipseq_data_root =
-                        new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_chip_atlas+File.separator+options_intern.folder_out_chip_atlas_peak_files);
+                File f_chip_atlas_tf_chipseq_data_root = new File(
+                        options_intern.com2pose_working_directory + File.separator +
+                                options_intern.folder_out_chip_atlas + File.separator +
+                                options_intern.folder_out_chip_atlas_peak_files);
 
-                if(f_chip_atlas_tf_chipseq_data_root.exists())
+                if (f_chip_atlas_tf_chipseq_data_root.exists())
                 {
-                    for(File f_tf : f_chip_atlas_tf_chipseq_data_root.listFiles())
+                    for (File f_tf : f_chip_atlas_tf_chipseq_data_root.listFiles())
                     {
-                        if(f_tf.isDirectory())
+                        if (f_tf.isDirectory())
                         {
 
-                            for(File f_tf_file : f_tf.listFiles())
+                            for (File f_tf_file : f_tf.listFiles())
                             {
-                                if(f_tf_file.isFile())
+                                if (f_tf_file.isFile())
                                 {
                                     String file_name = f_tf_file.getName();
-                                    if(file_name.endsWith("idx"))
-                                        continue;
-                                    if(file_name.endsWith("bam"))
-                                        continue;
-
-                                    if(added_prediction_data)
+                                    if (file_name.endsWith("idx"))
                                     {
-                                        load_tf_chip_seq+="," + f_tf_file.getAbsolutePath();
+                                        continue;
                                     }
-                                    else
+                                    if (file_name.endsWith("bam"))
                                     {
-                                        added_prediction_data=true;
-                                        load_tf_chip_seq+= f_tf_file.getAbsolutePath();
+                                        continue;
+                                    }
+
+                                    if (added_prediction_data)
+                                    {
+                                        load_tf_chip_seq += "," + f_tf_file.getAbsolutePath();
+                                    } else
+                                    {
+                                        added_prediction_data = true;
+                                        load_tf_chip_seq += f_tf_file.getAbsolutePath();
                                     }
 
                                 }
@@ -888,29 +916,28 @@ public class COM2POSE_lib
                 ArrayList<File> tdf_files = new ArrayList<>();
 
                 //add TDF if available
-                if(!options_intern.igv_path_to_tdf.equals(""))
+                if (!options_intern.igv_path_to_tdf.equals(""))
                 {
                     File f_input_tdfs = new File(options_intern.igv_path_to_tdf);
-                    File f_input_tdf_current_tp = new File(f_input_tdfs.getAbsolutePath()+File.separator+key_tp);
+                    File f_input_tdf_current_tp = new File(f_input_tdfs.getAbsolutePath() + File.separator + key_tp);
                     if (f_input_tdf_current_tp.exists())
                     {
-                        for(File f_hm_tdf : f_input_tdf_current_tp.listFiles())
+                        for (File f_hm_tdf : f_input_tdf_current_tp.listFiles())
                         {
-                            if(f_hm_tdf.isDirectory())
+                            if (f_hm_tdf.isDirectory())
                             {
-                                for(File f_hm_tdf_file : f_hm_tdf.listFiles())
+                                for (File f_hm_tdf_file : f_hm_tdf.listFiles())
                                 {
-                                    if(f_hm_tdf_file.isFile())
+                                    if (f_hm_tdf_file.isFile())
                                     {
-                                        if(added_prediction_data)
+                                        if (added_prediction_data)
                                         {
-                                            load_tf_chip_seq+="," + f_hm_tdf_file.getAbsolutePath();
+                                            load_tf_chip_seq += "," + f_hm_tdf_file.getAbsolutePath();
                                             tdf_files.add(f_hm_tdf_file);
-                                        }
-                                        else
+                                        } else
                                         {
-                                            added_prediction_data=true;
-                                            load_tf_chip_seq+= f_hm_tdf_file.getAbsolutePath();
+                                            added_prediction_data = true;
+                                            load_tf_chip_seq += f_hm_tdf_file.getAbsolutePath();
                                             tdf_files.add(f_hm_tdf_file);
                                         }
 
@@ -921,13 +948,15 @@ public class COM2POSE_lib
                     }
                 }
 
-                if(!added_prediction_data)
+                if (!added_prediction_data)
+                {
                     continue;
+                }
 
                 //save session
-                File f_save_session =
-                        new File(f_output_tf_hm_tp.getAbsolutePath()+File.separator+options_intern.file_suffix_session);
-                igv_save_sessions(f_save_session,load_tf_chip_seq, tdf_files);
+                File f_save_session = new File(
+                        f_output_tf_hm_tp.getAbsolutePath() + File.separator + options_intern.file_suffix_session);
+                igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
 
                 Socket socket_session = new Socket("127.0.0.1", options_intern.igv_port_number);
                 PrintWriter out_session = new PrintWriter(socket_session.getOutputStream(), true);
@@ -941,11 +970,11 @@ public class COM2POSE_lib
                 String response_load_sessoin = in_session.readLine();
 
                 //remodel tdf files if available
-                if(tdf_files.size()>0)
+                if (tdf_files.size() > 0)
                 {
                     String response_session_tdf = "";
 
-                    for(File f_tdf : tdf_files)
+                    for (File f_tdf : tdf_files)
                     {
                         out_session.println("setLogScale " + f_tdf.getName());
                         response_session_tdf = in_session.readLine();
@@ -957,14 +986,16 @@ public class COM2POSE_lib
                 }
 
                 //include enhancer regions of interest if available
-                if(options_intern.igv_enhancer_databases.size()>0)
+                if (options_intern.igv_enhancer_databases.size() > 0)
                 {
-                    File f_merged_databases =
-                            new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+                    File f_merged_databases = new File(options_intern.com2pose_working_directory + File.separator +
+                            options_intern.folder_name_deseq2_preprocessing + File.separator +
+                            options_intern.folder_name_deseq2_preprocessing_gene_positions + File.separator +
+                            options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
 
                     BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
                     String line_mergedDB = br_mergedDB.readLine();
-                    while((line_mergedDB= br_mergedDB.readLine())!=null)
+                    while ((line_mergedDB = br_mergedDB.readLine()) != null)
                     {
                         String[] split = line_mergedDB.split("\t");
 
@@ -974,7 +1005,7 @@ public class COM2POSE_lib
                 }
 
                 //do pics of important loci
-                for(String locus: options_intern.igv_important_locus_all_prio_tf)
+                for (String locus : options_intern.igv_important_locus_all_prio_tf)
                 {
                     if (!gene_to_coordinates.containsKey(locus))
                     {
@@ -982,7 +1013,7 @@ public class COM2POSE_lib
                     }
 
                     String snapshot_name = locus + ".png";
-                    String response ="";
+                    String response = "";
 
                     File f_output_shot = new File(f_output_tf_hm_tp.getAbsolutePath());
                     f_output_shot.mkdir();
@@ -1010,9 +1041,12 @@ public class COM2POSE_lib
                     File f_snapshot_made = new File("NO");
 
                     //search png name
-                    for (File f_snapshot : f_output_shot.listFiles()) {
-                        if (f_snapshot.isFile()) {
-                            if (f_snapshot.getName().startsWith("chr")) {
+                    for (File f_snapshot : f_output_shot.listFiles())
+                    {
+                        if (f_snapshot.isFile())
+                        {
+                            if (f_snapshot.getName().startsWith("chr"))
+                            {
                                 f_snapshot_made = f_snapshot;
                                 break;
                             }
@@ -1020,19 +1054,21 @@ public class COM2POSE_lib
                         }
                     }
 
-                    if (!f_snapshot_made.exists()) {
+                    if (!f_snapshot_made.exists())
+                    {
                         //its the all overview
                         //logger.logLine("[ERROR]: trying to move file which does not exist!");
-                    } else {
+                    } else
+                    {
 
                         String command_mv = "mv " + f_snapshot_made.getAbsolutePath() + " " +
-                                f_snapshot_made.getParentFile().getAbsolutePath() + File.separator +
-                                snapshot_name;
+                                f_snapshot_made.getParentFile().getAbsolutePath() + File.separator + snapshot_name;
 
 
                         Process child = Runtime.getRuntime().exec(command_mv);
                         int code = child.waitFor();
-                        switch (code) {
+                        switch (code)
+                        {
                             case 0:
                                 break;
                             case 1:
@@ -1081,8 +1117,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
@@ -1488,8 +1526,10 @@ public class COM2POSE_lib
                                 {
                                     continue;
                                 }
-                                if(tf_chip_seq_files.get(j).endsWith("bam"))
+                                if (tf_chip_seq_files.get(j).endsWith("bam"))
+                                {
                                     continue;
+                                }
 
                                 if (!added_prediction_data)
                                 {
@@ -1515,8 +1555,10 @@ public class COM2POSE_lib
                                     {
                                         continue;
                                     }
-                                    if(f_input.getName().endsWith("bam"))
+                                    if (f_input.getName().endsWith("bam"))
+                                    {
                                         continue;
+                                    }
 
                                     if (added_prediction_data)
                                     {
@@ -1533,30 +1575,29 @@ public class COM2POSE_lib
 
                             ArrayList<File> tdf_files = new ArrayList<>();
 
-                            if(!options_intern.igv_path_to_tdf.equals(""))
+                            if (!options_intern.igv_path_to_tdf.equals(""))
                             {
                                 File f_input_tdfs = new File(options_intern.igv_path_to_tdf);
                                 File f_input_tdf_current_tp =
-                                        new File(f_input_tdfs.getAbsolutePath()+File.separator+key_tp);
+                                        new File(f_input_tdfs.getAbsolutePath() + File.separator + key_tp);
                                 if (f_input_tdf_current_tp.exists())
                                 {
-                                    for(File f_hm_tdf : f_input_tdf_current_tp.listFiles())
+                                    for (File f_hm_tdf : f_input_tdf_current_tp.listFiles())
                                     {
-                                        if(f_hm_tdf.isDirectory())
+                                        if (f_hm_tdf.isDirectory())
                                         {
-                                            for(File f_hm_tdf_file : f_hm_tdf.listFiles())
+                                            for (File f_hm_tdf_file : f_hm_tdf.listFiles())
                                             {
-                                                if(f_hm_tdf_file.isFile())
+                                                if (f_hm_tdf_file.isFile())
                                                 {
-                                                    if(added_prediction_data)
+                                                    if (added_prediction_data)
                                                     {
-                                                        load_tf_chip_seq+="," + f_hm_tdf_file.getAbsolutePath();
+                                                        load_tf_chip_seq += "," + f_hm_tdf_file.getAbsolutePath();
                                                         tdf_files.add(f_hm_tdf_file);
-                                                    }
-                                                    else
+                                                    } else
                                                     {
-                                                        added_prediction_data=true;
-                                                        load_tf_chip_seq+= f_hm_tdf_file.getAbsolutePath();
+                                                        added_prediction_data = true;
+                                                        load_tf_chip_seq += f_hm_tdf_file.getAbsolutePath();
                                                         tdf_files.add(f_hm_tdf_file);
                                                     }
 
@@ -1779,11 +1820,11 @@ public class COM2POSE_lib
                             //logger.logLine("[IGV] " + response_load);
 
                             //remodel tdf files if available
-                            if(tdf_files.size()>0)
+                            if (tdf_files.size() > 0)
                             {
                                 String response_session_tdf = "";
 
-                                for(File f_tdf : tdf_files)
+                                for (File f_tdf : tdf_files)
                                 {
                                     out.println("setLogScale " + f_tdf.getName());
                                     response_session_tdf = in.readLine();
@@ -1802,14 +1843,18 @@ public class COM2POSE_lib
                             //logger.logLine("[IGV] "+ response);
 
                             //include enhancer regions of interest if available
-                            if(options_intern.igv_enhancer_databases.size()>0)
+                            if (options_intern.igv_enhancer_databases.size() > 0)
                             {
-                                File f_merged_databases =
-                                        new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+                                File f_merged_databases = new File(
+                                        options_intern.com2pose_working_directory + File.separator +
+                                                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                                                options_intern.folder_name_deseq2_preprocessing_gene_positions +
+                                                File.separator +
+                                                options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
 
                                 BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
                                 String line_mergedDB = br_mergedDB.readLine();
-                                while((line_mergedDB= br_mergedDB.readLine())!=null)
+                                while ((line_mergedDB = br_mergedDB.readLine()) != null)
                                 {
                                     String[] split = line_mergedDB.split("\t");
 
@@ -2008,14 +2053,16 @@ public class COM2POSE_lib
                         {
                             continue;
                         }
-                        if(f_dir_bed.getName().contains("bam"))
+                        if (f_dir_bed.getName().contains("bam"))
+                        {
                             continue;
+                        }
 
                         out.println("load " + f_dir_bed.getAbsolutePath());
                         String response_load = in.readLine();
 
                         load_chipatlas_overall += " " + f_dir_bed.getAbsolutePath();
-                        added_prediction_data=true;
+                        added_prediction_data = true;
                     }
                 }
             }
@@ -2038,8 +2085,10 @@ public class COM2POSE_lib
                                 {
                                     continue;
                                 }
-                                if(f_bed.getName().contains("bam"))
+                                if (f_bed.getName().contains("bam"))
+                                {
                                     continue;
+                                }
 
                                 out.println("load " + f_bed.getAbsolutePath());
                                 String response_load = in.readLine();
@@ -2136,7 +2185,6 @@ public class COM2POSE_lib
         String response_end = in.readLine();
         //logger.logLine("[IGV] " + response);
         socket.close();
-
 
 
         //save session
@@ -2254,8 +2302,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
@@ -2615,8 +2665,10 @@ public class COM2POSE_lib
                                 {
                                     continue;
                                 }
-                                if(f_bed_files.getName().endsWith("bam"))
+                                if (f_bed_files.getName().endsWith("bam"))
+                                {
                                     continue;
+                                }
                                 String load_tf_chip_seq = "load " + f_bed_files.getAbsolutePath();
 
                                 //out.println(load_tf_chip_seq);
@@ -2639,30 +2691,30 @@ public class COM2POSE_lib
 
                             ArrayList<File> tdf_files = new ArrayList<>();
 
-                            if(!options_intern.igv_path_to_tdf.equals(""))
+                            if (!options_intern.igv_path_to_tdf.equals(""))
                             {
                                 File f_input_tdfs = new File(options_intern.igv_path_to_tdf);
-                                File f_input_tdf_current_tp =
-                                        new File(f_input_tdfs.getAbsolutePath()+File.separator+file_dir_tp.getName());
+                                File f_input_tdf_current_tp = new File(
+                                        f_input_tdfs.getAbsolutePath() + File.separator + file_dir_tp.getName());
                                 if (f_input_tdf_current_tp.exists())
                                 {
-                                    for(File f_hm_tdf : f_input_tdf_current_tp.listFiles())
+                                    for (File f_hm_tdf : f_input_tdf_current_tp.listFiles())
                                     {
-                                        if(f_hm_tdf.isDirectory())
+                                        if (f_hm_tdf.isDirectory())
                                         {
-                                            for(File f_hm_tdf_file : f_hm_tdf.listFiles())
+                                            for (File f_hm_tdf_file : f_hm_tdf.listFiles())
                                             {
-                                                if(f_hm_tdf_file.isFile())
+                                                if (f_hm_tdf_file.isFile())
                                                 {
-                                                    if(added_prediction_data)
+                                                    if (added_prediction_data)
                                                     {
-                                                        load_for_session_intern+="," + f_hm_tdf_file.getAbsolutePath();
+                                                        load_for_session_intern +=
+                                                                "," + f_hm_tdf_file.getAbsolutePath();
                                                         tdf_files.add(f_hm_tdf_file);
-                                                    }
-                                                    else
+                                                    } else
                                                     {
-                                                        added_prediction_data=true;
-                                                        load_for_session_intern+= f_hm_tdf_file.getAbsolutePath();
+                                                        added_prediction_data = true;
+                                                        load_for_session_intern += f_hm_tdf_file.getAbsolutePath();
                                                         tdf_files.add(f_hm_tdf_file);
                                                     }
 
@@ -2672,7 +2724,6 @@ public class COM2POSE_lib
                                     }
                                 }
                             }
-
 
 
                             //save session
@@ -2691,11 +2742,11 @@ public class COM2POSE_lib
                             String response_load_2 = in.readLine();
 
                             //remodel tdf files if available
-                            if(tdf_files.size()>0)
+                            if (tdf_files.size() > 0)
                             {
                                 String response_session_tdf = "";
 
-                                for(File f_tdf : tdf_files)
+                                for (File f_tdf : tdf_files)
                                 {
                                     out.println("setLogScale " + f_tdf.getName());
                                     response_session_tdf = in.readLine();
@@ -2708,14 +2759,18 @@ public class COM2POSE_lib
                             }
 
                             //include enhancer regions of interest if available
-                            if(options_intern.igv_enhancer_databases.size()>0)
+                            if (options_intern.igv_enhancer_databases.size() > 0)
                             {
-                                File f_merged_databases =
-                                        new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+                                File f_merged_databases = new File(
+                                        options_intern.com2pose_working_directory + File.separator +
+                                                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                                                options_intern.folder_name_deseq2_preprocessing_gene_positions +
+                                                File.separator +
+                                                options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
 
                                 BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
                                 String line_mergedDB = br_mergedDB.readLine();
-                                while((line_mergedDB= br_mergedDB.readLine())!=null)
+                                while ((line_mergedDB = br_mergedDB.readLine()) != null)
                                 {
                                     String[] split = line_mergedDB.split("\t");
 
@@ -3238,7 +3293,7 @@ public class COM2POSE_lib
     }
 
     /**
-     *postprocess predicted binding site sequences and create frequencies and sequences logos
+     * postprocess predicted binding site sequences and create frequencies and sequences logos
      */
     public void create_tf_binding_logos_predicted_binding_sites() throws Exception
     {
@@ -3263,37 +3318,39 @@ public class COM2POSE_lib
         }
         br_dcg.close();
 
-        File f_input_sequences_root =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tepic_output_raw);
+        File f_input_sequences_root = new File(options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_name_tepic_output_raw);
 
-        File f_output_root =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+File.separator+options_intern.folder_out_distribution_logos+File.separator+options_intern.folder_out_distribution_logos_binding_sequence);
-        File f_output_data_root =
-                new File(f_output_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_binding_sequence_data);
+        File f_output_root = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_logos + File.separator +
+                        options_intern.folder_out_distribution_logos_binding_sequence);
+        File f_output_data_root = new File(f_output_root.getAbsolutePath() + File.separator +
+                options_intern.folder_out_distribution_logos_binding_sequence_data);
         f_output_data_root.mkdirs();
 
         int rank = 1;
-        for(String dcg_tf : ordered_tfs_dcg)
+        for (String dcg_tf : ordered_tfs_dcg)
         {
-            File f_output_data_tf = new File(f_output_data_root.getAbsolutePath()+File.separator+rank+"_"+dcg_tf);
+            File f_output_data_tf =
+                    new File(f_output_data_root.getAbsolutePath() + File.separator + rank + "_" + dcg_tf);
             f_output_data_tf.mkdirs();
 
-            File f_output_tf_logo = new File(f_output_root.getAbsolutePath()+File.separator+rank+"_"+dcg_tf);
+            File f_output_tf_logo = new File(f_output_root.getAbsolutePath() + File.separator + rank + "_" + dcg_tf);
             f_output_tf_logo.mkdir();
 
             //create necessary bufferedwriters
-            HashMap<String,BufferedWriter> bufferedWriters = new HashMap<>();
-            File f_all_fasta = new File(f_output_data_tf.getAbsolutePath()+File.separator+"ALL" +
+            HashMap<String, BufferedWriter> bufferedWriters = new HashMap<>();
+            File f_all_fasta = new File(f_output_data_tf.getAbsolutePath() + File.separator + "ALL" +
                     options_intern.file_suffix_distribution_analysis_predictedSequences_logo_fasta);
-            bufferedWriters.put("ALL",
-                    new BufferedWriter(new FileWriter(f_all_fasta)));
-            HashMap<String,Integer> bufferedWriters_sequencesNumbers = new HashMap<>();
-            bufferedWriters_sequencesNumbers.put("ALL",0);
+            bufferedWriters.put("ALL", new BufferedWriter(new FileWriter(f_all_fasta)));
+            HashMap<String, Integer> bufferedWriters_sequencesNumbers = new HashMap<>();
+            bufferedWriters_sequencesNumbers.put("ALL", 0);
 
-            HashMap<String,File> hm_files = new HashMap<>();
-            hm_files.put("ALL",f_all_fasta);
+            HashMap<String, File> hm_files = new HashMap<>();
+            hm_files.put("ALL", f_all_fasta);
 
-            HashMap<String,File> hm_files_frequencies = new HashMap<>();
+            HashMap<String, File> hm_files_frequencies = new HashMap<>();
 
             //HashMap<String,HashMap<Integer,ArrayList<String>>> hm_alphabet_frequencies = new HashMap<>();
 
@@ -3303,34 +3360,7 @@ public class COM2POSE_lib
 
 
             //run through directories to see which writers we need
-            for(File f_tp : f_input_sequences_root.listFiles())
-            {
-                if(f_tp.isDirectory())
-                {
-                    for(File f_hm : f_tp.listFiles())
-                    {
-                        if(f_hm.isDirectory())
-                        {
-                            String hm_name = f_hm.getName();
-
-                            if(!bufferedWriters.containsKey(hm_name))
-                            {
-                                File f_hm_fasta = new File(f_output_data_tf.getAbsolutePath()+File.separator+hm_name +
-                                        options_intern.file_suffix_distribution_analysis_predictedSequences_logo_fasta);
-                                bufferedWriters.put(hm_name,
-                                        new BufferedWriter(new FileWriter(f_hm_fasta)));
-                                bufferedWriters_sequencesNumbers.put(hm_name,0);
-                                hm_files.put(hm_name,f_hm_fasta);
-
-                                //HashMap<Integer,ArrayList<String>> hm_name_alphabet_frequencies = new HashMap<>();
-                                //hm_alphabet_frequencies.put(hm_name,hm_name_alphabet_frequencies);
-                            }
-                        }
-                    }
-                }
-            }
-            //run through all runs and add sequences to fasta
-            for(File f_tp : f_input_sequences_root.listFiles())
+            for (File f_tp : f_input_sequences_root.listFiles())
             {
                 if (f_tp.isDirectory())
                 {
@@ -3340,37 +3370,70 @@ public class COM2POSE_lib
                         {
                             String hm_name = f_hm.getName();
 
-                            for(File f_sample : f_hm.listFiles())
+                            if (!bufferedWriters.containsKey(hm_name))
                             {
-                                if(f_sample.isDirectory())
+                                File f_hm_fasta = new File(
+                                        f_output_data_tf.getAbsolutePath() + File.separator + hm_name +
+                                                options_intern.file_suffix_distribution_analysis_predictedSequences_logo_fasta);
+                                bufferedWriters.put(hm_name, new BufferedWriter(new FileWriter(f_hm_fasta)));
+                                bufferedWriters_sequencesNumbers.put(hm_name, 0);
+                                hm_files.put(hm_name, f_hm_fasta);
+
+                                //HashMap<Integer,ArrayList<String>> hm_name_alphabet_frequencies = new HashMap<>();
+                                //hm_alphabet_frequencies.put(hm_name,hm_name_alphabet_frequencies);
+                            }
+                        }
+                    }
+                }
+            }
+            //run through all runs and add sequences to fasta
+            for (File f_tp : f_input_sequences_root.listFiles())
+            {
+                if (f_tp.isDirectory())
+                {
+                    for (File f_hm : f_tp.listFiles())
+                    {
+                        if (f_hm.isDirectory())
+                        {
+                            String hm_name = f_hm.getName();
+
+                            for (File f_sample : f_hm.listFiles())
+                            {
+                                if (f_sample.isDirectory())
                                 {
                                     //search for correct file
-                                    for(File f_sample_file : f_sample.listFiles())
+                                    for (File f_sample_file : f_sample.listFiles())
                                     {
-                                        if(f_sample_file.isFile())
+                                        if (f_sample_file.isFile())
                                         {
                                             String name_file = f_sample_file.getName();
-                                            if(name_file.equals(options_intern.file_suffix_tepic_output_trap_sequences))
+                                            if (name_file.equals(
+                                                    options_intern.file_suffix_tepic_output_trap_sequences))
                                             {
                                                 BufferedReader br_input =
                                                         new BufferedReader(new FileReader(f_sample_file));
                                                 String line = "";
-                                                while((line= br_input.readLine())!=null)
+                                                while ((line = br_input.readLine()) != null)
                                                 {
-                                                    if(line.startsWith("#") || line.startsWith("TF\tAFFINITY_VALUE"))
+                                                    if (line.startsWith("#") || line.startsWith("TF\tAFFINITY_VALUE"))
+                                                    {
                                                         continue;
+                                                    }
 
                                                     String[] split = line.split("\t");
 
-                                                    String name_tf = split[0].split("_")[0].toUpperCase().replace(
-                                                            ":",".");
+                                                    String name_tf =
+                                                            split[0].split("_")[0].toUpperCase().replace(":", ".");
 
-                                                    if(dcg_tf.equals(name_tf))
+                                                    if (dcg_tf.equals(name_tf))
                                                     {
                                                         //check affinity value
                                                         double affinity = Double.parseDouble(split[1]);
-                                                        if(affinity < options_intern.plot_trap_predicted_sequence_logos_affinity_cutoff)
+                                                        if (affinity <
+                                                                options_intern.plot_trap_predicted_sequence_logos_affinity_cutoff)
+                                                        {
                                                             continue;
+                                                        }
                                                         String sequence = split[5];
                                                         /*
                                                         //add to frequencies
@@ -3413,19 +3476,17 @@ public class COM2POSE_lib
                                                         bw_all.write(sequence);
                                                         bw_all.newLine();
                                                         all_seqNumb++;
-                                                        bufferedWriters_sequencesNumbers.put("ALL",
-                                                                all_seqNumb);
+                                                        bufferedWriters_sequencesNumbers.put("ALL", all_seqNumb);
 
                                                         //add to hm file
                                                         BufferedWriter bw_hm = bufferedWriters.get(hm_name);
                                                         int hm_seqNumb = bufferedWriters_sequencesNumbers.get(hm_name);
-                                                        bw_hm.write(">"+hm_seqNumb);
+                                                        bw_hm.write(">" + hm_seqNumb);
                                                         bw_hm.newLine();
                                                         bw_hm.write(sequence);
                                                         bw_hm.newLine();
                                                         hm_seqNumb++;
-                                                        bufferedWriters_sequencesNumbers.put(hm_name,
-                                                                hm_seqNumb);
+                                                        bufferedWriters_sequencesNumbers.put(hm_name, hm_seqNumb);
                                                     }
                                                 }
                                             }
@@ -3438,7 +3499,7 @@ public class COM2POSE_lib
                 }
             }
 
-            for(String bws_key : bufferedWriters.keySet())
+            for (String bws_key : bufferedWriters.keySet())
             {
                 BufferedWriter bws = bufferedWriters.get(bws_key);
                 bws.close();
@@ -3448,44 +3509,43 @@ public class COM2POSE_lib
 
             StringBuilder sb_script_freq = new StringBuilder();
             sb_script_freq.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
-                    "    install.packages(\"BiocManager\")\n" + "\n" +
-                    "BiocManager::install(\"DiffLogo\")\n" +
-                    "BiocManager::install(\"seqLogo\")\n"+
-                    "library(DiffLogo)\n" +
-                    "library(seqLogo)\n");
+                    "    install.packages(\"BiocManager\")\n" + "\n" + "BiocManager::install(\"DiffLogo\")\n" +
+                    "BiocManager::install(\"seqLogo\")\n" + "library(DiffLogo)\n" + "library(seqLogo)\n");
 
-            for(String key_hm : hm_files.keySet())
+            for (String key_hm : hm_files.keySet())
             {
-                File f_logo_hm =
-                        new File(f_output_tf_logo.getAbsolutePath()+File.separator+dcg_tf+"_"+key_hm+options_intern.file_suffix_distribution_analysis_energymatrix_logo_png);
+                File f_logo_hm = new File(f_output_tf_logo.getAbsolutePath() + File.separator + dcg_tf + "_" + key_hm +
+                        options_intern.file_suffix_distribution_analysis_energymatrix_logo_png);
 
 
                 File f_input = hm_files.get(key_hm);
-                File f_output =
-                        new File(f_input.getParentFile().getAbsolutePath()+File.separator+key_hm+options_intern.file_suffix_distribution_analysis_predictedSequences_logo_frequencies);
+                File f_output = new File(f_input.getParentFile().getAbsolutePath() + File.separator + key_hm +
+                        options_intern.file_suffix_distribution_analysis_predictedSequences_logo_frequencies);
 
-                hm_files_frequencies.put(key_hm,f_output);
+                hm_files_frequencies.put(key_hm, f_output);
 
-                sb_script_freq.append("file_"+key_hm+"=\'"+f_input.getAbsolutePath()+"'\n");
-                sb_script_freq.append("pwm_"+key_hm+"=getPwmFromFastaFile(file_"+key_hm+")\n");
-                sb_script_freq.append("pwm_"+key_hm+"=seqLogo::makePWM(pwm_"+key_hm+")\n");
-                sb_script_freq.append("png(file='"+f_logo_hm.getAbsolutePath()+"')\n");
-                sb_script_freq.append("seqLogo::seqLogo(pwm_"+key_hm+",fill=c(A=\"#4daf4a\", C=\"#377eb8\", " +
-                                "G=\"#ffd92f\", T=\"#e41a1c\"))\n");
+                sb_script_freq.append("file_" + key_hm + "=\'" + f_input.getAbsolutePath() + "'\n");
+                sb_script_freq.append("pwm_" + key_hm + "=getPwmFromFastaFile(file_" + key_hm + ")\n");
+                sb_script_freq.append("pwm_" + key_hm + "=seqLogo::makePWM(pwm_" + key_hm + ")\n");
+                sb_script_freq.append("png(file='" + f_logo_hm.getAbsolutePath() + "')\n");
+                sb_script_freq.append("seqLogo::seqLogo(pwm_" + key_hm + ",fill=c(A=\"#4daf4a\", C=\"#377eb8\", " +
+                        "G=\"#ffd92f\", T=\"#e41a1c\"))\n");
                 sb_script_freq.append("dev.off()\n");
-                sb_script_freq.append("pwm_"+key_hm+"=t(pwm(pwm_"+key_hm+"))\n");
-                sb_script_freq.append("write.table(pwm_"+key_hm+",'"+f_output.getAbsolutePath()+"', row.names = " +
-                        "FALSE, col.names=FALSE, quote = F, sep=\"\\t\")\n");
+                sb_script_freq.append("pwm_" + key_hm + "=t(pwm(pwm_" + key_hm + "))\n");
+                sb_script_freq.append(
+                        "write.table(pwm_" + key_hm + ",'" + f_output.getAbsolutePath() + "', row.names = " +
+                                "FALSE, col.names=FALSE, quote = F, sep=\"\\t\")\n");
             }
 
-            File f_script = new File(f_output_data_tf.getAbsolutePath()+File.separator+options_intern.file_suffix_distribution_analysis_predictedSequences_logo_frequencies_script);
+            File f_script = new File(f_output_data_tf.getAbsolutePath() + File.separator +
+                    options_intern.file_suffix_distribution_analysis_predictedSequences_logo_frequencies_script);
             BufferedWriter bw_freq_script = new BufferedWriter(new FileWriter(f_script));
             bw_freq_script.write(sb_script_freq.toString());
             bw_freq_script.close();
 
             String command_frequencies = "Rscript " + f_script.getAbsolutePath();
 
-            logger.logLine("[LOGOS] Create Logos for TF "+dcg_tf+"- running Rscript: " + command_frequencies);
+            logger.logLine("[LOGOS] Create Logos for TF " + dcg_tf + "- running Rscript: " + command_frequencies);
 
             Process child_frequencies = Runtime.getRuntime().exec(command_frequencies);
             int code_frequencies = child_frequencies.waitFor();
@@ -3564,21 +3624,22 @@ public class COM2POSE_lib
     {
         logger.logLine("[LOGOS] Creating logos of TFs.");
 
-        File f_logos_root =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+ File.separator+options_intern.folder_out_distribution_logos);
+        File f_logos_root = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_logos);
         f_logos_root.mkdirs();
 
-        File f_logos_biophysical_root =
-                new File(f_logos_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_biophysiscal_model);
+        File f_logos_biophysical_root = new File(f_logos_root.getAbsolutePath() + File.separator +
+                options_intern.folder_out_distribution_logos_biophysiscal_model);
         f_logos_biophysical_root.mkdirs();
 
-        File f_logos_tf_sequence_root =
-                new File(f_logos_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_TF_sequence);
+        File f_logos_tf_sequence_root = new File(f_logos_root.getAbsolutePath() + File.separator +
+                options_intern.folder_out_distribution_logos_TF_sequence);
 
         f_logos_tf_sequence_root.mkdirs();
 
-        File f_logos_tf_binding_sequence_root =
-                new File(f_logos_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_binding_sequence);
+        File f_logos_tf_binding_sequence_root = new File(f_logos_root.getAbsolutePath() + File.separator +
+                options_intern.folder_out_distribution_logos_binding_sequence);
         f_logos_tf_binding_sequence_root.mkdirs();
 
         //retrieve ordered tfs
@@ -3603,25 +3664,24 @@ public class COM2POSE_lib
 
         //retrieve binding energy
         File f_binding_energy = new File(options_intern.tepic_path_pwms);
-        HashMap<String,ArrayList<String>> tf_to_binding_profile = new HashMap<>();
+        HashMap<String, ArrayList<String>> tf_to_binding_profile = new HashMap<>();
         BufferedReader br_binding_energy = new BufferedReader(new FileReader(f_binding_energy));
         String line_binding_energy = br_binding_energy.readLine();
         String temp_name_tf = "";
         ArrayList<String> temp_arrL_binding_energy = new ArrayList<>();
 
-        while((line_binding_energy= br_binding_energy.readLine())!=null)
+        while ((line_binding_energy = br_binding_energy.readLine()) != null)
         {
-            if(line_binding_energy.startsWith(">"))
+            if (line_binding_energy.startsWith(">"))
             {
-                if(!temp_name_tf.equals(""))
+                if (!temp_name_tf.equals(""))
                 {
-                    tf_to_binding_profile.put(temp_name_tf,temp_arrL_binding_energy);
-                    temp_arrL_binding_energy=new ArrayList<>();
-                    temp_name_tf="";
+                    tf_to_binding_profile.put(temp_name_tf, temp_arrL_binding_energy);
+                    temp_arrL_binding_energy = new ArrayList<>();
+                    temp_name_tf = "";
                 }
-                temp_name_tf = line_binding_energy.split("\t")[1].split("_")[0].toUpperCase().replace(":",".");
-            }
-            else
+                temp_name_tf = line_binding_energy.split("\t")[1].split("_")[0].toUpperCase().replace(":", ".");
+            } else
             {
                 temp_arrL_binding_energy.add(line_binding_energy);
             }
@@ -3629,47 +3689,48 @@ public class COM2POSE_lib
         }
         br_binding_energy.close();
 
-        for(int i = 0; i < ordered_tfs_dcg.size(); i++)
+        for (int i = 0; i < ordered_tfs_dcg.size(); i++)
         {
-            int rank = i+1;
+            int rank = i + 1;
             String tf_name = ordered_tfs_dcg.get(i);
 
-            File f_tf =
-                    new File(f_logos_biophysical_root.getAbsolutePath()+File.separator+rank+"_"+tf_name);
+            File f_tf = new File(f_logos_biophysical_root.getAbsolutePath() + File.separator + rank + "_" + tf_name);
             f_tf.mkdirs();
 
             ArrayList<String> tf_binding_energies = tf_to_binding_profile.get(tf_name);
 
-            File f_output_binding_energy =
-                    new File(f_tf.getAbsolutePath()+File.separator+tf_name+options_intern.file_suffix_distribution_analysis_energymatrix);
+            File f_output_binding_energy = new File(f_tf.getAbsolutePath() + File.separator + tf_name +
+                    options_intern.file_suffix_distribution_analysis_energymatrix);
             BufferedWriter bw_binding_energies = new BufferedWriter(new FileWriter(f_output_binding_energy));
-            for(String line_energy : tf_binding_energies)
+            for (String line_energy : tf_binding_energies)
             {
                 bw_binding_energies.write(line_energy);
                 bw_binding_energies.newLine();
             }
             bw_binding_energies.close();
 
-            File f_tf_script =
-                    new File(f_tf.getAbsolutePath()+File.separator+tf_name+options_intern.file_suffix_distribution_analysis_energymatrix_logo_py);
+            File f_tf_script = new File(f_tf.getAbsolutePath() + File.separator + tf_name +
+                    options_intern.file_suffix_distribution_analysis_energymatrix_logo_py);
 
-            File f_tf_png =
-                    new File(f_tf.getAbsolutePath()+File.separator+tf_name+options_intern.file_suffix_distribution_analysis_energymatrix_logo_png);
+            File f_tf_png = new File(f_tf.getAbsolutePath() + File.separator + tf_name +
+                    options_intern.file_suffix_distribution_analysis_energymatrix_logo_png);
 
-            if(f_tf_png.exists())
+            if (f_tf_png.exists())
+            {
                 continue;
+            }
 
             StringBuilder sb_script = new StringBuilder();
             sb_script.append("import pip\n" + "\n" + "def import_or_install(package):\n" + "    try:\n" +
                     "        __import__(package)\n" + "    except ImportError:\n" +
                     "        pip.main(['install', package])\n\n");
 
-            sb_script.append("import io\n" + "from base64 import b64encode\n" +
-                    "import_or_install(\"logomaker\")\n");
+            sb_script.append("import io\n" + "from base64 import b64encode\n" + "import_or_install(\"logomaker\")\n");
             sb_script.append("import numpy as np\n");
 
             sb_script.append("import logomaker\n" + "import pandas as pd\n" + "import matplotlib.pyplot as plt\n");
-            sb_script.append("motif = pd.read_csv(\""+f_output_binding_energy.getAbsolutePath()+"\",sep=\"\\t\",header=None)\n" +
+            sb_script.append("motif = pd.read_csv(\"" + f_output_binding_energy.getAbsolutePath() +
+                    "\",sep=\"\\t\",header=None)\n" +
                     "motif = motif.set_axis(['A','C','G','T'], axis=1, inplace=False)\n");
             sb_script.append("motif.index = np.arange(1, len(motif) + 1)\n");
             sb_script.append("crp_logo = logomaker.Logo(motif,\n" + "                          shade_below=.5,\n" +
@@ -3679,7 +3740,7 @@ public class COM2POSE_lib
                     "crp_logo.style_xticks(rotation=90, fmt='%d', anchor=0)\n" + "\n" + "# style using Axes methods\n" +
                     "crp_logo.ax.set_ylabel(\"Binding Energy\", labelpad=-1)\n" +
                     "crp_logo.ax.xaxis.set_ticks_position('none')\n" + "crp_logo.ax.xaxis.set_tick_params(pad=-1)\n\n");
-            sb_script.append("plt.savefig(\""+f_tf_png.getAbsolutePath()+"\")\n");
+            sb_script.append("plt.savefig(\"" + f_tf_png.getAbsolutePath() + "\")\n");
 
             BufferedWriter bw_tf_script = new BufferedWriter(new FileWriter(f_tf_script));
             bw_tf_script.write(sb_script.toString());
@@ -3703,12 +3764,12 @@ public class COM2POSE_lib
         logger.logLine("[LOGOS] Download JASPAR matrix ids from: " + options_intern.jaspar_download_url);
         logger.logLine("[LOGOS] waiting ...");
         //download JASPAR txt
-        File f_jaspar =
-                new File(f_logos_tf_sequence_root.getAbsolutePath()+File.separator+options_intern.folder_out_distribution_logos_TF_sequence_jaspar);
+        File f_jaspar = new File(f_logos_tf_sequence_root.getAbsolutePath() + File.separator +
+                options_intern.folder_out_distribution_logos_TF_sequence_jaspar);
         f_jaspar.mkdirs();
 
-        File f_output_jaspar_downloaded = new File(
-                f_jaspar.getAbsolutePath() + File.separator + options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar);
+        File f_output_jaspar_downloaded = new File(f_jaspar.getAbsolutePath() + File.separator +
+                options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar);
         if (!f_output_jaspar_downloaded.exists())
         {
             // Create a new trust manager that trust all certificates
@@ -3757,35 +3818,35 @@ public class COM2POSE_lib
         }
         logger.logLine("[LOGOS] JASPAR matrix id download complete.");
 
-        HashMap<String,HashSet<String>> tf_to_matrixID = new HashMap<>();
+        HashMap<String, HashSet<String>> tf_to_matrixID = new HashMap<>();
         BufferedReader br_jaspar_input = new BufferedReader(new FileReader(f_output_jaspar_downloaded));
         String line_jaspar = "";
-        while((line_jaspar= br_jaspar_input.readLine())!=null)
+        while ((line_jaspar = br_jaspar_input.readLine()) != null)
         {
-            if(line_jaspar.startsWith(">"))
+            if (line_jaspar.startsWith(">"))
             {
                 String[] split = line_jaspar.split("\t");
                 String matrixID = split[0].substring(1);
                 String tf = split[1].toUpperCase();
 
-                if(tf_to_matrixID.containsKey(tf))
+                if (tf_to_matrixID.containsKey(tf))
                 {
                     tf_to_matrixID.get(tf).add(matrixID);
-                }
-                else
+                } else
                 {
                     HashSet<String> x = new HashSet<>();
                     x.add(matrixID);
-                    tf_to_matrixID.put(tf,x);
+                    tf_to_matrixID.put(tf, x);
                 }
             }
         }
         br_jaspar_input.close();
 
-        logger.logLine("[LOGOS] Retrieve additional information from JASPAR API: " +options_intern.jaspar_api_call_front);
+        logger.logLine(
+                "[LOGOS] Retrieve additional information from JASPAR API: " + options_intern.jaspar_api_call_front);
         logger.logLine("[LOGOS] Retrieve sequence logos from JASPAR: " + options_intern.jaspar_logo_download_url);
 
-        for(int i = 0; i < ordered_tfs_dcg.size(); i++)
+        for (int i = 0; i < ordered_tfs_dcg.size(); i++)
         {
             int rank = i + 1;
             String tf_name = ordered_tfs_dcg.get(i);
@@ -3793,16 +3854,18 @@ public class COM2POSE_lib
             File f_tf = new File(f_logos_tf_sequence_root.getAbsolutePath() + File.separator + rank + "_" + tf_name);
             f_tf.mkdirs();
 
-            if(tf_to_matrixID.containsKey(tf_name))
+            if (tf_to_matrixID.containsKey(tf_name))
             {
                 HashSet<String> matrix_ids = tf_to_matrixID.get(tf_name);
 
-                for(String key_matrix : matrix_ids)
+                for (String key_matrix : matrix_ids)
                 {
                     //get json via curls
-                    String curl =
-                            "curl '"+options_intern.jaspar_api_call_front+key_matrix+"/'"+options_intern.jaspar_api_call_end + " -o " + f_tf.getAbsolutePath()+File.separator+key_matrix+options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_json;
-                    File f_curl = new File(f_tf.getAbsolutePath()+File.separator+key_matrix+options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_bash);
+                    String curl = "curl '" + options_intern.jaspar_api_call_front + key_matrix + "/'" +
+                            options_intern.jaspar_api_call_end + " -o " + f_tf.getAbsolutePath() + File.separator +
+                            key_matrix + options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_json;
+                    File f_curl = new File(f_tf.getAbsolutePath() + File.separator + key_matrix +
+                            options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_bash);
                     BufferedWriter bw_curl = new BufferedWriter(new FileWriter(f_curl));
                     bw_curl.write("bin_bash");
                     bw_curl.newLine();
@@ -3838,9 +3901,11 @@ public class COM2POSE_lib
 
                     //get logos via static file download
                     // Create a new trust manager that trust all certificates
-                    File f_matrix_svg = new File(f_tf.getAbsolutePath()+File.separator+key_matrix+options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg);
-                    String matrix_svg_download_url = options_intern.jaspar_logo_download_url+key_matrix+options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg;
-                    if(!f_matrix_svg.exists())
+                    File f_matrix_svg = new File(f_tf.getAbsolutePath() + File.separator + key_matrix +
+                            options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg);
+                    String matrix_svg_download_url = options_intern.jaspar_logo_download_url + key_matrix +
+                            options_intern.file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg;
+                    if (!f_matrix_svg.exists())
                     {
                         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager()
                         {
@@ -3938,8 +4003,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
             }
@@ -4968,8 +5035,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 String symbol = split[1].toUpperCase();
 
@@ -6993,8 +7062,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 ensg_gene_symbol_map.put(split[0], split[1]);
             }
@@ -7173,8 +7244,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 symbol_ensg_map.put(split[1].toUpperCase(), split[0].toUpperCase());
             }
@@ -8562,8 +8635,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_gene_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
 
                 if (composed_tfs.containsKey(split[0]))
                 {
@@ -9264,8 +9339,10 @@ public class COM2POSE_lib
                                 String[] split = line_ensg_symb.split("\t");
                                 if (split.length > 1)
                                 {
-                                    if(split[1].equals(""))
+                                    if (split[1].equals(""))
+                                    {
                                         continue;
+                                    }
 
                                     ensg_symb.put(split[1].toUpperCase(), split[0]);
                                 }
@@ -9503,8 +9580,10 @@ public class COM2POSE_lib
                                     String[] split = line_ensg_symb.split("\t");
                                     if (split.length > 1)
                                     {
-                                        if(split[1].equals(""))
+                                        if (split[1].equals(""))
+                                        {
                                             continue;
+                                        }
 
                                         ensg_symb.put(split[1].toUpperCase(), split[0]);
                                     }
@@ -11507,7 +11586,8 @@ public class COM2POSE_lib
                                     "[TEPIC-TGENE] using only tgene linked target genes for TF-Gene score calculation.");
                         }
 
-                        command_tail_sample += " -S " + output_sample.getAbsolutePath() + File.separator + options_intern.file_suffix_tepic_output_trap_sequences;
+                        command_tail_sample += " -S " + output_sample.getAbsolutePath() + File.separator +
+                                options_intern.file_suffix_tepic_output_trap_sequences;
 
                         String command_execute = command_sample + command_tail_sample;
                         logger.logLine("[TEPIC] execute TEPIC with command line: " + command_execute);
@@ -11866,33 +11946,33 @@ public class COM2POSE_lib
 
         StringBuilder sb_script = new StringBuilder();
 
-        sb_script.append("if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" +
-                "  install.packages(\"BiocManager\")\n" + "\n" +
-                "if (!requireNamespace(\"biomaRt\", quietly = TRUE))\n" + "  BiocManager::install(\"biomaRt\")\n" +
-                "\n" + "library('biomaRt')\n" + "httr::set_config(httr::config(ssl_verifypeer = FALSE))\n" + "\n" +
-                "input<-read.csv('"+f_data_input.getAbsolutePath()+"', sep = '\\t')\n" +
-                "input_ensg<-input$ensembl_gene_id\n" + "not_done=TRUE\n" + "\n" + "G_list= data.frame()\n" + "\n" +
-                "while(not_done)\n" + "{\n" + "  tryCatch({\n" +
-                "    mart <- useDataset(\""+options_intern.deseq2_biomart_dataset_species+"\", useMart(\"ensembl\"))" +
-                "\n" + "    #df$id <- NA\n" +
-                "    G_list_intern <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\",\"band\"),values=input_ensg,mart= mart)\n" +
-                "    G_list=rbind(G_list,G_list_intern)\n" + "    not_done=FALSE\n" + "  }, warning = function(w) {\n" +
-                "    print(\"WARNING SECTION\")\n" + "    print(w)\n" + "  }, error = function(e) {\n" +
-                "    print(\"ERROR SECTION\")\n" + "    print(e)\n" + "  }, finally = {\n" + "  })\n" + "}\n" + "\n" +
-                "G_list<-merge(G_list, input, by.x = \"ensembl_gene_id\", by.y = \"ensembl_gene_id\")\n" +
-                "G_list<-G_list[,c(7,2,3,4,5,6,1)]\n" +
-                "write.table(G_list,\""+f_data_prev.getAbsolutePath()+"\", row.names = FALSE, quote = F, sep=\"\\t\")" +
-                "\n" +
-                "not_done=TRUE\n" + "while (not_done) {\n" + "  tryCatch({\n" +
-                "    #check which genome version we have in biomart\n" + "    \n" +
-                "    ensembl <- useEnsembl(biomart = \"genes\")\n" + "    datasets <- listDatasets(ensembl)\n" +
-                "    used_dataset=searchDatasets(mart = ensembl, pattern = \""+options_intern.deseq2_biomart_dataset_species+"\")\n" +
-                "    version=used_dataset[,3]\n" + "    version=as.character(version)\n" +
-                "    fileConn<-file(\""+f_data_version.getAbsolutePath()+"\")\n" +
-                "    writeLines(version, fileConn)\n" + "    \n" + "    not_done=FALSE\n" +
-                "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" + "    print(w)\n" +
-                "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" + "    print(e)\n" +
-                "  }, finally = {\n" + "  })\n" + "}\n" + "\n");
+        sb_script.append(
+                "if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" + "  install.packages(\"BiocManager\")\n" +
+                        "\n" + "if (!requireNamespace(\"biomaRt\", quietly = TRUE))\n" +
+                        "  BiocManager::install(\"biomaRt\")\n" + "\n" + "library('biomaRt')\n" +
+                        "httr::set_config(httr::config(ssl_verifypeer = FALSE))\n" + "\n" + "input<-read.csv('" +
+                        f_data_input.getAbsolutePath() + "', sep = '\\t')\n" + "input_ensg<-input$ensembl_gene_id\n" +
+                        "not_done=TRUE\n" + "\n" + "G_list= data.frame()\n" + "\n" + "while(not_done)\n" + "{\n" +
+                        "  tryCatch({\n" + "    mart <- useDataset(\"" + options_intern.deseq2_biomart_dataset_species +
+                        "\", useMart(\"ensembl\"))" + "\n" + "    #df$id <- NA\n" +
+                        "    G_list_intern <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\"chromosome_name\",\"start_position\",\"end_position\",\"strand\",\"band\"),values=input_ensg,mart= mart)\n" +
+                        "    G_list=rbind(G_list,G_list_intern)\n" + "    not_done=FALSE\n" +
+                        "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" + "    print(w)\n" +
+                        "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" + "    print(e)\n" +
+                        "  }, finally = {\n" + "  })\n" + "}\n" + "\n" +
+                        "G_list<-merge(G_list, input, by.x = \"ensembl_gene_id\", by.y = \"ensembl_gene_id\")\n" +
+                        "G_list<-G_list[,c(7,2,3,4,5,6,1)]\n" + "write.table(G_list,\"" +
+                        f_data_prev.getAbsolutePath() + "\", row.names = FALSE, quote = F, sep=\"\\t\")" + "\n" +
+                        "not_done=TRUE\n" + "while (not_done) {\n" + "  tryCatch({\n" +
+                        "    #check which genome version we have in biomart\n" + "    \n" +
+                        "    ensembl <- useEnsembl(biomart = \"genes\")\n" + "    datasets <- listDatasets(ensembl)\n" +
+                        "    used_dataset=searchDatasets(mart = ensembl, pattern = \"" +
+                        options_intern.deseq2_biomart_dataset_species + "\")\n" + "    version=used_dataset[,3]\n" +
+                        "    version=as.character(version)\n" + "    fileConn<-file(\"" +
+                        f_data_version.getAbsolutePath() + "\")\n" + "    writeLines(version, fileConn)\n" + "    \n" +
+                        "    not_done=FALSE\n" + "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" +
+                        "    print(w)\n" + "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" +
+                        "    print(e)\n" + "  }, finally = {\n" + "  })\n" + "}\n" + "\n");
 /*
         sb_script.append(
                 "if (!requireNamespace(\"BiocManager\", quietly = TRUE))\n" + "  install.packages(\"BiocManager\")\n" +
@@ -11954,7 +12034,6 @@ public class COM2POSE_lib
         logger.logLine(" [PREP] -b was set. Skipping. " + command);
 
 
-
         File f_data = new File(f_output_positions_root.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
         File f_uplift_script = new File(f_output_positions_root.getAbsolutePath() + File.separator +
@@ -11976,9 +12055,10 @@ public class COM2POSE_lib
                 "    version_of_our_dat=\"" + options_intern.igv_species_ref_genome + "\"\n" + "\n");
 
         sb_pyuplift.append("    grc_dict={}\n\n");
-        for(String key_grc : options_intern.igv_GRC_synonym_dict.keySet())
+        for (String key_grc : options_intern.igv_GRC_synonym_dict.keySet())
         {
-            sb_pyuplift.append("    grc_dict['"+key_grc+"']='"+options_intern.igv_GRC_synonym_dict.get(key_grc)+"'\n");
+            sb_pyuplift.append(
+                    "    grc_dict['" + key_grc + "']='" + options_intern.igv_GRC_synonym_dict.get(key_grc) + "'\n");
         }
         sb_pyuplift.append("    version = []\n" + "    with open(path_to_version) as file:\n" +
                 "        version=file.readlines()\n" + "\n" + "    version = version.__getitem__(0).rstrip(\"\\n\")\n");
@@ -11986,34 +12066,34 @@ public class COM2POSE_lib
         sb_pyuplift.append("    version_convert_from = grc_dict.get(version)\n");
         sb_pyuplift.append("    please_convert = True\n");
 
-        sb_pyuplift.append("    if(version_of_our_dat == version_convert_from):\n" + "        please_convert" +
-            "=False" +
-            "\n" + "\n" +
-                "\n" + "    df = pd.read_csv(path_to_X, sep=\"\\t\")\n" + "\n" + "    data_output = []\n" + "\n" +
-                "    column_names=[]\n" + "\n" + "    for col in df.columns:\n" + "        column_names.append(col)\n");
+        sb_pyuplift.append(
+                "    if(version_of_our_dat == version_convert_from):\n" + "        please_convert" + "=False" + "\n" +
+                        "\n" + "\n" + "    df = pd.read_csv(path_to_X, sep=\"\\t\")\n" + "\n" +
+                        "    data_output = []\n" + "\n" + "    column_names=[]\n" + "\n" +
+                        "    for col in df.columns:\n" + "        column_names.append(col)\n");
         sb_pyuplift.append(
                 "    if please_convert:\n" + "        converter = LiftOver(version_convert_from, version_of_our_dat)" +
-                        "\n" +
-                "    for index, row in df.iterrows():\n" + "        mgi_symbol = row[column_names.__getitem__(0)]\n" +
-                "        chromosome_not_edited=str(row[column_names.__getitem__(1)])\n" +
-                "        chromosome = \"chr\" + str(row[column_names.__getitem__(1)])\n" +
-                "        start_position = row[column_names.__getitem__(2)]\n" +
-                "        end_position = row[column_names.__getitem__(3)]\n" +
-                "        strand = row[column_names.__getitem__(4)]\n" +
-                "        band = row[column_names.__getitem__(5)]\n" + "\n" +
-                "        ensg = row[column_names.__getitem__(6)]\n" + "\n" +
-                "        search_string = chromosome+\":\"+str(start_position)+\"-\"+str(end_position)\n" +
-                "        x_converted=start_position\n" + "        y_converted=end_position\n" + "\n" +
-                "        if please_convert:\n" +
-                "            x_converted, y_converted = convert(chromosome, start_position, end_position, strand, converter)\n" +
-                "            if(x_converted is None or y_converted is None):\n" + "                continue\n" + "\n" +
-                "        start_position=x_converted\n" + "        end_position=y_converted\n" + "\n" +
-                "        data_output.append([mgi_symbol,chromosome_not_edited,start_position,end_position,strand," +
-                        "band,ensg])\n" +
-                "\n" + "        #string_converted = chromosome+\":\"+x_converted+\"-\"+y_converted\n" +
-                "        #print(\"X\")\n" + "\n" +
-                "    df_converted = pd.DataFrame(data_output, columns=column_names)\n" +
-                "    df_converted.to_csv(path_to_newSave,sep=\"\\t\",index=False)\n\n" + "main()\n\n");
+                        "\n" + "    for index, row in df.iterrows():\n" +
+                        "        mgi_symbol = row[column_names.__getitem__(0)]\n" +
+                        "        chromosome_not_edited=str(row[column_names.__getitem__(1)])\n" +
+                        "        chromosome = \"chr\" + str(row[column_names.__getitem__(1)])\n" +
+                        "        start_position = row[column_names.__getitem__(2)]\n" +
+                        "        end_position = row[column_names.__getitem__(3)]\n" +
+                        "        strand = row[column_names.__getitem__(4)]\n" +
+                        "        band = row[column_names.__getitem__(5)]\n" + "\n" +
+                        "        ensg = row[column_names.__getitem__(6)]\n" + "\n" +
+                        "        search_string = chromosome+\":\"+str(start_position)+\"-\"+str(end_position)\n" +
+                        "        x_converted=start_position\n" + "        y_converted=end_position\n" + "\n" +
+                        "        if please_convert:\n" +
+                        "            x_converted, y_converted = convert(chromosome, start_position, end_position, strand, converter)\n" +
+                        "            if(x_converted is None or y_converted is None):\n" + "                continue\n" +
+                        "\n" + "        start_position=x_converted\n" + "        end_position=y_converted\n" + "\n" +
+                        "        data_output.append([mgi_symbol,chromosome_not_edited,start_position,end_position,strand," +
+                        "band,ensg])\n" + "\n" +
+                        "        #string_converted = chromosome+\":\"+x_converted+\"-\"+y_converted\n" +
+                        "        #print(\"X\")\n" + "\n" +
+                        "    df_converted = pd.DataFrame(data_output, columns=column_names)\n" +
+                        "    df_converted.to_csv(path_to_newSave,sep=\"\\t\",index=False)\n\n" + "main()\n\n");
 
         BufferedWriter bw_pyuplift = new BufferedWriter(new FileWriter(f_uplift_script));
         bw_pyuplift.write(sb_pyuplift.toString());
@@ -12026,22 +12106,23 @@ public class COM2POSE_lib
         line_biomart_version = line_biomart_version.split("\\.")[0];
 
         logger.logLine("[PREP] Uplift positions to correct genome version");
-        logger.logLine("[PREP] Our genome: " +options_intern.igv_species_ref_genome);
-        if(options_intern.igv_GRC_synonym_dict.containsKey(line_biomart_version))
+        logger.logLine("[PREP] Our genome: " + options_intern.igv_species_ref_genome);
+        if (options_intern.igv_GRC_synonym_dict.containsKey(line_biomart_version))
         {
-            logger.logLine("[PREP] Genome got from biomaRt: " + line_biomart_version + " = " + options_intern.igv_GRC_synonym_dict.get(line_biomart_version));
+            logger.logLine("[PREP] Genome got from biomaRt: " + line_biomart_version + " = " +
+                    options_intern.igv_GRC_synonym_dict.get(line_biomart_version));
 
-            if(options_intern.igv_species_ref_genome.equals(options_intern.igv_GRC_synonym_dict.get(line_biomart_version)))
+            if (options_intern.igv_species_ref_genome.equals(
+                    options_intern.igv_GRC_synonym_dict.get(line_biomart_version)))
             {
                 logger.logLine("[PREP] equal genome versions. No uplifted needed. Skipping this step.");
             }
-        }
-        else
+        } else
         {
-            logger.logLine("[ERROR] Do not have "+line_biomart_version+" in memory. Please add at igv_GRC_synonym_dict");
+            logger.logLine(
+                    "[ERROR] Do not have " + line_biomart_version + " in memory. Please add at igv_GRC_synonym_dict");
             System.exit(1);
         }
-
 
 
         String command_pyuplift = "python3 " + f_uplift_script.getAbsolutePath();
@@ -12059,7 +12140,7 @@ public class COM2POSE_lib
                 throw new Exception(message);
         }
 
-        if(options_intern.igv_enhancer_databases.size()>0)
+        if (options_intern.igv_enhancer_databases.size() > 0)
         {
             logger.logLine("[ENHANCER] Check reference genomes of Enhances DBs to currently used genomes and uplift " +
                     "if necessary.");
@@ -12067,27 +12148,29 @@ public class COM2POSE_lib
             String igv_species_symbol = options_intern.igv_species_ref_genome.replaceAll("[^A-Za-z]", "");
 
 
-            File f_output_enhancer_dbs =
-                    new File(f_output_positions_root.getAbsolutePath()+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions_enhancerDBs);
+            File f_output_enhancer_dbs = new File(f_output_positions_root.getAbsolutePath() + File.separator +
+                    options_intern.folder_name_deseq2_preprocessing_gene_positions_enhancerDBs);
             f_output_enhancer_dbs.mkdir();
 
-            File f_input_enhancerdbs_root =
-                    new File(options_intern.path_to_COM2POSE+File.separator+options_intern.folder_ext+File.separator+options_intern.folder_enhancerDB);
+            File f_input_enhancerdbs_root = new File(
+                    options_intern.path_to_COM2POSE + File.separator + options_intern.folder_ext + File.separator +
+                            options_intern.folder_enhancerDB);
 
             StringBuilder sb_merged_dbs = new StringBuilder();
-            sb_merged_dbs.append(options_intern.enhancerDB_bed_format+"\n");
+            sb_merged_dbs.append(options_intern.enhancerDB_bed_format + "\n");
 
-            for(String enhancer_db : options_intern.igv_enhancer_databases)
+            for (String enhancer_db : options_intern.igv_enhancer_databases)
             {
-                File f_input_enhancerdbs_DB =
-                        new File(f_input_enhancerdbs_root.getAbsolutePath()+File.separator+enhancer_db+options_intern.enhancerDB_bed_suffix);
+                File f_input_enhancerdbs_DB = new File(
+                        f_input_enhancerdbs_root.getAbsolutePath() + File.separator + enhancer_db +
+                                options_intern.enhancerDB_bed_suffix);
 
-                File f_output_filtered_db =
-                        new File(f_output_enhancer_dbs.getAbsolutePath()+File.separator+enhancer_db+"_prev" +
+                File f_output_filtered_db = new File(
+                        f_output_enhancer_dbs.getAbsolutePath() + File.separator + enhancer_db + "_prev" +
                                 options_intern.enhancerDB_bed_suffix);
 
                 StringBuilder sb_specific_db = new StringBuilder();
-                sb_specific_db.append(options_intern.enhancerDB_bed_format+"\n");
+                sb_specific_db.append(options_intern.enhancerDB_bed_format + "\n");
 
                 boolean needUplift = true;
 
@@ -12098,28 +12181,28 @@ public class COM2POSE_lib
 
                 String ref_genome_before = "";
 
-                while ((line_db= br_db.readLine())!=null)
+                while ((line_db = br_db.readLine()) != null)
                 {
                     String[] split = line_db.split("\t");
                     String species_refgenome = split[4];
                     String species_code = species_refgenome.replaceAll("[^A-Za-z]", "");
 
-                    if(species_code.equals(igv_species_symbol))
+                    if (species_code.equals(igv_species_symbol))
                     {
-                        if(species_refgenome.equals(options_intern.igv_species_ref_genome))
+                        if (species_refgenome.equals(options_intern.igv_species_ref_genome))
                         {
                             sb_merged_dbs.append(line_db);
                             sb_merged_dbs.append("\n");
-                            needUplift=false;
+                            needUplift = false;
                             continue;
                         }
 
-                        if(ref_genome_before.equals(""))
+                        if (ref_genome_before.equals(""))
                         {
-                            ref_genome_before=species_refgenome;
+                            ref_genome_before = species_refgenome;
                         }
 
-                        if(!species_refgenome.equals(ref_genome_before))
+                        if (!species_refgenome.equals(ref_genome_before))
                         {
                             continue;
                         }
@@ -12130,20 +12213,23 @@ public class COM2POSE_lib
                 }
                 br_db.close();
 
-                if(needUplift)
+                if (needUplift)
                 {
                     BufferedWriter bw_out_not_uplifted = new BufferedWriter(new FileWriter(f_output_filtered_db));
                     bw_out_not_uplifted.write(sb_specific_db.toString());
                     bw_out_not_uplifted.close();
 
-                    File f_not_upliftedDB = new File(f_output_enhancer_dbs.getAbsolutePath()+File.separator+enhancer_db+
-                            "_prev"+options_intern.enhancerDB_bed_suffix);
+                    File f_not_upliftedDB = new File(
+                            f_output_enhancer_dbs.getAbsolutePath() + File.separator + enhancer_db + "_prev" +
+                                    options_intern.enhancerDB_bed_suffix);
 
-                    File f_upliftedDB = new File(f_output_enhancer_dbs.getAbsolutePath()+File.separator+enhancer_db+options_intern.enhancerDB_bed_suffix);
+                    File f_upliftedDB = new File(
+                            f_output_enhancer_dbs.getAbsolutePath() + File.separator + enhancer_db +
+                                    options_intern.enhancerDB_bed_suffix);
 
-                    File f_uplift_script_enhancer =
-                            new File(f_output_enhancer_dbs.getAbsolutePath() + File.separator + enhancer_db+"_"+
-                            options_intern.file_suffix_deseq2_preprocessing_gene_positions_data_upliftpy);
+                    File f_uplift_script_enhancer = new File(
+                            f_output_enhancer_dbs.getAbsolutePath() + File.separator + enhancer_db + "_" +
+                                    options_intern.file_suffix_deseq2_preprocessing_gene_positions_data_upliftpy);
 
                     StringBuilder sb_pyuplift_db = new StringBuilder();
 
@@ -12158,10 +12244,10 @@ public class COM2POSE_lib
                             "    if(first is None or second is None):\n" + "        return None, None\n" + "\n" +
                             "    if len(first) == 0 or len(second) == 0:\n" + "        return None, None\n" + "\n" +
                             "    return str(first[0][1]), str(second[0][1])\n" + "\n" + "def main():\n" +
-                            "    path_to_X = \""+f_output_filtered_db.getAbsolutePath()+"\"\n" +
-                            "    path_to_newSave = \""+f_upliftedDB.getAbsolutePath()+"\"\n" +
-                            "\n" + "    version_of_our_dat=\""+options_intern.igv_species_ref_genome+"\"\n" +
-                            "    version_of_their_dat" + "=\""+ref_genome_before+"\"\n" + "\n" +
+                            "    path_to_X = \"" + f_output_filtered_db.getAbsolutePath() + "\"\n" +
+                            "    path_to_newSave = \"" + f_upliftedDB.getAbsolutePath() + "\"\n" + "\n" +
+                            "    version_of_our_dat=\"" + options_intern.igv_species_ref_genome + "\"\n" +
+                            "    version_of_their_dat" + "=\"" + ref_genome_before + "\"\n" + "\n" +
                             "    please_convert = True\n" + "    if(version_of_our_dat == version_of_their_dat):\n" +
                             "        please_convert=False\n" + "\n" + "\n" +
                             "    df = pd.read_csv(path_to_X, sep=\"\\t\")\n" + "\n" + "    data_output = []\n" + "\n" +
@@ -12182,8 +12268,9 @@ public class COM2POSE_lib
                             "            if(x_converted is None or y_converted is None):\n" +
                             "                continue\n" + "\n" + "        start_position=x_converted\n" +
                             "        end_position=y_converted\n" + "\n" +
-                            "        data_output.append([chromosome,start_position,end_position,mgi_symbol,'"+options_intern.igv_species_ref_genome+"'])\n" +
-                            "\n" + "        #string_converted = chromosome+\":\"+x_converted+\"-\"+y_converted\n" +
+                            "        data_output.append([chromosome,start_position,end_position,mgi_symbol,'" +
+                            options_intern.igv_species_ref_genome + "'])\n" + "\n" +
+                            "        #string_converted = chromosome+\":\"+x_converted+\"-\"+y_converted\n" +
                             "        #print(\"X\")\n" + "\n" +
                             "    df_converted = pd.DataFrame(data_output, columns=column_names)\n" +
                             "    df_converted.to_csv(path_to_newSave,sep=\"\\t\",index=False)\n" + "\n" + "main()\n");
@@ -12193,7 +12280,7 @@ public class COM2POSE_lib
                     bw_pyuplift_db.write(sb_pyuplift_db.toString());
                     bw_pyuplift_db.close();
 
-                    logger.logLine("[ENHANCER] Uplift db "+enhancer_db+" positions to correct genome version");
+                    logger.logLine("[ENHANCER] Uplift db " + enhancer_db + " positions to correct genome version");
 
                     String command_pyuplift_db = "python3 " + f_uplift_script_enhancer.getAbsolutePath();
 
@@ -12213,7 +12300,7 @@ public class COM2POSE_lib
                     BufferedReader br_input_uplifted_names =
                             new BufferedReader(new FileReader(f_upliftedDB.getAbsolutePath()));
                     String line_input_uplifted_names = br_input_uplifted_names.readLine();
-                    while((line_input_uplifted_names= br_input_uplifted_names.readLine())!=null)
+                    while ((line_input_uplifted_names = br_input_uplifted_names.readLine()) != null)
                     {
                         sb_merged_dbs.append(line_input_uplifted_names);
                         sb_merged_dbs.append("\n");
@@ -12222,8 +12309,8 @@ public class COM2POSE_lib
                 }
             }
 
-            File f_dbs_merged =
-                    new File(f_output_positions_root.getAbsolutePath()+File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+            File f_dbs_merged = new File(f_output_positions_root.getAbsolutePath() + File.separator +
+                    options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
 
             BufferedWriter bw_merged_enhancer_dbs = new BufferedWriter(new FileWriter(f_dbs_merged));
             bw_merged_enhancer_dbs.append(sb_merged_dbs.toString());
@@ -12507,8 +12594,10 @@ public class COM2POSE_lib
             String[] split = line_ensg_symbol.split("\t");
             if (split.length > 1)
             {
-                if(split[1].equals(""))
+                if (split[1].equals(""))
+                {
                     continue;
+                }
                 ensg_symbol.put(split[0], split[1]);
             }
         }
@@ -12867,7 +12956,8 @@ public class COM2POSE_lib
                         "    mart <- useDataset(\"" + options_intern.deseq2_biomart_dataset_species +
                         "\", useMart(\"ensembl\"))\n" + "    df$id <- NA\n" +
                         "    G_list_intern <- getBM(filters= \"ensembl_gene_id\", attributes= c(\"ensembl_gene_id\",\"" +
-                        options_intern.deseq2_biomart_dataset_symbol_column + "\",\"description\"),values=df$Geneid,mart= mart)\n" +
+                        options_intern.deseq2_biomart_dataset_symbol_column +
+                        "\",\"description\"),values=df$Geneid,mart= mart)\n" +
                         "    G_list=rbind(G_list,G_list_intern)\n" + "    not_done=FALSE\n" +
                         "  }, warning = function(w) {\n" + "    print(\"WARNING SECTION\")\n" + "    print(w)\n" +
                         "  }, error = function(e) {\n" + "    print(\"ERROR SECTION\")\n" + "    print(e)\n" +
@@ -13418,11 +13508,13 @@ public class COM2POSE_lib
         if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-            options_intern.tepic_input_directory = options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
-                    File.separator + options_intern.folder_name_mix_option_sample_mix;
+            options_intern.tepic_input_directory =
+                    options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
+                            File.separator + options_intern.folder_name_mix_option_sample_mix;
         }
 
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") || options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
+        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") ||
+                options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =
@@ -14819,11 +14911,11 @@ public class COM2POSE_lib
         }
 
         //fill GRC to synonym hashmap with default values
-        options_intern.igv_GRC_synonym_dict.put("GRCm39","mm39");
-        options_intern.igv_GRC_synonym_dict.put("GRCm38","mm10");
-        options_intern.igv_GRC_synonym_dict.put("GRCm37","mm9");
-        options_intern.igv_GRC_synonym_dict.put("GRCh37","hg19");
-        options_intern.igv_GRC_synonym_dict.put("GRCh38","hg38");
+        options_intern.igv_GRC_synonym_dict.put("GRCm39", "mm39");
+        options_intern.igv_GRC_synonym_dict.put("GRCm38", "mm10");
+        options_intern.igv_GRC_synonym_dict.put("GRCm37", "mm9");
+        options_intern.igv_GRC_synonym_dict.put("GRCh37", "hg19");
+        options_intern.igv_GRC_synonym_dict.put("GRCh38", "hg38");
 
         BufferedReader br = new BufferedReader(new FileReader(new File(options_intern.config_data_path)));
         String line = "";
@@ -15104,26 +15196,28 @@ public class COM2POSE_lib
                     options_intern.igv_path_to_tdf = split[1].substring(1, split[1].length() - 1);
                     break;
                 case "igv_enhancer_databases":
-                    String input_db= split[1].substring(1, split[1].length() - 1);
-                    if(input_db.length()<1)
+                    String input_db = split[1].substring(1, split[1].length() - 1);
+                    if (input_db.length() < 1)
+                    {
                         continue;
+                    }
 
                     String[] enhancer_databases = input_db.split(";");
                     options_intern.igv_enhancer_databases.addAll(Arrays.asList(enhancer_databases));
                     break;
                 case "igv_GRC_synonym_dict":
-                    String input= split[1].substring(1, split[1].length() - 1);
-                    if(input.length()<3)
+                    String input = split[1].substring(1, split[1].length() - 1);
+                    if (input.length() < 3)
                     {
                         break;
                     }
                     String[] groups = input.split(";");
-                    for(String g : groups)
+                    for (String g : groups)
                     {
                         String[] split_groups = g.split("=");
-                        if(split_groups.length>=2)
+                        if (split_groups.length >= 2)
                         {
-                            options_intern.igv_GRC_synonym_dict.put(split_groups[0],split_groups[1]);
+                            options_intern.igv_GRC_synonym_dict.put(split_groups[0], split_groups[1]);
                         }
                     }
                     break;
@@ -15649,42 +15743,43 @@ public class COM2POSE_lib
             }
         }
 
-        if(!options_intern.igv_path_to_tdf.equals(""))
+        if (!options_intern.igv_path_to_tdf.equals(""))
         {
             File f_igv_path_to_tdf = new File(options_intern.igv_path_to_tdf);
-            if(!f_igv_path_to_tdf.exists())
+            if (!f_igv_path_to_tdf.exists())
             {
-                all_set=false;
-                logger.logLine("[IGV] ERROR in igv_path_to_tdf. File path does not exist! Needs to follow " +
-                        "structure of " +
-                        "tepic_input_directory.");
+                all_set = false;
+                logger.logLine(
+                        "[IGV] ERROR in igv_path_to_tdf. File path does not exist! Needs to follow " + "structure of " +
+                                "tepic_input_directory.");
             }
         }
 
-        if(options_intern.igv_enhancer_databases.size()>0)
+        if (options_intern.igv_enhancer_databases.size() > 0)
         {
             //check if database files exists
             //check if format is correct
-            File f_input_root =
-                    new File(options_intern.path_to_COM2POSE+File.separator+options_intern.folder_ext+File.separator+options_intern.folder_enhancerDB);
-            for(String db : options_intern.igv_enhancer_databases)
+            File f_input_root = new File(
+                    options_intern.path_to_COM2POSE + File.separator + options_intern.folder_ext + File.separator +
+                            options_intern.folder_enhancerDB);
+            for (String db : options_intern.igv_enhancer_databases)
             {
-                File f_input_db = new File(f_input_root.getAbsolutePath()+File.separator+db+".bed");
-                if(!f_input_db.exists())
+                File f_input_db = new File(f_input_root.getAbsolutePath() + File.separator + db + ".bed");
+                if (!f_input_db.exists())
                 {
-                    all_set=false;
-                    logger.logLine("[ENHANCER] BED for database does not exist in "+options_intern.folder_ext+File.separator+options_intern.folder_enhancerDB+
-                            ": " + db);
-                }
-                else
+                    all_set = false;
+                    logger.logLine("[ENHANCER] BED for database does not exist in " + options_intern.folder_ext +
+                            File.separator + options_intern.folder_enhancerDB + ": " + db);
+                } else
                 {
                     BufferedReader br = new BufferedReader(new FileReader(f_input_db));
-                    String line = br.readLine();;
+                    String line = br.readLine();
+                    ;
                     br.close();
 
-                    if(!line.equals(options_intern.enhancerDB_bed_format))
+                    if (!line.equals(options_intern.enhancerDB_bed_format))
                     {
-                        all_set=false;
+                        all_set = false;
                         logger.logLine("[ENHANCER] BED format corrupted. Needs to have this format: ");
                         logger.logLine("[ENHANCER] " + options_intern.enhancerDB_bed_format);
                     }
@@ -17078,7 +17173,8 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = f_output_hm.getAbsolutePath();
         }
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") || options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
+        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") ||
+                options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
         {
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory =
@@ -17109,7 +17205,8 @@ public class COM2POSE_lib
         }
     }
 
-    private void igv_save_sessions(File f_output_file, String load_command, ArrayList<File> tdf_files) throws IOException
+    private void igv_save_sessions(File f_output_file, String load_command, ArrayList<File> tdf_files)
+            throws IOException
     {
         //save sessions
 
@@ -17127,11 +17224,11 @@ public class COM2POSE_lib
         String response_load_sessoin = in_session.readLine();
 
         //remodel tdf files if available
-        if(tdf_files.size()>0)
+        if (tdf_files.size() > 0)
         {
             String response_session_tdf = "";
 
-            for(File f_tdf : tdf_files)
+            for (File f_tdf : tdf_files)
             {
                 out_session.println("setLogScale " + f_tdf.getName());
                 response_session_tdf = in_session.readLine();
@@ -17144,14 +17241,16 @@ public class COM2POSE_lib
         }
 
         //include enhancer regions of interest if available
-        if(options_intern.igv_enhancer_databases.size()>0)
+        if (options_intern.igv_enhancer_databases.size() > 0)
         {
-            File f_merged_databases =
-                    new File(options_intern.com2pose_working_directory+File.separator+ options_intern.folder_name_deseq2_preprocessing+File.separator+options_intern.folder_name_deseq2_preprocessing_gene_positions+ File.separator+options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
+            File f_merged_databases = new File(options_intern.com2pose_working_directory + File.separator +
+                    options_intern.folder_name_deseq2_preprocessing + File.separator +
+                    options_intern.folder_name_deseq2_preprocessing_gene_positions + File.separator +
+                    options_intern.file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs);
 
             BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases));
             String line_mergedDB = br_mergedDB.readLine();
-            while((line_mergedDB= br_mergedDB.readLine())!=null)
+            while ((line_mergedDB = br_mergedDB.readLine()) != null)
             {
                 String[] split = line_mergedDB.split("\t");
 
@@ -17177,5 +17276,51 @@ public class COM2POSE_lib
         response_session = in_session.readLine();
 
         socket_session.close();
+    }
+
+    public void generateHeatmaps() throws IOException, InterruptedException
+    {
+        String script;
+
+
+        script = Files.readString(
+                new File(options_intern.path_to_COM2POSE + File.separator + options_intern.script_heatmaps).toPath());
+
+
+        script = script.replace("{TARGET_GENES_PATH}", options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_out_target_genes_dcg);
+        script = script.replace("{MAP_PATH}", options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                options_intern.file_suffix_deseq2_mapping);
+        script = script.replace("{PREPROCESSING_PATH}", options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                options_intern.folder_name_deseq2_preprocessing_combined);
+        script = script.replace("{HEATMAP_DIR}",
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_heatmap);
+
+        script = script.replace("{ NUMBER_OF_GENES }", String.valueOf(options_intern.plot_top_k_genes));
+
+        File targetFile = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.file_out_heatmap_script);
+
+        if (!targetFile.exists())
+        {
+            targetFile.getParentFile().mkdirs();
+            targetFile.createNewFile();
+        }
+
+        Files.writeString(targetFile.toPath(), script);
+
+        String command = "Rscript " + targetFile.getAbsolutePath();
+
+        Process child = Runtime.getRuntime().exec(command);
+        int code = child.waitFor();
+        switch (code)
+        {
+            case 0:
+                break;
+            case 1:
+                logger.logLine("Error during heatmap generation.");
+        }
     }
 }
