@@ -191,10 +191,10 @@ function update_image(selection, combinations) {
     let active_dropdown = document.getElementById(selection + "-dropdown").value;
 
     let image = document.getElementById(selection + "-image");
-    image.src = active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
+    image.src = selection + "/" + active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
 
     let modal_image = document.getElementById(selection + "-modal-image");
-    modal_image.src = active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
+    modal_image.src = selection + "/" + active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
 
     let possibleGenes = combinations[active_group][active_subgroup];
     let modal_caption = document.getElementById(selection + "-modal-caption");
