@@ -133,6 +133,9 @@ public class COM2POSE
 
         }
 
+        //generate DCG target genes heatmap
+        com2pose_lib.generateHeatmaps();
+
         //shoot IGV for own TF ChIP-seq data
         if (!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))
         {
@@ -145,13 +148,14 @@ public class COM2POSE
             com2pose_lib.run_igv_on_important_loci();
         }
 
-        if(options_intern.igv_top_log2fc > 0)
+        if (options_intern.igv_top_log2fc > 0)
         {
             com2pose_lib.run_igv_top_log2gc();
         }
 
         System.out.println("X");
     }
+
 
     private static void parseArguments(String[] args, Options_intern options_intern)
     {
