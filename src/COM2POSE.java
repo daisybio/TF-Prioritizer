@@ -119,6 +119,9 @@ public class COM2POSE
         //get target genes of TFs based on dcg analysis
         com2pose_lib.get_top_k_target_genes_dcg();
 
+        //generate DCG target genes heatmap
+        com2pose_lib.generateHeatmaps();
+
         //create energy motifs of dcg genes
         com2pose_lib.create_tf_binding_logos_biophysical_tfSequence();
         com2pose_lib.create_tf_binding_logos_predicted_binding_sites();
@@ -145,13 +148,14 @@ public class COM2POSE
             com2pose_lib.run_igv_on_important_loci();
         }
 
-        if(options_intern.igv_top_log2fc > 0)
+        if (options_intern.igv_top_log2fc > 0)
         {
             com2pose_lib.run_igv_top_log2gc();
         }
 
         System.out.println("X");
     }
+
 
     private static void parseArguments(String[] args, Options_intern options_intern)
     {

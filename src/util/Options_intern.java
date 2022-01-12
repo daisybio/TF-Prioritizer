@@ -21,11 +21,12 @@ public class Options_intern
 
     public String folder_ext = "ext";
     public String folder_enhancerDB = "Enhancers_DB";
-    public String enhancerDB_bed_format="chrom\tchromStart\tchromEnd\tname\treference_genome";
-    public String enhancerDB_bed_suffix=".bed";
+    public String enhancerDB_bed_format = "chrom\tchromStart\tchromEnd\tname\treference_genome";
+    public String enhancerDB_bed_suffix = ".bed";
 
     public String bin_bash = "#!/bin/bash";
-    public String jaspar_download_url = "https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_redundant_pfms_jaspar.txt";
+    public String jaspar_download_url =
+            "https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_redundant_pfms_jaspar.txt";
     public String jaspar_api_call_front = "https://jaspar.genereg.net/api/v1/matrix/";
     public String jaspar_api_call_end = " -H 'Accept: application/json'";
     public String jaspar_logo_download_url = "https://jaspar.genereg.net/static/logos/all/svg/";
@@ -132,8 +133,8 @@ public class Options_intern
     public String folder_out_distribution_logos_biophysiscal_model = "01_BIOPHYSICAL_MODEL";
     public String folder_out_distribution_logos_TF_sequence = "02_TF_SEQUENCE";
     public String folder_out_distribution_logos_TF_sequence_jaspar = "00_JASPAR";
-    public String folder_out_distribution_logos_binding_sequence ="03_TF_BINDING_SEQUENCE";
-    public String folder_out_distribution_logos_binding_sequence_data ="01_DATA";
+    public String folder_out_distribution_logos_binding_sequence = "03_TF_BINDING_SEQUENCE";
+    public String folder_out_distribution_logos_binding_sequence_data = "01_DATA";
     public String folder_out_website = "Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -162,6 +163,8 @@ public class Options_intern
     public String folder_out_igv_top_log2fc_upregulated = "01_upregulated";
     public String folder_out_igv_top_log2fc_downregulated = "02_downregulated";
 
+    public String folder_out_heatmap = folder_out_distribution + File.separator + "11_DCG_TARGET_GENES_HEATMAP";
+    public String file_out_heatmap_script = folder_out_heatmap + File.separator + "heatmap.R";
 
     public String file_suffix_deseq2_mapping = "ENSG_SYMBOL_MAP.csv";
     public String file_suffix_deseq2_preprocessing_meanCounts = "_meanCounts.txt";
@@ -174,7 +177,7 @@ public class Options_intern
     public String file_suffix_deseq2_preprocessing_gene_positions_data_prev_version = "version.csv";
     public String file_suffix_deseq2_preprocessing_gene_positions_data_upliftpy = "uplift_positions.py";
     public String file_suffix_deseq2_preprocessing_gene_positions_merged_enhancer_dbs =
-            "mergedEnhancerDBs"+enhancerDB_bed_suffix;
+            "mergedEnhancerDBs" + enhancerDB_bed_suffix;
     public String file_suffix_deseq2_preprocessing_gene_positions_data = "gene_positions.csv";
     public String file_suffix_deseq2_output_DYNAMITE = "_DYNAMITE.tsv";
     public String file_suffix_tepic_output_regions_to_target_genes = "regions_to_target_genes.csv";
@@ -216,10 +219,13 @@ public class Options_intern
     public String file_suffix_distribution_analysis_energymatrix_logo_jaspar_svg = ".svg";
     public String file_suffix_distribution_analysis_predictedSequences_logo_fasta = ".fa";
     public String file_suffix_distribution_analysis_predictedSequences_logo_frequencies_script = "calc_frequencies.R";
-    public String file_suffix_distribution_analysis_predictedSequences_logo_frequencies ="_frequencies.motif";
+    public String file_suffix_distribution_analysis_predictedSequences_logo_frequencies = "_frequencies.motif";
     public String file_suffix_chip_atlas_list_zipped = "chip_atlas_file_list.zip";
     public String file_suffix_chip_atlas_list_csv = "chip_atlas_file_list.csv";
     public String file_suffix_session = "session.xml";
+
+    public String scripts = "scripts";
+    public String script_heatmaps = scripts + File.separator + "heatmap.R";
 
     public String html_report_home_home = "HOME.html";
     public String html_report_home_regression_coefficient_analysis = "HOME_REGRESSION.html";
@@ -235,7 +241,7 @@ public class Options_intern
     public String analysis_types_regression_coefficient_analysis = "REGRESSION_COEFFICIENT";
 
 
-    public String directory_for_tepic_scripts = folder_ext+ File.separator + "TEPIC" + File.separator + "TEPIC";
+    public String directory_for_tepic_scripts = folder_ext + File.separator + "TEPIC" + File.separator + "TEPIC";
     public String directory_for_tepic_scripts_code = directory_for_tepic_scripts + File.separator + "Code";
     public String directory_for_tepic_scripts_code_tepic_sh =
             directory_for_tepic_scripts_code + File.separator + "TEPIC.sh";
@@ -427,7 +433,7 @@ public class Options_intern
     public String plot_distribution_analysis_score_type = "EXCL_GENE_COUNTS";
     //#[OPT]: TRAP predicted sequence logos affinity cutoff (default: 0.05) must be set - do not try to leave this
     // one blank!
-    public double plot_trap_predicted_sequence_logos_affinity_cutoff=0.05;
+    public double plot_trap_predicted_sequence_logos_affinity_cutoff = 0.05;
 
     /*#########################
       ####WEBSITE parameters###
@@ -460,9 +466,9 @@ public class Options_intern
     //#[OPT]: path to igv.sh, if not set no images of the top target genes of the discounted cumulative gain TFs will be taken
     public String igv_path_to_igv = "";
     //#[OPT]: include extra lncRNA, pseudogenes, etc. in top_log2fc (default: true)
-    public int igv_top_log2fc=15;
+    public int igv_top_log2fc = 15;
     //#[OPT] shot pics of most differentially expressed genes (top log2fc +/-) (default: 15, meaning 30 pics per group)
-    public boolean igv_top_log2fc_include_lncRNA_pseudogenes=true;
+    public boolean igv_top_log2fc_include_lncRNA_pseudogenes = true;
     //#[OPT] ChIP-seq names, which should be included in own ChIP-seq data defined in tepic_input_directory
     //#e.g., "H3K27ac;Pol2"
     public ArrayList<String> igv_include_prediction_data = new ArrayList<>();
@@ -472,15 +478,15 @@ public class Options_intern
     //#[OPT]: path to tf chip_seq data, of which you want to take images for target genes to see peaks
     public String igv_path_to_tf_chip_seq = "";
     //#[OPT]: path to bigWig files (same structure as ChIP-seq or ATAC-seq)
-    public String igv_path_to_tdf="";
+    public String igv_path_to_tdf = "";
     //#[OPT]: Enhancer Database Names, are shown as region of interestens in igv
     //#we provide ENdb, however you can include more databases - need to be the same format as ENdb.txt in ext/Enhancers_DB
     //#you need to add your file there and the txt name here
     //#(e.g., "ENdb;otherDatabase")
-    public ArrayList<String> igv_enhancer_databases= new ArrayList<>();
+    public ArrayList<String> igv_enhancer_databases = new ArrayList<>();
     //#[OPT] dictionary of GRC to synonyms (e.g., GRCh38=hg19 or GRCm39=mm39), GRCh and GRCm are already included
     //#format= "GRCx1=symbol1;GRCx2=symbol2"
-    public HashMap<String,String> igv_GRC_synonym_dict= new HashMap<>();
+    public HashMap<String, String> igv_GRC_synonym_dict = new HashMap<>();
     //#[OPT] port number of igv, default = 60151
     public int igv_port_number = 60151;
     //#[OPT] igv species name for reference genome
@@ -511,7 +517,7 @@ public class Options_intern
     ####################################*/
 
     public String rna_seq_conversion_input = "";
-    public String rna_seq_input_format ="";
+    public String rna_seq_input_format = "";
     public ArrayList<String> rna_seq_groups = new ArrayList<>();
     public boolean rna_seq_cut_to_integer = false;
     public String rna_seq_conversion_biomart_species_name = "";
