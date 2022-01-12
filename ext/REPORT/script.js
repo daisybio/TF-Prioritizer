@@ -153,7 +153,7 @@ function select_subgroup(selection, element, combinations) {
         option.value = possible_dropdown_values[m];
 
         let text;
-        if (/[1-9]+_*/.test(possible_dropdown_values[m])) {
+        if (/^[0-9]+_*/.test(possible_dropdown_values[m])) {
             text = possible_dropdown_values[m].substring(possible_dropdown_values[m].split("_")[0].length + 1)
         } else {
             text = possible_dropdown_values[m];
