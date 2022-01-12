@@ -211,3 +211,12 @@ function get_active_element(className) {
         }
     }
 }
+
+function open_all_panels() {
+    let panels = document.getElementsByClassName("panel");
+
+    let i;
+    for (i = 0; i < panels.length; i++) {
+        panels[i].style.display = "grid";
+    }
+}
