@@ -16,23 +16,18 @@ function accordion() {
     }
 }
 
-function selector() {
+
+function selectImage(element, imageID) {
+    let setClasses = !element.classList.contains("active");
     let selectors = document.getElementsByClassName("selector");
-    let i;
+    setClass(selectors, "active", "remove");
 
-    for (i = 0; i < selectors.length; i++) {
-        selectors[i].addEventListener("click", function () {
-            let setClasses = !this.classList.contains("active");
-            setClass(selectors, "active", "remove");
+    let image = document.getElementById(imageID)
 
-            let image = document.getElementById(this.name)
+    image.src = element.value;
 
-            image.src = this.value + ".png";
-
-            if (setClasses) {
-                this.classList.toggle("active");
-            }
-        });
+    if (setClasses) {
+        element.classList.toggle("active");
     }
 }
 
