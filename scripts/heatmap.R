@@ -48,9 +48,13 @@ for (group in list.files(path = target_genes_path)) {
           file.create(target_file)
         }
 
+        # TODO: Find a cleaner solution
         # Drop the entries that contain zeros, since they make DESeq and pheatmap crash
+        # Might result in a total number of chosen elements that is smaller than the defined one.
         read_counts <- subset(chosen, select = -c(geneID))
         chosen <- chosen[apply(read_counts, 1, function(row) all(row > 0) & any(row > 1)),]
+
+
         read_counts <- subset(chosen, select = -c(geneID))
 
         # Add geneSymbols to data
