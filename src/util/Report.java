@@ -638,8 +638,10 @@ public class Report
                                 if (file.getName().endsWith(".png"))
                                 {
                                     sourceFile = file;
+                                    break;
                                 }
                             }
+                            break;
                         }
                     }
                 }
@@ -649,6 +651,73 @@ public class Report
                     copyFile(sourceFile, targetFile);
                 }
             } // BIOPHYSICAL MODEL
+
+            {
+                File sDir = new File(sourceParentDir.getAbsolutePath() + File.separator +
+                        options_intern.folder_out_distribution_logos_TF_sequence);
+
+                File targetDir = new File(
+                        options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                                File.separator + tfGroup.name + File.separator +
+                                options_intern.d_out_validation_logos_tf_sequence);
+
+                File sourceDir = null;
+
+                for (File directory : Objects.requireNonNull(sDir.listFiles()))
+                {
+                    if (directory.getName().matches("[0-9]+_.*") && directory.isDirectory())
+                    {
+                        if (directory.getName().split("_")[1].equals(tfGroup.name))
+                        {
+                            sourceDir = directory;
+                            break;
+                        }
+                    }
+                }
+
+                if (sourceDir != null)
+                {
+                    ArrayList<File> files = new ArrayList<>();
+                    for (File file : Objects.requireNonNull(sourceDir.listFiles()))
+                    {
+                        if (file.getName().endsWith(".svg"))
+                        {
+                            File targetFile = new File(targetDir.getAbsolutePath() + File.separator + file.getName());
+                            copyFile(file, targetFile);
+                            files.add(targetFile);
+                        }
+                    }
+
+                    if (files.size() > 0)
+                    {
+                        StringBuilder sb_tf_sequence = new StringBuilder();
+
+                        if (files.size() > 1)
+                        {
+                            sb_tf_sequence.append("<div class='buttonbar'>");
+                            boolean first = true;
+                            for (File file : files)
+                            {
+                                sb_tf_sequence.append(
+                                                "<button onclick=\"selectImage(this, 'tf-sequence-image')\" value='" +
+                                                        options_intern.d_out_validation_logos_tf_sequence + File.separator +
+                                                        file.getName() + "' class='selector").append(first ? " active" : "")
+                                        .append("'>");
+                                first = false;
+                                sb_tf_sequence.append(file.getName(), 0, file.getName().lastIndexOf("."));
+                                sb_tf_sequence.append("</button>");
+                            }
+                            sb_tf_sequence.append("</div>");
+                        }
+
+                        sb_tf_sequence.append("<img id='tf-sequence-image' src='" +
+                                options_intern.d_out_validation_logos_tf_sequence + File.separator +
+                                files.get(0).getName() + "'>");
+
+                        frame = frame.replace("{TF_SEQUENCE}", sb_tf_sequence.toString());
+                    }
+                }
+            } // TF Sequence
         } // LOGOS
 
         frame = relativate(frame, 2);
@@ -877,9 +946,9 @@ public class Report
 
         for (String histoneModification : existingHMs)
         {
-            sb_histoneModifications.append(
-                    "<button class=\"selector" + (first ? " active" : "") + "\" name=\"distribution-plot\" value=\"" +
-                            histoneModification + "\">" + histoneModification + "</button>");
+            sb_histoneModifications.append("<button onclick='selectImage(this, 'distribution-plot')' class=\"selector" +
+                    (first ? " active" : "") + "\" value=\"" + histoneModification + ".png\">" + histoneModification +
+                    "</button>");
             first = false;
         }
 
