@@ -18,8 +18,10 @@ function accordion() {
 
 
 function selectImage(element, imageID) {
+    let selectors = element.parentNode.children;
+
     let setClasses = !element.classList.contains("active");
-    let selectors = document.getElementsByClassName("selector");
+
     setClass(selectors, "active", "remove");
 
     let image = document.getElementById(imageID)

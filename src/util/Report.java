@@ -718,6 +718,74 @@ public class Report
                     }
                 }
             } // TF Sequence
+
+            {
+                File sDir = new File(sourceParentDir.getAbsolutePath() + File.separator +
+                        options_intern.folder_out_distribution_logos_binding_sequence);
+
+                File targetDir = new File(
+                        options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                                File.separator + tfGroup.name + File.separator +
+                                options_intern.d_out_validation_logos_tf_binding_sequence);
+
+                File sourceDir = null;
+
+                for (File directory : Objects.requireNonNull(sDir.listFiles()))
+                {
+                    if (directory.getName().matches("[0-9]+_.*") && directory.isDirectory())
+                    {
+                        if (directory.getName().split("_")[1].equals(tfGroup.name))
+                        {
+                            sourceDir = directory;
+                            break;
+                        }
+                    }
+                }
+
+                if (sourceDir != null)
+                {
+                    StringBuilder sb_tf_binding_sequences = new StringBuilder();
+                    sb_tf_binding_sequences.append("<div class='buttonbar'>");
+
+                    boolean first = true;
+                    String firstImage = "";
+
+                    for (File imageFile : Objects.requireNonNull(sourceDir.listFiles()))
+                    {
+                        if (!imageFile.getName().endsWith(".png"))
+                        {
+                            continue;
+                        }
+
+                        String relevantFileName = imageFile.getName().split("_")[1];
+
+                        File targetFile =
+                                new File(targetDir.getAbsolutePath() + File.separator + relevantFileName + ".png");
+
+                        copyFile(imageFile, targetFile);
+
+                        sb_tf_binding_sequences.append("<button class='selector" + (first ? " active" : "") +
+                                "' onclick=\"selectImage(this, 'tf-binding-sequence-image')\" value='" +
+                                options_intern.d_out_validation_logos_tf_binding_sequence + File.separator +
+                                relevantFileName + ".png'>");
+                        sb_tf_binding_sequences.append(relevantFileName);
+                        sb_tf_binding_sequences.append("</button>");
+
+                        if (first)
+                        {
+                            firstImage = relevantFileName;
+                            first = false;
+                        }
+                    }
+                    sb_tf_binding_sequences.append("</div>");
+
+                    sb_tf_binding_sequences.append("<img id='tf-binding-sequence-image' src='" +
+                            options_intern.d_out_validation_logos_tf_binding_sequence + File.separator + firstImage +
+                            ".png'>");
+
+                    frame = frame.replace("{TF_BINDING_SEQUENCE}", sb_tf_binding_sequences.toString());
+                }
+            } // TF binding sequence
         } // LOGOS
 
         frame = relativate(frame, 2);
@@ -946,9 +1014,10 @@ public class Report
 
         for (String histoneModification : existingHMs)
         {
-            sb_histoneModifications.append("<button onclick='selectImage(this, 'distribution-plot')' class=\"selector" +
-                    (first ? " active" : "") + "\" value=\"" + histoneModification + ".png\">" + histoneModification +
-                    "</button>");
+            sb_histoneModifications.append(
+                    "<button onclick=\"selectImage(this, 'distribution-plot')\" " + "class=\"selector" +
+                            (first ? " active" : "") + "\" value=\"" + histoneModification + ".png\">" +
+                            histoneModification + "</button>");
             first = false;
         }
 
