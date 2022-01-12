@@ -611,6 +611,45 @@ public class Report
                     generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false));
         }
 
+        {
+            File sourceParentDir = new File(options_intern.com2pose_working_directory + File.separator +
+                    options_intern.folder_out_distribution + File.separator +
+                    options_intern.folder_out_distribution_logos);
+
+            {
+                File sourceDir = new File(sourceParentDir.getAbsolutePath() + File.separator +
+                        options_intern.folder_out_distribution_logos_biophysiscal_model);
+
+                File targetFile = new File(
+                        options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation +
+                                File.separator + tfGroup.name + File.separator + options_intern.d_out_validation_logos +
+                                File.separator + options_intern.f_out_validation_logos_biophysical_png);
+
+                File sourceFile = null;
+
+                for (File directory : Objects.requireNonNull(sourceDir.listFiles()))
+                {
+                    if (directory.getName().matches("[0-9]+_.*") && directory.isDirectory())
+                    {
+                        if (directory.getName().split("_")[1].equals(tfGroup.name))
+                        {
+                            for (File file : Objects.requireNonNull(directory.listFiles()))
+                            {
+                                if (file.getName().endsWith(".png"))
+                                {
+                                    sourceFile = file;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (sourceFile != null)
+                {
+                    copyFile(sourceFile, targetFile);
+                }
+            } // BIOPHYSICAL MODEL
+        } // LOGOS
 
         frame = relativate(frame, 2);
 
