@@ -265,6 +265,7 @@ public class Report
 
         generateHome();
         generateImportantLoci();
+        generateTopLog2fc();
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -697,10 +698,8 @@ public class Report
                             relevantFileName = relevantFileName.replace(entry, "");
                         }
 
-                        if (relevantFileName.matches("[0-9]+_.*_.*")) // Check for validation only
-                        {
-                            relevantFileName = relevantFileName.replaceAll("[0-9]+_", "");
-                        }
+
+                        relevantFileName = relevantFileName.replaceAll("_+", "_");
 
                         while (relevantFileName.endsWith("_"))
                         {
@@ -762,7 +761,10 @@ public class Report
                 for (String group : combinations.get(hm).keySet())
                 {
                     StringBuilder sb_genes = new StringBuilder("[");
-                    for (String gene : combinations.get(hm).get(group))
+                    ArrayList<String> genes = combinations.get(hm).get(group);
+                    genes.sort(new StringComparator());
+
+                    for (String gene : genes)
                     {
                         sb_genes.append("\"");
                         sb_genes.append(gene);
@@ -1064,10 +1066,51 @@ public class Report
 
         important_loci = important_loci.replace("{TITLE}", "Important loci");
         important_loci = important_loci.replace("{IMAGES}",
-                generateThreeLevelImageSelector("importantLoci", targetDir, null, true));
+                generateThreeLevelImageSelector(targetDir.getName(), targetDir, null, true));
         important_loci = relativate(important_loci, 0);
 
         writeFile(options_intern.com2pose_working_directory + File.separator +
                 options_intern.f_out_report_important_loci_html, important_loci);
+    }
+
+    private void generateTopLog2fc() throws IOException
+    {
+        File sourceDir = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv +
+                        File.separator + options_intern.folder_out_igv_top_log2fc);
+
+        File targetDir =
+                new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_top_log2fc);
+
+        String frame = loadFrame();
+        String top_log2fc = frame.replace("{BODY}", loadFile(
+                options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_top_log2fc_html));
+
+        top_log2fc = top_log2fc.replace("{TITLE}", "Top log2fc");
+        top_log2fc = top_log2fc.replace("{IMAGES}",
+                generateThreeLevelImageSelector(targetDir.getName(), sourceDir, targetDir, false));
+        top_log2fc = relativate(top_log2fc, 0);
+
+        writeFile(options_intern.com2pose_working_directory + File.separator +
+                options_intern.f_out_report_top_log2fc_html, top_log2fc);
+    }
+
+    static class StringComparator implements Comparator<String>
+    {
+        @Override public int compare(String a, String b)
+        {
+            return prefixNum(a) - prefixNum(b);
+        }
+
+        private int prefixNum(String a)
+        {
+            if (a.matches("[0-9]+_.*"))
+            {
+                return Integer.parseInt(a.split("_")[0]);
+            } else
+            {
+                return 0;
+            }
+        }
     }
 }
