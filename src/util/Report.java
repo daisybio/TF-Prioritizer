@@ -861,23 +861,9 @@ public class Report
         return true;
     }
 
+
     private boolean generateRegression(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        if (tfGroup.realGroup)
-        {
-            return generateRegression(tfGroup.name, tfGroup.regressionCoefficients);
-        } else
-        {
-            TranscriptionFactor tf = tfGroup.transcriptionFactors.get(0);
-
-            return generateRegression(tf.name, tfGroup.regressionCoefficients);
-        }
-    }
-
-    private boolean generateRegression(String name, Map<String, Map<String, Number>> regressionCoefficients)
-            throws IOException
-    {
-
         File templateFile = new File(options_intern.path_to_COM2POSE + File.separator +
                 options_intern.f_report_resources_regression_regression_html);
 
@@ -891,15 +877,17 @@ public class Report
 
         frame = frame.replace("{BODY}", loadFile(templateFile.getAbsolutePath()));
 
-        frame = frame.replace("{TFNAME}", name);
+        frame = frame.replace("{TFNAME}", tfGroup.name);
 
-        frame = frame.replace("{TITLE}", name + " - Regression");
+        frame = frame.replace("{TITLE}", tfGroup.name + " - Regression");
 
         String id = "regressionPlot";
-        File target = new File(d_out_regression.getAbsolutePath() + File.separator + name + File.separator + id);
+        File target =
+                new File(d_out_regression.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
         String three_level_image_selector = generateThreeLevelImageSelector(id, d_in_plots, target, false);
 
-        frame = frame.replace("{COEFFICIENTS}", getTabularData("regressionCoefficients", regressionCoefficients));
+        frame = frame.replace("{COEFFICIENTS}",
+                getTabularData("regressionCoefficients", tfGroup.regressionCoefficients));
 
         frame = frame.replace("{HEATMAPS}", three_level_image_selector);
 
@@ -908,7 +896,7 @@ public class Report
         frame = relativate(frame, 2);
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
-                File.separator + name + File.separator + name + ".html", frame);
+                File.separator + tfGroup.name + File.separator + tfGroup.name + ".html", frame);
 
         return true;
     }
