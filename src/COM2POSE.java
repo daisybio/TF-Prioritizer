@@ -119,6 +119,9 @@ public class COM2POSE
         //get target genes of TFs based on dcg analysis
         com2pose_lib.get_top_k_target_genes_dcg();
 
+        //generate DCG target genes heatmap
+        com2pose_lib.generateHeatmaps();
+
         //create energy motifs of dcg genes
         com2pose_lib.create_tf_binding_logos_biophysical_tfSequence();
         com2pose_lib.create_tf_binding_logos_predicted_binding_sites();
@@ -132,9 +135,6 @@ public class COM2POSE
             com2pose_lib.run_igv_chr_wide_data();
 
         }
-
-        //generate DCG target genes heatmap
-        com2pose_lib.generateHeatmaps();
 
         //shoot IGV for own TF ChIP-seq data
         if (!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))
