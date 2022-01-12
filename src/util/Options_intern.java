@@ -265,12 +265,15 @@ public class Options_intern
     public String d_out_validation = d_out_report + File.separator + "VALIDATION";
     public String d_out_distribution = d_out_report + File.separator + "DISTRIBUTION";
     public String d_out_regression = d_out_report + File.separator + "REGRESSION";
+    public String d_out_important_loci = d_out_report + File.separator + "importantLoci";
     public String f_out_report_logo_png = d_out_report + File.separator + "logo.png";
+    public String f_out_report_important_loci_html = d_out_report + File.separator + "IMPORTANT_LOCI.html";
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
     public String f_report_resources_logo_png = d_report_resources + File.separator + "logo.png";
     public String f_report_resources_three_level_image_selector_html =
             d_report_resources + File.separator + "THREE_LEVEL_IMAGE_SELECTOR.html";
+    public String f_report_resources_important_loci_html = d_report_resources + File.separator + "IMPORTANT_LOCI.html";
     public String d_report_resources_basicdata = d_report_resources + File.separator + "BASICDATA";
     public String f_report_resources_basicdata_html = d_report_resources_basicdata + File.separator + "BASICDATA.html";
     public String f_report_resources_basicdata_entry_html =

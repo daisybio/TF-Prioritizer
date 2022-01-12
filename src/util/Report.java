@@ -264,6 +264,7 @@ public class Report
         }
 
         generateHome();
+        generateImportantLoci();
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -712,9 +713,12 @@ public class Report
                         }
                     }
 
-                    copyFile(image_file, new File(
-                            targetDir.getAbsolutePath() + File.separator + group + File.separator + subgroup +
-                                    File.separator + relevantFileName + suffix));
+                    if (targetDir != null)
+                    {
+                        copyFile(image_file, new File(
+                                targetDir.getAbsolutePath() + File.separator + group + File.separator + subgroup +
+                                        File.separator + relevantFileName + suffix));
+                    }
 
                     combinations.get(group).get(subgroup).add(relevantFileName);
                 }
@@ -1018,5 +1022,52 @@ public class Report
         sb_output.append("}");
 
         return sb_output.toString();
+    }
+
+    private void generateImportantLoci() throws IOException
+    {
+        File sourceDir = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv +
+                        File.separator + options_intern.folder_out_igv_important_loci);
+
+        File targetDir = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.d_out_important_loci);
+
+
+        for (File groupFile : Objects.requireNonNull(sourceDir.listFiles()))
+        {
+            for (File imageFile : Objects.requireNonNull(groupFile.listFiles()))
+            {
+                if (!imageFile.getName().endsWith(".png"))
+                {
+                    continue;
+                }
+
+                for (String importantTf : options_intern.igv_important_locus_all_prio_tf)
+                {
+                    if (imageFile.getName().startsWith(importantTf))
+                    {
+                        File targetFile = new File(
+                                targetDir.getAbsolutePath() + File.separator + groupFile.getName() + File.separator +
+                                        importantTf + File.separator + imageFile.getName());
+
+                        copyFile(imageFile, targetFile);
+                        break;
+                    }
+                }
+            }
+        }
+
+        String frame = loadFrame();
+        String important_loci = frame.replace("{BODY}", loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_important_loci_html));
+
+        important_loci = important_loci.replace("{TITLE}", "Important loci");
+        important_loci = important_loci.replace("{IMAGES}",
+                generateThreeLevelImageSelector("importantLoci", targetDir, null, true));
+        important_loci = relativate(important_loci, 0);
+
+        writeFile(options_intern.com2pose_working_directory + File.separator +
+                options_intern.f_out_report_important_loci_html, important_loci);
     }
 }
