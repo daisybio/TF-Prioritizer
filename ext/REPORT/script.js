@@ -158,6 +158,14 @@ function select_subgroup(selection, element, combinations) {
         dropdown.appendChild(option);
     }
 
+    let leftarrow = document.getElementById(selection + "-leftarrow");
+    let rightarrow = document.getElementById(selection + "-rightarrow");
+
+    let modalleftarrow = document.getElementById(selection + "-modal-leftarrow");
+    let modalrightarrow = document.getElementById(selection + "-modal-rightarrow");
+
+    dropdown.disabled = modalleftarrow.disabled = modalrightarrow.disabled = leftarrow.disabled = rightarrow.disabled = possible_dropdown_values.length < 2;
+
     update_image(selection, combinations);
 }
 

@@ -174,11 +174,15 @@ button:hover {
     align-content: stretch;
 }
 
+select:disabled,
+select[disabled],
 button:disabled,
 button[disabled] {
     background-color: var(--disabledbutton);
 }
 
+select:disabled:hover,
+select[disabled]:hover,
 button:disabled:hover,
 button[disabled]:hover {
     background-color: var(--disabledbutton);
@@ -275,6 +279,15 @@ button.narrow {
 
 .modal.button:hover {
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal.button:disabled {
+    color: transparent;
+}
+
+.modal.button:disabled:hover {
+    cursor: default;
+    background-color: transparent;
 }
 
 .modal.close {

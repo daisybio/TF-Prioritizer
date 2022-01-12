@@ -7,9 +7,9 @@
     </div>
     <div class="buttonbar centered">
         <button onclick="openModal('{ID}-modal')">Zoom in</button>
-        <button class="narrow" onclick="move_dropdown('{ID}', -1, {ID}Combinations)">&lt;</button>
+        <button class="narrow" id="{ID}-leftarrow" onclick="move_dropdown('{ID}', -1, {ID}Combinations)">&lt;</button>
         <select name="gene" id="{ID}-dropdown" oninput="update_image('{ID}')"></select>
-        <button class="narrow" onclick="move_dropdown('{ID}', 1, {ID}Combinations)">&gt;</button>
+        <button class="narrow" id="{ID}-rightarrow" onclick="move_dropdown('{ID}', 1, {ID}Combinations)">&gt;</button>
         <button onclick="openImageInTab('{ID}-image')">Open in new tab</button>
     </div>
     <img id="{ID}-image" onclick="openModal('{ID}-modal')" class="modal source">
@@ -21,9 +21,11 @@
         <button class="modal button close" onclick="closeModal('{ID}-modal')">&times;</button>
     </div>
     <div class="buttonbar">
-        <button class="modal button" onclick="move_dropdown('{ID}', -1, {ID}Combinations)">&lt;</button>
+        <button class="modal button" id="{ID}-modal-leftarrow"onclick="move_dropdown('{ID}', -1, {ID}Combinations)">
+            &lt;</button>
         <img class="modal content" id="{ID}-modal-image">
-        <button class="modal button" onclick="move_dropdown('{ID}', 1, {ID}Combinations)">&gt;</button>
+        <button class="modal button" id="{ID}-modal-rightarrow" onclick="move_dropdown('{ID}', 1, {ID}Combinations)">
+            &gt;</button>
     </div>
 </div>
 <!--
