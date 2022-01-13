@@ -7,6 +7,10 @@ target_genes_path <- "{TARGET_GENES_PATH}"
 map_path <- "{MAP_PATH}"
 preprocessing_path <- "{PREPROCESSING_PATH}"
 heatmap_dir <- "{HEATMAP_DIR}"
+
+messagesfile <- file(paste(heatmap_dir, "messages.Rout", sep = "/"), open = "wt")
+sink(messagesfile, type = "message")
+
 number_of_genes_to_select <- { NUMBER_OF_GENES }
 map <- read.csv(map_path, sep = "\t")
 map[, 2] <- toupper(map[, 2])
@@ -31,7 +35,6 @@ for (group in list.files(path = target_genes_path)) {
       }
 
       for (group_pairing in group_pairings) {
-        print(paste(group, hm, gene, group_pairing, sep = " "))
         plot_file <- paste(target_dir, paste(group_pairing, "png", sep = "."), sep = "/")
 
         data <- read.csv(paste(preprocessing_path, group_pairing, paste(group_pairing, "csv", sep = "."), sep = "/"),
