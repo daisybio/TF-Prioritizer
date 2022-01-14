@@ -280,6 +280,8 @@ public class Options_intern
     public String f_report_resources_logo_png = d_report_resources + File.separator + "logo.png";
     public String f_report_resources_three_level_image_selector_html =
             d_report_resources + File.separator + "THREE_LEVEL_IMAGE_SELECTOR.html";
+    public String f_report_resources_two_level_image_selector_html =
+            d_report_resources + File.separator + "TWO_LEVEL_IMAGE_SELECTOR.html";
     public String f_report_resources_important_loci_html = d_report_resources + File.separator + "IMPORTANT_LOCI.html";
     public String f_report_resources_top_log2fc_html = d_report_resources + File.separator + "TOP_LOG2FC.html";
     public String d_report_resources_basicdata = d_report_resources + File.separator + "BASICDATA";
