@@ -142,6 +142,10 @@ public class COM2POSE
             com2pose_lib.run_igv_own_data();
         }
 
+        //shot IGV for dcg target gene heatmaps
+        com2pose_lib.run_igv_on_dcg_targetgenes_heatmaps();
+
+
 
         if (options_intern.igv_important_locus_all_prio_tf.size() > 0)
         {

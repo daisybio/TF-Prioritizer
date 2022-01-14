@@ -1094,6 +1094,111 @@ public class COM2POSE_lib
 
     }
 
+    public void run_igv_on_dcg_targetgenes_heatmaps() throws IOException
+    {
+        logger.logLine("[IGV] run IGV on DCG top target genes (affinity value)");
+
+        check_tepic_input_with_options();
+
+        HashMap<String, String> gene_to_coordinates = new HashMap<>();
+
+        HashMap<String, String> ensg_gene_symbol_map = new HashMap<>();
+        BufferedReader br_ensg_gene_symbol =
+                new BufferedReader(new FileReader(new File(options_intern.tepic_ensg_symbol)));
+        String line_ensg_gene_symbol = br_ensg_gene_symbol.readLine();
+        while ((line_ensg_gene_symbol = br_ensg_gene_symbol.readLine()) != null)
+        {
+            String[] split = line_ensg_gene_symbol.split("\t");
+            if (split.length > 1)
+            {
+                if (split[1].equals(""))
+                {
+                    continue;
+                }
+
+                ensg_gene_symbol_map.put(split[0].toUpperCase(), split[1].toUpperCase());
+            }
+        }
+        br_ensg_gene_symbol.close();
+
+        File f_input_gene_to_coordinates = new File(options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                options_intern.folder_name_deseq2_preprocessing_gene_positions + File.separator +
+                options_intern.file_suffix_deseq2_preprocessing_gene_positions_data);
+
+        ArrayList<String> gene_symbols = new ArrayList<>();
+
+        BufferedReader br_gene_coordinates = new BufferedReader(new FileReader(f_input_gene_to_coordinates));
+        String line_gene_coordinates = br_gene_coordinates.readLine();
+        String[] header_gene_coordinates = line_gene_coordinates.split("\t");
+        while ((line_gene_coordinates = br_gene_coordinates.readLine()) != null)
+        {
+            String[] split = line_gene_coordinates.split("\t");
+
+            if (split[1].startsWith("CHR"))
+            {
+                continue;
+            }
+
+            String gene_name = "";
+            if (split[0].equals(""))
+            {
+                gene_name = split[6];
+            } else
+            {
+                gene_name = split[0];
+            }
+
+            String chr = "chr" + split[1];
+            int begin = Integer.parseInt(split[2]);
+            int end = Integer.parseInt(split[3]);
+
+            begin -= 50000;
+            end += 50000;
+
+            String position_string = chr + ":" + begin + "-" + end;
+            gene_to_coordinates.put(gene_name.toUpperCase(), position_string);
+
+            gene_symbols.add(gene_name.toUpperCase());
+        }
+
+        File f_root_output =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_dcg_target_genes);
+        f_root_output.mkdirs();
+
+        File f_root_input =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_heatmap);
+
+        for(File f_tf : f_root_input.listFiles())
+        {
+            if(f_tf.isFile())
+            {
+                String key_tf = f_tf.getName();
+
+                File f_out_tf = new File(f_root_output.getAbsolutePath()+File.separator+key_tf);
+                f_out_tf.mkdirs();
+
+                for(File f_hm : f_tf.listFiles())
+                {
+                    if(f_hm.isFile())
+                    {
+                        String key_hm = f_hm.getName();
+                        File f_out_hm = new File(f_out_tf.getAbsolutePath()+File.separator+key_hm);
+                        f_out_hm.mkdir();
+
+
+
+                    }
+
+                }
+            }
+
+        }
+
+        logger.logLine("[IGV] finished run IGV on DCG top target genes (affinity value)");
+
+    }
+
     /**
      * run IGV on own TF ChIP-seq data.
      *
@@ -14882,6 +14987,8 @@ public class COM2POSE_lib
                 }
             }
         }
+
+        logger.logLine("[CHECK CHROMOSOMES] Chromosome checking done.");
     }
 
     /**
@@ -17280,6 +17387,8 @@ public class COM2POSE_lib
 
     public void generateHeatmaps() throws IOException, InterruptedException
     {
+        logger.logLine("[TARGET-GENES-HEATMAP] Create target gene heatmaps for all prioritized TFs.");
+
         String script;
 
 
@@ -17313,6 +17422,11 @@ public class COM2POSE_lib
 
         String command = "Rscript " + targetFile.getAbsolutePath();
 
+
+        logger.logLine("[TARGET-GENES-HEATMAP] Executing Rscript: " + command);
+        logger.logLine("[TARGET-GENES-HEATMAP] This can take up to 5 hours!");
+        logger.logLine("[TARGET-GENES-HEATMAP] waiting ...");
+
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();
         switch (code)
@@ -17320,7 +17434,9 @@ public class COM2POSE_lib
             case 0:
                 break;
             case 1:
-                logger.logLine("Error during heatmap generation.");
+                logger.logLine("[TARGET-GENES-HEATMAP] Error during heatmap generation.");
         }
+
+        logger.logLine("[TARGET-GENES-HEATMAP] Finished creating Heatmaps for target genes.");
     }
 }

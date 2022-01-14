@@ -134,7 +134,7 @@ public class Options_intern
     public String folder_out_distribution_logos_TF_sequence = "02_TF_SEQUENCE";
     public String folder_out_distribution_logos_TF_sequence_jaspar = "00_JASPAR";
     public String folder_out_distribution_logos_binding_sequence = "03_TF_BINDING_SEQUENCE";
-    public String folder_out_distribution_logos_binding_sequence_data = "01_DATA";
+    public String folder_out_distribution_logos_binding_sequence_data = "00_DATA";
     public String folder_out_website = "Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -162,6 +162,7 @@ public class Options_intern
     public String folder_out_igv_top_log2fc = "05_top_log2fc";
     public String folder_out_igv_top_log2fc_upregulated = "01_upregulated";
     public String folder_out_igv_top_log2fc_downregulated = "02_downregulated";
+    public String folder_out_igv_dcg_target_genes = "06_dcg_target_genes";
 
     public String folder_out_heatmap = folder_out_distribution + File.separator + "11_DCG_TARGET_GENES_HEATMAP";
     public String file_out_heatmap_script = folder_out_heatmap + File.separator + "heatmap.R";
