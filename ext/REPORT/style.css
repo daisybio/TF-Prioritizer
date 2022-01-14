@@ -8,6 +8,10 @@
     --black: 0, 0, 0;
 }
 
+html {
+    overflow-y: scroll;
+}
+
 .accordion {
     background-color: var(--c3);
     padding: 18px;
