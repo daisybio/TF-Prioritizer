@@ -1162,30 +1162,30 @@ public class COM2POSE_lib
             gene_symbols.add(gene_name.toUpperCase());
         }
 
-        File f_root_output =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_igv+File.separator+options_intern.folder_out_igv_dcg_target_genes);
+        File f_root_output = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv +
+                        File.separator + options_intern.folder_out_igv_dcg_target_genes);
         f_root_output.mkdirs();
 
-        File f_root_input =
-                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_heatmap);
+        File f_root_input = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_heatmap);
 
-        for(File f_tf : f_root_input.listFiles())
+        for (File f_tf : f_root_input.listFiles())
         {
-            if(f_tf.isFile())
+            if (f_tf.isFile())
             {
                 String key_tf = f_tf.getName();
 
-                File f_out_tf = new File(f_root_output.getAbsolutePath()+File.separator+key_tf);
+                File f_out_tf = new File(f_root_output.getAbsolutePath() + File.separator + key_tf);
                 f_out_tf.mkdirs();
 
-                for(File f_hm : f_tf.listFiles())
+                for (File f_hm : f_tf.listFiles())
                 {
-                    if(f_hm.isFile())
+                    if (f_hm.isFile())
                     {
                         String key_hm = f_hm.getName();
-                        File f_out_hm = new File(f_out_tf.getAbsolutePath()+File.separator+key_hm);
+                        File f_out_hm = new File(f_out_tf.getAbsolutePath() + File.separator + key_hm);
                         f_out_hm.mkdir();
-
 
 
                     }
@@ -4061,6 +4061,62 @@ public class COM2POSE_lib
 
 
         logger.logLine("[LOGOS] Finished sequence logos");
+    }
+
+
+    public void generateHeatmaps() throws IOException, InterruptedException
+    {
+        logger.logLine("[TARGET-GENES-HEATMAP] Create target gene heatmaps for all prioritized TFs.");
+
+        String script;
+
+
+        script = Files.readString(
+                new File(options_intern.path_to_COM2POSE + File.separator + options_intern.script_heatmaps).toPath());
+
+
+        script = script.replace("{TARGET_GENES_PATH}", options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_out_target_genes_dcg);
+        script = script.replace("{MAP_PATH}", options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                options_intern.file_suffix_deseq2_mapping);
+        script = script.replace("{PREPROCESSING_PATH}", options_intern.com2pose_working_directory + File.separator +
+                options_intern.folder_name_deseq2_preprocessing + File.separator +
+                options_intern.folder_name_deseq2_preprocessing_combined);
+        script = script.replace("{HEATMAP_DIR}",
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_heatmap);
+
+        script = script.replace("{ NUMBER_OF_GENES }", String.valueOf(options_intern.plot_top_k_genes));
+
+        File targetFile = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.file_out_heatmap_script);
+
+        if (!targetFile.exists())
+        {
+            targetFile.getParentFile().mkdirs();
+            targetFile.createNewFile();
+        }
+
+        Files.writeString(targetFile.toPath(), script);
+
+        String command = "Rscript " + targetFile.getAbsolutePath();
+
+
+        logger.logLine("[TARGET-GENES-HEATMAP] Executing Rscript: " + command);
+        logger.logLine("[TARGET-GENES-HEATMAP] This can take up to 5 hours!");
+        logger.logLine("[TARGET-GENES-HEATMAP] waiting ...");
+
+        Process child = Runtime.getRuntime().exec(command);
+        int code = child.waitFor();
+        switch (code)
+        {
+            case 0:
+                break;
+            case 1:
+                logger.logLine("[TARGET-GENES-HEATMAP] Error during heatmap generation.");
+        }
+
+        logger.logLine("[TARGET-GENES-HEATMAP] Finished creating Heatmaps for target genes.");
     }
 
     /**
@@ -17383,60 +17439,5 @@ public class COM2POSE_lib
         response_session = in_session.readLine();
 
         socket_session.close();
-    }
-
-    public void generateHeatmaps() throws IOException, InterruptedException
-    {
-        logger.logLine("[TARGET-GENES-HEATMAP] Create target gene heatmaps for all prioritized TFs.");
-
-        String script;
-
-
-        script = Files.readString(
-                new File(options_intern.path_to_COM2POSE + File.separator + options_intern.script_heatmaps).toPath());
-
-
-        script = script.replace("{TARGET_GENES_PATH}", options_intern.com2pose_working_directory + File.separator +
-                options_intern.folder_out_target_genes_dcg);
-        script = script.replace("{MAP_PATH}", options_intern.com2pose_working_directory + File.separator +
-                options_intern.folder_name_deseq2_preprocessing + File.separator +
-                options_intern.file_suffix_deseq2_mapping);
-        script = script.replace("{PREPROCESSING_PATH}", options_intern.com2pose_working_directory + File.separator +
-                options_intern.folder_name_deseq2_preprocessing + File.separator +
-                options_intern.folder_name_deseq2_preprocessing_combined);
-        script = script.replace("{HEATMAP_DIR}",
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_heatmap);
-
-        script = script.replace("{ NUMBER_OF_GENES }", String.valueOf(options_intern.plot_top_k_genes));
-
-        File targetFile = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.file_out_heatmap_script);
-
-        if (!targetFile.exists())
-        {
-            targetFile.getParentFile().mkdirs();
-            targetFile.createNewFile();
-        }
-
-        Files.writeString(targetFile.toPath(), script);
-
-        String command = "Rscript " + targetFile.getAbsolutePath();
-
-
-        logger.logLine("[TARGET-GENES-HEATMAP] Executing Rscript: " + command);
-        logger.logLine("[TARGET-GENES-HEATMAP] This can take up to 5 hours!");
-        logger.logLine("[TARGET-GENES-HEATMAP] waiting ...");
-
-        Process child = Runtime.getRuntime().exec(command);
-        int code = child.waitFor();
-        switch (code)
-        {
-            case 0:
-                break;
-            case 1:
-                logger.logLine("[TARGET-GENES-HEATMAP] Error during heatmap generation.");
-        }
-
-        logger.logLine("[TARGET-GENES-HEATMAP] Finished creating Heatmaps for target genes.");
     }
 }
