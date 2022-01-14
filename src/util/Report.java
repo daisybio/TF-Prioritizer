@@ -557,8 +557,8 @@ public class Report
             String id = "validationHeatmaps";
             File target =
                     new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
-            frame = frame.replace("{VALIDATION_HEATMAP}", (source == null) ? "" :
-                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), true));
+            frame = frame.replace("{VALIDATION_HEATMAP}",
+                    (source == null) ? "" : generateTwoLevelImageSelector(id, source, target));
         }
 
         {
@@ -961,6 +961,102 @@ public class Report
         three_level_image_selector = three_level_image_selector.replace("{COMBINATIONS}", json);
 
         return three_level_image_selector;
+    }
+
+    private String generateTwoLevelImageSelector(String name, File sourceDir, File targetDir) throws IOException
+    {
+        String suffix = ".png";
+        HashMap<String, ArrayList<String>> combinations = new HashMap<>();
+
+        for (File group_dir : Objects.requireNonNull(sourceDir.listFiles()))
+        {
+            if (group_dir.isFile())
+            {
+                continue;
+            }
+
+            String group = group_dir.getName();
+
+            combinations.put(group, new ArrayList<>());
+
+
+            for (File image_file : Objects.requireNonNull(group_dir.listFiles()))
+            {
+                if (image_file.isDirectory() || !image_file.getName().endsWith(suffix))
+                {
+                    continue;
+                }
+
+                String relevantFileName = image_file.getName();
+                relevantFileName = relevantFileName.replace(suffix, "");
+
+                if (targetDir != null)
+                {
+                    copyFile(image_file, new File(
+                            targetDir.getAbsolutePath() + File.separator + group + File.separator + relevantFileName +
+                                    suffix));
+                }
+
+                combinations.get(group).add(relevantFileName);
+            }
+
+        }
+
+        String two_level_image_selector = loadFile(options_intern.f_report_resources_two_level_image_selector_html);
+
+        Set<String> groups = combinations.keySet();
+        Set<String> subgroups = new HashSet<>();
+
+        {
+            StringBuilder sb_groups = new StringBuilder();
+
+            for (String group : groups)
+            {
+                subgroups.addAll(combinations.get(group));
+
+                sb_groups.append("<button class=\"{ID} group-selector\" onclick=\"select_group" + "('{ID}', this, " +
+                        "{ID}Combinations)\" " + "value=\"" + group + "\">" + group + "</button>");
+            }
+            two_level_image_selector = two_level_image_selector.replace("{GROUPS}", sb_groups.toString());
+        }
+
+        {
+            StringBuilder sb_subgroups = new StringBuilder();
+            for (String subgroup : subgroups)
+            {
+                sb_subgroups.append(
+                        "<button class=\"{ID} subgroup-selector\" onclick=\"select_subgroup" + "('{ID}', " + "this, " +
+                                "{ID}Combinations)\" " + "value=\"" + subgroup + "\">" + subgroup + "</button>");
+            }
+
+            two_level_image_selector = two_level_image_selector.replace("{SUBGROUPS}", sb_subgroups.toString());
+        }
+
+        String json;
+        {
+            HashMap<String, String> lv1 = new HashMap<>();
+
+            for (String group : combinations.keySet())
+            {
+                StringBuilder sb_subgroups = new StringBuilder("[");
+                for (String subgroup : combinations.get(group))
+                {
+                    sb_subgroups.append("\"");
+                    sb_subgroups.append(subgroup);
+                    sb_subgroups.append("\",");
+                }
+                sb_subgroups.setLength(sb_subgroups.length() - 1);
+                sb_subgroups.append("]");
+                lv1.put(group, sb_subgroups.toString());
+            }
+            json = mapToJson(lv1);
+        }
+
+        two_level_image_selector = two_level_image_selector.replace("{ID}", name);
+
+        two_level_image_selector = two_level_image_selector.replace("{COMBINATIONS}", json);
+
+        return two_level_image_selector;
     }
 
     private boolean generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException

@@ -16,7 +16,6 @@ function accordion() {
     }
 }
 
-
 function selectImage(element, imageID) {
     let selectors = element.parentNode.children;
 
@@ -104,7 +103,13 @@ function select_group(selection, element, combinations) {
         element.classList.toggle("active");
     }
 
-    let possible_subgroups = Object.keys(combinations[element.value]);
+    let possible_subgroups;
+    if (has_dropdown(selection)) {
+        possible_subgroups = Object.keys(combinations[element.value]);
+    } else {
+        possible_subgroups = combinations[element.value];
+    }
+
 
     let j;
 
@@ -140,78 +145,91 @@ function select_subgroup(selection, element, combinations) {
 
     let possible_dropdown_values = combinations[active_group.value][element.value];
 
-    let dropdown = document.getElementById(selection + "-dropdown");
-    let l, k = dropdown.options.length - 1;
+    if (has_dropdown(selection)) {
+        let dropdown = document.getElementById(selection + "-dropdown");
+        let l, k = dropdown.options.length - 1;
 
-    for (l = k; l >= 0; l--) {
-        dropdown.remove(l);
-    }
-
-    let m;
-    for (m = 0; m < possible_dropdown_values.length; m++) {
-        let option = document.createElement("option");
-        option.value = possible_dropdown_values[m];
-
-        let text;
-        if (/^[0-9]+_*/.test(possible_dropdown_values[m])) {
-            text = possible_dropdown_values[m].substring(possible_dropdown_values[m].split("_")[0].length + 1)
-        } else {
-            text = possible_dropdown_values[m];
+        for (l = k; l >= 0; l--) {
+            dropdown.remove(l);
         }
 
-        option.textContent = (m + 1) + ". " + text;
-        dropdown.appendChild(option);
+        let m;
+        for (m = 0; m < possible_dropdown_values.length; m++) {
+            let option = document.createElement("option");
+            option.value = possible_dropdown_values[m];
+
+            let text;
+            if (/^[0-9]+_*/.test(possible_dropdown_values[m])) {
+                text = possible_dropdown_values[m].substring(possible_dropdown_values[m].split("_")[0].length + 1)
+            } else {
+                text = possible_dropdown_values[m];
+            }
+
+            option.textContent = (m + 1) + ". " + text;
+            dropdown.appendChild(option);
+        }
+
+        let leftarrow = document.getElementById(selection + "-leftarrow");
+        let rightarrow = document.getElementById(selection + "-rightarrow");
+
+        let modalleftarrow = document.getElementById(selection + "-modal-leftarrow");
+        let modalrightarrow = document.getElementById(selection + "-modal-rightarrow");
+
+        dropdown.disabled = modalleftarrow.disabled = modalrightarrow.disabled = leftarrow.disabled = rightarrow.disabled = possible_dropdown_values.length < 2;
     }
-
-    let leftarrow = document.getElementById(selection + "-leftarrow");
-    let rightarrow = document.getElementById(selection + "-rightarrow");
-
-    let modalleftarrow = document.getElementById(selection + "-modal-leftarrow");
-    let modalrightarrow = document.getElementById(selection + "-modal-rightarrow");
-
-    dropdown.disabled = modalleftarrow.disabled = modalrightarrow.disabled = leftarrow.disabled = rightarrow.disabled = possible_dropdown_values.length < 2;
 
     update_image(selection, combinations);
 }
 
 function move_dropdown(selection, delta, combinations) {
-    let dropdown = document.getElementById(selection + "-dropdown");
-    let options = dropdown.children;
-    let i;
+    if (has_dropdown(selection)) {
+        let dropdown = document.getElementById(selection + "-dropdown");
+        let options = dropdown.children;
+        let i;
 
-    for (i = 0; i < options.length; i++) {
-        if (options[i].value === dropdown.value) {
-            break;
+        for (i = 0; i < options.length; i++) {
+            if (options[i].value === dropdown.value) {
+                break;
+            }
         }
+
+        i += delta;
+
+        if (i >= options.length) {
+            i = 0;
+        }
+        if (i < 0) {
+            i = options.length - 1;
+        }
+
+        dropdown.value = options[i].value;
     }
 
-    i += delta;
-
-    if (i >= options.length) {
-        i = 0;
-    }
-    if (i < 0) {
-        i = options.length - 1;
-    }
-
-    dropdown.value = options[i].value;
     update_image(selection, combinations);
 }
 
 function update_image(selection, combinations) {
     let active_group = get_active_element(selection + " group-selector").value;
     let active_subgroup = get_active_element(selection + " subgroup-selector").value;
-    let active_dropdown = document.getElementById(selection + "-dropdown").value;
+    let file_name;
+    let caption;
+
+    if (has_dropdown(selection)) {
+        let active_dropdown = document.getElementById(selection + "-dropdown").value;
+        file_name = selection + "/" + active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
+        let possibleGenes = combinations[active_group][active_subgroup];
+        caption = (possibleGenes.indexOf(active_dropdown) + 1) + ". " + active_dropdown.split("_")[1];
+    } else {
+        file_name = selection + "/" + active_group + "/" + active_subgroup + ".png";
+        caption = active_subgroup;
+    }
 
     let image = document.getElementById(selection + "-image");
-    image.src = selection + "/" + active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
-
     let modal_image = document.getElementById(selection + "-modal-image");
-    modal_image.src = selection + "/" + active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
+    modal_image.src = image.src = file_name;
 
-    let possibleGenes = combinations[active_group][active_subgroup];
     let modal_caption = document.getElementById(selection + "-modal-caption");
-    modal_caption.innerHTML = (possibleGenes.indexOf(active_dropdown) + 1) + ". " + active_dropdown;
+    modal_caption.innerHTML = caption;
 }
 
 function get_active_element(className) {
@@ -232,4 +250,8 @@ function open_all_panels() {
     for (i = 0; i < panels.length; i++) {
         panels[i].style.display = "grid";
     }
+}
+
+function has_dropdown(selection) {
+    return !!document.getElementById(selection + "-dropdown");
 }
