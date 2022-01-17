@@ -57,6 +57,246 @@ public class COM2POSE_lib
         logger.logLine("COM2POSE path set to: " + options_intern.path_to_COM2POSE);
     }
 
+    public void run_cooccurence_analysis() throws Exception
+    {
+        logger.logLine("[CO-OCCURENCE] Start Co-Occurence Analysis on found TF ChIP-ATLAS data.");
+
+        File f_output_root =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_distribution+ File.separator+ options_intern.folder_out_distribution_cooccurence);
+        f_output_root.mkdirs();
+
+        File f_input_root =
+                new File(options_intern.com2pose_working_directory+File.separator + options_intern.folder_out_chip_atlas + File.separator+ options_intern.folder_out_chip_atlas_peak_files);
+
+        File f_out_merged =
+                new File(f_output_root.getAbsolutePath()+File.separator+options_intern.file_suffix_cooccurence_mergedbed);
+        BufferedWriter bw_out = new BufferedWriter(new FileWriter(f_out_merged));
+
+        //loop over all bed files and merge them together
+        for(File f_tf : f_input_root.listFiles())
+        {
+            if(f_tf.isDirectory())
+            {
+                for(File f_tf_file : f_tf.listFiles())
+                {
+                    if(f_tf_file.isFile())
+                    {
+                        if(f_tf_file.getName().endsWith(".bed"))
+                        {
+                            String name = f_tf_file.getName().split("\\.")[0];
+
+                            BufferedReader br_tf = new BufferedReader(new FileReader(f_tf_file));
+                            String line_tf = "";
+                            while((line_tf = br_tf.readLine())!=null)
+                            {
+                                if(line_tf.startsWith("track"))
+                                    continue;
+
+                                String[] split = line_tf.split("\t");
+
+                                StringBuilder sb_out = new StringBuilder();
+                                sb_out.append(split[0]);
+                                sb_out.append("\t");
+                                sb_out.append(split[1]);
+                                sb_out.append("\t");
+                                sb_out.append(split[2]);
+                                sb_out.append("\t");
+                                sb_out.append(name);
+                                sb_out.append("\n");
+
+                                bw_out.write(sb_out.toString());
+
+
+                            }
+                            br_tf.close();
+                        }
+                    }
+                }
+            }
+        }
+        bw_out.close();
+
+        File f_out_sorted =
+                new File(f_output_root.getAbsolutePath()+File.separator+options_intern.file_suffix_cooccurence_mergedbed_sorted);
+
+        StringBuilder sb_script = new StringBuilder();
+        sb_script.append("#!/bin/bash\n");
+        sb_script.append("sort -k1,1 -k2,2n "+f_out_merged.getAbsolutePath()+" > "+f_out_sorted.getAbsolutePath()+"\n");
+        sb_script.append("bedtools merge -i "+f_out_sorted.getAbsolutePath()+" -c 4 -o collapse -delim \"|\" > " +
+                f_out_merged.getAbsolutePath() +"\n");
+        sb_script.append("rm "+f_out_sorted.getAbsolutePath());
+
+        //write sort and bedtools merge script
+        File f_bash =
+                new File(f_output_root.getAbsolutePath()+File.separator+options_intern.file_suffix_cooccurence_bash);
+        BufferedWriter bw_bash = new BufferedWriter(new FileWriter(f_bash));
+        bw_bash.write(sb_script.toString());
+        bw_bash.close();
+
+        //add execution rights
+        String command_chmod = "chmod u+x " + f_bash.getAbsolutePath();
+
+        logger.logLine("[CO-OCCURENCE] Add execution rights to script: " + command_chmod);
+
+        Process child_chmod = Runtime.getRuntime().exec(command_chmod);
+        int code_chmod = child_chmod.waitFor();
+        switch (code_chmod)
+        {
+            case 0:
+                break;
+            case 1:
+                String message = child_chmod.getErrorStream().toString();
+                throw new Exception(message);
+        }
+
+        //execute script
+        String command_bash = "bash " + f_bash.getAbsolutePath();
+        logger.logLine("[CO-OCCURENCE] Format bedfile: " + command_bash);
+
+        Process child_bash = Runtime.getRuntime().exec(command_bash);
+        int code_bash = child_bash.waitFor();
+        switch (code_bash)
+        {
+            case 0:
+                break;
+            case 1:
+                String message = child_bash.getErrorStream().toString();
+                throw new Exception(message);
+        }
+
+        //create co-occurence matrix
+
+        HashMap<String,Integer> tf_total_occurences = new HashMap<>();
+        HashMap<String,HashMap<String,Integer>> tf_othertf_coocurrences = new HashMap<>();
+
+        BufferedReader br_merged = new BufferedReader(new FileReader(f_out_merged.getAbsolutePath()));
+        String line_merged ="";
+        while((line_merged= br_merged.readLine())!=null)
+        {
+            String[] split = line_merged.split("\t");
+            if(split.length>3)
+            {
+                String[] split_tfs = split[3].split("\\|");
+
+                HashSet<String> tfs = new HashSet<>();
+                for(String s: split_tfs)
+                {
+                    tfs.add(s);
+                }
+
+                for(String tf : tfs)
+                {
+                    if(tf_total_occurences.containsKey(tf))
+                    {
+                        int count = tf_total_occurences.get(tf);
+                        count++;
+                        tf_total_occurences.put(tf,count);
+                    }
+                    else
+                    {
+                        tf_total_occurences.put(tf,1);
+                    }
+                }
+
+                ArrayList<String> ar_tfs = new ArrayList(tfs);
+                for(int i = 0; i < ar_tfs.size(); i++)
+                {
+                    String hold_tf = ar_tfs.get(i);
+                    HashMap<String,Integer> hold_tf_bin = new HashMap<>();
+                    if(tf_othertf_coocurrences.containsKey(hold_tf))
+                    {
+                        hold_tf_bin = tf_othertf_coocurrences.get(hold_tf);
+                    }
+
+                    for(int j = 0; j < ar_tfs.size(); j++)
+                    {
+                        if(i==j)
+                            continue;
+
+                        String look_tf = ar_tfs.get(j);
+
+                        if(hold_tf_bin.containsKey(look_tf))
+                        {
+                            int count = hold_tf_bin.get(look_tf);
+                            count++;
+                            hold_tf_bin.put(look_tf,count);
+                        }
+                        else
+                        {
+                            hold_tf_bin.put(look_tf,1);
+                        }
+                    }
+                    tf_othertf_coocurrences.put(hold_tf,hold_tf_bin);
+                }
+            }
+        }
+        br_merged.close();
+
+        HashMap<String,HashMap<String,Double>> tf_otherTF_percentageCoOcc = new HashMap<>();
+        for(String hold_tf : tf_othertf_coocurrences.keySet())
+        {
+            HashMap<String,Double> otherTF_percentageCoOcc = new HashMap<>();
+            tf_otherTF_percentageCoOcc.put(hold_tf,otherTF_percentageCoOcc);
+
+            HashMap<String,Integer> otherTF_counts = tf_othertf_coocurrences.get(hold_tf);
+            for(String key_otherTF : otherTF_counts.keySet())
+            {
+                int total_counts = tf_total_occurences.get(hold_tf) + tf_total_occurences.get(key_otherTF);
+                int co_occurences = otherTF_counts.get(key_otherTF);
+
+                double freq = (co_occurences*1.0)/total_counts;
+
+                otherTF_percentageCoOcc.put(key_otherTF,freq);
+            }
+        }
+
+        //write to file
+        File f_out_frequencies =
+                new File(f_output_root.getAbsolutePath()+File.separator+options_intern.file_suffix_cooccurence_frequencies);
+        StringBuilder sb_freq = new StringBuilder();
+
+        ArrayList<String> header_rows = new ArrayList<>(tf_otherTF_percentageCoOcc.keySet());
+        //write header columns
+        for(String s: header_rows)
+        {
+            sb_freq.append("\t");
+            sb_freq.append(s);
+        }
+        sb_freq.append("\n");
+
+        //write rows
+        for(int i = 0; i < header_rows.size();i++)
+        {
+            sb_freq.append(header_rows.get(i));
+            for(int j = 0; j < header_rows.size();j++)
+            {
+                sb_freq.append("\t");
+                if(j == i)
+                {
+                    sb_freq.append("1.00");
+                }
+                else
+                {
+                    String column_tf = header_rows.get(j);
+                    String row_tf = header_rows.get(i);
+
+                    double freq_column_row = tf_otherTF_percentageCoOcc.get(column_tf).get(row_tf);
+
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    String percentage_string = df.format(freq_column_row);
+                    sb_freq.append(percentage_string);
+                }
+            }
+            sb_freq.append("\n");
+        }
+
+        BufferedWriter bw_freq = new BufferedWriter(new FileWriter(f_out_frequencies));
+        bw_freq.write(sb_freq.toString());
+        bw_freq.close();
+
+        logger.logLine("[CO-OCCURENCE] Finish Co-Occurence Analysis on found TF ChIP-ATLAS data.");
+    }
+
     /**
      * runs IGV on top up and down regulated genes
      */

@@ -145,8 +145,6 @@ public class COM2POSE
         //shot IGV for dcg target gene heatmaps
         com2pose_lib.run_igv_on_dcg_targetgenes_heatmaps();
 
-
-
         if (options_intern.igv_important_locus_all_prio_tf.size() > 0)
         {
             com2pose_lib.run_igv_on_important_loci();
@@ -155,6 +153,12 @@ public class COM2POSE
         if (options_intern.igv_top_log2fc > 0)
         {
             com2pose_lib.run_igv_top_log2gc();
+        }
+
+        //run co-occurence analysis of ChIP-ATLAS .bed files
+        if (options_intern.chip_atlas_activated_chip_atlas)
+        {
+            com2pose_lib.run_cooccurence_analysis();
         }
 
         System.out.println("X");

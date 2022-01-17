@@ -135,6 +135,7 @@ public class Options_intern
     public String folder_out_distribution_logos_TF_sequence_jaspar = "00_JASPAR";
     public String folder_out_distribution_logos_binding_sequence = "03_TF_BINDING_SEQUENCE";
     public String folder_out_distribution_logos_binding_sequence_data = "00_DATA";
+    public String folder_out_distribution_cooccurence = "12_COOCCURENCE";
     public String folder_out_website = "Z_WEBSITE_OVERVIEW";
     public String folder_out_website_interactive_plots = "INTERACTIVE_PLOTS";
     public String folder_out_website_basics = "WEBSITE_BASICS";
@@ -224,6 +225,10 @@ public class Options_intern
     public String file_suffix_chip_atlas_list_zipped = "chip_atlas_file_list.zip";
     public String file_suffix_chip_atlas_list_csv = "chip_atlas_file_list.csv";
     public String file_suffix_session = "session.xml";
+    public String file_suffix_cooccurence_mergedbed = "cooccurence_merged.bed";
+    public String file_suffix_cooccurence_mergedbed_sorted = "cooccurence_merged_sorted.bed";
+    public String file_suffix_cooccurence_bash = "sort_and_merge.sh";
+    public String file_suffix_cooccurence_frequencies = "cooccurence_frequencies.csv";
 
     public String scripts = "scripts";
     public String script_heatmaps = scripts + File.separator + "heatmap.R";
