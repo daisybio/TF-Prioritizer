@@ -74,8 +74,6 @@ function init_selection(selection, combinations) {
     select_group(selection, group_selectors[0], combinations);
 
     select_first_possible_subgroup(selection, combinations);
-
-    update_image(selection, combinations);
 }
 
 function select_first_possible_subgroup(selection, combinations) {
@@ -218,7 +216,13 @@ function update_image(selection, combinations) {
         let active_dropdown = document.getElementById(selection + "-dropdown").value;
         file_name = selection + "/" + active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
         let possibleGenes = combinations[active_group][active_subgroup];
-        caption = (possibleGenes.indexOf(active_dropdown) + 1) + ". " + active_dropdown.split("_")[1];
+        let captionName;
+        if (/^[0-9]+_.*/.test(active_dropdown)) {
+            captionName = active_dropdown.substring(active_dropdown.indexOf("_") + 1);
+        } else {
+            captionName = active_dropdown;
+        }
+        caption = (possibleGenes.indexOf(active_dropdown) + 1) + ". " + captionName;
     } else {
         file_name = selection + "/" + active_group + "/" + active_subgroup + ".png";
         caption = active_subgroup;
