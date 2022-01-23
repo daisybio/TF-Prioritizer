@@ -1160,15 +1160,74 @@ public class Report
 
         frame = frame.replace("{TITLE}", tfGroup.name + " - Regression");
 
-        String id = "regressionPlot";
-        File target =
-                new File(d_out_regression.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
-        String three_level_image_selector = generateThreeLevelImageSelector(id, d_in_plots, target, false);
+        File tfDir = new File(d_out_regression.getAbsolutePath() + File.separator + tfGroup.name);
+
+        String overviewHeatmapsID = "overviewHeatmaps";
+        String overviewCoefficientsID = "overviewCoefficients";
+
+        for (File hm_dir : Objects.requireNonNull(d_in_plots.listFiles()))
+        {
+            if (!hm_dir.isDirectory())
+            {
+                continue;
+            }
+
+            for (File cutoff_dir : Objects.requireNonNull((hm_dir.listFiles())))
+            {
+                if (!cutoff_dir.isDirectory())
+                {
+                    continue;
+                }
+
+                for (File image_file : Objects.requireNonNull(cutoff_dir.listFiles()))
+                {
+                    if (!image_file.getName().endsWith(".png"))
+                    {
+                        continue;
+                    }
+
+                    String relevantFileName = image_file.getName();
+                    List<String> removables =
+                            Arrays.asList(".png", hm_dir.getName(), "threshold", cutoff_dir.getName());
+                    for (String removable : removables)
+                    {
+                        relevantFileName = relevantFileName.replace(removable, "");
+                    }
+                    while (relevantFileName.endsWith("_"))
+                    {
+                        relevantFileName = relevantFileName.substring(0, relevantFileName.length() - 1);
+                    }
+
+                    while (relevantFileName.startsWith("_"))
+                    {
+                        relevantFileName = relevantFileName.substring(1);
+                    }
+
+                    String targetCategory =
+                            relevantFileName.contains("stage") ? overviewHeatmapsID : overviewCoefficientsID;
+
+                    File targetFile = new File(
+                            tfDir.getAbsolutePath() + File.separator + targetCategory + File.separator +
+                                    hm_dir.getName() + File.separator + cutoff_dir.getName() + File.separator +
+                                    relevantFileName + ".png");
+
+                    copyFile(image_file, targetFile);
+                }
+            }
+        }
+
+        String overviewCoefficients = generateThreeLevelImageSelector(overviewCoefficientsID,
+                new File(tfDir.getAbsolutePath() + File.separator + overviewCoefficientsID), null, true);
+
+        String overviewHeatmaps = generateThreeLevelImageSelector(overviewHeatmapsID,
+                new File(tfDir.getAbsolutePath() + File.separator + overviewHeatmapsID), null, true);
 
         frame = frame.replace("{COEFFICIENTS}",
                 getTabularData("regressionCoefficients", tfGroup.regressionCoefficients));
 
-        frame = frame.replace("{HEATMAPS}", three_level_image_selector);
+        frame = frame.replace("{OVERVIEW_COEFFICIENTS}", overviewCoefficients);
+
+        frame = frame.replace("{OVERVIEW_HEATMAPS}", overviewHeatmaps);
 
         frame = frame.replace("{ADDHEAD}", "<script src=\"COMBINATIONS.js\"></script>");
 
