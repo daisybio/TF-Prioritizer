@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -15,6 +16,7 @@ public class Report
     private final Options_intern options_intern;
     private final ArrayList<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
     private final DecimalFormat formatter = new DecimalFormat("0.###");
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     public Report(Options_intern options_intern) throws IOException
     {
@@ -249,7 +251,7 @@ public class Report
         }
     }
 
-    public void generate() throws IOException
+    public void generate() throws IOException, InterruptedException
     {
         logger.logLine("[REPORT] Start generating report");
 
@@ -272,6 +274,30 @@ public class Report
         generateImportantLoci();
         generateTopLog2fc();
         generateCoOccurrence();
+
+        executorService.shutdown();
+        ThreadPoolExecutor tpe = (ThreadPoolExecutor) executorService;
+        long startTime = System.currentTimeMillis();
+        long totalTasks = tpe.getQueue().stream().filter(t -> !((FutureTask<?>) t).isDone()).count();
+
+        while (!executorService.isTerminated())
+        {
+            long now = System.currentTimeMillis();
+            long pendingTasks = tpe.getQueue().stream().filter(t -> !((FutureTask<?>) t).isDone()).count();
+            double timeDelta = (now - startTime) / 1000.;
+            long finishedTasks = totalTasks - pendingTasks;
+
+            double tasksPerSecond = finishedTasks / timeDelta;
+            long secondsLeft = (long) (pendingTasks / tasksPerSecond);
+            long minutesLeft = secondsLeft / 60;
+            secondsLeft = secondsLeft % 60;
+
+            System.out.print(
+                    "Files left to copy: " + pendingTasks + "\tETA: " + minutesLeft + "m " + secondsLeft + "s" + "\r");
+
+
+            Thread.sleep(500);
+        }
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -1479,6 +1505,11 @@ public class Report
 
     private void copyFile(File source, File target) throws IOException
     {
+        copyFile(source, target, true);
+    }
+
+    private void copyFile(File source, File target, boolean compression) throws IOException
+    {
         if (target.exists())
         {
             return;
@@ -1491,7 +1522,28 @@ public class Report
                 target.getParentFile().mkdirs();
             }
 
-            Files.copy(source.toPath(), target.toPath(), REPLACE_EXISTING);
+            if (target.getName().endsWith(".png") && compression)
+            {
+                String command = "pngtopnm " + source.getAbsolutePath() + " | pnmquant 16 | pnmtopng > " +
+                        target.getAbsolutePath();
+                String[] cmd = {"/bin/sh", "-c", command};
+                executorService.submit(() ->
+                {
+                    try
+                    {
+                        Process child = Runtime.getRuntime().exec(cmd);
+                        child.waitFor();
+
+                    } catch (IOException | InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                });
+            } else
+            {
+                Files.copy(source.toPath(), target.toPath(), REPLACE_EXISTING);
+            }
         }
     }
 
