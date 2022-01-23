@@ -266,6 +266,7 @@ public class Report
         generateHome();
         generateImportantLoci();
         generateTopLog2fc();
+        generateCoOccurrence();
 
         logger.logLine("[REPORT] Finished generating report");
     }
@@ -1425,6 +1426,50 @@ public class Report
 
         writeFile(options_intern.com2pose_working_directory + File.separator +
                 options_intern.f_out_report_top_log2fc_html, top_log2fc);
+    }
+
+    private void generateCoOccurrence() throws IOException
+    {
+        File dataSource = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_cooccurence + File.separator +
+                        options_intern.file_suffix_cooccurence_frequencies);
+
+        String input = loadFile(dataSource.getAbsolutePath());
+        String frame = loadFrame();
+
+        Map<String, Map<String, Number>> data = new HashMap<>();
+
+        ArrayList<String> tfs = new ArrayList<>();
+
+        for (String entry : input.split("\n")[0].split("\t"))
+        {
+            if (!entry.isEmpty())
+            {
+                tfs.add(entry);
+            }
+        }
+
+        for (String first : tfs)
+        {
+            data.put(first, new HashMap<>());
+            for (String second : tfs)
+            {
+                String value = input.split("\n")[tfs.indexOf(first) + 1].split("\t")[tfs.indexOf(second) + 1];
+                data.get(first).put(second, Double.parseDouble(value));
+            }
+        }
+
+        String cooccurrence = frame.replace("{BODY}", loadFile(options_intern.path_to_COM2POSE + File.separator +
+                options_intern.f_report_resources_cooccurrence_html));
+
+        cooccurrence = cooccurrence.replace("{TABLE}", getTabularData("coOccurrence", data));
+        cooccurrence = cooccurrence.replace("{TITLE}", "Co-Occurrence analysis");
+
+        cooccurrence = relativate(cooccurrence, 0);
+
+        writeFile(options_intern.com2pose_working_directory + File.separator +
+                options_intern.f_out_report_cooccurrence_html, cooccurrence);
     }
 
     static class StringComparator implements Comparator<String>
