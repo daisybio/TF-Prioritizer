@@ -256,11 +256,16 @@ public class Report
         styleAndScript();
         generateParameters();
 
+        int i = 1;
+
         for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
         {
+            System.out.print("Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
+                    tfGroup.name + ".\r");
             tfGroup.hasValidation = generateValidation(tfGroup);
             tfGroup.hasDistribution = generateDistribution(tfGroup);
             tfGroup.hasRegression = generateRegression(tfGroup);
+            i++;
         }
 
         generateHome();
@@ -788,6 +793,36 @@ public class Report
                 }
             } // TF binding sequence
         } // LOGOS
+
+        {
+            File sourceDir = new File(
+                    options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_igv +
+                            File.separator + options_intern.folder_out_igv_dcg_target_genes);
+
+            File targetDir = new File(
+                    options_intern.com2pose_working_directory + File.separator + options_intern.d_out_validation);
+
+            File source = null;
+
+            for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
+            {
+                String entryName = entry.getName();
+
+                if (entryName.equals(tfGroup.name))
+                {
+                    source = entry;
+                    break;
+                }
+            }
+
+            String id = "validationIGV";
+            File target = new File(targetDir.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
+
+            frame = frame.replace("{VALIDATION_IGV_DISABLED}", (source == null) ? "disabled" : "");
+
+            frame = frame.replace("{VALIDATION_IGV}", (source == null) ? "" :
+                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false));
+        } // IGV
 
         frame = relativate(frame, 2);
 
