@@ -270,6 +270,7 @@ public class Options_intern
     public String f_out_report_logo_png = d_out_report + File.separator + "logo.png";
     public String f_out_report_important_loci_html = d_out_report + File.separator + "IMPORTANT_LOCI.html";
     public String f_out_report_top_log2fc_html = d_out_report + File.separator + "TOP_LOG2FC.html";
+    public String f_out_report_cooccurrence_html = d_out_report + File.separator + "COOCCURRENCE.html";
     public String d_out_validation_logos = "Logos";
     public String d_out_validation_logos_tf_sequence = d_out_validation_logos + File.separator + "TF_Sequence";
     public String d_out_validation_logos_tf_binding_sequence =
@@ -284,6 +285,7 @@ public class Options_intern
             d_report_resources + File.separator + "TWO_LEVEL_IMAGE_SELECTOR.html";
     public String f_report_resources_important_loci_html = d_report_resources + File.separator + "IMPORTANT_LOCI.html";
     public String f_report_resources_top_log2fc_html = d_report_resources + File.separator + "TOP_LOG2FC.html";
+    public String f_report_resources_cooccurrence_html = d_report_resources + File.separator + "COOCCURRENCE.html";
     public String d_report_resources_basicdata = d_report_resources + File.separator + "BASICDATA";
     public String f_report_resources_basicdata_html = d_report_resources_basicdata + File.separator + "BASICDATA.html";
     public String f_report_resources_basicdata_entry_html =
