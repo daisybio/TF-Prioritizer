@@ -1073,14 +1073,14 @@ public class Report
 
         ArrayList<String> existingHMs = new ArrayList<>();
 
-        File d_plots = new File(
+        File d_plots_hm = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
                         File.separator + options_intern.folder_out_distribution_plots + File.separator +
                         options_intern.folder_out_distribution_plots_HM);
 
-        for (File d_hm : d_plots.listFiles())
+        for (File d_hm : Objects.requireNonNull(d_plots_hm.listFiles()))
         {
-            for (File f_plot : d_hm.listFiles())
+            for (File f_plot : Objects.requireNonNull(d_hm.listFiles()))
             {
                 if (f_plot.getName().substring(0, f_plot.getName().lastIndexOf(".")).equals(tfGroup.name))
                 {
@@ -1089,6 +1089,23 @@ public class Report
                             d_distribution_output.getAbsolutePath() + File.separator + d_hm.getName() + ".png"));
                     break;
                 }
+            }
+        }
+
+        File d_plots_all = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_plots + File.separator +
+                        options_intern.folder_out_distribution_plots_ALL);
+
+        for (File f_plot : Objects.requireNonNull(d_plots_all.listFiles()))
+        {
+            if (f_plot.getName().substring(0, f_plot.getName().lastIndexOf(".")).equals(tfGroup.name))
+            {
+                String categoryName = d_plots_all.getName().substring(d_plots_all.getName().indexOf("_") + 1);
+                existingHMs.add(categoryName);
+                copyFile(f_plot,
+                        new File(d_distribution_output.getAbsolutePath() + File.separator + categoryName + ".png"));
+                break;
             }
         }
 
@@ -1132,6 +1149,93 @@ public class Report
             }
 
             frame = frame.replace("{GENECARD_BUTTON_ACTION}", sb_actions.toString());
+        }
+
+        {
+            File allFile = new File(options_intern.com2pose_working_directory + File.separator +
+                    options_intern.folder_out_distribution + File.separator +
+                    options_intern.folder_out_distribution_stats + File.separator +
+                    options_intern.folder_out_distribution_stats_ALL + File.separator +
+                    options_intern.file_suffix_distribution_analysis_plot_stats);
+            File hmsDir = new File(options_intern.com2pose_working_directory + File.separator +
+                    options_intern.folder_out_distribution + File.separator +
+                    options_intern.folder_out_distribution_stats + File.separator +
+                    options_intern.folder_out_distribution_stats_HM);
+            HashMap<String, Integer> ranks = new HashMap<>();
+            HashMap<String, Integer> sizes = new HashMap<>();
+
+            try
+            {
+                ranks.put(options_intern.distribution_analysis_all_name,
+                        Integer.parseInt(findValueInTable(tfGroup.name, 1, 0, allFile, "\t", true)));
+            } catch (NoSuchFieldException e)
+            {
+                ranks.put(options_intern.distribution_analysis_all_name, -1);
+            } finally
+            {
+                String[] lines = loadFile(allFile.getAbsolutePath()).split("\n");
+                String lastLine = lines[lines.length - 1];
+                sizes.put(options_intern.distribution_analysis_all_name, Integer.parseInt(lastLine.split("\t")[0]));
+            }
+
+            for (File hmDir : Objects.requireNonNull(hmsDir.listFiles()))
+            {
+                if (!hmDir.isDirectory())
+                {
+                    continue;
+                }
+
+                File statsFile = new File(hmDir.getAbsolutePath() + File.separator +
+                        options_intern.file_suffix_distribution_analysis_plot_stats);
+
+                if (statsFile.exists())
+                {
+                    try
+                    {
+                        ranks.put(hmDir.getName(),
+                                Integer.parseInt(findValueInTable(tfGroup.name, 1, 0, statsFile, "\t", true)));
+                    } catch (NoSuchFieldException e)
+                    {
+                        ranks.put(hmDir.getName(), -1);
+                    } finally
+                    {
+                        String[] lines = loadFile(statsFile.getAbsolutePath()).split("\n");
+                        String lastLine = lines[lines.length - 1];
+                        sizes.put(hmDir.getName(), Integer.parseInt(lastLine.split("\t")[0]));
+                    }
+                }
+            }
+
+            StringBuilder sb_dcg = new StringBuilder();
+            sb_dcg.append("<table>");
+            sb_dcg.append("<tr>");
+            sb_dcg.append("<th>Modification</th>");
+            sb_dcg.append("<th>Availability</th>");
+            sb_dcg.append("<th>Rank</th>");
+            sb_dcg.append("</tr>");
+
+            for (Map.Entry<String, Integer> entry : ranks.entrySet())
+            {
+                sb_dcg.append("<tr>");
+                sb_dcg.append("<td>");
+                sb_dcg.append(entry.getKey());
+                sb_dcg.append("</td>");
+                sb_dcg.append("<td>");
+                sb_dcg.append("<image style='height: 30px' src='");
+                sb_dcg.append(
+                        entry.getValue() == -1 ? "{RELATIVATION}not_available.png" : "{RELATIVATION}is_available.png");
+                sb_dcg.append("'>");
+                sb_dcg.append("</td>");
+                sb_dcg.append("<td>");
+                sb_dcg.append(entry.getValue() > 0 ? entry.getValue() : "-");
+                sb_dcg.append("/");
+                sb_dcg.append(sizes.get(entry.getKey()));
+                sb_dcg.append("</td>");
+                sb_dcg.append("</tr>");
+            }
+            sb_dcg.append("</table>");
+
+            frame = frame.replace("{DISCOUNTED_CUMULATIVE_GAIN}", sb_dcg.toString());
         }
 
         frame = relativate(frame, 2);
@@ -1287,6 +1391,16 @@ public class Report
                 new File(options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_logo_png),
                 new File(options_intern.com2pose_working_directory + File.separator +
                         options_intern.f_out_report_logo_png));
+
+        copyFile(new File(
+                        options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_is_available_png),
+                new File(options_intern.com2pose_working_directory + File.separator +
+                        options_intern.f_out_report_is_available_png));
+
+        copyFile(new File(
+                        options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_not_available_png),
+                new File(options_intern.com2pose_working_directory + File.separator +
+                        options_intern.f_out_report_not_available_png));
     }
 
     private void copyFile(File source, File target) throws IOException
