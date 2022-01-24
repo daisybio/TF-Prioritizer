@@ -259,6 +259,7 @@ public class Options_intern
     public String link_report_genecards = "https://www.genecards.org/cgi-bin/carddisp.pl?gene={GENE}";
     public String d_out_report = "REPORT";
     public String f_out_report_home = d_out_report + File.separator + "HOME.html";
+    public String f_out_report_overview = d_out_report + File.separator + "OVERVIEW.html";
     public String f_out_report_parameters = d_out_report + File.separator + "PARAMETERS.html";
     public String f_out_report_style = d_out_report + File.separator + "style.css";
     public String f_out_report_script = d_out_report + File.separator + "script.js";
@@ -267,9 +268,10 @@ public class Options_intern
     public String d_out_regression = d_out_report + File.separator + "REGRESSION";
     public String d_out_important_loci = d_out_report + File.separator + "importantLoci";
     public String d_out_top_log2fc = d_out_report + File.separator + "topLog2fc";
-    public String f_out_report_logo_png = d_out_report + File.separator + "logo.png";
-    public String f_out_report_is_available_png = d_out_report + File.separator + "is_available.png";
-    public String f_out_report_not_available_png = d_out_report + File.separator + "not_available.png";
+    public String d_out_media = d_out_report + File.separator + "MEDIA";
+    public String f_out_report_logo_png = d_out_media + File.separator + "logo.png";
+    public String f_out_report_is_available_png = d_out_media + File.separator + "is_available.png";
+    public String f_out_report_not_available_png = d_out_media + File.separator + "not_available.png";
     public String f_out_report_important_loci_html = d_out_report + File.separator + "IMPORTANT_LOCI.html";
     public String f_out_report_top_log2fc_html = d_out_report + File.separator + "TOP_LOG2FC.html";
     public String f_out_report_cooccurrence_html = d_out_report + File.separator + "COOCCURRENCE.html";
@@ -280,9 +282,11 @@ public class Options_intern
     public String f_out_validation_logos_biophysical_png = "biophysical_model.png";
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
-    public String f_report_resources_logo_png = d_report_resources + File.separator + "logo.png";
-    public String f_report_resources_is_available_png = d_report_resources + File.separator + "is_available.png";
-    public String f_report_resources_not_available_png = d_report_resources + File.separator + "not_available.png";
+    public String d_report_resources_media = d_report_resources + File.separator + "MEDIA";
+    public String f_report_resources_logo_png = d_report_resources_media + File.separator + "logo.png";
+    public String f_report_resources_is_available_png = d_report_resources_media + File.separator + "is_available.png";
+    public String f_report_resources_not_available_png =
+            d_report_resources_media + File.separator + "not_available.png";
     public String f_report_resources_three_level_image_selector_html =
             d_report_resources + File.separator + "THREE_LEVEL_IMAGE_SELECTOR.html";
     public String f_report_resources_two_level_image_selector_html =
@@ -290,6 +294,7 @@ public class Options_intern
     public String f_report_resources_important_loci_html = d_report_resources + File.separator + "IMPORTANT_LOCI.html";
     public String f_report_resources_top_log2fc_html = d_report_resources + File.separator + "TOP_LOG2FC.html";
     public String f_report_resources_cooccurrence_html = d_report_resources + File.separator + "COOCCURRENCE.html";
+    public String f_report_resources_overview_html = d_report_resources + File.separator + "OVERVIEW.html";
     public String d_report_resources_basicdata = d_report_resources + File.separator + "BASICDATA";
     public String f_report_resources_basicdata_html = d_report_resources_basicdata + File.separator + "BASICDATA.html";
     public String f_report_resources_basicdata_entry_html =

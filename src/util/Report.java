@@ -274,6 +274,8 @@ public class Report
         generateImportantLoci();
         generateTopLog2fc();
         generateCoOccurrence();
+        generateOverview();
+        media();
 
         executorService.shutdown();
         ThreadPoolExecutor tpe = (ThreadPoolExecutor) executorService;
@@ -1322,8 +1324,8 @@ public class Report
                 sb_dcg.append("</td>");
                 sb_dcg.append("<td>");
                 sb_dcg.append("<image style='height: 30px' src='");
-                sb_dcg.append(
-                        entry.getValue() == -1 ? "{RELATIVATION}not_available.png" : "{RELATIVATION}is_available.png");
+                sb_dcg.append(entry.getValue() == -1 ? "{RELATIVATION}MEDIA/not_available.png" :
+                        "{RELATIVATION" + "}MEDIA/is_available.png");
                 sb_dcg.append("'>");
                 sb_dcg.append("</td>");
                 sb_dcg.append("<td>");
@@ -1491,16 +1493,19 @@ public class Report
                 new File(options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_logo_png),
                 new File(options_intern.com2pose_working_directory + File.separator +
                         options_intern.f_out_report_logo_png));
+    }
 
-        copyFile(new File(
-                        options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_is_available_png),
-                new File(options_intern.com2pose_working_directory + File.separator +
-                        options_intern.f_out_report_is_available_png));
+    private void media() throws IOException
+    {
+        File d_source =
+                new File(options_intern.path_to_COM2POSE + File.separator + options_intern.d_report_resources_media);
+        File d_target =
+                new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_media);
 
-        copyFile(new File(
-                        options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_not_available_png),
-                new File(options_intern.com2pose_working_directory + File.separator +
-                        options_intern.f_out_report_not_available_png));
+        for (File imageFile : Objects.requireNonNull(d_source.listFiles()))
+        {
+            copyFile(imageFile, new File(d_target.getAbsolutePath() + File.separator + imageFile.getName()), false);
+        }
     }
 
     private void copyFile(File source, File target) throws IOException
@@ -1719,6 +1724,21 @@ public class Report
 
         writeFile(options_intern.com2pose_working_directory + File.separator +
                 options_intern.f_out_report_cooccurrence_html, cooccurrence);
+    }
+
+    private void generateOverview() throws IOException
+    {
+        File source = new File(
+                options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_overview_html);
+        File target = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_overview);
+
+        String frame = loadFrame();
+        frame = frame.replace("{BODY}", loadFile(source.getAbsolutePath()));
+        frame = frame.replace("{TITLE}", "Overview");
+        frame = relativate(frame, 0);
+
+        writeFile(target.getAbsolutePath(), frame);
     }
 
     static class StringComparator implements Comparator<String>
