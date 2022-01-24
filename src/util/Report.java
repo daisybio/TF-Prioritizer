@@ -613,8 +613,47 @@ public class Report
 
             frame = frame.replace("{VALIDATION_CHIP_ATLAS_DISABLED}", (source == null) ? "disabled" : "");
 
-            frame = frame.replace("{VALIDATION_CHIP_ATLAS}", (source == null) ? "" :
-                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false));
+            if (source == null)
+            {
+                frame = frame.replace("{VALIDATION_CHIP_ATLAS}", "");
+            } else
+            {
+                for (File d_group : Objects.requireNonNull(source.listFiles()))
+                {
+                    if (d_group.isDirectory())
+                    {
+                        continue;
+                    }
+
+                    for (File d_hm : Objects.requireNonNull(d_group.listFiles()))
+                    {
+                        if (d_hm.isDirectory())
+                        {
+                            continue;
+                        }
+                        for (File f_plot : Objects.requireNonNull(d_hm.listFiles()))
+                        {
+                            if (f_plot.getName().endsWith(".png"))
+                            {
+                                String relevantFileName = f_plot.getName();
+                                relevantFileName = relevantFileName.replace("_" + tfGroup.name, "");
+
+                                File targetFile = new File(
+                                        target.getAbsolutePath() + File.separator + d_hm.getName() + File.separator +
+                                                d_group.getName() + File.separator + relevantFileName);
+
+                                copyFile(f_plot, targetFile);
+                            }
+                        }
+                    }
+                }
+
+                frame = frame.replace("{VALIDATION_CHIP_ATLAS}",
+                        generateThreeLevelImageSelector(id, target, null, new ArrayList<>(List.of(tfGroup.name)),
+                                false));
+            }
+
+
         }
 
         {
