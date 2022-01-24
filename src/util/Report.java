@@ -1542,7 +1542,16 @@ public class Report
                 });
             } else
             {
-                Files.copy(source.toPath(), target.toPath(), REPLACE_EXISTING);
+                executorService.submit(() ->
+                {
+                    try
+                    {
+                        Files.copy(source.toPath(), target.toPath(), REPLACE_EXISTING);
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                });
             }
         }
     }
