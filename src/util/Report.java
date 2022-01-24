@@ -590,7 +590,7 @@ public class Report
             File target =
                     new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
             frame = frame.replace("{VALIDATION_HEATMAP}",
-                    (source == null) ? "" : generateTwoLevelImageSelector(id, source, target));
+                    (source == null) ? "" : generateTwoLevelImageSelector(id, source, target, false));
         }
 
         {
@@ -613,7 +613,8 @@ public class Report
             File target =
                     new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
             frame = frame.replace("{VALIDATION_OWN_TF}", (source == null) ? "" :
-                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false));
+                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false,
+                            true));
         }
 
         {
@@ -675,8 +676,8 @@ public class Report
                 }
 
                 frame = frame.replace("{VALIDATION_CHIP_ATLAS}",
-                        generateThreeLevelImageSelector(id, target, null, new ArrayList<>(List.of(tfGroup.name)),
-                                false));
+                        generateThreeLevelImageSelector(id, target, null, new ArrayList<>(List.of(tfGroup.name)), false,
+                                true));
             }
 
 
@@ -886,7 +887,8 @@ public class Report
             frame = frame.replace("{VALIDATION_IGV_DISABLED}", (source == null) ? "disabled" : "");
 
             frame = frame.replace("{VALIDATION_IGV}", (source == null) ? "" :
-                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false));
+                    generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false,
+                            true));
         } // IGV
 
         frame = relativate(frame, 2);
@@ -913,12 +915,12 @@ public class Report
     private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir,
                                                    boolean keepFileNameAsIs) throws IOException
     {
-        return generateThreeLevelImageSelector(name, sourceDir, targetDir, new ArrayList<>(), keepFileNameAsIs);
+        return generateThreeLevelImageSelector(name, sourceDir, targetDir, new ArrayList<>(), keepFileNameAsIs, true);
     }
 
     private String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir,
-                                                   ArrayList<String> specialRemovables, boolean keepFileNameAsIs)
-            throws IOException
+                                                   ArrayList<String> specialRemovables, boolean keepFileNameAsIs,
+                                                   boolean compression) throws IOException
     {
         String suffix = ".png";
         HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
@@ -993,7 +995,7 @@ public class Report
                     {
                         copyFile(image_file, new File(
                                 targetDir.getAbsolutePath() + File.separator + group + File.separator + subgroup +
-                                        File.separator + relevantFileName + suffix));
+                                        File.separator + relevantFileName + suffix), compression);
                     }
 
                     combinations.get(group).get(subgroup).add(relevantFileName);
@@ -1064,7 +1066,8 @@ public class Report
         return three_level_image_selector;
     }
 
-    private String generateTwoLevelImageSelector(String name, File sourceDir, File targetDir) throws IOException
+    private String generateTwoLevelImageSelector(String name, File sourceDir, File targetDir, boolean compression)
+            throws IOException
     {
         String suffix = ".png";
         HashMap<String, ArrayList<String>> combinations = new HashMap<>();
@@ -1095,7 +1098,7 @@ public class Report
                 {
                     copyFile(image_file, new File(
                             targetDir.getAbsolutePath() + File.separator + group + File.separator + relevantFileName +
-                                    suffix));
+                                    suffix), compression);
                 }
 
                 combinations.get(group).add(relevantFileName);
