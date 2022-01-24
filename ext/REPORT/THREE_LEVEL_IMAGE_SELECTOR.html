@@ -8,7 +8,7 @@
     <div class="buttonbar centered">
         <button onclick="openModal('{ID}-modal')">Zoom in</button>
         <button class="narrow" id="{ID}-leftarrow" onclick="move_dropdown('{ID}', -1, {ID}Combinations)">&lt;</button>
-        <select name="gene" id="{ID}-dropdown" oninput="update_image('{ID}')"></select>
+        <select name="gene" id="{ID}-dropdown" oninput="update_image('{ID}', {ID}Combinations)"></select>
         <button class="narrow" id="{ID}-rightarrow" onclick="move_dropdown('{ID}', 1, {ID}Combinations)">&gt;</button>
         <button onclick="openImageInTab('{ID}-image')">Open in new tab</button>
     </div>
