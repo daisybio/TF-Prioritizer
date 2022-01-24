@@ -647,14 +647,13 @@ public class Report
             {
                 for (File d_group : Objects.requireNonNull(source.listFiles()))
                 {
-                    if (d_group.isDirectory())
+                    if (!d_group.isDirectory())
                     {
                         continue;
                     }
-
                     for (File d_hm : Objects.requireNonNull(d_group.listFiles()))
                     {
-                        if (d_hm.isDirectory())
+                        if (!d_hm.isDirectory())
                         {
                             continue;
                         }
@@ -674,10 +673,8 @@ public class Report
                         }
                     }
                 }
-
                 frame = frame.replace("{VALIDATION_CHIP_ATLAS}",
-                        generateThreeLevelImageSelector(id, target, null, new ArrayList<>(List.of(tfGroup.name)), false,
-                                true));
+                        generateThreeLevelImageSelector(id, target, null, true));
             }
 
 
