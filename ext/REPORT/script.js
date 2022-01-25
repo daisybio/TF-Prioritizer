@@ -144,16 +144,13 @@ function select_subgroup(selection, element, combinations) {
     let possible_dropdown_values = combinations[active_group.value][element.value];
 
     if (has_dropdown(selection)) {
-        let dropdown = document.getElementById(selection + "-dropdown");
-        let l, k = dropdown.options.length - 1;
+        let dropdown = document.getElementById(selection + "-dropdown-content");
+        dropdown.innerHTML = "";
 
-        for (l = k; l >= 0; l--) {
-            dropdown.remove(l);
-        }
+        let dropdown_button = document.getElementById(selection + "-dropdown");
 
-        let m;
-        for (m = 0; m < possible_dropdown_values.length; m++) {
-            let option = document.createElement("option");
+        for (let m = 0; m < possible_dropdown_values.length; m++) {
+            let option = document.createElement("button");
             option.value = possible_dropdown_values[m];
 
             let text;
@@ -163,7 +160,16 @@ function select_subgroup(selection, element, combinations) {
                 text = possible_dropdown_values[m];
             }
 
+            option.classList.add("dropdown");
+            option.classList.add("entry");
             option.textContent = (m + 1) + ". " + text;
+            if (m === 0) {
+                dropdown_button.textContent = option.textContent;
+                dropdown_button.value = option.value;
+            }
+            option.addEventListener("click", function () {
+                select_dropdown(selection, option.value, option.textContent, combinations)
+            });
             dropdown.appendChild(option);
         }
 
@@ -182,7 +188,7 @@ function select_subgroup(selection, element, combinations) {
 function move_dropdown(selection, delta, combinations) {
     if (has_dropdown(selection)) {
         let dropdown = document.getElementById(selection + "-dropdown");
-        let options = dropdown.children;
+        let options = document.getElementById(selection + "-dropdown-content").childNodes;
         let i;
 
         for (i = 0; i < options.length; i++) {
@@ -200,7 +206,7 @@ function move_dropdown(selection, delta, combinations) {
             i = options.length - 1;
         }
 
-        dropdown.value = options[i].value;
+        options[i].click();
     }
 
     update_image(selection, combinations);
@@ -258,4 +264,20 @@ function open_all_panels() {
 
 function has_dropdown(selection) {
     return !!document.getElementById(selection + "-dropdown");
+}
+
+function toggleDropdown(selection) {
+    document.getElementById(selection + "-dropdown-content").classList.toggle("show");
+}
+
+function select_dropdown(selection, value, text, combinations) {
+    let dropdown_button = document.getElementById(selection + "-dropdown");
+    dropdown_button.textContent = text;
+    dropdown_button.value = value;
+
+    update_image(selection, combinations);
+}
+
+function leave_dropdown(selection) {
+    document.getElementById(selection + "-dropdown").click();
 }

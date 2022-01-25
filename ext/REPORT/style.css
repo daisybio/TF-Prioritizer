@@ -303,3 +303,25 @@ button.narrow {
     transition: 0.3s;
     padding: 0;
 }
+
+.dropdown.container {
+    position: relative;
+}
+
+.dropdown.content {
+    display: none;
+    position: absolute;
+    left: -200px;
+    right: -200px;
+    z-index: 1;
+}
+
+.dropdown.content.show {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.dropdown.entry {
+    width: max-content;
+}
