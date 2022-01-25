@@ -674,10 +674,10 @@ public class COM2POSE_lib
                     File f_output_this_one = new File("");
                     ArrayList<DESeq2_gene_object> regulated_genes = new ArrayList<>();
 
-                    if (updown_mode.equals(options_intern.folder_out_igv_top_log2fc_upregulated))
+                    if (updown_mode.equals(options_intern.folder_out_igv_top_log2fc_downregulated))
                     {
                         f_output_this_one = new File(f_output_log2fc.getAbsolutePath() + File.separator +
-                                options_intern.folder_out_igv_top_log2fc_upregulated);
+                                options_intern.folder_out_igv_top_log2fc_downregulated);
 
                         int igv_top_log2fc_copy = options_intern.igv_top_log2fc;
 
@@ -728,10 +728,10 @@ public class COM2POSE_lib
                             }
                         }
                     }
-                    if (updown_mode.equals(options_intern.folder_out_igv_top_log2fc_downregulated))
+                    if (updown_mode.equals(options_intern.folder_out_igv_top_log2fc_upregulated))
                     {
                         f_output_this_one = new File(f_output_log2fc.getAbsolutePath() + File.separator +
-                                options_intern.folder_out_igv_top_log2fc_downregulated);
+                                options_intern.folder_out_igv_top_log2fc_upregulated);
 
 
                         int igv_top_log2fc_copy = log2fc.size() - options_intern.igv_top_log2fc;
@@ -12331,7 +12331,7 @@ public class COM2POSE_lib
 
                         String command_execute = command_sample + command_tail_sample;
                         logger.logLine("[TEPIC] execute TEPIC with command line: " + command_execute);
-                        Process child = Runtime.getRuntime().exec(command_execute);
+                        /*Process child = Runtime.getRuntime().exec(command_execute);
                         int code = child.waitFor();
                         switch (code)
                         {
@@ -12340,7 +12340,78 @@ public class COM2POSE_lib
                             case 1:
                                 String message = child.getErrorStream().toString();
                                 throw new Exception(message);
+                        }*/
+
+                        //correct TPMs
+
+                        HashMap<String,String> ensgTF_tpm = new HashMap<>();
+
+                        File f_outputdir_tpms = new File(output_dir_combined).getParentFile();
+                        for(File f_dir : f_outputdir_tpms.listFiles())
+                        {
+                            if(f_dir.isFile())
+                            {
+                                String name = f_dir.getName();
+                                if(name.endsWith("_TPM_values.txt"))
+                                {
+                                    BufferedReader br_tpms = new BufferedReader(new FileReader(f_dir));
+                                    String line_tpms = br_tpms.readLine();
+                                    while((line_tpms= br_tpms.readLine())!=null)
+                                    {
+                                        String[] split = line_tpms.split("\t");
+                                        ensgTF_tpm.put(split[0],split[2]);
+                                    }
+                                    br_tpms.close();
+                                }
+                            }
                         }
+                        //get correct TPM file
+                        File f_tobechanged_tpm =
+                                new File(options_intern.com2pose_working_directory+File.separator
+                                        +options_intern.folder_name_deseq2_preprocessing+File.separator
+                                        +options_intern.folder_name_deseq2_preprocessing_tpm+File.separator
+                                        + options_intern.folder_name_deseq2_preprocessing_tpm_results+File.separator
+                                        +dirGroup.getName()+options_intern.file_suffix_deseq2_preprocessing_tpm_mapping_get_tpm_mappings_data);
+
+                        StringBuilder sb_changed_tpm_file = new StringBuilder();
+
+                        BufferedReader br_tobechanged_tpm = new BufferedReader(new FileReader(f_tobechanged_tpm));
+                        String line_tobechanged_tpm = "";
+                        sb_changed_tpm_file.append(br_tobechanged_tpm.readLine());
+                        sb_changed_tpm_file.append("\n");
+
+                        while((line_tobechanged_tpm=br_tobechanged_tpm.readLine())!=null)
+                        {
+                            String[] split = line_tobechanged_tpm.split("\t");
+                            String ensg = split[0];
+
+                            if(ensgTF_tpm.containsKey(ensg))
+                            {
+                                String tpm_exchanged = ensgTF_tpm.get(ensg);
+                                split[3] = tpm_exchanged;
+
+                                StringBuilder sb_tf_line = new StringBuilder();
+                                sb_tf_line.append(ensg);
+                                for(int i = 1; i < split.length; i++)
+                                {
+                                    sb_tf_line.append("\t");
+                                    sb_tf_line.append(split[i]);
+                                }
+                                sb_changed_tpm_file.append(sb_tf_line.toString());
+                                sb_changed_tpm_file.append("\n");
+                            }
+                            else
+                            {
+                                sb_changed_tpm_file.append(line_tobechanged_tpm);
+                                sb_changed_tpm_file.append("\n");
+                            }
+                        }
+
+                        br_tobechanged_tpm.close();
+
+                        BufferedWriter bw_changed_tpm = new BufferedWriter(new FileWriter(f_tobechanged_tpm));
+                        bw_changed_tpm.write(sb_changed_tpm_file.toString());
+                        bw_changed_tpm.close();
                     }
                 }
             }

@@ -12,7 +12,14 @@ def isValidAffinity(lineSplit):
 	return False
 
 
-def check_tfs(tfs,ensg_counts,total_sample_number,gene_symbol_lengths,ensg_sym_map,cutoff):
+def check_tfs(tfs,ensg_counts,total_sample_number,gene_symbol_lengths,ensg_sym_map,cutoff,outfile_1):
+
+	outfile_tpm_values = outfile_1.replace(".txt","_TPM_values.txt")
+	output_tpm_values = open(outfile_tpm_values, "w")
+	header = "ENSG\tSYMBOL\tTPM\tRPK\tGENE_LENGTH"
+	header = header + "\n"
+	output_tpm_values.write(header)
+
 	per_million=total_sample_number/(1000000*1.0)
 	tfs=tfs[1:]
 
@@ -49,8 +56,11 @@ def check_tfs(tfs,ensg_counts,total_sample_number,gene_symbol_lengths,ensg_sym_m
 				else:
 					ensg_length=ensg_length/(1000*1.0)
 					rpk=ensg_count/(ensg_length*1.0)
+					tpm = rpk / (scaling_factor * 1.0)
 					if(tpm>cutoff):
 						wanna_print=True
+					tpm_values_line=tf_ensg+"\t"+s+"\t" + str(tpm) + "\t" + str(rpk) +"\t"+str(ensg_length)+ "\n"
+					output_tpm_values.write(tpm_values_line)
 			if(wanna_print):
 				should_write.append(1)
 			else:
@@ -71,6 +81,10 @@ def check_tfs(tfs,ensg_counts,total_sample_number,gene_symbol_lengths,ensg_sym_m
 			should_write.append(1)
 		else:
 			should_write.append(0)
+		tpm_values_line = tf_ensg + "\t" + split_tf[0] + "\t" + str(tpm) + "\t" + str(rpk) + "\t" + str(ensg_length) + "\n"
+		output_tpm_values.write(tpm_values_line)
+
+	output_tpm_values.close()
 
 	return should_write
 
@@ -139,7 +153,7 @@ def main():
 		infile_tpm=open(outfile_1,"r")
 		tfs=infile_tpm.readline()
 		tfs_splitted=tfs.split()
-		valid_columns=check_tfs(tfs_splitted,ensg_counts,total_sample_number,gene_symbol_lengths,ensg_sym_map,float(sys.argv[3]))
+		valid_columns=check_tfs(tfs_splitted,ensg_counts,total_sample_number,gene_symbol_lengths,ensg_sym_map,float(sys.argv[3]), outfile_1)
 		outfile_2=outfile_1.replace(".txt","_TPM.txt")
 		output_tpm = open(outfile_2, "w")
 		header=""
