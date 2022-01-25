@@ -52,10 +52,6 @@ img {
     margin: 5px;
 }
 
-.datatable {
-
-}
-
 table {
     border-spacing: 0;
     border-collapse: collapse;
@@ -134,7 +130,7 @@ h3 {
     color: white;
 }
 
-button, select {
+input, button, select {
     background-color: var(--c4);
     text-align: center;
     color: white;
@@ -219,10 +215,6 @@ button.narrow {
     border-radius: 5px;
     cursor: pointer;
     transition: 0.3s;
-}
-
-.modal.source:hover {
-    opacity: 0.7;
 }
 
 /* The Modal (background) */
@@ -311,8 +303,8 @@ button.narrow {
 .dropdown.content {
     display: none;
     position: absolute;
-    left: -200px;
-    right: -200px;
+    left: -300px;
+    right: -300px;
     z-index: 1;
 }
 
@@ -324,4 +316,21 @@ button.narrow {
 
 .dropdown.entry {
     width: max-content;
+}
+
+::placeholder {
+    color: #ccc;
+    opacity: 1;
+}
+
+:-ms-input-placeholder {
+    color: #ccc;
+}
+
+::-ms-input-placeholder {
+    color: #ccc;
+}
+
+input:focus {
+    outline: none;
 }

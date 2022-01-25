@@ -149,6 +149,17 @@ function select_subgroup(selection, element, combinations) {
 
         let dropdown_button = document.getElementById(selection + "-dropdown");
 
+        let searchbox = document.createElement("input");
+        searchbox.type = "text";
+        searchbox.placeholder = "Search...";
+        searchbox.id = selection + "-dropdown-search";
+        searchbox.style.width = "100%";
+        searchbox.addEventListener("keyup", function () {
+            filter_dropdown(selection)
+        });
+
+        dropdown.appendChild(searchbox);
+
         for (let m = 0; m < possible_dropdown_values.length; m++) {
             let option = document.createElement("button");
             option.value = possible_dropdown_values[m];
@@ -196,16 +207,14 @@ function move_dropdown(selection, delta, combinations) {
                 break;
             }
         }
-
         i += delta;
-
         if (i >= options.length) {
-            i = 0;
+            i = 1;
         }
-        if (i < 0) {
+        if (i < 1) {
             i = options.length - 1;
         }
-
+        
         options[i].click();
     }
 
@@ -280,4 +289,21 @@ function select_dropdown(selection, value, text, combinations) {
 
 function leave_dropdown(selection) {
     document.getElementById(selection + "-dropdown").click();
+}
+
+function filter_dropdown(selection) {
+    let searchbox = document.getElementById(selection + "-dropdown-search");
+    let term = searchbox.value.toUpperCase();
+    let options = document.getElementById(selection + "-dropdown-content").childNodes;
+
+    for (let i = 0; i < options.length; i++) {
+        if (options[i] === searchbox) {
+            continue;
+        }
+        if (options[i].textContent.toUpperCase().indexOf(term) > -1) {
+            options[i].style.display = "";
+        } else {
+            options[i].style.display = "none";
+        }
+    }
 }
