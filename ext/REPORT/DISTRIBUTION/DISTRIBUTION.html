@@ -49,5 +49,19 @@
     <div class="buttonbar">
         {HISTONEMODIFICATIONS}
     </div>
-    <img id="distribution-plot" src="{DISTRIBUTION-PLOT-PATH}">
+    <div class="buttonbar">
+        <button onclick="openModal('distribution-plot-modal')">Zoom in</button>
+        <button onclick="openImageInTab('distribution-plot')">Open in new tab</button>
+    </div>
+    <img id="distribution-plot" src="{DISTRIBUTION-PLOT-PATH}" class="modal source"
+         onclick="openModal('distribution-plot-modal')">
+</div>
+<div id="distribution-plot-modal" class="modal background">
+    <div class="buttonbar centered">
+        <div id="distribution-plot-modal-caption" class="modal caption">{DIST_PLOT_MODAL_CAPTION}</div>
+        <button class="modal button close" onclick="closeModal('distribution-plot-modal')">&times;</button>
+    </div>
+    <div class="buttonbar">
+        <img src="{DISTRIBUTION-PLOT-PATH}" class="modal content" id="distribution-plot-modal-image">
+    </div>
 </div>

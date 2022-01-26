@@ -23,6 +23,13 @@ function selectImage(element, imageID) {
 
     image.src = element.value;
 
+    let modal_image = document.getElementById(imageID + "-modal-image");
+
+    if (modal_image != null) {
+        modal_image.src = image.src;
+        document.getElementById(imageID + "-modal-caption").textContent = element.textContent;
+    }
+
     if (setClasses) {
         element.classList.toggle("active");
     }

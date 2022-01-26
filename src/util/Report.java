@@ -772,21 +772,35 @@ public class Report
                             boolean first = true;
                             for (File file : files)
                             {
-                                sb_tf_sequence.append(
-                                                "<button onclick=\"selectImage(this, 'tf-sequence-image')\" value='" +
-                                                        options_intern.d_out_validation_logos_tf_sequence + File.separator +
-                                                        file.getName() + "' class='selector").append(first ? " active" : "")
+                                sb_tf_sequence.append("<button onclick=\"selectImage(this, 'tf-sequence')\" value='" +
+                                                options_intern.d_out_validation_logos_tf_sequence + File.separator +
+                                                file.getName() + "' class='selector").append(first ? " active" : "")
                                         .append("'>");
+                                String prettyName = file.getName().substring(0, file.getName().lastIndexOf("."));
+                                sb_tf_sequence.append(prettyName);
+                                if (first)
+                                {
+                                    frame = frame.replace("{TFSEQUENCEMODALCAPTION}", prettyName);
+                                }
                                 first = false;
-                                sb_tf_sequence.append(file.getName(), 0, file.getName().lastIndexOf("."));
                                 sb_tf_sequence.append("</button>");
                             }
                             sb_tf_sequence.append("</div>");
                         }
 
-                        sb_tf_sequence.append("<img id='tf-sequence-image' src='" +
-                                options_intern.d_out_validation_logos_tf_sequence + File.separator +
-                                files.get(0).getName() + "'>");
+                        sb_tf_sequence.append("<div class='buttonbar'>");
+                        sb_tf_sequence.append("<button onclick='openModal(\"tf-sequence-modal\")'>Zoom in</button>");
+                        sb_tf_sequence.append(
+                                "<button onclick='openImageInTab(\"tf-sequence\")'>Open in new tab</button>");
+                        sb_tf_sequence.append("</div>");
+
+                        String firstFile = options_intern.d_out_validation_logos_tf_sequence + File.separator +
+                                files.get(0).getName();
+
+                        sb_tf_sequence.append("<img id='tf-sequence' class='modal source' onclick='openModal" +
+                                "(\"tf-sequence-modal\")'" + " src='" + firstFile + "'>");
+
+                        frame = frame.replace("{TFSEQUENCEMODALIMAGE}", firstFile);
 
                         frame = frame.replace("{TF_SEQUENCE}", sb_tf_sequence.toString());
                     }
@@ -839,7 +853,7 @@ public class Report
                         copyFile(imageFile, targetFile);
 
                         sb_tf_binding_sequences.append("<button class='selector" + (first ? " active" : "") +
-                                "' onclick=\"selectImage(this, 'tf-binding-sequence-image')\" value='" +
+                                "' onclick=\"selectImage(this, 'tf-binding-sequence')\" value='" +
                                 options_intern.d_out_validation_logos_tf_binding_sequence + File.separator +
                                 relevantFileName + ".png'>");
                         sb_tf_binding_sequences.append(relevantFileName);
@@ -853,9 +867,22 @@ public class Report
                     }
                     sb_tf_binding_sequences.append("</div>");
 
-                    sb_tf_binding_sequences.append("<img id='tf-binding-sequence-image' src='" +
+                    sb_tf_binding_sequences.append("<div class='buttonbar'>");
+                    sb_tf_binding_sequences.append(
+                            "<button onclick='openModal(\"tf-binding-sequence-modal\")'>Zoom in</button>");
+                    sb_tf_binding_sequences.append(
+                            "<button onclick='openImageInTab(\"tf-binding-sequence\")'>Open in new tab</button>");
+                    sb_tf_binding_sequences.append("</div>");
+
+                    sb_tf_binding_sequences.append("<img id='tf-binding-sequence' onclick='openModal" +
+                            "(\"tf-binding-sequence-modal\")' class='modal source' src='" +
                             options_intern.d_out_validation_logos_tf_binding_sequence + File.separator + firstImage +
                             ".png'>");
+
+                    frame = frame.replace("{TFBINDINGSEQUENCEMODALIMAGE}",
+                            options_intern.d_out_validation_logos_tf_binding_sequence + File.separator + firstImage +
+                                    ".png");
+                    frame = frame.replace("{TFBINDINGSEQUENCEMODALCAPTION}", firstImage);
 
                     frame = frame.replace("{TF_BINDING_SEQUENCE}", sb_tf_binding_sequences.toString());
                 }
@@ -1237,6 +1264,10 @@ public class Report
                     "<button onclick=\"selectImage(this, 'distribution-plot')\" " + "class=\"selector" +
                             (first ? " active" : "") + "\" value=\"" + histoneModification + ".png\">" +
                             histoneModification + "</button>");
+            if (first)
+            {
+                frame = frame.replace("{DIST_PLOT_MODAL_CAPTION}", histoneModification);
+            }
             first = false;
         }
 
