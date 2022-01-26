@@ -283,10 +283,6 @@ function select_dropdown(selection, value, text, combinations) {
     update_image(selection, combinations);
 }
 
-function leave_dropdown(selection) {
-    document.getElementById(selection + "-dropdown").click();
-}
-
 function filter_dropdown(selection) {
     let searchbox = document.getElementById(selection + "-dropdown-search");
     let term = searchbox.value.toUpperCase();
@@ -302,4 +298,13 @@ function filter_dropdown(selection) {
             options[i].style.display = "none";
         }
     }
+}
+
+function add_dropdown_closing(id) {
+    document.addEventListener("click", function (e) {
+        let content = document.getElementById(id + "-dropdown-content");
+        if (!content.contains(e.target) && e.target !== document.getElementById(id + "-dropdown")) {
+            content.classList.remove("show");
+        }
+    });
 }
