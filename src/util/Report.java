@@ -1438,8 +1438,7 @@ public class Report
         frame = frame.replace("{OVERVIEW_COEFFICIENTS}", overviewCoefficients);
 
         frame = frame.replace("{OVERVIEW_HEATMAPS}", overviewHeatmaps);
-
-        frame = frame.replace("{ADDHEAD}", "<script src=\"COMBINATIONS.js\"></script>");
+        frame = frame.replace("{BASICDATA}", getBasicData(tfGroup));
 
         {
             StringBuilder sb_actions = new StringBuilder();
@@ -1579,7 +1578,6 @@ public class Report
 
     private void writeFile(String path, String content) throws IOException
     {
-        content = content.replace("{ADDHEAD}", "");
         File target = new File(path);
         if (!target.exists())
         {
