@@ -1371,6 +1371,20 @@ public class Report
             }
             sb_dcg.append("</table>");
 
+            Double score;
+            try
+            {
+                score = Double.parseDouble(findValueInTable(tfGroup.name, 1, 2, new File(
+                        options_intern.com2pose_working_directory + File.separator +
+                                options_intern.folder_out_distribution + File.separator +
+                                options_intern.folder_out_distribution_dcg + File.separator +
+                                options_intern.file_suffix_distribution_analysis_dcg), "\t", true));
+                frame = frame.replace("{DCG_SCORE}", formatter.format(score));
+            } catch (NoSuchFieldException ignored)
+            {
+                frame = frame.replace("{DCG_SCORE}", "-");
+            }
+
             frame = frame.replace("{DISCOUNTED_CUMULATIVE_GAIN}", sb_dcg.toString());
         }
 
