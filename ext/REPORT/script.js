@@ -2,6 +2,11 @@ function toggleAccordion(id) {
     let panel = document.getElementById(id);
     if (panel.style.display === "grid") {
         panel.style.display = "none";
+
+        let info = document.getElementById(id + "-info");
+        if (info != null) {
+            info.style.display = "none";
+        }
     } else {
         panel.style.display = "grid";
     }

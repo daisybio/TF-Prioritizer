@@ -3,11 +3,48 @@
         {TFNAME}
     </h1>
 </div>
-<button class="accordion" onclick="toggleAccordion('coefficients')">Regression coefficients</button>
+<div class="accordion-info">
+    <button class="accordion" onclick="toggleAccordion('coefficients')">Regression coefficients</button>
+    <button class="info"
+            onclick="toggleAccordion('coefficients-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+</div>
+<div class="panel info" id="coefficients-info">
+    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+        condimentum
+        purus a
+        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+        metus nisl.</label>
+</div>
 <div class="panel" id="coefficients">
     {COEFFICIENTS}
 </div>
-<button class="accordion" onclick="toggleAccordion('overviewHeatmaps')">Overview regression heatmaps</button>
+<div class="accordion-info">
+    <button class="accordion" onclick="toggleAccordion('overviewHeatmaps')">Overview regression heatmaps</button>
+    <button class="info"
+            onclick="toggleAccordion('overviewHeatmaps-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+</div>
+<div class="panel info" id="overviewHeatmaps-info">
+    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+        condimentum
+        purus a
+        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+        metus nisl.</label>
+</div>
 {OVERVIEW_HEATMAPS}
-<button class="accordion" onclick="toggleAccordion('overviewCoefficients')">Overview regression coefficients</button>
+<div class="accordion-info">
+    <button class="accordion" onclick="toggleAccordion('overviewCoefficients')">Overview regression coefficients
+    </button>
+    <button class="info"
+            onclick="toggleAccordion('overviewCoefficients-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+</div>
+<div class="panel info" id="overviewCoefficients-info">
+    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+        condimentum
+        purus a
+        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+        metus nisl.</label>
+</div>
 {OVERVIEW_COEFFICIENTS}

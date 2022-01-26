@@ -334,3 +334,32 @@ button.narrow {
 input:focus {
     outline: none;
 }
+
+.accordion-info {
+    display: flex;
+}
+
+.accordion-info .accordion {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    justify-self: stretch;
+}
+
+.accordion-info .info {
+    background-color: var(--c3);
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.accordion-info .info:hover,
+.accordion-info.sub .info:hover {
+    background-color: var(--c2);
+}
+
+.accordion-info.sub .info {
+    background-color: var(--c4);
+}
+
+.panel.info label {
+    margin: 10px;
+}
