@@ -186,7 +186,7 @@ function select_subgroup(selection, element, combinations) {
         let modalleftarrow = document.getElementById(selection + "-modal-leftarrow");
         let modalrightarrow = document.getElementById(selection + "-modal-rightarrow");
 
-        dropdown.disabled = modalleftarrow.disabled = modalrightarrow.disabled = leftarrow.disabled = rightarrow.disabled = possible_dropdown_values.length < 2;
+        dropdown_button.disabled = modalleftarrow.disabled = modalrightarrow.disabled = leftarrow.disabled = rightarrow.disabled = possible_dropdown_values.length < 2;
     }
 
     update_image(selection, combinations);
