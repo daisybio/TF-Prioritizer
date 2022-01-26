@@ -10,8 +10,25 @@
     mattis turpis, non maximus augue sollicitudin sed. Sed auctor efficitur nulla quis venenatis. Curabitur scelerisque
     tellus eget commodo venenatis. Phasellus vitae magna id magna vehicula consectetur. Suspendisse risus quam, rhoncus
     ac aliquet quis, dignissim id sem. Cras auctor massa sed felis blandit sollicitudin.</p>
-<h2>Graphical abstract</h2>
-<img src="{RELATIVATION}MEDIA/TF_Prioritizer_graphical_abstract.png">
+<div class="header">
+    <h2>Graphical abstract</h2>
+    <button onclick="openModal('graphical-abstract-modal')">Zoom in</button>
+    <button onclick="window.open('{RELATIVATION}MEDIA/TF_Prioritizer_graphical_abstract.png')">Open in new tab</button>
+</div>
+<img src="{RELATIVATION}MEDIA/TF_Prioritizer_graphical_abstract.png" id="graphical-abstract-image"
+     onclick="openModal('graphical-abstract-modal')" class="modal source">
+
+<div id="graphical-abstract-modal" class="modal background">
+    <div class="buttonbar centered">
+        <div id="graphical-abstract-modal-caption" class="modal caption"></div>
+        <button class="modal button close" onclick="closeModal('graphical-abstract-modal')">&times;</button>
+    </div>
+    <div class="buttonbar">
+        <img src="{RELATIVATION}MEDIA/TF_Prioritizer_graphical_abstract.png" class="modal content"
+             id="graphical-abstract-modal-image">
+    </div>
+</div>
+
 <h1>Lorem ipsum</h1>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam lobortis tellus lectus, quis condimentum libero auctor
     non. Ut consectetur convallis ex, ac eleifend ligula vulputate eu. Duis justo ex, aliquam at nulla ac, sollicitudin
@@ -21,5 +38,56 @@
     mattis turpis, non maximus augue sollicitudin sed. Sed auctor efficitur nulla quis venenatis. Curabitur scelerisque
     tellus eget commodo venenatis. Phasellus vitae magna id magna vehicula consectetur. Suspendisse risus quam, rhoncus
     ac aliquet quis, dignissim id sem. Cras auctor massa sed felis blandit sollicitudin.</p>
-<h2>Technical workflow</h2>
-<img src="{RELATIVATION}MEDIA/COM2POSE_framework.png">
+<div class="header">
+    <h2>Technical workflow</h2>
+    <button onclick="openModal('technical-workflow-modal')">Zoom in</button>
+    <button onclick="window.open('{RELATIVATION}MEDIA/COM2POSE_framework.png')">Open in new tab</button>
+</div>
+<img src="{RELATIVATION}MEDIA/COM2POSE_framework.png" id="technical-workflow-image"
+     onclick="openModal('technical-workflow-modal')" class="modal source">
+
+<div id="technical-workflow-modal" class="modal background">
+    <div class="buttonbar centered">
+        <div id="technical-workflow-modal-caption" class="modal caption"></div>
+        <button class="modal button close" onclick="closeModal('technical-workflow-modal')">&times;</button>
+    </div>
+    <div class="buttonbar">
+        <img src="{RELATIVATION}MEDIA/COM2POSE_framework.png" class="modal content" id="technical-workflow-modal-image">
+    </div>
+</div>
+
+<h1>References</h1>
+<table class="citations">
+    <tr>
+        <td style="border-bottom: solid var(--c3)">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer elementum dignissim accumsan. Donec eget
+            felis eget urna cursus laoreet. Ut in feugiat mi. Pellentesque vestibulum lacus et ornare euismod. Aenean ac
+            ipsum congue quam feugiat bibendum. Praesent vehicula justo ut massa sollicitudin blandit. Suspendisse
+            lobortis odio vel purus suscipit auctor.
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <ol>
+                <li>
+                    First Paper
+                    <ul>
+                        <li>Some information about the paper</li>
+                    </ul>
+                </li>
+                <li>
+                    Second Paper
+                    <ul>
+                        <li>Some information about the paper</li>
+                    </ul>
+                </li>
+                <li>
+                    Third Paper
+                    <ul>
+                        <li>Some information about the paper</li>
+                    </ul>
+                </li>
+            </ol>
+        </td>
+    </tr>
+</table>

@@ -76,6 +76,10 @@ body {
     margin-right: auto;
 }
 
+p {
+    text-align: justify;
+}
+
 .header {
     display: flex;
     flex-direction: row;
@@ -102,6 +106,11 @@ body {
 
 h1 {
     font-size: 40px;
+    justify-self: left;
+    margin-right: auto;
+}
+
+.header h2 {
     justify-self: left;
     margin-right: auto;
 }
@@ -148,13 +157,11 @@ select {
 .header button {
     background-color: var(--c2);
     text-align: center;
-    text-decoration: none;
     font-size: 16px;
     padding: 10px 15px;
     margin: 5px;
     align-self: center;
     display: flex;
-    justify-self: right;
     flex-grow: 0;
 }
 
@@ -362,4 +369,18 @@ input:focus {
 
 .panel.info label {
     margin: 10px;
+}
+
+table.citations {
+    border-style: solid;
+    border-color: var(--c3);
+}
+
+table.citations td {
+    text-align: left;
+}
+
+table.citations td:hover {
+    background-color: rgba(var(--black), 0);
+    cursor: text;
 }
