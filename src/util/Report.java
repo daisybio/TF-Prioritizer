@@ -1441,6 +1441,19 @@ public class Report
 
         frame = frame.replace("{ADDHEAD}", "<script src=\"COMBINATIONS.js\"></script>");
 
+        {
+            StringBuilder sb_actions = new StringBuilder();
+
+            for (TranscriptionFactor tf : tfGroup.transcriptionFactors)
+            {
+                String command =
+                        "window.open('" + options_intern.link_report_genecards.replace("{GENE}", tf.name) + "');\n";
+                sb_actions.append(command);
+            }
+
+            frame = frame.replace("{GENECARD_BUTTON_ACTION}", sb_actions.toString());
+        }
+
         frame = relativate(frame, 2);
 
         writeFile(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_regression +
