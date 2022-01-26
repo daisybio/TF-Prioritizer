@@ -3,11 +3,11 @@
         {TFNAME}
     </h1>
 </div>
-<button class="accordion">Regression coefficients</button>
-<div class="panel">
+<button class="accordion" onclick="toggleAccordion('coefficients')">Regression coefficients</button>
+<div class="panel" id="coefficients">
     {COEFFICIENTS}
 </div>
-<button class="accordion">Overview regression heatmaps</button>
+<button class="accordion" onclick="toggleAccordion('overviewHeatmaps')">Overview regression heatmaps</button>
 {OVERVIEW_HEATMAPS}
-<button class="accordion">Overview regression coefficients</button>
+<button class="accordion" onclick="toggleAccordion('overviewCoefficients')">Overview regression coefficients</button>
 {OVERVIEW_COEFFICIENTS}

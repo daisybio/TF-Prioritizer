@@ -1,18 +1,9 @@
-function accordion() {
-    let acc = document.getElementsByClassName("accordion");
-    let i;
-
-    for (i = 0; i < acc.length; i++) {
-        acc[i].addEventListener("click", function () {
-            this.classList.toggle("active");
-
-            let panel = this.nextElementSibling;
-            if (panel.style.display === "grid") {
-                panel.style.display = "none";
-            } else {
-                panel.style.display = "grid";
-            }
-        });
+function toggleAccordion(id) {
+    let panel = document.getElementById(id);
+    if (panel.style.display === "grid") {
+        panel.style.display = "none";
+    } else {
+        panel.style.display = "grid";
     }
 }
 
@@ -214,7 +205,7 @@ function move_dropdown(selection, delta, combinations) {
         if (i < 1) {
             i = options.length - 1;
         }
-        
+
         options[i].click();
     }
 

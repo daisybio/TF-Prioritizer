@@ -349,6 +349,7 @@ public class Report
                     tf_string = tf_string.replace("{BUTTONBAR}", getButtonBar(tfGroup));
 
                     tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.name);
+                    tf_string = tf_string.replace("{ID}", String.valueOf(transcriptionFactor.name.hashCode()));
 
                     tf_string = tf_string.replace("{BASICDATA}", getBasicData(transcriptionFactor));
 
@@ -366,6 +367,7 @@ public class Report
                         options_intern.f_report_resources_home_tfGroup_html);
 
                 tfGroupString = tfGroupString.replace("{TF_NAME}", i + ". " + tfGroup.name);
+                tfGroupString = tfGroupString.replace("{ID}", String.valueOf(tfGroup.name.hashCode()));
                 tfGroupString = tfGroupString.replace("{BUTTONBAR}", getButtonBar(tfGroup));
                 tfGroupString = tfGroupString.replace("{SINGLE_TFS}", getBasicData(tfGroup));
 
@@ -517,6 +519,7 @@ public class Report
         for (TranscriptionFactor tf : tfGroup.transcriptionFactors)
         {
             String tfString = tfTemplate.replace("{BASICDATA}", getBasicData(tf));
+            tfString = tfString.replace("{ID}", String.valueOf(tf.name.hashCode()));
             tfString = tfString.replace("{GENEID}", tf.geneID);
             tfString = tfString.replace("{BUTTONBAR}", "");
             tfString = tfString.replace("{TF_NAME}", tf.name);
@@ -593,7 +596,7 @@ public class Report
                     new File(d_out_validation.getAbsolutePath() + File.separator + tfGroup.name + File.separator + id);
             frame = frame.replace("{VALIDATION_HEATMAP}",
                     (source == null) ? "" : generateTwoLevelImageSelector(id, source, target, false));
-        }
+        } // Heatmaps
 
         {
             File d_own_tf = new File(
@@ -617,7 +620,7 @@ public class Report
             frame = frame.replace("{VALIDATION_OWN_TF}", (source == null) ? "" :
                     generateThreeLevelImageSelector(id, source, target, new ArrayList<>(List.of(tfGroup.name)), false,
                             true));
-        }
+        } // Own tf
 
         {
             File d_chip_atlas = new File(d_igv_screenshots.getAbsolutePath() + File.separator +
@@ -680,7 +683,7 @@ public class Report
             }
 
 
-        }
+        } // Chip Atlas
 
         {
             File sourceParentDir = new File(options_intern.com2pose_working_directory + File.separator +

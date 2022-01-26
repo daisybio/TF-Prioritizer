@@ -6,16 +6,16 @@
         GeneCards
     </button>
 </div>
-<button class="accordion">Basic data</button>
-<div class="panel">
+<button class="accordion" onclick="toggleAccordion('basicData')">Basic data</button>
+<div class="panel" id="basicData">
     {BASICDATA}
 </div>
-<button class="accordion">Discounted cumulative gain</button>
-<div class="panel">
+<button class="accordion" onclick="toggleAccordion('discCumGain')">Discounted cumulative gain</button>
+<div class="panel" id="discCumGain">
     {DISCOUNTED_CUMULATIVE_GAIN}
 </div>
-<button class="accordion">Distribution plots</button>
-<div class="panel">
+<button class="accordion" onclick="toggleAccordion('distPlots')">Distribution plots</button>
+<div class="panel" id="distPlots">
     <div class="buttonbar">
         {HISTONEMODIFICATIONS}
     </div>

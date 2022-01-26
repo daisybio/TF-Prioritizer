@@ -9,31 +9,37 @@
         Distibution Analysis
     </button>
 </div>
-<button class="accordion">Basic data</button>
-<div class="panel">
+<button class="accordion" onclick="toggleAccordion('basicData')">Basic data</button>
+<div class="panel" id="basicData">
     {BASICDATA}
 </div>
-<button class="accordion">Logos</button>
-<div class="panel">
-    <button class="accordion">Biophysical model</button>
-    <div class="panel">
+<button class="accordion" onclick="toggleAccordion('logos')">Logos</button>
+<div class="panel" id="logos">
+    <button class="accordion" onclick="toggleAccordion('biophysicalModel')">Biophysical model</button>
+    <div class="panel" id="biophysicalModel">
         <img src="Logos/biophysical_model.png">
     </div>
-    <button class="accordion">TF sequence</button>
-    <div class="panel">
+    <button class="accordion" onclick="toggleAccordion('tfSequence')">TF sequence</button>
+    <div class="panel" id="tfSequence">
         {TF_SEQUENCE}
     </div>
-    <button class="accordion">TF binding sequence</button>
-    <div class="panel">
+    <button class="accordion" onclick="toggleAccordion('tfBindingSequence')">TF binding sequence</button>
+    <div class="panel" id="tfBindingSequence">
         {TF_BINDING_SEQUENCE}
     </div>
 </div>
 
-<button class="accordion">Differential gene expression of top target genes</button>
+<button class="accordion" onclick="toggleAccordion('validationHeatmaps')">Differential gene expression of top target
+    genes
+</button>
 {VALIDATION_HEATMAP}
-<button class="accordion" {VALIDATION_IGV_DISABLED}>IGV screenschots for top target genes</button>
+<button class="accordion" onclick="toggleAccordion('validationIGV')" {VALIDATION_IGV_DISABLED}>IGV screenschots for top
+    target genes
+</button>
 {VALIDATION_IGV}
-<button class="accordion">Validation: Own TF ChIP-seq data</button>
+<button class="accordion" onclick="toggleAccordion('validationOwnTF')">Validation: Own TF ChIP-seq data</button>
 {VALIDATION_OWN_TF}
-<button class="accordion" {VALIDATION_CHIP_ATLAS_DISABLED}>Validation: ChIP ATLAS</button>
+<button class="accordion" onclick="toggleAccordion('validationChipAtlas')" {VALIDATION_CHIP_ATLAS_DISABLED}>Validation:
+    ChIP ATLAS
+</button>
 {VALIDATION_CHIP_ATLAS}
