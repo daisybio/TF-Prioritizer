@@ -648,7 +648,7 @@ public class COM2POSE_lib
                 //save session
                 File f_save_session = new File(
                         f_output_log2fc.getAbsolutePath() + File.separator + options_intern.file_suffix_session);
-                igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
+                f_save_session=igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
 
                 //read in and sort genes
                 ArrayList<DESeq2_gene_object> log2fc = new ArrayList<>();
@@ -806,6 +806,12 @@ public class COM2POSE_lib
                     out_session.println("genome " + options_intern.igv_species_ref_genome);
                     String response_session = in_session.readLine();
 
+                    //faster if we load the saved session!
+                    String load_session = "load "+ f_save_session.getAbsolutePath();
+                    out_session.println(load_session);
+                    String response_load_sessoin = in_session.readLine();
+
+                    /*
                     //logger.logLine("[IGV] " + load_tf_chip_seq);
                     out_session.println(load_tf_chip_seq);
                     String response_load_sessoin = in_session.readLine();
@@ -843,7 +849,7 @@ public class COM2POSE_lib
                             out_session.println("region " + split[0] + " " + split[1] + " " + split[2]);
                             String response_region = in_session.readLine();
                         }
-                    }
+                    }*/
 
                     //do pics overall genes now
                     for (int i = 0; i < regulated_genes.size(); i++)
@@ -1196,7 +1202,7 @@ public class COM2POSE_lib
                 //save session
                 File f_save_session = new File(
                         f_output_tf_hm_tp.getAbsolutePath() + File.separator + options_intern.file_suffix_session);
-                igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
+                f_save_session=igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
 
                 Socket socket_session = new Socket("127.0.0.1", options_intern.igv_port_number);
                 PrintWriter out_session = new PrintWriter(socket_session.getOutputStream(), true);
@@ -1205,6 +1211,11 @@ public class COM2POSE_lib
                 out_session.println("genome " + options_intern.igv_species_ref_genome);
                 String response_session = in_session.readLine();
 
+                //faster if we load the saved session!
+                String load_session = "load "+ f_save_session.getAbsolutePath();
+                out_session.println(load_session);
+                String response_load_sessoin = in_session.readLine();
+                /*
                 //logger.logLine("[IGV] " + load_tf_chip_seq);
                 out_session.println(load_tf_chip_seq);
                 String response_load_sessoin = in_session.readLine();
@@ -1242,7 +1253,7 @@ public class COM2POSE_lib
                         out_session.println("region " + split[0] + " " + split[1] + " " + split[2]);
                         String response_region = in_session.readLine();
                     }
-                }
+                }*/
 
                 //do pics of important loci
                 for (String locus : options_intern.igv_important_locus_all_prio_tf)
@@ -1620,7 +1631,7 @@ public class COM2POSE_lib
                                     //save session
                                     File f_save_session = new File(
                                             f_output_group.getAbsolutePath() + File.separator + options_intern.file_suffix_session);
-                                    igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
+                                    f_save_session=igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
 
                                     Socket socket_session = new Socket("127.0.0.1", options_intern.igv_port_number);
                                     PrintWriter out_session = new PrintWriter(socket_session.getOutputStream(), true);
@@ -1630,6 +1641,12 @@ public class COM2POSE_lib
                                     out_session.println("genome " + options_intern.igv_species_ref_genome);
                                     String response_session = in_session.readLine();
 
+                                    //faster if we load the saved session!
+                                    String load_session = "load "+ f_save_session.getAbsolutePath();
+                                    out_session.println(load_session);
+                                    String response_load_sessoin = in_session.readLine();
+
+                                    /*
                                     //logger.logLine("[IGV] " + load_tf_chip_seq);
                                     out_session.println(load_tf_chip_seq);
                                     String response_load_sessoin = in_session.readLine();
@@ -1667,7 +1684,7 @@ public class COM2POSE_lib
                                             out_session.println("region " + split[0] + " " + split[1] + " " + split[2]);
                                             String response_region = in_session.readLine();
                                         }
-                                    }
+                                    }*/
 
                                     //do pics overall genes now
                                     for (int i = 0; i < regulated_genes.size(); i++)
@@ -2295,7 +2312,9 @@ public class COM2POSE_lib
                             //save sessions
                             File f_session_tp_name = new File(f_out_session_tp.getAbsolutePath() + File.separator +
                                     options_intern.file_suffix_session);
-                            igv_save_sessions(f_session_tp_name, load_tf_chip_seq, tdf_files);
+                            File f_save_session=igv_save_sessions(f_session_tp_name, load_tf_chip_seq, tdf_files);
+
+
 
                             /*out.println("genome "+options_intern.igv_species_ref_genome);
                             String response = in.readLine();
@@ -2497,7 +2516,12 @@ public class COM2POSE_lib
                             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+                            //faster if we load the saved session!
+                            String load_session = "load "+ f_save_session.getAbsolutePath();
+                            out.println(load_session);
+                            String response_load_sessoin = in.readLine();
 
+                            /*
                             //logger.logLine("[IGV] " + load_tf_chip_seq);
                             out.println(load_tf_chip_seq);
                             String response_load = in.readLine();
@@ -2518,12 +2542,14 @@ public class COM2POSE_lib
                                     response_session_tdf = in.readLine();
                                 }
 
-                            }
+                            }*/
 
 
                             //logger.logLine("[IGV] "+ "genome "+options_intern.igv_species_ref_genome);
                             out.println("genome " + options_intern.igv_species_ref_genome);
                             String response = in.readLine();
+
+                            /*
                             //logger.logLine("[IGV] "+ response);
 
                             //include enhancer regions of interest if available
@@ -2545,7 +2571,7 @@ public class COM2POSE_lib
                                     out.println("region " + split[0] + " " + split[1] + " " + split[2]);
                                     String response_region = in.readLine();
                                 }
-                            }
+                            }*/
 
                             int count = 1;
                             for (String targets : target_genes_for_photo_session)
@@ -3415,12 +3441,18 @@ public class COM2POSE_lib
                                     f_output_igv_shots.getAbsolutePath() + File.separator + file_dir_tp.getName() +
                                             File.separator + key_hm + File.separator +
                                             options_intern.file_suffix_session);
-                            igv_save_sessions(f_session_intern, load_for_session_intern, tdf_files);
+                            File f_save_session = igv_save_sessions(f_session_intern, load_for_session_intern,
+                                    tdf_files);
 
                             Socket socket = new Socket("127.0.0.1", options_intern.igv_port_number);
                             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+                            //faster if we load the saved session!
+                            String load_session = "load "+ f_save_session.getAbsolutePath();
+                            out.println(load_session);
+                            String response_load_sessoin = in.readLine();
+                            /*
                             //load again
                             out.println(load_for_session_intern);
                             String response_load_2 = in.readLine();
@@ -3461,7 +3493,7 @@ public class COM2POSE_lib
                                     out.println("region " + split[0] + " " + split[1] + " " + split[2]);
                                     String response_region = in.readLine();
                                 }
-                            }
+                            }*/
 
 
                             for (String key_target_gene : target_genes)
@@ -18018,7 +18050,7 @@ public class COM2POSE_lib
         }
     }
 
-    private void igv_save_sessions(File f_output_file, String load_command, ArrayList<File> tdf_files)
+    private File igv_save_sessions(File f_output_file, String load_command, ArrayList<File> tdf_files)
             throws IOException
     {
         //save sessions
@@ -18089,5 +18121,7 @@ public class COM2POSE_lib
         response_session = in_session.readLine();
 
         socket_session.close();
+
+        return f_session_tp_name;
     }
 }
