@@ -8485,6 +8485,7 @@ public class COM2POSE_lib
                     sb.append("sns.set_context(\"notebook\")\n");
                     sb.append("color = \"#A6CEE3\"\n");
                     sb.append("sns.set_context(\"talk\")\n");
+                    sb.append("sns.set(font_scale=2)\n");
                     sb.append("sns.set_style(\"whitegrid\")\n");
 
                     HashSet<String> th_group_differentpoints = new HashSet<>();
@@ -8563,6 +8564,12 @@ public class COM2POSE_lib
                         sb.append(fileDirHM_Group.getName());
                         sb.append(".empty:");
                         sb.append("    # Bar Plot\n");
+                        sb.append("    sns.set(font_scale=3)\n");
+                        sb.append("    if(len("+groupname1+"_"+groupname2+") > 61):\n" +
+                                "        sns.set(font_scale=2)\n" +
+                                "    if(len("+groupname1+"_"+groupname2+") > 81):\n" +
+                                "        sns.set(font_scale=1)\n");
+                        sb.append("    sns.set_style(\"whitegrid\")\n");
                         sb.append("    time = '");
                         sb.append(fileDirHM.getName());
                         sb.append(": ");
@@ -8575,9 +8582,9 @@ public class COM2POSE_lib
                         sb.append(".index, y=time, data=");
                         sb.append(fileDirHM_Group.getName());
                         sb.append(", color=color)\n");
-                        sb.append("    ax.set_title(time)\n");
-                        sb.append("    ax.set_ylabel('Normalized feature value')\n");
-                        sb.append("    ax.set_xlabel('')\n");
+                        sb.append("    ax.set_title(\""+fileDirHM.getName()+"\\n"+groupname1+":"+groupname2+"\")\n");
+                        sb.append("    ax.set_ylabel('Normalized feature value\\n(regression coefficient)')\n");
+                        sb.append("    ax.set_xlabel('Transcription Factor')\n");
                         sb.append("    plt.xticks(rotation=90)\n");
                         sb.append("    plt.tight_layout()\n");
                         sb.append("    plt.savefig(f\"");
@@ -8651,8 +8658,22 @@ public class COM2POSE_lib
                     sb.append("join_df_stages");
                     sb.append(".empty:\n");
 
+                    sb.append("    change_colnames=True\n" + "    sns.set(font_scale=1.2)\n" +
+                            "    if(len(join_df_stages) > 41):\n" + "        sns.set(font_scale=1)\n" +
+                            "        change_colnames=False\n" + "    if(len(join_df_stages) > 61):\n" +
+                            "        sns.set(font_scale=0.8)\n" + "        change_colnames=False\n" +
+                            "    sns.set_style(\"whitegrid\")\n" + "    column_names = list(join_df_stages.columns)\n" +
+                            "    n_column_names = []\n" + "    for n in column_names:\n" +
+                            "        split1 = n.split(\":\")\n" + "        hm = split1[0]\n" +
+                            "        split2 = split1[1].split(\"VS\")\n" + "        group1 = split2[0]\n" +
+                            "        group2 = split2[1]\n" + "        if change_colnames:\n" +
+                            "            n_column_names.append(hm+\"\\n\"+group1+\":\"+group2)\n" + "        else:\n" +
+                            "            n_column_names.append(hm + \" -\" + group1 + \":\" + group2)\n" +
+                            "    join_df_stages.columns = n_column_names\n");
+
                     sb.append(
                             "    plot = sns.heatmap(join_df_stages.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
+                    sb.append("    plot.set_xlabel('Transcription Factor')\n");
                     sb.append("    plt.savefig(\"");
                     sb.append(out_th.getAbsolutePath() + File.separator + fileDirHM.getName() + "_threshold_" + d +
                             "_different_stages.png\")\n");
@@ -8728,8 +8749,24 @@ public class COM2POSE_lib
                         sb.append("join_df_same");
                         sb.append(".empty:\n");
 
+                        sb.append("    change_colnames=True\n" + "    sns.set(font_scale=2)\n" +
+                                "    if(len(join_df_same) > 41):\n" + "        sns.set(font_scale=1)\n" +
+                                "        change_colnames=False\n" + "    if(len(join_df_same) > 61):\n" +
+                                "        sns.set(font_scale=0.8)\n" + "        change_colnames=False\n" +
+                                "    sns.set_style(\"whitegrid\")\n" +
+                                "    column_names = list(join_df_same.columns)\n" + "    n_column_names = []\n" +
+                                "    for n in column_names:\n" + "        split1 = n.split(\":\")\n" +
+                                "        hm = split1[0]\n" + "        split2 = split1[1].split(\"VS\")\n" +
+                                "        group1 = split2[0]\n" + "        group2 = split2[1]\n" +
+                                "        if change_colnames:\n" +
+                                "            n_column_names.append(hm+\"\\n\"+group1+\":\"+group2)\n" +
+                                "        else:\n" +
+                                "            n_column_names.append(hm + \" -\" + group1 + \":\" + group2)\n" +
+                                "    join_df_same.columns = n_column_names\n");
+
                         sb.append(
                                 "    plot = sns.heatmap(join_df_same.transpose(), cmap=\"Paired\",  square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5, linecolor='black', xticklabels=True)\n");
+                        sb.append("    plot.set_xlabel('Transcription Factor')\n");
                         sb.append("    plt.savefig(\"");
                         sb.append(out_th.getAbsolutePath() + File.separator + fileDirHM.getName() + "_threshold_" + d +
                                 "_same_stages.png\")\n");
@@ -17381,6 +17418,7 @@ public class COM2POSE_lib
                 "import_or_install(\"seaborn\")\n" + "import_or_install(\"matplotlib.pyplot\")\n" +
                 "import pandas as pd\n" + "import seaborn as sns\n" + "import matplotlib.pyplot as plt\n" +
                 "sns.set_context(\"notebook\")\n" + "color = \"#A6CEE3\"\n" + "sns.set_context(\"talk\")\n" +
+                "sns.set(font_scale=4)\n"+
                 "sns.set_style(\"whitegrid\")\n" + "\n" + "import_or_install(\"numpy\")\n" + "import numpy as np\n" +
                 "import_or_install(\"sts\")\n" + "import statistics as sts\n" + "import scipy.stats as scp\n" +
                 "plt.figure(figsize=(20, 17))\n\n\n" +
@@ -17435,7 +17473,8 @@ public class COM2POSE_lib
             sb_all.append(
                     "    background_" + name_tf + " = pd.concat([background," + name_tf + "],axis=0)\n" + "    ax_" +
                             name_tf + " = sns.boxplot(x=\"label\", y=\"TF_TG_SCORE\",data=background_" + name_tf +
-                            ",palette=\"Set3\")\n" + "    ax_" + name_tf + ".set_yscale(\"log\")\n");
+                            ",palette=\"husl\")\n" + "    ax_" + name_tf + ".set_yscale(\"log\")\n");
+            sb_all.append("    ax_"+name_tf+".set(xlabel='', ylabel='TF-TG score')\n");
             if (name_composed.equals(""))
             {
                 sb_all.append(
