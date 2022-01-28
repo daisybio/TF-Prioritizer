@@ -12076,11 +12076,11 @@ public class COM2POSE_lib
 
                     File file_to_shuffle = new File("");
 
-                    if (affinity_files.size() == 2)
+                    if (affinity_files.size() > 1)
                     {
                         for (File f : affinity_files)
                         {
-                            if (f.getName().matches(".*TPM.*"))
+                            if (f.getName().matches(".*TPM.txt"))
                             {
                                 file_to_shuffle = f;
                                 break;
