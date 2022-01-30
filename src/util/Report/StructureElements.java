@@ -493,4 +493,31 @@ public class StructureElements
             }
         }
     }
+
+    static String setGeneCardLinks(String text, TranscriptionFactorGroup tfGroup)
+    {
+        StringBuilder sb_links = new StringBuilder();
+
+        for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
+        {
+            String command =
+                    "window.open('" + Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) +
+                            "');\n";
+            sb_links.append(command);
+        }
+
+        return text.replace("{GENECARD_BUTTON_ACTION}", sb_links.toString());
+    }
+
+    static String setBasicData(String text, TranscriptionFactorGroup tfGroup) throws IOException
+    {
+        text = text.replace("{BASICDATA}", getBasicData(tfGroup));
+        return text;
+    }
+
+    static String setBasicData(String text, TranscriptionFactor tf) throws IOException
+    {
+        text = text.replace("{BASICDATA}", getBasicData(tf));
+        return text;
+    }
 }

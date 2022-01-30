@@ -178,7 +178,7 @@ public class PageGenerators
                     tf_string = tf_string.replace("{TF_NAME}", i + ". " + transcriptionFactor.getName());
                     tf_string = tf_string.replace("{ID}", String.valueOf(transcriptionFactor.getName().hashCode()));
 
-                    tf_string = tf_string.replace("{BASICDATA}", StructureElements.getBasicData(transcriptionFactor));
+                    tf_string = StructureElements.setBasicData(tf_string, transcriptionFactor);
 
                     tf_string = tf_string.replace("{GENEID}", transcriptionFactor.getGeneID());
 
@@ -212,8 +212,6 @@ public class PageGenerators
 
     static boolean generateValidation(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        String basicData = StructureElements.getBasicData(tfGroup);
-
         File templateFile = new File(Report.options_intern.path_to_COM2POSE + File.separator +
                 Report.options_intern.f_report_resources_validation_validation_html);
 
@@ -230,7 +228,7 @@ public class PageGenerators
 
         frame = frame.replace("{TFNAME}", tfGroup.getName());
 
-        frame = frame.replace("{BASICDATA}", basicData);
+        frame = StructureElements.setBasicData(frame, tfGroup);
 
         {
             File source = null;
@@ -387,19 +385,9 @@ public class PageGenerators
                         Report.options_intern.d_out_validation + File.separator + tfGroup.getName() + File.separator +
                         Report.options_intern.d_out_validation_logos_tf_sequence);
 
-                File sourceDir = null;
+                File sourceDir = FileManagement.getFileIfInDirectory(sDir, "[0-9]+_.*", false);
 
-                for (File directory : Objects.requireNonNull(sDir.listFiles()))
-                {
-                    if (directory.getName().matches("[0-9]+_.*") && directory.isDirectory())
-                    {
-                        if (directory.getName().split("_")[1].equals(tfGroup.getName()))
-                        {
-                            sourceDir = directory;
-                            break;
-                        }
-                    }
-                }
+                sourceDir = FileManagement.getFileIfInDirectory(sourceDir, ".*_" + tfGroup.getName() + ".*", false);
 
                 if (sourceDir != null)
                 {
@@ -424,10 +412,10 @@ public class PageGenerators
                             boolean first = true;
                             for (File file : files)
                             {
-                                sb_tf_sequence.append("<button onclick=\"selectImage(this, 'tf-sequence')\" value='" +
-                                                Report.options_intern.d_out_validation_logos_tf_sequence + File.separator +
-                                                file.getName() + "' class='selector").append(first ? " active" : "")
-                                        .append("'>");
+                                sb_tf_sequence.append("<button onclick=\"selectImage(this, 'tf-sequence')\" value='")
+                                        .append(Report.options_intern.d_out_validation_logos_tf_sequence)
+                                        .append(File.separator).append(file.getName()).append("' class='selector")
+                                        .append(first ? " active" : "").append("'>");
                                 String prettyName = file.getName().substring(0, file.getName().lastIndexOf("."));
                                 sb_tf_sequence.append(prettyName);
                                 if (first)
@@ -450,7 +438,7 @@ public class PageGenerators
                                 files.get(0).getName();
 
                         sb_tf_sequence.append("<img id='tf-sequence' class='modal source' onclick='openModal" +
-                                "(\"tf-sequence-modal\")'" + " src='" + firstFile + "'>");
+                                "(\"tf-sequence-modal\")' src='").append(firstFile).append("'>");
 
                         frame = frame.replace("{TFSEQUENCEMODALIMAGE}", firstFile);
 
@@ -503,10 +491,10 @@ public class PageGenerators
 
                         FileManagement.copyFile(imageFile, targetFile);
 
-                        sb_tf_binding_sequences.append("<button class='selector" + (first ? " active" : "") +
-                                "' onclick=\"selectImage(this, 'tf-binding-sequence')\" value='" +
-                                Report.options_intern.d_out_validation_logos_tf_binding_sequence + File.separator +
-                                relevantFileName + ".png'>");
+                        sb_tf_binding_sequences.append("<button class='selector").append(first ? " active" : "")
+                                .append("' onclick=\"selectImage(this, 'tf-binding-sequence')\" value='")
+                                .append(Report.options_intern.d_out_validation_logos_tf_binding_sequence)
+                                .append(File.separator).append(relevantFileName).append(".png'>");
                         sb_tf_binding_sequences.append(relevantFileName);
                         sb_tf_binding_sequences.append("</button>");
 
@@ -526,9 +514,9 @@ public class PageGenerators
                     sb_tf_binding_sequences.append("</div>");
 
                     sb_tf_binding_sequences.append("<img id='tf-binding-sequence' onclick='openModal" +
-                            "(\"tf-binding-sequence-modal\")' class='modal source' src='" +
-                            Report.options_intern.d_out_validation_logos_tf_binding_sequence + File.separator +
-                            firstImage + ".png'>");
+                                    "(\"tf-binding-sequence-modal\")' class='modal source' src='")
+                            .append(Report.options_intern.d_out_validation_logos_tf_binding_sequence)
+                            .append(File.separator).append(firstImage).append(".png'>");
 
                     frame = frame.replace("{TFBINDINGSEQUENCEMODALIMAGE}",
                             Report.options_intern.d_out_validation_logos_tf_binding_sequence + File.separator +
@@ -572,19 +560,7 @@ public class PageGenerators
                             new ArrayList<>(List.of(tfGroup.getName())), false, true));
         } // IGV
 
-        {
-            StringBuilder sb_actions = new StringBuilder();
-
-            for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
-            {
-                String command =
-                        "window.open('" + Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) +
-                                "');\n";
-                sb_actions.append(command);
-            }
-
-            frame = frame.replace("{GENECARD_BUTTON_ACTION}", sb_actions.toString());
-        }
+        frame = StructureElements.setGeneCardLinks(frame, tfGroup);
 
         FileManagement.writeHTML(Report.options_intern.com2pose_working_directory + File.separator +
                 Report.options_intern.d_out_validation + File.separator + tfGroup.getName() + File.separator +
@@ -595,8 +571,6 @@ public class PageGenerators
 
     static boolean generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        String basicData = StructureElements.getBasicData(tfGroup);
-
         File templateFile = new File(Report.options_intern.path_to_COM2POSE + File.separator +
                 Report.options_intern.f_report_resources_distribution_distribution_html);
 
@@ -650,7 +624,7 @@ public class PageGenerators
                 StructureElements.getFrame(tfGroup.getName() + " - Distribution", templateFile.getAbsolutePath());
 
         frame = frame.replace("{TFNAME}", tfGroup.getName());
-        frame = frame.replace("{BASICDATA}", basicData);
+        frame = StructureElements.setBasicData(frame, tfGroup);
 
         StringBuilder sb_histoneModifications = new StringBuilder();
 
@@ -659,9 +633,9 @@ public class PageGenerators
         for (String histoneModification : existingHMs)
         {
             sb_histoneModifications.append(
-                    "<button onclick=\"selectImage(this, 'distribution-plot')\" " + "class=\"selector" +
-                            (first ? " active" : "") + "\" value=\"" + histoneModification + ".png\">" +
-                            histoneModification + "</button>");
+                            "<button onclick=\"selectImage(this, 'distribution-plot')\" " + "class=\"selector")
+                    .append(first ? " active" : "").append("\" value=\"").append(histoneModification).append(".png\">")
+                    .append(histoneModification).append("</button>");
             if (first)
             {
                 frame = frame.replace("{DIST_PLOT_MODAL_CAPTION}", histoneModification);
@@ -672,19 +646,9 @@ public class PageGenerators
         frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
         frame = frame.replace("{DISTRIBUTION-PLOT-PATH}", existingHMs.get(0) + ".png");
 
-        {
-            StringBuilder sb_actions = new StringBuilder();
 
-            for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
-            {
-                String command =
-                        "window.open('" + Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) +
-                                "');\n";
-                sb_actions.append(command);
-            }
+        frame = StructureElements.setGeneCardLinks(frame, tfGroup);
 
-            frame = frame.replace("{GENECARD_BUTTON_ACTION}", sb_actions.toString());
-        }
 
         {
             File allFile = new File(Report.options_intern.com2pose_working_directory + File.separator +
@@ -876,21 +840,9 @@ public class PageGenerators
         frame = frame.replace("{OVERVIEW_COEFFICIENTS}", overviewCoefficients);
 
         frame = frame.replace("{OVERVIEW_HEATMAPS}", overviewHeatmaps);
-        frame = frame.replace("{BASICDATA}", StructureElements.getBasicData(tfGroup));
+        frame = StructureElements.setBasicData(frame, tfGroup);
 
-        {
-            StringBuilder sb_actions = new StringBuilder();
-
-            for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
-            {
-                String command =
-                        "window.open('" + Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) +
-                                "');\n";
-                sb_actions.append(command);
-            }
-
-            frame = frame.replace("{GENECARD_BUTTON_ACTION}", sb_actions.toString());
-        }
+        frame = StructureElements.setGeneCardLinks(frame, tfGroup);
 
         FileManagement.writeHTML(Report.options_intern.com2pose_working_directory + File.separator +
                 Report.options_intern.d_out_regression + File.separator + tfGroup.getName() + File.separator +

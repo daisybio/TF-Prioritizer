@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -125,5 +126,26 @@ public class FileManagement
             }
         }
         throw new NoSuchFieldException();
+    }
+
+    static File getFileIfInDirectory(File directory, String fileNameRegex, boolean lookingForFiles)
+    {
+        if (directory == null)
+        {
+            return null;
+        }
+
+        for (File entry : Objects.requireNonNull(directory.listFiles()))
+        {
+            if (lookingForFiles != entry.isFile())
+            {
+                continue;
+            }
+            if (entry.getName().matches(fileNameRegex))
+            {
+                return entry;
+            }
+        }
+        return null;
     }
 }
