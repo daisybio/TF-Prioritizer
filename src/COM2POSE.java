@@ -2,6 +2,7 @@ import com2pose.COM2POSE_lib;
 import org.apache.commons.cli.*;
 
 import util.Options_intern;
+import util.Report.Report;
 
 
 public class COM2POSE
@@ -16,7 +17,7 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
-        new util.Report(options_intern).generate();
+        new Report(options_intern).generate();
 
         /*
         com2pose_lib.check_chromosomes();
