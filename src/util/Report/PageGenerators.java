@@ -6,6 +6,15 @@ import java.util.*;
 
 public class PageGenerators
 {
+    static void generateGeneralPages() throws IOException
+    {
+        generateParameters();
+        generateImportantLoci();
+        generateTopLog2fc();
+        generateCoOccurrence();
+        generateOverview();
+    }
+
     static void generateImportantLoci() throws IOException
     {
         File sourceDir = new File(Report.options_intern.com2pose_working_directory + File.separator +

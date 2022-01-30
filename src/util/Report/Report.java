@@ -235,8 +235,6 @@ public class Report
 
         styleAndScript();
 
-        PageGenerators.generateParameters();
-
         int i = 1;
 
         for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
@@ -249,11 +247,8 @@ public class Report
             i++;
         }
 
+        PageGenerators.generateGeneralPages();
         PageGenerators.generateHome(transcriptionFactorGroups);
-        PageGenerators.generateImportantLoci();
-        PageGenerators.generateTopLog2fc();
-        PageGenerators.generateCoOccurrence();
-        PageGenerators.generateOverview();
 
         FileManagement.executorService.shutdown();
         ThreadPoolExecutor tpe = (ThreadPoolExecutor) FileManagement.executorService;
