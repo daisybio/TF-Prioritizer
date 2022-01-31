@@ -17,9 +17,6 @@ public class COM2POSE
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
 
-        new Report(options_intern).generate();
-
-        /*
         com2pose_lib.check_chromosomes();
 
         //mix histone modifications
@@ -160,13 +157,14 @@ public class COM2POSE
         {
             com2pose_lib.run_igv_top_log2gc();
         }
-        */
 
         //run co-occurence analysis of ChIP-ATLAS .bed files
         if (options_intern.chip_atlas_activated_chip_atlas)
         {
             com2pose_lib.run_cooccurence_analysis();
         }
+
+        new Report(options_intern).generate();
 
         System.out.println("X");
     }
