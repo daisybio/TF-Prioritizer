@@ -315,8 +315,11 @@ public class Report
         existingValues.get(SelectorTypes.IMPORTANT_LOCI).addAll(options_intern.igv_important_locus_all_prio_tf);
 
         existingValues.get(SelectorTypes.TOP_LOG2FC).addAll(Arrays.asList("downregulated", "upregulated"));
-        existingValues.get(SelectorTypes.REGRESSION_CUTOFFS)
-                .addAll(Arrays.asList("0.1", "0.2", "0.3", "0.4", "0.5", "0.6"));
+
+        for (Double cutoff : options_intern.plot_th_coefficient)
+        {
+            existingValues.get(SelectorTypes.REGRESSION_CUTOFFS).add(String.valueOf(cutoff));
+        }
 
         existingValues.get(SelectorTypes.DISTRIBUTION_OPTIONS)
                 .addAll(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
