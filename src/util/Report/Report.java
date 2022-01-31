@@ -270,32 +270,6 @@ public class Report
             i++;
         }
 
-        FileManagement.executorService.shutdown();
-        ThreadPoolExecutor tpe = (ThreadPoolExecutor) FileManagement.executorService;
-        long startTime = System.currentTimeMillis();
-        long totalTasks = tpe.getQueue().stream().filter(t -> !((FutureTask<?>) t).isDone()).count();
-
-        while (!FileManagement.executorService.isTerminated())
-        {
-            long now = System.currentTimeMillis();
-            long pendingTasks = tpe.getQueue().stream().filter(t -> !((FutureTask<?>) t).isDone()).count();
-            double timeDelta = (now - startTime) / 1000.;
-            long finishedTasks = totalTasks - pendingTasks;
-
-            double tasksPerSecond = finishedTasks / timeDelta;
-            long secondsLeft = (long) (pendingTasks / tasksPerSecond);
-            long minutesLeft = secondsLeft / 60;
-            secondsLeft = secondsLeft % 60;
-
-            System.out.print(
-                    "Files left to copy: " + pendingTasks + "\tETA: " + minutesLeft + "m " + secondsLeft + "s" + "\r");
-
-
-            Thread.sleep(500);
-        }
-
-        System.out.println(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
-
         logger.logLine("[REPORT] Finished generating report");
     }
 
@@ -348,9 +322,6 @@ public class Report
                 .addAll(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
         existingValues.get(SelectorTypes.DISTRIBUTION_OPTIONS).add("ALL");
 
-        System.out.println(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
-        System.out.println(existingValues.get(SelectorTypes.GROUP_PAIRINGS));
-
         for (SelectorTypes type : SelectorTypes.values())
         {
             if (existingValues.get(type).size() > 0)
@@ -361,7 +332,5 @@ public class Report
                 Collections.sort(existingValues.get(type));
             }
         }
-        System.out.println(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
-        System.out.println(existingValues.get(SelectorTypes.GROUP_PAIRINGS));
     }
 }

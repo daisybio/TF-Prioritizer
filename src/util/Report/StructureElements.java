@@ -347,11 +347,23 @@ public class StructureElements
 
         if (onlyFiles)
         {
-            sb_result.append("[");
+            ArrayList<String> fileNames = new ArrayList<>();
+
             for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
             {
-                sb_result.append("\"" + entry.getName() + "\",");
+                fileNames.add(entry.getName());
             }
+
+            Collections.sort(fileNames);
+            fileNames.sort(new StringComparator());
+
+            sb_result.append("[");
+
+            for (String fileName : fileNames)
+            {
+                sb_result.append("\"" + fileName + "\",");
+            }
+
             sb_result.deleteCharAt(sb_result.length() - 1);
             sb_result.append("]");
         }
@@ -372,5 +384,24 @@ public class StructureElements
         }
 
         return sb_result.toString();
+    }
+
+    static class StringComparator implements Comparator<String>
+    {
+        @Override public int compare(String a, String b)
+        {
+            return prefixNum(a) - prefixNum(b);
+        }
+
+        private int prefixNum(String a)
+        {
+            if (a.matches("[0-9]+_.*"))
+            {
+                return Integer.parseInt(a.split("_")[0]);
+            } else
+            {
+                return 0;
+            }
+        }
     }
 }

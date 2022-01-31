@@ -57,7 +57,6 @@ function init_selection(id, combinations) {
 }
 
 function update_selection(source_element, id, combinations) {
-    console.log(source_element.textContent);
     let level = parseInt(source_element.id.split("-")[1]);
     let depth = get_depth(combinations);
 

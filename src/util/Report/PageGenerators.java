@@ -3,6 +3,7 @@ package util.Report;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class PageGenerators
 {
@@ -266,7 +267,7 @@ public class PageGenerators
             File target = new File(
                     d_out_validation.getAbsolutePath() + File.separator + tfGroup.getName() + File.separator + id);
 
-            FileManagement.copyDirectory(source, target, false, ".+\\.png$");
+            FileManagement.copyDirectory(source, target, false, ".+\\.png$", new ArrayList<>());
 
             frame = frame.replace("{VALIDATION_HEATMAP}", StructureElements.generateImageSelector(id, target,
                     Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS)));
@@ -284,7 +285,7 @@ public class PageGenerators
 
             if (source != null)
             {
-                FileManagement.copyDirectory(source, target, true, ".+\\.png$");
+                FileManagement.copyDirectory(source, target, true, ".+\\.png$", List.of(tfGroup.getName()));
 
                 frame = frame.replace("{VALIDATION_OWN_TF}", StructureElements.generateImageSelector(id, target,
                         Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUPS,
@@ -340,6 +341,7 @@ public class PageGenerators
                         }
                     }
                 }
+
                 frame = frame.replace("{VALIDATION_CHIP_ATLAS}", StructureElements.generateImageSelector(id, target,
                         Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUPS,
                                 SelectorTypes.EMPTY_DROPDOWN)));
@@ -527,7 +529,7 @@ public class PageGenerators
 
             if (source != null)
             {
-                FileManagement.copyDirectory(source, target, true, ".+\\.png$");
+                FileManagement.copyDirectory(source, target, true, ".+\\.png$", new ArrayList<>());
             }
             frame = frame.replace("{VALIDATION_IGV}", (source == null) ? "" :
                     StructureElements.generateImageSelector(id, target,
