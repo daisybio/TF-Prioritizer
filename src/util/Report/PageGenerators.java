@@ -54,7 +54,9 @@ public class PageGenerators
                         Report.options_intern.f_report_resources_important_loci_html);
 
         important_loci = important_loci.replace("{IMAGES}",
-                StructureElements.generateThreeLevelImageSelector(targetDir.getName(), targetDir, null, true));
+                StructureElements.generateImageSelector(targetDir.getName(), targetDir,
+                        Arrays.asList(SelectorTypes.GROUPS, SelectorTypes.IMPORTANT_LOCI,
+                                SelectorTypes.EMPTY_DROPDOWN)));
 
         FileManagement.writeHTML(Report.options_intern.com2pose_working_directory + File.separator +
                 Report.options_intern.f_out_report_important_loci_html, important_loci, 0);
@@ -74,8 +76,35 @@ public class PageGenerators
                         Report.options_intern.f_report_resources_top_log2fc_html);
 
         top_log2fc = top_log2fc.replace("{TITLE}", "Top log2fc");
+
+        for (File group_pairing : Objects.requireNonNull(sourceDir.listFiles()))
+        {
+            if (group_pairing.isDirectory())
+            {
+                for (File log2fc : Objects.requireNonNull(group_pairing.listFiles()))
+                {
+                    if (log2fc.isDirectory())
+                    {
+                        for (File imageFile : Objects.requireNonNull(log2fc.listFiles()))
+                        {
+                            if (imageFile.getName().endsWith(".png"))
+                            {
+                                File targetFile = new File(
+                                        targetDir.getAbsolutePath() + File.separator + group_pairing.getName() +
+                                                File.separator + log2fc.getName().split("_")[1] + File.separator +
+                                                imageFile.getName());
+                                FileManagement.copyFile(imageFile, targetFile);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         top_log2fc = top_log2fc.replace("{IMAGES}",
-                StructureElements.generateThreeLevelImageSelector(targetDir.getName(), sourceDir, targetDir, false));
+                StructureElements.generateImageSelector(targetDir.getName(), targetDir,
+                        Arrays.asList(SelectorTypes.GROUP_PAIRINGS, SelectorTypes.TOP_LOG2FC,
+                                SelectorTypes.EMPTY_DROPDOWN)));
 
         FileManagement.writeHTML(Report.options_intern.com2pose_working_directory + File.separator +
                 Report.options_intern.f_out_report_top_log2fc_html, top_log2fc, 0);
@@ -231,64 +260,46 @@ public class PageGenerators
         frame = StructureElements.setBasicData(frame, tfGroup);
 
         {
-            File source = null;
+            File source = FileManagement.getFileIfInDirectory(d_heatmaps, tfGroup.getName(), false);
 
-            for (File entry : Objects.requireNonNull(d_heatmaps.listFiles()))
-            {
-                String entryName = entry.getName();
-                if (entryName.equals(tfGroup.getName()))
-                {
-                    source = entry;
-                    break;
-                }
-            }
             String id = "validationHeatmaps";
             File target = new File(
                     d_out_validation.getAbsolutePath() + File.separator + tfGroup.getName() + File.separator + id);
-            frame = frame.replace("{VALIDATION_HEATMAP}",
-                    (source == null) ? "" : StructureElements.generateTwoLevelImageSelector(id, source, target, false));
+
+            FileManagement.copyDirectory(source, target, false, ".+\\.png$");
+
+            frame = frame.replace("{VALIDATION_HEATMAP}", StructureElements.generateImageSelector(id, target,
+                    Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS)));
         } // Heatmaps
 
         {
             File d_own_tf = new File(d_igv_screenshots.getAbsolutePath() + File.separator +
                     Report.options_intern.folder_out_igv_own_data);
-            File source = null;
 
-            for (File entry : Objects.requireNonNull(d_own_tf.listFiles()))
-            {
-                String entryName = entry.getName();
-                entryName = entryName.split("_")[1];
-                if (entryName.equals(tfGroup.getName()))
-                {
-                    source = entry;
-                    break;
-                }
-            }
+            File source = FileManagement.getFileIfInDirectory(d_own_tf, "[0-9]+_" + tfGroup.getName(), false);
 
             String id = "validationOwnTF";
             File target = new File(
                     d_out_validation.getAbsolutePath() + File.separator + tfGroup.getName() + File.separator + id);
-            frame = frame.replace("{VALIDATION_OWN_TF}", (source == null) ? "" :
-                    StructureElements.generateThreeLevelImageSelector(id, source, target,
-                            new ArrayList<>(List.of(tfGroup.getName())), false, true));
+
+            if (source != null)
+            {
+                FileManagement.copyDirectory(source, target, true, ".+\\.png$");
+
+                frame = frame.replace("{VALIDATION_OWN_TF}", StructureElements.generateImageSelector(id, target,
+                        Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUPS,
+                                SelectorTypes.EMPTY_DROPDOWN)));
+            } else
+            {
+                frame = frame.replace("{VALIDATION_OWN_TF}", "");
+            }
         } // Own tf
 
         {
             File d_chip_atlas = new File(d_igv_screenshots.getAbsolutePath() + File.separator +
                     Report.options_intern.folder_out_igv_chip_atlas_data);
-            File source = null;
 
-            for (File entry : Objects.requireNonNull(d_chip_atlas.listFiles()))
-            {
-                String entryName = entry.getName();
-
-                if (entryName.matches("[0-9]+_" + tfGroup.getName()))
-                {
-                    source = entry;
-                    break;
-                }
-            }
-
+            File source = FileManagement.getFileIfInDirectory(d_chip_atlas, "[0-9]+_" + tfGroup.getName(), false);
 
             String id = "validationChipAtlas";
             File target = new File(
@@ -329,8 +340,9 @@ public class PageGenerators
                         }
                     }
                 }
-                frame = frame.replace("{VALIDATION_CHIP_ATLAS}",
-                        StructureElements.generateThreeLevelImageSelector(id, target, null, true));
+                frame = frame.replace("{VALIDATION_CHIP_ATLAS}", StructureElements.generateImageSelector(id, target,
+                        Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUPS,
+                                SelectorTypes.EMPTY_DROPDOWN)));
             }
 
 
@@ -350,26 +362,9 @@ public class PageGenerators
                         Report.options_intern.d_out_validation_logos + File.separator +
                         Report.options_intern.f_out_validation_logos_biophysical_png);
 
-                File sourceFile = null;
+                File tempDir = FileManagement.getFileIfInDirectory(sourceDir, "[0-9]+_" + tfGroup.getName(), false);
 
-                for (File directory : Objects.requireNonNull(sourceDir.listFiles()))
-                {
-                    if (directory.getName().matches("[0-9]+_.*") && directory.isDirectory())
-                    {
-                        if (directory.getName().split("_")[1].equals(tfGroup.getName()))
-                        {
-                            for (File file : Objects.requireNonNull(directory.listFiles()))
-                            {
-                                if (file.getName().endsWith(".png"))
-                                {
-                                    sourceFile = file;
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
+                File sourceFile = FileManagement.getFileIfInDirectory(tempDir, ".*\\.png", true);
 
                 if (sourceFile != null)
                 {
@@ -385,9 +380,7 @@ public class PageGenerators
                         Report.options_intern.d_out_validation + File.separator + tfGroup.getName() + File.separator +
                         Report.options_intern.d_out_validation_logos_tf_sequence);
 
-                File sourceDir = FileManagement.getFileIfInDirectory(sDir, "[0-9]+_.*", false);
-
-                sourceDir = FileManagement.getFileIfInDirectory(sourceDir, ".*_" + tfGroup.getName() + ".*", false);
+                File sourceDir = FileManagement.getFileIfInDirectory(sDir, "[0-9]+_" + tfGroup.getName(), false);
 
                 if (sourceDir != null)
                 {
@@ -455,19 +448,7 @@ public class PageGenerators
                         Report.options_intern.d_out_validation + File.separator + tfGroup.getName() + File.separator +
                         Report.options_intern.d_out_validation_logos_tf_binding_sequence);
 
-                File sourceDir = null;
-
-                for (File directory : Objects.requireNonNull(sDir.listFiles()))
-                {
-                    if (directory.getName().matches("[0-9]+_.*") && directory.isDirectory())
-                    {
-                        if (directory.getName().split("_")[1].equals(tfGroup.getName()))
-                        {
-                            sourceDir = directory;
-                            break;
-                        }
-                    }
-                }
+                File sourceDir = FileManagement.getFileIfInDirectory(sDir, "[0-9]+_" + tfGroup.getName(), false);
 
                 if (sourceDir != null)
                 {
@@ -536,18 +517,7 @@ public class PageGenerators
             File targetDir = new File(Report.options_intern.com2pose_working_directory + File.separator +
                     Report.options_intern.d_out_validation);
 
-            File source = null;
-
-            for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
-            {
-                String entryName = entry.getName();
-
-                if (entryName.equals(tfGroup.getName()))
-                {
-                    source = entry;
-                    break;
-                }
-            }
+            File source = FileManagement.getFileIfInDirectory(sourceDir, tfGroup.getName(), false);
 
             String id = "validationIGV";
             File target =
@@ -555,9 +525,14 @@ public class PageGenerators
 
             frame = frame.replace("{VALIDATION_IGV_DISABLED}", (source == null) ? "disabled" : "");
 
+            if (source != null)
+            {
+                FileManagement.copyDirectory(source, target, true, ".+\\.png$");
+            }
             frame = frame.replace("{VALIDATION_IGV}", (source == null) ? "" :
-                    StructureElements.generateThreeLevelImageSelector(id, source, target,
-                            new ArrayList<>(List.of(tfGroup.getName())), false, true));
+                    StructureElements.generateImageSelector(id, target,
+                            Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS,
+                                    SelectorTypes.EMPTY_DROPDOWN)));
         } // IGV
 
         frame = StructureElements.setGeneCardLinks(frame, tfGroup);
@@ -571,13 +546,16 @@ public class PageGenerators
 
     static boolean generateDistribution(TranscriptionFactorGroup tfGroup) throws IOException
     {
+        String id = "distributionPlots";
+
         File templateFile = new File(Report.options_intern.path_to_COM2POSE + File.separator +
                 Report.options_intern.f_report_resources_distribution_distribution_html);
 
         File d_distribution_output = new File(Report.options_intern.com2pose_working_directory + File.separator +
                 Report.options_intern.d_out_distribution + File.separator + tfGroup.getName());
 
-        ArrayList<String> existingHMs = new ArrayList<>();
+        File d_distribution_plots = new File(d_distribution_output.getAbsolutePath() + File.separator + id);
+
 
         File d_plots_hm = new File(Report.options_intern.com2pose_working_directory + File.separator +
                 Report.options_intern.folder_out_distribution + File.separator +
@@ -590,9 +568,8 @@ public class PageGenerators
             {
                 if (f_plot.getName().substring(0, f_plot.getName().lastIndexOf(".")).equals(tfGroup.getName()))
                 {
-                    existingHMs.add(d_hm.getName());
                     FileManagement.copyFile(f_plot, new File(
-                            d_distribution_output.getAbsolutePath() + File.separator + d_hm.getName() + ".png"));
+                            d_distribution_plots.getAbsolutePath() + File.separator + d_hm.getName() + ".png"));
                     break;
                 }
             }
@@ -603,21 +580,16 @@ public class PageGenerators
                 Report.options_intern.folder_out_distribution_plots + File.separator +
                 Report.options_intern.folder_out_distribution_plots_ALL);
 
+
         for (File f_plot : Objects.requireNonNull(d_plots_all.listFiles()))
         {
             if (f_plot.getName().substring(0, f_plot.getName().lastIndexOf(".")).equals(tfGroup.getName()))
             {
                 String categoryName = d_plots_all.getName().substring(d_plots_all.getName().indexOf("_") + 1);
-                existingHMs.add(categoryName);
                 FileManagement.copyFile(f_plot,
-                        new File(d_distribution_output.getAbsolutePath() + File.separator + categoryName + ".png"));
+                        new File(d_distribution_plots.getAbsolutePath() + File.separator + categoryName + ".png"));
                 break;
             }
-        }
-
-        if (existingHMs.isEmpty())
-        {
-            return false;
         }
 
         String frame =
@@ -626,25 +598,9 @@ public class PageGenerators
         frame = frame.replace("{TFNAME}", tfGroup.getName());
         frame = StructureElements.setBasicData(frame, tfGroup);
 
-        StringBuilder sb_histoneModifications = new StringBuilder();
 
-        boolean first = true;
-
-        for (String histoneModification : existingHMs)
-        {
-            sb_histoneModifications.append(
-                            "<button onclick=\"selectImage(this, 'distribution-plot')\" " + "class=\"selector")
-                    .append(first ? " active" : "").append("\" value=\"").append(histoneModification).append(".png\">")
-                    .append(histoneModification).append("</button>");
-            if (first)
-            {
-                frame = frame.replace("{DIST_PLOT_MODAL_CAPTION}", histoneModification);
-            }
-            first = false;
-        }
-
-        frame = frame.replace("{HISTONEMODIFICATIONS}", sb_histoneModifications.toString());
-        frame = frame.replace("{DISTRIBUTION-PLOT-PATH}", existingHMs.get(0) + ".png");
+        frame = frame.replace("{DISTRIBUTION_PLOTS}", StructureElements.generateImageSelector(id, d_distribution_plots,
+                List.of(SelectorTypes.DISTRIBUTION_OPTIONS)));
 
 
         frame = StructureElements.setGeneCardLinks(frame, tfGroup);
@@ -828,11 +784,15 @@ public class PageGenerators
             }
         }
 
-        String overviewCoefficients = StructureElements.generateThreeLevelImageSelector(overviewCoefficientsID,
-                new File(tfDir.getAbsolutePath() + File.separator + overviewCoefficientsID), null, true);
+        String overviewCoefficients = StructureElements.generateImageSelector(overviewCoefficientsID,
+                new File(tfDir.getAbsolutePath() + File.separator + overviewCoefficientsID),
+                Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.REGRESSION_CUTOFFS,
+                        SelectorTypes.EMPTY_DROPDOWN));
 
-        String overviewHeatmaps = StructureElements.generateThreeLevelImageSelector(overviewHeatmapsID,
-                new File(tfDir.getAbsolutePath() + File.separator + overviewHeatmapsID), null, true);
+        String overviewHeatmaps = StructureElements.generateImageSelector(overviewHeatmapsID,
+                new File(tfDir.getAbsolutePath() + File.separator + overviewHeatmapsID),
+                Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.REGRESSION_CUTOFFS,
+                        SelectorTypes.EMPTY_DROPDOWN));
 
         frame = frame.replace("{COEFFICIENTS}",
                 StructureElements.getTabularData("regressionCoefficients", tfGroup.regressionCoefficients));

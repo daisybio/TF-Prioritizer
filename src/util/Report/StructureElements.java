@@ -153,29 +153,21 @@ public class StructureElements
         return sb_data.toString();
     }
 
-
     static String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
-    {
-        return getButtonBar(tfGroup.getName(), tfGroup.hasValidation(), tfGroup.hasDistribution(),
-                tfGroup.hasRegression());
-    }
-
-    private static String getButtonBar(String name, boolean hasValidation, boolean hasDistribution,
-                                       boolean hasRegression) throws IOException
     {
         String buttonbar = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
                 Report.options_intern.f_report_resources_home_buttonbar_html);
 
         buttonbar = buttonbar.replace("{VALIDATION}",
-                "VALIDATION" + File.separator + name + File.separator + name + ".html");
+                "VALIDATION" + File.separator + tfGroup.getName() + File.separator + tfGroup.getName() + ".html");
         buttonbar = buttonbar.replace("{DISTRIBUTION}",
-                "DISTRIBUTION" + File.separator + name + File.separator + name + ".html");
+                "DISTRIBUTION" + File.separator + tfGroup.getName() + File.separator + tfGroup.getName() + ".html");
         buttonbar = buttonbar.replace("{REGRESSION}",
-                "REGRESSION" + File.separator + name + File.separator + name + ".html");
+                "REGRESSION" + File.separator + tfGroup.getName() + File.separator + tfGroup.getName() + ".html");
 
-        buttonbar = buttonbar.replace("{HASVALIDATION}", hasValidation ? "" : "disabled");
-        buttonbar = buttonbar.replace("{HASREGRESSION}", hasRegression ? "" : "disabled");
-        buttonbar = buttonbar.replace("{HASDISTRIBUTION}", hasDistribution ? "" : "disabled");
+        buttonbar = buttonbar.replace("{HASVALIDATION}", tfGroup.hasValidation() ? "" : "disabled");
+        buttonbar = buttonbar.replace("{HASREGRESSION}", tfGroup.hasRegression() ? "" : "disabled");
+        buttonbar = buttonbar.replace("{HASDISTRIBUTION}", tfGroup.hasDistribution() ? "" : "disabled");
 
         return buttonbar;
     }
@@ -192,259 +184,6 @@ public class StructureElements
         frame = frame.replace("{BODY}", body);
 
         return frame;
-    }
-
-    static String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir, boolean keepFileNameAsIs)
-            throws IOException
-    {
-        return generateThreeLevelImageSelector(name, sourceDir, targetDir, new ArrayList<>(), keepFileNameAsIs, true);
-    }
-
-    static String generateThreeLevelImageSelector(String name, File sourceDir, File targetDir,
-                                                  ArrayList<String> specialRemovables, boolean keepFileNameAsIs,
-                                                  boolean compression) throws IOException
-    {
-        String suffix = ".png";
-        HashMap<String, HashMap<String, ArrayList<String>>> combinations = new HashMap<>();
-
-        for (File group_dir : Objects.requireNonNull(sourceDir.listFiles()))
-        {
-            if (group_dir.isFile())
-            {
-                continue;
-            }
-
-            String group = group_dir.getName();
-
-            if (group.equals("A_SESSIONS"))
-            {
-                continue;
-            }
-
-            combinations.put(group, new HashMap<>());
-
-            for (File subgroup_dir : Objects.requireNonNull(group_dir.listFiles()))
-            {
-                if (subgroup_dir.isFile())
-                {
-                    continue;
-                }
-
-                String subgroup = subgroup_dir.getName();
-
-                if (subgroup.split("_").length > 1)
-                {
-                    subgroup = subgroup.split("_")[1];
-                }
-
-                combinations.get(group).put(subgroup, new ArrayList<>());
-
-                for (File image_file : Objects.requireNonNull(subgroup_dir.listFiles()))
-                {
-                    ArrayList<String> removables = new ArrayList<>(List.of(group, subgroup, "threshold"));
-                    removables.addAll(specialRemovables);
-
-                    if (image_file.isDirectory() || !image_file.getName().endsWith(suffix))
-                    {
-                        continue;
-                    }
-
-                    String relevantFileName = image_file.getName();
-                    relevantFileName = relevantFileName.replace(suffix, "");
-
-                    if (!keepFileNameAsIs)
-                    {
-                        for (String entry : removables)
-                        {
-                            relevantFileName = relevantFileName.replace(entry, "");
-                        }
-
-
-                        relevantFileName = relevantFileName.replaceAll("_+", "_");
-
-                        while (relevantFileName.endsWith("_"))
-                        {
-                            relevantFileName = relevantFileName.substring(0, relevantFileName.length() - 1);
-                        }
-
-                        while (relevantFileName.startsWith("_"))
-                        {
-                            relevantFileName = relevantFileName.substring(1);
-                        }
-                    }
-
-                    if (targetDir != null)
-                    {
-                        FileManagement.copyFile(image_file, new File(
-                                targetDir.getAbsolutePath() + File.separator + group + File.separator + subgroup +
-                                        File.separator + relevantFileName + suffix), compression);
-                    }
-
-                    combinations.get(group).get(subgroup).add(relevantFileName);
-                }
-            }
-        }
-
-        String three_level_image_selector =
-                FileManagement.loadFile(Report.options_intern.f_report_resources_three_level_image_selector_html);
-
-        Set<String> groups = combinations.keySet();
-        Set<String> subgroups = new HashSet<>();
-
-        StringBuilder sb_groups = new StringBuilder();
-
-        for (String group : groups)
-        {
-            subgroups.addAll(combinations.get(group).keySet());
-
-            sb_groups.append("<button class=\"{ID} group-selector\" onclick=\"select_group" + "('{ID}', this, " +
-                    "{ID}Combinations)\" " + "value=\"" + group + "\">" + group + "</button>");
-        }
-        three_level_image_selector = three_level_image_selector.replace("{GROUPS}", sb_groups.toString());
-
-        StringBuilder sb_subgroups = new StringBuilder();
-        for (String subgroup : subgroups)
-        {
-            sb_subgroups.append(
-                    "<button class=\"{ID} subgroup-selector\" onclick=\"select_subgroup" + "('{ID}', " + "this, " +
-                            "{ID}Combinations)\" " + "value=\"" + subgroup + "\">" + subgroup + "</button>");
-        }
-
-        three_level_image_selector = three_level_image_selector.replace("{SUBGROUPS}", sb_subgroups.toString());
-
-        String json;
-        {
-            HashMap<String, HashMap<String, String>> lv1 = new HashMap<>();
-            HashMap<String, String> lv2 = new HashMap<>();
-
-            for (String hm : combinations.keySet())
-            {
-                lv1.put(hm, new HashMap<>());
-                for (String group : combinations.get(hm).keySet())
-                {
-                    StringBuilder sb_genes = new StringBuilder("[");
-                    ArrayList<String> genes = combinations.get(hm).get(group);
-                    genes.sort(new StringComparator());
-
-                    for (String gene : genes)
-                    {
-                        sb_genes.append("\"");
-                        sb_genes.append(gene);
-                        sb_genes.append("\",");
-                    }
-                    sb_genes.setLength(sb_genes.length() - 1);
-                    sb_genes.append("]");
-                    lv1.get(hm).put(group, sb_genes.toString());
-                }
-                lv2.put(hm, mapToJson(lv1.get(hm)));
-            }
-
-            json = mapToJson(lv2);
-        }
-
-        three_level_image_selector = three_level_image_selector.replace("{ID}", name);
-
-        three_level_image_selector = three_level_image_selector.replace("{COMBINATIONS}", json);
-
-        return three_level_image_selector;
-    }
-
-    static String generateTwoLevelImageSelector(String name, File sourceDir, File targetDir, boolean compression)
-            throws IOException
-    {
-        String suffix = ".png";
-        HashMap<String, ArrayList<String>> combinations = new HashMap<>();
-
-        for (File group_dir : Objects.requireNonNull(sourceDir.listFiles()))
-        {
-            if (group_dir.isFile())
-            {
-                continue;
-            }
-
-            String group = group_dir.getName();
-
-            combinations.put(group, new ArrayList<>());
-
-
-            for (File image_file : Objects.requireNonNull(group_dir.listFiles()))
-            {
-                if (image_file.isDirectory() || !image_file.getName().endsWith(suffix))
-                {
-                    continue;
-                }
-
-                String relevantFileName = image_file.getName();
-                relevantFileName = relevantFileName.replace(suffix, "");
-
-                if (targetDir != null)
-                {
-                    FileManagement.copyFile(image_file, new File(
-                            targetDir.getAbsolutePath() + File.separator + group + File.separator + relevantFileName +
-                                    suffix), compression);
-                }
-
-                combinations.get(group).add(relevantFileName);
-            }
-
-        }
-
-        String two_level_image_selector =
-                FileManagement.loadFile(Report.options_intern.f_report_resources_two_level_image_selector_html);
-
-        Set<String> groups = combinations.keySet();
-        Set<String> subgroups = new HashSet<>();
-
-        {
-            StringBuilder sb_groups = new StringBuilder();
-
-            for (String group : groups)
-            {
-                subgroups.addAll(combinations.get(group));
-
-                sb_groups.append("<button class=\"{ID} group-selector\" onclick=\"select_group" + "('{ID}', this, " +
-                        "{ID}Combinations)\" " + "value=\"" + group + "\">" + group + "</button>");
-            }
-            two_level_image_selector = two_level_image_selector.replace("{GROUPS}", sb_groups.toString());
-        }
-
-        {
-            StringBuilder sb_subgroups = new StringBuilder();
-            for (String subgroup : subgroups)
-            {
-                sb_subgroups.append(
-                        "<button class=\"{ID} subgroup-selector\" onclick=\"select_subgroup" + "('{ID}', " + "this, " +
-                                "{ID}Combinations)\" " + "value=\"" + subgroup + "\">" + subgroup + "</button>");
-            }
-
-            two_level_image_selector = two_level_image_selector.replace("{SUBGROUPS}", sb_subgroups.toString());
-        }
-
-        String json;
-        {
-            HashMap<String, String> lv1 = new HashMap<>();
-
-            for (String group : combinations.keySet())
-            {
-                StringBuilder sb_subgroups = new StringBuilder("[");
-                for (String subgroup : combinations.get(group))
-                {
-                    sb_subgroups.append("\"");
-                    sb_subgroups.append(subgroup);
-                    sb_subgroups.append("\",");
-                }
-                sb_subgroups.setLength(sb_subgroups.length() - 1);
-                sb_subgroups.append("]");
-                lv1.put(group, sb_subgroups.toString());
-            }
-            json = mapToJson(lv1);
-        }
-
-        two_level_image_selector = two_level_image_selector.replace("{ID}", name);
-
-        two_level_image_selector = two_level_image_selector.replace("{COMBINATIONS}", json);
-
-        return two_level_image_selector;
     }
 
     private static String mapToJson(Map<String, String> map)
@@ -519,5 +258,169 @@ public class StructureElements
     {
         text = text.replace("{BASICDATA}", getBasicData(tf));
         return text;
+    }
+
+    static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types)
+    {
+        StringBuilder sb_imageSelector = new StringBuilder();
+        StringBuilder sb_combinations = new StringBuilder();
+
+        sb_imageSelector.append("<div class='panel' id='{ID}'>");
+        sb_combinations.append("{");
+
+        int i = 0;
+
+        for (SelectorTypes type : types)
+        {
+            if (type != SelectorTypes.EMPTY_DROPDOWN)
+            {
+                sb_imageSelector.append("<div class='buttonbar'>");
+
+                for (String entry : Report.existingValues.get(type))
+                {
+                    String value;
+                    if (i == types.size() - 1 && !entry.matches(".+\\.(gif|jpg|jpeg|tiff|png)$"))
+                    {
+                        value = entry + ".png";
+                    } else
+                    {
+                        value = entry;
+                    }
+                    sb_imageSelector.append("<button class='{ID} selector' value='").append(value).append("' id='{ID}-")
+                            .append(i).append("-").append(value)
+                            .append("' onclick='update_selection(this, \"{ID}\", {ID}Combinations)'>");
+                    sb_imageSelector.append(entry);
+                    sb_imageSelector.append("</button>");
+                }
+                sb_imageSelector.append("</div>");
+            } else
+            {
+                sb_imageSelector.append("<div class='buttonbar centered'>");
+
+                sb_imageSelector.append("<button onclick='openModal(\"{ID}-modal\")'>");
+                sb_imageSelector.append("Zoom in");
+                sb_imageSelector.append("</button>");
+
+                sb_imageSelector.append(
+                        "<button class='narrow' onclick='move_lowest_level(\"{ID}\", -1, " + "{ID}Combinations)'>");
+                sb_imageSelector.append("<");
+                sb_imageSelector.append("</button>");
+
+                sb_imageSelector.append("<div class='dropdown container'>");
+                sb_imageSelector.append(
+                        "<button class='dropdown button' id='{ID}-dropdown' onclick='toggleDropdown(\"{ID}\")" +
+                                "'></button>");
+                sb_imageSelector.append("<div class=\"dropdown content\" id=\"{ID}-dropdown-content\"></div>");
+                sb_imageSelector.append("<script>add_dropdown_closing('{ID}')</script>");
+
+                sb_imageSelector.append("</div>");
+
+                sb_imageSelector.append(
+                        "<button class='narrow' onclick='move_lowest_level(\"{ID}\", 1, " + "{ID}Combinations)'>");
+                sb_imageSelector.append(">");
+                sb_imageSelector.append("</button>");
+
+                sb_imageSelector.append("<button onclick='openImageInTab(\"{ID}-image\")'>");
+                sb_imageSelector.append("Open in new tab");
+                sb_imageSelector.append("</button>");
+
+                sb_imageSelector.append("</div>");
+            }
+            i++;
+        }
+
+        if (types.get(types.size() - 1) != SelectorTypes.EMPTY_DROPDOWN)
+        {
+            {
+                sb_imageSelector.append("<div class='buttonbar centered'>");
+
+                sb_imageSelector.append("<button onclick='openModal(\"{ID}-modal\")'>");
+                sb_imageSelector.append("Zoom in");
+                sb_imageSelector.append("</button>");
+
+                sb_imageSelector.append("<button onclick='openImageInTab(\"{ID}-image\")'>");
+                sb_imageSelector.append("Open in new tab");
+                sb_imageSelector.append("</button>");
+
+                sb_imageSelector.append("</div>");
+            }
+        }
+
+        {
+            sb_imageSelector.append("<img class='modal source' onclick='openModal(\"{ID}-modal\")'  id='{ID}-image'>");
+        }
+
+        {
+            sb_imageSelector.append("<div id='{ID}-modal' class='modal background'>");
+
+            sb_imageSelector.append("<div class='buttonbar centered'>");
+            sb_imageSelector.append("<div id='{ID}-modal-caption' class='modal caption'></div>");
+            sb_imageSelector.append(
+                    "<button class=\"modal button close\" onclick=\"closeModal('{ID}-modal')" + "\">&times;</button>");
+            sb_imageSelector.append("</div>");
+
+            sb_imageSelector.append("<div class='buttonbar'>");
+            sb_imageSelector.append(
+                    "<button class=\"modal button\" id=\"{ID}-modal-leftarrow\"onclick=\"move_lowest_level('{ID}', -1, {ID}Combinations)\">\n" +
+                            "            &lt;</button>");
+            sb_imageSelector.append("<img class=\"modal content\" id=\"{ID}-modal-image\">");
+            sb_imageSelector.append(
+                    "<button class=\"modal button\" id=\"{ID}-modal-rightarrow\" onclick=\"move_lowest_level('{ID}', 1, {ID}Combinations)\">\n" +
+                            "            &gt;</button>");
+            sb_imageSelector.append("</div>");
+
+            sb_imageSelector.append("</div>");
+        }
+
+        sb_combinations.append("}");
+        sb_imageSelector.append("</div>");
+
+        sb_imageSelector.append("<script>let {ID}Combinations = {COMBINATIONS};</script>");
+        sb_imageSelector.append("<script>init_selection(\"{ID}\", {ID}Combinations)</script>");
+
+        String imageSelector = sb_imageSelector.toString().replace("{ID}", id);
+
+        return imageSelector.replace("{COMBINATIONS}", getFileStructureAsString(sourceDir));
+    }
+
+    private static String getFileStructureAsString(File sourceDir)
+    {
+        boolean onlyFiles = true;
+        boolean onlyDirs = true;
+        StringBuilder sb_result = new StringBuilder();
+
+        for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
+        {
+            onlyFiles = onlyFiles && entry.isFile();
+            onlyDirs = onlyDirs && entry.isDirectory();
+        }
+
+        if (onlyFiles)
+        {
+            sb_result.append("[");
+            for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
+            {
+                sb_result.append("\"" + entry.getName() + "\",");
+            }
+            sb_result.deleteCharAt(sb_result.length() - 1);
+            sb_result.append("]");
+        }
+
+        if (onlyDirs)
+        {
+            sb_result.append("{");
+
+            for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
+            {
+                sb_result.append("\"" + entry.getName() + "\":");
+                sb_result.append(getFileStructureAsString(entry));
+                sb_result.append(",");
+            }
+
+            sb_result.deleteCharAt(sb_result.length() - 1);
+            sb_result.append("}");
+        }
+
+        return sb_result.toString();
     }
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class TranscriptionFactorGroup
 {
-    private boolean hasValidation, hasDistribution, hasRegression;
+    private boolean hasValidation = true, hasDistribution = true, hasRegression = true;
     private final String name;
     private final ArrayList<TranscriptionFactor> transcriptionFactors;
     Map<String, Map<String, Number>> regressionCoefficients;
@@ -63,10 +63,5 @@ public class TranscriptionFactorGroup
     public Map<String, Map<String, Number>> getRegressionCoefficients()
     {
         return regressionCoefficients;
-    }
-
-    public boolean isRealGroup()
-    {
-        return realGroup;
     }
 }

@@ -12,29 +12,6 @@ function toggleAccordion(id) {
     }
 }
 
-function selectImage(element, imageID) {
-    let selectors = element.parentNode.children;
-
-    let setClasses = !element.classList.contains("active");
-
-    setClass(selectors, "active", "remove");
-
-    let image = document.getElementById(imageID)
-
-    image.src = element.value;
-
-    let modal_image = document.getElementById(imageID + "-modal-image");
-
-    if (modal_image != null) {
-        modal_image.src = image.src;
-        document.getElementById(imageID + "-modal-caption").textContent = element.textContent;
-    }
-
-    if (setClasses) {
-        element.classList.toggle("active");
-    }
-}
-
 function openImageInTab(id) {
     let image = document.getElementById(id);
     window.open(image.src);
@@ -48,12 +25,6 @@ function openModal(modal_id) {
 function closeModal(modal_id) {
     let modal = document.getElementById(modal_id);
     modal.style.display = "none";
-}
-
-function setClass(els, className, fnName) {
-    for (let i = 0; i < els.length; i++) {
-        els[i].classList[fnName](className);
-    }
 }
 
 function tableMouseOver(gene, col, row) {
@@ -72,197 +43,164 @@ function tableMouseOut(gene, col, row) {
     rowHead.style.backgroundColor = "initial";
 }
 
-function init_selection(selection, combinations) {
-    let group_selectors = document.getElementsByClassName(selection + " group-selector");
-    select_group(selection, group_selectors[0], combinations);
+function init_selection(id, combinations) {
+    let firstValue;
 
-    select_first_possible_subgroup(selection, combinations);
+    if (Array.isArray(combinations)) {
+        firstValue = combinations[0];
+    } else {
+        firstValue = Object.keys(combinations)[0];
+    }
+
+    let firstButton = document.getElementById(id + "-0-" + firstValue);
+    firstButton.click();
 }
 
-function select_first_possible_subgroup(selection, combinations) {
-    let subgroups = document.getElementsByClassName(selection + " subgroup-selector");
+function update_selection(source_element, id, combinations) {
+    console.log(source_element.textContent);
+    let level = parseInt(source_element.id.split("-")[1]);
+    let depth = get_depth(combinations);
+
+    let parentElements = [];
+
+    { // Find activated parent nodes
+        for (let i = 0; i < level; i++) {
+            let nodes = document.querySelectorAll('[id^="' + id + '-' + i + '"]');
+
+            for (let j = 0; j < nodes.length; j++) {
+                if (nodes[j].classList.contains("active")) {
+                    parentElements.push(nodes[j].value);
+                    break;
+                }
+            }
+        }
+    }
+
+    let availableCombinations = combinations;
+
+    for (let i = 0; i < parentElements.length; i++) {
+        availableCombinations = availableCombinations[parentElements[i]];
+    }
+
+    { // Activate clicked element and deactivate siblings
+        let siblings = document.querySelectorAll('[id^="' + id + '-' + level + '"]');
+        let allowedSiblings;
+
+        if (Array.isArray(availableCombinations)) {
+            allowedSiblings = availableCombinations;
+        } else {
+            allowedSiblings = Object.keys(availableCombinations);
+        }
+
+        for (let i = 0; i < siblings.length; i++) {
+            siblings[i].classList.remove("active");
+            siblings[i].disabled = !allowedSiblings.includes(siblings[i].value);
+        }
+        source_element.classList.add("active");
+    }
+
+    availableCombinations = availableCombinations[source_element.value];
+
+    { // Fill dropdown if necessary
+        if (level === 1 && depth === 2) {
+            let dropdownContent = document.getElementById(id + "-dropdown-content");
+            dropdownContent.innerHTML = "";
+
+            let searchbox = document.createElement("input");
+            searchbox.type = "text";
+            searchbox.placeholder = "Search...";
+            searchbox.id = id + "-dropdown-search";
+            searchbox.style.width = "100%";
+            searchbox.addEventListener("keyup", function () {
+                filter_dropdown(id)
+            });
+
+            dropdownContent.appendChild(searchbox);
+
+            for (let i = 0; i < availableCombinations.length; i++) {
+                let option = document.createElement("button");
+                let value = availableCombinations[i];
+                option.value = value;
+                option.id = id + "-" + 2 + "-" + value;
+                option.classList.add("dropdown");
+                option.classList.add("entry");
+
+                let text = value.replace(/\.[^/.]+$/, "");
+                if (/^[0-9]+_*/.test(text)) {
+                    text = text.substring(text.split("_")[0].length + 1);
+                }
+
+                option.textContent = (i + 1) + ". " + text;
+                option.addEventListener("click", function () {
+                    update_selection(option, id, combinations);
+                });
+
+                dropdownContent.appendChild(option);
+            }
+        }
+    }
+
+    { // Click first possible child
+        if (level < depth) {
+            let firstPossibleChildValue;
+            if (Array.isArray(availableCombinations)) {
+                firstPossibleChildValue = availableCombinations[0];
+            } else {
+                firstPossibleChildValue = Object.keys(availableCombinations)[0];
+            }
+            let term = id + "-" + (level + 1) + "-" + firstPossibleChildValue;
+            let firstPossibleChildNode = document.getElementById(term);
+            firstPossibleChildNode.disabled = false;
+            firstPossibleChildNode.click();
+        }
+    }
+
+    { // Update image if necessary
+        if (level === depth) {
+            let image = document.getElementById(id + "-image");
+            let modal_image = document.getElementById(id + "-modal-image");
+
+            let source = id + "/";
+
+            for (let i = 0; i < parentElements.length; i++) {
+                source += parentElements[i] + "/";
+            }
+            source += source_element.value;
+
+            modal_image.src = image.src = source;
+
+            let modal_caption = document.getElementById(id + "-modal-caption");
+            modal_caption.textContent = source_element.textContent;
+
+            if (depth === 2) {
+                let dropdown = document.getElementById(id + "-dropdown");
+
+                dropdown.textContent = source_element.textContent;
+                dropdown.value = source_element.value;
+            }
+        }
+    }
+}
+
+function move_lowest_level(id, delta, combinations) {
+    let options = document.querySelectorAll('[id^="' + id + '-' + get_depth(combinations) + '"]');
     let i;
 
-    for (i = 0; i < subgroups.length; i++) {
-        if (!subgroups[i].disabled) {
-            select_subgroup(selection, subgroups[i], combinations);
+    for (i = 0; i < options.length; i++) {
+        if (options[i].classList.contains("active")) {
             break;
         }
     }
-}
-
-function select_group(selection, element, combinations) {
-    let groups = document.getElementsByClassName(selection + " group-selector");
-    let subgroups = document.getElementsByClassName(selection + " subgroup-selector")
-
-    if (element.classList.contains("active")) return;
-
-    let inactive = !element.classList.contains("active");
-    setClass(groups, "active", "remove");
-
-    if (inactive) {
-        element.classList.toggle("active");
+    i += delta;
+    if (i >= options.length) {
+        i = 1;
+    }
+    if (i < 1) {
+        i = options.length - 1;
     }
 
-    let possible_subgroups;
-    if (has_dropdown(selection)) {
-        possible_subgroups = Object.keys(combinations[element.value]);
-    } else {
-        possible_subgroups = combinations[element.value];
-    }
+    options[i].click();
 
-
-    let j;
-
-    for (j = 0; j < subgroups.length; j++) {
-        subgroups[j].disabled = !possible_subgroups.includes(subgroups[j].value);
-    }
-
-    let active_subgroup = get_active_element(selection + " subgroup-selector");
-
-    if (!(typeof active_subgroup === 'undefined')) {
-        if (!possible_subgroups.includes(active_subgroup.value)) {
-            select_first_possible_subgroup(selection, combinations);
-        } else {
-            select_subgroup(selection, active_subgroup, combinations);
-        }
-    }
-}
-
-function select_subgroup(selection, element, combinations) {
-    let group_selectors = document.getElementsByClassName(selection + " subgroup-selector");
-
-    if (!element.classList.contains("active")) {
-        let inactive = !element.classList.contains("active");
-        setClass(group_selectors, "active", "remove");
-
-        if (inactive) {
-            element.classList.toggle("active");
-        }
-    }
-
-
-    let active_group = get_active_element(selection + " group-selector");
-
-    let possible_dropdown_values = combinations[active_group.value][element.value];
-
-    if (has_dropdown(selection)) {
-        let dropdown = document.getElementById(selection + "-dropdown-content");
-        dropdown.innerHTML = "";
-
-        let dropdown_button = document.getElementById(selection + "-dropdown");
-
-        let searchbox = document.createElement("input");
-        searchbox.type = "text";
-        searchbox.placeholder = "Search...";
-        searchbox.id = selection + "-dropdown-search";
-        searchbox.style.width = "100%";
-        searchbox.addEventListener("keyup", function () {
-            filter_dropdown(selection)
-        });
-
-        dropdown.appendChild(searchbox);
-
-        for (let m = 0; m < possible_dropdown_values.length; m++) {
-            let option = document.createElement("button");
-            option.value = possible_dropdown_values[m];
-
-            let text;
-            if (/^[0-9]+_*/.test(possible_dropdown_values[m])) {
-                text = possible_dropdown_values[m].substring(possible_dropdown_values[m].split("_")[0].length + 1)
-            } else {
-                text = possible_dropdown_values[m];
-            }
-
-            option.classList.add("dropdown");
-            option.classList.add("entry");
-            option.textContent = (m + 1) + ". " + text;
-            if (m === 0) {
-                dropdown_button.textContent = option.textContent;
-                dropdown_button.value = option.value;
-            }
-            option.addEventListener("click", function () {
-                select_dropdown(selection, option.value, option.textContent, combinations)
-            });
-            dropdown.appendChild(option);
-        }
-
-        let leftarrow = document.getElementById(selection + "-leftarrow");
-        let rightarrow = document.getElementById(selection + "-rightarrow");
-
-        let modalleftarrow = document.getElementById(selection + "-modal-leftarrow");
-        let modalrightarrow = document.getElementById(selection + "-modal-rightarrow");
-
-        dropdown_button.disabled = modalleftarrow.disabled = modalrightarrow.disabled = leftarrow.disabled = rightarrow.disabled = possible_dropdown_values.length < 2;
-    }
-
-    update_image(selection, combinations);
-}
-
-function move_dropdown(selection, delta, combinations) {
-    if (has_dropdown(selection)) {
-        let dropdown = document.getElementById(selection + "-dropdown");
-        let options = document.getElementById(selection + "-dropdown-content").childNodes;
-        let i;
-
-        for (i = 0; i < options.length; i++) {
-            if (options[i].value === dropdown.value) {
-                break;
-            }
-        }
-        i += delta;
-        if (i >= options.length) {
-            i = 1;
-        }
-        if (i < 1) {
-            i = options.length - 1;
-        }
-
-        options[i].click();
-    }
-
-    update_image(selection, combinations);
-}
-
-function update_image(selection, combinations) {
-    let active_group = get_active_element(selection + " group-selector").value;
-    let active_subgroup = get_active_element(selection + " subgroup-selector").value;
-    let file_name;
-    let caption;
-
-    if (has_dropdown(selection)) {
-        let active_dropdown = document.getElementById(selection + "-dropdown").value;
-        file_name = selection + "/" + active_group + "/" + active_subgroup + "/" + active_dropdown + ".png";
-        let possibleGenes = combinations[active_group][active_subgroup];
-        let captionName;
-        if (/^[0-9]+_.*/.test(active_dropdown)) {
-            captionName = active_dropdown.substring(active_dropdown.indexOf("_") + 1);
-        } else {
-            captionName = active_dropdown;
-        }
-        caption = (possibleGenes.indexOf(active_dropdown) + 1) + ". " + captionName;
-    } else {
-        file_name = selection + "/" + active_group + "/" + active_subgroup + ".png";
-        caption = active_subgroup;
-    }
-
-    let image = document.getElementById(selection + "-image");
-    let modal_image = document.getElementById(selection + "-modal-image");
-    modal_image.src = image.src = file_name;
-
-    let modal_caption = document.getElementById(selection + "-modal-caption");
-    modal_caption.innerHTML = caption;
-}
-
-function get_active_element(className) {
-    let elements = document.getElementsByClassName(className);
-    let j;
-
-    for (j = 0; j < elements.length; j++) {
-        if (elements[j].classList.contains("active")) {
-            return elements[j];
-        }
-    }
 }
 
 function open_all_panels() {
@@ -274,20 +212,8 @@ function open_all_panels() {
     }
 }
 
-function has_dropdown(selection) {
-    return !!document.getElementById(selection + "-dropdown");
-}
-
 function toggleDropdown(selection) {
     document.getElementById(selection + "-dropdown-content").classList.toggle("show");
-}
-
-function select_dropdown(selection, value, text, combinations) {
-    let dropdown_button = document.getElementById(selection + "-dropdown");
-    dropdown_button.textContent = text;
-    dropdown_button.value = value;
-
-    update_image(selection, combinations);
 }
 
 function filter_dropdown(selection) {
@@ -314,4 +240,14 @@ function add_dropdown_closing(id) {
             content.classList.remove("show");
         }
     });
+}
+
+function get_depth(combinations) {
+    let i = 0;
+
+    while (!Array.isArray(combinations)) {
+        combinations = combinations[Object.keys(combinations)[0]];
+        i++;
+    }
+    return i;
 }

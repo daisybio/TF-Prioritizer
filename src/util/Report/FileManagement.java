@@ -77,11 +77,25 @@ public class FileManagement
 
     static void copyDirectory(File source, File target, boolean compression)
     {
+        copyDirectory(source, target, compression, ".*");
+    }
+
+    static void copyDirectory(File source, File target, boolean compression, String fileNameRegex)
+    {
         for (File sourceFile : Objects.requireNonNull(source.listFiles()))
         {
             File targetFile = new File(target.getAbsolutePath() + File.separator + sourceFile.getName());
 
-            copyFile(sourceFile, targetFile, compression);
+            if (sourceFile.isFile())
+            {
+                if (sourceFile.getName().matches(fileNameRegex))
+                {
+                    copyFile(sourceFile, targetFile, compression);
+                }
+            } else
+            {
+                copyDirectory(sourceFile, targetFile, compression, fileNameRegex);
+            }
         }
     }
 

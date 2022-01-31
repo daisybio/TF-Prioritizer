@@ -19,12 +19,26 @@ public class Report
     static Options_intern options_intern = null;
     final ArrayList<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
     static final DecimalFormat formatter = new DecimalFormat("0.###");
+    static Map<SelectorTypes, HashSet<String>> existingValues = new HashMap<>();
 
     public Report(Options_intern options_intern) throws IOException
     {
         Report.options_intern = options_intern;
+
+        for (SelectorTypes type : SelectorTypes.values())
+        {
+            if (type != SelectorTypes.EMPTY_DROPDOWN)
+            {
+                existingValues.put(type, new HashSet<>());
+            }
+        }
+
         logger = new Logger(true, options_intern.com2pose_working_directory);
+
+        logger.logLine("[REPORT] Start loading TF data");
         loadTFs();
+        findExistingValues();
+        logger.logLine("[REPORT] Finished loading TF data");
     }
 
 
@@ -90,6 +104,8 @@ public class Report
             histoneModifications.add(f_histoneModification.getName());
         }
 
+        existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS).addAll(histoneModifications);
+
         try (Scanner scanner = new Scanner(tf_file))
         {
             boolean firstLine = true;
@@ -123,6 +139,9 @@ public class Report
                                 {
                                     String group1 = entry.getName().split("_")[0];
                                     String group2 = entry.getName().split("_")[1];
+
+                                    existingValues.get(SelectorTypes.GROUPS).add(group1);
+                                    existingValues.get(SelectorTypes.GROUPS).add(group2);
 
                                     try
                                     {
@@ -233,22 +252,26 @@ public class Report
     {
         logger.logLine("[REPORT] Start generating report");
 
-        styleAndScript();
+        copyDependencies();
+
+        PageGenerators.generateGeneralPages();
+        PageGenerators.generateHome(transcriptionFactorGroups);
 
         int i = 1;
 
         for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
         {
             System.out.print("Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
-                    tfGroup.getName() + ".\r");
+                    tfGroup.getName() + ": Validation.\r");
             tfGroup.setValidation(PageGenerators.generateValidation(tfGroup));
+            System.out.print("Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
+                    tfGroup.getName() + ": Distribution.\r");
             tfGroup.setDistribution(PageGenerators.generateDistribution(tfGroup));
+            System.out.print("Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
+                    tfGroup.getName() + ": Regression.\r");
             tfGroup.setRegression(PageGenerators.generateRegression(tfGroup));
             i++;
         }
-
-        PageGenerators.generateGeneralPages();
-        PageGenerators.generateHome(transcriptionFactorGroups);
 
         FileManagement.executorService.shutdown();
         ThreadPoolExecutor tpe = (ThreadPoolExecutor) FileManagement.executorService;
@@ -274,12 +297,14 @@ public class Report
             Thread.sleep(500);
         }
 
+        System.out.println(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
+
         logger.logLine("[REPORT] Finished generating report");
     }
 
-    private void styleAndScript() throws IOException
+    private void copyDependencies() throws IOException
     {
-        logger.logLine("[REPORT] Start moving CSS and JS components");
+        logger.logLine("[REPORT] Start copying dependencies");
         String css = FileManagement.loadFile(
                 options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_style);
         String script = FileManagement.loadFile(
@@ -300,5 +325,30 @@ public class Report
                 new File(options_intern.path_to_COM2POSE + File.separator + options_intern.d_report_resources_media),
                 new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_media),
                 false);
+        logger.logLine("[REPORT] Finished copying dependencies");
+    }
+
+    private void findExistingValues()
+    {
+        {
+            File pairings = new File(options_intern.com2pose_working_directory + File.separator +
+                    options_intern.folder_name_deseq2_preprocessing + File.separator +
+                    options_intern.folder_name_deseq2_preprocessing_combined);
+
+            for (File pairing : Objects.requireNonNull(pairings.listFiles()))
+            {
+                existingValues.get(SelectorTypes.GROUP_PAIRINGS).add(pairing.getName());
+            }
+        }
+
+        existingValues.get(SelectorTypes.IMPORTANT_LOCI).addAll(options_intern.igv_important_locus_all_prio_tf);
+
+        existingValues.get(SelectorTypes.TOP_LOG2FC).addAll(Arrays.asList("downregulated", "upregulated"));
+        existingValues.get(SelectorTypes.REGRESSION_CUTOFFS)
+                .addAll(Arrays.asList("0.1", "0.2", "0.3", "0.4", "0.5", "0.6"));
+
+        existingValues.get(SelectorTypes.DISTRIBUTION_OPTIONS)
+                .addAll(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
+        existingValues.get(SelectorTypes.DISTRIBUTION_OPTIONS).add("ALL");
     }
 }
