@@ -191,15 +191,32 @@ public class StructureElements
     {
         StringBuilder sb_links = new StringBuilder();
 
-        for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
+        if (tfGroup.getTranscriptionFactors().size() > 1)
         {
-            String command =
-                    "window.open('" + Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) +
-                            "');\n";
-            sb_links.append(command);
+            sb_links.append("<div class='dropdown container'>");
+            sb_links.append("<button onclick='toggleDropdown(\"geneCardsDropdown\")' id='geneCardsDropdown-dropdown'>");
+            sb_links.append("GeneCards");
+            sb_links.append("</button>");
+            sb_links.append("<div class='genecards dropdown content' id='geneCardsDropdown-dropdown-content'>");
+            for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
+            {
+                sb_links.append("<button onclick='window.open(\"" +
+                        Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) + "\");'>");
+                sb_links.append(tf.getName());
+                sb_links.append("</button>");
+            }
+            sb_links.append("</div>");
+            sb_links.append("</div>");
+            sb_links.append("<script>add_dropdown_closing('geneCardsDropdown');</script>");
+        } else
+        {
+            sb_links.append("<button onclick='window.open(\"" +
+                    Report.options_intern.link_report_genecards.replace("{GENE}", tfGroup.getName()) + "\");'>");
+            sb_links.append("GeneCards");
+            sb_links.append("</button>");
         }
 
-        return text.replace("{GENECARD_BUTTON_ACTION}", sb_links.toString());
+        return text.replace("{GENECARD_LINKS}", sb_links.toString());
     }
 
     static String setBasicData(String text, TranscriptionFactorGroup tfGroup) throws IOException

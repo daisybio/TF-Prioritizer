@@ -305,7 +305,9 @@ button.narrow {
 
 .dropdown.container {
     position: relative;
+    display: flex;
 }
+
 
 .dropdown.content {
     display: none;
@@ -313,6 +315,13 @@ button.narrow {
     left: -300px;
     right: -300px;
     z-index: 1;
+    top: 40px;
+}
+
+.genecards.dropdown.content {
+    left: 0;
+    right: 0;
+    top: 75px;
 }
 
 .dropdown.content.show {
