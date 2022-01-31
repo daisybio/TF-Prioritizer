@@ -1,0 +1,395 @@
+:root {
+    --c1: #0d1b2a;
+    --c2: #1b263b;
+    --c3: #415a77;
+    --c4: #778da9;
+    --c5: #e0e1dd;
+    --disabledbutton: #999999;
+    --black: 0, 0, 0;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+.accordion {
+    background-color: var(--c3);
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    transition: 0.2s ease-out;
+}
+
+.panel .accordion {
+    background-color: var(--c4);
+}
+
+.accordion:hover {
+    background-color: var(--c2);
+}
+
+.selector.active,
+.group-selector.active,
+.subgroup-selector.active {
+    background-color: var(--c3);
+}
+
+.panel {
+    padding: 0 18px;
+    overflow: hidden;
+    display: none;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.dataset {
+    background-color: var(--c5);
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px;
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+td, th {
+    cursor: default;
+    padding: 10px;
+    text-align: center;
+    vertical-align: center;
+    border-radius: 8px;
+}
+
+td:hover {
+    background-color: rgba(var(--black), 0.1);
+}
+
+body {
+    font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+p {
+    text-align: justify;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+.keyvaluepaircontainer {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: left;
+    flex-wrap: wrap;
+}
+
+.keyvaluepair {
+    width: min-content;
+    display: grid;
+    grid-template-columns: min-content;
+    grid-template-rows: min-content min-content;
+    text-align: center;
+}
+
+h1 {
+    font-size: 40px;
+    justify-self: left;
+    margin-right: auto;
+}
+
+.header h2 {
+    justify-self: left;
+    margin-right: auto;
+}
+
+h2, .accordion {
+    font-size: 25px;
+}
+
+h3 {
+    font-size: 15px;
+    text-align: left;
+}
+
+.dataset h4, .dataset th {
+    font-size: 15px;
+}
+
+.accordion, button, select {
+    cursor: pointer;
+    transition: 0.4s;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    margin: 1px;
+    text-decoration: none;
+    color: white;
+}
+
+input, button, select {
+    background-color: var(--c4);
+    text-align: center;
+    color: white;
+    font-size: 16px;
+    padding: 10px 15px;
+    flex-grow: 1;
+    border-radius: 8px;
+    border-width: 0;
+}
+
+select {
+    appearance: none;
+}
+
+.header button {
+    background-color: var(--c2);
+    text-align: center;
+    font-size: 16px;
+    padding: 10px 15px;
+    margin: 5px;
+    align-self: center;
+    display: flex;
+    flex-grow: 0;
+}
+
+button:hover {
+    background-color: var(--c1);
+}
+
+.buttonbar button:hover {
+    background-color: var(--c3);
+}
+
+.buttonbar {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: stretch;
+}
+
+select:disabled,
+select[disabled],
+button:disabled,
+button[disabled] {
+    background-color: var(--disabledbutton);
+}
+
+select:disabled:hover,
+select[disabled]:hover,
+button:disabled:hover,
+button[disabled]:hover {
+    background-color: var(--disabledbutton);
+    cursor: not-allowed;
+}
+
+select {
+    max-width: max-content;
+}
+
+option {
+    background-color: var(--c4);
+}
+
+select:hover {
+    background-color: var(--c3);
+    cursor: pointer;
+}
+
+button.narrow {
+    max-width: max-content;
+}
+
+.buttonbar.centered {
+    justify-content: center;
+}
+
+/* Style the Image Used to Trigger the Modal */
+.modal.source {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* The Modal (background) */
+.modal.background {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vw;
+    overflow: hidden;
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (Image) */
+.modal.content {
+    margin: auto;
+    display: block;
+    max-width: 80vw;
+    max-height: 90vh;
+    position: center;
+}
+
+/* Caption of Modal Image (Image Text) - Same Width as the Image */
+.modal.caption {
+    font-size: 40px;
+    display: block;
+    color: #ccc;
+    padding: 10px 0;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Add Animation - Zoom in the Modal */
+.modal.content {
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+    from {
+        transform: scale(0)
+    }
+    to {
+        transform: scale(1)
+    }
+}
+
+.modal.button {
+    background-color: transparent;
+    font-size: 60px;
+    border-radius: 0;
+    margin: 0;
+}
+
+.modal.button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal.button:disabled {
+    color: transparent;
+}
+
+.modal.button:disabled:hover {
+    cursor: default;
+    background-color: transparent;
+}
+
+.modal.close {
+    justify-self: right;
+    margin-left: auto;
+    max-width: 10%;
+    color: #f1f1f1;
+    font-weight: bold;
+    transition: 0.3s;
+    padding: 0;
+}
+
+.dropdown.container {
+    position: relative;
+    display: flex;
+}
+
+
+.dropdown.content {
+    display: none;
+    position: absolute;
+    left: -300px;
+    right: -300px;
+    z-index: 1;
+    top: 40px;
+}
+
+.genecards.dropdown.content {
+    left: 0;
+    right: 0;
+    top: 75px;
+}
+
+.dropdown.content.show {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.dropdown.entry {
+    width: max-content;
+}
+
+::placeholder {
+    color: #ccc;
+    opacity: 1;
+}
+
+:-ms-input-placeholder {
+    color: #ccc;
+}
+
+::-ms-input-placeholder {
+    color: #ccc;
+}
+
+input:focus {
+    outline: none;
+}
+
+.accordion-info {
+    display: flex;
+}
+
+.accordion-info .accordion {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    justify-self: stretch;
+}
+
+.accordion-info .info {
+    background-color: var(--c3);
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.accordion-info .info:hover,
+.accordion-info.sub .info:hover {
+    background-color: var(--c2);
+}
+
+.accordion-info.sub .info {
+    background-color: var(--c4);
+}
+
+.panel.info label {
+    margin: 10px;
+}
+
+table.citations {
+    border-style: solid;
+    border-color: var(--c3);
+}
+
+table.citations td {
+    text-align: left;
+}
+
+table.citations td:hover {
+    background-color: rgba(var(--black), 0);
+    cursor: text;
+}

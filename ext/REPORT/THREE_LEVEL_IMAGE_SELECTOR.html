@@ -1,0 +1,44 @@
+<div class="panel" id="{ID}">
+    <div class="buttonbar">
+        {GROUPS}
+    </div>
+    <div class="buttonbar">
+        {SUBGROUPS}
+    </div>
+    <div class="buttonbar centered">
+        <button onclick="openModal('{ID}-modal')">Zoom in</button>
+        <button class="narrow" id="{ID}-leftarrow" onclick="move_dropdown('{ID}', -1, {ID}Combinations)">&lt;</button>
+        <div class="dropdown container">
+            <button class="dropdown button" id="{ID}-dropdown" onclick="toggleDropdown('{ID}')">Dropdown
+            </button>
+            <div class="dropdown content" id="{ID}-dropdown-content">
+            </div>
+            <script>add_dropdown_closing('{ID}')</script>
+        </div>
+        <button class="narrow" id="{ID}-rightarrow" onclick="move_dropdown('{ID}', 1, {ID}Combinations)">&gt;</button>
+        <button onclick="openImageInTab('{ID}-image')">Open in new tab</button>
+    </div>
+    <img id="{ID}-image" onclick="openModal('{ID}-modal')" class="modal source">
+</div>
+
+<div id="{ID}-modal" class="modal background">
+    <div class="buttonbar centered">
+        <div id="{ID}-modal-caption" class="modal caption"></div>
+        <button class="modal button close" onclick="closeModal('{ID}-modal')">&times;</button>
+    </div>
+    <div class="buttonbar">
+        <button class="modal button" id="{ID}-modal-leftarrow"onclick="move_dropdown('{ID}', -1, {ID}Combinations)">
+            &lt;</button>
+        <img class="modal content" id="{ID}-modal-image">
+        <button class="modal button" id="{ID}-modal-rightarrow" onclick="move_dropdown('{ID}', 1, {ID}Combinations)">
+            &gt;</button>
+    </div>
+</div>
+<!--
+@formatter:off
+-->
+<script>let {ID}Combinations = {COMBINATIONS};</script>
+<script>init_selection("{ID}", {ID}Combinations)</script>
+<!--
+@formatter:on
+-->

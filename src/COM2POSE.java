@@ -2,6 +2,7 @@ import com2pose.COM2POSE_lib;
 import org.apache.commons.cli.*;
 
 import util.Options_intern;
+import util.Report.Report;
 
 
 public class COM2POSE
@@ -15,6 +16,7 @@ public class COM2POSE
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
+
         com2pose_lib.check_chromosomes();
 
         //mix histone modifications
@@ -68,6 +70,7 @@ public class COM2POSE
             com2pose_lib.run_tgen();
             com2pose_lib.merge_tgen();
         }
+
 
         //TEPIC
         com2pose_lib.run_tepic();
@@ -160,6 +163,8 @@ public class COM2POSE
         {
             com2pose_lib.run_cooccurence_analysis();
         }
+
+        new Report(options_intern).generate();
 
         System.out.println("X");
     }

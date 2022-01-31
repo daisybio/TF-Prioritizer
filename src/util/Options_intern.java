@@ -255,6 +255,74 @@ public class Options_intern
             directory_for_tepic_scripts + File.separator + "MachineLearningPipelines" + File.separator + "DYNAMITE" +
                     File.separator + "Scripts";
 
+    // REPORT options
+    public String link_report_genecards = "https://www.genecards.org/cgi-bin/carddisp.pl?gene={GENE}";
+    public String d_out_report = "REPORT";
+    public String f_out_report_home = d_out_report + File.separator + "HOME.html";
+    public String f_out_report_overview = d_out_report + File.separator + "OVERVIEW.html";
+    public String f_out_report_parameters = d_out_report + File.separator + "PARAMETERS.html";
+    public String f_out_report_style = d_out_report + File.separator + "style.css";
+    public String f_out_report_script = d_out_report + File.separator + "script.js";
+    public String d_out_validation = d_out_report + File.separator + "VALIDATION";
+    public String d_out_distribution = d_out_report + File.separator + "DISTRIBUTION";
+    public String d_out_regression = d_out_report + File.separator + "REGRESSION";
+    public String d_out_important_loci = d_out_report + File.separator + "importantLoci";
+    public String d_out_top_log2fc = d_out_report + File.separator + "topLog2fc";
+    public String d_out_media = d_out_report + File.separator + "MEDIA";
+    public String f_out_report_logo_png = d_out_media + File.separator + "logo.png";
+    public String f_out_report_is_available_png = d_out_media + File.separator + "is_available.png";
+    public String f_out_report_not_available_png = d_out_media + File.separator + "not_available.png";
+    public String f_out_report_important_loci_html = d_out_report + File.separator + "IMPORTANT_LOCI.html";
+    public String f_out_report_top_log2fc_html = d_out_report + File.separator + "TOP_LOG2FC.html";
+    public String f_out_report_cooccurrence_html = d_out_report + File.separator + "COOCCURRENCE.html";
+    public String d_out_validation_logos_tf_sequence = "logosTfSequence";
+    public String d_out_validation_logos_tf_binding_sequence = "logosTfBindingSequence";
+    public String d_out_validation_logos_biophysical_model = "logosBiophysicalModel";
+    public String f_out_validation_logos_biophysical_png = "BiophysicalModel.png";
+
+    public String d_report_resources = folder_ext + File.separator + "REPORT";
+    public String d_report_resources_media = d_report_resources + File.separator + "MEDIA";
+    public String f_report_resources_logo_png = d_report_resources_media + File.separator + "logo.png";
+    public String f_report_resources_is_available_png = d_report_resources_media + File.separator + "is_available.png";
+    public String f_report_resources_not_available_png =
+            d_report_resources_media + File.separator + "not_available.png";
+    public String f_report_resources_three_level_image_selector_html =
+            d_report_resources + File.separator + "THREE_LEVEL_IMAGE_SELECTOR.html";
+    public String f_report_resources_two_level_image_selector_html =
+            d_report_resources + File.separator + "TWO_LEVEL_IMAGE_SELECTOR.html";
+    public String f_report_resources_important_loci_html = d_report_resources + File.separator + "IMPORTANT_LOCI.html";
+    public String f_report_resources_top_log2fc_html = d_report_resources + File.separator + "TOP_LOG2FC.html";
+    public String f_report_resources_cooccurrence_html = d_report_resources + File.separator + "COOCCURRENCE.html";
+    public String f_report_resources_overview_html = d_report_resources + File.separator + "OVERVIEW.html";
+    public String d_report_resources_basicdata = d_report_resources + File.separator + "BASICDATA";
+    public String f_report_resources_basicdata_html = d_report_resources_basicdata + File.separator + "BASICDATA.html";
+    public String f_report_resources_basicdata_entry_html =
+            d_report_resources_basicdata + File.separator + "ENTRY.html";
+    public String d_report_resources_home = d_report_resources + File.separator + "HOME";
+    public String f_report_resources_home_home_html = d_report_resources_home + File.separator + "HOME.html";
+    public String f_report_resources_home_tf_html = d_report_resources_home + File.separator + "TF.html";
+    public String f_report_resources_home_tfGroup_html = d_report_resources_home + File.separator + "TF_GROUP.html";
+    public String f_report_resources_home_buttonbar_html = d_report_resources_home + File.separator + "BUTTONBAR.html";
+    public String f_report_resources_frame_html = d_report_resources + File.separator + "FRAME.html";
+    public String f_report_resources_style = d_report_resources + File.separator + "style.css";
+    public String f_report_resources_script = d_report_resources + File.separator + "script.js";
+    public String d_report_resources_parameters = d_report_resources + File.separator + "PARAMETERS";
+    public String f_report_resources_parameters_parameters_html =
+            d_report_resources_parameters + File.separator + "PARAMETERS.html";
+    public String f_report_resources_parameters_tool_html =
+            d_report_resources_parameters + File.separator + "TOOL.html";
+    public String f_report_resources_parameters_parameter_html =
+            d_report_resources_parameters + File.separator + "PARAMETER.html";
+    public String d_report_resources_validation = d_report_resources + File.separator + "VALIDATION";
+    public String f_report_resources_validation_validation_html =
+            d_report_resources_validation + File.separator + "VALIDATION.html";
+    public String d_report_resources_distribution = d_report_resources + File.separator + "DISTRIBUTION";
+    public String f_report_resources_distribution_distribution_html =
+            d_report_resources_distribution + File.separator + "DISTRIBUTION" + ".html";
+    public String d_report_resources_regression = d_report_resources + File.separator + "REGRESSION";
+    public String f_report_resources_regression_regression_html =
+            d_report_resources_regression + File.separator + "REGRESSION" + ".html";
+
     /*#################################
       ##PREPROCESSING MIX OPTIONS######
       #################################*/
