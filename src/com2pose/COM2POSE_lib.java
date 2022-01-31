@@ -4413,11 +4413,31 @@ public class COM2POSE_lib
             File f_tf = new File(f_logos_biophysical_root.getAbsolutePath() + File.separator + rank + "_" + tf_name);
             f_tf.mkdirs();
 
-            ArrayList<String> tf_binding_energies = tf_to_binding_profile.get(tf_name);
+            tf_name=tf_name.replaceAll("\\.",":");
+            ArrayList<String> tf_binding_energies = new ArrayList<>();
+            if(tf_name.contains("::"))
+            {
+                String[] split = tf_name.split("::");
+                for(String tf_split : split)
+                {
+                    tf_binding_energies.addAll(tf_to_binding_profile.get(tf_split));
+                }
+                if(tf_to_binding_profile.containsKey(tf_name))
+                {
+                    tf_binding_energies.addAll(tf_to_binding_profile.get(tf_name));
+                }
+            }
+            else
+            {
+                tf_binding_energies=tf_to_binding_profile.get(tf_name);
+            }
+
+            tf_name=tf_name.replaceAll(":",".");
 
             File f_output_binding_energy = new File(f_tf.getAbsolutePath() + File.separator + tf_name +
                     options_intern.file_suffix_distribution_analysis_energymatrix);
             BufferedWriter bw_binding_energies = new BufferedWriter(new FileWriter(f_output_binding_energy));
+
             for (String line_energy : tf_binding_energies)
             {
                 bw_binding_energies.write(line_energy);
@@ -5836,6 +5856,8 @@ public class COM2POSE_lib
         }
         br_ensg_symbol.close();
 
+        Random random = new Random();
+
         File f_genecounts_root = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing + File.separator +
                 options_intern.folder_name_deseq2_preprocessing_gene_symbols);
@@ -6310,6 +6332,26 @@ public class COM2POSE_lib
                                     if (group_clash_diff_gene_expr.containsKey(k_group_clash))
                                     {
                                         ensg_diff_gene_expr = group_clash_diff_gene_expr.get(k_group_clash);
+
+                                        //if random get randomized diff gene expr
+                                        if(options_intern.tepic_randomize_tf_gene_matrix)
+                                        {
+                                            ArrayList<String> group_clash_diff_gene_expr_list =
+                                                    new ArrayList<>(group_clash_diff_gene_expr.keySet());
+
+                                            int random_index = random.nextInt(group_clash_diff_gene_expr_list.size()-0)+0;
+                                            if(random_index< 0)
+                                            {
+                                                random_index++;
+                                            }
+                                            if(random_index == group_clash_diff_gene_expr_list.size())
+                                            {
+                                                random_index--;
+                                            }
+                                            String random_clash = group_clash_diff_gene_expr_list.get(random_index);
+                                            ensg_diff_gene_expr = group_clash_diff_gene_expr.get(random_clash);
+                                        }
+
                                     }
 
                                     double tg_score_1 = 0;
@@ -12041,6 +12083,8 @@ public class COM2POSE_lib
     {
         logger.logLine("[TEPIC] Randomize output start.");
 
+        Random r = new Random();
+
         File f_input_root = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_tepic_output_raw);
 
@@ -12064,6 +12108,9 @@ public class COM2POSE_lib
                             new File(f_output_tp_hm.getAbsolutePath() + File.separator + fileDir_sample.getName());
                     f_output_tp_hm_sample.mkdir();
 
+                    File file_to_shuffle_sequences =
+                            new File(fileDir_sample.getAbsolutePath()+File.separator+options_intern.file_suffix_tepic_output_trap_sequences);
+
                     ArrayList<File> affinity_files = new ArrayList<>();
 
                     for (File fileDir_affinity : fileDir_sample.listFiles())
@@ -12075,7 +12122,6 @@ public class COM2POSE_lib
                     }
 
                     File file_to_shuffle = new File("");
-
                     if (affinity_files.size() > 1)
                     {
                         for (File f : affinity_files)
@@ -12138,6 +12184,75 @@ public class COM2POSE_lib
 
                     br.close();
                     bw.close();
+
+                    //shuffle sequences
+                    File f_out_shuffled_sequences = new File(
+                            f_output_tp_hm_sample.getAbsolutePath() + File.separator + file_to_shuffle_sequences.getName());
+                    BufferedReader br_sequences = new BufferedReader(new FileReader(file_to_shuffle_sequences));
+                    HashSet<String> tfs = new HashSet<>();
+
+                    String line_shuf_seq = "";
+                    while((line_shuf_seq= br_sequences.readLine())!=null)
+                    {
+                        if(line_shuf_seq.startsWith("#"))
+                            continue;
+
+                        String[] split = line_shuf_seq.split("\t");
+                        if(tfs.contains(split[0]))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            tfs.add(split[0]);
+                        }
+                    }
+                    br_sequences.close();
+
+                    ArrayList<String> tfs_draw_random = new ArrayList<>(tfs);
+
+                    BufferedReader br_sequences_write = new BufferedReader(new FileReader(file_to_shuffle_sequences));
+                    BufferedWriter bw_shuffled_seq = new BufferedWriter(new FileWriter(f_out_shuffled_sequences));
+                    String line_shuf_seq_write = "";
+                    while((line_shuf_seq_write=br_sequences_write.readLine())!=null)
+                    {
+                        if(line_shuf_seq.startsWith("#") || line_shuf_seq.startsWith("TF\t"))
+                        {
+                            bw_shuffled_seq.write(line_shuf_seq_write);
+                            bw_shuffled_seq.newLine();
+                            continue;
+                        }
+
+                        String[] split = line_shuf_seq.split("\t");
+                        StringBuilder sb_suf = new StringBuilder();
+
+                        //draw random TF
+                        int random_index = r.nextInt(tfs_draw_random.size()-0)+0;
+                        if(random_index< 0)
+                        {
+                            random_index++;
+                        }
+                        if(random_index == tfs_draw_random.size())
+                        {
+                            random_index--;
+                        }
+                        String tf_drawn = tfs_draw_random.get(random_index);
+
+                        sb_suf.append(tf_drawn);
+                        for(int i = 1; i < split.length; i++)
+                        {
+                            sb_suf.append("\n");
+                            sb_suf.append(split[i]);
+                        }
+                        bw_shuffled_seq.write(sb_suf.toString());
+                        bw_shuffled_seq.newLine();
+                    }
+                    br_sequences_write.close();
+                    bw_shuffled_seq.close();
+
+
+
+
                 }
             }
         }
