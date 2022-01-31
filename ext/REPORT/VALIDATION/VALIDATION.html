@@ -30,11 +30,12 @@
 </div>
 <div class="panel" id="logos">
     <div class="accordion-info sub">
-        <button class="accordion" onclick="toggleAccordion('biophysicalModel')">Biophysical model</button>
+        <button class="accordion" onclick="toggleAccordion('logosBiophysicalModel')">Biophysical model</button>
         <button class="info"
-                onclick="toggleAccordion('biophysicalModel-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+                onclick="toggleAccordion('logosBiophysicalModel-info')"><img src="{RELATIVATION}MEDIA/info.svg">
+        </button>
     </div>
-    <div class="panel info" id="biophysicalModel-info">
+    <div class="panel info" id="logosBiophysicalModel-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -42,20 +43,13 @@
             elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
             metus nisl.</label>
     </div>
-    <div class="panel" id="biophysicalModel">
-        <div class="buttonbar">
-            <button onclick="openModal('biophysical-model-modal')">Zoom in</button>
-            <button onclick="openImageInTab('biophysical-model')">Open in new tab</button>
-        </div>
-        <img src="Logos/biophysical_model.png" class="modal source" onclick="openModal('biophysical-model-modal')"
-             id="biophysical-model">
-    </div>
+    {BIOPHYSICAL_MODEL}
     <div class="accordion-info sub">
-        <button class="accordion" onclick="toggleAccordion('tfSequence')">TF sequence</button>
+        <button class="accordion" onclick="toggleAccordion('logosTfSequence')">TF sequence</button>
         <button class="info"
-                onclick="toggleAccordion('tfSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+                onclick="toggleAccordion('logosTfSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel info" id="tfSequence-info">
+    <div class="panel info" id="logosTfSequence-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -63,15 +57,14 @@
             elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
             metus nisl.</label>
     </div>
-    <div class="panel" id="tfSequence">
-        {TF_SEQUENCE}
-    </div>
+    {TF_SEQUENCE}
     <div class="accordion-info sub">
-        <button class="accordion" onclick="toggleAccordion('tfBindingSequence')">TF binding sequence</button>
+        <button class="accordion" onclick="toggleAccordion('logosTfBindingSequence')">TF binding sequence</button>
         <button class="info"
-                onclick="toggleAccordion('tfBindingSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+                onclick="toggleAccordion('logosTfBindingSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg">
+        </button>
     </div>
-    <div class="panel info" id="tfBindingSequence-info">
+    <div class="panel info" id="logosTfBindingSequence-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -79,9 +72,7 @@
             elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
             metus nisl.</label>
     </div>
-    <div class="panel" id="tfBindingSequence">
-        {TF_BINDING_SEQUENCE}
-    </div>
+    {TF_BINDING_SEQUENCE}
 </div>
 <div class="accordion-info">
     <button class="accordion" onclick="toggleAccordion('validationHeatmaps')">Differential gene expression of top target

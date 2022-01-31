@@ -192,9 +192,9 @@ function move_lowest_level(id, delta, combinations) {
     }
     i += delta;
     if (i >= options.length) {
-        i = 1;
+        i = 0;
     }
-    if (i < 1) {
+    if (i < 0) {
         i = options.length - 1;
     }
 

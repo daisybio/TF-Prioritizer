@@ -275,11 +275,10 @@ public class Options_intern
     public String f_out_report_important_loci_html = d_out_report + File.separator + "IMPORTANT_LOCI.html";
     public String f_out_report_top_log2fc_html = d_out_report + File.separator + "TOP_LOG2FC.html";
     public String f_out_report_cooccurrence_html = d_out_report + File.separator + "COOCCURRENCE.html";
-    public String d_out_validation_logos = "Logos";
-    public String d_out_validation_logos_tf_sequence = d_out_validation_logos + File.separator + "TF_Sequence";
-    public String d_out_validation_logos_tf_binding_sequence =
-            d_out_validation_logos + File.separator + "TF_Binding_Sequence";
-    public String f_out_validation_logos_biophysical_png = "biophysical_model.png";
+    public String d_out_validation_logos_tf_sequence = "logosTfSequence";
+    public String d_out_validation_logos_tf_binding_sequence = "logosTfBindingSequence";
+    public String d_out_validation_logos_biophysical_model = "logosBiophysicalModel";
+    public String f_out_validation_logos_biophysical_png = "BiophysicalModel.png";
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
     public String d_report_resources_media = d_report_resources + File.separator + "MEDIA";

@@ -1,5 +1,6 @@
 package util.Report;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -215,31 +216,52 @@ public class StructureElements
 
     static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types)
     {
+        ArrayList<ArrayList<String>> options = new ArrayList<>();
+
+        for (SelectorTypes type : types)
+        {
+            options.add(Report.existingValues.get(type));
+        }
+
+        return generateImageSelector(id, sourceDir, options);
+    }
+
+    static String generateImageSelector(String id, File sourceDir, ArrayList<ArrayList<String>> options)
+    {
         StringBuilder sb_imageSelector = new StringBuilder();
 
         sb_imageSelector.append("<div class='panel' id='{ID}'>");
 
         int i = 0;
 
-        for (SelectorTypes type : types)
+        for (ArrayList<String> levelOptions : options)
         {
-            if (type != SelectorTypes.EMPTY_DROPDOWN)
+            if (levelOptions.size() > 0)
             {
                 sb_imageSelector.append("<div class='buttonbar'>");
 
-                for (String entry : Report.existingValues.get(type))
+                for (String entry : levelOptions)
                 {
                     String value;
-                    if (i == types.size() - 1 && !entry.matches(".+\\.(gif|jpg|jpeg|tiff|png)$"))
+                    if (i == options.size() - 1)
                     {
-                        value = entry + ".png";
+                        if (entry.matches(".+\\.(gif|jpg|jpeg|tiff|png|svg)$"))
+                        {
+                            value = entry;
+                            entry = entry.substring(0, entry.lastIndexOf("."));
+                        } else
+                        {
+                            value = entry + ".png";
+                        }
+
                     } else
                     {
                         value = entry;
                     }
                     sb_imageSelector.append("<button class='{ID} selector' value='").append(value).append("' id='{ID}-")
-                            .append(i).append("-").append(value)
-                            .append("' onclick='update_selection(this, \"{ID}\", {ID}Combinations)'>");
+                            .append(i).append("-").append(value).append("' " +
+                                    ((options.size() == 1 && levelOptions.size() == 1) ? "style='display: none'" : "") +
+                                    " onclick='update_selection(this, \"{ID}\", {ID}Combinations)'>");
                     sb_imageSelector.append(entry);
                     sb_imageSelector.append("</button>");
                 }
@@ -280,7 +302,7 @@ public class StructureElements
             i++;
         }
 
-        if (types.get(types.size() - 1) != SelectorTypes.EMPTY_DROPDOWN)
+        if (options.get(options.size() - 1).size() > 0)
         {
             {
                 sb_imageSelector.append("<div class='buttonbar centered'>");

@@ -361,16 +361,24 @@ public class PageGenerators
 
                 File targetFile = new File(Report.options_intern.com2pose_working_directory + File.separator +
                         Report.options_intern.d_out_validation + File.separator + tfGroup.getName() + File.separator +
-                        Report.options_intern.d_out_validation_logos + File.separator +
+                        Report.options_intern.d_out_validation_logos_biophysical_model + File.separator +
                         Report.options_intern.f_out_validation_logos_biophysical_png);
 
                 File tempDir = FileManagement.getFileIfInDirectory(sourceDir, "[0-9]+_" + tfGroup.getName(), false);
 
-                File sourceFile = FileManagement.getFileIfInDirectory(tempDir, ".*\\.png", true);
+                File sourceFile = FileManagement.getFileIfInDirectory(tempDir, ".+\\.png$", true);
 
                 if (sourceFile != null)
                 {
                     FileManagement.copyFile(sourceFile, targetFile);
+
+                    ArrayList<ArrayList<String>> options = new ArrayList<>();
+
+                    options.add(new ArrayList<>(List.of(targetFile.getName())));
+
+                    frame = frame.replace("{BIOPHYSICAL_MODEL}",
+                            StructureElements.generateImageSelector("logosBiophysicalModel", targetFile.getParentFile(),
+                                    options));
                 }
             } // BIOPHYSICAL MODEL
 
@@ -386,58 +394,24 @@ public class PageGenerators
 
                 if (sourceDir != null)
                 {
-                    ArrayList<File> files = new ArrayList<>();
+                    ArrayList<String> files = new ArrayList<>();
                     for (File file : Objects.requireNonNull(sourceDir.listFiles()))
                     {
                         if (file.getName().endsWith(".svg"))
                         {
                             File targetFile = new File(targetDir.getAbsolutePath() + File.separator + file.getName());
                             FileManagement.copyFile(file, targetFile);
-                            files.add(targetFile);
+                            files.add(targetFile.getName());
                         }
                     }
 
                     if (files.size() > 0)
                     {
-                        StringBuilder sb_tf_sequence = new StringBuilder();
+                        ArrayList<ArrayList<String>> options = new ArrayList<>();
+                        options.add(files);
 
-                        if (files.size() > 1)
-                        {
-                            sb_tf_sequence.append("<div class='buttonbar'>");
-                            boolean first = true;
-                            for (File file : files)
-                            {
-                                sb_tf_sequence.append("<button onclick=\"selectImage(this, 'tf-sequence')\" value='")
-                                        .append(Report.options_intern.d_out_validation_logos_tf_sequence)
-                                        .append(File.separator).append(file.getName()).append("' class='selector")
-                                        .append(first ? " active" : "").append("'>");
-                                String prettyName = file.getName().substring(0, file.getName().lastIndexOf("."));
-                                sb_tf_sequence.append(prettyName);
-                                if (first)
-                                {
-                                    frame = frame.replace("{TFSEQUENCEMODALCAPTION}", prettyName);
-                                }
-                                first = false;
-                                sb_tf_sequence.append("</button>");
-                            }
-                            sb_tf_sequence.append("</div>");
-                        }
-
-                        sb_tf_sequence.append("<div class='buttonbar'>");
-                        sb_tf_sequence.append("<button onclick='openModal(\"tf-sequence-modal\")'>Zoom in</button>");
-                        sb_tf_sequence.append(
-                                "<button onclick='openImageInTab(\"tf-sequence\")'>Open in new tab</button>");
-                        sb_tf_sequence.append("</div>");
-
-                        String firstFile = Report.options_intern.d_out_validation_logos_tf_sequence + File.separator +
-                                files.get(0).getName();
-
-                        sb_tf_sequence.append("<img id='tf-sequence' class='modal source' onclick='openModal" +
-                                "(\"tf-sequence-modal\")' src='").append(firstFile).append("'>");
-
-                        frame = frame.replace("{TFSEQUENCEMODALIMAGE}", firstFile);
-
-                        frame = frame.replace("{TF_SEQUENCE}", sb_tf_sequence.toString());
+                        frame = frame.replace("{TF_SEQUENCE}",
+                                StructureElements.generateImageSelector("logosTfSequence", targetDir, options));
                     }
                 }
             } // TF Sequence
@@ -454,59 +428,12 @@ public class PageGenerators
 
                 if (sourceDir != null)
                 {
-                    StringBuilder sb_tf_binding_sequences = new StringBuilder();
-                    sb_tf_binding_sequences.append("<div class='buttonbar'>");
+                    FileManagement.copyDirectory(sourceDir, targetDir, true, ".*_biophysical_model.png$",
+                            Arrays.asList(tfGroup.getName(), "biophysical_model"));
 
-                    boolean first = true;
-                    String firstImage = "";
-
-                    for (File imageFile : Objects.requireNonNull(sourceDir.listFiles()))
-                    {
-                        if (!imageFile.getName().endsWith(".png"))
-                        {
-                            continue;
-                        }
-
-                        String relevantFileName = imageFile.getName().split("_")[1];
-
-                        File targetFile =
-                                new File(targetDir.getAbsolutePath() + File.separator + relevantFileName + ".png");
-
-                        FileManagement.copyFile(imageFile, targetFile);
-
-                        sb_tf_binding_sequences.append("<button class='selector").append(first ? " active" : "")
-                                .append("' onclick=\"selectImage(this, 'tf-binding-sequence')\" value='")
-                                .append(Report.options_intern.d_out_validation_logos_tf_binding_sequence)
-                                .append(File.separator).append(relevantFileName).append(".png'>");
-                        sb_tf_binding_sequences.append(relevantFileName);
-                        sb_tf_binding_sequences.append("</button>");
-
-                        if (first)
-                        {
-                            firstImage = relevantFileName;
-                            first = false;
-                        }
-                    }
-                    sb_tf_binding_sequences.append("</div>");
-
-                    sb_tf_binding_sequences.append("<div class='buttonbar'>");
-                    sb_tf_binding_sequences.append(
-                            "<button onclick='openModal(\"tf-binding-sequence-modal\")'>Zoom in</button>");
-                    sb_tf_binding_sequences.append(
-                            "<button onclick='openImageInTab(\"tf-binding-sequence\")'>Open in new tab</button>");
-                    sb_tf_binding_sequences.append("</div>");
-
-                    sb_tf_binding_sequences.append("<img id='tf-binding-sequence' onclick='openModal" +
-                                    "(\"tf-binding-sequence-modal\")' class='modal source' src='")
-                            .append(Report.options_intern.d_out_validation_logos_tf_binding_sequence)
-                            .append(File.separator).append(firstImage).append(".png'>");
-
-                    frame = frame.replace("{TFBINDINGSEQUENCEMODALIMAGE}",
-                            Report.options_intern.d_out_validation_logos_tf_binding_sequence + File.separator +
-                                    firstImage + ".png");
-                    frame = frame.replace("{TFBINDINGSEQUENCEMODALCAPTION}", firstImage);
-
-                    frame = frame.replace("{TF_BINDING_SEQUENCE}", sb_tf_binding_sequences.toString());
+                    frame = frame.replace("{TF_BINDING_SEQUENCE}",
+                            StructureElements.generateImageSelector("logosTfBindingSequence", targetDir,
+                                    List.of(SelectorTypes.DISTRIBUTION_OPTIONS)));
                 }
             } // TF binding sequence
         } // LOGOS

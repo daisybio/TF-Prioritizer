@@ -78,14 +78,28 @@ public class FileManagement
                 if (sourceFile.getName().matches(fileNameRegex))
                 {
                     String cleanName = sourceFile.getName();
+                    String fileExtension = cleanName.substring(cleanName.lastIndexOf("."));
+
+                    cleanName = cleanName.replace(fileExtension, "");
+
                     for (String removable : removables)
                     {
                         cleanName = cleanName.replace(removable, "");
                     }
+
                     while (cleanName.contains("__"))
                     {
                         cleanName = cleanName.replace("__", "_");
                     }
+                    while (cleanName.startsWith("_"))
+                    {
+                        cleanName = cleanName.substring(1);
+                    }
+                    while (cleanName.endsWith("_"))
+                    {
+                        cleanName = cleanName.substring(0, cleanName.length() - 1);
+                    }
+                    cleanName = cleanName + fileExtension;
                     File targetFile = new File(target.getAbsolutePath() + File.separator + cleanName);
                     executorService.execute(() ->
                     {
