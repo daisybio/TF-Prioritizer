@@ -292,7 +292,8 @@ public class StructureElements
                 sb_imageSelector.append("</button>");
 
                 sb_imageSelector.append(
-                        "<button class='narrow' onclick='move_lowest_level(\"{ID}\", -1, " + "{ID}Combinations)'>");
+                        "<button class='narrow' id='{ID}-next-option' onclick='move_lowest_level(\"{ID}\", -1, " +
+                                "{ID" + "}Combinations)" + "'>");
                 sb_imageSelector.append("<");
                 sb_imageSelector.append("</button>");
 
@@ -306,7 +307,8 @@ public class StructureElements
                 sb_imageSelector.append("</div>");
 
                 sb_imageSelector.append(
-                        "<button class='narrow' onclick='move_lowest_level(\"{ID}\", 1, " + "{ID}Combinations)'>");
+                        "<button class='narrow' id='{ID}-previous-option' onclick='move_lowest_level(\"{ID}\", 1, " +
+                                "{ID}Combinations)'>");
                 sb_imageSelector.append(">");
                 sb_imageSelector.append("</button>");
 

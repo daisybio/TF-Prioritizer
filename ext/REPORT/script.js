@@ -136,6 +136,14 @@ function update_selection(source_element, id, combinations) {
 
                 dropdownContent.appendChild(option);
             }
+
+            let dropdownButton = document.getElementById(id + "-dropdown");
+            let dropdownLeftArrow = document.getElementById(id + "-next-option");
+            let dropdownRightArrow = document.getElementById(id + "-previous-option");
+            let modalLeftArrow = document.getElementById(id + "-modal-leftarrow");
+            let modalRightArrow = document.getElementById(id + "-modal-rightarrow");
+
+            dropdownButton.disabled = dropdownLeftArrow.disabled = dropdownRightArrow.disabled = modalLeftArrow.disabled = modalRightArrow.disabled = availableCombinations.length <= 1;
         }
     }
 
@@ -202,13 +210,9 @@ function move_lowest_level(id, delta, combinations) {
 
 }
 
-function open_all_panels() {
-    let panels = document.getElementsByClassName("panel");
-
-    let i;
-    for (i = 0; i < panels.length; i++) {
-        panels[i].style.display = "grid";
-    }
+function openPanel(id) {
+    let panel = document.getElementById(id);
+    panel.style.display = "grid";
 }
 
 function toggleDropdown(selection) {
