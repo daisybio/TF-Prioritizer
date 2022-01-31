@@ -186,53 +186,6 @@ public class StructureElements
         return frame;
     }
 
-    private static String mapToJson(Map<String, String> map)
-    {
-        StringBuilder sb_output = new StringBuilder("{");
-
-        for (Map.Entry<String, String> entry : map.entrySet())
-        {
-            boolean valueIsJson = (entry.getValue().startsWith("{") && entry.getValue().endsWith("}")) ||
-                    (entry.getValue().startsWith("[") && entry.getValue().endsWith("]"));
-            sb_output.append("\"");
-            sb_output.append(entry.getKey());
-            sb_output.append("\":");
-            if (!valueIsJson)
-            {
-                sb_output.append("\"");
-            }
-            sb_output.append(entry.getValue());
-            if (!valueIsJson)
-            {
-                sb_output.append("\"");
-            }
-            sb_output.append(",");
-        }
-        sb_output.setLength(sb_output.length() - 1);
-        sb_output.append("}");
-
-        return sb_output.toString();
-    }
-
-    static class StringComparator implements Comparator<String>
-    {
-        @Override public int compare(String a, String b)
-        {
-            return prefixNum(a) - prefixNum(b);
-        }
-
-        private int prefixNum(String a)
-        {
-            if (a.matches("[0-9]+_.*"))
-            {
-                return Integer.parseInt(a.split("_")[0]);
-            } else
-            {
-                return 0;
-            }
-        }
-    }
-
     static String setGeneCardLinks(String text, TranscriptionFactorGroup tfGroup)
     {
         StringBuilder sb_links = new StringBuilder();
@@ -263,10 +216,8 @@ public class StructureElements
     static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types)
     {
         StringBuilder sb_imageSelector = new StringBuilder();
-        StringBuilder sb_combinations = new StringBuilder();
 
         sb_imageSelector.append("<div class='panel' id='{ID}'>");
-        sb_combinations.append("{");
 
         int i = 0;
 
@@ -372,7 +323,6 @@ public class StructureElements
             sb_imageSelector.append("</div>");
         }
 
-        sb_combinations.append("}");
         sb_imageSelector.append("</div>");
 
         sb_imageSelector.append("<script>let {ID}Combinations = {COMBINATIONS};</script>");

@@ -19,7 +19,7 @@ public class Report
     static Options_intern options_intern = null;
     final ArrayList<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
     static final DecimalFormat formatter = new DecimalFormat("0.###");
-    static Map<SelectorTypes, HashSet<String>> existingValues = new HashMap<>();
+    static Map<SelectorTypes, ArrayList<String>> existingValues = new HashMap<>();
 
     public Report(Options_intern options_intern) throws IOException
     {
@@ -27,10 +27,7 @@ public class Report
 
         for (SelectorTypes type : SelectorTypes.values())
         {
-            if (type != SelectorTypes.EMPTY_DROPDOWN)
-            {
-                existingValues.put(type, new HashSet<>());
-            }
+            existingValues.put(type, new ArrayList<>());
         }
 
         logger = new Logger(true, options_intern.com2pose_working_directory);
@@ -350,5 +347,21 @@ public class Report
         existingValues.get(SelectorTypes.DISTRIBUTION_OPTIONS)
                 .addAll(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
         existingValues.get(SelectorTypes.DISTRIBUTION_OPTIONS).add("ALL");
+
+        System.out.println(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
+        System.out.println(existingValues.get(SelectorTypes.GROUP_PAIRINGS));
+
+        for (SelectorTypes type : SelectorTypes.values())
+        {
+            if (existingValues.get(type).size() > 0)
+            {
+                Set<String> set = new HashSet<>(existingValues.get(type));
+                existingValues.get(type).clear();
+                existingValues.get(type).addAll(set);
+                Collections.sort(existingValues.get(type));
+            }
+        }
+        System.out.println(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
+        System.out.println(existingValues.get(SelectorTypes.GROUP_PAIRINGS));
     }
 }
