@@ -16,7 +16,6 @@ public class COM2POSE
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);
-
         com2pose_lib.check_chromosomes();
 
         //mix histone modifications
@@ -110,13 +109,13 @@ public class COM2POSE
         com2pose_lib.get_top_k_target_genes_plots();
 
 
-        //CREATE OVERVIEW WEBSITE FOR EVERYTHING BEFORE DISTRIBUTION
-        com2pose_lib.create_overview_html_report_before_distribution_analysis();
+        //PREPARE DISTR ANALYSIS
+        com2pose_lib.prepare_distribution_analysis();
 
         //DISTRIBUTION ANALYSIS
         com2pose_lib.perform_distribution_analysis();
         com2pose_lib.create_distribution_plots();
-        com2pose_lib.create_overview_html_report_distribution();
+        //com2pose_lib.create_overview_html_report_distribution();
         com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();
 
         //get target genes of TFs based on dcg analysis

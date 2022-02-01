@@ -19,6 +19,9 @@ public class Options_intern
     public boolean calculate_tpm_lengths = true;
     public boolean calculcate_gene_positions = true;
 
+    public String different_tps = "DIFFERENT_TPS";
+    public String same_tps = "SAME_TPS";
+
     public String folder_ext = "ext";
     public String folder_enhancerDB = "Enhancers_DB";
     public String enhancerDB_bed_format = "chrom\tchromStart\tchromEnd\tname\treference_genome";

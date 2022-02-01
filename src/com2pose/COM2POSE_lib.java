@@ -5090,8 +5090,9 @@ public class COM2POSE_lib
         String html_tail = "</body>\n" + "</html>";
 
         StringBuilder sb_cumulative_gain_website = new StringBuilder();
-        sb_cumulative_gain_website.append(get_header_html(options_intern.html_report_levels_3_steps,
-                "Distribution Analysis: " + "CUMULATIVE GAIN"));
+        sb_cumulative_gain_website.append("");
+                /*get_header_html(options_intern.html_report_levels_3_steps,
+                "Distribution Analysis: " + "CUMULATIVE GAIN"));*/
 
         //get gene counts
         HashMap<String, HashMap<String, String>> tp_tf_gene_count = new HashMap<>();
@@ -5298,8 +5299,8 @@ public class COM2POSE_lib
         bw.close();
 
         StringBuilder sb_home_home = new StringBuilder();
-        sb_home_home.append(
-                get_header_html(options_intern.html_report_levels_home, options_intern.html_report_levels_home));
+        sb_home_home.append("");
+                //get_header_html(options_intern.html_report_levels_home, options_intern.html_report_levels_home));
 
         //CREATE EXPANDABLE BUTTONS FOR DISTRIBUTION ANALYSIS OVERVIEW
         sb_home_home.append(
@@ -5459,7 +5460,7 @@ public class COM2POSE_lib
         }
 
 
-        String html_header = get_header_html("HOME", options_intern.analysis_types_distribution_analysis);
+        String html_header = "";//get_header_html("HOME", options_intern.analysis_types_distribution_analysis);
         String html_tail = "</body>\n" + "</html>";
 
         File html_home_distribution_analysis = new File(f_output_website_root.getAbsolutePath() + File.separator +
@@ -6434,1419 +6435,133 @@ public class COM2POSE_lib
      * creates the HTML report
      * it creates also one important file (available tfs in HMs and which stages) for distribution analysis
      */
-    public void create_overview_html_report_before_distribution_analysis() throws Exception
+    public void prepare_distribution_analysis() throws Exception
     {
-        logger.logLine("[WEBSITE] Start creating overview website.");
+        logger.logLine("[PREP-DISTRIBUTION ANALYSIS] PREPARING DISTR-ANALYSIS.");
 
-        File f_website_css =
-                new File(options_intern.path_to_COM2POSE + File.separator + "ext" + File.separator + "WEBSITE");
+        HashMap<String, HashMap<String, HashSet<String>>> distinct_tf_hm_diff_same = new HashMap<>();
 
-        File f_move_css = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_website +
-                        File.separator + options_intern.folder_out_website_basics);
-        f_move_css.mkdir();
+        //fill distinct_tf_hm_diff_same
+        File f_input_plotsdata =
+                new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_out_data_plots);
 
-        File f_output_website = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_website);
-        f_output_website.mkdir();
-
-        File f_output_website_htmls = new File(f_output_website.getAbsolutePath() + File.separator +
-                options_intern.folder_out_website_htmls_regression_coefficients);
-        f_output_website_htmls.mkdir();
-
-        String command = "cp -u -r " + f_website_css.getAbsolutePath() + " " + f_move_css.getAbsolutePath();
-        Process child = Runtime.getRuntime().exec(command);
-        logger.logLine("[WEBSITE] Copy CSS files: " + command);
-        int code = child.waitFor();
-        switch (code)
+        for(File f_hm : f_input_plotsdata.listFiles())
         {
-            case 0:
-                break;
-            case 1:
-                String message = child.getErrorStream().toString();
-                throw new Exception(message);
+            if(f_hm.isDirectory())
+            {
+                String key_hm = f_hm.getName();
+                ArrayList<Double> cutoffs = new ArrayList<>();
+
+                for(File f_cutoff : f_hm.listFiles())
+                {
+                    if(f_cutoff.isDirectory())
+                    {
+                        String key_cutoff = f_cutoff.getName();
+                        cutoffs.add(Double.parseDouble(key_cutoff));
+                    }
+                }
+                //sort
+                Collections.sort(cutoffs);
+                //take lowest cutoff
+                File f_input_hm_cutoff = new File(f_hm.getAbsolutePath()+File.separator+cutoffs.get(0));
+                for(File f_stages : f_input_hm_cutoff.listFiles())
+                {
+                    if(f_stages.isFile())
+                    {
+                        String name = f_stages.getName();
+                        String check_name = f_stages.getName();
+                        if(name.endsWith(".py") || name.endsWith(".png"))
+                            continue;
+
+                        if(check_name.matches(".*different.*"))
+                        {
+                            name=options_intern.different_tps;
+                        }
+                        if(check_name.matches(".*same.*"))
+                        {
+                            name=options_intern.same_tps;
+                        }
+
+                        BufferedReader br_stages = new BufferedReader(new FileReader(f_stages));
+                        String line_stages = br_stages.readLine();
+                        while((line_stages=br_stages.readLine())!=null)
+                        {
+                            String[] split = line_stages.split(",");
+                            String tf = split[0].toUpperCase();
+
+                            HashMap<String, HashSet<String>> hm_diff_same = new HashMap<>();
+                            if(distinct_tf_hm_diff_same.containsKey(tf))
+                            {
+                                hm_diff_same=distinct_tf_hm_diff_same.get(tf);
+                            }
+                            distinct_tf_hm_diff_same.put(tf,hm_diff_same);
+
+                            HashSet<String> diff_same = new HashSet<>();
+                            if(hm_diff_same.containsKey(key_hm))
+                            {
+                                diff_same = hm_diff_same.get(key_hm);
+                            }
+                            hm_diff_same.put(key_hm,diff_same);
+
+                            diff_same.add(name);
+                        }
+                        br_stages.close();
+                    }
+                }
+            }
         }
 
-        for (int i_dont_know = 0; i_dont_know < 2; i_dont_know++)
+        File f_output_distribution_analysis = new File(
+                options_intern.com2pose_working_directory + File.separator +
+                        options_intern.folder_out_distribution);
+        f_output_distribution_analysis.mkdir();
+
+        File f_output_distribution_analysis_analyzed_tfs = new File(
+                f_output_distribution_analysis.getAbsolutePath() + File.separator +
+                        options_intern.folder_out_distribution_analyzed_tfs);
+        f_output_distribution_analysis_analyzed_tfs.mkdir();
+
+        BufferedWriter bw_distinct_tf_hm_diff_same = new BufferedWriter(new FileWriter(new File(
+                f_output_distribution_analysis_analyzed_tfs.getAbsolutePath() + File.separator +
+                        options_intern.file_suffix_distribution_analysis_analysed_tfs)));
+
+        bw_distinct_tf_hm_diff_same.write("TF\tHM\tSTAGES");
+        bw_distinct_tf_hm_diff_same.newLine();
+
+        for (String key_tf : distinct_tf_hm_diff_same.keySet())
         {
+            HashMap<String, HashSet<String>> hm_diff_stages = distinct_tf_hm_diff_same.get(key_tf);
 
-            HashMap<String, HashMap<String, HashSet<String>>> distinct_tf_hm_diff_same = new HashMap<>();
-
-            String html_tail = "</body>\n" + "</html>";
-
-            BufferedWriter bw_home = new BufferedWriter(new FileWriter(f_output_website + File.separator +
-                    options_intern.html_report_home_regression_coefficient_analysis));
-
-            //bw_home.write(sb_home_front.toString());
-            bw_home.write(get_header_html(options_intern.html_report_levels_home,
-                    options_intern.analysis_types_regression_coefficient_analysis));
-
-            threshold_folders_filled = true;
-
-            for (Double d : options_intern.plot_th_coefficient)
+            for (String key_hm : hm_diff_stages.keySet())
             {
-                bw_home.append(write_regression_coeffecient_analysis_found_table_html(d, "HOME"));
-            }
+                StringBuilder sb = new StringBuilder();
+                sb.append(key_tf);
+                sb.append("\t");
+                sb.append(key_hm);
+                sb.append("\t");
 
-            bw_home.write(html_tail);
-
-            bw_home.close();
-
-
-            StringBuilder sb_parameter = new StringBuilder(get_header_html(options_intern.html_report_levels_home, ""));
-
-            sb_parameter.append(" <script>\n" + " document.title = \"PARAMETERS\";\n" + " </script>\n");
-
-
-            //mix_option_parameters
-            {
-                sb_parameter.append(
-                        "<button class=\"button_expandable\" id=\"button_preprocessing_mix_options\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_preprocessing_mix_options','table_preprocessing_mix_options')\"> Preprocessing Mix Options\n");
-                sb_parameter.append(
-                        "<div style=\"display: none;background-color: white;color:black;\" id=\"table_preprocessing_mix_options\">\n");
-
-                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
-                sb_parameter.append("\t\t\t\t<th>Value</th>");
-                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>mix_level</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.mix_level + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: if set a mix of either the Histone Modification Level (HM_LEVEL) or the Sample Level (SAMPLE_LEVEL) will be performed, mix_option is required\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>mix_option</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.mix_option + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: set histone marks or samples will be mixed with option: UNION (all peaks of all HMs will be used), INTERSECTION (only peaks, which are in all HMs will be used)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                if (options_intern.mix_option.equals("INTERSECTION"))
+                int i = 0;
+                for (String stages : hm_diff_stages.get(key_hm))
                 {
-                    sb_parameter.append("\t\t\t<tr>");
-                    sb_parameter.append("\t\t\t\t<th>mix_occurence_intersection</th>");
-                    sb_parameter.append("\t\t\t\t<th>" + options_intern.mix_occurence_intersection + "</th>");
-                    sb_parameter.append(
-                            "\t\t\t\t<th>#[OPT]: minimal occurence of peaks in intersection (only applied if mix_option is set to INTERSECTION), if set to zero it means it must be in all samples /histone modifications available, default 2\n</th>");
-                    sb_parameter.append("\t\t\t</tr>");
-                }
-                sb_parameter.append("\t\t</table>");
-                sb_parameter.append("</div>\n</button>\n");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>mix_mutually_exclusive</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.mix_mutually_exclusive + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: mutually exclusive peaks. Use only peaks, which are mutually exclusive, default: TRUE\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-            }
-
-            //blacklist parameters
-            {
-                sb_parameter.append(
-                        "<button class=\"button_expandable\" id=\"button_blacklist_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_blacklist_parameters','table_blacklist_parameters')\"> Blacklist Parameters\n");
-                sb_parameter.append(
-                        "<div style=\"display: none;background-color: white;color:black;\" id=\"table_blacklist_parameters\">\n");
-                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
-                sb_parameter.append("\t\t\t\t<th>Value</th>");
-                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>black_list_dir</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.black_list_dir + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: if blacklist filter should be used provide path to BED file here (BED files can be found at https://github.com/Boyle-Lab/Blacklist/tree/master/lists)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>black_list_signals</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.black_list_signals.toString() + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: which regions should be ignored: Low_Mappability;High_Signal_Region\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-
-                sb_parameter.append("\t\t</table>");
-                sb_parameter.append("</div>\n</button>\n");
-            }
-
-            //DESeq2 parameters
-            {
-                sb_parameter.append(
-                        "<button class=\"button_expandable\" id=\"button_deseq2_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_deseq2_parameters','table_deseq2_parameters')\"> DESeq2 Parameters\n");
-                sb_parameter.append(
-                        "<div style=\"display: none;background-color: white;color:black;\" id=\"table_deseq2_parameters\">\n");
-
-                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
-                sb_parameter.append("\t\t\t\t<th>Value</th>");
-                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>deseq2_input_directory</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.deseq2_input_directory + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]: count files in nfcore RNA-seq format (each line is a count of one gene), directory must be ordered like: TP1 - samples_1,...,samples_n;....\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>deseq2_input_gene_id</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.deseq2_input_gene_id + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]: gene ID file from nfcore RNA-seq (each line names one gene ID (ENSG) - must be same order as deseq2_input_directory files\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>deseq2_biomart_dataset_species</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.deseq2_biomart_dataset_species + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]: biomart dataset name for the species which is used in RNA-seq and CHIP-seq data, (https://www.bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/biomaRt.html)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>deseq2_count_threshold</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.deseq2_count_threshold + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: minimum count over all samples of two timepoints for DESeq2, default: 0\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-                sb_parameter.append("\t\t</table>");
-                sb_parameter.append("</div>\n</button>\n");
-            }
-
-            //TEPIC parameters
-            {
-                sb_parameter.append(
-                        "<button class=\"button_expandable\" id=\"button_tepic_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_tepic_parameters','table_tepic_parameters')\"> TEPIC Parameters\n");
-                sb_parameter.append(
-                        "<div style=\"display: none;background-color: white;color:black;\" id=\"table_tepic_parameters\">\n");
-
-                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
-                sb_parameter.append("\t\t\t\t<th>Value</th>");
-                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_input_directory [ORIGINAL]</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_input_original + "</th>");
-                sb_parameter.append("\t\t\t\t<th></th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                if (!options_intern.tepic_input_prev.equals(""))
-                {
-                    sb_parameter.append("\t\t\t<tr>");
-                    sb_parameter.append("\t\t\t\t<th>tepic_input_directory [LAST FILTER]</th>");
-                    sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_input_directory + "</th>");
-                    sb_parameter.append("\t\t\t\t<th></th>");
-                    sb_parameter.append("\t\t\t</tr>");
+                    if (i == 0)
+                    {
+                        sb.append(stages);
+                    } else
+                    {
+                        sb.append(";");
+                        sb.append(stages);
+                    }
+                    i++;
                 }
 
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_input_ref_genome</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_input_ref_genome + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]:fasta files (in RefSeq format, without \\\"chr\\\" prefix)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_path_pwms</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_path_pwms + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]: path to position specific energy matrix used for TRAP (different matrices can be found in ~/COM2POSE/ext/TEPIC/TEPIC/PWMs/2.1)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_cores</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_cores + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: number of cores\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_bed_chr_sign</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_bed_chr_sign + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: bedgraph file containing open chromatin signal, e.g. DNase1-seq, or Histone-Mark signal\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_column_bedfile</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_column_bedfile + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: column in the tepic_input_directory file containing the average per base signal within a peak. If this option is used, the tepic_bed_chr_sign option must not be used\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_gene_annot</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_gene_annot + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]: gene annotation file, required to generate the gene view, required for TPM filter\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_window_size</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_window_size + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: size of the window to be considered to generate gene view (default 50kb)]\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_onlyDNasePeaks</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_onlyDNasePeaks + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: path to annotation file and annotate only DNase peaks that are within a window specified by the tepic_window_size option around all genes contained in the gene annotation file specified by this option\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_exponential_decay</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_exponential_decay + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: indicating whether exponential decay should be used (default TRUE)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_not_norm_peak_length</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_not_norm_peak_length + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: flag to be set if affinities should not be normalised by peak length\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_not_generated</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_not_generated + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: flag to be set if peak features for peak length and peak counts should not be generated\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_original_decay</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_original_decay + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: if tepic_bed_chr_sign or tepic_column_bedfile is used together with this flag, the original (Decay-)Scaling formulation of TEPIC is used to compute gene-TF scores\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_psems_length</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_psems_length + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: path to a tab delimited file containing the length of the used PSEMs\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_entire_gene_body</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_entire_gene_body + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: flag to be set if the entire gene body should be screened for TF binding. The search window is extended by a region half of the size that is specified by the tepic_window_size option upstream of the genes 5' TSS\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_zipped</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_zipped + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: flag indicating that the output of TEPIC should be zipped\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_background_seq</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_background_seq + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: path to a set of background sequences that should be used to compute to generate a binary score for TF binding. Mutually exclusive to the tepic_2bit option\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_2bit</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_2bit + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: path to a 2bit representation of the reference genome, required to generate a binary score for TF binding. The binary score is generated in addition to the standard affinity values. Mutually exclusive to the tepic_background_seq option\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_pvalue</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_pvalue + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: p-value cut off used to determine a cut off to derive a binary score for TF binding (default 0.05)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_minutes_per_chr</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_minutes_per_chr + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: minutes that should be spend at most per chromosome to find matching random regions (default 3)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_chr_prefix</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_chr_prefix + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: flag indicating that the reference genome contains a chr prefix\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_transcript_based</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_transcript_based + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: flag indicating that the annotation should be transcript and not gene based\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_loop_list</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_loop_list + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: loop list file containing chromatin contacts\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_loop_windows</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_loop_windows + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: size of the loop window used around a genes promoter to link chromatin loops to genes (default 5000)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_only_peak_features</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_only_peak_features + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: parameter to be set if only peak features should be computed (default FALSE)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_tpm_cutoff</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_tpm_cutoff + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: set (T)ranscripts (P)er (M)illion cutoff, default: TPM filter not active\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_ensg_symbol</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_ensg_symbol + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]: IF NOT SET MAPPING WILL BE PERFORMED AUTOMATICALLY - path to input file ensg to gene symbol file\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tepic_tgene_target_genes</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tepic_tgene_target_genes + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: use only tgene linked target genes default: true\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t</table>");
-                sb_parameter.append("</div>\n</button>\n");
-
-            }
-
-            //TGEN parameters
-            if (!options_intern.path_tgen.equals(""))
-            {
-                sb_parameter.append(
-                        "<button class=\"button_expandable\" id=\"button_tgen_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_tgen_parameters','table_tgen_parameters')\"> TGene Parameters\n");
-                sb_parameter.append(
-                        "<div style=\"display: none;background-color: white;color:black;\" id=\"table_tgen_parameters\">\n");
-
-                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
-                sb_parameter.append("\t\t\t\t<th>Value</th>");
-                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tgen_no_closest_locus</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_no_closest_locus + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: if no locus is found within window size, the nearest locus is used, default:false, meaning locus is used\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tgen_no_closest_tss</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_no_closest_tss + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: if no tss is found within window size, the nearest locus is used, default:false, meaning locus is used\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tgen_max_link_distances</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_max_link_distances + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: window size of tgen, default: 500000\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tgen_pvalue</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_pvalue + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: max pvalue, which is accepted, default 0.05\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>tgen_self_regulatory</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_self_regulatory + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]: should self regulatory TFs {OPT-SELF-REG} be increased? default: false\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-                if (options_intern.tgen_self_regulatory)
-                {
-                    sb_parameter.append("\t\t\t<tr>");
-                    sb_parameter.append("\t\t\t\t<th>tgen_consensus</th>");
-                    sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_consensus + "</th>");
-                    sb_parameter.append(
-                            "\t\t\t\t<th>#[OPT]: {OPT-SELF-REG} value for consus approach (e.g. 0.5 = 50:50 TGene:TEPIC, 0.4 = 40:60 TGene:TEPIC), default: 0.5\n</th>");
-                    sb_parameter.append("\t\t\t</tr>");
-
-                    sb_parameter.append("\t\t\t<tr>");
-                    sb_parameter.append("\t\t\t\t<th>tgen_consensus_calc</th>");
-                    sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_consensus_calc + "</th>");
-                    sb_parameter.append(
-                            "\t\t\t\t<th>#[OPT]: {OPT-SELF-REG} can be \"INCREASE_TGENE_TFS\" (increases TEPIC TF affinities for TFs found in TGENE at target gene) or \"DECREASE_NOT_TGENE_TFs (decreases TEPIC TF affinities for TFs not found in TGENE at target gene)\".\n</th>");
-                    sb_parameter.append("\t\t\t</tr>");
-
-                    sb_parameter.append("\t\t\t<tr>");
-                    sb_parameter.append("\t\t\t\t<th>tgen_mt_writing</th>");
-                    sb_parameter.append("\t\t\t\t<th>" + options_intern.tgen_mt_writing + "</th>");
-                    sb_parameter.append(
-                            "\t\t\t\t<th>#[OPT]: {OPT-SELF-REG} if TGENE consensus is used please specify the writing of the Mitochondrial DNA chromosome in Peak Files, default: MT\n</th>");
-                    sb_parameter.append("\t\t\t</tr>");
-
-                }
-                sb_parameter.append("\t\t</table>");
-                sb_parameter.append("</div>\n</button>\n");
-            }
-
-            //DYNAMITE parameters
-            {
-                sb_parameter.append(
-                        "<button class=\"button_expandable\" id=\"button_dynamite_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_dynamite_parameters','table_dynamite_parameters')\"> DYNAMITE parameters\n");
-                sb_parameter.append(
-                        "<div style=\"display: none;background-color: white;color:black;\" id=\"table_dynamite_parameters\">\n");
-
-                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
-                sb_parameter.append("\t\t\t\t<th>Value</th>");
-                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_preprocessing_integrate_data_consider_geneFile</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>" + options_intern.dynamite_preprocessing_integrate_data_consider_geneFile +
-                                "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: File containing gene IDs that should be considered\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_out_var</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_out_var + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[REQ]: Name of the response variable default: Expression (in this pipeline)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_cores</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_cores + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: Number of the cores to use (1 as default)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_alpha</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_alpha + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: Alpha parameter stepsize (0.1 as default)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_testsize</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_testsize + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]:Size of test data (0.2 as default)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_Ofolds</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_Ofolds + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: Number of outer folds for model validation (3 as default)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_Ifolds</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_Ifolds + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: Number of inner cross validation folds (6 as default)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_balanced</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_balanced + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: Flag indicating whether the data should be balanced through downsampling (default TRUE)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_performance</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_performance + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: Flag indicating whether performance measures should be computed (default TRUE)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>dynamite_randomise</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.dynamite_randomise + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: Flag indicating whether a model should be learned on randomised data (default FALSE)\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t</table>");
-                sb_parameter.append("</div>\n</button>\n");
-
-            }
-
-            //PLOT parameters
-            {
-                sb_parameter.append(
-                        "<button class=\"button_expandable\" id=\"button_plot_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_plot_parameters','table_plot_parameters')\"> PLOT Parameters\n");
-                sb_parameter.append(
-                        "<div style=\"display: none;background-color: white;color:black;\" id=\"table_plot_parameters\">\n");
-
-                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
-                sb_parameter.append("\t\t\t\t<th>Value</th>");
-                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>plot_th_coefficient</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.plot_th_coefficient.toString() + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: thresholds for coefficent plot and overall plots, for each threshold it creates a plot for each timepoint and an overall plot for each HistoneMod\n" +
-                                "#e.g. 0.1 means it creates a plot of the coefficient range ([-1;1]), it uses all TFs of [-1,-0.1] and [0.1,1]\n" +
-                                "#default: 0.1;0.2;0.3;0.4;0.5;0.6</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>plot_cutoff_tps</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.plot_cutoff_tps + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: in how many TPs should a TF be found, default: 2\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>plot_cutoff_hms</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.plot_cutoff_hms + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: in how many HMs should a TF be found, default: 2\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>plot_cutoff_gcs</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.plot_cutoff_gcs + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: minimum gene counts, default: 100\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>plot_top_k_genes</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.plot_top_k_genes + "</th>");
-                sb_parameter.append("\t\t\t\t<th>#[OPT]: top k target genes for TFs, default: 30\n</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t</table>");
-                sb_parameter.append("</div>\n</button>\n");
-
-            }
-
-            //HTML Report PARAMETERS
-            {
-                sb_parameter.append(
-                        "<button class=\"button_expandable\" id=\"button_html_report_parameters\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_html_report_parameters','table_html_report_parameters')\"> HTML Report Parameters\n");
-                sb_parameter.append(
-                        "<div style=\"display: none;background-color: white;color:black;\" id=\"table_html_report_parameters\">\n");
-
-                sb_parameter.append("\t\t<table style=\"width:100%;font-size:15px;text-align: left;\">\n");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>Parameter</th>");
-                sb_parameter.append("\t\t\t\t<th>Value</th>");
-                sb_parameter.append("\t\t\t\t<th>Explanation</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t\t<tr>");
-                sb_parameter.append("\t\t\t\t<th>html_report_interesting_tfs</th>");
-                sb_parameter.append("\t\t\t\t<th>" + options_intern.website_interesting_tfs + "</th>");
-                sb_parameter.append(
-                        "\t\t\t\t<th>#[OPT]: list of TFs which you are interested in - is only used to search fast for known TFs in the results, it does not affect results\n" +
-                                "#e.g. website_interesting_tfs=\"STAT3;GATA3;NFIB\"</th>");
-                sb_parameter.append("\t\t\t</tr>");
-
-                sb_parameter.append("\t\t</table>");
-                sb_parameter.append("</div>\n</button>\n");
-            }
-
-
-            /*
-            sb_parameter.append("\t\t\t<tr>");
-            sb_parameter.append("\t\t\t\t<th></th>");
-            sb_parameter.append("\t\t\t\t<th></th>");
-            sb_parameter.append("\t\t\t\t<th></th>");
-            sb_parameter.append("\t\t\t</tr>");
-             */
-
-
-            sb_parameter.append(html_tail);
-
-            BufferedWriter bw_parameter =
-                    new BufferedWriter(new FileWriter(new File(f_output_website + File.separator + "PARAMETERS.html")));
-            bw_parameter.write(sb_parameter.toString());
-            bw_parameter.close();
-
-
-            HashMap<String, ArrayList<String>> tf_gene_count = new HashMap<>();
-
-            for (File fileDir : threshold_folders)
-            {
-                HashSet<String> tfs_to_create_pages = new HashSet<>();
-                HashSet<String> possible_hms = new HashSet<>();
-
-                File f_interactive_plots_root = new File(f_output_website.getAbsolutePath() + File.separator +
-                        options_intern.folder_out_website_interactive_plots + File.separator + fileDir.getName());
-
-                StringBuilder sb_threshold = new StringBuilder(
-                        get_header_html(options_intern.html_report_levels_3_steps,
-                                options_intern.analysis_types_regression_coefficient_analysis));
-                sb_threshold.append(
-                        " <script>\n" + " document.title = \"TH: " + fileDir.getName() + "\";\n" + " </script>\n");
-                sb_threshold.append(
-                        "<div class=\"w3-row-padding w3-padding-64 w3-container\"><div class=\"w3-content\"><h1>Current threshold: " +
-                                fileDir.getName() + "</h1></div>\n</div>\n");
-
-
-                HashSet<String> total_number_tfs = new HashSet<>();
-
-                for (File fileDir_hm : f_interactive_plots_root.listFiles())
-                {
-                    HashSet<String> total_number_tfs_hm = new HashSet<>();
-
-                    possible_hms.add(fileDir_hm.getName());
-
-                    sb_threshold.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
-                            "  <div class=\"w3-content\">\n" + "    <div class=\"w3-twothird\">\n" + "      <h1>");
-                    sb_threshold.append(fileDir_hm.getName());
-                    sb_threshold.append(
-                            "</h1>\n" + "\t  \n" + "\t <h4> Different timepoints / conditions </h4> \n" + "\t  \n");
-                    sb_threshold.append("</div>\n");
-                    sb_threshold.append("</div>\n");
-                    sb_threshold.append(
-                            "<div class=\"container\" style=\"\n" + "    width: 100%;\n" + "    position: relative;\n" +
-                                    "    display: block;\n" + "    overflow-x: scroll;overflow-y: scroll;\">\n" +
-                                    "\t  <iframe id=\"igraph_" + fileDir_hm.getName() + "_threshold_" +
-                                    fileDir.getName() + "_different_stages.html" +
-                                    "\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
-                    String relative_path_diff_th = ".." + File.separator + ".." + File.separator +
-                            options_intern.folder_out_website_interactive_plots + File.separator + fileDir.getName() +
-                            File.separator + fileDir_hm.getName() + File.separator +
-                            options_intern.folder_out_website_interactive_plots_overview + File.separator +
-                            fileDir_hm.getName() + "_threshold_" + fileDir.getName() + "_different_stages.html";
-
-                    sb_threshold.append(relative_path_diff_th);
-                    sb_threshold.append("\" height=\"400\" width=\"2500\" overflow=\"scroll\"></iframe>\n");
-                    sb_threshold.append("</div>\n");
-
-                    sb_threshold.append("    <div class=\"w3-twothird\">\n");
-                    sb_threshold.append("  <div class=\"w3-content\">\n");
-
-                    //gene count table for plot
-
-                    //collapse thing
-                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_" + fileDir_hm.getName() +
-                            "_diff\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_" +
-                            fileDir_hm.getName() + "_diff','table_" + fileDir_hm.getName() + "_diff')\"> GeneCounts\n");
-                    //tooltip
-                    sb_threshold.append(
-                            "<div class=\"tooltip\"><img src=\".." + File.separator + ".." + File.separator +
-                                    options_intern.folder_out_website_basics + File.separator +
-                                    options_intern.folder_out_website_basics_website + File.separator +
-                                    options_intern.folder_out_website_basics_website_images + File.separator +
-                                    "information.png" + "\" style=\"width:45px;height:40px;\"/>" +
-                                    "  <span class=\"tooltiptext\">GeneCount is the unprocessed data counted by nfcore RNA-seq. A TF which is at least expressed with GeneCount 1000 is considered highly expressed and active.</span>\n" +
-                                    "</div>");
-                    sb_threshold.append(
-                            "<div style=\"display: none;background-color: white;color:black;\" id=\"table_" +
-                                    fileDir_hm.getName() + "_diff\">\n");
-
-                    HashSet<String> total_numbers_tfs_hm_diff = new HashSet<>();
-                    sb_threshold.append("<h4>Gene Count threshold: " + options_intern.plot_cutoff_gcs + "</h4>");
-                    sb_threshold.append(
-                            "<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
-                    sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
-
-                    File f_gene_counts_input_different = new File(
-                            options_intern.com2pose_working_directory + File.separator +
-                                    options_intern.folder_out_analysis_data + File.separator +
-                                    options_intern.folder_out_analysis_data_TP_LEVEL + File.separator +
-                                    fileDir_hm.getName() + File.separator + fileDir.getName() + File.separator +
-                                    options_intern.file_suffix_analysis_plot_data_hm_level_different);
-                    BufferedReader br_gc_different = new BufferedReader(new FileReader(f_gene_counts_input_different));
-                    String line_gc_different = "";
-                    while ((line_gc_different = br_gc_different.readLine()) != null)
-                    {
-                        String[] split = line_gc_different.split("\t");
-                        sb_threshold.append("\t\t\t<tr>\n");
-
-                        tfs_to_create_pages.add(split[0]);
-
-                        String tf_key = "";
-                        ArrayList<String> tf_key_set = new ArrayList<>();
-
-                        int count = 0;
-                        for (String s : split)
-                        {
-                            if (count == 0)
-                            {
-                                tf_key = s;
-                            }
-                            if (count != 0)
-                            {
-                                tf_key_set.add(s);
-                            }
-                            sb_threshold.append("\t\t\t\t<th>");
-                            if (count != 0 || s.equals("TF"))
-                            {
-                                sb_threshold.append(s.toUpperCase());
-                            } else
-                            {
-                                File f_try = new File(options_intern.com2pose_working_directory + File.separator +
-                                        options_intern.folder_out_website + File.separator +
-                                        options_intern.folder_out_website_htmls_regression_coefficients +
-                                        File.separator + fileDir.getName() + File.separator +
-                                        options_intern.folder_out_website_htmls_TFs + File.separator + s.toUpperCase() +
-                                        ".html");
-                                if (f_try.exists())
-                                {
-                                    sb_threshold.append("<a href='");
-                                    //sb_threshold.append(f_try.getAbsolutePath());
-                                    sb_threshold.append("TFs" + File.separator + f_try.getName());
-                                    sb_threshold.append(
-                                            "' target='_blank'><button class=\"button\">" + s.toUpperCase() +
-                                                    "</button>");
-                                    sb_threshold.append("</a>");
-
-                                    total_number_tfs.add(s.toUpperCase());
-                                    total_number_tfs_hm.add(s.toUpperCase());
-                                    total_numbers_tfs_hm_diff.add(s.toUpperCase());
-
-                                    HashMap<String, HashSet<String>> current_tf_hm;
-
-                                    if (distinct_tf_hm_diff_same.containsKey(s.toUpperCase()))
-                                    {
-                                        current_tf_hm = distinct_tf_hm_diff_same.get(s.toUpperCase());
-                                    } else
-                                    {
-                                        current_tf_hm = new HashMap<>();
-                                    }
-
-                                    HashSet<String> current_tf_hm_stage = new HashSet<>();
-
-                                    if (current_tf_hm.containsKey(fileDir_hm.getName()))
-                                    {
-                                        current_tf_hm_stage = current_tf_hm.get(fileDir_hm.getName());
-                                    } else
-                                    {
-                                        current_tf_hm_stage = new HashSet<>();
-                                    }
-
-                                    current_tf_hm_stage.add("DIFFERENT_TPS");
-                                    current_tf_hm.put(fileDir_hm.getName(), current_tf_hm_stage);
-                                    distinct_tf_hm_diff_same.put(s.toUpperCase(), current_tf_hm);
-
-                                } else
-                                {
-                                    sb_threshold.append(s.toUpperCase());
-                                }
-
-                            }
-                            sb_threshold.append("\t\t\t\t</th>\n");
-                            count++;
-                        }
-
-                        tf_gene_count.put(tf_key.toUpperCase(), tf_key_set);
-
-                        sb_threshold.append("\t\t\t</tr>\n");
-
-                    }
-                    br_gc_different.close();
-
-                    sb_threshold.append("\t\t</table>\n");
-
-                    //collapse thing
-                    sb_threshold.append("</div>\n");
-                    sb_threshold.append("</button>\n");
-
-                    sb_threshold.append("<h5> A total number of " + total_numbers_tfs_hm_diff.size() +
-                            " distinct TFs are considered in different time points group </h5>\n");
-
-                    HashSet<String> total_numbers_tfs_hm_same = new HashSet<>();
-                    sb_threshold.append("\t <h4> Same timepoints / conditions </h4> \n" + "\t  \n");
-                    sb_threshold.append("</div>\n");
-                    sb_threshold.append("</div>\n");
-                    sb_threshold.append(
-                            "<div class=\"container\" style=\"\n" + "    width: 100%;\n" + "    position: relative;\n" +
-                                    "    display: block;\n" + "    overflow-x: scroll;overflow-y: scroll;\">\n" +
-                                    "\t  <iframe id=\"igraph_" + fileDir_hm.getName() + "_threshold_" +
-                                    fileDir.getName() + "_same_stages.html" +
-                                    "\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
-                    String relative_path_same_th = ".." + File.separator + ".." + File.separator +
-                            options_intern.folder_out_website_interactive_plots + File.separator + fileDir.getName() +
-                            File.separator + fileDir_hm.getName() + File.separator +
-                            options_intern.folder_out_website_interactive_plots_overview + File.separator +
-                            fileDir_hm.getName() + "_threshold_" + fileDir.getName() + "_same_stages.html";
-                    sb_threshold.append(relative_path_same_th);
-                    sb_threshold.append("\" height=\"400\" width=\"2500\"></iframe>\n");
-                    sb_threshold.append("</div>\n");
-
-                    sb_threshold.append("    <div class=\"w3-twothird\">\n");
-                    sb_threshold.append("  <div class=\"w3-content\">\n");
-
-
-                    //collapse thing
-                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_" + fileDir_hm.getName() +
-                            "_same\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_" +
-                            fileDir_hm.getName() + "_diff','table_" + fileDir_hm.getName() + "_same')\"> GeneCounts\n");
-                    //tooltip
-                    sb_threshold.append(
-                            "<div class=\"tooltip\"><img src=\".." + File.separator + ".." + File.separator +
-                                    options_intern.folder_out_website_basics + File.separator +
-                                    options_intern.folder_out_website_basics_website + File.separator +
-                                    options_intern.folder_out_website_basics_website_images + File.separator +
-                                    "information.png" + "\" style=\"width:45px;height:40px;\"/>" +
-                                    "  <span class=\"tooltiptext\">GeneCount is the unprocessed data counted by nfcore RNA-seq. A TF which is at least expressed with GeneCount 1000 is considered highly expressed and active.</span>\n" +
-                                    "</div>");
-                    sb_threshold.append(
-                            "<div style=\"display: none;background-color: white;color:black;\" id=\"table_" +
-                                    fileDir_hm.getName() + "_same\">\n");
-
-                    //gene count table for plot
-                    sb_threshold.append("<h4>Gene Count threshold: " + options_intern.plot_cutoff_gcs + "</h4>");
-                    sb_threshold.append(
-                            "<h5><i>Click on TF for detailed information - if no Button is available it means that this TF was eliminated by a filter.</i></h5>\n");
-                    sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
-
-                    File f_gene_counts_input_same = new File(
-                            options_intern.com2pose_working_directory + File.separator +
-                                    options_intern.folder_out_analysis_data + File.separator +
-                                    options_intern.folder_out_analysis_data_TP_LEVEL + File.separator +
-                                    fileDir_hm.getName() + File.separator + fileDir.getName() + File.separator +
-                                    options_intern.file_suffix_analysis_plot_data_hm_level_same);
-                    if (f_gene_counts_input_same.exists())
-                    {
-                        BufferedReader br_gc_same = new BufferedReader(new FileReader(f_gene_counts_input_same));
-                        String line_gc_same = "";
-                        while ((line_gc_same = br_gc_same.readLine()) != null)
-                        {
-                            String[] split = line_gc_same.split("\t");
-                            sb_threshold.append("\t\t\t<tr>\n");
-
-                            tfs_to_create_pages.add(split[0]);
-
-                            String tf_key = "";
-                            ArrayList<String> tf_key_set = new ArrayList<>();
-
-                            int count = 0;
-                            for (String s : split)
-                            {
-                                if (count == 0)
-                                {
-                                    tf_key = s;
-                                }
-                                if (count != 0)
-                                {
-                                    tf_key_set.add(s);
-                                }
-
-                                sb_threshold.append("\t\t\t\t<th>");
-                                if (count != 0 || s.equals("TF"))
-                                {
-                                    sb_threshold.append(s.toUpperCase());
-                                } else
-                                {
-                                    File f_try = new File(options_intern.com2pose_working_directory + File.separator +
-                                            options_intern.folder_out_website + File.separator +
-                                            options_intern.folder_out_website_htmls_regression_coefficients +
-                                            File.separator + fileDir.getName() + File.separator +
-                                            options_intern.folder_out_website_htmls_TFs + File.separator +
-                                            s.toUpperCase() + ".html");
-                                    if (f_try.exists())
-                                    {
-
-                                        sb_threshold.append("<a href='");
-                                        //sb_threshold.append(f_try.getAbsolutePath());
-                                        sb_threshold.append("TFs" + File.separator + f_try.getName());
-                                        sb_threshold.append(
-                                                "' target='_blank'><button class=\"button\">" + s.toUpperCase() +
-                                                        "</button>");
-                                        sb_threshold.append("</a>");
-
-                                        total_number_tfs.add(s.toUpperCase());
-                                        total_number_tfs_hm.add(s.toUpperCase());
-                                        total_numbers_tfs_hm_same.add(s.toUpperCase());
-
-                                        HashMap<String, HashSet<String>> current_tf_hm;
-
-                                        if (distinct_tf_hm_diff_same.containsKey(s.toUpperCase()))
-                                        {
-                                            current_tf_hm = distinct_tf_hm_diff_same.get(s.toUpperCase());
-                                        } else
-                                        {
-                                            current_tf_hm = new HashMap<>();
-                                        }
-
-                                        HashSet<String> current_tf_hm_stage = new HashSet<>();
-
-                                        if (current_tf_hm.containsKey(fileDir_hm.getName()))
-                                        {
-                                            current_tf_hm_stage = current_tf_hm.get(fileDir_hm.getName());
-                                        } else
-                                        {
-                                            current_tf_hm_stage = new HashSet<>();
-                                        }
-
-                                        current_tf_hm_stage.add("SAME_TPS");
-                                        current_tf_hm.put(fileDir_hm.getName(), current_tf_hm_stage);
-                                        distinct_tf_hm_diff_same.put(s.toUpperCase(), current_tf_hm);
-                                    } else
-                                    {
-                                        sb_threshold.append(s.toUpperCase());
-                                    }
-
-                                }
-                                sb_threshold.append("\t\t\t\t</th>\n");
-                                count++;
-                            }
-                            tf_gene_count.put(tf_key.toUpperCase(), tf_key_set);
-
-                            sb_threshold.append("\t\t\t</tr>\n");
-
-                        }
-                        br_gc_same.close();
-                    }
-
-
-                    sb_threshold.append("\t\t</table>\n");
-
-                    //collapse thing
-                    sb_threshold.append("</div>\n");
-                    sb_threshold.append("</button>");
-
-                    sb_threshold.append("<h5> A total number of " + total_numbers_tfs_hm_same.size() +
-                            " distinct TFs are considered in same time points group. </h5>\n");
-
-                    sb_threshold.append("<h5> A total number of " + total_number_tfs_hm.size() +
-                            " distinct TFs are considered in Histone Modification " + fileDir_hm.getName() +
-                            " group. </h5>\n");
-
-                    //collapse thing
-                    sb_threshold.append("<button class=\"button_expandable\" id=\"button_" + fileDir_hm.getName() +
-                            "_distTFs\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_" +
-                            fileDir_hm.getName() + "_distTFs','table_" + fileDir_hm.getName() + "_distTFs')\">" +
-                            fileDir_hm.getName() + ": Distinct TFs\n");
-                    //tooltip
-                    sb_threshold.append(
-                            "<div class=\"tooltip\"><img src=\".." + File.separator + ".." + File.separator +
-                                    options_intern.folder_out_website_basics + File.separator +
-                                    options_intern.folder_out_website_basics_website + File.separator +
-                                    options_intern.folder_out_website_basics_website_images + File.separator +
-                                    "information.png" + "\" style=\"width:45px;height:40px;\"/>" +
-                                    "  <span class=\"tooltiptext\">Distinct TFs in a group are the TFs in the union of different and same conditions.</span>\n" +
-                                    "</div>");
-                    sb_threshold.append(
-                            "<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_" +
-                                    fileDir_hm.getName() + "_distTFs\">\n");
-                    sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
-                    for (String tf_distinct : total_number_tfs_hm)
-                    {
-                        sb_threshold.append("<tr><th><a href='TFs" + File.separator + tf_distinct.toUpperCase() +
-                                ".html' target='_blank'> <button class=\"button\">" + tf_distinct.toUpperCase() +
-                                "</button></a></th></tr>\n");
-                    }
-                    sb_threshold.append("</table>");
-
-                    //collapse thing
-                    sb_threshold.append("</div>\n");
-                    sb_threshold.append("</button>\n");
-
-
-                    sb_threshold.append("    </div>\n" + "\n" + "    <div class=\"w3-third w3-center\">\n" +
-                            "      <i class=\"fa fa-anchor w3-padding-64 w3-text-red\"></i>\n");
-                    sb_threshold.append("    </div>\n" + "  </div>\n" + "</div>\n");
-                }
-
-
-                sb_threshold.append("<div class=\"container-buttons w3-content\"><h5> A total number of " +
-                        total_number_tfs.size() + " distinct TFs are considered in Threshold " + fileDir.getName() +
-                        " group. </h5>\n");
-
-                //collapse thing
-                sb_threshold.append(
-                        "<button class=\"button_expandable\" id=\"button_distTFs\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_distTFs','table_distTFs')\"> Distinct TFs overall\n");
-                //tooltip
-                sb_threshold.append("<div class=\"tooltip\"><img src=\".." + File.separator + ".." + File.separator +
-                        options_intern.folder_out_website_basics + File.separator +
-                        options_intern.folder_out_website_basics_website + File.separator +
-                        options_intern.folder_out_website_basics_website_images + File.separator + "information.png" +
-                        "\" style=\"width:45px;height:40px;\"/>" +
-                        "  <span class=\"tooltiptext\">Distinct TFs in a threshold are the TFs in the union of all timepoints and different and same conditions.</span>\n" +
-                        "</div>");
-                sb_threshold.append(
-                        "<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_distTFs\">\n");
-                sb_threshold.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
-                for (String tf_distinct : total_number_tfs)
-                {
-                    sb_threshold.append("<tr><th><a href='TFs" + File.separator + tf_distinct.toUpperCase() +
-                            ".html' target='_blank'> <button class=\"button\">" + tf_distinct.toUpperCase() +
-                            "</button></a></th></tr>\n");
-                }
-                sb_threshold.append("</table>");
-
-                //collapse thing
-                sb_threshold.append("</div>\n");
-                sb_threshold.append("</button>\n");
-
-                sb_threshold.append(
-                        write_regression_coeffecient_analysis_found_table_html(Double.parseDouble(fileDir.getName()),
-                                options_intern.html_report_levels_3_steps));
-
-                sb_threshold.append("</div>\n");
-                sb_threshold.append("</div>\n");
-                sb_threshold.append("</div>\n");
-
-                sb_threshold.append(html_tail);
-
-
-                BufferedWriter bw_thresholds = new BufferedWriter(new FileWriter(
-                        fileDir.getAbsolutePath() + File.separator + "threshold_" + fileDir.getName() +
-                                "_overview.html"));
-                bw_thresholds.write(sb_threshold.toString());
-                bw_thresholds.close();
-
-                ArrayList<String> poss_hms_list = new ArrayList(possible_hms);
-                ArrayList<String> poss_tfs_list = new ArrayList<>(tfs_to_create_pages);
-
-                File f_output_tf_root = new File(
-                        fileDir.getAbsolutePath() + File.separator + options_intern.folder_out_website_htmls_TFs);
-                f_output_tf_root.mkdir();
-
-                //create TF pages
-                File f_root_target_genes = new File(options_intern.com2pose_working_directory + File.separator +
-                        options_intern.folder_out_target_genes);
-
-                for (String tf : tfs_to_create_pages)
-                {
-                    File f_output_tf_page =
-                            new File(f_output_tf_root.getAbsolutePath() + File.separator + tf.toUpperCase() + ".html");
-                    if (f_output_tf_page.exists())
-                    {
-                        //continue;
-                    }
-
-                    StringBuilder sb_tf_page = new StringBuilder();
-                    sb_tf_page.append(get_header_html(options_intern.html_report_levels_4_steps,
-                            options_intern.analysis_types_regression_coefficient_analysis));
-                    sb_tf_page.append(" <script>\n" + " document.title = \"TF: " + tf.toUpperCase() + " TH: " +
-                            fileDir.getName() + "\";\n" + " </script>\n");
-
-                    ArrayList<File> files_to_consider = new ArrayList<>();
-
-                    sb_tf_page.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
-                            "  <div class=\"w3-content\">\n" + "    <div class=\"w3-twothird\">\n" +
-                            "      <h1>Transcription Factor: ");
-                    sb_tf_page.append(tf.toUpperCase());
-                    sb_tf_page.append(" <i>details</i></h1>\n");
-                    sb_tf_page.append("<h3>Threshold: " + fileDir.getName().toUpperCase() + "</h3>\n");
-                    sb_tf_page.append("<h4><i>Click <a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene=" +
-                            tf.toUpperCase() + "' target='_blank'><button class=\"button\">" + tf.toUpperCase() +
-                            "</button></a> to go to GeneCards</i></h4>\n");
-
-
-                    sb_tf_page.append("<h4>Gene Count threshold: " + options_intern.plot_cutoff_gcs + "</h4>");
-                    sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
-
-                    ArrayList<String> table_header = tf_gene_count.get("TF");
-                    sb_tf_page.append("\t\t\t<tr>\n");
-                    sb_tf_page.append("\t\t\t\t<th>TF</th>\n");
-                    for (String s : table_header)
-                    {
-                        sb_tf_page.append("\t\t\t\t<th>" + s + "</th>\n");
-                    }
-                    sb_tf_page.append("\t\t\t</tr>\n");
-
-                    ArrayList<String> table_header_tf = tf_gene_count.get(tf.toUpperCase());
-                    sb_tf_page.append("\t\t\t<tr>\n");
-                    sb_tf_page.append("\t\t\t\t<th>" + tf.toUpperCase() + "</th>\n");
-                    for (String s : table_header_tf)
-                    {
-
-                        sb_tf_page.append("\t\t\t\t<th>" + s + "</th>\n");
-
-                    }
-                    sb_tf_page.append("\t\t\t</tr>\n");
-
-                    sb_tf_page.append("</table>");
-
-                    for (String hm : possible_hms)
-                    {
-
-                        File f_interactive_plots = new File(options_intern.com2pose_working_directory + File.separator +
-                                options_intern.folder_out_website + File.separator +
-                                options_intern.folder_out_website_interactive_plots + File.separator +
-                                fileDir.getName() + File.separator + hm + File.separator +
-                                options_intern.folder_out_website_interactive_plots_tps + File.separator);
-
-                        sb_tf_page.append("<div class=\"w3-row-padding w3-padding-64 w3-container\">\n" +
-                                "  <div class=\"w3-content\">\n" + "    <div class=\"w3-twothird\">\n" + "      <h1>");
-                        sb_tf_page.append(hm);
-                        sb_tf_page.append("</h1>\n");
-
-                        sb_tf_page.append("<h3> Group plots: </h3>\n");
-                        sb_tf_page.append("</div>\n");
-                        sb_tf_page.append(
-                                "<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_group_plots_" +
-                                        hm +
-                                        "\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_group_plots_" +
-                                        hm + "','table_group_plots_" + hm + "')\">" + hm + " group plots\n");
-                        sb_tf_page.append(
-                                "<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_group_plots_" +
-                                        hm + "\">\n");
-
-                        sb_tf_page.append("\t\t<table style=\"width:100%;font-size:15px;\">\n");
-
-                        for (File fileDir_plot : f_interactive_plots.listFiles())
-                        {
-                            String[] split_dot = fileDir_plot.getName().split("\\.");
-                            String[] split_name = split_dot[0].split("_");
-
-                            sb_tf_page.append("\t  \n" + "\t <tr><th><h4>" + split_name[1] + " VS " + split_name[2] +
-                                    " </h4></th></tr> \n" + "\t  \n" + "<tr><th><div class=\"container\" style=\"\n" +
-                                    "    width: 980px;\n" + "    position: relative;\n" + "    display: block;\n" +
-                                    "    overflow-x: scroll;overflow-y: scroll;\">\n" + "\t  <iframe  id=\"igraph_" +
-                                    fileDir_plot.getName() +
-                                    "\" scrolling=\"no\" style=\"border:none;\" seamless=\"seamless\" src=\"");
-                            sb_tf_page.append(".." + File.separator + ".." + File.separator + ".." + File.separator +
-                                    options_intern.folder_out_website_interactive_plots + File.separator +
-                                    fileDir.getName() + File.separator + hm + File.separator +
-                                    options_intern.folder_out_website_interactive_plots_tps + File.separator +
-                                    fileDir_plot.getName());
-                            sb_tf_page.append("\" height=\"400\" width=\"2500\" overflow=\"scroll\"></iframe>\n");
-                            sb_tf_page.append("</div></th></tr>\n");
-                        }
-
-                        sb_tf_page.append("</table>");
-
-
-                        sb_tf_page.append("</div>\n</button>\n");
-
-                        sb_tf_page.append("<div class=\"w3-twothird\">\n");
-
-                        //include target genes
-                        HashSet<String> already_found_tps = new HashSet<>();
-
-                        File f_consider_different = new File(
-                                f_root_target_genes.getAbsolutePath() + File.separator + hm + File.separator +
-                                        fileDir.getName() + File.separator +
-                                        options_intern.folder_out_target_genes_all_different);
-                        for (File tps_different : f_consider_different.listFiles())
-                        {
-                            if (tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
-                            {
-                                files_to_consider.add(tps_different);
-                                already_found_tps.add(tps_different.getName());
-                            }
-                        }
-
-                        File f_consider_same = new File(
-                                f_root_target_genes.getAbsolutePath() + File.separator + hm + File.separator +
-                                        fileDir.getName() + File.separator +
-                                        options_intern.folder_out_target_genes_same);
-                        if (f_consider_same.exists())
-                        {
-                            for (File tps_different : f_consider_same.listFiles())
-                            {
-                                if (tps_different.exists() && !already_found_tps.contains(tps_different.getName()))
-                                {
-                                    files_to_consider.add(tps_different);
-                                    already_found_tps.add(tps_different.getName());
-                                }
-                            }
-                            Boolean anything_to_write = false;
-                            for (File f_considered_no_tf : files_to_consider)
-                            {
-                                File f_considered =
-                                        new File(f_considered_no_tf.getAbsolutePath() + File.separator + tf + ".csv");
-                                if (f_considered.exists())
-                                {
-                                    anything_to_write = true;
-                                }
-                            }
-                            if (anything_to_write)
-                            {
-                                //tooltip
-
-                                sb_tf_page.append("<h3> Target Genes - top " + options_intern.plot_top_k_genes +
-                                        " (normalised value):\n");
-                                sb_tf_page.append("<div class=\"tooltip\"><img src=\".." + File.separator + ".." +
-                                        File.separator + ".." + File.separator +
-                                        options_intern.folder_out_website_basics + File.separator +
-                                        options_intern.folder_out_website_basics_website + File.separator +
-                                        options_intern.folder_out_website_basics_website_images + File.separator +
-                                        "information.png" + "\" style=\"width:35px;height:30px;\"/>" +
-                                        "  <span class=\"tooltiptext\">TargetGenes are harvested from TEPIC output. The higher the normalized affinity value the higher is the ranking.</span>\n" +
-                                        "</div></h3>\n");
-                                sb_tf_page.append("<p><i>Click on Symbol for GeneCard</i></p>\n");
-                            }
-
-                            for (File f_considered_no_tf : files_to_consider)
-                            {
-                                File f_considered =
-                                        new File(f_considered_no_tf.getAbsolutePath() + File.separator + tf + ".csv");
-                                if (f_considered.exists())
-                                {
-                                    sb_tf_page.append(
-                                            "<button class=\"button_expandable\" style=\"width:1200px\" id=\"button_" +
-                                                    hm + "_" + f_considered_no_tf.getName() +
-                                                    "\" aria-expanded=\"false\" ondblclick=\"expand_collapse('button_" +
-                                                    hm + "_" + f_considered_no_tf.getName() + "','table_" + hm + "_" +
-                                                    f_considered_no_tf.getName() + "')\">" + hm + ": " +
-                                                    f_considered_no_tf.getName() + "\n");
-                                    sb_tf_page.append(
-                                            "<div class='container-buttons' style=\"display: none;background-color: white;color:black;width:100%;\" id=\"table_" +
-                                                    hm + "_" + f_considered_no_tf.getName() + "\">\n");
-
-
-                                    sb_tf_page.append("<h4> Point: " + f_considered_no_tf.getName() + " </h4>\n");
-
-                                    sb_tf_page.append("\t\t<table style=\"width:100%\">\n");
-
-                                    BufferedReader br_point_target_genes =
-                                            new BufferedReader(new FileReader(f_considered));
-                                    String line_point_target_getnes = "";
-                                    while ((line_point_target_getnes = br_point_target_genes.readLine()) != null)
-                                    {
-                                        String[] split = line_point_target_getnes.split("\t");
-
-                                        sb_tf_page.append("\t\t\t<tr>\n");
-
-                                        int i = 0;
-                                        for (String xx : split)
-                                        {
-                                            if (xx.equals("NOT_AVAILABLE"))
-                                            {
-                                                sb_tf_page.append("\t\t\t\t<th>");
-                                                sb_tf_page.append("-");
-                                                sb_tf_page.append("\t\t\t\t</th>\n");
-                                            } else
-                                            {
-                                                sb_tf_page.append("\t\t\t\t<th>");
-                                                if (i == 1 && !xx.equals("SYMBOL"))
-                                                {
-                                                    sb_tf_page.append(
-                                                            "<a href='https://www.genecards.org/cgi-bin/carddisp.pl?gene=" +
-                                                                    xx.toUpperCase() +
-                                                                    "' target='_blank'><button class=\"button\">" +
-                                                                    xx.toUpperCase() + "</button></a>");
-                                                } else if (i == 2 && !xx.equals("AFFINITY"))
-                                                {
-
-                                                    DecimalFormat df = new DecimalFormat("0.00000000");
-                                                    sb_tf_page.append(df.format(Double.parseDouble(xx)));
-
-                                                } else
-                                                {
-                                                    sb_tf_page.append(xx.toUpperCase());
-                                                }
-                                                sb_tf_page.append("\t\t\t\t</th>\n");
-                                            }
-                                            i++;
-
-                                        }
-                                        sb_tf_page.append("\t\t\t</tr>\n");
-                                    }
-                                    br_point_target_genes.close();
-
-                                    sb_tf_page.append("\t\t</table>\n");
-                                    sb_tf_page.append("</div>\n</button>\n");
-                                }
-                            }
-                        }
-
-                    }
-
-
-                    sb_tf_page.append(html_tail);
-                    BufferedWriter bw_tf = new BufferedWriter(new FileWriter(f_output_tf_page));
-                    bw_tf.write(sb_tf_page.toString());
-                    bw_tf.close();
-                }
-
-                File f_output_distribution_analysis = new File(
-                        options_intern.com2pose_working_directory + File.separator +
-                                options_intern.folder_out_distribution);
-                f_output_distribution_analysis.mkdir();
-
-                File f_output_distribution_analysis_analyzed_tfs = new File(
-                        f_output_distribution_analysis.getAbsolutePath() + File.separator +
-                                options_intern.folder_out_distribution_analyzed_tfs);
-                f_output_distribution_analysis_analyzed_tfs.mkdir();
-
-                BufferedWriter bw_distinct_tf_hm_diff_same = new BufferedWriter(new FileWriter(new File(
-                        f_output_distribution_analysis_analyzed_tfs.getAbsolutePath() + File.separator +
-                                options_intern.file_suffix_distribution_analysis_analysed_tfs)));
-
-                bw_distinct_tf_hm_diff_same.write("TF\tHM\tSTAGES");
+                bw_distinct_tf_hm_diff_same.write(sb.toString());
                 bw_distinct_tf_hm_diff_same.newLine();
 
-                for (String key_tf : distinct_tf_hm_diff_same.keySet())
-                {
-                    HashMap<String, HashSet<String>> hm_diff_stages = distinct_tf_hm_diff_same.get(key_tf);
-
-                    for (String key_hm : hm_diff_stages.keySet())
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(key_tf);
-                        sb.append("\t");
-                        sb.append(key_hm);
-                        sb.append("\t");
-
-                        int i = 0;
-                        for (String stages : hm_diff_stages.get(key_hm))
-                        {
-                            if (i == 0)
-                            {
-                                sb.append(stages);
-                            } else
-                            {
-                                sb.append(";");
-                                sb.append(stages);
-                            }
-                            i++;
-                        }
-
-                        bw_distinct_tf_hm_diff_same.write(sb.toString());
-                        bw_distinct_tf_hm_diff_same.newLine();
-
-                    }
-
-                }
-
-                bw_distinct_tf_hm_diff_same.close();
             }
-        }
 
-        logger.logLine("[WEBSITE] Finished creating overview website.");
+        }
+        bw_distinct_tf_hm_diff_same.close();
+        logger.logLine("[PREP-DISTRIBUTION ANALYSIS] PREPARING DISTR-ANALYSIS DONE.");
     }
 
     /**
@@ -8453,14 +7168,14 @@ public class COM2POSE_lib
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_data_plots);
         data_output.mkdir();
 
-        File interactive_plots_output_root = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_website);
-        interactive_plots_output_root.mkdir();
+        //File interactive_plots_output_root = new File(
+        //        options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_website);
+        //interactive_plots_output_root.mkdir();
 
-        File interactive_plots_output_interactive_plots = new File(
-                interactive_plots_output_root.getAbsolutePath() + File.separator +
-                        options_intern.folder_out_website_interactive_plots);
-        interactive_plots_output_interactive_plots.mkdir();
+        //File interactive_plots_output_interactive_plots = new File(
+        //        interactive_plots_output_root.getAbsolutePath() + File.separator +
+        //                options_intern.folder_out_website_interactive_plots);
+        //interactive_plots_output_interactive_plots.mkdir();
 
         folder_output.mkdir();
 
@@ -8484,23 +7199,24 @@ public class COM2POSE_lib
                     File out_data_th = new File(folder_out_data_HM.getAbsolutePath() + File.separator + d);
                     out_data_th.mkdir();
 
-                    File interactive_plots_output_coeff =
-                            new File(interactive_plots_output_interactive_plots.getAbsolutePath() + File.separator + d);
-                    interactive_plots_output_coeff.mkdir();
+                    //File interactive_plots_output_coeff =
+                    //        new File(interactive_plots_output_interactive_plots.getAbsolutePath() + File.separator
+                    //        + d);
+                    //interactive_plots_output_coeff.mkdir();
 
-                    File interactive_plots_output_coeff_hm = new File(
-                            interactive_plots_output_coeff.getAbsolutePath() + File.separator + fileDirHM.getName());
-                    interactive_plots_output_coeff_hm.mkdir();
+                    //File interactive_plots_output_coeff_hm = new File(
+                    //        interactive_plots_output_coeff.getAbsolutePath() + File.separator + fileDirHM.getName());
+                    //interactive_plots_output_coeff_hm.mkdir();
 
-                    File interactive_plots_output_coeff_hm_tps = new File(
-                            interactive_plots_output_coeff_hm.getAbsolutePath() + File.separator +
-                                    options_intern.folder_out_website_interactive_plots_tps);
-                    interactive_plots_output_coeff_hm_tps.mkdir();
+                    //File interactive_plots_output_coeff_hm_tps = new File(
+                    //        interactive_plots_output_coeff_hm.getAbsolutePath() + File.separator +
+                    //                options_intern.folder_out_website_interactive_plots_tps);
+                    //interactive_plots_output_coeff_hm_tps.mkdir();
 
-                    File interactive_plots_output_coeff_hm_overview = new File(
-                            interactive_plots_output_coeff_hm.getAbsolutePath() + File.separator +
-                                    options_intern.folder_out_website_interactive_plots_overview);
-                    interactive_plots_output_coeff_hm_overview.mkdir();
+                    //File interactive_plots_output_coeff_hm_overview = new File(
+                    //        interactive_plots_output_coeff_hm.getAbsolutePath() + File.separator +
+                    //                options_intern.folder_out_website_interactive_plots_overview);
+                    //interactive_plots_output_coeff_hm_overview.mkdir();
 
                     StringBuilder sb = new StringBuilder();
 
@@ -8635,7 +7351,7 @@ public class COM2POSE_lib
                         sb.append("\")\n");
                         sb.append("    plt.clf()\n");
                         /*WEBSITE_INTERACTIVE_PLOTS*/
-                        sb.append("    fig_fin = px.bar(");
+                        /*sb.append("    fig_fin = px.bar(");
                         sb.append(fileDirHM_Group.getName());
                         sb.append(",x= ");
                         sb.append(fileDirHM_Group.getName());
@@ -8644,7 +7360,7 @@ public class COM2POSE_lib
                         sb.append("    fig_fin.write_html(f\"");
                         sb.append(interactive_plots_output_coeff_hm_tps.getAbsolutePath() + File.separator +
                                 fileDirHM.getName() + "_" + fileDirHM_Group.getName() + "_threshold_" + d +
-                                ".html\",include_plotlyjs=\"cdn\")\n");
+                                ".html\",include_plotlyjs=\"cdn\")\n");*/
                         /*WEBSITE_INTERACTIVE_PLOTS*/
 
                     }
@@ -8723,7 +7439,7 @@ public class COM2POSE_lib
                     sb.append("    plt.clf()\n");
 
                     /*WEBSITE_INTERACTIVE_PLOTS*/
-                    sb.append("    fig_fin = px.imshow(join_df_stages.transpose())\n");
+                    /*sb.append("    fig_fin = px.imshow(join_df_stages.transpose())\n");
                     sb.append("    fig_fin.update_layout(plot_bgcolor='rgb(136, 136, 136)')\n");
                     sb.append("    fig_fin.update_xaxes(gridcolor='rgb(136, 136, 136)')\n");
                     sb.append("    fig_fin.layout.xaxis.dtick=1\n");
@@ -8735,7 +7451,7 @@ public class COM2POSE_lib
                     sb.append("    fig_fin.write_html(f\"");
                     sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath() + File.separator +
                             fileDirHM.getName() + "_threshold_" + d +
-                            "_different_stages.html\",include_plotlyjs=\"cdn\")\n");
+                            "_different_stages.html\",include_plotlyjs=\"cdn\")\n");*/
                     /*WEBSITE_INTERACTIVE_PLOTS*/
 
                     sb.append("plt.figure(figsize=(26, 20))\n");
@@ -8813,7 +7529,7 @@ public class COM2POSE_lib
                         sb.append(out_th.getAbsolutePath() + File.separator + fileDirHM.getName() + "_threshold_" + d +
                                 "_same_stages.png\")\n");
                         /*WEBSITE_INTERACTIVE_PLOTS*/
-                        sb.append("    fig_fin = px.imshow(join_df_same.transpose())\n");
+                        /*sb.append("    fig_fin = px.imshow(join_df_same.transpose())\n");
                         sb.append("    fig_fin.update_layout(plot_bgcolor='rgb(136, 136, 136)')\n");
                         sb.append("    fig_fin.update_xaxes(gridcolor='rgb(136, 136, 136)')\n");
                         sb.append("    fig_fin.layout.xaxis.dtick=1\n");
@@ -8825,7 +7541,7 @@ public class COM2POSE_lib
                         sb.append("    fig_fin.write_html(f\"");
                         sb.append(interactive_plots_output_coeff_hm_overview.getAbsolutePath() + File.separator +
                                 fileDirHM.getName() + "_threshold_" + d +
-                                "_same_stages.html\",include_plotlyjs=\"cdn\")\n");
+                                "_same_stages.html\",include_plotlyjs=\"cdn\")\n");*/
                     }
 
                     /*WEBSITE_INTERACTIVE_PLOTS*/
@@ -17281,7 +15997,6 @@ public class COM2POSE_lib
 
     private String get_header_html(String level, String which_analysis)
     {
-
         File f_website_css = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_website +
                         File.separator + options_intern.folder_out_website_basics + File.separator +
