@@ -4409,6 +4409,8 @@ public class COM2POSE_lib
         {
             int rank = i + 1;
             String tf_name = ordered_tfs_dcg.get(i);
+            if(tf_name.startsWith("STAT5"))
+                System.out.println("X");
 
             File f_tf = new File(f_logos_biophysical_root.getAbsolutePath() + File.separator + rank + "_" + tf_name);
             f_tf.mkdirs();
@@ -4420,11 +4422,12 @@ public class COM2POSE_lib
                 String[] split = tf_name.split("::");
                 for(String tf_split : split)
                 {
-                    tf_binding_energies.addAll(tf_to_binding_profile.get(tf_split));
+                    if(tf_to_binding_profile.containsKey(tf_split))
+                        tf_binding_energies.addAll(tf_to_binding_profile.get(tf_split));
                 }
-                if(tf_to_binding_profile.containsKey(tf_name))
+                if(tf_to_binding_profile.containsKey(ordered_tfs_dcg.get(i)))
                 {
-                    tf_binding_energies.addAll(tf_to_binding_profile.get(tf_name));
+                    tf_binding_energies.addAll(tf_to_binding_profile.get(ordered_tfs_dcg.get(i)));
                 }
             }
             else
@@ -4483,6 +4486,7 @@ public class COM2POSE_lib
             bw_tf_script.close();
 
             String command = "python3 " + f_tf_script.getAbsolutePath();
+            logger.logLine("[LOGOS] run: " + command);
 
             Process child = Runtime.getRuntime().exec(command);
             int code = child.waitFor();
