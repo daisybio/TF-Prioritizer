@@ -5293,10 +5293,10 @@ public class COM2POSE_lib
         }
 
         sb_cumulative_gain_website.append(html_tail);
-        BufferedWriter bw = new BufferedWriter(new FileWriter(folder_website_out.getAbsolutePath() + File.separator +
+        /*BufferedWriter bw = new BufferedWriter(new FileWriter(folder_website_out.getAbsolutePath() + File.separator +
                 options_intern.html_report_home_regression_distribution_analysis_all));
         bw.write(sb_cumulative_gain_website.toString());
-        bw.close();
+        bw.close();*/
 
         StringBuilder sb_home_home = new StringBuilder();
         sb_home_home.append("");
@@ -5337,12 +5337,13 @@ public class COM2POSE_lib
 
         sb_home_home.append(html_tail);
 
+        /*
         File f_output_website_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_website);
         BufferedWriter bw_home_home = new BufferedWriter(new FileWriter(
                 f_output_website_root.getAbsolutePath() + File.separator + options_intern.html_report_home_home));
         bw_home_home.write(sb_home_home.toString());
-        bw_home_home.close();
+        bw_home_home.close();*/
 
         logger.logLine("[DISTRIBUTION-ANALYSIS] Finish calculate ranks overall groups.");
     }
