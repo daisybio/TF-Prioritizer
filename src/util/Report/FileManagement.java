@@ -45,8 +45,9 @@ public class FileManagement
 
             if (target.getName().endsWith(".png") && compression)
             {
-                String command = "pngtopnm " + source.getAbsolutePath() + " | pnmquant 16 | pnmtopng > " +
-                        target.getAbsolutePath();
+                String command =
+                        "pngtopnm " + source.getAbsolutePath().replace(" ", "\\ ") + " | pnmquant 16 | pnmtopng >" +
+                                " " + target.getAbsolutePath().replace(" ", "\\ ");
                 String[] cmd = {"/bin/sh", "-c", command};
                 Process child = Runtime.getRuntime().exec(cmd);
                 try
