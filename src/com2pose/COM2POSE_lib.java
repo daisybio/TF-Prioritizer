@@ -4973,7 +4973,10 @@ public class COM2POSE_lib
         }
 
         Analysis_distribution_stats_object all_object = get_distribution_analysis_stats_ordered(f_distr_stats_ALL);
-        group_analysis_distr_stats_objects.put(options_intern.distribution_analysis_all_name, all_object);
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            group_analysis_distr_stats_objects.put(options_intern.distribution_analysis_all_name, all_object);
+        }
 
         int not_found_factor = 0;
         int group_number = 0;
@@ -5536,9 +5539,14 @@ public class COM2POSE_lib
         File f_root_plots_scripts = new File(f_analysis_distr_root.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_plots_scripts);
         f_root_plots_scripts.mkdir();
-        File f_root_plots_scripts_all = new File(f_root_plots_scripts.getAbsolutePath() + File.separator +
-                options_intern.folder_out_distribution_plots_script_ALL);
-        f_root_plots_scripts_all.mkdir();
+
+        File f_root_plots_scripts_all=new File("");
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            f_root_plots_scripts_all= new File(f_root_plots_scripts.getAbsolutePath() + File.separator +
+                    options_intern.folder_out_distribution_plots_script_ALL);
+            f_root_plots_scripts_all.mkdir();
+        }
         File f_root_plots_scripts_hm = new File(f_root_plots_scripts.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_plots_scripts_HM);
         f_root_plots_scripts_hm.mkdir();
@@ -5546,9 +5554,14 @@ public class COM2POSE_lib
         File f_root_mwu_plots_scripts = new File(f_analysis_distr_root.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_mwu_scripts);
         f_root_mwu_plots_scripts.mkdir();
-        File f_root_mwu_plots_scripts_ALL = new File(f_root_mwu_plots_scripts.getAbsolutePath() + File.separator +
-                options_intern.folder_out_distribution_plots_ALL);
-        f_root_mwu_plots_scripts_ALL.mkdir();
+
+        File f_root_mwu_plots_scripts_ALL=new File("");
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            f_root_mwu_plots_scripts_ALL = new File(f_root_mwu_plots_scripts.getAbsolutePath() + File.separator +
+                    options_intern.folder_out_distribution_plots_ALL);
+            f_root_mwu_plots_scripts_ALL.mkdir();
+        }
         File f_root_mwu_plots_scripts_HM = new File(f_root_mwu_plots_scripts.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_plots_HM);
         f_root_mwu_plots_scripts_HM.mkdir();
@@ -5556,9 +5569,14 @@ public class COM2POSE_lib
         File f_root_muw_plots_plots = new File(f_analysis_distr_root.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_mwu_plots);
         f_root_muw_plots_plots.mkdir();
-        File f_root_muw_plots_plots_ALL = new File(f_root_muw_plots_plots.getAbsolutePath() + File.separator +
-                options_intern.folder_out_distribution_plots_ALL);
-        f_root_muw_plots_plots_ALL.mkdir();
+
+        File f_root_muw_plots_plots_ALL = new File("");
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            f_root_muw_plots_plots_ALL = new File(f_root_muw_plots_plots.getAbsolutePath() + File.separator +
+                    options_intern.folder_out_distribution_plots_ALL);
+            f_root_muw_plots_plots_ALL.mkdir();
+        }
         File f_root_muw_plots_plots_HM = new File(f_root_muw_plots_plots.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_plots_HM);
         f_root_muw_plots_plots_HM.mkdir();
@@ -5567,9 +5585,14 @@ public class COM2POSE_lib
         File f_root_plots = new File(f_analysis_distr_root.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_plots);
         f_root_plots.mkdir();
-        File f_root_plots_all = new File(
-                f_root_plots.getAbsolutePath() + File.separator + options_intern.folder_out_distribution_plots_ALL);
-        f_root_plots_all.mkdir();
+
+        File f_root_plots_all = new File("");
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            f_root_plots_all = new File(
+                    f_root_plots.getAbsolutePath() + File.separator + options_intern.folder_out_distribution_plots_ALL);
+            f_root_plots_all.mkdir();
+        }
         File f_root_plots_hm = new File(
                 f_root_plots.getAbsolutePath() + File.separator + options_intern.folder_out_distribution_plots_HM);
         f_root_plots_hm.mkdir();
@@ -5596,9 +5619,13 @@ public class COM2POSE_lib
         File f_stats = new File(f_analysis_distr_root.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_stats);
         f_stats.mkdir();
-        File f_stats_ALL =
-                new File(f_stats.getAbsolutePath() + File.separator + options_intern.folder_out_distribution_stats_ALL);
-        f_stats_ALL.mkdir();
+
+        File f_stats_ALL = new File("");
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            f_stats_ALL = new File(f_stats.getAbsolutePath() + File.separator + options_intern.folder_out_distribution_stats_ALL);
+            f_stats_ALL.mkdir();
+        }
         File f_stats_HM =
                 new File(f_stats.getAbsolutePath() + File.separator + options_intern.folder_out_distribution_stats_HM);
         f_stats_HM.mkdir();
@@ -5665,9 +5692,12 @@ public class COM2POSE_lib
         File f_script_out_all = new File(f_root_plots_scripts_all.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_distribution_analysis_python_script);
 
-        write_python_script_distribution_analysis(all_background_distr, f_tf_distribution_ALL, f_root_plots_all,
-                f_script_out_all, f_stats_ALL);
-        scripts_to_execute.add(f_script_out_all);
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            write_python_script_distribution_analysis(all_background_distr, f_tf_distribution_ALL, f_root_plots_all,
+                    f_script_out_all, f_stats_ALL);
+            scripts_to_execute.add(f_script_out_all);
+        }
 
         MANN_WHITNEYU_PLOTS_FILES mwu = new MANN_WHITNEYU_PLOTS_FILES();
         mwu.background = all_background_distr;
@@ -5677,7 +5707,10 @@ public class COM2POSE_lib
         mwu.f_output_plot = f_root_muw_plots_plots_ALL;
         mwu.options_intern = options_intern;
 
-        mann_whitneyU_plots.add(mwu);
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            mann_whitneyU_plots.add(mwu);
+        }
 
         for (File fileDir : scripts_to_execute)
         {
@@ -5718,6 +5751,9 @@ public class COM2POSE_lib
         //search input directories and create output directories
         File f_distr_analysis = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution);
+
+        File f_distr_empty = new File(f_distr_analysis.getAbsolutePath()+File.separator+"empty.txt");
+
         File f_distr_analysis_analysed_tfs = new File(f_distr_analysis.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_analyzed_tfs);
         File f_distr_analysis_analysed_tfs_csv = new File(
@@ -5731,10 +5767,16 @@ public class COM2POSE_lib
                 f_out_distr_analysis_tf_tg_scores.getAbsolutePath() + File.separator +
                         options_intern.folder_out_distribution_tf_tg_scores_background_distr);
         f_out_distr_analysis_tf_tg_scores_background_distr.mkdir();
-        File f_out_distr_analysis_tf_tg_scores_background_distr_ALL = new File(
-                f_out_distr_analysis_tf_tg_scores_background_distr.getAbsolutePath() + File.separator +
-                        options_intern.folder_out_distribution_tf_tg_scores_background_distr_ALL);
-        f_out_distr_analysis_tf_tg_scores_background_distr_ALL.mkdir();
+
+        File f_out_distr_analysis_tf_tg_scores_background_distr_ALL = new File("");
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            f_out_distr_analysis_tf_tg_scores_background_distr_ALL = new File(
+                    f_out_distr_analysis_tf_tg_scores_background_distr.getAbsolutePath() + File.separator +
+                            options_intern.folder_out_distribution_tf_tg_scores_background_distr_ALL);
+            f_out_distr_analysis_tf_tg_scores_background_distr_ALL.mkdir();
+        }
+
         File f_out_distr_analysis_tf_tg_scores_background_distr_HM = new File(
                 f_out_distr_analysis_tf_tg_scores_background_distr.getAbsolutePath() + File.separator +
                         options_intern.folder_out_distribution_tf_tg_scores_background_distr_HM);
@@ -5743,10 +5785,14 @@ public class COM2POSE_lib
                 f_out_distr_analysis_tf_tg_scores.getAbsolutePath() + File.separator +
                         options_intern.folder_out_distribution_tf_tg_scores_tf_distributions);
         f_out_distr_analysis_tf_tg_scores_tf_distr.mkdir();
-        File f_out_distr_analysis_tf_tg_scores_tf_distr_ALL = new File(
-                f_out_distr_analysis_tf_tg_scores_tf_distr.getAbsolutePath() + File.separator +
-                        options_intern.folder_out_distribution_tf_tg_scores_tf_distributions_ALL);
-        f_out_distr_analysis_tf_tg_scores_tf_distr_ALL.mkdir();
+
+        File f_out_distr_analysis_tf_tg_scores_tf_distr_ALL = new File("");
+        if(options_intern.perform_ALL_background_distr_analysis)
+        {
+            f_out_distr_analysis_tf_tg_scores_tf_distr_ALL = new File(
+                    f_out_distr_analysis_tf_tg_scores_tf_distr.getAbsolutePath() + File.separator + options_intern.folder_out_distribution_tf_tg_scores_tf_distributions_ALL);
+            f_out_distr_analysis_tf_tg_scores_tf_distr_ALL.mkdir();
+        }
         File f_out_distr_analysis_tf_tg_scores_tf_distr_HM = new File(
                 f_out_distr_analysis_tf_tg_scores_tf_distr.getAbsolutePath() + File.separator +
                         options_intern.folder_out_distribution_tf_tg_scores_tf_distributions_HM);
@@ -6240,22 +6286,23 @@ public class COM2POSE_lib
                             }
                             br_group2_hm_tf_target_genes.close();
 
-
-                            BufferedWriter bw_background_ALL;
-                            File f_out_background_ALL = new File(
-                                    f_out_distr_analysis_tf_tg_scores_background_distr_ALL.getAbsolutePath() +
-                                            File.separator +
-                                            options_intern.file_suffix_distribution_analysis_distributions);
-                            if (f_out_background_ALL.exists())
+                            BufferedWriter bw_background_ALL= new BufferedWriter(new FileWriter(f_distr_empty));
+                            if(options_intern.perform_ALL_background_distr_analysis)
                             {
-                                bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL, true));
-                            } else
-                            {
-                                bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL));
-                                bw_background_ALL.write("##HM\tALL\n");
-                                bw_background_ALL.write("##TF\tALL\n");
-                                bw_background_ALL.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                                File f_out_background_ALL = new File(
+                                        f_out_distr_analysis_tf_tg_scores_background_distr_ALL.getAbsolutePath() + File.separator +
+                                                options_intern.file_suffix_distribution_analysis_distributions);
+                                if (f_out_background_ALL.exists())
+                                {
+                                    bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL, true));
+                                } else
+                                {
+                                    bw_background_ALL = new BufferedWriter(new FileWriter(f_out_background_ALL));
+                                    bw_background_ALL.write("##HM\tALL\n");
+                                    bw_background_ALL.write("##TF\tALL\n");
+                                    bw_background_ALL.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
 
+                                }
                             }
 
                             File f_out_background_HM = new File(
@@ -6276,18 +6323,20 @@ public class COM2POSE_lib
 
                             File f_out_tf_ALL = new File(
                                     f_out_distr_analysis_tf_tg_scores_tf_distr_ALL.getAbsolutePath() + File.separator +
-                                            key_tf + "_" +
-                                            options_intern.file_suffix_distribution_analysis_distributions);
-                            BufferedWriter bw_tf_ALL;
-                            if (f_out_tf_ALL.exists())
+                                            key_tf + "_" + options_intern.file_suffix_distribution_analysis_distributions);
+                            BufferedWriter bw_tf_ALL= new BufferedWriter(new FileWriter(f_distr_empty));
+                            if(options_intern.perform_ALL_background_distr_analysis)
                             {
-                                bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL, true));
-                            } else
-                            {
-                                bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL));
-                                bw_tf_ALL.write("##HM\tALL\n");
-                                bw_tf_ALL.write("##TF\t" + key_tf + "\n");
-                                bw_tf_ALL.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                                if (f_out_tf_ALL.exists())
+                                {
+                                    bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL, true));
+                                } else
+                                {
+                                    bw_tf_ALL = new BufferedWriter(new FileWriter(f_out_tf_ALL));
+                                    bw_tf_ALL.write("##HM\tALL\n");
+                                    bw_tf_ALL.write("##TF\t" + key_tf + "\n");
+                                    bw_tf_ALL.write("TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n");
+                                }
                             }
 
                             BufferedWriter bw_tf_HM;
@@ -6409,20 +6458,32 @@ public class COM2POSE_lib
                                     bw_background_HM.write(sb_line.toString());
                                     bw_background_HM.newLine();
 
-                                    bw_background_ALL.write(sb_line.toString());
-                                    bw_background_ALL.newLine();
+                                    if(options_intern.perform_ALL_background_distr_analysis)
+                                    {
+                                        bw_background_ALL.write(sb_line.toString());
+                                        bw_background_ALL.newLine();
+                                    }
 
-                                    bw_tf_ALL.write(sb_line.toString());
-                                    bw_tf_ALL.newLine();
+                                    if(options_intern.perform_ALL_background_distr_analysis)
+                                    {
+                                        bw_tf_ALL.write(sb_line.toString());
+                                        bw_tf_ALL.newLine();
+                                    }
 
                                     bw_tf_HM.write(sb_line.toString());
                                     bw_tf_HM.newLine();
                                 }
                             }
-                            bw_background_ALL.close();
+                            if(options_intern.perform_ALL_background_distr_analysis)
+                            {
+                                bw_background_ALL.close();
+                            }
                             bw_background_HM.close();
-                            bw_tf_ALL.close();
-                            bw_tf_HM.close();
+                            if(options_intern.perform_ALL_background_distr_analysis)
+                            {
+                                bw_tf_ALL.close();
+                                bw_tf_HM.close();
+                            }
                         }
                     }
                 }

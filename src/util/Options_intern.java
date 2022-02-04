@@ -38,6 +38,8 @@ public class Options_intern
      * COM2POSE private options - cannot be set from the outside
      */
 
+    public boolean perform_ALL_background_distr_analysis = false;
+
     public String folder_name_usual_working_dir_name = "working_dir";
 
     public String distribution_analysis_all_name = "ALL";
