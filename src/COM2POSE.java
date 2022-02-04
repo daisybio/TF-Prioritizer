@@ -133,15 +133,15 @@ public class COM2POSE
         {
             com2pose_lib.get_chip_atlas_data_list();
             com2pose_lib.get_chip_atlas_data();
-            com2pose_lib.run_igv_chip_atlas_data();
-            com2pose_lib.run_igv_chr_wide_data();
+            //com2pose_lib.run_igv_chip_atlas_data();
+            //com2pose_lib.run_igv_chr_wide_data();
 
         }
 
         //shoot IGV for own TF ChIP-seq data
         if (!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))
         {
-            com2pose_lib.run_igv_own_data();
+            //com2pose_lib.run_igv_own_data();
         }
 
         //shot IGV for dcg target gene heatmaps

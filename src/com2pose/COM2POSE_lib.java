@@ -3055,10 +3055,14 @@ public class COM2POSE_lib
         }
 
         //read in TFs from ALL analysis
+        /*
         File f_input_all_hm_to_important_tfs = new File(
                 f_important_tfs_per_hm.getParentFile().getAbsolutePath() + File.separator +
                         options_intern.folder_out_distribution_stats_ALL + File.separator +
-                        options_intern.file_suffix_distribution_analysis_plot_stats);
+                        options_intern.file_suffix_distribution_analysis_plot_stats);*/
+        File f_input_all_hm_to_important_tfs =
+                new File(options_intern.com2pose_working_directory+ File.separator + options_intern.folder_out_distribution +
+                        File.separator + options_intern.folder_out_distribution_dcg + File.separator+ options_intern.file_suffix_distribution_analysis_dcg);
         BufferedReader br_input_all_hm_to_important_tfs =
                 new BufferedReader(new FileReader(f_input_all_hm_to_important_tfs));
         String line_input_all_hm_to_important_tfs = br_input_all_hm_to_important_tfs.readLine();
@@ -4972,10 +4976,13 @@ public class COM2POSE_lib
             group_analysis_distr_stats_objects.put(fileDir_stat.getName(), current_object);
         }
 
-        Analysis_distribution_stats_object all_object = get_distribution_analysis_stats_ordered(f_distr_stats_ALL);
         if(options_intern.perform_ALL_background_distr_analysis)
         {
-            group_analysis_distr_stats_objects.put(options_intern.distribution_analysis_all_name, all_object);
+            Analysis_distribution_stats_object all_object = get_distribution_analysis_stats_ordered(f_distr_stats_ALL);
+            if (options_intern.perform_ALL_background_distr_analysis)
+            {
+                group_analysis_distr_stats_objects.put(options_intern.distribution_analysis_all_name, all_object);
+            }
         }
 
         int not_found_factor = 0;
@@ -5322,9 +5329,9 @@ public class COM2POSE_lib
             stat_files.add(fileDir_stat);
         }
 
-        sb_home_home.append(
+       /*sb_home_home.append(
                 get_html_table_found_tfs_in_distribution_analysis(stat_files, options_intern.html_report_levels_home,
-                        final_ranks_only));
+                        final_ranks_only));*/
 
         sb_home_home.append("</div>\n</button>\n");
 
@@ -6482,8 +6489,9 @@ public class COM2POSE_lib
                             if(options_intern.perform_ALL_background_distr_analysis)
                             {
                                 bw_tf_ALL.close();
-                                bw_tf_HM.close();
                             }
+                            bw_tf_HM.close();
+
                         }
                     }
                 }
