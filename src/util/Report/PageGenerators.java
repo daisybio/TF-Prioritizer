@@ -294,6 +294,8 @@ public class PageGenerators
             {
                 frame = frame.replace("{VALIDATION_OWN_TF}", "");
             }
+
+            frame = frame.replace("{VALIDATION_OWN_TF_DISABLED}", (source == null ? "disabled" : ""));
         } // Own tf
 
         {

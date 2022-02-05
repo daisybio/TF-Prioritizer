@@ -179,7 +179,12 @@ public class FileManagement
             return null;
         }
 
-        for (File entry : Objects.requireNonNull(directory.listFiles()))
+        if (directory.listFiles() == null)
+        {
+            return null;
+        }
+
+        for (File entry : directory.listFiles())
         {
             if (lookingForFiles != entry.isFile())
             {
