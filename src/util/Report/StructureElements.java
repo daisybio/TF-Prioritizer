@@ -380,6 +380,11 @@ public class StructureElements
         boolean onlyDirs = true;
         StringBuilder sb_result = new StringBuilder();
 
+        if (sourceDir.listFiles() == null)
+        {
+            return "";
+        }
+
         for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
         {
             onlyFiles = onlyFiles && entry.isFile();

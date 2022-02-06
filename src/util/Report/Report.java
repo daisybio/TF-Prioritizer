@@ -4,14 +4,9 @@ import util.Logger;
 import util.Options_intern;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.*;
-
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Report
 {
@@ -323,7 +318,6 @@ public class Report
 
         existingValues.get(SelectorTypes.DISTRIBUTION_OPTIONS)
                 .addAll(existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS));
-        existingValues.get(SelectorTypes.DISTRIBUTION_OPTIONS).add("ALL");
 
         for (SelectorTypes type : SelectorTypes.values())
         {

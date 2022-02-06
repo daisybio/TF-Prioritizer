@@ -305,10 +305,9 @@ public class PageGenerators
             File source = FileManagement.getFileIfInDirectory(d_chip_atlas, "[0-9]+_" + tfGroup.getName(), false);
 
             String id = "validationChipAtlas";
+
             File target = new File(
                     d_out_validation.getAbsolutePath() + File.separator + tfGroup.getName() + File.separator + id);
-
-            frame = frame.replace("{VALIDATION_CHIP_ATLAS_DISABLED}", (source == null) ? "disabled" : "");
 
             if (source == null)
             {
@@ -343,13 +342,14 @@ public class PageGenerators
                         }
                     }
                 }
-
-                frame = frame.replace("{VALIDATION_CHIP_ATLAS}", StructureElements.generateImageSelector(id, target,
+                String imageSelector = StructureElements.generateImageSelector(id, target,
                         Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUPS,
-                                SelectorTypes.EMPTY_DROPDOWN)));
+                                SelectorTypes.EMPTY_DROPDOWN));
+
+                frame = frame.replace("{VALIDATION_CHIP_ATLAS}", imageSelector);
             }
 
-
+            frame = frame.replace("{VALIDATION_CHIP_ATLAS_DISABLED}", target.exists() ? "" : "disabled");
         } // Chip Atlas
 
         {
@@ -506,23 +506,6 @@ public class PageGenerators
             }
         }
 
-        File d_plots_all = new File(Report.options_intern.com2pose_working_directory + File.separator +
-                Report.options_intern.folder_out_distribution + File.separator +
-                Report.options_intern.folder_out_distribution_plots + File.separator +
-                Report.options_intern.folder_out_distribution_plots_ALL);
-
-
-        for (File f_plot : Objects.requireNonNull(d_plots_all.listFiles()))
-        {
-            if (f_plot.getName().substring(0, f_plot.getName().lastIndexOf(".")).equals(tfGroup.getName()))
-            {
-                String categoryName = d_plots_all.getName().substring(d_plots_all.getName().indexOf("_") + 1);
-                FileManagement.copyFile(f_plot,
-                        new File(d_distribution_plots.getAbsolutePath() + File.separator + categoryName + ".png"));
-                break;
-            }
-        }
-
         String frame =
                 StructureElements.getFrame(tfGroup.getName() + " - Distribution", templateFile.getAbsolutePath());
 
@@ -538,32 +521,12 @@ public class PageGenerators
 
 
         {
-            File allFile = new File(Report.options_intern.com2pose_working_directory + File.separator +
-                    Report.options_intern.folder_out_distribution + File.separator +
-                    Report.options_intern.folder_out_distribution_stats + File.separator +
-                    Report.options_intern.folder_out_distribution_stats_ALL + File.separator +
-                    Report.options_intern.file_suffix_distribution_analysis_plot_stats);
             File hmsDir = new File(Report.options_intern.com2pose_working_directory + File.separator +
                     Report.options_intern.folder_out_distribution + File.separator +
                     Report.options_intern.folder_out_distribution_stats + File.separator +
                     Report.options_intern.folder_out_distribution_stats_HM);
             HashMap<String, Integer> ranks = new HashMap<>();
             HashMap<String, Integer> sizes = new HashMap<>();
-
-            try
-            {
-                ranks.put(Report.options_intern.distribution_analysis_all_name, Integer.parseInt(
-                        FileManagement.findValueInTable(tfGroup.getName(), 1, 0, allFile, "\t", true)));
-            } catch (NoSuchFieldException e)
-            {
-                ranks.put(Report.options_intern.distribution_analysis_all_name, -1);
-            } finally
-            {
-                String[] lines = FileManagement.loadFile(allFile.getAbsolutePath()).split("\n");
-                String lastLine = lines[lines.length - 1];
-                sizes.put(Report.options_intern.distribution_analysis_all_name,
-                        Integer.parseInt(lastLine.split("\t")[0]));
-            }
 
             for (File hmDir : Objects.requireNonNull(hmsDir.listFiles()))
             {
