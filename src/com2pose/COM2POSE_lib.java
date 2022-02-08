@@ -15501,6 +15501,7 @@ public class COM2POSE_lib
             socket.close();
         }
 
+        /*
         if (options_intern.igv_include_prediction_data.size() != 0)
         {
             HashSet<String> available_hms = new HashSet<>();
@@ -15528,7 +15529,7 @@ public class COM2POSE_lib
                     logger.logLine("[IGV] Histone Modification " + s + " does not exist, please check in config file");
                 }
             }
-        }
+        }*/
 
         if (!options_intern.igv_path_to_tdf.equals(""))
         {
