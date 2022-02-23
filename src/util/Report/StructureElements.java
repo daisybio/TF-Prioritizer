@@ -198,10 +198,10 @@ public class StructureElements
             sb_links.append("<button onclick='toggleDropdown(\"geneCardsDropdown\")' id='geneCardsDropdown-dropdown'>");
             sb_links.append("GeneCards");
             sb_links.append("</button>");
-            sb_links.append("<div class='genecards dropdown content' id='geneCardsDropdown-dropdown-content'>");
+            sb_links.append("<div class='geneCards dropdown content' id='geneCardsDropdown-dropdown-content'>");
             for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
             {
-                sb_links.append("<button onclick='window.open(\"" +
+                sb_links.append("<button class='dropdown geneCards' onclick='window.open(\"" +
                         Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) + "\");'>");
                 sb_links.append(tf.getName());
                 sb_links.append("</button>");
@@ -300,8 +300,8 @@ public class StructureElements
 
                 sb_imageSelector.append("<div class='dropdown container'>");
                 sb_imageSelector.append(
-                        "<button class='dropdown button' id='{ID}-dropdown' onclick='toggleDropdown(\"{ID}\")" +
-                                "'></button>");
+                        "<button class='dropdown imageSelector' id='{ID}-dropdown' onclick='toggleDropdown" +
+                                "(\"{ID}\")'></button>");
                 sb_imageSelector.append("<div class=\"dropdown content\" id=\"{ID}-dropdown-content\"></div>");
                 sb_imageSelector.append("<script>add_dropdown_closing('{ID}')</script>");
 

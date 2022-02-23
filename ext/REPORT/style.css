@@ -80,6 +80,10 @@ p {
     text-align: justify;
 }
 
+.main {
+    margin: 5px;
+}
+
 .header {
     display: flex;
     flex-direction: row;
@@ -308,11 +312,6 @@ button.narrow {
     display: flex;
 }
 
-.dropdown button {
-    min-width: 200px;
-}
-
-
 .dropdown.content {
     display: none;
     position: absolute;
@@ -322,16 +321,28 @@ button.narrow {
     top: 40px;
 }
 
-.genecards.dropdown.content {
+.geneCards.dropdown.content {
     left: 0;
     right: 0;
     top: 75px;
+    background: white;
+    border-radius: 8px;
+    justify-content: stretch;
+}
+
+.geneCards.dropdown button {
+    flex-grow: 1;
+    justify-content: center;
 }
 
 .dropdown.content.show {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+}
+
+button.imageSelector.dropdown {
+    min-width: 200px;
 }
 
 .dropdown.entry {

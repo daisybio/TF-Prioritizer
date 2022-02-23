@@ -10,38 +10,40 @@
     </button>
     {GENECARD_LINKS}
 </div>
-<button class="accordion" onclick="toggleAccordion('basicData')">Basic data</button>
-<div class="panel" id="basicData">
-    {BASICDATA}
+<div class="main">
+    <button class="accordion" onclick="toggleAccordion('basicData')">Basic data</button>
+    <div class="panel" id="basicData">
+        {BASICDATA}
+    </div>
+    <div class="accordion-info">
+        <button class="accordion" onclick="toggleAccordion('discCumGain')">Discounted cumulative gain</button>
+        <button class="info"
+                onclick="toggleAccordion('discCumGain-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+    </div>
+    <div class="panel info" id="discCumGain-info">
+        <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+            condimentum
+            purus a
+            maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+            elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+            metus nisl.</label>
+    </div>
+    <div class="panel" id="discCumGain">
+        <h2>Overall score: {DCG_SCORE}</h2>
+        {DISCOUNTED_CUMULATIVE_GAIN}
+    </div>
+    <div class="accordion-info">
+        <button class="accordion" onclick="toggleAccordion('distributionPlots')">Distribution plots</button>
+        <button class="info"
+                onclick="toggleAccordion('distPlots-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+    </div>
+    <div class="panel info" id="distPlots-info">
+        <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+            condimentum
+            purus a
+            maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+            elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+            metus nisl.</label>
+    </div>
+    {DISTRIBUTION_PLOTS}
 </div>
-<div class="accordion-info">
-    <button class="accordion" onclick="toggleAccordion('discCumGain')">Discounted cumulative gain</button>
-    <button class="info"
-            onclick="toggleAccordion('discCumGain-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
-</div>
-<div class="panel info" id="discCumGain-info">
-    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
-        condimentum
-        purus a
-        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
-        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
-        metus nisl.</label>
-</div>
-<div class="panel" id="discCumGain">
-    <h2>Overall score: {DCG_SCORE}</h2>
-    {DISCOUNTED_CUMULATIVE_GAIN}
-</div>
-<div class="accordion-info">
-    <button class="accordion" onclick="toggleAccordion('distributionPlots')">Distribution plots</button>
-    <button class="info"
-            onclick="toggleAccordion('distPlots-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
-</div>
-<div class="panel info" id="distPlots-info">
-    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
-        condimentum
-        purus a
-        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
-        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
-        metus nisl.</label>
-</div>
-{DISTRIBUTION_PLOTS}
