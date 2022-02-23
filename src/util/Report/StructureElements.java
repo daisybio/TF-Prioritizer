@@ -398,7 +398,11 @@ public class StructureElements
 
             for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
             {
-                fileNames.add(entry.getName());
+                String name = entry.getName();
+                if (!name.equals("ALL.png"))
+                {
+                    fileNames.add(name);
+                }
             }
 
             Collections.sort(fileNames);
