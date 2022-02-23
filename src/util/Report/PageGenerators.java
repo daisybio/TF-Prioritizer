@@ -351,6 +351,7 @@ public class PageGenerators
             }
 
             frame = frame.replace("{VALIDATION_CHIP_ATLAS_DISABLED}", target.exists() ? "" : "disabled");
+            frame = frame.replace("{VALIDATION_CHIP_ATLAS_VISIBLE}", target.exists() ? "" : "style='display: none'");
         } // Chip Atlas
 
         {
@@ -438,6 +439,9 @@ public class PageGenerators
                             StructureElements.generateImageSelector("logosTfBindingSequence", targetDir,
                                     List.of(SelectorTypes.DISTRIBUTION_OPTIONS)));
                 }
+
+                frame = frame.replace("{TF_BINDING_SEQUENCE_VISIBLE}",
+                        sourceDir == null ? "style='display: none'" : "");
             } // TF binding sequence
         } // LOGOS
 

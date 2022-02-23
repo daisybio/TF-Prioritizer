@@ -56,7 +56,7 @@
             metus nisl.</label>
     </div>
     {TF_SEQUENCE}
-    <div class="accordion-info sub">
+    <div class="accordion-info sub" {TF_BINDING_SEQUENCE_VISIBLE}>
         <button class="accordion" onclick="toggleAccordion('logosTfBindingSequence')">TF binding sequence</button>
         <button class="info"
                 onclick="toggleAccordion('logosTfBindingSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg">
@@ -122,7 +122,7 @@
         metus nisl.</label>
 </div>
 {VALIDATION_OWN_TF}
-<div class="accordion-info">
+<div class="accordion-info" {VALIDATION_CHIP_ATLAS_VISIBLE}>
     <button class="accordion" onclick="toggleAccordion('validationChipAtlas')" {VALIDATION_CHIP_ATLAS_DISABLED}>
         Validation:
         ChIP ATLAS
