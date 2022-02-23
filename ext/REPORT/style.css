@@ -308,6 +308,10 @@ button.narrow {
     display: flex;
 }
 
+.dropdown button {
+    min-width: 200px;
+}
+
 
 .dropdown.content {
     display: none;
