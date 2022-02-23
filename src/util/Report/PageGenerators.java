@@ -284,6 +284,8 @@ public class PageGenerators
             File target = new File(
                     d_out_validation.getAbsolutePath() + File.separator + tfGroup.getName() + File.separator + id);
 
+            source = null; // Deactivate generation of own tf chip-seq data
+
             if (source != null)
             {
                 FileManagement.copyDirectory(source, target, true, ".+\\.png$", List.of(tfGroup.getName()));
@@ -297,6 +299,7 @@ public class PageGenerators
             }
 
             frame = frame.replace("{VALIDATION_OWN_TF_DISABLED}", (source == null ? "disabled" : ""));
+            frame = frame.replace("{VALIDATION_OWN_TF_VISIBLE}", (source == null ? "style='display: none'" : ""));
         } // Own tf
 
         {
