@@ -1,11 +1,11 @@
 package util.Report;
 
-import util.FileManagement;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
+
+import util.FileManagement;
 
 public class StructureElements
 {
@@ -25,11 +25,20 @@ public class StructureElements
         log2fcTemplate = log2fcTemplate.replace("{DATA}",
                 getTabularData(transcriptionFactor.getName(), transcriptionFactor.getLog2fc()));
 
-        template = template.replace("{LOG2FC}", log2fcTemplate);
+        //template = template.replace("{LOG2FC}", log2fcTemplate);
+        template = template.replace("{LOG2FC}",
+                getBasicDataEntry(transcriptionFactor.getName(), "LOG2FC", transcriptionFactor.getLog2fc()));
 
-        template = template.replace("{TPM}", getBasicDataEntry("TPM", transcriptionFactor.getTpm()));
+        template = template.replace("{TPM}", getBasicDataEntry(transcriptionFactor.getName(), "TPM", new HashMap<>()
+        {{
+            put("", transcriptionFactor.getTpm());
+        }}));
 
-        template = template.replace("{NORMEX}", getBasicDataEntry("Norm. expression", transcriptionFactor.getNormex()));
+        template = template.replace("{NORMEX}",
+                getBasicDataEntry(transcriptionFactor.getName(), "Norm. expression", new HashMap<>()
+                {{
+                    put("", transcriptionFactor.getNormex());
+                }}));
 
         return template;
     }
@@ -58,7 +67,8 @@ public class StructureElements
         return basicData.toString();
     }
 
-    private static String getBasicDataEntry(String name, Map<String, Number> data) throws IOException
+    private static String getBasicDataEntry(String tfName, String name, Map<String, Map<String, Number>> data)
+            throws IOException
     {
         if (data.size() == 0)
         {
@@ -70,19 +80,7 @@ public class StructureElements
 
         template = template.replace("{NAME}", name);
 
-        StringBuilder sb_data = new StringBuilder();
-
-        sb_data.append("<div class='keyvaluepaircontainer'>");
-
-        for (Map.Entry<String, Number> kvPair : data.entrySet())
-        {
-            sb_data.append("<div class=\"keyvaluepair\"><h4>").append(kvPair.getKey()).append("</h4><p>")
-                    .append(formatter.format(kvPair.getValue())).append("</p></div>");
-        }
-
-        sb_data.append("</div>");
-
-        template = template.replace("{DATA}", sb_data.toString());
+        template = template.replace("{DATA}", getTabularData(String.valueOf((tfName + " " + name).hashCode()), data));
 
         return template;
     }
@@ -96,13 +94,24 @@ public class StructureElements
 
         StringBuilder sb_data = new StringBuilder();
 
-        List<String> columns = new ArrayList<>(data.keySet());
-        Set<String> rowsSet = new HashSet<>();
+        List<String> rows = new ArrayList<>(data.keySet());
+        Set<String> columnsSet = new HashSet<>();
+        Collections.sort(rows);
+
+        for (String row : rows)
+        {
+            columnsSet.addAll(data.get(row).keySet());
+        }
+
+        List<String> columns = new ArrayList<>(columnsSet);
         Collections.sort(columns);
 
         sb_data.append("<table>");
         sb_data.append("<tr>");
-        sb_data.append("<th></th>");
+        if (!(rows.size() == 1 && rows.get(0).isEmpty()))
+        {
+            sb_data.append("<th></th>");
+        }
         int i = 0;
         for (String column : columns)
         {
@@ -110,22 +119,20 @@ public class StructureElements
             sb_data.append(column);
             sb_data.append("</th>");
             i++;
-
-            rowsSet.addAll(data.get(column).keySet());
         }
         sb_data.append("</tr>");
 
-        List<String> rows = new ArrayList<>(rowsSet);
-        Collections.sort(rows);
 
         i = 0;
         for (String row : rows)
         {
             sb_data.append("<tr>");
-
-            sb_data.append("<th id='").append(id).append("-row-").append(i).append("'>");
-            sb_data.append(row);
-            sb_data.append("</th>");
+            if (!(rows.size() == 1 && rows.get(0).isEmpty()))
+            {
+                sb_data.append("<th id='").append(id).append("-row-").append(i).append("'>");
+                sb_data.append(row);
+                sb_data.append("</th>");
+            }
 
             int j = 0;
             for (String column : columns)
@@ -133,9 +140,9 @@ public class StructureElements
                 String parameters = "\"" + id + "\", " + j + ", " + i;
                 sb_data.append("<td onmouseover='tableMouseOver(").append(parameters)
                         .append(")' onmouseout" + "='tableMouseOut(").append(parameters).append(")'>");
-                if (!column.equals(row) && data.get(column).get(row) != null)
+                if (!column.equals(row) && data.get(row).get(column) != null)
                 {
-                    sb_data.append(formatter.format(data.get(column).get(row)));
+                    sb_data.append(formatter.format(data.get(row).get(column)));
                 } else
                 {
                     sb_data.append("-");
@@ -288,19 +295,19 @@ public class StructureElements
             {
                 sb_imageSelector.append("<div class='buttonbar centered'>");
 
-                sb_imageSelector.append("<button onclick='openModal(\"{ID}-modal\")'>");
+                sb_imageSelector.append("<button class='selector' onclick='openModal(\"{ID}-modal\")'>");
                 sb_imageSelector.append("Zoom in");
                 sb_imageSelector.append("</button>");
 
                 sb_imageSelector.append(
-                        "<button class='narrow' id='{ID}-next-option' onclick='move_lowest_level(\"{ID}\", -1, " +
-                                "{ID" + "}Combinations)" + "'>");
+                        "<button class='selector narrow' id='{ID}-next-option' onclick='move_lowest_level(\"{ID}\", " +
+                                "-1, {ID" + "}Combinations)'>");
                 sb_imageSelector.append("<");
                 sb_imageSelector.append("</button>");
 
                 sb_imageSelector.append("<div class='dropdown container'>");
                 sb_imageSelector.append(
-                        "<button class='dropdown imageSelector' id='{ID}-dropdown' onclick='toggleDropdown" +
+                        "<button class='selector dropdown imageSelector' id='{ID}-dropdown' onclick='toggleDropdown" +
                                 "(\"{ID}\")'></button>");
                 sb_imageSelector.append("<div class=\"dropdown content\" id=\"{ID}-dropdown-content\"></div>");
                 sb_imageSelector.append("<script>add_dropdown_closing('{ID}')</script>");
@@ -308,12 +315,12 @@ public class StructureElements
                 sb_imageSelector.append("</div>");
 
                 sb_imageSelector.append(
-                        "<button class='narrow' id='{ID}-previous-option' onclick='move_lowest_level(\"{ID}\", 1, " +
-                                "{ID}Combinations)'>");
+                        "<button class='selector narrow' id='{ID}-previous-option' onclick='move_lowest_level" +
+                                "(\"{ID}\", 1, " + "{ID}Combinations)'>");
                 sb_imageSelector.append(">");
                 sb_imageSelector.append("</button>");
 
-                sb_imageSelector.append("<button onclick='openImageInTab(\"{ID}-image\")'>");
+                sb_imageSelector.append("<button class='selector' onclick='openImageInTab(\"{ID}-image\")'>");
                 sb_imageSelector.append("Open in new tab");
                 sb_imageSelector.append("</button>");
 
@@ -327,11 +334,11 @@ public class StructureElements
             {
                 sb_imageSelector.append("<div class='buttonbar centered'>");
 
-                sb_imageSelector.append("<button onclick='openModal(\"{ID}-modal\")'>");
+                sb_imageSelector.append("<button class='selector' onclick='openModal(\"{ID}-modal\")'>");
                 sb_imageSelector.append("Zoom in");
                 sb_imageSelector.append("</button>");
 
-                sb_imageSelector.append("<button onclick='openImageInTab(\"{ID}-image\")'>");
+                sb_imageSelector.append("<button class='selector' onclick='openImageInTab(\"{ID}-image\")'>");
                 sb_imageSelector.append("Open in new tab");
                 sb_imageSelector.append("</button>");
 

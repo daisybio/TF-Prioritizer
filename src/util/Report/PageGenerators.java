@@ -390,6 +390,7 @@ public class PageGenerators
             } // BIOPHYSICAL MODEL
 
             {
+                boolean created = false;
                 File sDir = new File(sourceParentDir.getAbsolutePath() + File.separator +
                         Report.options_intern.folder_out_distribution_logos_TF_sequence);
 
@@ -419,8 +420,14 @@ public class PageGenerators
 
                         frame = frame.replace("{TF_SEQUENCE}",
                                 StructureElements.generateImageSelector("logosTfSequence", targetDir, options));
+                        created = true;
                     }
                 }
+                if (!created)
+                {
+                    frame = frame.replace("{TF_SEQUENCE}", "");
+                }
+                frame = frame.replace("{TF_SEQUENCE_DISABLED}", created ? "" : "disabled");
             } // TF Sequence
 
             {

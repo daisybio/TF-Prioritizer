@@ -113,6 +113,7 @@ function update_selection(source_element, id, combinations) {
             searchbox.addEventListener("keyup", function () {
                 filter_dropdown(id)
             });
+            searchbox.classList.add("selector")
 
             dropdownContent.appendChild(searchbox);
 
@@ -121,8 +122,7 @@ function update_selection(source_element, id, combinations) {
                 let value = availableCombinations[i];
                 option.value = value;
                 option.id = id + "-" + 2 + "-" + value;
-                option.classList.add("dropdown");
-                option.classList.add("entry");
+                option.classList.add("selector");
 
                 let text = value.replace(/\.[^/.]+$/, "");
                 if (/^[0-9]+_*/.test(text)) {

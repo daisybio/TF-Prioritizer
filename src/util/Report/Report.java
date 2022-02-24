@@ -284,11 +284,6 @@ public class Report
                 options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_script,
                 script);
 
-        FileManagement.copyFile(
-                new File(options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_logo_png),
-                new File(options_intern.com2pose_working_directory + File.separator +
-                        options_intern.f_out_report_logo_png));
-
         FileManagement.copyDirectory(
                 new File(options_intern.path_to_COM2POSE + File.separator + options_intern.d_report_resources_media),
                 new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_media),

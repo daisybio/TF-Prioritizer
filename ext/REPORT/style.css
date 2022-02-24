@@ -12,32 +12,115 @@ html {
     overflow-y: scroll;
 }
 
+body {
+    font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div {
+    border-radius: 8px;
+}
+
+.main {
+    margin: 5px;
+}
+
+button, input {
+    border-radius: 8px;
+    margin: 1px;
+    background-color: var(--c2);
+    opacity: 0.88;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    text-decoration: none;
+    outline: none;
+}
+
+button:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
+button.active {
+    opacity: 0.94;
+    cursor: default;
+}
+
+button:disabled {
+    background-color: var(--disabledbutton);
+}
+
+button:disabled:hover {
+    cursor: not-allowed;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.header button {
+    background-color: var(--c1);
+    margin: 5px;
+    height: min-content;
+}
+
+.header h1 {
+    justify-self: left;
+    margin-right: auto;
+}
+
 .accordion {
-    background-color: var(--c3);
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.accordion button {
+    display: block;
+    font-size: 25px;
+    text-align: left;
     padding: 18px;
     width: 100%;
-    text-align: left;
-    transition: 0.2s ease-out;
-}
-
-.panel .accordion {
-    background-color: var(--c4);
-}
-
-.accordion:hover {
-    background-color: var(--c2);
-}
-
-.selector.active,
-.group-selector.active,
-.subgroup-selector.active {
-    background-color: var(--c3);
 }
 
 .panel {
     padding: 0 18px;
     overflow: hidden;
     display: none;
+}
+
+.panel button.accordion {
+    background-color: var(--c3);
+}
+
+button.image {
+    font-size: 0;
+    padding: 10px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+button.text {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+
+button.image img {
+    min-width: 45px;
+    min-height: 45px;
+}
+
+button.image {
+    width: max-content;
+    justify-self: end;
 }
 
 img {
@@ -47,202 +130,53 @@ img {
 
 .dataset {
     background-color: var(--c5);
-    border-radius: 8px;
     padding: 10px;
-    margin: 5px;
-}
-
-table {
-    border-spacing: 0;
-    border-collapse: collapse;
-}
-
-td, th {
-    cursor: default;
-    padding: 10px;
-    text-align: center;
-    vertical-align: center;
-    border-radius: 8px;
-}
-
-td:hover {
-    background-color: rgba(var(--black), 0.1);
-}
-
-body {
-    font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-p {
-    text-align: justify;
-}
-
-.main {
-    margin: 5px;
-}
-
-.header {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    align-content: center;
-}
-
-.keyvaluepaircontainer {
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    justify-content: left;
-    flex-wrap: wrap;
-}
-
-.keyvaluepair {
-    width: min-content;
-    display: grid;
-    grid-template-columns: min-content;
-    grid-template-rows: min-content min-content;
-    text-align: center;
-}
-
-h1 {
-    font-size: 40px;
-    justify-self: left;
-    margin-right: auto;
-}
-
-.header h2 {
-    justify-self: left;
-    margin-right: auto;
-}
-
-h2, .accordion {
-    font-size: 25px;
-}
-
-h3 {
-    font-size: 15px;
-    text-align: left;
-}
-
-.dataset h4, .dataset th {
-    font-size: 15px;
-}
-
-.accordion, button, select {
-    cursor: pointer;
-    transition: 0.4s;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    margin: 1px;
-    text-decoration: none;
-    color: white;
-}
-
-input, button, select {
-    background-color: var(--c4);
-    text-align: center;
-    color: white;
-    font-size: 16px;
-    padding: 10px 15px;
-    flex-grow: 1;
-    border-radius: 8px;
-    border-width: 0;
-}
-
-select {
-    appearance: none;
-}
-
-.header button {
-    background-color: var(--c2);
-    text-align: center;
-    font-size: 16px;
-    padding: 10px 15px;
-    margin: 5px;
-    align-self: center;
-    display: flex;
-    flex-grow: 0;
-}
-
-button:hover {
-    background-color: var(--c1);
-}
-
-.buttonbar button:hover {
-    background-color: var(--c3);
+    margin: 2px;
 }
 
 .buttonbar {
     display: flex;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
     flex-direction: row;
+    justify-content: space-evenly;
     align-content: stretch;
+    flex-wrap: wrap;
 }
 
-select:disabled,
-select[disabled],
-button:disabled,
-button[disabled] {
-    background-color: var(--disabledbutton);
+.buttonbar button {
+    flex-grow: 1;
 }
 
-select:disabled:hover,
-select[disabled]:hover,
-button:disabled:hover,
-button[disabled]:hover {
-    background-color: var(--disabledbutton);
-    cursor: not-allowed;
+.panel .accordion button, .accordion.sub button {
+    background-color: var(--c3);
 }
 
-select {
-    max-width: max-content;
-}
-
-option {
+.selector {
     background-color: var(--c4);
 }
 
-select:hover {
+.selector.active {
     background-color: var(--c3);
-    cursor: pointer;
 }
 
-button.narrow {
-    max-width: max-content;
-}
-
-.buttonbar.centered {
-    justify-content: center;
-}
-
-/* Style the Image Used to Trigger the Modal */
 .modal.source {
     border-radius: 5px;
     cursor: pointer;
     transition: 0.3s;
 }
 
-/* The Modal (background) */
 .modal.background {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1;
     left: 0;
     top: 0;
     width: 100vw;
     height: 100vw;
     overflow: hidden;
-    background-color: rgb(0, 0, 0); /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.9); /* Black w/ opacity */
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.9);
 }
 
-/* Modal Content (Image) */
 .modal.content {
     margin: auto;
     display: block;
@@ -251,7 +185,6 @@ button.narrow {
     position: center;
 }
 
-/* Caption of Modal Image (Image Text) - Same Width as the Image */
 .modal.caption {
     font-size: 40px;
     display: block;
@@ -262,7 +195,6 @@ button.narrow {
     transform: translateX(-50%);
 }
 
-/* Add Animation - Zoom in the Modal */
 .modal.content {
     animation-name: zoom;
     animation-duration: 0.6s;
@@ -270,10 +202,10 @@ button.narrow {
 
 @keyframes zoom {
     from {
-        transform: scale(0)
+        transform: scale(0);
     }
     to {
-        transform: scale(1)
+        transform: scale(1);
     }
 }
 
@@ -307,6 +239,27 @@ button.narrow {
     padding: 0;
 }
 
+td, th {
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 0;
+}
+
+td:hover {
+    background-color: rgba(var(--black), 0.1);
+    cursor: default;
+}
+
+button.dropdown {
+    background-color: var(--c3);
+    min-width: 200px;
+}
+
+.selector.narrow {
+    max-width: max-content;
+}
+
 .dropdown.container {
     position: relative;
     display: flex;
@@ -321,28 +274,10 @@ button.narrow {
     top: 40px;
 }
 
-.geneCards.dropdown.content {
-    left: 0;
-    right: 0;
-    top: 75px;
-    background: white;
-    border-radius: 8px;
-    justify-content: stretch;
-}
-
-.geneCards.dropdown button {
-    flex-grow: 1;
-    justify-content: center;
-}
-
 .dropdown.content.show {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-}
-
-button.imageSelector.dropdown {
-    min-width: 200px;
 }
 
 .dropdown.entry {
@@ -366,45 +301,20 @@ input:focus {
     outline: none;
 }
 
-.accordion-info {
-    display: flex;
+.dropdown.content {
+    background-color: white;
 }
 
-.accordion-info .accordion {
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
-    justify-self: stretch;
+.geneCards.dropdown.content {
+    flex-direction: column;
+    left: 0;
+    right: 0;
 }
 
-.accordion-info .info {
-    background-color: var(--c3);
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
+button.geneCards.dropdown {
+    min-width: min-content;
 }
 
-.accordion-info .info:hover,
-.accordion-info.sub .info:hover {
-    background-color: var(--c2);
-}
-
-.accordion-info.sub .info {
-    background-color: var(--c4);
-}
-
-.panel.info label {
-    margin: 10px;
-}
-
-table.citations {
-    border-style: solid;
-    border-color: var(--c3);
-}
-
-table.citations td {
-    text-align: left;
-}
-
-table.citations td:hover {
-    background-color: rgba(var(--black), 0);
-    cursor: text;
+input {
+    text-align: center;
 }

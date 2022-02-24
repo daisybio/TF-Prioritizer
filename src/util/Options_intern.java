@@ -274,7 +274,6 @@ public class Options_intern
     public String d_out_important_loci = d_out_report + File.separator + "importantLoci";
     public String d_out_top_log2fc = d_out_report + File.separator + "topLog2fc";
     public String d_out_media = d_out_report + File.separator + "MEDIA";
-    public String f_out_report_logo_png = d_out_media + File.separator + "logo.svg";
     public String f_out_report_important_loci_html = d_out_report + File.separator + "IMPORTANT_LOCI.html";
     public String f_out_report_top_log2fc_html = d_out_report + File.separator + "TOP_LOG2FC.html";
     public String f_out_report_cooccurrence_html = d_out_report + File.separator + "COOCCURRENCE.html";
@@ -285,7 +284,6 @@ public class Options_intern
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
     public String d_report_resources_media = d_report_resources + File.separator + "MEDIA";
-    public String f_report_resources_logo_png = d_report_resources_media + File.separator + "logo.svg";
     public String f_report_resources_important_loci_html = d_report_resources + File.separator + "IMPORTANT_LOCI.html";
     public String f_report_resources_top_log2fc_html = d_report_resources + File.separator + "TOP_LOG2FC.html";
     public String f_report_resources_cooccurrence_html = d_report_resources + File.separator + "COOCCURRENCE.html";

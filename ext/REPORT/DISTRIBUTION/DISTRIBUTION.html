@@ -11,16 +11,18 @@
     {GENECARD_LINKS}
 </div>
 <div class="main">
-    <button class="accordion" onclick="toggleAccordion('basicData')">Basic data</button>
+    <div class="accordion">
+        <button onclick="toggleAccordion('basicData')">Basic data</button>
+    </div>
     <div class="panel" id="basicData">
         {BASICDATA}
     </div>
-    <div class="accordion-info">
-        <button class="accordion" onclick="toggleAccordion('discCumGain')">Discounted cumulative gain</button>
-        <button class="info"
+    <div class="accordion">
+        <button class="text" onclick="toggleAccordion('discCumGain')">Discounted cumulative gain</button>
+        <button class="image"
                 onclick="toggleAccordion('discCumGain-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel info" id="discCumGain-info">
+    <div class="panel" id="discCumGain-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -32,12 +34,12 @@
         <h2>Overall score: {DCG_SCORE}</h2>
         {DISCOUNTED_CUMULATIVE_GAIN}
     </div>
-    <div class="accordion-info">
-        <button class="accordion" onclick="toggleAccordion('distributionPlots')">Distribution plots</button>
-        <button class="info"
+    <div class="accordion">
+        <button class="text" onclick="toggleAccordion('distributionPlots')">Distribution plots</button>
+        <button class="image"
                 onclick="toggleAccordion('distPlots-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel info" id="distPlots-info">
+    <div class="panel" id="distPlots-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
