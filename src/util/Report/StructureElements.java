@@ -241,17 +241,17 @@ public class StructureElements
 
     static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types)
     {
-        ArrayList<ArrayList<String>> options = new ArrayList<>();
+        List<List<String>> options = new ArrayList<>();
 
         for (SelectorTypes type : types)
         {
             options.add(Report.existingValues.get(type));
         }
 
-        return generateImageSelector(id, sourceDir, options);
+        return generateImageSelector(sourceDir, id, options);
     }
 
-    static String generateImageSelector(String id, File sourceDir, ArrayList<ArrayList<String>> options)
+    static String generateImageSelector(File sourceDir, String id, List<List<String>> options)
     {
         StringBuilder sb_imageSelector = new StringBuilder();
 
@@ -259,7 +259,7 @@ public class StructureElements
 
         int i = 0;
 
-        for (ArrayList<String> levelOptions : options)
+        for (List<String> levelOptions : options)
         {
             if (levelOptions.size() > 0)
             {

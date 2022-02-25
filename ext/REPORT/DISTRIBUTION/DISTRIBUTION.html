@@ -1,7 +1,20 @@
 <div class="header">
     <h1>
-        {TFNAME}
+        {TFNAME}: Distribution Analysis
     </h1>
+    <button onclick="toggleAccordion('info')">
+        <img src="{RELATIVATION}MEDIA/info.svg">
+    </button>
+</div>
+<div class="panel text" id="info">
+    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+        condimentum
+        purus a
+        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+        metus nisl.</label>
+</div>
+<div class="buttonbar">
     <button onclick="window.location.href='{RELATIVATION}REGRESSION/{TFNAME}/{TFNAME}.html';">
         Regression Analysis
     </button>
@@ -22,7 +35,7 @@
         <button class="image"
                 onclick="toggleAccordion('discCumGain-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel" id="discCumGain-info">
+    <div class="panel text" id="discCumGain-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -39,7 +52,7 @@
         <button class="image"
                 onclick="toggleAccordion('distPlots-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel" id="distPlots-info">
+    <div class="panel text" id="distPlots-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a

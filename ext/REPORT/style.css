@@ -130,6 +130,9 @@ img {
 
 .dataset {
     background-color: var(--c5);
+}
+
+.panel.text, .dataset {
     padding: 10px;
     margin: 2px;
 }

@@ -1,10 +1,7 @@
 <div class="header">
     <h1>
-        {TFNAME}: Regression Analysis
-    </h1>
-    <button onclick="window.location.href='{RELATIVATION}REGRESSION/Performance/PERFORMANCE_ANALYSIS.html';">
         Regression Performance Analysis
-    </button>
+    </h1>
     <button onclick="toggleAccordion('info')">
         <img src="{RELATIVATION}MEDIA/info.svg">
     </button>
@@ -17,28 +14,14 @@
         elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
         metus nisl.</label>
 </div>
-<div class="buttonbar">
-    <button onclick="window.location.href='{RELATIVATION}DISTRIBUTION/{TFNAME}/{TFNAME}.html';">
-        Distibution Analysis
-    </button>
-    <button onclick="window.location.href='{RELATIVATION}VALIDATION/{TFNAME}/{TFNAME}.html';">
-        Validation Analysis
-    </button>
-    {GENECARD_LINKS}
-</div>
 <div class="main">
     <div class="accordion">
-        <button onclick="toggleAccordion('basicData')">Basic data</button>
-    </div>
-    <div class="panel" id="basicData">
-        {BASICDATA}
-    </div>
-    <div class="accordion">
-        <button class="text" onclick="toggleAccordion('coefficients')">Regression coefficients</button>
+        <button class="text" onclick="toggleAccordion('foldChanges')">Fold changes</button>
         <button class="image"
-                onclick="toggleAccordion('coefficients-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+                onclick="toggleAccordion('foldChanges-info')"><img src="{RELATIVATION}MEDIA/info.svg">
+        </button>
     </div>
-    <div class="panel text" id="coefficients-info">
+    <div class="panel text" id="foldChanges-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -46,30 +29,15 @@
             elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
             metus nisl.</label>
     </div>
-    <div class="panel" id="coefficients">
-        {COEFFICIENTS}
-    </div>
+    {PERFORMANCE_FOLD_CHANGES}
     <div class="accordion">
-        <button class="text" onclick="toggleAccordion('overviewHeatmaps')">Overview regression heatmaps</button>
-        <button class="image"
-                onclick="toggleAccordion('overviewHeatmaps-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
-    </div>
-    <div class="panel text" id="overviewHeatmaps-info">
-        <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
-            condimentum
-            purus a
-            maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
-            elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
-            metus nisl.</label>
-    </div>
-    {OVERVIEW_HEATMAPS}
-    <div class="accordion">
-        <button class="text" onclick="toggleAccordion('overviewCoefficients')">Overview regression coefficients
+        <button class="text" onclick="toggleAccordion('barplots')">Barplots
         </button>
         <button class="image"
-                onclick="toggleAccordion('overviewCoefficients-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+                onclick="toggleAccordion('barplots-info')"><img src="{RELATIVATION}MEDIA/info.svg">
+        </button>
     </div>
-    <div class="panel text" id="overviewCoefficients-info">
+    <div class="panel text" id="barplots-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -77,5 +45,23 @@
             elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
             metus nisl.</label>
     </div>
-    {OVERVIEW_COEFFICIENTS}
+    {PERFORMANCE_BARPLOT}
+    <div class="accordion">
+        <button class="text" onclick="toggleAccordion('heatmap')">Cross Validation
+            Heatmap
+        </button>
+        <button class="image"
+                onclick="toggleAccordion('heatmap-info')"><img
+                src="{RELATIVATION}MEDIA/info.svg">
+        </button>
+    </div>
+    <div class="panel text" id="heatmap-info">
+        <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+            condimentum
+            purus a
+            maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+            elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+            metus nisl.</label>
+    </div>
+    {PERFORMANCE_CROSS_VALIDATION_HEATMAP}
 </div>

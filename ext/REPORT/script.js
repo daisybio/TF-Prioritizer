@@ -101,7 +101,7 @@ function update_selection(source_element, id, combinations) {
     availableCombinations = availableCombinations[source_element.value];
 
     { // Fill dropdown if necessary
-        if (level === 1 && depth === 2) {
+        if (level === depth - 1 && document.getElementById(id + "-dropdown") != null) {
             let dropdownContent = document.getElementById(id + "-dropdown-content");
             dropdownContent.innerHTML = "";
 
@@ -179,9 +179,8 @@ function update_selection(source_element, id, combinations) {
             let modal_caption = document.getElementById(id + "-modal-caption");
             modal_caption.textContent = source_element.textContent;
 
-            if (depth === 2) {
-                let dropdown = document.getElementById(id + "-dropdown");
-
+            let dropdown = document.getElementById(id + "-dropdown");
+            if (dropdown != null) {
                 dropdown.textContent = source_element.textContent;
                 dropdown.value = source_element.value;
             }

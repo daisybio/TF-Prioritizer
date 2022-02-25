@@ -1,10 +1,10 @@
 package util.Report;
 
-import util.FileManagement;
-
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class PageGenerators
 {
@@ -15,6 +15,7 @@ public class PageGenerators
         generateTopLog2fc();
         generateCoOccurrence();
         generateOverview();
+        generateRegressionPerformance();
     }
 
     static void generateImportantLoci() throws IOException
@@ -241,6 +242,74 @@ public class PageGenerators
         Report.logger.logLine("[REPORT] Finished generating report home page");
     }
 
+    static void generateRegressionPerformance() throws IOException
+    {
+        {
+            File parent = new File(Report.options_intern.com2pose_working_directory + File.separator +
+                    Report.options_intern.folder_out_put_DYNAMITE);
+
+            for (File hm : Objects.requireNonNull(parent.listFiles()))
+            {
+                for (File group_pairing : Objects.requireNonNull(hm.listFiles()))
+                {
+                    FileManagement.copyFile(
+                            new File(group_pairing.getAbsolutePath() + File.separator + "Performance_Barplots.png"),
+                            new File(Report.options_intern.com2pose_working_directory + File.separator +
+                                    Report.options_intern.d_out_regression_performance_barplots + File.separator +
+                                    hm.getName() + File.separator + group_pairing.getName() + ".png"));
+
+                    FileManagement.copyDirectory(group_pairing, new File(
+                                    Report.options_intern.com2pose_working_directory + File.separator +
+                                            Report.options_intern.d_out_regression_performance_foldChanges + File.separator +
+                                            hm.getName() + File.separator + group_pairing.getName()), true,
+                            "Misclassification_vs_Lambda_Fold_[1-9]_Integrated_Data_For_Classification.svg",
+                            List.of("Misclassification_vs_Lambda_Fold", "Integrated_Data_For_Classification"));
+
+                    FileManagement.copyFile(new File(group_pairing.getAbsolutePath() + File.separator +
+                                    "Regression_Coefficients_Cross_Validation_Heatmap_Integrated_Data_For_Classification.svg"),
+                            new File(Report.options_intern.com2pose_working_directory + File.separator +
+                                    Report.options_intern.d_out_regression_performance_heatmap + File.separator +
+                                    hm.getName() + File.separator + group_pairing.getName() + ".svg"));
+                }
+            }
+
+        } // Copy files
+
+        String frame = StructureElements.getFrame("Regression performance analysis",
+                Report.options_intern.path_to_COM2POSE + File.separator +
+                        Report.options_intern.f_report_resources_regression_regression_performance_html);
+
+        List<String> fileNames = new ArrayList<>();
+
+        Report.existingValues.get(SelectorTypes.PERFORMANCE_CUTOFFS).forEach(cutoff -> fileNames.add(cutoff + ".svg"));
+
+        File d_fold_changes = new File(Report.options_intern.com2pose_working_directory + File.separator +
+                Report.options_intern.d_out_regression_performance_foldChanges);
+        frame = frame.replace("{PERFORMANCE_FOLD_CHANGES}",
+                StructureElements.generateImageSelector(d_fold_changes, "foldChanges",
+                        Arrays.asList(Report.existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS),
+                                Report.existingValues.get(SelectorTypes.GROUP_PAIRINGS), fileNames)));
+
+        File d_barplots = new File(Report.options_intern.com2pose_working_directory + File.separator +
+                Report.options_intern.d_out_regression_performance_barplots);
+        frame = frame.replace("{PERFORMANCE_BARPLOT}", StructureElements.generateImageSelector("barplots", d_barplots,
+                Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS)));
+
+        File d_heatmap = new File(Report.options_intern.com2pose_working_directory + File.separator +
+                Report.options_intern.d_out_regression_performance_heatmap);
+
+        fileNames.clear();
+        Report.existingValues.get(SelectorTypes.GROUP_PAIRINGS)
+                .forEach(group_pairing -> fileNames.add(group_pairing + ".svg"));
+
+        frame = frame.replace("{PERFORMANCE_CROSS_VALIDATION_HEATMAP}",
+                StructureElements.generateImageSelector(d_heatmap, "heatmap",
+                        Arrays.asList(Report.existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS), fileNames)));
+
+        FileManagement.writeHTML(Report.options_intern.com2pose_working_directory + File.separator +
+                Report.options_intern.f_out_regression_performance_analysis_html, frame, 2);
+    }
+
     static boolean generateValidation(TranscriptionFactorGroup tfGroup) throws IOException
     {
         File templateFile = new File(Report.options_intern.path_to_COM2POSE + File.separator +
@@ -379,12 +448,12 @@ public class PageGenerators
                 {
                     FileManagement.copyFile(sourceFile, targetFile);
 
-                    ArrayList<ArrayList<String>> options = new ArrayList<>();
+                    List<List<String>> options = new ArrayList<>();
 
                     options.add(new ArrayList<>(List.of(targetFile.getName())));
 
                     frame = frame.replace("{BIOPHYSICAL_MODEL}",
-                            StructureElements.generateImageSelector("logosBiophysicalModel", targetFile.getParentFile(),
+                            StructureElements.generateImageSelector(targetFile.getParentFile(), "logosBiophysicalModel",
                                     options));
                 }
             } // BIOPHYSICAL MODEL
@@ -415,11 +484,11 @@ public class PageGenerators
 
                     if (files.size() > 0)
                     {
-                        ArrayList<ArrayList<String>> options = new ArrayList<>();
+                        List<List<String>> options = new ArrayList<>();
                         options.add(files);
 
                         frame = frame.replace("{TF_SEQUENCE}",
-                                StructureElements.generateImageSelector("logosTfSequence", targetDir, options));
+                                StructureElements.generateImageSelector(targetDir, "logosTfSequence", options));
                         created = true;
                     }
                 }

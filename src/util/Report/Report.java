@@ -304,6 +304,8 @@ public class Report
             }
         }
 
+        existingValues.get(SelectorTypes.PERFORMANCE_CUTOFFS).addAll(List.of("1", "2", "3"));
+
         existingValues.get(SelectorTypes.IMPORTANT_LOCI).addAll(options_intern.igv_important_locus_all_prio_tf);
 
         existingValues.get(SelectorTypes.TOP_LOG2FC).addAll(Arrays.asList("downregulated", "upregulated"));

@@ -1,7 +1,20 @@
 <div class="header">
     <h1>
-        {TFNAME}
+        {TFNAME}: Validation Analysis
     </h1>
+    <button onclick="toggleAccordion('info')">
+        <img src="{RELATIVATION}MEDIA/info.svg">
+    </button>
+</div>
+<div class="panel text" id="info">
+    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+        condimentum
+        purus a
+        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+        metus nisl.</label>
+</div>
+<div class="buttonbar">
     <button onclick="window.location.href='{RELATIVATION}DISTRIBUTION/{TFNAME}/{TFNAME}.html';">
         Distibution Analysis
     </button>
@@ -23,7 +36,7 @@
         <button class="image" onclick="toggleAccordion('logos-info')"><img src="{RELATIVATION}MEDIA/info.svg">
         </button>
     </div>
-    <div class="panel" id="logos-info">
+    <div class="panel text" id="logos-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -32,13 +45,13 @@
             metus nisl.</label>
     </div>
     <div class="panel" id="logos">
-        <div class="accordion info sub">
+        <div class="accordion sub">
             <button class="text" onclick="toggleAccordion('logosBiophysicalModel')">Biophysical model</button>
             <button class="image"
                     onclick="toggleAccordion('logosBiophysicalModel-info')"><img src="{RELATIVATION}MEDIA/info.svg">
             </button>
         </div>
-        <div class="panel" id="logosBiophysicalModel-info">
+        <div class="panel text" id="logosBiophysicalModel-info">
             <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
                 condimentum
                 purus a
@@ -47,14 +60,14 @@
                 metus nisl.</label>
         </div>
         {BIOPHYSICAL_MODEL}
-        <div class="accordion info sub">
+        <div class="accordion sub">
             <button class="text" onclick="toggleAccordion('logosTfSequence')" {TF_SEQUENCE_DISABLED}>TF sequence
                 (JASPAR)
             </button>
             <button class="image"
                     onclick="toggleAccordion('logosTfSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
         </div>
-        <div class="panel" id="logosTfSequence-info">
+        <div class="panel text" id="logosTfSequence-info">
             <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
                 condimentum
                 purus a
@@ -63,13 +76,13 @@
                 metus nisl.</label>
         </div>
         {TF_SEQUENCE}
-        <div class="accordion info sub" {TF_BINDING_SEQUENCE_VISIBLE}>
+        <div class="accordion sub" {TF_BINDING_SEQUENCE_VISIBLE}>
             <button class="text" onclick="toggleAccordion('logosTfBindingSequence')">TF binding sequence</button>
             <button class="image"
                     onclick="toggleAccordion('logosTfBindingSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg">
             </button>
         </div>
-        <div class="panel" id="logosTfBindingSequence-info">
+        <div class="panel text" id="logosTfBindingSequence-info">
             <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
                 condimentum
                 purus a
@@ -87,7 +100,7 @@
         <button class="image"
                 onclick="toggleAccordion('validationHeatmaps-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel" id="validationHeatmaps-info">
+    <div class="panel text" id="validationHeatmaps-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -105,7 +118,7 @@
         <button class="image"
                 onclick="toggleAccordion('validationIGV-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel" id="validationIGV-info">
+    <div class="panel text" id="validationIGV-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -123,7 +136,7 @@
         <button class="image"
                 onclick="toggleAccordion('validationOwnTF-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel" id="validationOwnTF-info">
+    <div class="panel text" id="validationOwnTF-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
@@ -140,7 +153,7 @@
         <button class="image"
                 onclick="toggleAccordion('validationChipAtlas-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>
-    <div class="panel" id="validationChipAtlas-info">
+    <div class="panel text" id="validationChipAtlas-info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
             condimentum
             purus a
