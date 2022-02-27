@@ -1,4 +1,4 @@
-package util.Report;
+package util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,26 +10,29 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class FileManagement
 {
-    static String loadFile(String path) throws IOException
+    public static String loadFile(String path) throws IOException
     {
         File source = new File(path);
-        return Files.readString(source.toPath());
+        return loadFile(source);
     }
 
-    static void copyFile(File source, File target) throws IOException
+    public static String loadFile(File file) throws IOException
     {
-        copyFile(source, target, true);
+        return Files.readString(file.toPath());
     }
 
-    static void copyFile(File source, File target, boolean compression) throws IOException
+    public static void copyFile(File source, File target) throws IOException
+    {
+        copyFile(source, target, false);
+    }
+
+    public static void copyFile(File source, File target, boolean compression) throws IOException
     {
         if (target.exists())
         {
@@ -63,13 +66,13 @@ public class FileManagement
         }
     }
 
-    static void copyDirectory(File source, File target, boolean compression) throws IOException
+    public static void copyDirectory(File source, File target, boolean compression) throws IOException
     {
         copyDirectory(source, target, compression, ".*", new ArrayList<>());
     }
 
-    static void copyDirectory(File source, File target, boolean compression, String fileNameRegex,
-                              List<String> removables) throws IOException
+    public static void copyDirectory(File source, File target, boolean compression, String fileNameRegex,
+                                     List<String> removables) throws IOException
     {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         for (File sourceFile : Objects.requireNonNull(source.listFiles()))
@@ -129,14 +132,14 @@ public class FileManagement
         }
     }
 
-    static void writeHTML(String path, String content, int relativationDepth) throws IOException
+    public static void writeHTML(String path, String content, int relativationDepth) throws IOException
     {
         content = content.replace("{RELATIVATION}", (".." + File.separator).repeat(relativationDepth));
 
         writeFile(path, content);
     }
 
-    static void writeFile(String path, String content) throws IOException
+    public static void writeFile(String path, String content) throws IOException
     {
         File target = new File(path);
         if (!target.exists())
@@ -147,8 +150,8 @@ public class FileManagement
         Files.writeString(target.toPath(), content);
     }
 
-    static String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
-                                   boolean ignoreCase) throws FileNotFoundException, NoSuchFieldException
+    public static String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
+                                          boolean ignoreCase) throws FileNotFoundException, NoSuchFieldException
     {
         if (file.isFile())
         {
@@ -172,7 +175,7 @@ public class FileManagement
         throw new NoSuchFieldException();
     }
 
-    static File getFileIfInDirectory(File directory, String fileNameRegex, boolean lookingForFiles)
+    public static File getFileIfInDirectory(File directory, String fileNameRegex, boolean lookingForFiles)
     {
         if (directory == null)
         {
