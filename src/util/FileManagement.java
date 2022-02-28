@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -139,15 +140,15 @@ public class FileManagement
         writeFile(path, content);
     }
 
+    public static void writeFile(File file, String content) throws IOException
+    {
+        makeSureFileExists(file);
+        Files.writeString(file.toPath(), content);
+    }
+
     public static void writeFile(String path, String content) throws IOException
     {
-        File target = new File(path);
-        if (!target.exists())
-        {
-            target.getParentFile().mkdirs();
-            target.createNewFile();
-        }
-        Files.writeString(target.toPath(), content);
+        writeFile(new File(path), content);
     }
 
     public static String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
@@ -199,5 +200,42 @@ public class FileManagement
             }
         }
         return null;
+    }
+
+    public static void makeSureFileExists(File file) throws IOException
+    {
+        if (!file.exists())
+        {
+            try
+            {
+                if (!file.getParentFile().exists())
+                {
+                    if (!file.getParentFile().mkdirs())
+                    {
+                        throw new IOException();
+                    }
+                }
+                if (!file.createNewFile())
+                {
+                    throw new IOException();
+                }
+            } catch (IOException e)
+            {
+                throw new IOException("Exception during file creation: " + file.getAbsolutePath());
+            }
+        }
+    }
+
+    public static void appendToFile(File file, String content) throws IOException
+    {
+        makeSureFileExists(file);
+
+        try
+        {
+            Files.write(file.toPath(), content.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e)
+        {
+            throw new IOException("Could not append content to file: " + file.getAbsolutePath());
+        }
     }
 }

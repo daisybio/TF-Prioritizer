@@ -1,23 +1,53 @@
 package util.Configs;
 
+import java.io.File;
+
 public class Config<Type>
 {
     private final Type defaultValue;
     private Type actualValue;
+    private final boolean writeable;
+
+    public Config()
+    {
+        this(null);
+    }
 
     public Config(Type defaultValue)
     {
-        this.actualValue = this.defaultValue = defaultValue;
+        this(defaultValue, false);
     }
 
-    public void setValue(Object value)
+    public Config(Type defaultValue, boolean writeable)
     {
-        try
+        this.actualValue = this.defaultValue = defaultValue;
+        this.writeable = writeable;
+    }
+
+    public void setValue(Object value) throws IllegalAccessException, ClassCastException
+    {
+        if (writeable)
         {
-            this.actualValue = (Type) value;
-        } catch (Exception e)
+            if (value.getClass().equals(actualValue.getClass()))
+            {
+                try
+                {
+                    this.actualValue = (Type) value;
+                } catch (Exception ignore)
+                {
+                }
+            } else if (actualValue.getClass().equals(File.class) && value.getClass().equals(String.class))
+            {
+                actualValue = (Type) new File((String) value);
+            } else
+            {
+                throw new ClassCastException(
+                        "Trying to set a value of type " + value.getClass() + " to a config with" + " type " +
+                                actualValue.getClass());
+            }
+        } else
         {
-            e.printStackTrace();
+            throw new IllegalAccessException("Trying to manipulate an internal config.");
         }
     }
 

@@ -21,7 +21,8 @@ public class TPM_GC_Filter_Analysis
 
         parseArguments(args, options_intern);
 
-        Logger logger = new Logger(options_intern.write_to_logfile, options_intern.tpm_gc_filter_analysis_working_dir);
+        Logger logger = new Logger("TPM_GC_Filter_Analysis", options_intern.write_to_logfile,
+                new File(options_intern.tpm_gc_filter_analysis_working_dir + File.separator + "logfile.txt"));
 
         logger.logLine("#########################################");
         logger.logLine("############## COM2POSE #################");

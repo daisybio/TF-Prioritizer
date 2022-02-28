@@ -48,7 +48,8 @@ public class COM2POSE_lib
     {
         this.options_intern = options_intern;
 
-        logger = new Logger(options_intern.write_to_logfile, options_intern.com2pose_working_directory);
+        logger = new Logger("General", options_intern.write_to_logfile,
+                new File(options_intern.com2pose_working_directory + File.separator + "logfile.txt"));
 
         logger.logLine("#########################################");
         logger.logLine("############## COM2POSE #################");
