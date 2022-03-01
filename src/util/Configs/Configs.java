@@ -23,6 +23,8 @@ public class Configs
     public Jaspar jaspar;
     public Tgen tgen;
     public DeSeq2 deSeq2;
+    public Tepic tepic;
+
     private final Logger logger;
 
 
