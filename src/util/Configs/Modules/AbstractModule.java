@@ -105,7 +105,7 @@ public abstract class AbstractModule
         }
         for (String key : entries.keySet())
         {
-            combined.accumulate(key, entries.get(key).toString());
+            combined.accumulate(key, entries.get(key).toJSONifyAble());
         }
 
         return combined;

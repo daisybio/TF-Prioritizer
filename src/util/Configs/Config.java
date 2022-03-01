@@ -1,5 +1,7 @@
 package util.Configs;
 
+import org.json.JSONObject;
+
 import java.io.File;
 
 public class Config<Type>
@@ -63,5 +65,18 @@ public class Config<Type>
             return actualValue.toString();
         }
         return "{NULL}";
+    }
+
+    public Object toJSONifyAble()
+    {
+        if (actualValue == null)
+        {
+            return JSONObject.NULL;
+        }
+        if (actualValue.getClass().equals(File.class))
+        {
+            return ((File) actualValue).getAbsolutePath();
+        }
+        return actualValue;
     }
 }
