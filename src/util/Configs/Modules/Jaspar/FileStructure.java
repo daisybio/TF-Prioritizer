@@ -1,4 +1,4 @@
-package util.Configs.Modules.FileStructure;
+package util.Configs.Modules.Jaspar;
 
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
@@ -8,12 +8,9 @@ import java.lang.reflect.InvocationTargetException;
 
 public class FileStructure extends AbstractModule
 {
-    public MixOption mixOption;
-    public BlacklistedRegions blacklistedRegions;
-    public DistributionAnalysis distributionAnalysis;
 
     public FileStructure(File workingDirectory, File sourceDirectory, Logger logger)
-            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
+            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);
         init();

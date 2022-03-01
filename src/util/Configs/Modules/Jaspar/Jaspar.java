@@ -1,6 +1,7 @@
-package util.Configs.Modules;
+package util.Configs.Modules.Jaspar;
 
 import util.Configs.Config;
+import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
 import java.io.File;
@@ -8,6 +9,8 @@ import java.lang.reflect.InvocationTargetException;
 
 public class Jaspar extends AbstractModule
 {
+    public FileStructure fileStructure;
+
     public final Config<String> downloadUrl =
             new Config<>("https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_redundant_pfms_jaspar.txt",
                     false);

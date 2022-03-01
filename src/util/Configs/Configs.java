@@ -1,7 +1,14 @@
 package util.Configs;
 
 import util.Configs.Modules.*;
+import util.Configs.Modules.DeSeq2.DeSeq2;
+import util.Configs.Modules.Dynamite.Dynamite;
 import util.Configs.Modules.FileStructure.FileStructure;
+import util.Configs.Modules.Igv.Igv;
+import util.Configs.Modules.Jaspar.Jaspar;
+import util.Configs.Modules.Report.Report;
+import util.Configs.Modules.Tepic.Tepic;
+import util.Configs.Modules.Tgene.Tgene;
 import util.FileManagement;
 
 import java.io.File;
@@ -21,9 +28,12 @@ public class Configs
     public General general;
     public FileStructure fileStructure;
     public Jaspar jaspar;
-    public Tgen tgen;
+    public Tgene tgene;
     public DeSeq2 deSeq2;
     public Tepic tepic;
+    public Dynamite dynamite;
+    public Igv igv;
+    public Report report;
 
     private final Logger logger;
 
@@ -62,8 +72,16 @@ public class Configs
         {
             JSONObject moduleJSONObject = combined.getJSONObject(moduleName);
 
-            AbstractModule module = configs.get(moduleName);
-            module.merge(moduleJSONObject);
+            if (configs.containsKey(moduleName))
+            {
+                AbstractModule module = configs.get(moduleName);
+                module.merge(moduleJSONObject);
+            } else
+            {
+                logger.warn("Trying to set config for unknown module: " + moduleName);
+            }
+
+
         }
         logger.info("Merged configuration file from " + configFile.getAbsolutePath());
     }
