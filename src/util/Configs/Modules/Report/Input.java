@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class Input extends AbstractModule
 {
-    public final Config<File> d_root = extend(workingDirectory, "ext" + File.separator + "REPORT");
+    public final Config<File> d_root = extend(sourceDirectory, "ext" + File.separator + "REPORT");
     public final Config<File> d_media = extend(d_root, "MEDIA");
     public final Config<File> f_logo = extend(d_media, "logo.png");
     public final Config<File> f_isAvailable = extend(d_media, "is_available.png");

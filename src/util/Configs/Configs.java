@@ -1,11 +1,13 @@
 package util.Configs;
 
 import util.Configs.Modules.*;
+import util.Configs.Modules.Blacklist.Blacklist;
 import util.Configs.Modules.DeSeq2.DeSeq2;
 import util.Configs.Modules.Dynamite.Dynamite;
 import util.Configs.Modules.FileStructure.FileStructure;
 import util.Configs.Modules.Igv.Igv;
 import util.Configs.Modules.Jaspar.Jaspar;
+import util.Configs.Modules.MixOptions.MixOptions;
 import util.Configs.Modules.Report.Report;
 import util.Configs.Modules.Tepic.Tepic;
 import util.Configs.Modules.Tgene.Tgene;
@@ -34,6 +36,8 @@ public class Configs
     public Dynamite dynamite;
     public Igv igv;
     public Report report;
+    public Blacklist blacklist;
+    public MixOptions mixOptions;
 
     private final Logger logger;
 

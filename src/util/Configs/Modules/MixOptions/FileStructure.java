@@ -1,4 +1,4 @@
-package util.Configs.Modules.FileStructure;
+package util.Configs.Modules.MixOptions;
 
 import util.Configs.Config;
 import util.Configs.Modules.AbstractModule;
@@ -7,7 +7,7 @@ import util.Logger;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
-public class MixOption extends AbstractModule
+public class FileStructure extends AbstractModule
 {
     public final Config<File> d_root = extend(workingDirectory, "00_MIX_OPTION");
     public final Config<File> d_preprocessingCheckChr = extend(d_root, "00_chromosome_annotation_checking");
@@ -20,7 +20,7 @@ public class MixOption extends AbstractModule
     public final Config<File> d_mutuallyExclusive_preprocessing = extend(d_mutuallyExclusive, "01_PREPROCESSING");
     public final Config<File> d_mutuallyExclusive_input = extend(d_mutuallyExclusive, "02_NEW_INPUT");
 
-    public MixOption(File workingDirectory, File sourceDirectory, Logger logger)
+    public FileStructure(File workingDirectory, File sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

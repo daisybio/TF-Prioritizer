@@ -8,8 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 
 public class FileStructure extends AbstractModule
 {
-    public MixOption mixOption;
-    public BlacklistedRegions blacklistedRegions;
     public DistributionAnalysis distributionAnalysis;
 
     public FileStructure(File workingDirectory, File sourceDirectory, Logger logger)
