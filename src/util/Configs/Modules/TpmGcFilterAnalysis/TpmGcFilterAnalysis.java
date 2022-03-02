@@ -1,4 +1,4 @@
-package util.Configs.Modules.Report;
+package util.Configs.Modules.TpmGcFilterAnalysis;
 
 import util.Configs.Config;
 import util.Configs.Modules.AbstractModule;
@@ -6,16 +6,16 @@ import util.Logger;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
-public class Report extends AbstractModule
+public class TpmGcFilterAnalysis extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<String> genecardsUrl =
-            new Config<>("https://www.genecards.org/cgi-bin/carddisp" + ".pl?gene={GENE}");
+    public final Config<List> tfList = new Config<>(List.class);
+    public final Config<Boolean> countZeros = new Config<>(true);
 
-
-    public Report(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public TpmGcFilterAnalysis(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

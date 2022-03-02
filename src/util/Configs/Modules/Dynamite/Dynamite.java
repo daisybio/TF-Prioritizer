@@ -25,7 +25,7 @@ public class Dynamite extends AbstractModule
     public final Config<Boolean> performance = new Config<>(true);
     public final Config<Boolean> randomize = new Config<>(false);
 
-    public Dynamite(File workingDirectory, File sourceDirectory, Logger logger)
+    public Dynamite(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

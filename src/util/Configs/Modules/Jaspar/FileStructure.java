@@ -1,5 +1,6 @@
 package util.Configs.Modules.Jaspar;
 
+import util.Configs.Config;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -9,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 public class FileStructure extends AbstractModule
 {
 
-    public FileStructure(File workingDirectory, File sourceDirectory, Logger logger)
+    public FileStructure(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

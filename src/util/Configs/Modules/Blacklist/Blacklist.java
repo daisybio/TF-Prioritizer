@@ -17,7 +17,7 @@ public class Blacklist extends AbstractModule
     public final Config<List> signalsToIgnore =
             new Config<>(Arrays.asList("Low_Mappability".toUpperCase(), "High_Signal_Region".toUpperCase()));
 
-    public Blacklist(File workingDirectory, File sourceDirectory, Logger logger)
+    public Blacklist(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

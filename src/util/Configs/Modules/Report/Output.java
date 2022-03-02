@@ -7,6 +7,8 @@ import util.Logger;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import static util.FileManagement.extend;
+
 public class Output extends AbstractModule
 {
     public final Config<File> root = extend(workingDirectory, "REPORT");
@@ -39,7 +41,7 @@ public class Output extends AbstractModule
 
     public final Config<File> f_cooccurrence_html = extend(root, "COOCCURRENCE.html");
 
-    public Output(File workingDirectory, File sourceDirectory, Logger logger)
+    public Output(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

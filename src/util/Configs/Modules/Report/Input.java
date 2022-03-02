@@ -7,6 +7,8 @@ import util.Logger;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import static util.FileManagement.extend;
+
 public class Input extends AbstractModule
 {
     public final Config<File> d_root = extend(sourceDirectory, "ext" + File.separator + "REPORT");
@@ -46,7 +48,7 @@ public class Input extends AbstractModule
     public final Config<File> d_regression = extend(d_root, "REGRESSION");
     public final Config<File> f_regression = extend(d_home, "REGRESSION.html");
 
-    public Input(File workingDirectory, File sourceDirectory, Logger logger)
+    public Input(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

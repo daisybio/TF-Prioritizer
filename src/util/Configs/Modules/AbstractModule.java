@@ -10,19 +10,24 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static util.FileManagement.extend;
+
+
 public abstract class AbstractModule
 {
-    protected final File workingDirectory;
-    protected final File sourceDirectory;
+    protected final Config<File> workingDirectory;
+    protected final Config<File> sourceDirectory;
+    protected final Config<File> extDirectory;
     protected final Logger logger;
 
     protected Map<String, Config<?>> entries = new HashMap<>();
     protected Map<String, AbstractModule> subModules = new HashMap<>();
 
-    public AbstractModule(File workingDirectory, File sourceDirectory, Logger logger)
+    public AbstractModule(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
     {
         this.workingDirectory = workingDirectory;
         this.sourceDirectory = sourceDirectory;
+        this.extDirectory = extend(sourceDirectory, "ext");
         this.logger = logger;
     }
 
@@ -39,12 +44,12 @@ public abstract class AbstractModule
         Field[] fields = this.getClass().getFields();
         for (Field field : fields)
         {
-            Class superClass = field.getType().getSuperclass();
+            Class<?> superClass = field.getType().getSuperclass();
 
             if (superClass != null && superClass.equals(AbstractModule.class))
             {
                 AbstractModule module =
-                        (AbstractModule) field.getType().getConstructor(File.class, File.class, Logger.class)
+                        (AbstractModule) field.getType().getConstructor(Config.class, Config.class, Logger.class)
                                 .newInstance(workingDirectory, sourceDirectory, logger);
                 field.set(this, module);
                 subModules.put(field.getType().getSimpleName(), module);
@@ -94,30 +99,27 @@ public abstract class AbstractModule
         }
     }
 
-    public JSONObject toJSONObject()
+    public JSONObject toJSONObject(boolean onlyWriteable)
     {
 
         JSONObject combined = new JSONObject();
 
         for (String key : subModules.keySet())
         {
-            combined.accumulate(key, subModules.get(key).toJSONObject());
+            combined.accumulate(key, subModules.get(key).toJSONObject(onlyWriteable));
         }
         for (String key : entries.keySet())
         {
-            combined.accumulate(key, entries.get(key).toJSONifyAble());
+            Config<?> entry = entries.get(key);
+
+            if (onlyWriteable && !entry.isWriteable())
+            {
+                continue;
+            }
+
+            combined.accumulate(key, entry.toJSONifyAble());
         }
 
         return combined;
-    }
-
-    protected Config<File> extend(Config<File> fileConfig, String extension)
-    {
-        return extend(fileConfig.get(), extension);
-    }
-
-    protected Config<File> extend(File file, String extension)
-    {
-        return new Config<>(new File(file.getAbsolutePath() + File.separator + extension));
     }
 }

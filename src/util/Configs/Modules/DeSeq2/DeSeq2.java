@@ -7,6 +7,8 @@ import util.Logger;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import static util.FileManagement.extend;
+
 public class DeSeq2 extends AbstractModule
 {
     public FileStructure fileStructure;
@@ -17,8 +19,9 @@ public class DeSeq2 extends AbstractModule
     public final Config<String> biomartDatasetSymbolColumn = new Config<>(String.class);
     public final Config<Integer> countThreshold = new Config<>(Integer.class);
     public final Config<Double> tpmFilter = new Config<>(Double.class);
+    public final Config<File> d_enhancerDB = extend(extDirectory, "Enhancers_DB");
 
-    public DeSeq2(File workingDirectory, File sourceDirectory, Logger logger)
+    public DeSeq2(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

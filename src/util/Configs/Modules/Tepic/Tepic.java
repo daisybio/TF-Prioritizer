@@ -7,9 +7,17 @@ import util.Logger;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import static util.FileManagement.extend;
+
 public class Tepic extends AbstractModule
 {
     public FileStructure fileStructure;
+
+    public final Config<File> d_ext_tepic = extend(extDirectory, "TEPIC" + File.separator + "TEPIC");
+    public final Config<File> executable = new Config<>(
+            new File(d_ext_tepic.get().getAbsolutePath() + File.separator + "Code" + File.separator + "TEPIC.sh"));
+    public final Config<File> d_dynamiteScripts =
+            extend(d_ext_tepic, "MachineLearningPipelines" + File.separator + "DYNAMITE" + File.separator + "Scripts");
 
     public final Config<File> inputDirectory = new Config<>(File.class);
     public final Config<File> inputPrevious = new Config<>(File.class);
@@ -46,7 +54,7 @@ public class Tepic extends AbstractModule
     public final Config<String> tfBindingSiteSearch = new Config<>("INSIDE");
     public final Config<Integer> betweenMaxBps = new Config<>(500);
 
-    public Tepic(File workingDirectory, File sourceDirectory, Logger logger)
+    public Tepic(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

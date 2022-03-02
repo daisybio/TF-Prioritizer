@@ -13,19 +13,16 @@ public class General extends AbstractModule
     public final Config<Boolean> calculateTpmLengthsEnabled = new Config<>(true, true);
     public final Config<Boolean> calculateGenePositionsEnabled = new Config<>(true, true);
 
-    public final Config<String> differentTps = new Config<>("DIFFERENT_TPS", false);
-    public final Config<String> sameTps = new Config<>("SAME_TPS", false);
+    public final Config<String> differentTps = new Config<>("DIFFERENT_TPS");
+    public final Config<String> sameTps = new Config<>("SAME_TPS");
 
-    public final Config<File> d_ext =
-            new Config<>(new File(sourceDirectory.getAbsolutePath() + File.separator + "ext"), false);
+    public final Config<String> shebang = new Config<>("#!/bin/bash");
 
-    public final Config<String> shebang = new Config<>("#!/bin/bash", false);
-
-    public final Config<Boolean> performAllBackgroundDistributionAnalysis = new Config<>(false, false);
-    public final Config<String> distributionAnalysisAllName = new Config<>("ALL", false);
+    public final Config<Boolean> performAllBackgroundDistributionAnalysis = new Config<>(false);
+    public final Config<String> distributionAnalysisAllName = new Config<>("ALL");
 
 
-    public General(File workingDirectory, File sourceDirectory, Logger logger)
+    public General(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

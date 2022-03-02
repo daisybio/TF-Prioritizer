@@ -7,8 +7,11 @@ import util.Logger;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import static util.FileManagement.extend;
+
 public class FileStructure extends AbstractModule
 {
+    public final Config<String> s_session = new Config<>("session.xml");
     public final Config<File> d_root = extend(workingDirectory, "09_IGV_screenshots");
     public final Config<File> d_ownData = extend(d_root, "01_own_tf_data");
     public final Config<File> d_session = extend(d_root, "A_SESSIONS");
@@ -23,7 +26,7 @@ public class FileStructure extends AbstractModule
 
     public final Config<File> d_igvDcgTargetGenes = extend(d_root, "06_dcg_target_genes");
 
-    public FileStructure(File workingDirectory, File sourceDirectory, Logger logger)
+    public FileStructure(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

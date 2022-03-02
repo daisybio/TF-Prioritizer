@@ -22,7 +22,7 @@ public class Tgene extends AbstractModule
     public final Config<String> consensusCalc = new Config<>("INCREASE_TGENE_TFS");
     public final Config<String> mtWriting = new Config<>("MT");
 
-    public Tgene(File workingDirectory, File sourceDirectory, Logger logger)
+    public Tgene(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

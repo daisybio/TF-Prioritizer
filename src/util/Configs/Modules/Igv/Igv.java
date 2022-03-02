@@ -25,7 +25,7 @@ public class Igv extends AbstractModule
     public final Config<Integer> port = new Config<>(60151);
     public final Config<String> speciesReferenceGenome = new Config<>(String.class);
 
-    public Igv(File workingDirectory, File sourceDirectory, Logger logger)
+    public Igv(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

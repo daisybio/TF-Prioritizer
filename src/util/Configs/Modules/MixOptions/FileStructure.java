@@ -7,6 +7,8 @@ import util.Logger;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import static util.FileManagement.extend;
+
 public class FileStructure extends AbstractModule
 {
     public final Config<File> d_root = extend(workingDirectory, "00_MIX_OPTION");
@@ -20,7 +22,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_mutuallyExclusive_preprocessing = extend(d_mutuallyExclusive, "01_PREPROCESSING");
     public final Config<File> d_mutuallyExclusive_input = extend(d_mutuallyExclusive, "02_NEW_INPUT");
 
-    public FileStructure(File workingDirectory, File sourceDirectory, Logger logger)
+    public FileStructure(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

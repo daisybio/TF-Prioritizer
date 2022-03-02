@@ -21,7 +21,7 @@ public class Jaspar extends AbstractModule
             new Config<>("https://jaspar.genereg.net/static/logos/all/svg/", false);
 
 
-    public Jaspar(File workingDirectory, File sourceDirectory, Logger logger)
+    public Jaspar(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

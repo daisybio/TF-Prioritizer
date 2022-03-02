@@ -1,5 +1,7 @@
 package util;
 
+import util.Configs.Config;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -237,5 +239,15 @@ public class FileManagement
         {
             throw new IOException("Could not append content to file: " + file.getAbsolutePath());
         }
+    }
+
+    public static Config<File> extend(Config<File> fileConfig, String extension)
+    {
+        return new Config<>(extend(fileConfig.get(), extension));
+    }
+
+    public static File extend(File file, String extension)
+    {
+        return new File(file.getAbsolutePath() + File.separator + extension);
     }
 }

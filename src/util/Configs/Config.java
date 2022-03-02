@@ -92,4 +92,9 @@ public class Config<T>
         }
         return actualValue;
     }
+
+    public boolean isWriteable()
+    {
+        return writeable;
+    }
 }

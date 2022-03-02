@@ -17,7 +17,7 @@ public class MixOptions extends AbstractModule
     public final Config<Boolean> mutuallyExclusive = new Config<>(false);
     public final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals = new Config<>(true);
 
-    public MixOptions(File workingDirectory, File sourceDirectory, Logger logger)
+    public MixOptions(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);
