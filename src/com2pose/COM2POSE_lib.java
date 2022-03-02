@@ -1208,7 +1208,7 @@ public class COM2POSE_lib
                         f_output_tf_hm_tp.getAbsolutePath() + File.separator + options_intern.file_suffix_session);
                 f_save_session = igv_save_sessions(f_save_session, load_tf_chip_seq, tdf_files);
 
-                IGV_Headless igv = new IGV_Headless(options_intern, "igv_command");
+                IGV_Headless igv = new IGV_Headless(options_intern);
 
                 igv.addCommand("genome " + options_intern.igv_species_ref_genome);
 
@@ -1233,7 +1233,9 @@ public class COM2POSE_lib
                     igv.addCommand("snapshot " + snapshot_name);
                 }
 
-                igv.run(new File(f_output_tf_hm_tp.getAbsolutePath()));
+                igv.save(new File(f_output_tf_hm_tp.getAbsolutePath() + File.separator + "command.bat"));
+
+                new Thread(igv).start();
             }
         }
 
@@ -16905,7 +16907,7 @@ public class COM2POSE_lib
     private File igv_save_sessions(File f_output_file, String load_command, ArrayList<File> tdf_files) throws Exception
     {
         //save sessions
-        IGV_Headless igv = new IGV_Headless(options_intern, "create_session");
+        IGV_Headless igv = new IGV_Headless(options_intern);
 
         File f_session_tp_name = f_output_file;
 
@@ -16948,7 +16950,10 @@ public class COM2POSE_lib
 
         igv.addCommand("saveSession " + f_session_tp_name.getAbsolutePath());
 
-        igv.run(new File(f_session_tp_name.getParentFile().getAbsolutePath()));
+        igv.save(new File(f_session_tp_name.getParentFile().getAbsolutePath() + File.separator + "create_session.bat"));
+        Thread thread = new Thread(igv);
+        thread.start();
+        thread.join();
 
         return f_session_tp_name;
     }
