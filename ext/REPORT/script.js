@@ -1,3 +1,5 @@
+const textDownloadPrefix = "data:text/plain;charset=utf-8,";
+
 function toggleAccordion(id) {
     let panel = document.getElementById(id);
     if (panel.style.display === "grid") {
@@ -252,6 +254,33 @@ function get_depth(combinations) {
         i++;
     }
     return i;
+}
+
+function updateTfDownload() {
+    let button = document.getElementById("tfDownload");
+
+    let tfs = document.getElementsByClassName("tf");
+
+    let tfString = "";
+
+    for (let i = 0; i < tfs.length; i++) {
+        if (tfs[i].style.display != "none") {
+            tfString += tfs[i].id + "\n";
+        }
+    }
+
+    let fileName = "tfs_";
+
+    if (document.getElementById("searchTFNames").value != "") {
+        fileName += "nameFilter_" + document.getElementById("searchTFNames").value;
+    } else if (document.getElementById("searchTargetGenes").value != "") {
+        fileName += "targetGeneFilter_" + document.getElementById("searchTargetGenes").value;
+    } else {
+        fileName += "all";
+    }
+
+    button.download = fileName + ".csv";
+    button.href = textDownloadPrefix + tfString;
 }
 
 function filterTfsByName(term) {

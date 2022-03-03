@@ -2,8 +2,11 @@
     <h1>
         Prioritized transcription factors
     </h1>
-    <img onclick="toggleAccordion('info')" title="Download currently visible transcription factors as csv"
-         src="{RELATIVATION}MEDIA/download_dark.svg">
+    <a id="tfDownload" class="transparent" title="Download currently visible transcription factors as csv"
+       onclick="updateTfDownload()">
+        <img
+                src="{RELATIVATION}MEDIA/download_dark.svg">
+    </a>
     <img onclick="toggleAccordion('info')" src="{RELATIVATION}MEDIA/info_dark.svg">
 </div>
 <div class="panel text" id="info">
@@ -21,13 +24,13 @@
 </div>
 <div class="buttonbar">
     <label>
-        <input type="text" id="searchTFNames" placeholder="Search transcription factors"
+        <input type="text" id="searchTFNames" placeholder="Search by name"
                onkeyup="filterTfsByName(this.value)"
                onclick="document.getElementById('searchTargetGenes').value='';
                filterTfsByTargetGene('')">
     </label>
     <label>
-        <input type="text" id="searchTargetGenes" placeholder="Search target genes"
+        <input type="text" id="searchTargetGenes" placeholder="Search by target genes"
                onkeyup="filterTfsByTargetGene(this.value)"
                onclick="document.getElementById('searchTFNames').value='';
                filterTfsByName('')">

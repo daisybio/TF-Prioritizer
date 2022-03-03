@@ -1,10 +1,12 @@
 <div class="dataset">
     <div class="header">
-        <h3>{NAME}</h3>
-        <img onclick="toggleAccordion('{INFO-ID}')" src="{RELATIVATION}MEDIA/download_dark.svg">
-        <img onclick="toggleAccordion('{INFO-ID}')" src="{RELATIVATION}MEDIA/info_dark.svg">
+        <h3>{ANALYSIS-NAME}</h3>
+        <a class="transparent" download="{FILENAME}.csv" href="data:text/plain;charset=utf-8,{CSV-DATA}">
+            <img src="{RELATIVATION}MEDIA/download_dark.svg">
+        </a>
+        <img onclick="toggleAccordion('{TF-NAME}_{ANALYSIS-NAME}_info')" src="{RELATIVATION}MEDIA/info_dark.svg">
     </div>
-    <div class="panel text" id="{INFO-ID}">
+    <div class="panel text" id="{TF-NAME}_{ANALYSIS-NAME}_info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer condimentum purus
             a maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo
             condimentum elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum.

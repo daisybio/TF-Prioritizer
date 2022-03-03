@@ -331,8 +331,6 @@ public class PageGenerators
 
         String frame = StructureElements.getFrame(tfGroup.getName() + " - Validation", templateFile.getAbsolutePath());
 
-        frame = frame.replace("{TFNAME}", tfGroup.getName());
-
         frame = StructureElements.setBasicData(frame, tfGroup);
 
         {
@@ -448,6 +446,7 @@ public class PageGenerators
                 File tempDir = FileManagement.getFileIfInDirectory(sourceDir, "[0-9]+_" + tfGroup.getName(), false);
 
                 File sourceFile = FileManagement.getFileIfInDirectory(tempDir, ".+\\.png$", true);
+                File csvFile = FileManagement.getFileIfInDirectory(tempDir, ".+energy_matrix\\.csv$", true);
 
                 if (sourceFile != null)
                 {
@@ -456,6 +455,9 @@ public class PageGenerators
                     List<List<String>> options = new ArrayList<>();
 
                     options.add(new ArrayList<>(List.of(targetFile.getName())));
+
+                    frame = frame.replace("{CSV-BIOPHYSICALMODEL}",
+                            FileManagement.loadFile(csvFile.getAbsolutePath()).replace("\t", ","));
 
                     frame = frame.replace("{BIOPHYSICAL_MODEL}",
                             StructureElements.generateImageSelector(targetFile.getParentFile(), "logosBiophysicalModel",
@@ -554,6 +556,8 @@ public class PageGenerators
                             Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS,
                                     SelectorTypes.EMPTY_DROPDOWN)));
         } // IGV
+
+        frame = frame.replace("{TFNAME}", tfGroup.getName());
 
         frame = StructureElements.setGeneCardLinks(frame, tfGroup);
 

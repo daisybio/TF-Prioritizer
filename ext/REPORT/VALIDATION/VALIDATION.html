@@ -45,6 +45,10 @@
     <div class="panel" id="logos">
         <div class="accordion sub">
             <button class="text" onclick="toggleAccordion('logosBiophysicalModel')">Biophysical model</button>
+            <a class="download" download="{TFNAME}_biophysicalModel_energyMatrix.csv"
+               href="data:text/plain;charset=utf-8,{CSV-BIOPHYSICALMODEL}"><img
+                    src="{RELATIVATION}MEDIA/download.svg">
+            </a>
             <button class="image"
                     onclick="toggleAccordion('logosBiophysicalModel-info')"><img src="{RELATIVATION}MEDIA/info.svg">
             </button>
@@ -62,6 +66,10 @@
             <button class="text" onclick="toggleAccordion('logosTfSequence')" {TF_SEQUENCE_DISABLED}>TF sequence
                 (JASPAR)
             </button>
+            <a class="download" download="{TFNAME}_tfSequence_energyMatrix.csv"
+               href="data:text/plain;charset=utf-8,{CSV-TFSEQUENCE}"><img
+                    src="{RELATIVATION}MEDIA/download.svg">
+            </a>
             <button class="image"
                     onclick="toggleAccordion('logosTfSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
         </div>
@@ -76,6 +84,10 @@
         {TF_SEQUENCE}
         <div class="accordion sub" {TF_BINDING_SEQUENCE_VISIBLE}>
             <button class="text" onclick="toggleAccordion('logosTfBindingSequence')">TF binding sequence</button>
+            <a class="download" download="{TFNAME}_tfBindingSequence_energyMatrix.csv"
+               href="data:text/plain;charset=utf-8,{CSV-TFBINDINGSEQUENCE}"><img
+                    src="{RELATIVATION}MEDIA/download.svg">
+            </a>
             <button class="image"
                     onclick="toggleAccordion('logosTfBindingSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg">
             </button>

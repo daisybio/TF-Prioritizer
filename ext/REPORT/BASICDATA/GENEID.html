@@ -1,11 +1,12 @@
 <div class="dataset">
     <div class="header">
         <h3>GeneID</h3>
-        <img onclick="window.open('{GENECARDS-LINK}')" src="{RELATIVATION}MEDIA/geneCards.png"
-             title="Open geneCards in new tab">
-        <img onclick="toggleAccordion('{ID}-geneCards')" src="{RELATIVATION}MEDIA/info_dark.svg">
+        <a class="transparent" href="{GENECARDS-LINK}" target="_blank" title="Open geneCards in new tab">
+            <img src="{RELATIVATION}MEDIA/geneCards.png">
+        </a>
+        <img onclick="toggleAccordion('{TF-NAME}_geneCards_info')" src="{RELATIVATION}MEDIA/info_dark.svg">
     </div>
-    <div class="panel text" id="{ID}-geneCards">
+    <div class="panel text" id="{TF-NAME}_geneCards_info">
         <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer condimentum
             purus
             a maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo

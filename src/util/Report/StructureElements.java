@@ -43,7 +43,7 @@ public class StructureElements
         }}));
 
         template = template.replace("{NORMEX}",
-                getBasicDataEntry(transcriptionFactor.getName(), "Norm. expression", new HashMap<>()
+                getBasicDataEntry(transcriptionFactor.getName(), "Normalized expression", new HashMap<>()
                 {{
                     put("", transcriptionFactor.getNormex());
                 }}));
@@ -85,13 +85,73 @@ public class StructureElements
         String template = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
                 Report.options_intern.f_report_resources_basicdata_entry_html);
 
-        template = template.replace("{NAME}", name);
+        template = template.replace("{ANALYSIS-NAME}", name);
+
+        template = template.replace("{FILENAME}", tfName + "_" + name.replace(" ", "-"));
 
         template = template.replace("{DATA}", getTabularData(String.valueOf((tfName + " " + name).hashCode()), data));
 
-        template = template.replace("{INFO-ID}", tfName + "-" + name);
+        template = template.replace("{TF-NAME}", tfName);
+
+        template = template.replace("{CSV-DATA}", getCsvData(data));
 
         return template;
+    }
+
+    static String getCsvData(Map<String, Map<String, Number>> data)
+    {
+        if (data.size() == 0)
+        {
+            return "";
+        }
+
+        StringBuilder sb_data = new StringBuilder();
+
+        List<String> rows = new ArrayList<>(data.keySet());
+        Set<String> columnsSet = new HashSet<>();
+        Collections.sort(rows);
+
+        for (String row : rows)
+        {
+            columnsSet.addAll(data.get(row).keySet());
+        }
+
+        List<String> columns = new ArrayList<>(columnsSet);
+        Collections.sort(columns);
+
+        if (!(rows.size() == 1 && rows.get(0).isEmpty()))
+        {
+            sb_data.append(",");
+        }
+        for (String column : columns)
+        {
+            sb_data.append(column + ",");
+        }
+        sb_data.deleteCharAt(sb_data.toString().length() - 1);
+        sb_data.append("\n");
+
+        for (String row : rows)
+        {
+            if (!(rows.size() == 1 && rows.get(0).isEmpty()))
+            {
+                sb_data.append(row + ", ");
+            }
+
+            for (String column : columns)
+            {
+                if (!column.equals(row) && data.get(row).get(column) != null)
+                {
+                    sb_data.append(formatter.format(data.get(row).get(column)));
+                } else
+                {
+                    sb_data.append("-");
+                }
+                sb_data.append(",");
+            }
+            sb_data.append("\n");
+        }
+
+        return sb_data.toString();
     }
 
     static String getTabularData(String id, Map<String, Map<String, Number>> data)
