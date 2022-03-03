@@ -25,7 +25,15 @@ public class StructureElements
         log2fcTemplate = log2fcTemplate.replace("{DATA}",
                 getTabularData(transcriptionFactor.getName(), transcriptionFactor.getLog2fc()));
 
-        //template = template.replace("{LOG2FC}", log2fcTemplate);
+        log2fcTemplate = log2fcTemplate.replace("{INFO-ID}", transcriptionFactor.getName() + "-" + "log2fc");
+
+        template = template.replace("{GENEID}", FileManagement.loadFile(
+                Report.options_intern.path_to_COM2POSE + File.separator + "ext" + File.separator + "REPORT" +
+                        File.separator + "BASICDATA" + File.separator + "GENEID.html"));
+        template = template.replace("{GENE-ID}", transcriptionFactor.getGeneID());
+        template = template.replace("{GENECARDS-LINK}",
+                Report.options_intern.link_report_genecards.replace("{GENE}", transcriptionFactor.getName()));
+
         template = template.replace("{LOG2FC}",
                 getBasicDataEntry(transcriptionFactor.getName(), "LOG2FC", transcriptionFactor.getLog2fc()));
 
@@ -58,7 +66,6 @@ public class StructureElements
         {
             String tfString = tfTemplate.replace("{BASICDATA}", getBasicData(tf));
             tfString = tfString.replace("{ID}", String.valueOf(tf.getName().hashCode()));
-            tfString = tfString.replace("{GENEID}", tf.getGeneID());
             tfString = tfString.replace("{BUTTONBAR}", "");
             tfString = tfString.replace("{TF_NAME}", tf.getName());
             basicData.append(tfString);
@@ -81,6 +88,8 @@ public class StructureElements
         template = template.replace("{NAME}", name);
 
         template = template.replace("{DATA}", getTabularData(String.valueOf((tfName + " " + name).hashCode()), data));
+
+        template = template.replace("{INFO-ID}", tfName + "-" + name);
 
         return template;
     }

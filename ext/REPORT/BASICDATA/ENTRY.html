@@ -1,4 +1,15 @@
 <div class="dataset">
-    <h3>{NAME}</h3>
+    <div class="header">
+        <h3>{NAME}</h3>
+        <button onclick="toggleAccordion('{INFO-ID}')">
+            <img src="{RELATIVATION}MEDIA/info.svg">
+        </button>
+    </div>
+    <div class="panel text" id="{INFO-ID}">
+        <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer condimentum purus
+            a maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo
+            condimentum elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum.
+            Aliquam sit amet metus nisl.</label>
+    </div>
     {DATA}
 </div>
