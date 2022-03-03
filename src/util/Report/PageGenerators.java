@@ -107,7 +107,7 @@ public class PageGenerators
         top_log2fc = top_log2fc.replace("{IMAGES}",
                 StructureElements.generateImageSelector(targetDir.getName(), targetDir,
                         Arrays.asList(SelectorTypes.GROUP_PAIRINGS, SelectorTypes.TOP_LOG2FC,
-                                SelectorTypes.EMPTY_DROPDOWN)));
+                                SelectorTypes.EMPTY_DROPDOWN), true));
 
         FileManagement.writeHTML(Report.options_intern.com2pose_working_directory + File.separator +
                 Report.options_intern.f_out_report_top_log2fc_html, top_log2fc, 0);
@@ -554,7 +554,7 @@ public class PageGenerators
             frame = frame.replace("{VALIDATION_IGV}", (source == null) ? "" :
                     StructureElements.generateImageSelector(id, target,
                             Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS,
-                                    SelectorTypes.EMPTY_DROPDOWN)));
+                                    SelectorTypes.EMPTY_DROPDOWN), true));
         } // IGV
 
         frame = frame.replace("{TFNAME}", tfGroup.getName());

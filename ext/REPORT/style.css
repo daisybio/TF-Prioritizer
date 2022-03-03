@@ -101,7 +101,7 @@ button:disabled:hover {
 
 .panel {
     padding: 0 18px;
-    overflow: hidden;
+    overflow: visible;
     display: none;
 }
 
@@ -182,12 +182,16 @@ a.download {
     background-color: var(--c3);
 }
 
-.selector {
+.selector, .filterOption {
     background-color: var(--c4);
 }
 
-.selector.active {
+.selector.active, .filterOption.active {
     background-color: var(--c3);
+}
+
+.filterOption.active:hover {
+    cursor: pointer;
 }
 
 .modal.source {

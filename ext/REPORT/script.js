@@ -45,6 +45,61 @@ function tableMouseOut(gene, col, row) {
     rowHead.style.backgroundColor = "initial";
 }
 
+function getAllCombinationEntries(combinations) {
+    if (Array.isArray(combinations)) {
+        return new Set(combinations);
+    } else {
+        let childrenSet = new Set();
+        for (let i = 0; i < Object.keys(combinations).length; i++) {
+            let addSet = getAllCombinationEntries(combinations[Object.keys(combinations)[i]]);
+            addSet.forEach(entry => childrenSet.add(entry));
+        }
+        return childrenSet;
+    }
+}
+
+function init_filterOptions(id, combinations) {
+    let filterOptions = document.getElementsByClassName("filterOption " + id);
+
+    if (filterOptions.length > 0) {
+        let foundFilterOptions = new Set();
+        let regexTemplate = "^[0-9]+_{PREFIX}.+"
+        let entries = getAllCombinationEntries(combinations);
+
+        let symbolFilterOption;
+        for (let i = 0; i < filterOptions.length; i++) {
+            if (filterOptions[i].id.endsWith("Symbols")) {
+                symbolFilterOption = filterOptions[i];
+            }
+        }
+
+        entries.forEach(entry => {
+            let assigned = false;
+            for (let i = 0; i < filterOptions.length; i++) {
+                if (filterOptions[i] !== symbolFilterOption) {
+                    let regexString = regexTemplate.replace("{PREFIX}", filterOptions[i].value);
+                    if (new RegExp(regexTemplate.replace("{PREFIX}", filterOptions[i].value)).test(entry)) {
+                        foundFilterOptions.add(filterOptions[i]);
+                        assigned = true;
+                    }
+                }
+            }
+
+            if (!assigned) {
+                foundFilterOptions.add(symbolFilterOption);
+            }
+        });
+
+        for (let j = 0; j < filterOptions.length; j++) {
+            if (foundFilterOptions.has(filterOptions[j])) {
+                filterOptions[j].classList.add("active");
+            } else {
+                filterOptions[j].disabled = true;
+            }
+        }
+    }
+}
+
 function init_selection(id, combinations) {
     let firstValue;
 
@@ -119,24 +174,59 @@ function update_selection(source_element, id, combinations) {
 
             dropdownContent.appendChild(searchbox);
 
+            let filterOptions = document.getElementsByClassName("filterOption " + id);
+            let regexTemplate = "^[0-9]+_{PREFIX}.+"
+
+            let symbolFilterOption;
+            for (let i = 0; i < filterOptions.length; i++) {
+                if (filterOptions[i].id.endsWith("Symbols")) {
+                    symbolFilterOption = filterOptions[i];
+                    break;
+                }
+            }
+
             for (let i = 0; i < availableCombinations.length; i++) {
                 let option = document.createElement("button");
                 let value = availableCombinations[i];
-                option.value = value;
-                option.id = id + "-" + 2 + "-" + value;
-                option.classList.add("selector");
 
-                let text = value.replace(/\.[^/.]+$/, "");
-                if (/^[0-9]+_*/.test(text)) {
-                    text = text.substring(text.split("_")[0].length + 1);
+                let keepEntry = true;
+
+                if (filterOptions.length > 0) {
+                    let assigned = false;
+
+
+                    for (let j = 0; j < filterOptions.length; j++) {
+                        if (filterOptions[j] !== symbolFilterOption) {
+                            let regexString = regexTemplate.replace("{PREFIX}", filterOptions[j].value);
+                            if (new RegExp(regexString).test(value)) {
+                                keepEntry = filterOptions[j].classList.contains("active");
+                                assigned = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!assigned) {
+                        keepEntry = symbolFilterOption.classList.contains("active");
+                    }
                 }
 
-                option.textContent = (i + 1) + ". " + text;
-                option.addEventListener("click", function () {
-                    update_selection(option, id, combinations);
-                });
+                if (keepEntry) {
+                    option.value = value;
+                    option.id = id + "-" + 2 + "-" + value;
+                    option.classList.add("selector");
 
-                dropdownContent.appendChild(option);
+                    let text = value.replace(/\.[^/.]+$/, "");
+                    if (/^[0-9]+_*/.test(text)) {
+                        text = text.substring(text.split("_")[0].length + 1);
+                    }
+
+                    option.textContent = (i + 1) + ". " + text;
+                    option.addEventListener("click", function () {
+                        update_selection(option, id, combinations);
+                    });
+
+                    dropdownContent.appendChild(option);
+                }
             }
 
             let dropdownButton = document.getElementById(id + "-dropdown");
@@ -151,16 +241,36 @@ function update_selection(source_element, id, combinations) {
 
     { // Click first possible child
         if (level < depth) {
-            let firstPossibleChildValue;
+            let availableValues = [];
+
             if (Array.isArray(availableCombinations)) {
-                firstPossibleChildValue = availableCombinations[0];
+                availableValues = availableCombinations;
             } else {
-                firstPossibleChildValue = Object.keys(availableCombinations)[0];
+                availableValues = Array.from(Object.keys(availableCombinations));
             }
-            let term = id + "-" + (level + 1) + "-" + firstPossibleChildValue;
-            let firstPossibleChildNode = document.getElementById(term);
-            firstPossibleChildNode.disabled = false;
-            firstPossibleChildNode.click();
+
+            let currentlyActiveChild = getActiveElement('[id^="' + id + '-' + (level + 1) + '"]');
+
+            if (currentlyActiveChild !== null && availableValues.includes(currentlyActiveChild.value)) {
+                currentlyActiveChild.click()
+            } else {
+                let child;
+                let found = false;
+
+                for (let i = 0; i < availableValues.length; i++) {
+                    let term = id + "-" + (level + 1) + "-" + availableValues[i];
+                    child = document.getElementById(term);
+                    if (child !== null) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    child.disabled = false;
+                    child.click();
+                }
+            }
         }
     }
 
@@ -316,4 +426,26 @@ function filterTfsByTargetGene(term) {
             tfs[i].style.display = "none";
         }
     }
+}
+
+function toggleFilterActive(element, id, combinations) {
+    if (element.classList.contains("active")) {
+        element.classList.remove("active");
+    } else {
+        element.classList.add("active");
+    }
+
+    let firstChild = getActiveElement('[id^="' + id + '-0"]');
+    firstChild.click();
+}
+
+function getActiveElement(regex) {
+    let elements = document.querySelectorAll(regex);
+
+    for (let i = 0; i < elements.length; i++) {
+        if (elements[i].classList.contains("active")) {
+            return elements[i];
+        }
+    }
+    return null;
 }

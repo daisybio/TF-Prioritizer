@@ -312,6 +312,12 @@ public class StructureElements
 
     static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types)
     {
+        return generateImageSelector(id, sourceDir, types, false);
+    }
+
+    static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types,
+                                        boolean enableFilterOptions)
+    {
         List<List<String>> options = new ArrayList<>();
 
         for (SelectorTypes type : types)
@@ -319,14 +325,41 @@ public class StructureElements
             options.add(Report.existingValues.get(type));
         }
 
-        return generateImageSelector(sourceDir, id, options);
+        return generateImageSelector(sourceDir, id, options, enableFilterOptions);
     }
 
     static String generateImageSelector(File sourceDir, String id, List<List<String>> options)
     {
+        return generateImageSelector(sourceDir, id, options, false);
+    }
+
+    static String generateImageSelector(File sourceDir, String id, List<List<String>> options,
+                                        boolean enableFilterOptions)
+    {
         StringBuilder sb_imageSelector = new StringBuilder();
 
         sb_imageSelector.append("<div class='panel' id='{ID}'>");
+
+        if (enableFilterOptions)
+        {
+            sb_imageSelector.append("<div class='buttonbar'>");
+            sb_imageSelector.append(
+                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='MIR' id='" + id +
+                            "-filterMiRNA' class='filterOption " + id + "'>miRNA</button>");
+            sb_imageSelector.append(
+                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='ENSG' id='" + id +
+                            "-filterENSG' class='filterOption " + id + "'>ENSG</button>");
+            sb_imageSelector.append(
+                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='RNA' id='" + id +
+                            "-filterRNA' class='filterOption " + id + "'>RNA</button>");
+            sb_imageSelector.append(
+                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='PSEUDOGENE' id='" +
+                            id + "-filterPseudogenes' class='filterOption " + id + "'>Pseudogenes</button>");
+            sb_imageSelector.append(
+                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='' id='" + id +
+                            "-filterSymbols' class='filterOption " + id + "'>Symbols</button>");
+            sb_imageSelector.append("</div>");
+        }
 
         int i = 0;
 
@@ -448,6 +481,7 @@ public class StructureElements
         sb_imageSelector.append("</div>");
 
         sb_imageSelector.append("<script>let {ID}Combinations = {COMBINATIONS};</script>");
+        sb_imageSelector.append("<script>init_filterOptions(\"{ID}\", {ID}Combinations)</script>");
         sb_imageSelector.append("<script>init_selection(\"{ID}\", {ID}Combinations)</script>");
 
         String imageSelector = sb_imageSelector.toString().replace("{ID}", id);
