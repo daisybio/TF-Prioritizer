@@ -198,6 +198,10 @@ public class PageGenerators
 
         for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
         {
+            String prettyName = tfGroup.getName().replace("..", "_");
+            sb_tfs.append("<div class='tf' id='" + prettyName + "'>");
+            sb_tfs.append("<script>var targetGenes" + prettyName + " = " + tfGroup.getTargetGenes() + "</script>");
+
             if (!tfGroup.realGroup)
             {
                 for (TranscriptionFactor transcriptionFactor : tfGroup.getTranscriptionFactors())
@@ -232,6 +236,7 @@ public class PageGenerators
 
                 sb_tfs.append(tfGroupString);
             }
+            sb_tfs.append("</div>");
 
             i++;
         }

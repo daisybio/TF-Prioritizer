@@ -19,6 +19,20 @@
         elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
         metus nisl.</label>
 </div>
+<div class="buttonbar">
+    <label>
+        <input type="text" id="searchTFNames" placeholder="Search transcription factors"
+               onkeyup="filterTfsByName(this.value)"
+               onclick="document.getElementById('searchTargetGenes').value='';
+               filterTfsByTargetGene('')">
+    </label>
+    <label>
+        <input type="text" id="searchTargetGenes" placeholder="Search target genes"
+               onkeyup="filterTfsByTargetGene(this.value)"
+               onclick="document.getElementById('searchTFNames').value='';
+               filterTfsByName('')">
+    </label>
+</div>
 <div class="main">
     {TFS}
 </div>

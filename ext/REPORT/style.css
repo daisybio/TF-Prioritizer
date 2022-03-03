@@ -154,8 +154,12 @@ button.image {
     flex-wrap: wrap;
 }
 
-.buttonbar button, .buttonbar a {
+.buttonbar button, .buttonbar a, .buttonbar label {
     flex-grow: 1;
+}
+
+.buttonbar input {
+    width: -webkit-fill-available;
 }
 
 .panel .accordion button, .accordion.sub button {

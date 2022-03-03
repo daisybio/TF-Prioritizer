@@ -306,7 +306,8 @@ public class StructureElements
             {
                 sb_imageSelector.append("<div class='buttonbar centered'>");
 
-                sb_imageSelector.append("<button class='selector' onclick='openModal(\"{ID}-modal\")'>");
+                sb_imageSelector.append(
+                        "<button style='width: 15%' class='selector' onclick='openModal(\"{ID}-modal\")'>");
                 sb_imageSelector.append("Zoom in");
                 sb_imageSelector.append("</button>");
 
@@ -331,7 +332,8 @@ public class StructureElements
                 sb_imageSelector.append(">");
                 sb_imageSelector.append("</button>");
 
-                sb_imageSelector.append("<button class='selector' onclick='openImageInTab(\"{ID}-image\")'>");
+                sb_imageSelector.append(
+                        "<button style='width: 15%' class='selector' onclick='openImageInTab(\"{ID}-image\")'>");
                 sb_imageSelector.append("Open in new tab");
                 sb_imageSelector.append("</button>");
 

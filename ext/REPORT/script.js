@@ -253,3 +253,38 @@ function get_depth(combinations) {
     }
     return i;
 }
+
+function filterTfsByName(term) {
+    let tfs = document.getElementsByClassName("tf");
+
+    for (let i = 0; i < tfs.length; i++) {
+        if (tfs[i].id.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+            tfs[i].style.display = "";
+        } else {
+            tfs[i].style.display = "none";
+        }
+    }
+}
+
+function filterTfsByTargetGene(term) {
+    let tfs = document.getElementsByClassName("tf");
+
+    for (let i = 0; i < tfs.length; i++) {
+        let varName = "targetGenes" + tfs[i].id;
+        let targetGenes = window[varName];
+        let found = false;
+
+        for (let j = 0; j < targetGenes.length; j++) {
+            if (targetGenes[j].toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            tfs[i].style.display = "";
+        } else {
+            tfs[i].style.display = "none";
+        }
+    }
+}

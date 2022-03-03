@@ -5,6 +5,7 @@ import util.Logger;
 import util.Options_intern;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -237,6 +238,70 @@ public class Report
                 {
                     transcriptionFactorGroups.add(
                             new TranscriptionFactorGroup(tfGroupName, tf_group, regressionCoefficients));
+                }
+            }
+        }
+
+        loadTargetGenes();
+    }
+
+    private void loadTargetGenes() throws FileNotFoundException
+    {
+        File tfsDirectory = new File(
+                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_heatmap);
+
+        for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
+        {
+            File tfDirectory = FileManagement.getFileIfInDirectory(tfsDirectory, tfGroup.getName(), false);
+
+            if (tfDirectory == null)
+            {
+                continue;
+            }
+
+            for (File d_hm : Objects.requireNonNull(tfDirectory.listFiles()))
+            {
+                for (File f_data : Objects.requireNonNull(d_hm.listFiles()))
+                {
+                    if (f_data.getName().endsWith(".csv"))
+                    {
+                        try (Scanner scanner = new Scanner(f_data))
+                        {
+                            boolean first = true;
+                            int c_geneID = -1, c_geneSymbol = -1;
+
+                            while (scanner.hasNextLine())
+                            {
+                                String[] line = scanner.nextLine().split(",");
+
+                                if (first)
+                                {
+                                    for (int i = 0; i < line.length; i++)
+                                    {
+                                        String strippedEntry = line[i].substring(1, line[i].length() - 1);
+
+                                        if (strippedEntry.equals("geneID"))
+                                        {
+                                            c_geneID = i;
+                                        } else if (strippedEntry.equals("geneSymbol"))
+                                        {
+                                            c_geneSymbol = i;
+                                        }
+                                    }
+
+                                    if (c_geneID == -1 || c_geneSymbol == -1)
+                                    {
+                                        break;
+                                    }
+
+                                    first = false;
+                                } else
+                                {
+                                    tfGroup.addTargetGene(line[c_geneSymbol], line[c_geneID]);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
