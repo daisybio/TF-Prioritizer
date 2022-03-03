@@ -127,9 +127,20 @@ button img {
     max-height: 50px;
 }
 
-.dataset button img {
-    max-width: 30px;
-    max-height: 30px;
+.header img {
+    max-width: 50px;
+    max-height: 50px;
+    margin: 5px;
+}
+
+.dataset img {
+    max-width: 40px;
+    max-height: 40px;
+    margin: 5px;
+}
+
+.dataset img:hover, .header img:hover {
+    cursor: pointer;
 }
 
 button.image {
