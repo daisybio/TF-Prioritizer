@@ -208,20 +208,22 @@ public class StructureElements
             sb_links.append("<div class='geneCards dropdown content' id='geneCardsDropdown-dropdown-content'>");
             for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
             {
-                sb_links.append("<button class='dropdown geneCards' onclick='window.open(\"" +
-                        Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) + "\");'>");
+                sb_links.append("<a class='dropdown geneCards' href='" +
+                        Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) + "', target" +
+                        "='_blank'>");
                 sb_links.append(tf.getName());
-                sb_links.append("</button>");
+                sb_links.append("</a>");
             }
             sb_links.append("</div>");
             sb_links.append("</div>");
             sb_links.append("<script>add_dropdown_closing('geneCardsDropdown');</script>");
         } else
         {
-            sb_links.append("<button onclick='window.open(\"" +
-                    Report.options_intern.link_report_genecards.replace("{GENE}", tfGroup.getName()) + "\");'>");
+            sb_links.append(
+                    "<a href='" + Report.options_intern.link_report_genecards.replace("{GENE}", tfGroup.getName()) +
+                            "' target" + "='_blank'>");
             sb_links.append("GeneCards");
-            sb_links.append("</button>");
+            sb_links.append("</a>");
         }
 
         return text.replace("{GENECARD_LINKS}", sb_links.toString());
