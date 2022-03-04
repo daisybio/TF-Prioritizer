@@ -2,6 +2,9 @@ package util.Report;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -98,7 +101,7 @@ public class StructureElements
         return template;
     }
 
-    static String getCsvData(Map<String, Map<String, Number>> data)
+    static String getCsvData(Map<String, Map<String, Number>> data) throws UnsupportedEncodingException
     {
         if (data.size() == 0)
         {
@@ -151,7 +154,7 @@ public class StructureElements
             sb_data.append("\n");
         }
 
-        return sb_data.toString();
+        return URLEncoder.encode(sb_data.toString(), StandardCharsets.UTF_8.toString());
     }
 
     static String getTabularData(String id, Map<String, Map<String, Number>> data)
@@ -344,20 +347,16 @@ public class StructureElements
         {
             sb_imageSelector.append("<div class='buttonbar'>");
             sb_imageSelector.append(
-                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='MIR' id='" + id +
-                            "-filterMiRNA' class='filterOption " + id + "'>miRNA</button>");
+                    "<button value='MIR' id='" + id + "-filterMiRNA' class='filterOption " + id + "'>miRNA</button>");
             sb_imageSelector.append(
-                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='ENSG' id='" + id +
-                            "-filterENSG' class='filterOption " + id + "'>ENSG</button>");
+                    "<button value='ENSG' id='" + id + "-filterENSG' class='filterOption " + id + "'>ENSG</button>");
             sb_imageSelector.append(
-                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='RNA' id='" + id +
-                            "-filterRNA' class='filterOption " + id + "'>RNA</button>");
+                    "<button value='RNA' id='" + id + "-filterRNA' class='filterOption " + id + "'>RNA</button>");
             sb_imageSelector.append(
-                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='PSEUDOGENE' id='" +
-                            id + "-filterPseudogenes' class='filterOption " + id + "'>Pseudogenes</button>");
+                    "<button value='PSEUDOGENE' id='" + id + "-filterPseudogenes' class='filterOption " + id +
+                            "'>Pseudogenes</button>");
             sb_imageSelector.append(
-                    "<button onclick='toggleFilterActive(this, \"{ID}\", {ID}Combinations)' value='' id='" + id +
-                            "-filterSymbols' class='filterOption " + id + "'>Symbols</button>");
+                    "<button value='' id='" + id + "-filterSymbols' class='filterOption " + id + "'>Symbols</button>");
             sb_imageSelector.append("</div>");
         }
 
@@ -390,7 +389,7 @@ public class StructureElements
                     sb_imageSelector.append("<button class='{ID} selector' value='").append(value).append("' id='{ID}-")
                             .append(i).append("-").append(value).append("' " +
                                     ((options.size() == 1 && levelOptions.size() == 1) ? "style='display: none'" : "") +
-                                    " onclick='update_selection(this, \"{ID}\", {ID}Combinations)'>");
+                                    " onclick='update_selection(this, \"{ID}\")'>");
                     sb_imageSelector.append(entry);
                     sb_imageSelector.append("</button>");
                 }
@@ -400,8 +399,8 @@ public class StructureElements
                 sb_imageSelector.append("<div class='buttonbar centered'>");
 
                 sb_imageSelector.append(
-                        "<button style='width: 15%' class='selector' onclick='openModal(\"{ID}-modal\")'>");
-                sb_imageSelector.append("Zoom in");
+                        "<button style='width: 15%' class='selector' onclick='downloadActive(\"{ID}\")'>");
+                sb_imageSelector.append("Download data");
                 sb_imageSelector.append("</button>");
 
                 sb_imageSelector.append(
@@ -421,7 +420,7 @@ public class StructureElements
 
                 sb_imageSelector.append(
                         "<button class='selector narrow' id='{ID}-previous-option' onclick='move_lowest_level" +
-                                "(\"{ID}\", 1, " + "{ID}Combinations)'>");
+                                "(\"{ID}\", 1)'>");
                 sb_imageSelector.append(">");
                 sb_imageSelector.append("</button>");
 
@@ -442,6 +441,10 @@ public class StructureElements
 
                 sb_imageSelector.append("<button class='selector' onclick='openModal(\"{ID}-modal\")'>");
                 sb_imageSelector.append("Zoom in");
+                sb_imageSelector.append("</button>");
+
+                sb_imageSelector.append("<button class='selector' onclick='downloadActive(\"{ID}\")'>");
+                sb_imageSelector.append("Download data");
                 sb_imageSelector.append("</button>");
 
                 sb_imageSelector.append("<button class='selector' onclick='openImageInTab(\"{ID}-image\")'>");
@@ -467,11 +470,11 @@ public class StructureElements
 
             sb_imageSelector.append("<div class='buttonbar'>");
             sb_imageSelector.append(
-                    "<button class=\"modal button\" id=\"{ID}-modal-leftarrow\"onclick=\"move_lowest_level('{ID}', -1, {ID}Combinations)\">\n" +
+                    "<button class=\"modal button\" id=\"{ID}-modal-leftarrow\"onclick=\"move_lowest_level('{ID}', -1)\">\n" +
                             "            &lt;</button>");
             sb_imageSelector.append("<img class=\"modal content\" id=\"{ID}-modal-image\">");
             sb_imageSelector.append(
-                    "<button class=\"modal button\" id=\"{ID}-modal-rightarrow\" onclick=\"move_lowest_level('{ID}', 1, {ID}Combinations)\">\n" +
+                    "<button class=\"modal button\" id=\"{ID}-modal-rightarrow\" onclick=\"move_lowest_level('{ID}', 1)\">\n" +
                             "            &gt;</button>");
             sb_imageSelector.append("</div>");
 
@@ -480,9 +483,11 @@ public class StructureElements
 
         sb_imageSelector.append("</div>");
 
-        sb_imageSelector.append("<script>let {ID}Combinations = {COMBINATIONS};</script>");
-        sb_imageSelector.append("<script>init_filterOptions(\"{ID}\", {ID}Combinations)</script>");
-        sb_imageSelector.append("<script>init_selection(\"{ID}\", {ID}Combinations)</script>");
+        sb_imageSelector.append("<script>var {ID}CombinationsUnfiltered = {COMBINATIONS};</script>");
+        sb_imageSelector.append("<script>var {ID}Combinations = {COMBINATIONS};</script>");
+        sb_imageSelector.append("<script>var {ID}DataCombinations = {DATACOMBINATIONS};</SCRIPT>");
+        sb_imageSelector.append("<script>init_filterOptions(\"{ID}\")</script>");
+        sb_imageSelector.append("<script>init_selection(\"{ID}\")</script>");
 
         String imageSelector = sb_imageSelector.toString().replace("{ID}", id);
 

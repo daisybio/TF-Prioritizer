@@ -1,10 +1,12 @@
 package util.Report;
 
-import javax.swing.*;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class PageGenerators
 {
@@ -457,7 +459,8 @@ public class PageGenerators
                     options.add(new ArrayList<>(List.of(targetFile.getName())));
 
                     frame = frame.replace("{CSV-BIOPHYSICALMODEL}",
-                            FileManagement.loadFile(csvFile.getAbsolutePath()).replace("\t", ","));
+                            URLEncoder.encode(FileManagement.loadFile(csvFile.getAbsolutePath()).replace("\t", ","),
+                                    StandardCharsets.UTF_8.toString()));
 
                     frame = frame.replace("{BIOPHYSICAL_MODEL}",
                             StructureElements.generateImageSelector(targetFile.getParentFile(), "logosBiophysicalModel",
@@ -504,6 +507,25 @@ public class PageGenerators
                     frame = frame.replace("{TF_SEQUENCE}", "");
                 }
                 frame = frame.replace("{TF_SEQUENCE_DISABLED}", created ? "" : "disabled");
+
+                if (created)
+                {
+                    StringBuilder sb_download = new StringBuilder();
+                    for (File file : sourceDir.listFiles())
+                    {
+                        if (file.getName().endsWith(".json"))
+                        {
+                            sb_download.append("download('");
+                            sb_download.append(URLEncoder.encode(FileManagement.loadFile(file.getAbsolutePath()),
+                                    StandardCharsets.UTF_8));
+                            // TODO: Make json prettier
+                            sb_download.append("', '");
+                            sb_download.append(tfGroup.getName()).append("_").append(file.getName());
+                            sb_download.append("');");
+                        }
+                    }
+                    frame = frame.replace("{TFSEQUENCE-DOWNLOAD}", sb_download.toString());
+                }
             } // TF Sequence
 
             {
@@ -528,6 +550,11 @@ public class PageGenerators
 
                 frame = frame.replace("{TF_BINDING_SEQUENCE_VISIBLE}",
                         sourceDir == null ? "style='display: none'" : "");
+
+                if (sourceDir != null)
+                {
+
+                }
             } // TF binding sequence
         } // LOGOS
 
@@ -555,6 +582,47 @@ public class PageGenerators
                     StructureElements.generateImageSelector(id, target,
                             Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS,
                                     SelectorTypes.EMPTY_DROPDOWN), true));
+
+            {
+                Map<String, Set<String>> csvSetData = new HashMap<>();
+
+                for (File d_hm : target.listFiles())
+                {
+                    csvSetData.put(d_hm.getName(), new HashSet<>());
+                    for (File d_groupPairing : d_hm.listFiles())
+                    {
+                        for (File f_targetGene : d_groupPairing.listFiles())
+                        {
+                            String name = f_targetGene.getName();
+                            if (name.endsWith(".png"))
+                            {
+                                name = name.split("_")[1];
+                                name = name.split("\\.")[0];
+                                csvSetData.get(d_hm.getName()).add(name);
+                            }
+                        }
+                    }
+                }
+
+                JSONObject jsonObject = new JSONObject();
+
+                for (String hm : Report.existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS))
+                {
+                    StringBuilder sb_hm = new StringBuilder();
+                    sb_hm.append("GeneSymbol,ENSG\n");
+
+                    for (String targetGeneSymbol : csvSetData.get(hm))
+                    {
+                        sb_hm.append(targetGeneSymbol);
+                        sb_hm.append(",");
+                    }
+                }
+
+                frame = frame.replace("{IGV-CSV-DATA}",
+                        URLEncoder.encode(jsonObject.toString(), StandardCharsets.UTF_8.toString()));
+            }
+
+
         } // IGV
 
         frame = frame.replace("{TFNAME}", tfGroup.getName());

@@ -2,7 +2,9 @@
     <h1>
         {TFNAME}: Validation Analysis
     </h1>
-    <img onclick="toggleAccordion('info')" src="{RELATIVATION}MEDIA/info_dark.svg">
+    <button onclick="toggleAccordion('info')">
+        <img src="{RELATIVATION}MEDIA/info_dark.svg">
+    </button>
 </div>
 <div class="panel text" id="info">
     <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
@@ -45,10 +47,10 @@
     <div class="panel" id="logos">
         <div class="accordion sub">
             <button class="text" onclick="toggleAccordion('logosBiophysicalModel')">Biophysical model</button>
-            <a class="download" download="{TFNAME}_biophysicalModel_energyMatrix.csv"
-               href="data:text/plain;charset=utf-8,{CSV-BIOPHYSICALMODEL}"><img
-                    src="{RELATIVATION}MEDIA/download.svg">
-            </a>
+            <button class="download"
+                    onclick="download('{CSV-BIOPHYSICALMODEL}', '{TFNAME}_biophysicalModel_energyMatrix.csv')">
+                <img src="{RELATIVATION}MEDIA/download.svg">
+            </button>
             <button class="image"
                     onclick="toggleAccordion('logosBiophysicalModel-info')"><img src="{RELATIVATION}MEDIA/info.svg">
             </button>
@@ -66,10 +68,9 @@
             <button class="text" onclick="toggleAccordion('logosTfSequence')" {TF_SEQUENCE_DISABLED}>TF sequence
                 (JASPAR)
             </button>
-            <a class="download" download="{TFNAME}_tfSequence_energyMatrix.csv"
-               href="data:text/plain;charset=utf-8,{CSV-TFSEQUENCE}"><img
-                    src="{RELATIVATION}MEDIA/download.svg">
-            </a>
+            <button class="download" onclick="{TFSEQUENCE-DOWNLOAD}" {TF_SEQUENCE_DISABLED}>
+                <img src="{RELATIVATION}MEDIA/download.svg">
+            </button>
             <button class="image"
                     onclick="toggleAccordion('logosTfSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
         </div>
@@ -84,10 +85,6 @@
         {TF_SEQUENCE}
         <div class="accordion sub" {TF_BINDING_SEQUENCE_VISIBLE}>
             <button class="text" onclick="toggleAccordion('logosTfBindingSequence')">TF binding sequence</button>
-            <a class="download" download="{TFNAME}_tfBindingSequence_energyMatrix.csv"
-               href="data:text/plain;charset=utf-8,{CSV-TFBINDINGSEQUENCE}"><img
-                    src="{RELATIVATION}MEDIA/download.svg">
-            </a>
             <button class="image"
                     onclick="toggleAccordion('logosTfBindingSequence-info')"><img src="{RELATIVATION}MEDIA/info.svg">
             </button>
@@ -125,6 +122,9 @@
             top
             target genes
         </button>
+        <button class="download"
+                onclick="download('{IGV-CSV-DATA}', '{TFNAME}-targetGenes.csv')"><img
+                src="{RELATIVATION}MEDIA/download.svg"></button>
         <button class="image"
                 onclick="toggleAccordion('validationIGV-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
     </div>

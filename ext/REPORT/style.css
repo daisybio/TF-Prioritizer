@@ -41,10 +41,6 @@ button, input, a {
     text-align: center;
 }
 
-a.transparent {
-    background-color: transparent;
-}
-
 button:hover, a:hover {
     opacity: 1;
     cursor: pointer;
@@ -53,10 +49,6 @@ button:hover, a:hover {
 button.active {
     opacity: 0.94;
     cursor: default;
-}
-
-button:disabled {
-    background-color: var(--disabledbutton);
 }
 
 button:disabled:hover {
@@ -76,8 +68,12 @@ button:disabled:hover {
     margin: 5px;
 }
 
-.dataset .header button {
-    background-color: var(--c4);
+.header button {
+    background-color: transparent;
+}
+
+.header button:hover {
+    background-color: rgba(var(--black), 0.1);
 }
 
 .header h1, .header h2, .header h3 {
@@ -136,11 +132,7 @@ button img, a img {
     margin: 5px;
 }
 
-.dataset img:hover, .header img:hover {
-    cursor: pointer;
-}
-
-button.image, a.download {
+button.image, button.download {
     font-size: 0;
     padding: 10px;
     border-bottom-left-radius: 0;
@@ -149,7 +141,7 @@ button.image, a.download {
     justify-self: end;
 }
 
-a.download {
+button.download {
     border-radius: 0;
 }
 
@@ -184,6 +176,10 @@ a.download {
 
 .selector, .filterOption {
     background-color: var(--c4);
+}
+
+.selector img {
+    max-height: 25px;
 }
 
 .selector.active, .filterOption.active {
@@ -289,11 +285,13 @@ td:hover {
 
 button.dropdown {
     background-color: var(--c3);
-    min-width: 200px;
+    min-width: 280px;
 }
 
 .selector.narrow {
     max-width: max-content;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .dropdown.container {
@@ -304,8 +302,8 @@ button.dropdown {
 .dropdown.content {
     display: none;
     position: absolute;
-    left: -300px;
-    right: -300px;
+    left: -250px;
+    right: -250px;
     z-index: 1;
     top: 40px;
 }
@@ -353,4 +351,8 @@ button.geneCards.dropdown {
 
 input {
     text-align: center;
+}
+
+button:disabled, .panel .accordion button:disabled, .accordion.sub button:disabled {
+    background-color: var(--disabledbutton);
 }

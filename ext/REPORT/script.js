@@ -33,16 +33,24 @@ function tableMouseOver(gene, col, row) {
     colHead = document.getElementById(gene + "-col-" + col);
     rowHead = document.getElementById(gene + "-row-" + row);
 
-    colHead.style.backgroundColor = "rgba(var(--black), 0.1)";
-    rowHead.style.backgroundColor = "rgba(var(--black), 0.1)";
+    if (colHead !== null) {
+        colHead.style.backgroundColor = "rgba(var(--black), 0.1)";
+    }
+    if (rowHead !== null) {
+        rowHead.style.backgroundColor = "rgba(var(--black), 0.1)";
+    }
 }
 
 function tableMouseOut(gene, col, row) {
     colHead = document.getElementById(gene + "-col-" + col);
     rowHead = document.getElementById(gene + "-row-" + row);
 
-    colHead.style.backgroundColor = "initial";
-    rowHead.style.backgroundColor = "initial";
+    if (colHead !== null) {
+        colHead.style.backgroundColor = "initial";
+    }
+    if (rowHead !== null) {
+        rowHead.style.backgroundColor = "initial";
+    }
 }
 
 function getAllCombinationEntries(combinations) {
@@ -58,7 +66,8 @@ function getAllCombinationEntries(combinations) {
     }
 }
 
-function init_filterOptions(id, combinations) {
+function init_filterOptions(id) {
+    let combinations = window[id + "CombinationsUnfiltered"];
     let filterOptions = document.getElementsByClassName("filterOption " + id);
 
     if (filterOptions.length > 0) {
@@ -90,30 +99,52 @@ function init_filterOptions(id, combinations) {
             }
         });
 
-        for (let j = 0; j < filterOptions.length; j++) {
-            if (foundFilterOptions.has(filterOptions[j])) {
-                filterOptions[j].classList.add("active");
+        for (let filterOption of filterOptions) {
+            if (foundFilterOptions.has(filterOption)) {
+                filterOption.classList.add("active");
+                filterOption.addEventListener("click", () => {
+                    toggleFilterActive(filterOption, id);
+                    window[id + "Combinations"] = getFilteredCombinations(id);
+                    init_selection(id, window[id + "Combinations"]);
+                });
             } else {
-                filterOptions[j].disabled = true;
+                filterOption.disabled = true;
+                filterOption.title = "This gene type is not present in this analysis"
             }
+        }
+
+        if (countActiveElements(filterOptions) === 1) {
+            getActiveElement(filterOptions).click();
+            //filterOptions[0].parentElement.style.display = "none";
         }
     }
 }
 
-function init_selection(id, combinations) {
+function init_selection(id) {
+    let combinations = window[id + "Combinations"];
     let firstValue;
+    let availableValues;
 
     if (Array.isArray(combinations)) {
-        firstValue = combinations[0];
+        availableValues = combinations;
     } else {
-        firstValue = Object.keys(combinations)[0];
+        availableValues = Object.keys(combinations);
     }
 
-    let firstButton = document.getElementById(id + "-0-" + firstValue);
-    firstButton.click();
+    let activeChild = getActiveElement(document.querySelectorAll('[id^="' + id + '-0"]'));
+    if (activeChild !== null && availableValues.includes(activeChild.value)) {
+        activeChild.click();
+    } else {
+        let term = id + "-0-" + availableValues[0];
+        let firstChild = document.getElementById(term);
+        if (firstChild !== null) {
+            firstChild.click();
+        }
+    }
 }
 
-function update_selection(source_element, id, combinations) {
+function update_selection(source_element, id) {
+    let combinations = window[id + "Combinations"];
     let level = parseInt(source_element.id.split("-")[1]);
     let depth = get_depth(combinations);
 
@@ -175,7 +206,7 @@ function update_selection(source_element, id, combinations) {
             dropdownContent.appendChild(searchbox);
 
             let filterOptions = document.getElementsByClassName("filterOption " + id);
-            let regexTemplate = "^[0-9]+_{PREFIX}.+"
+            let regexTemplate = "^[0-9]+_{PREFIX}.+";
 
             let symbolFilterOption;
             for (let i = 0; i < filterOptions.length; i++) {
@@ -249,7 +280,7 @@ function update_selection(source_element, id, combinations) {
                 availableValues = Array.from(Object.keys(availableCombinations));
             }
 
-            let currentlyActiveChild = getActiveElement('[id^="' + id + '-' + (level + 1) + '"]');
+            let currentlyActiveChild = getActiveElement(document.querySelectorAll('[id^="' + id + '-' + (level + 1) + '"]'));
 
             if (currentlyActiveChild !== null && availableValues.includes(currentlyActiveChild.value)) {
                 currentlyActiveChild.click()
@@ -300,7 +331,8 @@ function update_selection(source_element, id, combinations) {
     }
 }
 
-function move_lowest_level(id, delta, combinations) {
+function move_lowest_level(id, delta) {
+    let combinations = window[id + "Combinations"];
     let options = document.querySelectorAll('[id^="' + id + '-' + get_depth(combinations) + '"]');
     let i;
 
@@ -366,7 +398,7 @@ function get_depth(combinations) {
     return i;
 }
 
-function updateTfDownload() {
+function downloadVisibleTfs() {
     let button = document.getElementById("tfDownload");
 
     let tfs = document.getElementsByClassName("tf");
@@ -389,8 +421,7 @@ function updateTfDownload() {
         fileName += "all";
     }
 
-    button.download = fileName + ".csv";
-    button.href = textDownloadPrefix + tfString;
+    download(tfString, fileName + ".csv");
 }
 
 function filterTfsByName(term) {
@@ -428,24 +459,117 @@ function filterTfsByTargetGene(term) {
     }
 }
 
-function toggleFilterActive(element, id, combinations) {
+function toggleFilterActive(element, id) {
+    let filterOptions = document.getElementsByClassName("filterOption " + id);
+
     if (element.classList.contains("active")) {
-        element.classList.remove("active");
+        if (countActiveElements(filterOptions) > 1) {
+            element.classList.remove("active");
+        }
+        if (countActiveElements(filterOptions) === 1) {
+            let lastActive = getActiveElement(filterOptions);
+            lastActive.style.cursor = "not-allowed";
+            lastActive.title = "At least one gene type has to be active";
+        }
     } else {
         element.classList.add("active");
-    }
 
-    let firstChild = getActiveElement('[id^="' + id + '-0"]');
-    firstChild.click();
+        for (let filterOption of filterOptions) {
+            if (!filterOption.disabled) {
+                filterOption.style.cursor = "pointer";
+                filterOption.removeAttribute("title");
+            }
+        }
+    }
 }
 
-function getActiveElement(regex) {
-    let elements = document.querySelectorAll(regex);
-
-    for (let i = 0; i < elements.length; i++) {
-        if (elements[i].classList.contains("active")) {
-            return elements[i];
+function getActiveElement(elements) {
+    for (let element of elements) {
+        if (element.classList.contains("active")) {
+            return element;
         }
     }
     return null;
+}
+
+function getFilteredCombinations(id) {
+    let allCombinations = window[id + "CombinationsUnfiltered"];
+    let filterOptions = document.getElementsByClassName("filterOption " + id);
+    let regexTemplate = "^[0-9]+_{PREFIX}.+";
+
+    let symbolFilterOption;
+    for (let filterOption of filterOptions) {
+        if (filterOption.id.endsWith("Symbols")) {
+            symbolFilterOption = filterOption;
+            break;
+        }
+    }
+
+    function filterCombination(allCombinations) {
+        if (Array.isArray(allCombinations)) {
+            let filteredCombinations = [];
+
+            for (let entry of allCombinations) {
+                let keep = false;
+                for (let filterOption of filterOptions) {
+                    if (filterOption !== symbolFilterOption && new RegExp(regexTemplate.replace("{PREFIX}", filterOption.value)).test(entry)) {
+                        keep = filterOption.classList.contains("active");
+                    }
+                }
+                if (!keep) {
+                    keep = symbolFilterOption.classList.contains("active");
+                }
+                if (keep) {
+                    filteredCombinations.push(entry);
+                }
+            }
+
+            return filteredCombinations;
+        } else {
+            let filteredCombinations = {};
+
+            for (let [key, value] of Object.entries(allCombinations)) {
+                let values = filterCombination(value);
+
+                if (Array.isArray(values) && values.length > 0) {
+                    filteredCombinations[key] = values;
+                } else if (Object.keys(values).length > 0) {
+                    filteredCombinations[key] = values;
+                }
+            }
+
+            return filteredCombinations;
+        }
+    }
+
+    return filterCombination(allCombinations);
+}
+
+function download(text, filename) {
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + text);
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+function countActiveElements(elements) {
+    let activeCount = 0;
+
+    for (let element of elements) {
+        if (element.classList.contains("active")) {
+            activeCount++;
+        }
+    }
+
+    return activeCount;
+}
+
+function downloadActive(id) {
+    console.log(id);
 }
