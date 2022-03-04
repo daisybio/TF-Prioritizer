@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 
+import com2pose.COM2POSE;
+import org.json.JSONObject;
 import util.FileManagement;
 
 public class StructureElements
@@ -16,12 +18,11 @@ public class StructureElements
 
     static String getBasicData(TranscriptionFactor transcriptionFactor) throws IOException
     {
-        String template = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_basicdata_html);
+        String template = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_basicData.get());
 
 
-        String log2fcTemplate = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_basicdata_entry_html);
+        String log2fcTemplate =
+                FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_basicDataEntry.get());
 
         log2fcTemplate = log2fcTemplate.replace("{NAME}", "LOG2FC");
 
@@ -30,12 +31,11 @@ public class StructureElements
 
         log2fcTemplate = log2fcTemplate.replace("{INFO-ID}", transcriptionFactor.getName() + "-" + "log2fc");
 
-        template = template.replace("{GENEID}", FileManagement.loadFile(
-                Report.options_intern.path_to_COM2POSE + File.separator + "ext" + File.separator + "REPORT" +
-                        File.separator + "BASICDATA" + File.separator + "GENEID.html"));
+        template = template.replace("{GENEID}",
+                FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_basicDataGeneID.get()));
         template = template.replace("{GENE-ID}", transcriptionFactor.getGeneID());
         template = template.replace("{GENECARDS-LINK}",
-                Report.options_intern.link_report_genecards.replace("{GENE}", transcriptionFactor.getName()));
+                COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", transcriptionFactor.getName()));
 
         template = template.replace("{LOG2FC}",
                 getBasicDataEntry(transcriptionFactor.getName(), "LOG2FC", transcriptionFactor.getLog2fc()));
@@ -62,8 +62,7 @@ public class StructureElements
         }
 
         StringBuilder basicData = new StringBuilder();
-        String tfTemplate = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_home_tf_html);
+        String tfTemplate = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_home_tf.get());
 
         for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
         {
@@ -85,8 +84,7 @@ public class StructureElements
             return "";
         }
 
-        String template = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_basicdata_entry_html);
+        String template = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_basicDataEntry.get());
 
         template = template.replace("{ANALYSIS-NAME}", name);
 
@@ -236,8 +234,7 @@ public class StructureElements
 
     static String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        String buttonbar = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_home_buttonbar_html);
+        String buttonbar = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_home_buttonbar.get());
 
         buttonbar = buttonbar.replace("{VALIDATION}",
                 "VALIDATION" + File.separator + tfGroup.getName() + File.separator + tfGroup.getName() + ".html");
@@ -253,14 +250,13 @@ public class StructureElements
         return buttonbar;
     }
 
-    static String getFrame(String title, String bodyPath) throws IOException
+    static String getFrame(String title, File bodyFile) throws IOException
     {
-        String frame = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_frame_html);
+        String frame = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_frame.get());
 
         frame = frame.replace("{TITLE}", title);
 
-        String body = FileManagement.loadFile(bodyPath);
+        String body = FileManagement.loadFile(bodyFile);
 
         frame = frame.replace("{BODY}", body);
 
@@ -281,7 +277,7 @@ public class StructureElements
             for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
             {
                 sb_links.append("<a class='dropdown geneCards' href='" +
-                        Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) + "', target" +
+                        COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", tf.getName()) + "', target" +
                         "='_blank'>");
                 sb_links.append(tf.getName());
                 sb_links.append("</a>");
@@ -292,7 +288,7 @@ public class StructureElements
         } else
         {
             sb_links.append(
-                    "<a href='" + Report.options_intern.link_report_genecards.replace("{GENE}", tfGroup.getName()) +
+                    "<a href='" + COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", tfGroup.getName()) +
                             "' target" + "='_blank'>");
             sb_links.append("GeneCards");
             sb_links.append("</a>");
@@ -315,11 +311,16 @@ public class StructureElements
 
     static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types)
     {
-        return generateImageSelector(id, sourceDir, types, false);
+        return generateImageSelector(id, sourceDir, types, false, new JSONObject());
+    }
+
+    static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types, JSONObject data)
+    {
+        return generateImageSelector(id, sourceDir, types, false, data);
     }
 
     static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types,
-                                        boolean enableFilterOptions)
+                                        boolean enableFilterOptions, JSONObject data)
     {
         List<List<String>> options = new ArrayList<>();
 
@@ -328,16 +329,16 @@ public class StructureElements
             options.add(Report.existingValues.get(type));
         }
 
-        return generateImageSelector(sourceDir, id, options, enableFilterOptions);
+        return generateImageSelector(sourceDir, id, options, enableFilterOptions, data);
     }
 
-    static String generateImageSelector(File sourceDir, String id, List<List<String>> options)
+    static String generateImageSelector(File sourceDir, String id, List<List<String>> options, JSONObject data)
     {
-        return generateImageSelector(sourceDir, id, options, false);
+        return generateImageSelector(sourceDir, id, options, false, data);
     }
 
     static String generateImageSelector(File sourceDir, String id, List<List<String>> options,
-                                        boolean enableFilterOptions)
+                                        boolean enableFilterOptions, JSONObject data)
     {
         StringBuilder sb_imageSelector = new StringBuilder();
 
@@ -485,7 +486,7 @@ public class StructureElements
 
         sb_imageSelector.append("<script>var {ID}CombinationsUnfiltered = {COMBINATIONS};</script>");
         sb_imageSelector.append("<script>var {ID}Combinations = {COMBINATIONS};</script>");
-        sb_imageSelector.append("<script>var {ID}DataCombinations = {DATACOMBINATIONS};</SCRIPT>");
+        sb_imageSelector.append("<script>var {ID}DataCombinations = " + data.toString() + ";</SCRIPT>");
         sb_imageSelector.append("<script>init_filterOptions(\"{ID}\")</script>");
         sb_imageSelector.append("<script>init_selection(\"{ID}\")</script>");
 

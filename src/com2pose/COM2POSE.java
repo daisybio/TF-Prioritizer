@@ -3,7 +3,6 @@ package com2pose;
 import org.apache.commons.cli.*;
 
 import util.Configs.Configs;
-import util.MapSymbolAndEnsg;
 import util.Options_intern;
 import util.Report.Report;
 
@@ -18,9 +17,13 @@ public class COM2POSE
     {
         Options_intern options_intern = new Options_intern();
         parseArguments(args, options_intern);
+
         configs = new Configs(new File(options_intern.com2pose_working_directory),
                 new File(options_intern.path_to_COM2POSE));
 
+        configs.merge(new File(options_intern.path_to_COM2POSE + File.separator + "config_templates" + File.separator +
+                "configs.json"));
+        
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);

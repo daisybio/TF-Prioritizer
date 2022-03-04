@@ -32,7 +32,7 @@ import static util.FileManagement.extend;
 public class Configs
 {
     public final Config<File> workingDirectory, sourceDirectory;
-    public final Map<String, AbstractModule> configs = new HashMap<>();
+    private final Map<String, AbstractModule> configs = new HashMap<>();
     public General general;
     public Jaspar jaspar;
     public Tgene tgene;

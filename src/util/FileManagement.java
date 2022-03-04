@@ -19,12 +19,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class FileManagement
 {
-    public static String loadFile(String path) throws IOException
-    {
-        File source = new File(path);
-        return loadFile(source);
-    }
-
     public static String loadFile(File file) throws IOException
     {
         return Files.readString(file.toPath());
@@ -135,22 +129,17 @@ public class FileManagement
         }
     }
 
-    public static void writeHTML(String path, String content, int relativationDepth) throws IOException
+    public static void writeHTML(File file, String content, int relativationDepth) throws IOException
     {
         content = content.replace("{RELATIVATION}", (".." + File.separator).repeat(relativationDepth));
 
-        writeFile(path, content);
+        writeFile(file, content);
     }
 
     public static void writeFile(File file, String content) throws IOException
     {
         makeSureFileExists(file);
         Files.writeString(file.toPath(), content);
-    }
-
-    public static void writeFile(String path, String content) throws IOException
-    {
-        writeFile(new File(path), content);
     }
 
     public static String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
