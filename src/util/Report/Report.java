@@ -1,5 +1,6 @@
 package util.Report;
 
+import util.FileManagement;
 import util.Logger;
 import util.Options_intern;
 
@@ -25,7 +26,8 @@ public class Report
             existingValues.put(type, new ArrayList<>());
         }
 
-        logger = new Logger(true, options_intern.com2pose_working_directory);
+        logger = new Logger("Report", true,
+                new File(options_intern.com2pose_working_directory + File.separator + "logfile.txt"));
 
         logger.logLine("[REPORT] Start loading TF data");
         loadTFs();

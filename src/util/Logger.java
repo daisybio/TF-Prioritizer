@@ -1,50 +1,81 @@
 package util;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Logger
 {
-    boolean write_to_file;
-    File logfile;
+    private final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-    public Logger(boolean write_to_file, String working_dir) throws IOException
+    boolean fileLoggingEnabled;
+    File logFile;
+    String module;
+
+    private enum LogLevel
     {
-        this.write_to_file = write_to_file;
-
-        if (write_to_file)
-        {
-            logfile = new File(working_dir + File.separator + "logfile.txt");
-            logLine("[LOGGER] Initialised logger");
-        }
-
+        DEBUG, INFO, WARN, ERROR
     }
 
-    public void logLine(String message) throws IOException
+    public Logger(String module, boolean fileLoggingEnabled, File logFile) throws IOException
     {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        this.fileLoggingEnabled = fileLoggingEnabled;
+        this.module = module;
+
+        if (fileLoggingEnabled)
+        {
+            assert logFile != null;
+            this.logFile = logFile;
+        }
+
+        debug("Initialised logger " +
+                (fileLoggingEnabled ? "with file logging to " + logFile.getAbsolutePath() : "without file logging."));
+    }
+
+    public void debug(String message)
+    {
+        logLine(message, LogLevel.DEBUG);
+    }
+
+    public void info(String message)
+    {
+        logLine(message, LogLevel.INFO);
+    }
+
+    public void warn(String message)
+    {
+        logLine(message, LogLevel.WARN);
+    }
+
+    public void error(String message)
+    {
+        logLine(message, LogLevel.ERROR);
+    }
+
+    private void logLine(String message, LogLevel level)
+    {
         Date date = new Date();
 
-        String line = "[" + formatter.format(date) + "]\t" + message;
-        System.out.println(line);
+        String line = "[" + formatter.format(date) + "]\t" + level + "\t[" + module + "]\t" + message;
 
-        if (write_to_file)
+        if (fileLoggingEnabled)
         {
-            if (!logfile.isFile())
+            try
             {
-                logfile.createNewFile();
-            }
-            if (logfile.canWrite())
+                FileManagement.appendToFile(logFile, line);
+            } catch (IOException e)
             {
-                BufferedWriter bw = new BufferedWriter(new FileWriter(logfile, true));
-                bw.write(line);
-                bw.newLine();
-                bw.close();
+                fileLoggingEnabled = false;
+                logLine("File logging not possible: " + e.getMessage(), LogLevel.ERROR);
             }
         }
+
+        System.out.println(line);
+    }
+
+    public void logLine(String message)
+    {
+        logLine(message, LogLevel.INFO);
     }
 }

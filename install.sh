@@ -107,10 +107,16 @@ if [ ! -d "ext/lib/commons-cli-1.5.0" ]; then
 fi
 
 # Install weka classifier
-if [ ! -d "ext/lib/weka" ]; then
+if [ ! -f "ext/lib/weka/weka.jar" ]; then
     wget http://www.java2s.com/Code/JarDownload/weka/weka.jar.zip
     unzip weka.jar.zip
     rm weka.jar.zip
     mkdir -p ext/lib/weka
     mv weka.jar ext/lib/weka/weka.jar
+fi
+
+# Install json parser
+if [ ! -f "ext/lib/json/json.jar" ]; then
+    mkdir -p ext/lib/json
+    wget 'https://search.maven.org/remotecontent?filepath=org/json/json/20211205/json-20211205.jar' -O ext/lib/json/json.jar
 fi
