@@ -1,12 +1,17 @@
 package util.Report;
 
+import com2pose.COM2POSE;
 import org.json.JSONObject;
+import util.FileManagement;
+import util.MapSymbolAndEnsg;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
 
 public class PageGenerators
 {
@@ -615,14 +620,21 @@ public class PageGenerators
                     {
                         sb_hm.append(targetGeneSymbol);
                         sb_hm.append(",");
+                        try
+                        {
+                            sb_hm.append(MapSymbolAndEnsg.symbolToEnsg(targetGeneSymbol));
+                        } catch (NoSuchFieldException | FileNotFoundException e)
+                        {
+                            Report.logger.warn(e.getMessage());
+                        }
+                        sb_hm.append("\n");
                     }
+
+                    jsonObject.put(hm, URLEncoder.encode(sb_hm.toString(), StandardCharsets.UTF_8));
                 }
 
-                frame = frame.replace("{IGV-CSV-DATA}",
-                        URLEncoder.encode(jsonObject.toString(), StandardCharsets.UTF_8.toString()));
+                frame = frame.replace("{DATACOMBINATIONS}", jsonObject.toString());
             }
-
-
         } // IGV
 
         frame = frame.replace("{TFNAME}", tfGroup.getName());

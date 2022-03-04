@@ -571,5 +571,17 @@ function countActiveElements(elements) {
 }
 
 function downloadActive(id) {
-    console.log(id);
+    let dataCombinations = window[id + "DataCombinations"];
+    let level = 0;
+    let steps = "";
+
+    while (typeof dataCombinations !== "string") {
+        let active = getActiveElement(document.querySelectorAll('[id^=\"' + id + '-' + level + '\"]'));
+        steps += active.value + "-";
+        dataCombinations = dataCombinations[active.value];
+    }
+
+    steps = steps.substring(0, steps.length - 1);
+
+    download(dataCombinations, id + "_" + steps + ".csv");
 }

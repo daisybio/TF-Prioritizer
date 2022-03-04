@@ -1,5 +1,6 @@
 package util.Report;
 
+import util.Configs.Configs;
 import util.FileManagement;
 import util.Logger;
 import util.Options_intern;

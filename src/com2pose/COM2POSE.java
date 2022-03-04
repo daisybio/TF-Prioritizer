@@ -1,6 +1,5 @@
 package com2pose;
 
-import com2pose.COM2POSE_lib;
 import org.apache.commons.cli.*;
 
 import util.Configs.Configs;
@@ -14,7 +13,6 @@ import java.io.File;
 public class COM2POSE
 {
     public static Configs configs;
-    public static MapSymbolAndEnsg mapSymbolAndEnsg;
 
     public static void main(String[] args) throws Exception
     {
@@ -22,8 +20,6 @@ public class COM2POSE
         parseArguments(args, options_intern);
         configs = new Configs(new File(options_intern.com2pose_working_directory),
                 new File(options_intern.path_to_COM2POSE));
-
-        mapSymbolAndEnsg = new MapSymbolAndEnsg();
 
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
