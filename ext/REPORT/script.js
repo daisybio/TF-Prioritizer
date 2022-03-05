@@ -575,13 +575,14 @@ function downloadActive(id) {
     let level = 0;
     let steps = "";
 
-    while (typeof dataCombinations !== "string") {
+    while (!Object.keys(dataCombinations).includes("fileExtension")) {
         let active = getActiveElement(document.querySelectorAll('[id^=\"' + id + '-' + level + '\"]'));
-        steps += active.value + "-";
-        dataCombinations = dataCombinations[active.value];
+        steps += active.textContent + "-";
+        dataCombinations = dataCombinations[active.textContent];
+        level++;
     }
 
     steps = steps.substring(0, steps.length - 1);
 
-    download(dataCombinations, id + "_" + steps + ".csv");
+    download(dataCombinations["content"], id + "_" + steps + dataCombinations["fileExtension"]);
 }

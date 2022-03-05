@@ -324,8 +324,30 @@ public class PageGenerators
 
             FileManagement.copyDirectory(source, target, false, ".+\\.png$", new ArrayList<>());
 
+            JSONObject data = new JSONObject();
+
+            {
+                for (File d_hm : source.listFiles())
+                {
+                    JSONObject hmObject = new JSONObject();
+                    for (File f_groupPairing : d_hm.listFiles())
+                    {
+                        if (f_groupPairing.getName().endsWith(".csv"))
+                        {
+                            String fileNameWithoutExtension = f_groupPairing.getName().replace(".csv", "");
+                            hmObject.put(fileNameWithoutExtension, new JSONObject(new HashMap<>()
+                            {{
+                                put("content", FileManagement.loadFile(f_groupPairing));
+                                put("fileExtension", ".csv");
+                            }}));
+                        }
+                    }
+                    data.put(d_hm.getName(), hmObject);
+                }
+            }
+
             frame = frame.replace("{VALIDATION_HEATMAP}", StructureElements.generateImageSelector(id, target,
-                    Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS)));
+                    Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS), data));
         } // Heatmaps
 
         {
@@ -410,8 +432,6 @@ public class PageGenerators
         } // Chip Atlas
 
         {
-            File sourceParentDir = COM2POSE.configs.distributionAnalysis.fileStructure.d_logos.get();
-
             {
                 File sourceDir = COM2POSE.configs.distributionAnalysis.fileStructure.d_logos_biophysicalModel.get();
 
@@ -436,7 +456,11 @@ public class PageGenerators
                     options.add(new ArrayList<>(List.of(targetFile.getName())));
 
                     JSONObject data = new JSONObject();
-                    data.put(targetFile.getName(), FileManagement.loadFile(csvFile).replace("\t", ","));
+                    data.put(targetFile.getName().replace(".png", ""), new JSONObject(new HashMap<>()
+                    {{
+                        put("content", FileManagement.loadFile(csvFile).replace("\t", ","));
+                        put("fileExtension", ".csv");
+                    }}));
 
                     frame = frame.replace("{BIOPHYSICAL_MODEL}",
                             StructureElements.generateImageSelector(targetFile.getParentFile(), "logosBiophysicalModel",
@@ -473,9 +497,29 @@ public class PageGenerators
                         List<List<String>> options = new ArrayList<>();
                         options.add(files);
 
+                        JSONObject data = new JSONObject();
+
+                        for (String imageFileName : files)
+                        {
+                            String nameWithoutExtension = imageFileName.replace(".svg", "");
+
+                            File jsonFile =
+                                    FileManagement.getFileIfInDirectory(sourceDir, nameWithoutExtension + ".json",
+                                            true);
+
+                            if (jsonFile != null)
+                            {
+                                data.put(nameWithoutExtension, new JSONObject(new HashMap<>()
+                                {{
+                                    put("content", FileManagement.loadFile(jsonFile));
+                                    put("fileExtension", ".json");
+                                }}));
+                            }
+                        }
+
+
                         frame = frame.replace("{TF_SEQUENCE}",
-                                StructureElements.generateImageSelector(targetDir, "logosTfSequence", options,
-                                        new JSONObject()));
+                                StructureElements.generateImageSelector(targetDir, "logosTfSequence", options, data));
                         created = true;
                     }
                 }
@@ -484,25 +528,6 @@ public class PageGenerators
                     frame = frame.replace("{TF_SEQUENCE}", "");
                 }
                 frame = frame.replace("{TF_SEQUENCE_DISABLED}", created ? "" : "disabled");
-
-                if (created)
-                {
-                    StringBuilder sb_download = new StringBuilder();
-                    for (File file : sourceDir.listFiles())
-                    {
-                        if (file.getName().endsWith(".json"))
-                        {
-                            sb_download.append("download('");
-                            sb_download.append(
-                                    URLEncoder.encode(FileManagement.loadFile(file), StandardCharsets.UTF_8));
-                            // TODO: Make json prettier
-                            sb_download.append("', '");
-                            sb_download.append(tfGroup.getName()).append("_").append(file.getName());
-                            sb_download.append("');");
-                        }
-                    }
-                    frame = frame.replace("{TFSEQUENCE-DOWNLOAD}", sb_download.toString());
-                }
             } // TF Sequence
 
             {
@@ -594,7 +619,11 @@ public class PageGenerators
                         sb_hm.append("\n");
                     }
 
-                    data.put(hm, URLEncoder.encode(sb_hm.toString(), StandardCharsets.UTF_8));
+                    data.put(hm, new JSONObject(new HashMap<>()
+                    {{
+                        put("content", URLEncoder.encode(sb_hm.toString(), StandardCharsets.UTF_8));
+                        put("fileExtension", ".csv");
+                    }}));
                 }
             }
 
