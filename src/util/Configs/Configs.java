@@ -118,7 +118,11 @@ public class Configs
 
         for (String key : configs.keySet())
         {
-            combined.accumulate(key, configs.get(key).toJSONObject(onlyWriteable));
+            JSONObject module = configs.get(key).toJSONObject(onlyWriteable);
+            if (!module.isEmpty())
+            {
+                combined.accumulate(key, module);
+            }
         }
 
         return combined;

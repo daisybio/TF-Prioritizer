@@ -22,8 +22,8 @@ public class COM2POSE
                 new File(options_intern.path_to_COM2POSE));
 
         configs.merge(new File(options_intern.path_to_COM2POSE + File.separator + "config_templates" + File.separator +
-                "configs.json"));
-        
+                "configsTemplate.json"));
+
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
         com2pose_lib.read_config_file(true);

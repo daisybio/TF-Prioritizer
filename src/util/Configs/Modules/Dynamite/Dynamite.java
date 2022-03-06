@@ -16,14 +16,14 @@ public class Dynamite extends AbstractModule
     public final Config<File> preprocessing_IntegrateDataConsiderGeneFile = new Config<>(File.class);
 
     public final Config<String> outVar = new Config<>(String.class);
-    public final Config<Integer> cores = new Config<>(1);
-    public final Config<Double> alpha = new Config<>(0.1);
-    public final Config<Double> testSize = new Config<>(0.2);
-    public final Config<Integer> oFolds = new Config<>(3);
-    public final Config<Integer> iFolds = new Config<>(6);
-    public final Config<Boolean> balanced = new Config<>(true);
-    public final Config<Boolean> performance = new Config<>(true);
-    public final Config<Boolean> randomize = new Config<>(false);
+    public final Config<Integer> cores = new Config<>(1, true);
+    public final Config<Double> alpha = new Config<>(0.1, true);
+    public final Config<Double> testSize = new Config<>(0.2, true);
+    public final Config<Integer> oFolds = new Config<>(3, true);
+    public final Config<Integer> iFolds = new Config<>(6, true);
+    public final Config<Boolean> balanced = new Config<>(true, true);
+    public final Config<Boolean> performance = new Config<>(true, true);
+    public final Config<Boolean> randomize = new Config<>(false, true);
 
     public Dynamite(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
