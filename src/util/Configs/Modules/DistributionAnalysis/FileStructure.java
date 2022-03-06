@@ -39,7 +39,7 @@ public class FileStructure extends AbstractModule
 
     public final Config<File> d_stats = extend(d_root, "05_STATS");
     public final Config<File> d_stats_all = extend(d_stats, "01_ALL");
-    public final Config<File> d_stats_hm = extend(d_stats, "02_HM");
+    public final Config<File> d_stats_hm = extend(d_stats, "01_HM");
     public final Config<String> s_stats_csv = new Config<>("stats.csv");
 
     public final Config<File> d_hypergeometricTest = extend(d_root, "06_HYPERGEOMETRIC_TEST");
@@ -79,7 +79,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_heatmaps = extend(d_root, "11_DCG_TARGET_GENES_HEATMAP");
     public final Config<File> f_heatmaps_script = extend(d_heatmaps, "heatmap.R");
 
-    public final Config<File> d_cooccurrence = extend(d_root, "12_COOCCURRENCE");
+    public final Config<File> d_cooccurrence = extend(d_root, "12_COOCCURENCE");
     public final Config<File> f_cooccurrence_mergedBed = extend(d_cooccurrence, "cooccurence_merged.bed");
     public final Config<File> f_cooccurrence_mergedBedSorted = extend(d_cooccurrence, "cooccurence_merged_sorted.bed");
     public final Config<File> f_cooccurrence_script = extend(d_cooccurrence, "sort_and_merge.sh");

@@ -1,6 +1,7 @@
 package util.Report;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 public class TranscriptionFactorGroup
@@ -10,6 +11,7 @@ public class TranscriptionFactorGroup
     private final ArrayList<TranscriptionFactor> transcriptionFactors;
     Map<String, Map<String, Number>> regressionCoefficients;
     boolean realGroup;
+    private final HashSet<String> targetGenes = new HashSet<>();
 
     TranscriptionFactorGroup(String name, ArrayList<TranscriptionFactor> transcriptionFactors,
                              Map<String, Map<String, Number>> regressionCoefficients)
@@ -55,6 +57,12 @@ public class TranscriptionFactorGroup
         return name;
     }
 
+    public void addTargetGene(String symbol, String ensembl)
+    {
+        targetGenes.add(symbol);
+        targetGenes.add(ensembl);
+    }
+
     public ArrayList<TranscriptionFactor> getTranscriptionFactors()
     {
         return transcriptionFactors;
@@ -63,5 +71,10 @@ public class TranscriptionFactorGroup
     public Map<String, Map<String, Number>> getRegressionCoefficients()
     {
         return regressionCoefficients;
+    }
+
+    public HashSet<String> getTargetGenes()
+    {
+        return targetGenes;
     }
 }

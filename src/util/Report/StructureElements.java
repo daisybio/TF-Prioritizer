@@ -1,11 +1,16 @@
 package util.Report;
 
-import util.FileManagement;
-
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
+
+import com2pose.COM2POSE;
+import org.json.JSONObject;
+import util.FileManagement;
 
 public class StructureElements
 {
@@ -13,23 +18,38 @@ public class StructureElements
 
     static String getBasicData(TranscriptionFactor transcriptionFactor) throws IOException
     {
-        String template = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_basicdata_html);
+        String template = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_basicData.get());
 
 
-        String log2fcTemplate = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_basicdata_entry_html);
+        String log2fcTemplate = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_basicDataEntry.get());
 
         log2fcTemplate = log2fcTemplate.replace("{NAME}", "LOG2FC");
 
         log2fcTemplate = log2fcTemplate.replace("{DATA}",
                 getTabularData(transcriptionFactor.getName(), transcriptionFactor.getLog2fc()));
 
-        template = template.replace("{LOG2FC}", log2fcTemplate);
+        log2fcTemplate = log2fcTemplate.replace("{INFO-ID}", transcriptionFactor.getName() + "-" + "log2fc");
 
-        template = template.replace("{TPM}", getBasicDataEntry("TPM", transcriptionFactor.getTpm()));
+        template = template.replace("{GENEID}",
+                FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_basicDataGeneID.get()));
+        template = template.replace("{GENE-ID}", transcriptionFactor.getGeneID());
+        template = template.replace("{GENECARDS-LINK}",
+                COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", transcriptionFactor.getName()));
+        template = template.replace("{TF-NAME}", transcriptionFactor.getName());
 
-        template = template.replace("{NORMEX}", getBasicDataEntry("Norm. expression", transcriptionFactor.getNormex()));
+        template = template.replace("{LOG2FC}",
+                getBasicDataEntry(transcriptionFactor.getName(), "LOG2FC", transcriptionFactor.getLog2fc()));
+
+        template = template.replace("{TPM}", getBasicDataEntry(transcriptionFactor.getName(), "TPM", new HashMap<>()
+        {{
+            put("", transcriptionFactor.getTpm());
+        }}));
+
+        template = template.replace("{NORMEX}",
+                getBasicDataEntry(transcriptionFactor.getName(), "Normalized expression", new HashMap<>()
+                {{
+                    put("", transcriptionFactor.getNormex());
+                }}));
 
         return template;
     }
@@ -42,14 +62,12 @@ public class StructureElements
         }
 
         StringBuilder basicData = new StringBuilder();
-        String tfTemplate = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_home_tf_html);
+        String tfTemplate = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_home_tf.get());
 
         for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
         {
             String tfString = tfTemplate.replace("{BASICDATA}", getBasicData(tf));
             tfString = tfString.replace("{ID}", String.valueOf(tf.getName().hashCode()));
-            tfString = tfString.replace("{GENEID}", tf.getGeneID());
             tfString = tfString.replace("{BUTTONBAR}", "");
             tfString = tfString.replace("{TF_NAME}", tf.getName());
             basicData.append(tfString);
@@ -58,33 +76,83 @@ public class StructureElements
         return basicData.toString();
     }
 
-    private static String getBasicDataEntry(String name, Map<String, Number> data) throws IOException
+    private static String getBasicDataEntry(String tfName, String name, Map<String, Map<String, Number>> data)
+            throws IOException
     {
         if (data.size() == 0)
         {
             return "";
         }
 
-        String template = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_basicdata_entry_html);
+        String template = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_basicDataEntry.get());
 
-        template = template.replace("{NAME}", name);
+        template = template.replace("{ANALYSIS-NAME}", name);
+
+        template = template.replace("{FILENAME}", tfName + "_" + name.replace(" ", "-"));
+
+        template = template.replace("{DATA}", getTabularData(String.valueOf((tfName + " " + name).hashCode()), data));
+
+        template = template.replace("{TF-NAME}", tfName);
+
+        template = template.replace("{CSV-DATA}", getCsvData(data));
+
+        return template;
+    }
+
+    static String getCsvData(Map<String, Map<String, Number>> data) throws UnsupportedEncodingException
+    {
+        if (data.size() == 0)
+        {
+            return "";
+        }
 
         StringBuilder sb_data = new StringBuilder();
 
-        sb_data.append("<div class='keyvaluepaircontainer'>");
+        List<String> rows = new ArrayList<>(data.keySet());
+        Set<String> columnsSet = new HashSet<>();
+        Collections.sort(rows);
 
-        for (Map.Entry<String, Number> kvPair : data.entrySet())
+        for (String row : rows)
         {
-            sb_data.append("<div class=\"keyvaluepair\"><h4>").append(kvPair.getKey()).append("</h4><p>")
-                    .append(formatter.format(kvPair.getValue())).append("</p></div>");
+            columnsSet.addAll(data.get(row).keySet());
         }
 
-        sb_data.append("</div>");
+        List<String> columns = new ArrayList<>(columnsSet);
+        Collections.sort(columns);
 
-        template = template.replace("{DATA}", sb_data.toString());
+        if (!(rows.size() == 1 && rows.get(0).isEmpty()))
+        {
+            sb_data.append(",");
+        }
+        for (String column : columns)
+        {
+            sb_data.append(column + ",");
+        }
+        sb_data.deleteCharAt(sb_data.toString().length() - 1);
+        sb_data.append("\n");
 
-        return template;
+        for (String row : rows)
+        {
+            if (!(rows.size() == 1 && rows.get(0).isEmpty()))
+            {
+                sb_data.append(row + ", ");
+            }
+
+            for (String column : columns)
+            {
+                if (!column.equals(row) && data.get(row).get(column) != null)
+                {
+                    sb_data.append(formatter.format(data.get(row).get(column)));
+                } else
+                {
+                    sb_data.append("-");
+                }
+                sb_data.append(",");
+            }
+            sb_data.append("\n");
+        }
+
+        return URLEncoder.encode(sb_data.toString(), StandardCharsets.UTF_8.toString());
     }
 
     static String getTabularData(String id, Map<String, Map<String, Number>> data)
@@ -96,13 +164,24 @@ public class StructureElements
 
         StringBuilder sb_data = new StringBuilder();
 
-        List<String> columns = new ArrayList<>(data.keySet());
-        Set<String> rowsSet = new HashSet<>();
+        List<String> rows = new ArrayList<>(data.keySet());
+        Set<String> columnsSet = new HashSet<>();
+        Collections.sort(rows);
+
+        for (String row : rows)
+        {
+            columnsSet.addAll(data.get(row).keySet());
+        }
+
+        List<String> columns = new ArrayList<>(columnsSet);
         Collections.sort(columns);
 
         sb_data.append("<table>");
         sb_data.append("<tr>");
-        sb_data.append("<th></th>");
+        if (!(rows.size() == 1 && rows.get(0).isEmpty()))
+        {
+            sb_data.append("<th></th>");
+        }
         int i = 0;
         for (String column : columns)
         {
@@ -110,22 +189,20 @@ public class StructureElements
             sb_data.append(column);
             sb_data.append("</th>");
             i++;
-
-            rowsSet.addAll(data.get(column).keySet());
         }
         sb_data.append("</tr>");
 
-        List<String> rows = new ArrayList<>(rowsSet);
-        Collections.sort(rows);
 
         i = 0;
         for (String row : rows)
         {
             sb_data.append("<tr>");
-
-            sb_data.append("<th id='").append(id).append("-row-").append(i).append("'>");
-            sb_data.append(row);
-            sb_data.append("</th>");
+            if (!(rows.size() == 1 && rows.get(0).isEmpty()))
+            {
+                sb_data.append("<th id='").append(id).append("-row-").append(i).append("'>");
+                sb_data.append(row);
+                sb_data.append("</th>");
+            }
 
             int j = 0;
             for (String column : columns)
@@ -133,9 +210,9 @@ public class StructureElements
                 String parameters = "\"" + id + "\", " + j + ", " + i;
                 sb_data.append("<td onmouseover='tableMouseOver(").append(parameters)
                         .append(")' onmouseout" + "='tableMouseOut(").append(parameters).append(")'>");
-                if (!column.equals(row) && data.get(column).get(row) != null)
+                if (!column.equals(row) && data.get(row).get(column) != null)
                 {
-                    sb_data.append(formatter.format(data.get(column).get(row)));
+                    sb_data.append(formatter.format(data.get(row).get(column)));
                 } else
                 {
                     sb_data.append("-");
@@ -157,8 +234,7 @@ public class StructureElements
 
     static String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        String buttonbar = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_home_buttonbar_html);
+        String buttonbar = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_home_buttonbar.get());
 
         buttonbar = buttonbar.replace("{VALIDATION}",
                 "VALIDATION" + File.separator + tfGroup.getName() + File.separator + tfGroup.getName() + ".html");
@@ -174,14 +250,13 @@ public class StructureElements
         return buttonbar;
     }
 
-    static String getFrame(String title, String bodyPath) throws IOException
+    static String getFrame(String title, File bodyFile) throws IOException
     {
-        String frame = FileManagement.loadFile(Report.options_intern.path_to_COM2POSE + File.separator +
-                Report.options_intern.f_report_resources_frame_html);
+        String frame = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_frame.get());
 
         frame = frame.replace("{TITLE}", title);
 
-        String body = FileManagement.loadFile(bodyPath);
+        String body = FileManagement.loadFile(bodyFile);
 
         frame = frame.replace("{BODY}", body);
 
@@ -198,23 +273,25 @@ public class StructureElements
             sb_links.append("<button onclick='toggleDropdown(\"geneCardsDropdown\")' id='geneCardsDropdown-dropdown'>");
             sb_links.append("GeneCards");
             sb_links.append("</button>");
-            sb_links.append("<div class='genecards dropdown content' id='geneCardsDropdown-dropdown-content'>");
+            sb_links.append("<div class='geneCards dropdown content' id='geneCardsDropdown-dropdown-content'>");
             for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
             {
-                sb_links.append("<button onclick='window.open(\"" +
-                        Report.options_intern.link_report_genecards.replace("{GENE}", tf.getName()) + "\");'>");
+                sb_links.append("<a class='dropdown geneCards' href='" +
+                        COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", tf.getName()) + "', target" +
+                        "='_blank'>");
                 sb_links.append(tf.getName());
-                sb_links.append("</button>");
+                sb_links.append("</a>");
             }
             sb_links.append("</div>");
             sb_links.append("</div>");
             sb_links.append("<script>add_dropdown_closing('geneCardsDropdown');</script>");
         } else
         {
-            sb_links.append("<button onclick='window.open(\"" +
-                    Report.options_intern.link_report_genecards.replace("{GENE}", tfGroup.getName()) + "\");'>");
+            sb_links.append(
+                    "<a href='" + COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", tfGroup.getName()) +
+                            "' target" + "='_blank'>");
             sb_links.append("GeneCards");
-            sb_links.append("</button>");
+            sb_links.append("</a>");
         }
 
         return text.replace("{GENECARD_LINKS}", sb_links.toString());
@@ -234,25 +311,59 @@ public class StructureElements
 
     static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types)
     {
-        ArrayList<ArrayList<String>> options = new ArrayList<>();
+        return generateImageSelector(id, sourceDir, types, false, new JSONObject());
+    }
+
+    static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types, JSONObject data)
+    {
+        return generateImageSelector(id, sourceDir, types, false, data);
+    }
+
+    static String generateImageSelector(String id, File sourceDir, List<SelectorTypes> types,
+                                        boolean enableFilterOptions, JSONObject data)
+    {
+        List<List<String>> options = new ArrayList<>();
 
         for (SelectorTypes type : types)
         {
             options.add(Report.existingValues.get(type));
         }
 
-        return generateImageSelector(id, sourceDir, options);
+        return generateImageSelector(sourceDir, id, options, enableFilterOptions, data);
     }
 
-    static String generateImageSelector(String id, File sourceDir, ArrayList<ArrayList<String>> options)
+    static String generateImageSelector(File sourceDir, String id, List<List<String>> options, JSONObject data)
+    {
+        return generateImageSelector(sourceDir, id, options, false, data);
+    }
+
+    static String generateImageSelector(File sourceDir, String id, List<List<String>> options,
+                                        boolean enableFilterOptions, JSONObject data)
     {
         StringBuilder sb_imageSelector = new StringBuilder();
 
         sb_imageSelector.append("<div class='panel' id='{ID}'>");
 
+        if (enableFilterOptions)
+        {
+            sb_imageSelector.append("<div class='buttonbar'>");
+            sb_imageSelector.append(
+                    "<button value='MIR' id='" + id + "-filterMiRNA' class='filterOption " + id + "'>miRNA</button>");
+            sb_imageSelector.append(
+                    "<button value='ENSG' id='" + id + "-filterENSG' class='filterOption " + id + "'>ENSG</button>");
+            sb_imageSelector.append(
+                    "<button value='RNA' id='" + id + "-filterRNA' class='filterOption " + id + "'>RNA</button>");
+            sb_imageSelector.append(
+                    "<button value='PSEUDOGENE' id='" + id + "-filterPseudogenes' class='filterOption " + id +
+                            "'>Pseudogenes</button>");
+            sb_imageSelector.append(
+                    "<button value='' id='" + id + "-filterSymbols' class='filterOption " + id + "'>Symbols</button>");
+            sb_imageSelector.append("</div>");
+        }
+
         int i = 0;
 
-        for (ArrayList<String> levelOptions : options)
+        for (List<String> levelOptions : options)
         {
             if (levelOptions.size() > 0)
             {
@@ -279,7 +390,7 @@ public class StructureElements
                     sb_imageSelector.append("<button class='{ID} selector' value='").append(value).append("' id='{ID}-")
                             .append(i).append("-").append(value).append("' " +
                                     ((options.size() == 1 && levelOptions.size() == 1) ? "style='display: none'" : "") +
-                                    " onclick='update_selection(this, \"{ID}\", {ID}Combinations)'>");
+                                    " onclick='update_selection(this, \"{ID}\")'>");
                     sb_imageSelector.append(entry);
                     sb_imageSelector.append("</button>");
                 }
@@ -288,32 +399,34 @@ public class StructureElements
             {
                 sb_imageSelector.append("<div class='buttonbar centered'>");
 
-                sb_imageSelector.append("<button onclick='openModal(\"{ID}-modal\")'>");
-                sb_imageSelector.append("Zoom in");
+                sb_imageSelector.append(
+                        "<button style='width: 15%' class='selector' onclick='downloadActive(\"{ID}\")'>");
+                sb_imageSelector.append("Download data");
                 sb_imageSelector.append("</button>");
 
                 sb_imageSelector.append(
-                        "<button class='narrow' id='{ID}-next-option' onclick='move_lowest_level(\"{ID}\", -1, " +
-                                "{ID" + "}Combinations)" + "'>");
+                        "<button class='selector narrow' id='{ID}-next-option' onclick='move_lowest_level(\"{ID}\", " +
+                                "-1, {ID" + "}Combinations)'>");
                 sb_imageSelector.append("<");
                 sb_imageSelector.append("</button>");
 
                 sb_imageSelector.append("<div class='dropdown container'>");
                 sb_imageSelector.append(
-                        "<button class='dropdown button' id='{ID}-dropdown' onclick='toggleDropdown(\"{ID}\")" +
-                                "'></button>");
+                        "<button class='selector dropdown imageSelector' id='{ID}-dropdown' onclick='toggleDropdown" +
+                                "(\"{ID}\")'></button>");
                 sb_imageSelector.append("<div class=\"dropdown content\" id=\"{ID}-dropdown-content\"></div>");
                 sb_imageSelector.append("<script>add_dropdown_closing('{ID}')</script>");
 
                 sb_imageSelector.append("</div>");
 
                 sb_imageSelector.append(
-                        "<button class='narrow' id='{ID}-previous-option' onclick='move_lowest_level(\"{ID}\", 1, " +
-                                "{ID}Combinations)'>");
+                        "<button class='selector narrow' id='{ID}-previous-option' onclick='move_lowest_level" +
+                                "(\"{ID}\", 1)'>");
                 sb_imageSelector.append(">");
                 sb_imageSelector.append("</button>");
 
-                sb_imageSelector.append("<button onclick='openImageInTab(\"{ID}-image\")'>");
+                sb_imageSelector.append(
+                        "<button style='width: 15%' class='selector' onclick='openImageInTab(\"{ID}-image\")'>");
                 sb_imageSelector.append("Open in new tab");
                 sb_imageSelector.append("</button>");
 
@@ -327,11 +440,15 @@ public class StructureElements
             {
                 sb_imageSelector.append("<div class='buttonbar centered'>");
 
-                sb_imageSelector.append("<button onclick='openModal(\"{ID}-modal\")'>");
+                sb_imageSelector.append("<button class='selector' onclick='openModal(\"{ID}-modal\")'>");
                 sb_imageSelector.append("Zoom in");
                 sb_imageSelector.append("</button>");
 
-                sb_imageSelector.append("<button onclick='openImageInTab(\"{ID}-image\")'>");
+                sb_imageSelector.append("<button class='selector' onclick='downloadActive(\"{ID}\")'>");
+                sb_imageSelector.append("Download data");
+                sb_imageSelector.append("</button>");
+
+                sb_imageSelector.append("<button class='selector' onclick='openImageInTab(\"{ID}-image\")'>");
                 sb_imageSelector.append("Open in new tab");
                 sb_imageSelector.append("</button>");
 
@@ -354,11 +471,11 @@ public class StructureElements
 
             sb_imageSelector.append("<div class='buttonbar'>");
             sb_imageSelector.append(
-                    "<button class=\"modal button\" id=\"{ID}-modal-leftarrow\"onclick=\"move_lowest_level('{ID}', -1, {ID}Combinations)\">\n" +
+                    "<button class=\"modal button\" id=\"{ID}-modal-leftarrow\"onclick=\"move_lowest_level('{ID}', -1)\">\n" +
                             "            &lt;</button>");
             sb_imageSelector.append("<img class=\"modal content\" id=\"{ID}-modal-image\">");
             sb_imageSelector.append(
-                    "<button class=\"modal button\" id=\"{ID}-modal-rightarrow\" onclick=\"move_lowest_level('{ID}', 1, {ID}Combinations)\">\n" +
+                    "<button class=\"modal button\" id=\"{ID}-modal-rightarrow\" onclick=\"move_lowest_level('{ID}', 1)\">\n" +
                             "            &gt;</button>");
             sb_imageSelector.append("</div>");
 
@@ -367,8 +484,11 @@ public class StructureElements
 
         sb_imageSelector.append("</div>");
 
-        sb_imageSelector.append("<script>let {ID}Combinations = {COMBINATIONS};</script>");
-        sb_imageSelector.append("<script>init_selection(\"{ID}\", {ID}Combinations)</script>");
+        sb_imageSelector.append("<script>var {ID}CombinationsUnfiltered = {COMBINATIONS};</script>");
+        sb_imageSelector.append("<script>var {ID}Combinations = {COMBINATIONS};</script>");
+        sb_imageSelector.append("<script>var {ID}DataCombinations = " + data.toString() + ";</SCRIPT>");
+        sb_imageSelector.append("<script>init_filterOptions(\"{ID}\")</script>");
+        sb_imageSelector.append("<script>init_selection(\"{ID}\")</script>");
 
         String imageSelector = sb_imageSelector.toString().replace("{ID}", id);
 
@@ -398,7 +518,11 @@ public class StructureElements
 
             for (File entry : Objects.requireNonNull(sourceDir.listFiles()))
             {
-                fileNames.add(entry.getName());
+                String name = entry.getName();
+                if (!name.equals("ALL.png"))
+                {
+                    fileNames.add(name);
+                }
             }
 
             Collections.sort(fileNames);

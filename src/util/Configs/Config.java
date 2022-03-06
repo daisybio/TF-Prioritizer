@@ -4,8 +4,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.math.BigDecimal;
 
 public class Config<T>
 {
@@ -49,12 +51,31 @@ public class Config<T>
             } else if (configClass.equals(File.class) && value.getClass().equals(String.class))
             {
                 actualValue = (T) new File((String) value);
-            } else if (configClass.equals(List.class) && value.getClass().equals(JSONArray.class))
+            } else if ((configClass.equals(List.class) || configClass.equals(java.util.ArrayList.class)) &&
+                    value.getClass().equals(JSONArray.class))
             {
-                actualValue = (T) ((JSONArray) value).toList();
+                List<?> bigDecimalList = ((JSONArray) value).toList();
+                if (bigDecimalList.size() > 0 && bigDecimalList.get(0).getClass().equals(BigDecimal.class))
+                {
+                    List<Double> doubleList = new ArrayList<>();
+                    for (Object bigDecimalValue : bigDecimalList)
+                    {
+                        doubleList.add(Double.valueOf(((BigDecimal) bigDecimalValue).doubleValue()));
+                    }
+                    actualValue = (T) doubleList;
+                } else
+                {
+                    actualValue = (T) bigDecimalList;
+                }
             } else if (configClass.equals(Map.class) && value.getClass().equals(JSONObject.class))
             {
                 actualValue = (T) ((JSONObject) value).toMap();
+            } else if (configClass.equals(Double.class) && value.getClass().equals(BigDecimal.class))
+            {
+                actualValue = (T) Double.valueOf(((BigDecimal) value).doubleValue());
+            } else if (value == JSONObject.NULL)
+            {
+                actualValue = null;
             } else
             {
                 throw new ClassCastException(

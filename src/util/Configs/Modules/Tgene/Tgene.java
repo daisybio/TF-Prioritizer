@@ -13,14 +13,14 @@ public class Tgene extends AbstractModule
 
     public final Config<File> pathToExecutable = new Config<>(File.class);
 
-    public final Config<Boolean> noClosestLocus = new Config<>(false);
-    public final Config<Boolean> noClosestTss = new Config<>(false);
-    public final Config<Integer> maxLinkDistance = new Config<>(500000);
-    public final Config<Double> pValue = new Config<>(0.05);
-    public final Config<Boolean> selfRegulatory = new Config<>(false);
-    public final Config<Double> consensus = new Config<>(.5);
-    public final Config<String> consensusCalc = new Config<>("INCREASE_TGENE_TFS");
-    public final Config<String> mtWriting = new Config<>("MT");
+    public final Config<Boolean> noClosestLocus = new Config<>(false, true);
+    public final Config<Boolean> noClosestTss = new Config<>(false, true);
+    public final Config<Integer> maxLinkDistance = new Config<>(500000, true);
+    public final Config<Double> pValue = new Config<>(0.05, true);
+    public final Config<Boolean> selfRegulatory = new Config<>(false, true);
+    public final Config<Double> consensus = new Config<>(0.5, true);
+    public final Config<String> consensusCalc = new Config<>("INCREASE_TGENE_TFS", true);
+    public final Config<String> mtWriting = new Config<>("MT", true);
 
     public Tgene(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException

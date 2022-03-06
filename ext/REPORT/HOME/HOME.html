@@ -1,17 +1,17 @@
-<div class="buttonbar">
-    <button onclick="window.location.href='IMPORTANT_LOCI.html';">Important loci</button>
-    <button onclick="window.location.href='TOP_LOG2FC.html';">Top LOG2FC change</button>
-    <button onclick="window.location.href='COOCCURRENCE.html';">Co-Occurrence Analysis</button>
-</div>
 <div class="header">
     <h1>
         Prioritized transcription factors
     </h1>
+    <button id="tfDownload" title="Download currently visible transcription factors as csv"
+            onclick="downloadVisibleTfs()">
+        <img
+                src="{RELATIVATION}MEDIA/download_dark.svg">
+    </button>
     <button onclick="toggleAccordion('info')">
-        <img src="{RELATIVATION}MEDIA/info.svg">
+        <img src="{RELATIVATION}MEDIA/info_dark.svg">
     </button>
 </div>
-<div class="panel info" id="info">
+<div class="panel text" id="info">
     <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
         condimentum
         purus a
@@ -19,4 +19,25 @@
         elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
         metus nisl.</label>
 </div>
-{TFS}
+<div class="buttonbar">
+    <a href='IMPORTANT_LOCI.html'>Important loci</a>
+    <a href='TOP_LOG2FC.html'>Top LOG2FC change</a>
+    <a href='COOCCURRENCE.html'>Co-Occurrence Analysis</a>
+</div>
+<div class="buttonbar">
+    <label>
+        <input type="text" id="searchTFNames" placeholder="Search by name"
+               onkeyup="filterTfsByName(this.value)"
+               onclick="document.getElementById('searchTargetGenes').value='';
+               filterTfsByTargetGene('')">
+    </label>
+    <label>
+        <input type="text" id="searchTargetGenes" placeholder="Search by target genes"
+               onkeyup="filterTfsByTargetGene(this.value)"
+               onclick="document.getElementById('searchTFNames').value='';
+               filterTfsByName('')">
+    </label>
+</div>
+<div class="main">
+    {TFS}
+</div>

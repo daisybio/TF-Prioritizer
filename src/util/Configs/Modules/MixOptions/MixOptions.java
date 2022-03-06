@@ -13,9 +13,9 @@ public class MixOptions extends AbstractModule
 
     public final Config<String> level = new Config<>(String.class);
     public final Config<String> option = new Config<>(String.class);
-    public final Config<Integer> occurrenceIntersection = new Config<>(2);
-    public final Config<Boolean> mutuallyExclusive = new Config<>(false);
-    public final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals = new Config<>(true);
+    public final Config<Integer> occurrenceIntersection = new Config<>(2, true);
+    public final Config<Boolean> mutuallyExclusive = new Config<>(false, true);
+    public final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals = new Config<>(true, true);
 
     public MixOptions(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException

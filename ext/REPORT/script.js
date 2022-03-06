@@ -1,3 +1,5 @@
+const textDownloadPrefix = "data:text/plain;charset=utf-8,";
+
 function toggleAccordion(id) {
     let panel = document.getElementById(id);
     if (panel.style.display === "grid") {
@@ -31,32 +33,118 @@ function tableMouseOver(gene, col, row) {
     colHead = document.getElementById(gene + "-col-" + col);
     rowHead = document.getElementById(gene + "-row-" + row);
 
-    colHead.style.backgroundColor = "rgba(var(--black), 0.1)";
-    rowHead.style.backgroundColor = "rgba(var(--black), 0.1)";
+    if (colHead !== null) {
+        colHead.style.backgroundColor = "rgba(var(--black), 0.1)";
+    }
+    if (rowHead !== null) {
+        rowHead.style.backgroundColor = "rgba(var(--black), 0.1)";
+    }
 }
 
 function tableMouseOut(gene, col, row) {
     colHead = document.getElementById(gene + "-col-" + col);
     rowHead = document.getElementById(gene + "-row-" + row);
 
-    colHead.style.backgroundColor = "initial";
-    rowHead.style.backgroundColor = "initial";
+    if (colHead !== null) {
+        colHead.style.backgroundColor = "initial";
+    }
+    if (rowHead !== null) {
+        rowHead.style.backgroundColor = "initial";
+    }
 }
 
-function init_selection(id, combinations) {
+function getAllCombinationEntries(combinations) {
+    if (Array.isArray(combinations)) {
+        return new Set(combinations);
+    } else {
+        let childrenSet = new Set();
+        for (let i = 0; i < Object.keys(combinations).length; i++) {
+            let addSet = getAllCombinationEntries(combinations[Object.keys(combinations)[i]]);
+            addSet.forEach(entry => childrenSet.add(entry));
+        }
+        return childrenSet;
+    }
+}
+
+function init_filterOptions(id) {
+    let combinations = window[id + "CombinationsUnfiltered"];
+    let filterOptions = document.getElementsByClassName("filterOption " + id);
+
+    if (filterOptions.length > 0) {
+        let foundFilterOptions = new Set();
+        let regexTemplate = "^[0-9]+_{PREFIX}.+"
+        let entries = getAllCombinationEntries(combinations);
+
+        let symbolFilterOption;
+        for (let i = 0; i < filterOptions.length; i++) {
+            if (filterOptions[i].id.endsWith("Symbols")) {
+                symbolFilterOption = filterOptions[i];
+            }
+        }
+
+        entries.forEach(entry => {
+            let assigned = false;
+            for (let i = 0; i < filterOptions.length; i++) {
+                if (filterOptions[i] !== symbolFilterOption) {
+                    let regexString = regexTemplate.replace("{PREFIX}", filterOptions[i].value);
+                    if (new RegExp(regexTemplate.replace("{PREFIX}", filterOptions[i].value)).test(entry)) {
+                        foundFilterOptions.add(filterOptions[i]);
+                        assigned = true;
+                    }
+                }
+            }
+
+            if (!assigned) {
+                foundFilterOptions.add(symbolFilterOption);
+            }
+        });
+
+        for (let filterOption of filterOptions) {
+            if (foundFilterOptions.has(filterOption)) {
+                filterOption.classList.add("active");
+                filterOption.addEventListener("click", () => {
+                    toggleFilterActive(filterOption, id);
+                    window[id + "Combinations"] = getFilteredCombinations(id);
+                    init_selection(id, window[id + "Combinations"]);
+                });
+            } else {
+                filterOption.disabled = true;
+                filterOption.title = "This gene type is not present in this analysis"
+            }
+        }
+
+        if (countActiveElements(filterOptions) === 1) {
+            getActiveElement(filterOptions).click();
+            //filterOptions[0].parentElement.style.display = "none";
+        }
+    }
+}
+
+function init_selection(id) {
+    let combinations = window[id + "Combinations"];
     let firstValue;
+    let availableValues;
 
     if (Array.isArray(combinations)) {
-        firstValue = combinations[0];
+        availableValues = combinations;
     } else {
-        firstValue = Object.keys(combinations)[0];
+        availableValues = Object.keys(combinations);
     }
 
-    let firstButton = document.getElementById(id + "-0-" + firstValue);
-    firstButton.click();
+    let activeChild = getActiveElement(document.querySelectorAll('[id^="' + id + '-0"]'));
+    if (activeChild !== null && availableValues.includes(activeChild.value)) {
+        activeChild.click();
+    } else {
+        let term = id + "-0-" + availableValues[0];
+        let firstChild = document.getElementById(term);
+        if (firstChild !== null) {
+            firstChild.click();
+        }
+    }
 }
 
-function update_selection(source_element, id, combinations) {
+function update_selection(source_element, id) {
+    let combinations = window[id + "Combinations"];
     let level = parseInt(source_element.id.split("-")[1]);
     let depth = get_depth(combinations);
 
@@ -101,7 +189,7 @@ function update_selection(source_element, id, combinations) {
     availableCombinations = availableCombinations[source_element.value];
 
     { // Fill dropdown if necessary
-        if (level === 1 && depth === 2) {
+        if (level === depth - 1 && document.getElementById(id + "-dropdown") != null) {
             let dropdownContent = document.getElementById(id + "-dropdown-content");
             dropdownContent.innerHTML = "";
 
@@ -113,28 +201,63 @@ function update_selection(source_element, id, combinations) {
             searchbox.addEventListener("keyup", function () {
                 filter_dropdown(id)
             });
+            searchbox.classList.add("selector")
 
             dropdownContent.appendChild(searchbox);
+
+            let filterOptions = document.getElementsByClassName("filterOption " + id);
+            let regexTemplate = "^[0-9]+_{PREFIX}.+";
+
+            let symbolFilterOption;
+            for (let i = 0; i < filterOptions.length; i++) {
+                if (filterOptions[i].id.endsWith("Symbols")) {
+                    symbolFilterOption = filterOptions[i];
+                    break;
+                }
+            }
 
             for (let i = 0; i < availableCombinations.length; i++) {
                 let option = document.createElement("button");
                 let value = availableCombinations[i];
-                option.value = value;
-                option.id = id + "-" + 2 + "-" + value;
-                option.classList.add("dropdown");
-                option.classList.add("entry");
 
-                let text = value.replace(/\.[^/.]+$/, "");
-                if (/^[0-9]+_*/.test(text)) {
-                    text = text.substring(text.split("_")[0].length + 1);
+                let keepEntry = true;
+
+                if (filterOptions.length > 0) {
+                    let assigned = false;
+
+
+                    for (let j = 0; j < filterOptions.length; j++) {
+                        if (filterOptions[j] !== symbolFilterOption) {
+                            let regexString = regexTemplate.replace("{PREFIX}", filterOptions[j].value);
+                            if (new RegExp(regexString).test(value)) {
+                                keepEntry = filterOptions[j].classList.contains("active");
+                                assigned = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!assigned) {
+                        keepEntry = symbolFilterOption.classList.contains("active");
+                    }
                 }
 
-                option.textContent = (i + 1) + ". " + text;
-                option.addEventListener("click", function () {
-                    update_selection(option, id, combinations);
-                });
+                if (keepEntry) {
+                    option.value = value;
+                    option.id = id + "-" + 2 + "-" + value;
+                    option.classList.add("selector");
 
-                dropdownContent.appendChild(option);
+                    let text = value.replace(/\.[^/.]+$/, "");
+                    if (/^[0-9]+_*/.test(text)) {
+                        text = text.substring(text.split("_")[0].length + 1);
+                    }
+
+                    option.textContent = (i + 1) + ". " + text;
+                    option.addEventListener("click", function () {
+                        update_selection(option, id, combinations);
+                    });
+
+                    dropdownContent.appendChild(option);
+                }
             }
 
             let dropdownButton = document.getElementById(id + "-dropdown");
@@ -149,16 +272,36 @@ function update_selection(source_element, id, combinations) {
 
     { // Click first possible child
         if (level < depth) {
-            let firstPossibleChildValue;
+            let availableValues = [];
+
             if (Array.isArray(availableCombinations)) {
-                firstPossibleChildValue = availableCombinations[0];
+                availableValues = availableCombinations;
             } else {
-                firstPossibleChildValue = Object.keys(availableCombinations)[0];
+                availableValues = Array.from(Object.keys(availableCombinations));
             }
-            let term = id + "-" + (level + 1) + "-" + firstPossibleChildValue;
-            let firstPossibleChildNode = document.getElementById(term);
-            firstPossibleChildNode.disabled = false;
-            firstPossibleChildNode.click();
+
+            let currentlyActiveChild = getActiveElement(document.querySelectorAll('[id^="' + id + '-' + (level + 1) + '"]'));
+
+            if (currentlyActiveChild !== null && availableValues.includes(currentlyActiveChild.value)) {
+                currentlyActiveChild.click()
+            } else {
+                let child;
+                let found = false;
+
+                for (let i = 0; i < availableValues.length; i++) {
+                    let term = id + "-" + (level + 1) + "-" + availableValues[i];
+                    child = document.getElementById(term);
+                    if (child !== null) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    child.disabled = false;
+                    child.click();
+                }
+            }
         }
     }
 
@@ -179,9 +322,8 @@ function update_selection(source_element, id, combinations) {
             let modal_caption = document.getElementById(id + "-modal-caption");
             modal_caption.textContent = source_element.textContent;
 
-            if (depth === 2) {
-                let dropdown = document.getElementById(id + "-dropdown");
-
+            let dropdown = document.getElementById(id + "-dropdown");
+            if (dropdown != null) {
                 dropdown.textContent = source_element.textContent;
                 dropdown.value = source_element.value;
             }
@@ -189,7 +331,8 @@ function update_selection(source_element, id, combinations) {
     }
 }
 
-function move_lowest_level(id, delta, combinations) {
+function move_lowest_level(id, delta) {
+    let combinations = window[id + "Combinations"];
     let options = document.querySelectorAll('[id^="' + id + '-' + get_depth(combinations) + '"]');
     let i;
 
@@ -253,4 +396,193 @@ function get_depth(combinations) {
         i++;
     }
     return i;
+}
+
+function downloadVisibleTfs() {
+    let button = document.getElementById("tfDownload");
+
+    let tfs = document.getElementsByClassName("tf");
+
+    let tfString = "";
+
+    for (let i = 0; i < tfs.length; i++) {
+        if (tfs[i].style.display != "none") {
+            tfString += tfs[i].id + "\n";
+        }
+    }
+
+    let fileName = "tfs_";
+
+    if (document.getElementById("searchTFNames").value != "") {
+        fileName += "nameFilter_" + document.getElementById("searchTFNames").value;
+    } else if (document.getElementById("searchTargetGenes").value != "") {
+        fileName += "targetGeneFilter_" + document.getElementById("searchTargetGenes").value;
+    } else {
+        fileName += "all";
+    }
+
+    download(tfString, fileName + ".csv");
+}
+
+function filterTfsByName(term) {
+    let tfs = document.getElementsByClassName("tf");
+
+    for (let i = 0; i < tfs.length; i++) {
+        if (tfs[i].id.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+            tfs[i].style.display = "";
+        } else {
+            tfs[i].style.display = "none";
+        }
+    }
+}
+
+function filterTfsByTargetGene(term) {
+    let tfs = document.getElementsByClassName("tf");
+
+    for (let i = 0; i < tfs.length; i++) {
+        let varName = "targetGenes" + tfs[i].id;
+        let targetGenes = window[varName];
+        let found = false;
+
+        for (let j = 0; j < targetGenes.length; j++) {
+            if (targetGenes[j].toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            tfs[i].style.display = "";
+        } else {
+            tfs[i].style.display = "none";
+        }
+    }
+}
+
+function toggleFilterActive(element, id) {
+    let filterOptions = document.getElementsByClassName("filterOption " + id);
+
+    if (element.classList.contains("active")) {
+        if (countActiveElements(filterOptions) > 1) {
+            element.classList.remove("active");
+        }
+        if (countActiveElements(filterOptions) === 1) {
+            let lastActive = getActiveElement(filterOptions);
+            lastActive.style.cursor = "not-allowed";
+            lastActive.title = "At least one gene type has to be active";
+        }
+    } else {
+        element.classList.add("active");
+
+        for (let filterOption of filterOptions) {
+            if (!filterOption.disabled) {
+                filterOption.style.cursor = "pointer";
+                filterOption.removeAttribute("title");
+            }
+        }
+    }
+}
+
+function getActiveElement(elements) {
+    for (let element of elements) {
+        if (element.classList.contains("active")) {
+            return element;
+        }
+    }
+    return null;
+}
+
+function getFilteredCombinations(id) {
+    let allCombinations = window[id + "CombinationsUnfiltered"];
+    let filterOptions = document.getElementsByClassName("filterOption " + id);
+    let regexTemplate = "^[0-9]+_{PREFIX}.+";
+
+    let symbolFilterOption;
+    for (let filterOption of filterOptions) {
+        if (filterOption.id.endsWith("Symbols")) {
+            symbolFilterOption = filterOption;
+            break;
+        }
+    }
+
+    function filterCombination(allCombinations) {
+        if (Array.isArray(allCombinations)) {
+            let filteredCombinations = [];
+
+            for (let entry of allCombinations) {
+                let keep = false;
+                for (let filterOption of filterOptions) {
+                    if (filterOption !== symbolFilterOption && new RegExp(regexTemplate.replace("{PREFIX}", filterOption.value)).test(entry)) {
+                        keep = filterOption.classList.contains("active");
+                    }
+                }
+                if (!keep) {
+                    keep = symbolFilterOption.classList.contains("active");
+                }
+                if (keep) {
+                    filteredCombinations.push(entry);
+                }
+            }
+
+            return filteredCombinations;
+        } else {
+            let filteredCombinations = {};
+
+            for (let [key, value] of Object.entries(allCombinations)) {
+                let values = filterCombination(value);
+
+                if (Array.isArray(values) && values.length > 0) {
+                    filteredCombinations[key] = values;
+                } else if (Object.keys(values).length > 0) {
+                    filteredCombinations[key] = values;
+                }
+            }
+
+            return filteredCombinations;
+        }
+    }
+
+    return filterCombination(allCombinations);
+}
+
+function download(text, filename) {
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + text);
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+function countActiveElements(elements) {
+    let activeCount = 0;
+
+    for (let element of elements) {
+        if (element.classList.contains("active")) {
+            activeCount++;
+        }
+    }
+
+    return activeCount;
+}
+
+function downloadActive(id) {
+    let dataCombinations = window[id + "DataCombinations"];
+    let level = 0;
+    let steps = "";
+
+    while (!Object.keys(dataCombinations).includes("fileExtension")) {
+        let active = getActiveElement(document.querySelectorAll('[id^=\"' + id + '-' + level + '\"]'));
+        steps += active.textContent + "-";
+        dataCombinations = dataCombinations[active.textContent];
+        level++;
+    }
+
+    steps = steps.substring(0, steps.length - 1);
+
+    download(dataCombinations["content"], id + "_" + steps + dataCombinations["fileExtension"]);
 }

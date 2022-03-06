@@ -1,10 +1,14 @@
 package util.Report;
 
+import com2pose.COM2POSE;
+import util.Configs.Configs;
 import util.FileManagement;
 import util.Logger;
+import util.MapSymbolAndEnsg;
 import util.Options_intern;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -12,15 +16,12 @@ import java.util.*;
 public class Report
 {
     static Logger logger = null;
-    static Options_intern options_intern = null;
     final ArrayList<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
     static final DecimalFormat formatter = new DecimalFormat("0.###");
     static Map<SelectorTypes, ArrayList<String>> existingValues = new HashMap<>();
 
     public Report(Options_intern options_intern) throws IOException
     {
-        Report.options_intern = options_intern;
-
         for (SelectorTypes type : SelectorTypes.values())
         {
             existingValues.put(type, new ArrayList<>());
@@ -40,8 +41,7 @@ public class Report
     {
         Map<String, Map<String, Map<String, Double>>> coefficients = new HashMap<>();
 
-        File parentDir = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_put_DYNAMITE);
+        File parentDir = COM2POSE.configs.dynamite.fileStructure.d_output.get();
 
         for (File hm_dir : Objects.requireNonNull(parentDir.listFiles()))
         {
@@ -51,10 +51,10 @@ public class Report
             {
                 coefficients.get(hm_dir.getName()).put(groups_dir.getName(), new HashMap<>());
 
-                File f_data = new File(
-                        groups_dir + File.separator + options_intern.file_suffix_dynamite_output_to_be_plotted);
+                File f_data = new File(groups_dir + File.separator +
+                        COM2POSE.configs.dynamite.fileStructure.s_output_toBePlotted.get());
 
-                String data = FileManagement.loadFile(f_data.getAbsolutePath());
+                String data = FileManagement.loadFile(f_data);
 
                 boolean first = true;
                 for (String line : data.split("\n"))
@@ -77,17 +77,9 @@ public class Report
 
     private void loadTFs() throws IOException
     {
-        File tf_file = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
-                        File.separator + options_intern.folder_out_distribution_dcg + File.separator +
-                        options_intern.file_suffix_distribution_analysis_dcg);
+        File tf_file = COM2POSE.configs.distributionAnalysis.fileStructure.f_dcg_stats.get();
 
-        File geneIDFile = new File(options_intern.com2pose_working_directory + File.separator +
-                options_intern.folder_name_deseq2_preprocessing + File.separator +
-                options_intern.file_suffix_deseq2_mapping);
-
-        File d_plots =
-                new File(options_intern.com2pose_working_directory + File.separator + options_intern.folder_plots);
+        File d_plots = COM2POSE.configs.plots.fileStructure.d_output.get();
 
         Map<String, Map<String, Map<String, Double>>> allRegressionCoefficients = loadRegressionCoefficients();
 
@@ -118,14 +110,13 @@ public class Report
                 {
                     try
                     {
-                        String geneID = FileManagement.findValueInTable(tf_name, 1, 0, geneIDFile, "\t", true);
+                        String geneID = MapSymbolAndEnsg.symbolToEnsg(tf_name);
                         Map<String, Map<String, Number>> log2fc = new HashMap<>();
                         Map<String, Number> tpm = new HashMap<>();
                         Map<String, Number> normex = new HashMap<>();
 
                         {   //LOG2FC
-                            File d_log2fs = new File(options_intern.com2pose_working_directory + File.separator +
-                                    options_intern.folder_name_deseq2_output);
+                            File d_log2fs = COM2POSE.configs.deSeq2.fileStructure.d_output.get();
 
                             for (File entry : Objects.requireNonNull(d_log2fs.listFiles()))
                             {
@@ -161,10 +152,7 @@ public class Report
                         }   //LOG2FC
 
                         {   //TPM
-                            File d_tpm = new File(options_intern.com2pose_working_directory + File.separator +
-                                    options_intern.folder_name_deseq2_preprocessing + File.separator +
-                                    options_intern.folder_name_deseq2_preprocessing_tpm + File.separator +
-                                    options_intern.folder_name_deseq2_preprocessing_tpm_results);
+                            File d_tpm = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get();
 
                             for (File entry : Objects.requireNonNull(d_tpm.listFiles()))
                             {
@@ -185,9 +173,7 @@ public class Report
                         }   //TPM
 
                         {   //Normalized expression
-                            File d_normex = new File(options_intern.com2pose_working_directory + File.separator +
-                                    options_intern.folder_name_deseq2_preprocessing + File.separator +
-                                    options_intern.folder_name_deseq2_preprocessing_gene_symbols);
+                            File d_normex = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_geneSymbols.get();
 
 
                             for (File entry : Objects.requireNonNull(d_normex.listFiles()))
@@ -240,6 +226,69 @@ public class Report
                 }
             }
         }
+
+        loadTargetGenes();
+    }
+
+    private void loadTargetGenes() throws FileNotFoundException
+    {
+        File tfsDirectory = COM2POSE.configs.distributionAnalysis.fileStructure.d_heatmaps.get();
+
+        for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
+        {
+            File tfDirectory = FileManagement.getFileIfInDirectory(tfsDirectory, tfGroup.getName(), false);
+
+            if (tfDirectory == null)
+            {
+                continue;
+            }
+
+            for (File d_hm : Objects.requireNonNull(tfDirectory.listFiles()))
+            {
+                for (File f_data : Objects.requireNonNull(d_hm.listFiles()))
+                {
+                    if (f_data.getName().endsWith(".csv"))
+                    {
+                        try (Scanner scanner = new Scanner(f_data))
+                        {
+                            boolean first = true;
+                            int c_geneID = -1, c_geneSymbol = -1;
+
+                            while (scanner.hasNextLine())
+                            {
+                                String[] line = scanner.nextLine().split(",");
+
+                                if (first)
+                                {
+                                    for (int i = 0; i < line.length; i++)
+                                    {
+                                        String strippedEntry = line[i].substring(1, line[i].length() - 1);
+
+                                        if (strippedEntry.equals("geneID"))
+                                        {
+                                            c_geneID = i;
+                                        } else if (strippedEntry.equals("geneSymbol"))
+                                        {
+                                            c_geneSymbol = i;
+                                        }
+                                    }
+
+                                    if (c_geneID == -1 || c_geneSymbol == -1)
+                                    {
+                                        break;
+                                    }
+
+                                    first = false;
+                                } else
+                                {
+                                    tfGroup.addTargetGene(line[c_geneSymbol], line[c_geneID]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void generate() throws IOException, InterruptedException
@@ -267,41 +316,26 @@ public class Report
             i++;
         }
 
-        logger.logLine("[REPORT] Finished generating report");
+        logger.logLine("Finished generating report");
     }
 
     private void copyDependencies() throws IOException
     {
-        logger.logLine("[REPORT] Start copying dependencies");
-        String css = FileManagement.loadFile(
-                options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_style);
-        String script = FileManagement.loadFile(
-                options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_script);
+        logger.logLine("Start copying dependencies");
+        FileManagement.copyFile(COM2POSE.configs.report.inputStructure.f_style.get(),
+                COM2POSE.configs.report.outputStructure.f_style.get());
+        FileManagement.copyFile(COM2POSE.configs.report.inputStructure.f_script.get(),
+                COM2POSE.configs.report.outputStructure.f_script.get());
 
-        FileManagement.writeFile(
-                options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_style, css);
-        FileManagement.writeFile(
-                options_intern.com2pose_working_directory + File.separator + options_intern.f_out_report_script,
-                script);
-
-        FileManagement.copyFile(
-                new File(options_intern.path_to_COM2POSE + File.separator + options_intern.f_report_resources_logo_png),
-                new File(options_intern.com2pose_working_directory + File.separator +
-                        options_intern.f_out_report_logo_png));
-
-        FileManagement.copyDirectory(
-                new File(options_intern.path_to_COM2POSE + File.separator + options_intern.d_report_resources_media),
-                new File(options_intern.com2pose_working_directory + File.separator + options_intern.d_out_media),
-                false);
-        logger.logLine("[REPORT] Finished copying dependencies");
+        FileManagement.copyDirectory(COM2POSE.configs.report.inputStructure.d_media.get(),
+                COM2POSE.configs.report.outputStructure.d_media.get(), false);
+        logger.logLine("Finished copying dependencies");
     }
 
     private void findExistingValues()
     {
         {
-            File pairings = new File(options_intern.com2pose_working_directory + File.separator +
-                    options_intern.folder_name_deseq2_preprocessing + File.separator +
-                    options_intern.folder_name_deseq2_preprocessing_combined);
+            File pairings = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_combined.get();
 
             for (File pairing : Objects.requireNonNull(pairings.listFiles()))
             {
@@ -309,11 +343,13 @@ public class Report
             }
         }
 
-        existingValues.get(SelectorTypes.IMPORTANT_LOCI).addAll(options_intern.igv_important_locus_all_prio_tf);
+        existingValues.get(SelectorTypes.PERFORMANCE_CUTOFFS).addAll(List.of("1", "2", "3"));
+
+        existingValues.get(SelectorTypes.IMPORTANT_LOCI).addAll(COM2POSE.configs.igv.importantLociAllPrioTf.get());
 
         existingValues.get(SelectorTypes.TOP_LOG2FC).addAll(Arrays.asList("downregulated", "upregulated"));
 
-        for (Double cutoff : options_intern.plot_th_coefficient)
+        for (Double cutoff : COM2POSE.configs.plots.thresholds.get())
         {
             existingValues.get(SelectorTypes.REGRESSION_CUTOFFS).add(String.valueOf(cutoff));
         }

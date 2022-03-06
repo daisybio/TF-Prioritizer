@@ -1,17 +1,28 @@
-import com2pose.COM2POSE_lib;
+package com2pose;
+
 import org.apache.commons.cli.*;
 
+import util.Configs.Configs;
 import util.Options_intern;
 import util.Report.Report;
+
+import java.io.File;
 
 
 public class COM2POSE
 {
+    public static Configs configs;
 
     public static void main(String[] args) throws Exception
     {
         Options_intern options_intern = new Options_intern();
         parseArguments(args, options_intern);
+
+        configs = new Configs(new File(options_intern.com2pose_working_directory),
+                new File(options_intern.path_to_COM2POSE));
+
+        configs.merge(new File(options_intern.path_to_COM2POSE + File.separator + "config_templates" + File.separator +
+                "configsTemplate.json"));
 
         //prepare pipeline
         COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);

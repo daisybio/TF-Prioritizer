@@ -1,5 +1,7 @@
-<button class="accordion" onclick="toggleAccordion('{ID}')">{TF_NAME}</button>
-<div class="panel" id="{ID}">
+<div class="accordion">
+    <button onclick="toggleAccordion('{ID}-panel')">{TF_NAME}</button>
+</div>
+<div class="panel" id="{ID}-panel">
     {BUTTONBAR}
     {SINGLE_TFS}
 </div>

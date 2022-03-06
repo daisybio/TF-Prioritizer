@@ -1,0 +1,144 @@
+{
+  "TpmGcFilterAnalysis": {
+    "FileStructure": {
+      "d_wd": null
+    },
+    "tfList": null
+  },
+  "DeSeq2": {
+    "FileStructure": {
+      "s_preprocessing_genePositions_mergedEnhancerDbs_bedSuffix": ".bed",
+      "s_preprocessing_genePositions_mergedEnhancerDbs_bedFormat": "chrom\tchromStart\tchromEnd\tname\treference_genome"
+    },
+    "tpmFilter": null,
+    "inputGeneID": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data/Gene_id.txt",
+    "biomartDatasetSymbolColumn": null,
+    "countThreshold": 50,
+    "biomartDatasetSpecies": "mmusculus_gene_ensembl",
+    "inputDirectory": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data"
+  },
+  "Dynamite": {
+    "iFolds": 6,
+    "cores": 1,
+    "performance": true,
+    "preprocessing_IntegrateDataConsiderGeneFile": null,
+    "alpha": 0.1,
+    "testSize": 0.2,
+    "outVar": "Expression",
+    "oFolds": 3,
+    "balanced": true,
+    "randomize": false
+  },
+  "ChipAtlas": {
+    "genomeVersion": null,
+    "tissueType": null
+  },
+  "Tepic": {
+    "inputPrevious": null,
+    "transcriptBased": false,
+    "randomizeTfGeneMatrix": false,
+    "columnBedfile": null,
+    "windowSize": 50000,
+    "loopListFile": null,
+    "cores": 4,
+    "loopWindows": 5000,
+    "geneAnnotationFile": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/gencode.vM25.annotation.gtf",
+    "ensgSymbolFile": null,
+    "exponentialDecay": true,
+    "doNotNormalizePeakLength": false,
+    "doNotGenerate": false,
+    "inputDirectory": "/home/nico/Software/COM2POSE_raw_data/01_ChIP_seq/03_broadPeaks_inc_Pol2",
+    "maxMinutesPerChromosome": 3,
+    "pathPwms": "/home/nico/Software/COM2POSE/ext/TEPIC/TEPIC/PWMs/2.1/Merged_PSEMs/Merged_JASPAR_HOCOMOCO_KELLIS_Mus_musculus.PSEM",
+    "doZip": false,
+    "originalDecay": false,
+    "psemsLengthFile": null,
+    "pValue": 0.05,
+    "chromosomePrefix": false,
+    "tgeneTargetGenes": true,
+    "tfBindingSiteSearch": "INSIDE",
+    "onlyPeakFeatures": false,
+    "entireGeneBody": false,
+    "betweenMaxBps": 500,
+    "tpmCutoff": null,
+    "twoBitFile": null,
+    "backgroundSequencesDirectory": null,
+    "inputOriginal": null,
+    "onlyDNasePeaks": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/gencode.vM25.annotation.gtf",
+    "inputReferenceGenome": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/genome.fa",
+    "bedChromatinSignal": null
+  },
+  "MixOptions": {
+    "mutuallyExclusiveDifferentialPeakSignals": true,
+    "level": null,
+    "mutuallyExclusive": false,
+    "occurrenceIntersection": 2,
+    "option": null
+  },
+  "Plots": {
+    "cutoffTps": 1,
+    "cutoffGcs": 100,
+    "thresholds": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6
+    ],
+    "cutoffTpms": 0,
+    "mannWhitneyUPvalueCutoff": 0.01,
+    "topKGenes": 30,
+    "cutoffHms": 1,
+    "distributionAnalysisScoreType": "ECVL_GENE_COUNTS",
+    "trapPredictedSequenceLogosAffinityCutoff": 0.05
+  },
+  "Misc": {
+    "conversionHelpers_groups": null,
+    "conversionHelpers_conversionInput": null,
+    "conversionHelpers_inputFormat": null,
+    "conversionHelpers_biomartColumn": null
+  },
+  "General": {
+    "fileLogging": true,
+    "ensgMappingEnabled": true,
+    "calculateGenePositionsEnabled": true,
+    "calculateTpmLengthsEnabled": true
+  },
+  "Tgene": {
+    "selfRegulatory": false,
+    "consensus": 0.5,
+    "pathToExecutable": null,
+    "noClosestLocus": false,
+    "consensusCalc": "INCREASE_TGENE_TFS",
+    "maxLinkDistance": 500000,
+    "noClosestTss": false,
+    "mtWriting": "MT",
+    "pValue": 0.05
+  },
+  "Igv": {
+    "port": 60151,
+    "topLog2fcIncludeLncRnaPseudogenes": true,
+    "pathToTdf": null,
+    "pathToTfChipSeq": null,
+    "pathToIGV": null,
+    "topLog2fc": 15,
+    "speciesReferenceGenome": null,
+    "includePredictionData": null,
+    "importantLociAllPrioTf": [
+      "CSN",
+      "SOCS2",
+      "STAT5",
+      "WAP"
+    ],
+    "enhancerDatabases": null,
+    "grcSynonymDict": null
+  },
+  "Blacklist": {
+    "bedFilePath": "/home/nico/Software/COM2POSE_raw_data/05_black_listed_regions/mm10-blacklist.v2.txt",
+    "signalsToIgnore": [
+      "LOW_MAPPABILITY",
+      "HIGH_SIGNAL_REGION"
+    ]
+  }
+}

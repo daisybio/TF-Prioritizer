@@ -274,9 +274,6 @@ public class Options_intern
     public String d_out_important_loci = d_out_report + File.separator + "importantLoci";
     public String d_out_top_log2fc = d_out_report + File.separator + "topLog2fc";
     public String d_out_media = d_out_report + File.separator + "MEDIA";
-    public String f_out_report_logo_png = d_out_media + File.separator + "logo.png";
-    public String f_out_report_is_available_png = d_out_media + File.separator + "is_available.png";
-    public String f_out_report_not_available_png = d_out_media + File.separator + "not_available.png";
     public String f_out_report_important_loci_html = d_out_report + File.separator + "IMPORTANT_LOCI.html";
     public String f_out_report_top_log2fc_html = d_out_report + File.separator + "TOP_LOG2FC.html";
     public String f_out_report_cooccurrence_html = d_out_report + File.separator + "COOCCURRENCE.html";
@@ -284,17 +281,16 @@ public class Options_intern
     public String d_out_validation_logos_tf_binding_sequence = "logosTfBindingSequence";
     public String d_out_validation_logos_biophysical_model = "logosBiophysicalModel";
     public String f_out_validation_logos_biophysical_png = "BiophysicalModel.png";
+    public String d_out_regression_performance = d_out_regression + File.separator + "Performance";
+    public String f_out_regression_performance_analysis_html =
+            d_out_regression_performance + File.separator + "PERFORMANCE_ANALYSIS.html";
+    public String d_out_regression_performance_barplots = d_out_regression_performance + File.separator + "barplots";
+    public String d_out_regression_performance_heatmap = d_out_regression_performance + File.separator + "heatmap";
+    public String d_out_regression_performance_foldChanges =
+            d_out_regression_performance + File.separator + "foldChanges";
 
     public String d_report_resources = folder_ext + File.separator + "REPORT";
     public String d_report_resources_media = d_report_resources + File.separator + "MEDIA";
-    public String f_report_resources_logo_png = d_report_resources_media + File.separator + "logo.png";
-    public String f_report_resources_is_available_png = d_report_resources_media + File.separator + "is_available.png";
-    public String f_report_resources_not_available_png =
-            d_report_resources_media + File.separator + "not_available.png";
-    public String f_report_resources_three_level_image_selector_html =
-            d_report_resources + File.separator + "THREE_LEVEL_IMAGE_SELECTOR.html";
-    public String f_report_resources_two_level_image_selector_html =
-            d_report_resources + File.separator + "TWO_LEVEL_IMAGE_SELECTOR.html";
     public String f_report_resources_important_loci_html = d_report_resources + File.separator + "IMPORTANT_LOCI.html";
     public String f_report_resources_top_log2fc_html = d_report_resources + File.separator + "TOP_LOG2FC.html";
     public String f_report_resources_cooccurrence_html = d_report_resources + File.separator + "COOCCURRENCE.html";
@@ -326,7 +322,9 @@ public class Options_intern
             d_report_resources_distribution + File.separator + "DISTRIBUTION" + ".html";
     public String d_report_resources_regression = d_report_resources + File.separator + "REGRESSION";
     public String f_report_resources_regression_regression_html =
-            d_report_resources_regression + File.separator + "REGRESSION" + ".html";
+            d_report_resources_regression + File.separator + "REGRESSION.html";
+    public String f_report_resources_regression_regression_performance_html =
+            d_report_resources_regression + File.separator + "PERFORMANCE_ANALYSIS.html";
 
     /*#################################
       ##PREPROCESSING MIX OPTIONS######

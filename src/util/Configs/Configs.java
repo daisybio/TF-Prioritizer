@@ -32,7 +32,7 @@ import static util.FileManagement.extend;
 public class Configs
 {
     public final Config<File> workingDirectory, sourceDirectory;
-    public final Map<String, AbstractModule> configs = new HashMap<>();
+    private final Map<String, AbstractModule> configs = new HashMap<>();
     public General general;
     public Jaspar jaspar;
     public Tgene tgene;
@@ -109,13 +109,23 @@ public class Configs
 
     private String getConfigsJSONString(boolean onlyWriteable)
     {
+        return getConfigsJSONObject(onlyWriteable).toString(4);
+    }
+
+    public JSONObject getConfigsJSONObject(boolean onlyWriteable)
+    {
         JSONObject combined = new JSONObject();
 
         for (String key : configs.keySet())
         {
-            combined.accumulate(key, configs.get(key).toJSONObject(onlyWriteable));
+            JSONObject module = configs.get(key).toJSONObject(onlyWriteable);
+            if (!module.isEmpty())
+            {
+                combined.accumulate(key, module);
+            }
         }
-        return combined.toString(4);
+
+        return combined;
     }
 
     public void save(File file, boolean onlyWriteable) throws IOException

@@ -1,47 +1,64 @@
 <div class="header">
     <h1>
-        {TFNAME}
+        {TFNAME}: Distribution Analysis
     </h1>
-    <button onclick="window.location.href='{RELATIVATION}REGRESSION/{TFNAME}/{TFNAME}.html';">
+    <button onclick="toggleAccordion('info')">
+        <img src="{RELATIVATION}MEDIA/info_dark.svg">
+    </button>
+</div>
+<div class="panel text" id="info">
+    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+        condimentum
+        purus a
+        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+        metus nisl.</label>
+</div>
+<div class="buttonbar">
+    <a href='{RELATIVATION}REGRESSION/{TFNAME}/{TFNAME}.html'>
         Regression Analysis
-    </button>
-    <button onclick="window.location.href='{RELATIVATION}VALIDATION/{TFNAME}/{TFNAME}.html';">
+    </a>
+    <a href='{RELATIVATION}VALIDATION/{TFNAME}/{TFNAME}.html'>
         Validation Analysis
-    </button>
+    </a>
     {GENECARD_LINKS}
 </div>
-<button class="accordion" onclick="toggleAccordion('basicData')">Basic data</button>
-<div class="panel" id="basicData">
-    {BASICDATA}
+<div class="main">
+    <div class="accordion">
+        <button onclick="toggleAccordion('basicData')">Basic data</button>
+    </div>
+    <div class="panel" id="basicData">
+        {BASICDATA}
+    </div>
+    <div class="accordion">
+        <button class="text" onclick="toggleAccordion('discCumGain')">Discounted cumulative gain</button>
+        <button class="image"
+                onclick="toggleAccordion('discCumGain-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+    </div>
+    <div class="panel text" id="discCumGain-info">
+        <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+            condimentum
+            purus a
+            maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+            elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+            metus nisl.</label>
+    </div>
+    <div class="panel" id="discCumGain">
+        <h2>Overall score: {DCG_SCORE}</h2>
+        {DISCOUNTED_CUMULATIVE_GAIN}
+    </div>
+    <div class="accordion">
+        <button class="text" onclick="toggleAccordion('distributionPlots')">Distribution plots</button>
+        <button class="image"
+                onclick="toggleAccordion('distPlots-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
+    </div>
+    <div class="panel text" id="distPlots-info">
+        <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
+            condimentum
+            purus a
+            maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
+            elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
+            metus nisl.</label>
+    </div>
+    {DISTRIBUTION_PLOTS}
 </div>
-<div class="accordion-info">
-    <button class="accordion" onclick="toggleAccordion('discCumGain')">Discounted cumulative gain</button>
-    <button class="info"
-            onclick="toggleAccordion('discCumGain-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
-</div>
-<div class="panel info" id="discCumGain-info">
-    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
-        condimentum
-        purus a
-        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
-        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
-        metus nisl.</label>
-</div>
-<div class="panel" id="discCumGain">
-    <h2>Overall score: {DCG_SCORE}</h2>
-    {DISCOUNTED_CUMULATIVE_GAIN}
-</div>
-<div class="accordion-info">
-    <button class="accordion" onclick="toggleAccordion('distributionPlots')">Distribution plots</button>
-    <button class="info"
-            onclick="toggleAccordion('distPlots-info')"><img src="{RELATIVATION}MEDIA/info.svg"></button>
-</div>
-<div class="panel info" id="distPlots-info">
-    <label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a lorem neque. Integer
-        condimentum
-        purus a
-        maximus vehicula. Aenean interdum ligula vitae interdum ullamcorper. Sed vehicula sem id leo condimentum
-        elementum. Ut varius quis turpis vitae tristique. Donec viverra venenatis condimentum. Aliquam sit amet
-        metus nisl.</label>
-</div>
-{DISTRIBUTION_PLOTS}

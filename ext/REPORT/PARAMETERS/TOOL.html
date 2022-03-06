@@ -1,8 +1,7 @@
-<button class="accordion">{TOOL_NAME}</button>
-<div class="panel">
-    <h3>Name</h3>
-    <h3>Default</h3>
-    <h3>Custom</h3>
-    <h3>Description</h3>
-    {PARAMETERS}
+<div class="accordion">
+    <button onclick="toggleAccordion('{ID}')">{TOOL_NAME}</button>
+</div>
+<div class="panel" id="{ID}">
+    {SUBMODULES}
+    {SIMPLECONFIGS}
 </div>
