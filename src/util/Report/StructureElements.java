@@ -35,6 +35,7 @@ public class StructureElements
         template = template.replace("{GENE-ID}", transcriptionFactor.getGeneID());
         template = template.replace("{GENECARDS-LINK}",
                 COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", transcriptionFactor.getName()));
+        template = template.replace("{TF-NAME}", transcriptionFactor.getName());
 
         template = template.replace("{LOG2FC}",
                 getBasicDataEntry(transcriptionFactor.getName(), "LOG2FC", transcriptionFactor.getLog2fc()));
