@@ -82,7 +82,16 @@ public class Configs
     public void merge(File configFile) throws IOException
     {
         String content = FileManagement.loadFile(configFile);
-        JSONObject combined = new JSONObject(content);
+        JSONObject combined = new JSONObject();
+
+        try
+        {
+            combined = new JSONObject(content);
+        } catch (JSONException e)
+        {
+            logger.error("The config JSON-File does not match the JSON formant: " + e.getMessage());
+            System.exit(1);
+        }
 
         for (String moduleName : combined.keySet())
         {
@@ -96,8 +105,6 @@ public class Configs
             {
                 logger.warn("Trying to set config for unknown module: " + moduleName);
             }
-
-
         }
         logger.info("Merged configuration file from " + configFile.getAbsolutePath());
     }
