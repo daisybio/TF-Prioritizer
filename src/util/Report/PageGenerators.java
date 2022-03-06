@@ -4,6 +4,8 @@ import com.sun.tools.jconsole.JConsoleContext;
 import com2pose.COM2POSE;
 import org.json.JSONObject;
 import org.json.JSONString;
+import util.Configs.Configs;
+import util.Configs.Modules.AbstractModule;
 import util.FileManagement;
 import util.MapSymbolAndEnsg;
 
@@ -11,6 +13,7 @@ import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -166,10 +169,75 @@ public class PageGenerators
         String parameters = StructureElements.getFrame("Parameters",
                 COM2POSE.configs.report.fileStructure.input.f_parameters.get());
 
-        parameters = parameters.replace("{TOOLS}",
-                FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_parameters_tool.get()));
-        parameters = parameters.replace("{PARAMETERS}",
-                FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_parameters_parameter.get()));
+        String moduleTemplate =
+                FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_parameters_tool.get());
+
+        StringBuilder sb_tools = new StringBuilder();
+
+        JSONObject configs = COM2POSE.configs.getConfigsJSONObject(true);
+
+        for (String moduleName : configs.keySet())
+        {
+            JSONObject module = configs.getJSONObject(moduleName);
+
+            if (module.isEmpty())
+            {
+                continue;
+            }
+
+            String moduleString = moduleTemplate.replace("{TOOL_NAME}", moduleName);
+            moduleString = moduleString.replace("{ID}", moduleName);
+
+            StringBuilder sb_subModules = new StringBuilder();
+            StringBuilder sb_simpleConfigs = new StringBuilder();
+
+            for (String configName : module.keySet())
+            {
+                if (module.get(configName).getClass().equals(JSONObject.class))
+                {
+                    JSONObject subModule = module.getJSONObject(configName);
+
+                    if (subModule.isEmpty())
+                    {
+                        continue;
+                    }
+
+                    String subModuleString = moduleTemplate.replace("{TOOL_NAME}", configName);
+                    subModuleString = subModuleString.replace("{ID}", moduleName + "_" + configName);
+                    subModuleString = subModuleString.replace("{SUBMODULES}", "");
+
+                    StringBuilder sb_subConfigs = new StringBuilder();
+                    for (String subConfigName : subModule.keySet())
+                    {
+                        sb_subConfigs.append("<p>");
+                        sb_subConfigs.append(subConfigName);
+                        sb_subConfigs.append(": ");
+                        sb_subConfigs.append(subModule.get(subConfigName).toString());
+                        sb_subConfigs.append("</p>");
+                    }
+                    subModuleString = subModuleString.replace("{SIMPLECONFIGS}", sb_subConfigs.toString());
+
+                    sb_subModules.append(subModuleString);
+                } else
+                {
+                    sb_simpleConfigs.append("<p>");
+                    sb_simpleConfigs.append(configName);
+                    sb_simpleConfigs.append(": ");
+                    sb_simpleConfigs.append(module.get(configName).toString());
+                    sb_simpleConfigs.append("</p>");
+                }
+            }
+
+            moduleString = moduleString.replace("{SUBMODULES}", sb_subModules.toString());
+            moduleString = moduleString.replace("{SIMPLECONFIGS}", sb_simpleConfigs.toString());
+
+            sb_tools.append(moduleString);
+        }
+
+        parameters = parameters.replace("{TOOLS}", sb_tools.toString());
+
+        //parameters = parameters.replace("{PARAMETERS}",
+        //        FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_parameters_parameter.get()));
 
         FileManagement.writeHTML(COM2POSE.configs.report.fileStructure.output.f_parameters.get(), parameters, 0);
         Report.logger.logLine("[REPORT] Finished generating report parameters page");

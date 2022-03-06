@@ -106,7 +106,11 @@ public abstract class AbstractModule
 
         for (String key : subModules.keySet())
         {
-            combined.accumulate(key, subModules.get(key).toJSONObject(onlyWriteable));
+            JSONObject subModuleJSONObject = subModules.get(key).toJSONObject(onlyWriteable);
+            if (!subModuleJSONObject.keySet().isEmpty())
+            {
+                combined.accumulate(key, subModuleJSONObject);
+            }
         }
         for (String key : entries.keySet())
         {

@@ -109,13 +109,19 @@ public class Configs
 
     private String getConfigsJSONString(boolean onlyWriteable)
     {
+        return getConfigsJSONObject(onlyWriteable).toString(4);
+    }
+
+    public JSONObject getConfigsJSONObject(boolean onlyWriteable)
+    {
         JSONObject combined = new JSONObject();
 
         for (String key : configs.keySet())
         {
             combined.accumulate(key, configs.get(key).toJSONObject(onlyWriteable));
         }
-        return combined.toString(4);
+
+        return combined;
     }
 
     public void save(File file, boolean onlyWriteable) throws IOException
