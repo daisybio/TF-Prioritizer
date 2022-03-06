@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import static util.FileManagement.extend;
 
-public class Output extends AbstractModule
+public class OutputStructure extends AbstractModule
 {
     public final Config<File> root = extend(workingDirectory, "REPORT");
     public final Config<File> f_home = extend(root, "HOME.html");
@@ -46,7 +46,7 @@ public class Output extends AbstractModule
 
     public final Config<File> f_cooccurrence_html = extend(root, "COOCCURRENCE.html");
 
-    public Output(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public OutputStructure(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

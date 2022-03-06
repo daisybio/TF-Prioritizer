@@ -18,11 +18,10 @@ public class StructureElements
 
     static String getBasicData(TranscriptionFactor transcriptionFactor) throws IOException
     {
-        String template = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_basicData.get());
+        String template = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_basicData.get());
 
 
-        String log2fcTemplate =
-                FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_basicDataEntry.get());
+        String log2fcTemplate = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_basicDataEntry.get());
 
         log2fcTemplate = log2fcTemplate.replace("{NAME}", "LOG2FC");
 
@@ -32,7 +31,7 @@ public class StructureElements
         log2fcTemplate = log2fcTemplate.replace("{INFO-ID}", transcriptionFactor.getName() + "-" + "log2fc");
 
         template = template.replace("{GENEID}",
-                FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_basicDataGeneID.get()));
+                FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_basicDataGeneID.get()));
         template = template.replace("{GENE-ID}", transcriptionFactor.getGeneID());
         template = template.replace("{GENECARDS-LINK}",
                 COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", transcriptionFactor.getName()));
@@ -62,7 +61,7 @@ public class StructureElements
         }
 
         StringBuilder basicData = new StringBuilder();
-        String tfTemplate = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_home_tf.get());
+        String tfTemplate = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_home_tf.get());
 
         for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
         {
@@ -84,7 +83,7 @@ public class StructureElements
             return "";
         }
 
-        String template = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_basicDataEntry.get());
+        String template = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_basicDataEntry.get());
 
         template = template.replace("{ANALYSIS-NAME}", name);
 
@@ -234,7 +233,7 @@ public class StructureElements
 
     static String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        String buttonbar = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_home_buttonbar.get());
+        String buttonbar = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_home_buttonbar.get());
 
         buttonbar = buttonbar.replace("{VALIDATION}",
                 "VALIDATION" + File.separator + tfGroup.getName() + File.separator + tfGroup.getName() + ".html");
@@ -252,7 +251,7 @@ public class StructureElements
 
     static String getFrame(String title, File bodyFile) throws IOException
     {
-        String frame = FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_frame.get());
+        String frame = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_frame.get());
 
         frame = frame.replace("{TITLE}", title);
 

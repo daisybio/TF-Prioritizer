@@ -322,13 +322,13 @@ public class Report
     private void copyDependencies() throws IOException
     {
         logger.logLine("Start copying dependencies");
-        FileManagement.copyFile(COM2POSE.configs.report.fileStructure.input.f_style.get(),
-                COM2POSE.configs.report.fileStructure.output.f_style.get());
-        FileManagement.copyFile(COM2POSE.configs.report.fileStructure.input.f_script.get(),
-                COM2POSE.configs.report.fileStructure.output.f_script.get());
+        FileManagement.copyFile(COM2POSE.configs.report.inputStructure.f_style.get(),
+                COM2POSE.configs.report.outputStructure.f_style.get());
+        FileManagement.copyFile(COM2POSE.configs.report.inputStructure.f_script.get(),
+                COM2POSE.configs.report.outputStructure.f_script.get());
 
-        FileManagement.copyDirectory(COM2POSE.configs.report.fileStructure.input.d_media.get(),
-                COM2POSE.configs.report.fileStructure.output.d_media.get(), false);
+        FileManagement.copyDirectory(COM2POSE.configs.report.inputStructure.d_media.get(),
+                COM2POSE.configs.report.outputStructure.d_media.get(), false);
         logger.logLine("Finished copying dependencies");
     }
 

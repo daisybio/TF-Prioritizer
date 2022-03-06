@@ -9,7 +9,8 @@ import java.lang.reflect.InvocationTargetException;
 
 public class Report extends AbstractModule
 {
-    public FileStructure fileStructure;
+    public OutputStructure outputStructure;
+    public InputStructure inputStructure;
 
     public final Config<String> genecardsUrl =
             new Config<>("https://www.genecards.org/cgi-bin/carddisp" + ".pl?gene={GENE}");

@@ -35,7 +35,7 @@ public class PageGenerators
     {
         File sourceDir = COM2POSE.configs.igv.fileStructure.d_importantLoci.get();
 
-        File targetDir = COM2POSE.configs.report.fileStructure.output.d_importantLoci.get();
+        File targetDir = COM2POSE.configs.report.outputStructure.d_importantLoci.get();
 
 
         for (File groupFile : Objects.requireNonNull(sourceDir.listFiles()))
@@ -63,25 +63,24 @@ public class PageGenerators
         }
 
         String important_loci = StructureElements.getFrame("Important loci",
-                COM2POSE.configs.report.fileStructure.input.f_importantLoci.get());
+                COM2POSE.configs.report.inputStructure.f_importantLoci.get());
 
         important_loci = important_loci.replace("{IMAGES}",
                 StructureElements.generateImageSelector(targetDir.getName(), targetDir,
                         Arrays.asList(SelectorTypes.GROUPS, SelectorTypes.IMPORTANT_LOCI,
                                 SelectorTypes.EMPTY_DROPDOWN)));
 
-        FileManagement.writeHTML(COM2POSE.configs.report.fileStructure.output.f_importantLoci_html.get(),
-                important_loci, 0);
+        FileManagement.writeHTML(COM2POSE.configs.report.outputStructure.f_importantLoci_html.get(), important_loci, 0);
     }
 
     static void generateTopLog2fc() throws IOException
     {
         File sourceDir = COM2POSE.configs.igv.fileStructure.d_igvTopLog2fc.get();
 
-        File targetDir = COM2POSE.configs.report.fileStructure.output.d_topLog2fc.get();
+        File targetDir = COM2POSE.configs.report.outputStructure.d_topLog2fc.get();
 
         String top_log2fc =
-                StructureElements.getFrame("Top log2fc", COM2POSE.configs.report.fileStructure.input.f_topLog2fc.get());
+                StructureElements.getFrame("Top log2fc", COM2POSE.configs.report.inputStructure.f_topLog2fc.get());
 
         top_log2fc = top_log2fc.replace("{TITLE}", "Top log2fc");
 
@@ -114,7 +113,7 @@ public class PageGenerators
                         Arrays.asList(SelectorTypes.GROUP_PAIRINGS, SelectorTypes.TOP_LOG2FC,
                                 SelectorTypes.EMPTY_DROPDOWN), true, new JSONObject()));
 
-        FileManagement.writeHTML(COM2POSE.configs.report.fileStructure.output.f_topLog2fc_html.get(), top_log2fc, 0);
+        FileManagement.writeHTML(COM2POSE.configs.report.outputStructure.f_topLog2fc_html.get(), top_log2fc, 0);
     }
 
     static void generateCoOccurrence() throws IOException
@@ -123,7 +122,7 @@ public class PageGenerators
 
         String input = FileManagement.loadFile(dataSource);
         String cooccurrence = StructureElements.getFrame("Co-Occurrence analysis",
-                COM2POSE.configs.report.fileStructure.input.f_cooccurrence.get());
+                COM2POSE.configs.report.inputStructure.f_cooccurrence.get());
 
         Map<String, Map<String, Number>> data = new HashMap<>();
 
@@ -149,14 +148,13 @@ public class PageGenerators
 
         cooccurrence = cooccurrence.replace("{TABLE}", StructureElements.getTabularData("coOccurrence", data));
 
-        FileManagement.writeHTML(COM2POSE.configs.report.fileStructure.output.f_cooccurrence_html.get(), cooccurrence,
-                0);
+        FileManagement.writeHTML(COM2POSE.configs.report.outputStructure.f_cooccurrence_html.get(), cooccurrence, 0);
     }
 
     static void generateOverview() throws IOException
     {
-        File source = COM2POSE.configs.report.fileStructure.input.f_overview.get();
-        File target = COM2POSE.configs.report.fileStructure.output.f_overview.get();
+        File source = COM2POSE.configs.report.inputStructure.f_overview.get();
+        File target = COM2POSE.configs.report.outputStructure.f_overview.get();
 
         String frame = StructureElements.getFrame("Overview", source);
 
@@ -166,11 +164,10 @@ public class PageGenerators
     static void generateParameters() throws IOException
     {
         Report.logger.logLine("[REPORT] Start generating report parameters page");
-        String parameters = StructureElements.getFrame("Parameters",
-                COM2POSE.configs.report.fileStructure.input.f_parameters.get());
+        String parameters =
+                StructureElements.getFrame("Parameters", COM2POSE.configs.report.inputStructure.f_parameters.get());
 
-        String moduleTemplate =
-                FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_parameters_tool.get());
+        String moduleTemplate = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_parameters_tool.get());
 
         StringBuilder sb_tools = new StringBuilder();
 
@@ -237,9 +234,9 @@ public class PageGenerators
         parameters = parameters.replace("{TOOLS}", sb_tools.toString());
 
         //parameters = parameters.replace("{PARAMETERS}",
-        //        FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_parameters_parameter.get()));
+        //        FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_parameters_parameter.get()));
 
-        FileManagement.writeHTML(COM2POSE.configs.report.fileStructure.output.f_parameters.get(), parameters, 0);
+        FileManagement.writeHTML(COM2POSE.configs.report.outputStructure.f_parameters.get(), parameters, 0);
         Report.logger.logLine("[REPORT] Finished generating report parameters page");
     }
 
@@ -247,7 +244,7 @@ public class PageGenerators
     {
         Report.logger.logLine("[REPORT] Start generating report home page");
         String home = StructureElements.getFrame("Transcription factors",
-                COM2POSE.configs.report.fileStructure.input.f_home.get());
+                COM2POSE.configs.report.inputStructure.f_home.get());
 
         StringBuilder sb_tfs = new StringBuilder();
 
@@ -264,8 +261,7 @@ public class PageGenerators
             {
                 for (TranscriptionFactor transcriptionFactor : tfGroup.getTranscriptionFactors())
                 {
-                    String tf_string =
-                            FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_home_tf.get());
+                    String tf_string = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_home_tf.get());
 
                     tf_string = tf_string.replace("{BUTTONBAR}", StructureElements.getButtonBar(tfGroup));
 
@@ -285,7 +281,7 @@ public class PageGenerators
             } else
             {
                 String tfGroupString =
-                        FileManagement.loadFile(COM2POSE.configs.report.fileStructure.input.f_home_tfGroup.get());
+                        FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_home_tfGroup.get());
 
                 tfGroupString = tfGroupString.replace("{TF_NAME}", i + ". " + tfGroup.getName());
                 tfGroupString = tfGroupString.replace("{ID}", String.valueOf(tfGroup.getName().hashCode()));
@@ -300,7 +296,7 @@ public class PageGenerators
         }
         home = home.replace("{TFS}", sb_tfs.toString());
 
-        FileManagement.writeHTML(COM2POSE.configs.report.fileStructure.output.f_home.get(), home, 0);
+        FileManagement.writeHTML(COM2POSE.configs.report.outputStructure.f_home.get(), home, 0);
         Report.logger.logLine("[REPORT] Finished generating report home page");
     }
 
@@ -315,13 +311,12 @@ public class PageGenerators
                 {
                     FileManagement.copyFile(
                             new File(group_pairing.getAbsolutePath() + File.separator + "Performance_Barplots.png"),
-                            new File(
-                                    COM2POSE.configs.report.fileStructure.output.d_regression_performance_barplots.get()
-                                            .getAbsolutePath() + File.separator + hm.getName() + File.separator +
-                                            group_pairing.getName() + ".png"));
+                            new File(COM2POSE.configs.report.outputStructure.d_regression_performance_barplots.get()
+                                    .getAbsolutePath() + File.separator + hm.getName() + File.separator +
+                                    group_pairing.getName() + ".png"));
 
                     FileManagement.copyDirectory(group_pairing, new File(
-                                    COM2POSE.configs.report.fileStructure.output.d_regression_performance_foldChanges.get()
+                                    COM2POSE.configs.report.outputStructure.d_regression_performance_foldChanges.get()
                                             .getAbsolutePath() + File.separator + hm.getName() + File.separator +
                                             group_pairing.getName()), true,
                             "Misclassification_vs_Lambda_Fold_[1-9]_Integrated_Data_For_Classification.svg",
@@ -329,7 +324,7 @@ public class PageGenerators
 
                     FileManagement.copyFile(new File(group_pairing.getAbsolutePath() + File.separator +
                                     "Regression_Coefficients_Cross_Validation_Heatmap_Integrated_Data_For_Classification.svg"),
-                            new File(COM2POSE.configs.report.fileStructure.output.d_regression_performance_heatmap.get()
+                            new File(COM2POSE.configs.report.outputStructure.d_regression_performance_heatmap.get()
                                     .getAbsolutePath() + File.separator + hm.getName() + File.separator +
                                     group_pairing.getName() + ".svg"));
                 }
@@ -338,24 +333,24 @@ public class PageGenerators
         } // Copy files
 
         String frame = StructureElements.getFrame("Regression performance analysis",
-                COM2POSE.configs.report.fileStructure.input.f_regressionPerformance.get());
+                COM2POSE.configs.report.inputStructure.f_regressionPerformance.get());
 
         List<String> fileNames = new ArrayList<>();
 
         Report.existingValues.get(SelectorTypes.PERFORMANCE_CUTOFFS).forEach(cutoff -> fileNames.add(cutoff + ".svg"));
 
-        File d_fold_changes = COM2POSE.configs.report.fileStructure.output.d_regression_performance_foldChanges.get();
+        File d_fold_changes = COM2POSE.configs.report.outputStructure.d_regression_performance_foldChanges.get();
 
         frame = frame.replace("{PERFORMANCE_FOLD_CHANGES}",
                 StructureElements.generateImageSelector(d_fold_changes, "foldChanges",
                         Arrays.asList(Report.existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS),
                                 Report.existingValues.get(SelectorTypes.GROUP_PAIRINGS), fileNames), new JSONObject()));
 
-        File d_barplots = COM2POSE.configs.report.fileStructure.output.d_regression_performance_barplots.get();
+        File d_barplots = COM2POSE.configs.report.outputStructure.d_regression_performance_barplots.get();
         frame = frame.replace("{PERFORMANCE_BARPLOT}", StructureElements.generateImageSelector("barplots", d_barplots,
                 Arrays.asList(SelectorTypes.HISTONE_MODIFICATIONS, SelectorTypes.GROUP_PAIRINGS)));
 
-        File d_heatmap = COM2POSE.configs.report.fileStructure.output.d_regression_performance_heatmap.get();
+        File d_heatmap = COM2POSE.configs.report.outputStructure.d_regression_performance_heatmap.get();
         fileNames.clear();
         Report.existingValues.get(SelectorTypes.GROUP_PAIRINGS)
                 .forEach(group_pairing -> fileNames.add(group_pairing + ".svg"));
@@ -365,17 +360,16 @@ public class PageGenerators
                         Arrays.asList(Report.existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS), fileNames),
                         new JSONObject()));
 
-        FileManagement.writeHTML(COM2POSE.configs.report.fileStructure.output.f_regression_performance_html.get(),
-                frame, 2);
+        FileManagement.writeHTML(COM2POSE.configs.report.outputStructure.f_regression_performance_html.get(), frame, 2);
     }
 
     static boolean generateValidation(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        File templateFile = COM2POSE.configs.report.fileStructure.input.f_validation.get();
+        File templateFile = COM2POSE.configs.report.inputStructure.f_validation.get();
 
         File d_igv_screenshots = COM2POSE.configs.igv.fileStructure.d_root.get();
 
-        File d_out_validation = COM2POSE.configs.report.fileStructure.output.d_validation.get();
+        File d_out_validation = COM2POSE.configs.report.outputStructure.d_validation.get();
 
         File d_heatmaps = COM2POSE.configs.distributionAnalysis.fileStructure.d_heatmaps.get();
 
@@ -504,11 +498,11 @@ public class PageGenerators
                 File sourceDir = COM2POSE.configs.distributionAnalysis.fileStructure.d_logos_biophysicalModel.get();
 
                 File targetFile = new File(
-                        COM2POSE.configs.report.fileStructure.output.d_validation.get().getAbsolutePath() +
-                                File.separator + tfGroup.getName() + File.separator +
-                                COM2POSE.configs.report.fileStructure.output.s_validation_logos_biophysicalModel +
+                        COM2POSE.configs.report.outputStructure.d_validation.get().getAbsolutePath() + File.separator +
+                                tfGroup.getName() + File.separator +
+                                COM2POSE.configs.report.outputStructure.s_validation_logos_biophysicalModel +
                                 File.separator +
-                                COM2POSE.configs.report.fileStructure.output.s_validation_logos_biophysicalModel_png);
+                                COM2POSE.configs.report.outputStructure.s_validation_logos_biophysicalModel_png);
 
                 File tempDir = FileManagement.getFileIfInDirectory(sourceDir, "[0-9]+_" + tfGroup.getName(), false);
 
@@ -541,9 +535,9 @@ public class PageGenerators
                 File sDir = COM2POSE.configs.distributionAnalysis.fileStructure.d_logos_tfSequence.get();
 
                 File targetDir = new File(
-                        COM2POSE.configs.report.fileStructure.output.d_validation.get().getAbsolutePath() +
-                                File.separator + tfGroup.getName() + File.separator +
-                                COM2POSE.configs.report.fileStructure.output.s_validation_logos_tfSequence.get());
+                        COM2POSE.configs.report.outputStructure.d_validation.get().getAbsolutePath() + File.separator +
+                                tfGroup.getName() + File.separator +
+                                COM2POSE.configs.report.outputStructure.s_validation_logos_tfSequence.get());
 
                 File sourceDir = FileManagement.getFileIfInDirectory(sDir, "[0-9]+_" + tfGroup.getName(), false);
 
@@ -602,9 +596,9 @@ public class PageGenerators
                 File sDir = COM2POSE.configs.distributionAnalysis.fileStructure.d_logos_tfBindingSequence.get();
 
                 File targetDir = new File(
-                        COM2POSE.configs.report.fileStructure.output.d_validation.get().getAbsolutePath() +
-                                File.separator + tfGroup.getName() + File.separator +
-                                COM2POSE.configs.report.fileStructure.output.s_validation_logos_tfBindingSequence.get());
+                        COM2POSE.configs.report.outputStructure.d_validation.get().getAbsolutePath() + File.separator +
+                                tfGroup.getName() + File.separator +
+                                COM2POSE.configs.report.outputStructure.s_validation_logos_tfBindingSequence.get());
 
                 File sourceDir = FileManagement.getFileIfInDirectory(sDir, "[0-9]+_" + tfGroup.getName(), false);
 
@@ -631,7 +625,7 @@ public class PageGenerators
         {
             File sourceDir = COM2POSE.configs.igv.fileStructure.d_igvDcgTargetGenes.get();
 
-            File targetDir = COM2POSE.configs.report.fileStructure.output.d_validation.get();
+            File targetDir = COM2POSE.configs.report.outputStructure.d_validation.get();
 
             File source = FileManagement.getFileIfInDirectory(sourceDir, tfGroup.getName(), false);
 
@@ -706,7 +700,7 @@ public class PageGenerators
         frame = StructureElements.setGeneCardLinks(frame, tfGroup);
 
         FileManagement.writeHTML(new File(
-                COM2POSE.configs.report.fileStructure.output.d_validation.get().getAbsolutePath() + File.separator +
+                COM2POSE.configs.report.outputStructure.d_validation.get().getAbsolutePath() + File.separator +
                         tfGroup.getName() + File.separator + tfGroup.getName() + ".html"), frame, 2);
 
         return true;
@@ -716,10 +710,10 @@ public class PageGenerators
     {
         String id = "distributionPlots";
 
-        File templateFile = COM2POSE.configs.report.fileStructure.input.f_distribution.get();
+        File templateFile = COM2POSE.configs.report.inputStructure.f_distribution.get();
 
         File d_distribution_output = new File(
-                COM2POSE.configs.report.fileStructure.output.d_distribution.get().getAbsolutePath() + File.separator +
+                COM2POSE.configs.report.outputStructure.d_distribution.get().getAbsolutePath() + File.separator +
                         tfGroup.getName());
 
         File d_distribution_plots = new File(d_distribution_output.getAbsolutePath() + File.separator + id);
@@ -837,11 +831,11 @@ public class PageGenerators
 
     static boolean generateRegression(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        File templateFile = COM2POSE.configs.report.fileStructure.input.f_regression.get();
+        File templateFile = COM2POSE.configs.report.inputStructure.f_regression.get();
 
         File d_in_plots = COM2POSE.configs.plots.fileStructure.d_output.get();
 
-        File d_out_regression = COM2POSE.configs.report.fileStructure.output.d_regression.get();
+        File d_out_regression = COM2POSE.configs.report.outputStructure.d_regression.get();
 
         String frame = StructureElements.getFrame(tfGroup.getName() + " - Regression", templateFile);
 
@@ -924,7 +918,7 @@ public class PageGenerators
         frame = StructureElements.setGeneCardLinks(frame, tfGroup);
 
         FileManagement.writeHTML(new File(
-                COM2POSE.configs.report.fileStructure.output.d_regression.get().getAbsolutePath() + File.separator +
+                COM2POSE.configs.report.outputStructure.d_regression.get().getAbsolutePath() + File.separator +
                         tfGroup.getName() + File.separator + tfGroup.getName() + ".html"), frame, 2);
 
         return true;
