@@ -1,5 +1,7 @@
 package util;
 
+import com2pose.COM2POSE;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -16,6 +18,11 @@ public class Logger
     private enum LogLevel
     {
         DEBUG, INFO, WARN, ERROR
+    }
+
+    public Logger(String module) throws IOException
+    {
+        this(module, COM2POSE.configs.general.fileLogging.get(), COM2POSE.configs.general.logFile.get());
     }
 
     public Logger(String module, boolean fileLoggingEnabled, File logFile) throws IOException
