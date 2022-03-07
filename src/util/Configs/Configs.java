@@ -81,7 +81,7 @@ public class Configs
 
     public void merge(File configFile) throws IOException
     {
-        String content = FileManagement.loadFile(configFile);
+        String content = FileManagement.readFile(configFile);
         JSONObject combined = new JSONObject();
 
         try

@@ -1,7 +1,6 @@
-package util.Report;
+package lib.Report;
 
 import com2pose.COM2POSE;
-import util.Configs.Configs;
 import util.FileManagement;
 import util.Logger;
 import util.MapSymbolAndEnsg;
@@ -54,7 +53,7 @@ public class Report
                 File f_data = new File(groups_dir + File.separator +
                         COM2POSE.configs.dynamite.fileStructure.s_output_toBePlotted.get());
 
-                String data = FileManagement.loadFile(f_data);
+                String data = FileManagement.readFile(f_data);
 
                 boolean first = true;
                 for (String line : data.split("\n"))

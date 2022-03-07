@@ -19,9 +19,14 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class FileManagement
 {
-    public static String loadFile(File file) throws IOException
+    public static String readFile(File file) throws IOException
     {
         return Files.readString(file.toPath());
+    }
+
+    public static List<String> readLines(File file) throws IOException
+    {
+        return Files.readAllLines(file.toPath());
     }
 
     public static void copyFile(File source, File target) throws IOException
@@ -63,13 +68,13 @@ public class FileManagement
         }
     }
 
-    public static void copyDirectory(File source, File target, boolean compression) throws IOException
+    public static void copyDirectory(File source, File target, boolean compression)
     {
         copyDirectory(source, target, compression, ".*", new ArrayList<>());
     }
 
     public static void copyDirectory(File source, File target, boolean compression, String fileNameRegex,
-                                     List<String> removables) throws IOException
+                                     List<String> removables)
     {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         for (File sourceFile : Objects.requireNonNull(source.listFiles()))
@@ -139,7 +144,14 @@ public class FileManagement
     public static void writeFile(File file, String content) throws IOException
     {
         makeSureFileExists(file);
-        Files.writeString(file.toPath(), content);
+        if (file.isFile())
+        {
+            Files.writeString(file.toPath(), content);
+        } else
+        {
+            System.out.println(file.getAbsolutePath());
+            throw new IllegalArgumentException("Can only process files, not directories!");
+        }
     }
 
     public static String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
@@ -193,7 +205,7 @@ public class FileManagement
         return null;
     }
 
-    public static void makeSureFileExists(File file) throws IOException
+    public static synchronized void makeSureFileExists(File file) throws IOException
     {
         if (!file.exists())
         {
@@ -203,16 +215,16 @@ public class FileManagement
                 {
                     if (!file.getParentFile().mkdirs())
                     {
-                        throw new IOException();
+                        throw new IOException("parent directory");
                     }
                 }
                 if (!file.createNewFile())
                 {
-                    throw new IOException();
+                    throw new IOException("file");
                 }
             } catch (IOException e)
             {
-                throw new IOException("Exception during file creation: " + file.getAbsolutePath());
+                throw new IOException("Exception during " + e.getMessage() + " creation: " + file.getAbsolutePath());
             }
         }
     }

@@ -20,12 +20,12 @@ public class Logger
         DEBUG, INFO, WARN, ERROR
     }
 
-    public Logger(String module) throws IOException
+    public Logger(String module)
     {
         this(module, COM2POSE.configs.general.fileLogging.get(), COM2POSE.configs.general.logFile.get());
     }
 
-    public Logger(String module, boolean fileLoggingEnabled, File logFile) throws IOException
+    public Logger(String module, boolean fileLoggingEnabled, File logFile)
     {
         this.fileLoggingEnabled = fileLoggingEnabled;
         this.module = module;
@@ -70,7 +70,7 @@ public class Logger
         {
             try
             {
-                FileManagement.appendToFile(logFile, line);
+                FileManagement.appendToFile(logFile, line + "\n");
             } catch (IOException e)
             {
                 fileLoggingEnabled = false;

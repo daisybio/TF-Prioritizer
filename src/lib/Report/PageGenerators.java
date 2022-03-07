@@ -1,19 +1,13 @@
-package util.Report;
+package lib.Report;
 
-import com.sun.tools.jconsole.JConsoleContext;
 import com2pose.COM2POSE;
 import org.json.JSONObject;
-import org.json.JSONString;
-import util.Configs.Configs;
-import util.Configs.Modules.AbstractModule;
 import util.FileManagement;
 import util.MapSymbolAndEnsg;
 
-import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -120,7 +114,7 @@ public class PageGenerators
     {
         File dataSource = COM2POSE.configs.distributionAnalysis.fileStructure.f_cooccurrence_frequencies.get();
 
-        String input = FileManagement.loadFile(dataSource);
+        String input = FileManagement.readFile(dataSource);
         String cooccurrence = StructureElements.getFrame("Co-Occurrence analysis",
                 COM2POSE.configs.report.inputStructure.f_cooccurrence.get());
 
@@ -167,7 +161,7 @@ public class PageGenerators
         String parameters =
                 StructureElements.getFrame("Parameters", COM2POSE.configs.report.inputStructure.f_parameters.get());
 
-        String moduleTemplate = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_parameters_tool.get());
+        String moduleTemplate = FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_parameters_tool.get());
 
         StringBuilder sb_tools = new StringBuilder();
 
@@ -261,7 +255,7 @@ public class PageGenerators
             {
                 for (TranscriptionFactor transcriptionFactor : tfGroup.getTranscriptionFactors())
                 {
-                    String tf_string = FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_home_tf.get());
+                    String tf_string = FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_home_tf.get());
 
                     tf_string = tf_string.replace("{BUTTONBAR}", StructureElements.getButtonBar(tfGroup));
 
@@ -281,7 +275,7 @@ public class PageGenerators
             } else
             {
                 String tfGroupString =
-                        FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_home_tfGroup.get());
+                        FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_home_tfGroup.get());
 
                 tfGroupString = tfGroupString.replace("{TF_NAME}", i + ". " + tfGroup.getName());
                 tfGroupString = tfGroupString.replace("{ID}", String.valueOf(tfGroup.getName().hashCode()));
@@ -399,7 +393,7 @@ public class PageGenerators
                             String fileNameWithoutExtension = f_groupPairing.getName().replace(".csv", "");
                             hmObject.put(fileNameWithoutExtension, new JSONObject(new HashMap<>()
                             {{
-                                put("content", FileManagement.loadFile(f_groupPairing));
+                                put("content", FileManagement.readFile(f_groupPairing));
                                 put("fileExtension", ".csv");
                             }}));
                         }
@@ -520,7 +514,7 @@ public class PageGenerators
                     JSONObject data = new JSONObject();
                     data.put(targetFile.getName().replace(".png", ""), new JSONObject(new HashMap<>()
                     {{
-                        put("content", FileManagement.loadFile(csvFile).replace("\t", ","));
+                        put("content", FileManagement.readFile(csvFile).replace("\t", ","));
                         put("fileExtension", ".csv");
                     }}));
 
@@ -573,7 +567,7 @@ public class PageGenerators
                             {
                                 data.put(nameWithoutExtension, new JSONObject(new HashMap<>()
                                 {{
-                                    put("content", FileManagement.loadFile(jsonFile));
+                                    put("content", FileManagement.readFile(jsonFile));
                                     put("fileExtension", ".json");
                                 }}));
                             }
@@ -773,7 +767,7 @@ public class PageGenerators
                         ranks.put(hmDir.getName(), -1);
                     } finally
                     {
-                        String[] lines = FileManagement.loadFile(statsFile).split("\n");
+                        String[] lines = FileManagement.readFile(statsFile).split("\n");
                         String lastLine = lines[lines.length - 1];
                         sizes.put(hmDir.getName(), Integer.parseInt(lastLine.split("\t")[0]));
                     }

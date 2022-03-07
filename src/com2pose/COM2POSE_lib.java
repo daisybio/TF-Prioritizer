@@ -1,7 +1,11 @@
 package com2pose;
 
+import lib.MixOptions.MIX_Interval;
+import lib.MixOptions.MIX_Interval_Object;
 import org.apache.commons.compress.utils.IOUtils;
 import util.*;
+import util.FileFilters.DirectoryFilter;
+import util.FileFilters.FileFilter;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -16,11 +20,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import static util.FileManagement.*;
 
 public class COM2POSE_lib
 {
     public Options_intern options_intern;
-    public Logger logger;
+    public Logger globalLogger;
 
     //only used in create_overview_website()!!
     ArrayList<File> threshold_folders = new ArrayList<>();
@@ -35,7 +44,7 @@ public class COM2POSE_lib
     public COM2POSE_lib(Options_intern options_intern, Logger logger)
     {
         this.options_intern = options_intern;
-        this.logger = logger;
+        this.globalLogger = logger;
     }
 
     /**
@@ -48,19 +57,19 @@ public class COM2POSE_lib
     {
         this.options_intern = options_intern;
 
-        logger = new Logger("General", options_intern.write_to_logfile,
+        globalLogger = new Logger("General", options_intern.write_to_logfile,
                 new File(options_intern.com2pose_working_directory + File.separator + "logfile.txt"));
 
-        logger.logLine("#########################################");
-        logger.logLine("############## COM2POSE #################");
-        logger.logLine("#########################################");
-        logger.logLine("Working directory set to: " + options_intern.com2pose_working_directory);
-        logger.logLine("COM2POSE path set to: " + options_intern.path_to_COM2POSE);
+        globalLogger.logLine("#########################################");
+        globalLogger.logLine("############## COM2POSE #################");
+        globalLogger.logLine("#########################################");
+        globalLogger.logLine("Working directory set to: " + options_intern.com2pose_working_directory);
+        globalLogger.logLine("COM2POSE path set to: " + options_intern.path_to_COM2POSE);
     }
 
     public void run_cooccurence_analysis() throws Exception
     {
-        logger.logLine("[CO-OCCURENCE] Start Co-Occurence Analysis on found TF ChIP-ATLAS data.");
+        globalLogger.logLine("[CO-OCCURENCE] Start Co-Occurence Analysis on found TF ChIP-ATLAS data.");
 
         File f_output_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
@@ -142,7 +151,7 @@ public class COM2POSE_lib
         //add execution rights
         String command_chmod = "chmod u+x " + f_bash.getAbsolutePath();
 
-        logger.logLine("[CO-OCCURENCE] Add execution rights to script: " + command_chmod);
+        globalLogger.logLine("[CO-OCCURENCE] Add execution rights to script: " + command_chmod);
 
         Process child_chmod = Runtime.getRuntime().exec(command_chmod);
         int code_chmod = child_chmod.waitFor();
@@ -157,7 +166,7 @@ public class COM2POSE_lib
 
         //execute script
         String command_bash = "bash " + f_bash.getAbsolutePath();
-        logger.logLine("[CO-OCCURENCE] Format bedfile: " + command_bash);
+        globalLogger.logLine("[CO-OCCURENCE] Format bedfile: " + command_bash);
 
         Process child_bash = Runtime.getRuntime().exec(command_bash);
         int code_bash = child_bash.waitFor();
@@ -299,7 +308,7 @@ public class COM2POSE_lib
         bw_freq.write(sb_freq.toString());
         bw_freq.close();
 
-        logger.logLine("[CO-OCCURENCE] Finish Co-Occurence Analysis on found TF ChIP-ATLAS data.");
+        globalLogger.logLine("[CO-OCCURENCE] Finish Co-Occurence Analysis on found TF ChIP-ATLAS data.");
     }
 
     /**
@@ -307,7 +316,7 @@ public class COM2POSE_lib
      */
     public void run_igv_top_log2gc() throws Exception
     {
-        logger.logLine("[IGV] run IGV on top upregulated and downregulated genes");
+        globalLogger.logLine("[IGV] run IGV on top upregulated and downregulated genes");
 
         check_tepic_input_with_options();
 
@@ -949,7 +958,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[IGV] finished IGV on top upregulated and downregulated genes");
+        globalLogger.logLine("[IGV] finished IGV on top upregulated and downregulated genes");
     }
 
     /**
@@ -959,7 +968,7 @@ public class COM2POSE_lib
      */
     public void run_igv_on_important_loci() throws Exception
     {
-        logger.logLine("[IGV] Run IGV on important loci.");
+        globalLogger.logLine("[IGV] Run IGV on important loci.");
 
         check_tepic_input_with_options();
 
@@ -1238,12 +1247,12 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[IGV] Finished run IGV on important loci.");
+        globalLogger.logLine("[IGV] Finished run IGV on important loci.");
     }
 
     public void run_igv_on_dcg_targetgenes_heatmaps() throws Exception
     {
-        logger.logLine("[IGV] run IGV on DCG top target genes (affinity value)");
+        globalLogger.logLine("[IGV] run IGV on DCG top target genes (affinity value)");
 
         check_tepic_input_with_options();
 
@@ -1687,13 +1696,13 @@ public class COM2POSE_lib
 
             if (percentage_done % 10 == 0 && !already_done_percentage.contains(percentage_done))
             {
-                logger.logLine("[IGV] percentage of tasks done: " + percentage_done + "%");
+                globalLogger.logLine("[IGV] percentage of tasks done: " + percentage_done + "%");
                 already_done_percentage.add(percentage_done);
             }
             j++;
         }
 
-        logger.logLine("[IGV] finished run IGV on DCG top target genes (affinity value)");
+        globalLogger.logLine("[IGV] finished run IGV on DCG top target genes (affinity value)");
 
     }
 
@@ -1704,7 +1713,7 @@ public class COM2POSE_lib
      */
     public void run_igv_own_data() throws Exception
     {
-        logger.logLine(
+        globalLogger.logLine(
                 "[IGV] start taking screenshots for top TFs and their corresponding top target genes (OWN TF DATA)");
 
         check_tepic_input_with_options();
@@ -1990,7 +1999,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[IGV] taking pictures ...");
+        globalLogger.logLine("[IGV] taking pictures ...");
         /*
         http://software.broadinstitute.org/software/igv/automation
          */
@@ -2572,13 +2581,13 @@ public class COM2POSE_lib
 
             if (percentage_done % 10 == 0 && !already_done_percentage.contains(percentage_done))
             {
-                logger.logLine("[IGV] percentage of tasks done: " + percentage_done + "%");
+                globalLogger.logLine("[IGV] percentage of tasks done: " + percentage_done + "%");
                 already_done_percentage.add(percentage_done);
             }
         }
 
 
-        logger.logLine("[IGV] finished taking screenshots for top TFs and their corresponding top target genes");
+        globalLogger.logLine("[IGV] finished taking screenshots for top TFs and their corresponding top target genes");
     }
 
     /**
@@ -2586,7 +2595,7 @@ public class COM2POSE_lib
      */
     public void run_igv_chr_wide_data() throws Exception
     {
-        logger.logLine("[IGV] Take screenshots of peaks chr wide and genome wide");
+        globalLogger.logLine("[IGV] Take screenshots of peaks chr wide and genome wide");
 
         if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
         {
@@ -2804,7 +2813,7 @@ public class COM2POSE_lib
                 new File(f_output_shot.getAbsolutePath() + File.separator + options_intern.file_suffix_session);
         igv_save_sessions(f_output_session, load_chipatlas_overall, tdf_files);
 
-        logger.logLine("[IGV] Finished taking screenshots of peaks chr wide");
+        globalLogger.logLine("[IGV] Finished taking screenshots of peaks chr wide");
 
     }
 
@@ -2813,7 +2822,7 @@ public class COM2POSE_lib
      */
     public void run_igv_chip_atlas_data() throws Exception
     {
-        logger.logLine("[ChIP-ATLAS-IGV] Start running ChIP Atlas evaluation data. (ChIP-ATLAS data)");
+        globalLogger.logLine("[ChIP-ATLAS-IGV] Start running ChIP Atlas evaluation data. (ChIP-ATLAS data)");
         //logger.logLine("[ChIP-ATLAS-IGV] This is as far automated as possible. If a .bed file is very big a user entry is prompted at IGV, please click GO there!");
 
         check_tepic_input_with_options();
@@ -3516,7 +3525,7 @@ public class COM2POSE_lib
 
             if (percentage_done % 10 == 0 && !already_done_percentage.contains(percentage_done))
             {
-                logger.logLine("[ChIP-ATLAS-IGV] percentage of tasks done: " + percentage_done + "%");
+                globalLogger.logLine("[ChIP-ATLAS-IGV] percentage of tasks done: " + percentage_done + "%");
                 already_done_percentage.add(percentage_done);
             }
 
@@ -3524,7 +3533,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[ChIP-ATLAS-IGV] Finished evaluation with ChIP Atlas data.");
+        globalLogger.logLine("[ChIP-ATLAS-IGV] Finished evaluation with ChIP Atlas data.");
     }
 
     public void get_chip_atlas_data() throws Exception
@@ -3546,7 +3555,7 @@ public class COM2POSE_lib
                 f_output_list.getAbsolutePath() + File.separator + options_intern.file_suffix_chip_atlas_list_csv);
 
 
-        logger.logLine("[ChIP-ATLAS] Reading available TFs in ChIP-Atlas ...");
+        globalLogger.logLine("[ChIP-ATLAS] Reading available TFs in ChIP-Atlas ...");
 
         HashMap<String, String> tf_to_url = new HashMap<>();
 
@@ -3653,8 +3662,8 @@ public class COM2POSE_lib
         }
         br.close();
 
-        logger.logLine("[ChIP-ATLAS] downloading available TF data and creating IGV index files");
-        logger.logLine("[ChIP-ATLAS] waiting ...");
+        globalLogger.logLine("[ChIP-ATLAS] downloading available TF data and creating IGV index files");
+        globalLogger.logLine("[ChIP-ATLAS] waiting ...");
 
         //read in discounted cumulative gain tfs
         File f_input_dcg_result = new File(
@@ -3784,7 +3793,7 @@ public class COM2POSE_lib
                         double percentage = ((i * 1.0 / ordered_tfs_dcg.size())) * 100;
                         if (percentage <= 100)
                         {
-                            logger.logLine("[ChIP-ATLAS] processed " + df.format(percentage) + "% TFs.");
+                            globalLogger.logLine("[ChIP-ATLAS] processed " + df.format(percentage) + "% TFs.");
                         }
                     }
 
@@ -3810,7 +3819,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[ChIP-ATLAS] finished downloading all available ChIP-Atlas Data");
+        globalLogger.logLine("[ChIP-ATLAS] finished downloading all available ChIP-Atlas Data");
 
     }
 
@@ -3821,9 +3830,9 @@ public class COM2POSE_lib
      */
     public void get_chip_atlas_data_list() throws Exception
     {
-        logger.logLine("[ChIP-ATLAS] get ChIP-Atlas Data for Discounted Cumulative Gain TFs!");
-        logger.logLine("[ChIP-ATLAS] Genome version: " + options_intern.chip_atlas_genome_version);
-        logger.logLine("[ChIP-ATLAS] Tissue type: " + options_intern.chip_atlas_tissue_type);
+        globalLogger.logLine("[ChIP-ATLAS] get ChIP-Atlas Data for Discounted Cumulative Gain TFs!");
+        globalLogger.logLine("[ChIP-ATLAS] Genome version: " + options_intern.chip_atlas_genome_version);
+        globalLogger.logLine("[ChIP-ATLAS] Tissue type: " + options_intern.chip_atlas_tissue_type);
 
         File f_output_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_chip_atlas);
@@ -3840,9 +3849,9 @@ public class COM2POSE_lib
         /**
          * Download list of latest available ChIP-ATLAS files
          */
-        logger.logLine("[ChIP-ATLAS] Downloading list of available TF ChIP-seq Files from " +
+        globalLogger.logLine("[ChIP-ATLAS] Downloading list of available TF ChIP-seq Files from " +
                 options_intern.chip_atlas_url_to_list);
-        logger.logLine("[ChIP-ATLAS] waiting ...");
+        globalLogger.logLine("[ChIP-ATLAS] waiting ...");
         File f_output_list_zip = new File(
                 f_output_list.getAbsolutePath() + File.separator + options_intern.file_suffix_chip_atlas_list_zipped);
         if (!f_output_list_zip.exists())
@@ -3892,7 +3901,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[ChIP-ATLAS] Unzipping file: " + f_output_list.getAbsolutePath());
+        globalLogger.logLine("[ChIP-ATLAS] Unzipping file: " + f_output_list.getAbsolutePath());
         File f_output_list_csv = new File(
                 f_output_list.getAbsolutePath() + File.separator + options_intern.file_suffix_chip_atlas_list_csv);
         if (!f_output_list_csv.exists())
@@ -3900,7 +3909,7 @@ public class COM2POSE_lib
             //unzip file
             String command_edited =
                     "unzip " + f_output_list_zip + " -d " + f_output_list_csv.getParentFile().getAbsolutePath();
-            logger.logLine("[ChIP-ATLAS] executing command: " + command_edited);
+            globalLogger.logLine("[ChIP-ATLAS] executing command: " + command_edited);
             Process child = Runtime.getRuntime().exec(command_edited);
             int code = child.waitFor();
             switch (code)
@@ -3920,8 +3929,8 @@ public class COM2POSE_lib
      */
     public void create_tf_binding_logos_predicted_binding_sites() throws Exception
     {
-        logger.logLine("[LOGOS] start predicted binding site logos");
-        logger.logLine("[LOGOS] prepare predicted binding sites per TF");
+        globalLogger.logLine("[LOGOS] start predicted binding site logos");
+        globalLogger.logLine("[LOGOS] prepare predicted binding sites per TF");
 
         //retrieve ordered tfs
         File f_input_dcg_result = new File(
@@ -4168,7 +4177,7 @@ public class COM2POSE_lib
 
             String command_frequencies = "Rscript " + f_script.getAbsolutePath();
 
-            logger.logLine("[LOGOS] Create Logos for TF " + dcg_tf + "- running Rscript: " + command_frequencies);
+            globalLogger.logLine("[LOGOS] Create Logos for TF " + dcg_tf + "- running Rscript: " + command_frequencies);
 
             Process child_frequencies = Runtime.getRuntime().exec(command_frequencies);
             int code_frequencies = child_frequencies.waitFor();
@@ -4234,7 +4243,7 @@ public class COM2POSE_lib
             rank++;
         }
 
-        logger.logLine("[LOGOS] finished predicted binding site logos");
+        globalLogger.logLine("[LOGOS] finished predicted binding site logos");
 
     }
 
@@ -4245,7 +4254,7 @@ public class COM2POSE_lib
      */
     public void create_tf_binding_logos_biophysical_tfSequence() throws Exception
     {
-        logger.logLine("[LOGOS] Creating logos of TFs.");
+        globalLogger.logLine("[LOGOS] Creating logos of TFs.");
 
         File f_logos_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_distribution +
@@ -4283,7 +4292,7 @@ public class COM2POSE_lib
         }
         br_dcg.close();
 
-        logger.logLine("[LOGOS] Preparing energies of biophysicial model for logo creation");
+        globalLogger.logLine("[LOGOS] Preparing energies of biophysicial model for logo creation");
 
         //retrieve binding energy
         File f_binding_energy = new File(options_intern.tepic_path_pwms);
@@ -4396,7 +4405,7 @@ public class COM2POSE_lib
             bw_tf_script.close();
 
             String command = "python3 " + f_tf_script.getAbsolutePath();
-            logger.logLine("[LOGOS] run: " + command);
+            globalLogger.logLine("[LOGOS] run: " + command);
 
             Process child = Runtime.getRuntime().exec(command);
             int code = child.waitFor();
@@ -4409,10 +4418,10 @@ public class COM2POSE_lib
                     throw new Exception(message);
             }
         }
-        logger.logLine("[LOGOS] Finished biophyisical logos.");
-        logger.logLine("[LOGOS] Starting sequence logos.");
-        logger.logLine("[LOGOS] Download JASPAR matrix ids from: " + options_intern.jaspar_download_url);
-        logger.logLine("[LOGOS] waiting ...");
+        globalLogger.logLine("[LOGOS] Finished biophyisical logos.");
+        globalLogger.logLine("[LOGOS] Starting sequence logos.");
+        globalLogger.logLine("[LOGOS] Download JASPAR matrix ids from: " + options_intern.jaspar_download_url);
+        globalLogger.logLine("[LOGOS] waiting ...");
         //download JASPAR txt
         File f_jaspar = new File(f_logos_tf_sequence_root.getAbsolutePath() + File.separator +
                 options_intern.folder_out_distribution_logos_TF_sequence_jaspar);
@@ -4466,7 +4475,7 @@ public class COM2POSE_lib
                 e.printStackTrace();
             }
         }
-        logger.logLine("[LOGOS] JASPAR matrix id download complete.");
+        globalLogger.logLine("[LOGOS] JASPAR matrix id download complete.");
 
         HashMap<String, HashSet<String>> tf_to_matrixID = new HashMap<>();
         BufferedReader br_jaspar_input = new BufferedReader(new FileReader(f_output_jaspar_downloaded));
@@ -4492,9 +4501,9 @@ public class COM2POSE_lib
         }
         br_jaspar_input.close();
 
-        logger.logLine(
+        globalLogger.logLine(
                 "[LOGOS] Retrieve additional information from JASPAR API: " + options_intern.jaspar_api_call_front);
-        logger.logLine("[LOGOS] Retrieve sequence logos from JASPAR: " + options_intern.jaspar_logo_download_url);
+        globalLogger.logLine("[LOGOS] Retrieve sequence logos from JASPAR: " + options_intern.jaspar_logo_download_url);
 
         for (int i = 0; i < ordered_tfs_dcg.size(); i++)
         {
@@ -4605,13 +4614,13 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[LOGOS] Finished sequence logos");
+        globalLogger.logLine("[LOGOS] Finished sequence logos");
     }
 
 
     public void generateHeatmaps() throws IOException, InterruptedException
     {
-        logger.logLine("[TARGET-GENES-HEATMAP] Create target gene heatmaps for all prioritized TFs.");
+        globalLogger.logLine("[TARGET-GENES-HEATMAP] Create target gene heatmaps for all prioritized TFs.");
 
         String script;
 
@@ -4647,9 +4656,9 @@ public class COM2POSE_lib
         String command = "Rscript " + targetFile.getAbsolutePath();
 
 
-        logger.logLine("[TARGET-GENES-HEATMAP] Executing Rscript: " + command);
-        logger.logLine("[TARGET-GENES-HEATMAP] This can take up to 5 hours!");
-        logger.logLine("[TARGET-GENES-HEATMAP] waiting ...");
+        globalLogger.logLine("[TARGET-GENES-HEATMAP] Executing Rscript: " + command);
+        globalLogger.logLine("[TARGET-GENES-HEATMAP] This can take up to 5 hours!");
+        globalLogger.logLine("[TARGET-GENES-HEATMAP] waiting ...");
 
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();
@@ -4658,10 +4667,10 @@ public class COM2POSE_lib
             case 0:
                 break;
             case 1:
-                logger.logLine("[TARGET-GENES-HEATMAP] Error during heatmap generation.");
+                globalLogger.logLine("[TARGET-GENES-HEATMAP] Error during heatmap generation.");
         }
 
-        logger.logLine("[TARGET-GENES-HEATMAP] Finished creating Heatmaps for target genes.");
+        globalLogger.logLine("[TARGET-GENES-HEATMAP] Finished creating Heatmaps for target genes.");
     }
 
     /**
@@ -4669,7 +4678,7 @@ public class COM2POSE_lib
      */
     public void get_top_k_target_genes_dcg() throws IOException
     {
-        logger.logLine("[EVALUATION-PREPROCESSING] retrieve top " + options_intern.plot_top_k_genes +
+        globalLogger.logLine("[EVALUATION-PREPROCESSING] retrieve top " + options_intern.plot_top_k_genes +
                 " target genes foreach discounted cumulative gain TF");
 
         File f_output_results_root = new File(options_intern.com2pose_working_directory + File.separator +
@@ -4848,7 +4857,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[EVALUATION-PREPROCESSING] finished retrieving target genes.");
+        globalLogger.logLine("[EVALUATION-PREPROCESSING] finished retrieving target genes.");
     }
 
     /**
@@ -4856,7 +4865,7 @@ public class COM2POSE_lib
      */
     public void calculate_discounted_cumulative_gain_rank_distribution_analysis() throws Exception
     {
-        logger.logLine("[DISTRIBUTION-ANALYSIS] Start calculate ranks overall groups.");
+        globalLogger.logLine("[DISTRIBUTION-ANALYSIS] Start calculate ranks overall groups.");
 
         //calculate ranks overall groups
         HashMap<String, HashMap<String, Integer>> group_analysis_distr_stats = new HashMap<>();
@@ -5265,7 +5274,7 @@ public class COM2POSE_lib
         bw_home_home.write(sb_home_home.toString());
         bw_home_home.close();*/
 
-        logger.logLine("[DISTRIBUTION-ANALYSIS] Finish calculate ranks overall groups.");
+        globalLogger.logLine("[DISTRIBUTION-ANALYSIS] Finish calculate ranks overall groups.");
     }
 
     /**
@@ -5273,7 +5282,7 @@ public class COM2POSE_lib
      */
     public void create_overview_html_report_distribution() throws Exception
     {
-        logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Create HTML report.");
+        globalLogger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Create HTML report.");
 
         File f_output_website_root = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_website);
@@ -5320,7 +5329,7 @@ public class COM2POSE_lib
         String command =
                 "cp -u -r " + f_root_plots.getAbsolutePath() + " " + f_distr_plots_html_report.getAbsolutePath();
         Process child = Runtime.getRuntime().exec(command);
-        logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Copy plots for transferable html report: " + command);
+        globalLogger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Copy plots for transferable html report: " + command);
         int code = child.waitFor();
         switch (code)
         {
@@ -5430,7 +5439,7 @@ public class COM2POSE_lib
         BufferedWriter bw_html_home = new BufferedWriter(new FileWriter(html_home_distribution_analysis));
         bw_html_home.write(sb_home_distribution_analysis.toString());
         bw_html_home.close();
-        logger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Finished HTML report.");
+        globalLogger.logLine("[DISTRIBUTION-ANALYSIS-HTML-REPORT] Finished HTML report.");
     }
 
     /**
@@ -5438,7 +5447,7 @@ public class COM2POSE_lib
      */
     public void create_distribution_plots() throws Exception
     {
-        logger.logLine(
+        globalLogger.logLine(
                 "[DISTRIBUTION-ANALYSIS-PLOTS] Start comparing background distribution to TF distribution and create plots for outstanding TFs");
 
         File f_analysis_distr_root = new File(
@@ -5629,7 +5638,7 @@ public class COM2POSE_lib
         for (File fileDir : scripts_to_execute)
         {
             String command_edited = "python3 " + fileDir.getAbsolutePath();
-            logger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Run python script: " + command_edited);
+            globalLogger.logLine("[DISTRIBUTION-ANALYSIS-PLOTS] Run python script: " + command_edited);
 
 
             Process child = Runtime.getRuntime().exec(command_edited);
@@ -5651,7 +5660,7 @@ public class COM2POSE_lib
             mwu_execute.write_and_execute_scripts();
         }
 
-        logger.logLine(
+        globalLogger.logLine(
                 "[DISTRIBUTION-ANALYSIS-PLOTS] Finished comparing background distribution to TF distribution and create plots for outstanding TFs");
     }
 
@@ -5660,7 +5669,7 @@ public class COM2POSE_lib
      */
     public void perform_distribution_analysis() throws IOException
     {
-        logger.logLine("[DISTRIBUTION-ANALYSIS] Calculate distributions for TFs");
+        globalLogger.logLine("[DISTRIBUTION-ANALYSIS] Calculate distributions for TFs");
 
         //search input directories and create output directories
         File f_distr_analysis = new File(
@@ -6413,7 +6422,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[DISTRIBUTION-ANALYSIS] Finished calculating distributions");
+        globalLogger.logLine("[DISTRIBUTION-ANALYSIS] Finished calculating distributions");
     }
 
     /**
@@ -6422,7 +6431,7 @@ public class COM2POSE_lib
      */
     public void prepare_distribution_analysis() throws Exception
     {
-        logger.logLine("[PREP-DISTRIBUTION ANALYSIS] PREPARING DISTR-ANALYSIS.");
+        globalLogger.logLine("[PREP-DISTRIBUTION ANALYSIS] PREPARING DISTR-ANALYSIS.");
 
         HashMap<String, HashMap<String, HashSet<String>>> distinct_tf_hm_diff_same = new HashMap<>();
 
@@ -6547,7 +6556,7 @@ public class COM2POSE_lib
 
         }
         bw_distinct_tf_hm_diff_same.close();
-        logger.logLine("[PREP-DISTRIBUTION ANALYSIS] PREPARING DISTR-ANALYSIS DONE.");
+        globalLogger.logLine("[PREP-DISTRIBUTION ANALYSIS] PREPARING DISTR-ANALYSIS DONE.");
     }
 
     /**
@@ -6555,7 +6564,7 @@ public class COM2POSE_lib
      */
     public void get_top_k_target_genes_plots() throws IOException
     {
-        logger.logLine("[PLOTS-TARGET-GENES] Start fetching top " + options_intern.plot_top_k_genes +
+        globalLogger.logLine("[PLOTS-TARGET-GENES] Start fetching top " + options_intern.plot_top_k_genes +
                 " target genes for TFs under thresholds.");
 
         File f_input = new File(
@@ -6690,7 +6699,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[PLOTS-TARGET-GENES] Finished fetching top " + options_intern.plot_top_k_genes +
+        globalLogger.logLine("[PLOTS-TARGET-GENES] Finished fetching top " + options_intern.plot_top_k_genes +
                 " target genes for TFs under thresholds.");
     }
 
@@ -6700,7 +6709,7 @@ public class COM2POSE_lib
     public void analyze_plots_data() throws IOException
     {
 
-        logger.logLine("[PLOT-ANALYSE] Analyse plot data.");
+        globalLogger.logLine("[PLOT-ANALYSE] Analyse plot data.");
 
         File input_read_counts = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing + File.separator +
@@ -7134,7 +7143,7 @@ public class COM2POSE_lib
             bw.close();
         }
 
-        logger.logLine("[PLOT-ANALYSE] Finished analysing plot data.");
+        globalLogger.logLine("[PLOT-ANALYSE] Finished analysing plot data.");
     }
 
     /**
@@ -7143,7 +7152,7 @@ public class COM2POSE_lib
     public void create_tp_plots() throws Exception
     {
 
-        logger.logLine("[PLOTS] start creating / running python scripts for plots");
+        globalLogger.logLine("[PLOTS] start creating / running python scripts for plots");
 
         File folder_input = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_out_put_DYNAMITE);
@@ -7540,7 +7549,7 @@ public class COM2POSE_lib
                             "python3 " + out_th.getAbsolutePath() + File.separator + fileDirHM.getName() + "_" + d +
                                     ".py";
 
-                    logger.logLine("[PLOTS] run plot: " + command);
+                    globalLogger.logLine("[PLOTS] run plot: " + command);
                     Process child = Runtime.getRuntime().exec(command);
                     int code = child.waitFor();
                     switch (code)
@@ -7554,7 +7563,7 @@ public class COM2POSE_lib
                 }
             }
         }
-        logger.logLine("[PLOTS] end creating / running python scripts for plots");
+        globalLogger.logLine("[PLOTS] end creating / running python scripts for plots");
     }
 
     /**
@@ -7562,7 +7571,7 @@ public class COM2POSE_lib
      */
     public void run_DYNAMITE() throws Exception
     {
-        logger.logLine("[DYNAMITE] start running DYNAMITE with parameters: ");
+        globalLogger.logLine("[DYNAMITE] start running DYNAMITE with parameters: ");
 
         String command_base = "Rscript " + options_intern.path_to_COM2POSE + File.separator +
                 options_intern.directory_for_tepic_DYNAMITE + File.separator + "DYNAMITE.R";
@@ -7633,9 +7642,9 @@ public class COM2POSE_lib
                             command_edited += " --randomise=" + options_intern.dynamite_randomise;
                         }
 
-                        logger.logLine("[DYNAMITE] " + fileDirHM.getName() + ":" + fileDirHM_Group.getName() +
+                        globalLogger.logLine("[DYNAMITE] " + fileDirHM.getName() + ":" + fileDirHM_Group.getName() +
                                 " DYNAMITE.R: " + command_edited);
-                        logger.logLine("[DYNAMITE] ... waiting ...");
+                        globalLogger.logLine("[DYNAMITE] ... waiting ...");
                         Process child = Runtime.getRuntime().exec(command_edited);
                         int code = child.waitFor();
                         switch (code)
@@ -7652,7 +7661,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[DYNAMITE] finished running DYNAMITE");
+        globalLogger.logLine("[DYNAMITE] finished running DYNAMITE");
     }
 
     /**
@@ -7660,7 +7669,7 @@ public class COM2POSE_lib
      */
     public void install_required_packages() throws Exception
     {
-        logger.logLine("[DYNAMITE] installing required packages... please wait ...");
+        globalLogger.logLine("[DYNAMITE] installing required packages... please wait ...");
         StringBuilder sb = new StringBuilder();
 
         sb.append("packages <- c(\"ggplot2\", \"dplyr\", \"gplots\", \"glmnet\", \"doMC\", \"methods\")\n" + "\n" +
@@ -7689,7 +7698,7 @@ public class COM2POSE_lib
                 String message = child.getErrorStream().toString();
                 throw new Exception(message);
         }
-        logger.logLine("[DYNAMITE] required packages ready!");
+        globalLogger.logLine("[DYNAMITE] required packages ready!");
     }
 
     /**
@@ -7698,7 +7707,7 @@ public class COM2POSE_lib
     public void preprocess_dynamite() throws Exception
     {
 
-        logger.logLine("[DYNAMITE]: start preprocessing data for DYNAMITE");
+        globalLogger.logLine("[DYNAMITE]: start preprocessing data for DYNAMITE");
 
         File folder;
         if (options_intern.path_tgen.equals(""))
@@ -7787,7 +7796,7 @@ public class COM2POSE_lib
                             command += " " + options_intern.dynamite_preprocessing_integrate_data_consider_geneFile;
                         }
 
-                        logger.logLine("[DYNAMITE] " + fileDirHM.getName() + ":" + fileDirGroups.getName() +
+                        globalLogger.logLine("[DYNAMITE] " + fileDirHM.getName() + ":" + fileDirGroups.getName() +
                                 " preprocessing integrateData.py: " + command);
                         Process child = Runtime.getRuntime().exec(command);
                         int code = child.waitFor();
@@ -7833,7 +7842,7 @@ public class COM2POSE_lib
                                 options_intern.file_suffix_output_preprocessing_DYNAMITE_integrateData_log2coeff;
                         command += " " + folder_output_classificationHM_Group.getAbsolutePath() + File.separator +
                                 options_intern.file_suffix_output_preprocessing_DYNAMITE_prepClass;
-                        logger.logLine(
+                        globalLogger.logLine(
                                 "[DYNAMITE] " + fileDirGroup.getName() + " preprocessing prepareForClassification.R: " +
                                         command);
                         Process child = Runtime.getRuntime().exec(command);
@@ -7853,7 +7862,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[DYNAMITE]: finished preprocessing data for DYNAMITE");
+        globalLogger.logLine("[DYNAMITE]: finished preprocessing data for DYNAMITE");
 
     }
 
@@ -7862,7 +7871,8 @@ public class COM2POSE_lib
      */
     public void integrate_self_regulatory_tgen() throws IOException
     {
-        logger.logLine("[TGENE-SELF-REGULATORY] Integrate self-regulatoring TFs found in TGene data into TEPIC data");
+        globalLogger.logLine(
+                "[TGENE-SELF-REGULATORY] Integrate self-regulatoring TFs found in TGene data into TEPIC data");
 
         File folder_output = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tgen +
@@ -7904,7 +7914,7 @@ public class COM2POSE_lib
 
                     if (folderDirHM_Group.isDirectory())
                     {
-                        logger.logLine("[TGENE-SELF-REGULATORY] integrate self-regulatory TFs " + hm + ": " +
+                        globalLogger.logLine("[TGENE-SELF-REGULATORY] integrate self-regulatory TFs " + hm + ": " +
                                 folderDirHM_Group.getName());
 
                         BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
@@ -8123,7 +8133,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine(
+        globalLogger.logLine(
                 "[TGENE-SELF-REGULATORY] Finished integrating self-regulatory TFs found in TGene data into TEPIC data");
     }
 
@@ -8132,7 +8142,7 @@ public class COM2POSE_lib
      */
     public void filter_target_genes_tgen() throws IOException
     {
-        logger.logLine("[TGENE] Start filtering target genes.");
+        globalLogger.logLine("[TGENE] Start filtering target genes.");
 
         File folder_output = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tgen +
@@ -8215,7 +8225,7 @@ public class COM2POSE_lib
                     {
                         String group_name = folderDirHM_Group.getName();
 
-                        logger.logLine("[TGENE] filter target genes " + hm + ": " + group_name);
+                        globalLogger.logLine("[TGENE] filter target genes " + hm + ": " + group_name);
 
                         File input_data_TGENE = new File(options_intern.com2pose_working_directory + File.separator +
                                 options_intern.folder_name_tgen + File.separator +
@@ -8277,7 +8287,7 @@ public class COM2POSE_lib
                 }
             }
         }
-        logger.logLine("[TGENE] Finished filtering target genes.");
+        globalLogger.logLine("[TGENE] Finished filtering target genes.");
     }
 
     /**
@@ -8285,7 +8295,7 @@ public class COM2POSE_lib
      */
     public void create_tgen_groups() throws IOException
     {
-        logger.logLine("[TGENE] Create TGene group data");
+        globalLogger.logLine("[TGENE] Create TGene group data");
 
         check_tepic_input_with_options();
         /*
@@ -8557,7 +8567,7 @@ public class COM2POSE_lib
                 }
             }
         }
-        logger.logLine("[TGENE] Finished creating TGene group data");
+        globalLogger.logLine("[TGENE] Finished creating TGene group data");
     }
 
     /**
@@ -8565,7 +8575,7 @@ public class COM2POSE_lib
      */
     public void merge_tgen() throws IOException
     {
-        logger.logLine("[TGENE] Postprocessing: Merge TGene results");
+        globalLogger.logLine("[TGENE] Postprocessing: Merge TGene results");
 
         File folder_input = new File(
                 options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_tgen +
@@ -8787,7 +8797,7 @@ public class COM2POSE_lib
                                 [-A input gene annotation desq2 file, required for TPM filter]
                                 [-E input ensg to gene symbol file, required for TPM filter*/
 
-                            logger.logLine(
+                            globalLogger.logLine(
                                     "[TGENE] TPM filter is set. Filtering TGENE results: " + fileDirTP_HM.getName() +
                                             " - " + fileDirTP.getName() + ".");
 
@@ -9313,7 +9323,7 @@ public class COM2POSE_lib
                                             File.separator + fileDirTP.getName());
                             folder_output_groups_hm.mkdirs();
 
-                            logger.logLine("[TGENE] CREATE TGENE Group Clashes.");
+                            globalLogger.logLine("[TGENE] CREATE TGENE Group Clashes.");
 
                             HashMap<String, ArrayList<ENSG_ranges_binary_trees>> updated_tfs_to_region_list =
                                     new HashMap<>();
@@ -9365,7 +9375,7 @@ public class COM2POSE_lib
                 }
             }
         }
-        logger.logLine("[TGENE] Finished merging TGene results");
+        globalLogger.logLine("[TGENE] Finished merging TGene results");
     }
 
     /**
@@ -9373,7 +9383,7 @@ public class COM2POSE_lib
      */
     public void run_tgen() throws Exception
     {
-        logger.logLine("[TGENE] Run TGene");
+        globalLogger.logLine("[TGENE] Run TGene");
 
         check_tepic_input_with_options();
         /*
@@ -9410,7 +9420,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
         }*/
 
-        logger.logLine("[TGENE] Used data: " + options_intern.tepic_input_directory);
+        globalLogger.logLine("[TGENE] Used data: " + options_intern.tepic_input_directory);
 
 
         String command_base = options_intern.path_tgen + File.separator + "bin" + File.separator + "tgene";
@@ -9467,7 +9477,7 @@ public class COM2POSE_lib
 
                                 if (gtf.getName().equals(""))
                                 {
-                                    logger.logLine("[TGENE] could not find preprocessed GTF.");
+                                    globalLogger.logLine("[TGENE] could not find preprocessed GTF.");
                                     System.exit(1);
                                 }
 
@@ -9488,7 +9498,7 @@ public class COM2POSE_lib
                                 command_execute += " --max-pvalue " + options_intern.tgen_pvalue;
 
                                 //now execute TGENE:
-                                logger.logLine("[TGENE] execute TGENE with command line: " + command_execute);
+                                globalLogger.logLine("[TGENE] execute TGENE with command line: " + command_execute);
                                 Process child = Runtime.getRuntime().exec(command_execute);
                                 int code = child.waitFor();
                                 switch (code)
@@ -9497,7 +9507,7 @@ public class COM2POSE_lib
                                         break;
                                     case 1:
                                         String message = child.getErrorStream().toString();
-                                        logger.logLine(
+                                        globalLogger.logLine(
                                                 "[TGENE] please check chromosome names in peak file and gtf file - they need to be named the same!");
                                         throw new Exception(message);
                                 }
@@ -9507,7 +9517,7 @@ public class COM2POSE_lib
                 }
             }
         }
-        logger.logLine("[TGENE] Finished TGene");
+        globalLogger.logLine("[TGENE] Finished TGene");
     }
 
     /**
@@ -9515,7 +9525,7 @@ public class COM2POSE_lib
      */
     public void preprocess_tgen() throws IOException
     {
-        logger.logLine("[TGENE] Consensus approach with TGen is used. Preprocessing ...");
+        globalLogger.logLine("[TGENE] Consensus approach with TGen is used. Preprocessing ...");
 
         check_tepic_input_with_options();
         /*
@@ -9559,7 +9569,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
         }*/
 
-        logger.logLine("[TGENE] Used data: " + options_intern.tepic_input_directory);
+        globalLogger.logLine("[TGENE] Used data: " + options_intern.tepic_input_directory);
 
         //create necessary folders for preprocessing
         File f_TGEN =
@@ -9587,7 +9597,7 @@ public class COM2POSE_lib
                         options_intern.folder_name_tgen_preprocessing_binary_trees_sorted);
         f_TGEN_preprocess_binary_trees_sorted.mkdir();
 
-        logger.logLine("[TGENE] Preprocessing GTF.");
+        globalLogger.logLine("[TGENE] Preprocessing GTF.");
         //restructure GTF for TGEN -> only transcript data positions are allowed
 
         String[] gtf_name_split_dir = options_intern.tepic_gene_annot.split(File.separator);
@@ -9649,7 +9659,7 @@ public class COM2POSE_lib
         bw_gtf_transcripts.close();
         br_gtf_transcripts.close();
 
-        logger.logLine("[TGENE] Preprocessing Binary Trees for position to Gen Mapping.");
+        globalLogger.logLine("[TGENE] Preprocessing Binary Trees for position to Gen Mapping.");
 
         BufferedReader br_gtf_bin_tree = new BufferedReader(new FileReader(new File(options_intern.tepic_gene_annot)));
         BufferedWriter bw_gtf_bin_tree = new BufferedWriter(new FileWriter(new File(
@@ -9899,7 +9909,7 @@ public class COM2POSE_lib
 
         //sort for binary tree implementation
 
-        logger.logLine("[TGENE] Preparing chromosomes for binary search.");
+        globalLogger.logLine("[TGENE] Preparing chromosomes for binary search.");
 
         for (File fileDir : f_TGEN_preprocess_binary_trees_merged.listFiles())
         {
@@ -9961,7 +9971,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[TGENE] Finished preprocessing.");
+        globalLogger.logLine("[TGENE] Finished preprocessing.");
     }
 
 
@@ -9970,7 +9980,7 @@ public class COM2POSE_lib
      */
     public void postprocess_tepic_output() throws Exception
     {
-        logger.logLine("Start postprocessing of TEPIC output");
+        globalLogger.logLine("Start postprocessing of TEPIC output");
 
         HashMap<String, HashMap<String, HashSet<String>>> groups_to_compare = checkGroupsTEPIC();
 
@@ -10063,7 +10073,7 @@ public class COM2POSE_lib
                                             folder_pp_input.getAbsolutePath() + File.separator + s + File.separator +
                                             ss;
                                     Process child = Runtime.getRuntime().exec(command);
-                                    logger.logLine("[TEPIC] Copy files: " + command);
+                                    globalLogger.logLine("[TEPIC] Copy files: " + command);
                                     int code = child.waitFor();
                                     switch (code)
                                     {
@@ -10192,7 +10202,7 @@ public class COM2POSE_lib
                     {
                         String current_HM = fileDir.getName();
                         String current_group_clash = fileDir2.getName();
-                        logger.logLine("[TEPIC] Postprocess: " + current_HM + " - " + current_group_clash);
+                        globalLogger.logLine("[TEPIC] Postprocess: " + current_HM + " - " + current_group_clash);
                         String[] group_clash_split = current_group_clash.split("_");
 
                         String group1 = group_clash_split[0];
@@ -10287,7 +10297,7 @@ public class COM2POSE_lib
                         //if TPM filter was used we need to postprocess the TPM files. otherwise it will not work!
                         if (options_intern.tepic_tpm_cutoff > 0)
                         {
-                            logger.logLine("[TEPIC] TPM filter > 0, start postprocessing of TPM filtered scores");
+                            globalLogger.logLine("[TEPIC] TPM filter > 0, start postprocessing of TPM filtered scores");
                             File output_post_group1 = new File(
                                     folder_pp_output + File.separator + current_HM + File.separator +
                                             current_group_clash + File.separator + group1);
@@ -10454,7 +10464,7 @@ public class COM2POSE_lib
                                     break;
                                 }
                             }
-                            logger.logLine("[TEPIC] TPM filter > 0, end postprocessing of TPM filtered scores");
+                            globalLogger.logLine("[TEPIC] TPM filter > 0, end postprocessing of TPM filtered scores");
 
                             //set to postprocessed TMP filtered data
                             group1_input_dir = output_post_group1.getAbsolutePath();
@@ -10496,7 +10506,7 @@ public class COM2POSE_lib
                                     String command_edited = "mv " + f_group1_data.getAbsolutePath() + " " +
                                             f_group1_file.getAbsolutePath() + File.separator + f_group1_data.getName();
 
-                                    logger.logLine(
+                                    globalLogger.logLine(
                                             "[TEPIC] Moving file due to mutually exclusive option: " + command_edited);
                                     Process child = Runtime.getRuntime().exec(command_edited);
                                     int code = child.waitFor();
@@ -10512,7 +10522,7 @@ public class COM2POSE_lib
                                     String command_edited_2 = "mv " + f_group2_data.getAbsolutePath() + " " +
                                             f_group2_file.getAbsolutePath() + File.separator + f_group2_data.getName();
 
-                                    logger.logLine("[TEPIC] Moving file due to mutually exclusive option: " +
+                                    globalLogger.logLine("[TEPIC] Moving file due to mutually exclusive option: " +
                                             command_edited_2);
                                     Process child2 = Runtime.getRuntime().exec(command_edited_2);
                                     int code2 = child2.waitFor();
@@ -10607,7 +10617,7 @@ public class COM2POSE_lib
 
                         command_edited += command_tail;
 
-                        logger.logLine(
+                        globalLogger.logLine(
                                 "[TEPIC] execute computeMeanRatioTFAffinities.py with command line: " + command_edited);
                         Process child = Runtime.getRuntime().exec(command_edited);
                         int code = child.waitFor();
@@ -10633,7 +10643,7 @@ public class COM2POSE_lib
             bw_all_tfs.newLine();
         }
         bw_all_tfs.close();
-        logger.logLine("Finished postprocessing of TEPIC output");
+        globalLogger.logLine("Finished postprocessing of TEPIC output");
     }
 
     /**
@@ -10643,7 +10653,7 @@ public class COM2POSE_lib
      */
     public void create_open_regions_violin_plots() throws Exception
     {
-        logger.logLine("[TEPIC-ANALYSIS] Create Violine Plots of lengths of Peaks");
+        globalLogger.logLine("[TEPIC-ANALYSIS] Create Violine Plots of lengths of Peaks");
 
         //create R dataformat
         File f_output_root = new File(options_intern.com2pose_working_directory + File.separator +
@@ -10760,7 +10770,7 @@ public class COM2POSE_lib
         bw_script.close();
 
         String command_execute = "Rscript " + f_script.getAbsolutePath();
-        logger.logLine("[TEPIC-ANALYSIS] execute Rscript for violin plot: " + command_execute);
+        globalLogger.logLine("[TEPIC-ANALYSIS] execute Rscript for violin plot: " + command_execute);
         Process child = Runtime.getRuntime().exec(command_execute);
         int code = child.waitFor();
         switch (code)
@@ -10773,7 +10783,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[TEPIC-ANALYSIS] Finished Violine Plots");
+        globalLogger.logLine("[TEPIC-ANALYSIS] Finished Violine Plots");
     }
 
     /**
@@ -10783,7 +10793,7 @@ public class COM2POSE_lib
      */
     public void randomize_tepic() throws IOException
     {
-        logger.logLine("[TEPIC] Randomize output start.");
+        globalLogger.logLine("[TEPIC] Randomize output start.");
 
         Random r = new Random();
 
@@ -10958,7 +10968,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[TEPIC] Randomize output finished.");
+        globalLogger.logLine("[TEPIC] Randomize output finished.");
 
     }
 
@@ -10969,7 +10979,7 @@ public class COM2POSE_lib
      */
     public void run_tepic() throws Exception
     {
-        logger.logLine("Start TEPIC.sh");
+        globalLogger.logLine("Start TEPIC.sh");
 
         check_tepic_input_with_options();
 
@@ -11005,7 +11015,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_prev = options_intern.tepic_input_directory;
             options_intern.tepic_input_directory = options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_mix_option+File.separator+options_intern.folder_name_mix_option_mutually_exclusive+File.separator+options_intern.folder_name_mix_options_mutually_exclusive_input;
         }*/
-        logger.logLine("[TEPIC] Used data: " + options_intern.tepic_input_directory);
+        globalLogger.logLine("[TEPIC] Used data: " + options_intern.tepic_input_directory);
 
 
         String command = "bash";
@@ -11125,17 +11135,17 @@ public class COM2POSE_lib
                         new File(output_TEPIC.getAbsolutePath() + File.separator + dirGroup.getName());
                 output_TEPIC_group.mkdir();
 
-                logger.logLine("[TEPIC] Start group " + dirGroup.getName());
+                globalLogger.logLine("[TEPIC] Start group " + dirGroup.getName());
                 for (File dirHM : dirGroup.listFiles())
                 {
                     File output_TEPIC_group_hm =
                             new File(output_TEPIC_group.getAbsolutePath() + File.separator + dirHM.getName());
                     output_TEPIC_group_hm.mkdir();
 
-                    logger.logLine("[TEPIC] Start histone modification: " + dirHM.getName());
+                    globalLogger.logLine("[TEPIC] Start histone modification: " + dirHM.getName());
                     for (File sample : dirHM.listFiles())
                     {
-                        logger.logLine("[TEPIC] Start sample " + sample.getName());
+                        globalLogger.logLine("[TEPIC] Start sample " + sample.getName());
 
                         File output_sample =
                                 new File(output_TEPIC_group_hm.getAbsolutePath() + File.separator + sample.getName());
@@ -11207,7 +11217,7 @@ public class COM2POSE_lib
                             //f_tgene_input = new File(options_intern.com2pose_working_directory+File.separator+options_intern.folder_name_tgen+File.separator+options_intern.folder_name_tgen_output+File.separator+dirGroup.getName()+File.separator+dirHM.getName()+File.separator+dirGroup.getName()+"_"+dirHM.getName()+File.separator+options_intern.file_suffix_tgen_output);
 
                             command_tail_sample += " -L " + f_tgene_input.getAbsolutePath();
-                            logger.logLine(
+                            globalLogger.logLine(
                                     "[TEPIC-TGENE] using only tgene linked target genes for TF-Gene score calculation.");
                         }
 
@@ -11215,7 +11225,7 @@ public class COM2POSE_lib
                                 options_intern.file_suffix_tepic_output_trap_sequences;
 
                         String command_execute = command_sample + command_tail_sample;
-                        logger.logLine("[TEPIC] execute TEPIC with command line: " + command_execute);
+                        globalLogger.logLine("[TEPIC] execute TEPIC with command line: " + command_execute);
                         Process child = Runtime.getRuntime().exec(command_execute);
                         int code = child.waitFor();
                         switch (code)
@@ -11300,7 +11310,7 @@ public class COM2POSE_lib
                 }
             }
         }
-        logger.logLine("[TEPIC] Finished TEPIC.sh");
+        globalLogger.logLine("[TEPIC] Finished TEPIC.sh");
     }
 
     /**
@@ -11309,7 +11319,7 @@ public class COM2POSE_lib
     public void run_and_postprocess_DESeq2() throws Exception
     {
 
-        logger.logLine("Start running DESeq2 RScripts");
+        globalLogger.logLine("Start running DESeq2 RScripts");
 
         File folder = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_R_scripts);
@@ -11319,7 +11329,7 @@ public class COM2POSE_lib
             if (!dir.isDirectory())
             {
                 String command = "Rscript " + dir.getAbsolutePath();
-                logger.logLine("[DESEQ2] Running script " + dir.getName() + ": " + command);
+                globalLogger.logLine("[DESEQ2] Running script " + dir.getName() + ": " + command);
                 Process child = Runtime.getRuntime().exec(command);
                 int code = child.waitFor();
                 switch (code)
@@ -11333,8 +11343,8 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("Finished running DESeq2 RScripts");
-        logger.logLine("Start postprocessing DESeq2 data for input to DYNAMITE");
+        globalLogger.logLine("Finished running DESeq2 RScripts");
+        globalLogger.logLine("Start postprocessing DESeq2 data for input to DYNAMITE");
 
 
         File folder_results = new File(options_intern.com2pose_working_directory + File.separator +
@@ -11383,7 +11393,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("Finished postprocessing DESeq2 data for input to DYNAMITE");
+        globalLogger.logLine("Finished postprocessing DESeq2 data for input to DYNAMITE");
 
     }
 
@@ -11392,7 +11402,7 @@ public class COM2POSE_lib
      */
     public void preprocess_deseq2_input_tpm() throws IOException
     {
-        logger.logLine("[DESEQ2-PREP-TPM] Filter genes with TPM under cutoff.");
+        globalLogger.logLine("[DESEQ2-PREP-TPM] Filter genes with TPM under cutoff.");
 
         //read in TPMs
         HashMap<String, HashMap<String, Double>> tp_gene_tpm_value = new HashMap<>();
@@ -11624,17 +11634,17 @@ public class COM2POSE_lib
         File f_data_version = new File(f_output_positions_root.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_deseq2_preprocessing_gene_positions_data_prev_version);
 
-        logger.logLine("[PREP] Create gene positions for all RNA-seq data.");
-        logger.logLine("[PREP] Get gene lengths ...");
+        globalLogger.logLine("[PREP] Create gene positions for all RNA-seq data.");
+        globalLogger.logLine("[PREP] Get gene lengths ...");
 
-        logger.logLine("[PREP] if not done in 5 hours:");
-        logger.logLine("[PREP] 1. Please stop com2pose.");
-        logger.logLine("[PREP] 2. Please run script manually in RStudio.");
-        logger.logLine("[PREP] Script path: " + f_script.getAbsolutePath());
-        logger.logLine(
+        globalLogger.logLine("[PREP] if not done in 5 hours:");
+        globalLogger.logLine("[PREP] 1. Please stop com2pose.");
+        globalLogger.logLine("[PREP] 2. Please run script manually in RStudio.");
+        globalLogger.logLine("[PREP] Script path: " + f_script.getAbsolutePath());
+        globalLogger.logLine(
                 "[PREP] 3. Afterwards add paramter -b to com2pose command line, so this script wont be started again.");
-        logger.logLine("[PREP] 4. restart com2pose");
-        logger.logLine("[PREP] waiting ...");
+        globalLogger.logLine("[PREP] 4. restart com2pose");
+        globalLogger.logLine("[PREP] waiting ...");
 
 
         //get biomart gene positions
@@ -11705,7 +11715,7 @@ public class COM2POSE_lib
         bw_script.close();
 
         String command = "Rscript " + f_script;
-        logger.logLine("[PREP] run R script: " + command);
+        globalLogger.logLine("[PREP] run R script: " + command);
 
         if (options_intern.calculcate_gene_positions)
         {
@@ -11717,16 +11727,16 @@ public class COM2POSE_lib
                     break;
                 case 1:
                     String message = child.getErrorStream().toString();
-                    logger.logLine(
+                    globalLogger.logLine(
                             "[PREP-TPM] Script failed due to bioMart connection error. Please run script manually in RStudio.");
-                    logger.logLine("[PREP-TPM] Script path: " + f_script.getAbsolutePath());
-                    logger.logLine(
+                    globalLogger.logLine("[PREP-TPM] Script path: " + f_script.getAbsolutePath());
+                    globalLogger.logLine(
                             "[PREP-TPM] Afterwards, add paramter -b to com2pose command line, so this script wont be started again.");
                     throw new Exception(message);
             }
         }
 
-        logger.logLine(" [PREP] -b was set. Skipping. " + command);
+        globalLogger.logLine(" [PREP] -b was set. Skipping. " + command);
 
 
         File f_data = new File(f_output_positions_root.getAbsolutePath() + File.separator +
@@ -11800,21 +11810,21 @@ public class COM2POSE_lib
 
         line_biomart_version = line_biomart_version.split("\\.")[0];
 
-        logger.logLine("[PREP] Uplift positions to correct genome version");
-        logger.logLine("[PREP] Our genome: " + options_intern.igv_species_ref_genome);
+        globalLogger.logLine("[PREP] Uplift positions to correct genome version");
+        globalLogger.logLine("[PREP] Our genome: " + options_intern.igv_species_ref_genome);
         if (options_intern.igv_GRC_synonym_dict.containsKey(line_biomart_version))
         {
-            logger.logLine("[PREP] Genome got from biomaRt: " + line_biomart_version + " = " +
+            globalLogger.logLine("[PREP] Genome got from biomaRt: " + line_biomart_version + " = " +
                     options_intern.igv_GRC_synonym_dict.get(line_biomart_version));
 
             if (options_intern.igv_species_ref_genome.equals(
                     options_intern.igv_GRC_synonym_dict.get(line_biomart_version)))
             {
-                logger.logLine("[PREP] equal genome versions. No uplifted needed. Skipping this step.");
+                globalLogger.logLine("[PREP] equal genome versions. No uplifted needed. Skipping this step.");
             }
         } else
         {
-            logger.logLine(
+            globalLogger.logLine(
                     "[ERROR] Do not have " + line_biomart_version + " in memory. Please add at igv_GRC_synonym_dict");
             System.exit(1);
         }
@@ -11822,7 +11832,7 @@ public class COM2POSE_lib
 
         String command_pyuplift = "python3 " + f_uplift_script.getAbsolutePath();
 
-        logger.logLine("[PREP] executing command: " + command_pyuplift);
+        globalLogger.logLine("[PREP] executing command: " + command_pyuplift);
 
         Process child_pyuplift = Runtime.getRuntime().exec(command_pyuplift);
         int code_pyuplift = child_pyuplift.waitFor();
@@ -11837,8 +11847,9 @@ public class COM2POSE_lib
 
         if (options_intern.igv_enhancer_databases.size() > 0)
         {
-            logger.logLine("[ENHANCER] Check reference genomes of Enhances DBs to currently used genomes and uplift " +
-                    "if necessary.");
+            globalLogger.logLine(
+                    "[ENHANCER] Check reference genomes of Enhances DBs to currently used genomes and uplift " +
+                            "if necessary.");
 
             String igv_species_symbol = options_intern.igv_species_ref_genome.replaceAll("[^A-Za-z]", "");
 
@@ -11975,11 +11986,12 @@ public class COM2POSE_lib
                     bw_pyuplift_db.write(sb_pyuplift_db.toString());
                     bw_pyuplift_db.close();
 
-                    logger.logLine("[ENHANCER] Uplift db " + enhancer_db + " positions to correct genome version");
+                    globalLogger.logLine(
+                            "[ENHANCER] Uplift db " + enhancer_db + " positions to correct genome version");
 
                     String command_pyuplift_db = "python3 " + f_uplift_script_enhancer.getAbsolutePath();
 
-                    logger.logLine("[ENHANCER] executing command: " + command_pyuplift_db);
+                    globalLogger.logLine("[ENHANCER] executing command: " + command_pyuplift_db);
 
                     Process child_pyuplift_db = Runtime.getRuntime().exec(command_pyuplift_db);
                     int code_pyuplift_db = child_pyuplift_db.waitFor();
@@ -12013,7 +12025,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[PREP] Finished creating gene positions for all RNA-seq data.");
+        globalLogger.logLine("[PREP] Finished creating gene positions for all RNA-seq data.");
 
 
     }
@@ -12023,7 +12035,7 @@ public class COM2POSE_lib
      */
     public void create_TPM_mappings() throws Exception
     {
-        logger.logLine("[PREP] Create TPM values for all RNA-seq data.");
+        globalLogger.logLine("[PREP] Create TPM values for all RNA-seq data.");
 
         File f_output_ot = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_deseq2_preprocessing + File.separator +
@@ -12035,16 +12047,16 @@ public class COM2POSE_lib
         File f_output_lengths = new File(f_output_ot.getAbsolutePath() + File.separator +
                 options_intern.file_suffix_deseq2_preprocessing_tpm_mapping_geneLengths_file);
 
-        logger.logLine("[PREP] Get gene lengths ...");
+        globalLogger.logLine("[PREP] Get gene lengths ...");
 
-        logger.logLine("[PREP] if not done in 5 hours:");
-        logger.logLine("[PREP] 1. Please stop com2pose.");
-        logger.logLine("[PREP] 2. Please run script manually in RStudio.");
-        logger.logLine("[PREP] Script path: " + f_output_script_lengths.getAbsolutePath());
-        logger.logLine(
+        globalLogger.logLine("[PREP] if not done in 5 hours:");
+        globalLogger.logLine("[PREP] 1. Please stop com2pose.");
+        globalLogger.logLine("[PREP] 2. Please run script manually in RStudio.");
+        globalLogger.logLine("[PREP] Script path: " + f_output_script_lengths.getAbsolutePath());
+        globalLogger.logLine(
                 "[PREP] 3. Afterwards add paramter -a to com2pose command line, so this script wont be started again.");
-        logger.logLine("[PREP] 4. restart com2pose");
-        logger.logLine("[PREP] waiting ...");
+        globalLogger.logLine("[PREP] 4. restart com2pose");
+        globalLogger.logLine("[PREP] waiting ...");
 
 
         if (options_intern.calculate_tpm_lengths)
@@ -12120,7 +12132,7 @@ public class COM2POSE_lib
             bw_lengths_script.close();
 
             String command = "Rscript " + f_output_script_lengths;
-            logger.logLine("[PREP-TPM] run R script: " + command);
+            globalLogger.logLine("[PREP-TPM] run R script: " + command);
 
             Process child = Runtime.getRuntime().exec(command);
             int code = child.waitFor();
@@ -12130,16 +12142,16 @@ public class COM2POSE_lib
                     break;
                 case 1:
                     String message = child.getErrorStream().toString();
-                    logger.logLine(
+                    globalLogger.logLine(
                             "[PREP-TPM] Script failed due to bioMart connection error. Please run script manually in RStudio.");
-                    logger.logLine("[PREP-TPM] Script path: " + f_output_script_lengths.getAbsolutePath());
-                    logger.logLine(
+                    globalLogger.logLine("[PREP-TPM] Script path: " + f_output_script_lengths.getAbsolutePath());
+                    globalLogger.logLine(
                             "[PREP-TPM] Afterwards, add paramter -a to com2pose command line, so this script wont be started again.");
                     throw new Exception(message);
             }
         } else
         {
-            logger.logLine(
+            globalLogger.logLine(
                     "[PREP-TPM] -a is set, get gene_lengths script is not executed, as it was executed manually.");
         }
 
@@ -12216,7 +12228,7 @@ public class COM2POSE_lib
                 bw.close();
 
                 String command_intern = "Rscript " + f_output_script;
-                logger.logLine("[PREP-TPM] run R script: " + command_intern);
+                globalLogger.logLine("[PREP-TPM] run R script: " + command_intern);
 
                 Process child_intern = Runtime.getRuntime().exec(command_intern);
                 int code_intern = child_intern.waitFor();
@@ -12232,7 +12244,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[PREP] TPM values finished.");
+        globalLogger.logLine("[PREP] TPM values finished.");
     }
 
     /**
@@ -12241,7 +12253,7 @@ public class COM2POSE_lib
     public void create_DESeq2_scripts() throws IOException
     {
 
-        logger.logLine("Start preprocessing nfcore RNA-seq for DESeq2 input");
+        globalLogger.logLine("Start preprocessing nfcore RNA-seq for DESeq2 input");
         HashMap<Integer, String> row_ensg_name = new HashMap<>();
 
         File ensg_names = new File(options_intern.deseq2_input_gene_id);
@@ -12343,7 +12355,7 @@ public class COM2POSE_lib
                     }
                     if (count != count_ensg_lines)
                     {
-                        logger.logLine("Error in nfcore RNA-seq data: File " + sample.getName() +
+                        globalLogger.logLine("Error in nfcore RNA-seq data: File " + sample.getName() +
                                 " has not the same number of rows as in File " + ensg_names.getName());
                         System.exit(1);
                     }
@@ -12482,8 +12494,8 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("Finished preprocessing of nfcore RNA-seq data - no errors detected");
-        logger.logLine("Started creating RScripts for running DESeq2");
+        globalLogger.logLine("Finished preprocessing of nfcore RNA-seq data - no errors detected");
+        globalLogger.logLine("Started creating RScripts for running DESeq2");
 
         //CREATE RScripts for every folder in here
         File r_scripts = new File(options_intern.com2pose_working_directory + File.separator +
@@ -12509,7 +12521,7 @@ public class COM2POSE_lib
                 sb.append("  BiocManager::install(\"DESeq2\")\n");
                 sb.append("library(DESeq2)\n");
                 sb.append("#" + group1 + " VS " + group2 + "\n");
-                logger.logLine("[DESEQ2] Group " + group1 + " VS " + group2);
+                globalLogger.logLine("[DESEQ2] Group " + group1 + " VS " + group2);
 
                 BufferedReader br_header = new BufferedReader(
                         new FileReader(dir.getAbsolutePath() + File.separator + dir.getName() + ".csv"));
@@ -12613,7 +12625,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("Finished creating RScripts for running DESeq2");
+        globalLogger.logLine("Finished creating RScripts for running DESeq2");
 
 
     }
@@ -12626,15 +12638,15 @@ public class COM2POSE_lib
         script_output_dir.mkdir();
         File script_output = new File(script_output_dir.getAbsolutePath() + File.separator + "ENSG_SYMBOL_MAP.R");
 
-        logger.logLine("[DESEQ2] Start mapping ENSG to GENE SYMBOLS.");
-        logger.logLine("[DESEQ2] if not done in 2 hours:");
-        logger.logLine("[DESEQ2] 1. Please stop com2pose.");
-        logger.logLine("[DESEQ2] 2. Please run script manually in RStudio.");
-        logger.logLine("[DESEQ2] Script path: " + script_output.getAbsolutePath());
-        logger.logLine(
+        globalLogger.logLine("[DESEQ2] Start mapping ENSG to GENE SYMBOLS.");
+        globalLogger.logLine("[DESEQ2] if not done in 2 hours:");
+        globalLogger.logLine("[DESEQ2] 1. Please stop com2pose.");
+        globalLogger.logLine("[DESEQ2] 2. Please run script manually in RStudio.");
+        globalLogger.logLine("[DESEQ2] Script path: " + script_output.getAbsolutePath());
+        globalLogger.logLine(
                 "[DESEQ2] 3. Afterwards add paramter -m to com2pose command line, so this script wont be started again.");
-        logger.logLine("[DESEQ2] 4. restart com2pose");
-        logger.logLine("[DESEQ2] waiting ...");
+        globalLogger.logLine("[DESEQ2] 4. restart com2pose");
+        globalLogger.logLine("[DESEQ2] waiting ...");
 
 
         File results = new File(
@@ -12687,7 +12699,7 @@ public class COM2POSE_lib
 
         String command = "Rscript " + script_output.getAbsolutePath();
         Process child = Runtime.getRuntime().exec(command);
-        logger.logLine("[DESEQ2] Running script " + script_output.getName() + ": " + command);
+        globalLogger.logLine("[DESEQ2] Running script " + script_output.getName() + ": " + command);
         int code = child.waitFor();
         switch (code)
         {
@@ -12695,10 +12707,10 @@ public class COM2POSE_lib
                 break;
             case 1:
                 String message = child.getErrorStream().toString();
-                logger.logLine(
+                globalLogger.logLine(
                         "[DESEQ2] Script failed due to bioMart connection error. Please run script manually in RStudio.");
-                logger.logLine("[DESEQ2] Script path: " + script_output.getAbsolutePath());
-                logger.logLine(
+                globalLogger.logLine("[DESEQ2] Script path: " + script_output.getAbsolutePath());
+                globalLogger.logLine(
                         "[DESEQ2] Afterwards add paramter -m to com2pose command line, so this script wont be started again.");
                 System.exit(1);
         }
@@ -12706,16 +12718,17 @@ public class COM2POSE_lib
         options_intern.tepic_ensg_symbol = results.getAbsolutePath();
 
 
-        logger.logLine("[DESEQ2] Finished mapping ENSG to GENE SYMBOLS.");
+        globalLogger.logLine("[DESEQ2] Finished mapping ENSG to GENE SYMBOLS.");
 
     }
 
     public void mix_mutually_exclusive_peaks() throws IOException
     {
-        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Start mutually exclusive peaks calculation.");
-        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Preprocessing mutually exclusive peaks for binary tree comparison.");
+        globalLogger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Start mutually exclusive peaks calculation.");
+        globalLogger.logLine(
+                "[MUTUALLY-EXCLUSIVE-PEAKS] Preprocessing mutually exclusive peaks for binary tree comparison.");
 
-        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Used data: " + options_intern.tepic_input_directory);
+        globalLogger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Used data: " + options_intern.tepic_input_directory);
 
         options_intern.tepic_input_prev = options_intern.tepic_input_directory;
         File f_annotation_check = new File(
@@ -12820,9 +12833,9 @@ public class COM2POSE_lib
                         //we can only use this option with one input file
                         if (fileDir_hm.listFiles().length > 1)
                         {
-                            logger.logLine(
+                            globalLogger.logLine(
                                     "[MUTUALLY-EXCLUSIVE-PEAKS] A UNION OVER SAMPLES MUST BE MADE! Start MIX-OPTION now");
-                            logger.logLine(
+                            globalLogger.logLine(
                                     "[MUTUALLY-EXCLUSIVE-PEAKS] Setting parameters to \"UNION, SAMPLE_LEVEL\" now.");
 
                             options_intern.mix_option = "UNION";
@@ -12831,7 +12844,7 @@ public class COM2POSE_lib
                             mix_option();
                             if (!options_intern.black_list_dir.equals(""))
                             {
-                                logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Redo blacklist on unioned samples");
+                                globalLogger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Redo blacklist on unioned samples");
                                 preprocess_blacklist();
                                 filter_blacklist();
                             }
@@ -12911,7 +12924,7 @@ public class COM2POSE_lib
                 tps_to_hms.put(fileDir_tp.getName(), hms);
             }
         }
-        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Finished preprocessing. Starting binary tree filtering now.");
+        globalLogger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Finished preprocessing. Starting binary tree filtering now.");
 
         HashSet<String> already_worked_tp_groups = new HashSet<>();
 
@@ -13185,7 +13198,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Finished binary tree filtering.");
+        globalLogger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Finished binary tree filtering.");
     }
 
     /**
@@ -13225,14 +13238,14 @@ public class COM2POSE_lib
                 options_intern.folder_name_blacklisted_regions_new_input);
         output_folder_new_input.mkdir();
 
-        logger.logLine("[BLACKLIST] Used input: " + options_intern.tepic_input_directory);
+        globalLogger.logLine("[BLACKLIST] Used input: " + options_intern.tepic_input_directory);
 
         //set new folder directory for tepic input and save old one
         options_intern.tepic_input_prev = options_intern.tepic_input_directory;
         options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
 
 
-        logger.logLine("[BLACKLIST] Create chromosome binary trees.");
+        globalLogger.logLine("[BLACKLIST] Create chromosome binary trees.");
         //CREATE BINARY TREES
         HashMap<String, BL_binary_tree> chr_tree = new HashMap<>();
 
@@ -13278,7 +13291,7 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[BLACKLIST] Filter input files for blacklisted regions.");
+        globalLogger.logLine("[BLACKLIST] Filter input files for blacklisted regions.");
         //now filter all files
         int count_matched = 0;
 
@@ -13302,7 +13315,7 @@ public class COM2POSE_lib
                         {
                             if (filrDirTP_HM_sample.isFile())
                             {
-                                logger.logLine(
+                                globalLogger.logLine(
                                         "[BLACKLIST] Filter: " + fileDirTP.getName() + ": " + fileDirTP_HM.getName() +
                                                 " - " + filrDirTP_HM_sample.getName());
                                 //FILTER HERE WITH BINARY TREE
@@ -13353,7 +13366,7 @@ public class COM2POSE_lib
                 }
             }
         }
-        logger.logLine("[BLACKLIST] Finished filtering for blacklisted regions.");
+        globalLogger.logLine("[BLACKLIST] Finished filtering for blacklisted regions.");
     }
 
     /**
@@ -13362,7 +13375,7 @@ public class COM2POSE_lib
     public void preprocess_blacklist() throws IOException
     {
 
-        logger.logLine("[BLACKLIST] start preprocessing blacklist");
+        globalLogger.logLine("[BLACKLIST] start preprocessing blacklist");
 
         File f_blacklist = new File(options_intern.com2pose_working_directory + File.separator +
                 options_intern.folder_name_blacklisted_regions);
@@ -13464,7 +13477,7 @@ public class COM2POSE_lib
         bw_chr.close();
         br_chr.close();
 
-        logger.logLine("[BLACKLIST] prepare chromosomes for binary tree");
+        globalLogger.logLine("[BLACKLIST] prepare chromosomes for binary tree");
 
         File f_blacklist_pre_sorted = new File(f_blacklist_pre.getAbsolutePath() + File.separator +
                 options_intern.folder_name_blacklisted_regions_preprocessing_sorted);
@@ -13515,7 +13528,7 @@ public class COM2POSE_lib
         }
 
 
-        logger.logLine("[BLACKLIST] finished preprocessing blacklist");
+        globalLogger.logLine("[BLACKLIST] finished preprocessing blacklist");
 
 
     }
@@ -13527,10 +13540,10 @@ public class COM2POSE_lib
      */
     public void create_footprints_between_peaks() throws IOException
     {
-        logger.logLine(
+        globalLogger.logLine(
                 "[FOOTPRINTS] OPTION tepic_tf_binding_site_search=\"" + options_intern.tepic_tf_binding_site_search +
                         "\" was set!");
-        logger.logLine("[FOOTPRINTS] creating footprints");
+        globalLogger.logLine("[FOOTPRINTS] creating footprints");
 
 
         File root_mix_working_dir = new File(
@@ -13556,7 +13569,7 @@ public class COM2POSE_lib
             options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
         }
 
-        logger.logLine("[FOOTPRINTS] Used data: " + options_intern.tepic_input_directory);
+        globalLogger.logLine("[FOOTPRINTS] Used data: " + options_intern.tepic_input_directory);
 
         options_intern.tepic_input_prev = options_intern.tepic_input_directory;
 
@@ -13870,740 +13883,34 @@ public class COM2POSE_lib
             }
         }
 
-        logger.logLine("[FOOTPRINTS] finished footprints");
+        globalLogger.logLine("[FOOTPRINTS] finished footprints");
     }
 
-    /**
-     * preprocess mix histones, search for same peaks and use either the union or the intersection of all
-     */
-    public void mix_option() throws IOException
-    {
-
-        options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-        File f_annotation_check = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option +
-                        File.separator + options_intern.folder_name_mix_option_preprocessing_check_chr);
-        options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
-
-        File file_root_input = new File(options_intern.tepic_input_directory);
-        File root_mix_working_dir = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
-        root_mix_working_dir.mkdir();
-
-        File f_sample_mix_preprocess = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
-                options_intern.folder_name_mix_option_sample_mix_preprocessing);
-        f_sample_mix_preprocess.mkdir();
-
-        File f_sample_mix_output = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
-                options_intern.folder_name_mix_option_sample_mix);
-        f_sample_mix_output.mkdir();
-
-        logger.logLine("[MIX] Used data: " + options_intern.tepic_input_directory);
-
-        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
-        {
-            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-            options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
-        }
-
-        logger.logLine("[MIX] Preprocess input data for sample mix - split chromosomes.");
-
-        for (File fileDir : file_root_input.listFiles())
-        {
-            if (fileDir.isDirectory())
-            {
-                String timepoint = fileDir.getName();
-                File file_output_tp = new File(f_sample_mix_preprocess + File.separator + timepoint);
-                file_output_tp.mkdir();
-
-                for (File fileDirHM : fileDir.listFiles())
-                {
-                    if (fileDirHM.isDirectory())
-                    {
-                        File file_output_tp_hm =
-                                new File(file_output_tp.getAbsolutePath() + File.separator + fileDirHM.getName());
-                        file_output_tp_hm.mkdir();
-
-                        for (File fileDirHM_sample : fileDirHM.listFiles())
-                        {
-                            if (fileDirHM_sample.isFile())
-                            {
-                                BufferedWriter bw = new BufferedWriter(new FileWriter(
-                                        new File(file_output_tp_hm.getAbsolutePath() + File.separator + "test.txt")));
-                                BufferedReader br = new BufferedReader(new FileReader(fileDirHM_sample));
-                                String line = "";
-                                String currentChr = "";
-                                while ((line = br.readLine()) != null)
-                                {
-                                    String[] split = line.split("\t");
-                                    if (!split[0].equals(currentChr))
-                                    {
-                                        bw.close();
-                                        currentChr = split[0];
-                                        File f_output_chr = new File(
-                                                file_output_tp_hm.getAbsolutePath() + File.separator + currentChr);
-                                        f_output_chr.mkdir();
-
-                                        bw = new BufferedWriter(new FileWriter(new File(
-                                                f_output_chr.getAbsolutePath() + File.separator +
-                                                        fileDirHM_sample.getName())));
-                                    }
-                                    bw.write(line);
-                                    bw.newLine();
-                                }
-                                bw.close();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        logger.logLine("[MIX] Create " + options_intern.mix_option + " of samples");
-
-        for (File fileDir : f_sample_mix_preprocess.listFiles())
-        {
-            if (fileDir.isDirectory())
-            {
-                String timepoint = fileDir.getName();
-                File f_output_union_samples_tp =
-                        new File(f_sample_mix_output.getAbsolutePath() + File.separator + timepoint);
-                f_output_union_samples_tp.mkdir();
-
-                for (File fileDirHM : fileDir.listFiles())
-                {
-                    if (fileDirHM.isDirectory())
-                    {
-                        String hm = fileDirHM.getName();
-                        File f_output_union_samples_tp_hm =
-                                new File(f_output_union_samples_tp.getAbsolutePath() + File.separator + hm);
-                        f_output_union_samples_tp_hm.mkdir();
-
-                        String file_ending = "";
-
-                        HashMap<String, ArrayList<MIX_Interval>> all_chromosomes = new HashMap();
-                        ArrayList<Integer> chr_alpha = new ArrayList<>();
-                        ArrayList<String> chr_str = new ArrayList<>();
-
-                        for (File fileDirHM_Chr : fileDirHM.listFiles())
-                        {
-                            if (fileDirHM_Chr.isDirectory())
-                            {
-                                String chr = fileDirHM_Chr.getName();
-
-                                ArrayList<MIX_Interval> all_intervals = new ArrayList<>();
-
-                                int sample_number = 0;
-
-                                for (File fileDirHM_Chr_sample : fileDirHM_Chr.listFiles())
-                                {
-                                    if (fileDirHM_Chr_sample.isFile())
-                                    {
-                                        String[] f_ending = fileDirHM_Chr_sample.getName().split("\\.");
-                                        file_ending = f_ending[f_ending.length - 1];
-                                        //build array of a union of all peaks
-                                        BufferedReader br = new BufferedReader(new FileReader(fileDirHM_Chr_sample));
-                                        String line = "";
-                                        while ((line = br.readLine()) != null)
-                                        {
-                                            String[] split = line.split("\t");
-
-                                            MIX_Interval_Object mio =
-                                                    new MIX_Interval_Object(split[0], Integer.parseInt(split[1]),
-                                                            Integer.parseInt(split[2]), split[3],
-                                                            Integer.parseInt(split[4]), split[5],
-                                                            Double.parseDouble(split[6]), Double.parseDouble(split[7]),
-                                                            Double.parseDouble(split[8]));
-                                            MIX_Interval mi = new MIX_Interval(Integer.parseInt(split[1]),
-                                                    Integer.parseInt(split[2]));
-                                            mi.merged_intervals.add(mio);
-
-                                            all_intervals.add(mi);
-
-                                        }
-                                        br.close();
-                                        sample_number++;
-
-                                        /*
-                                        if(options_intern.mix_option.equals("INTERSECTION"))
-                                        {
-                                            ArrayList<MIX_Interval> intersec_al = new ArrayList<>();
-
-                                            BufferedReader br_intersec = new BufferedReader(new FileReader(fileDirHM_Chr_sample));
-                                            String line_intersec = "";
-                                            while((line_intersec=br_intersec.readLine())!=null)
-                                            {
-                                                String[] split = line_intersec.split("\t");
-
-                                                MIX_Interval_Object mio = new MIX_Interval_Object(split[0],Integer.parseInt(split[1]),Integer.parseInt(split[2]),split[3],Integer.parseInt(split[4]),split[5],Double.parseDouble(split[6]),Double.parseDouble(split[7]),Double.parseDouble(split[8]));
-                                                MIX_Interval mi = new MIX_Interval(Integer.parseInt(split[1]),Integer.parseInt(split[2]));
-                                                mi.merged_intervals.add(mio);
-
-                                                intersec_al.add(mi);
-
-                                            }
-                                            br.close();
-
-
-                                            intersec_vals.put(fileDirHM_Chr_sample.getName(),intersec_al);
-                                        }*/
-
-                                    }
-                                }
-
-                                //intersections sorting!
-                                /*if(options_intern.mix_option.equals("INTERSECTION"))
-                                {
-                                    for(String k: intersec_vals.keySet())
-                                    {
-                                        Collections.sort(intersec_vals.get(k));
-                                    }
-                                }*/
-
-                                //unions sorting
-                                Collections.sort(all_intervals);
-
-                                Stack<MIX_Interval> stack_union = mergeIntervals(all_intervals);
-
-                                ArrayList<MIX_Interval> chr_unions = new ArrayList<>();
-
-                                int min_occurence = 0;
-                                if (options_intern.mix_occurence_intersection == -1)
-                                {
-                                    min_occurence = sample_number;
-                                } else
-                                {
-                                    if (sample_number < options_intern.mix_occurence_intersection)
-                                    {
-                                        min_occurence = sample_number;
-
-                                    } else
-                                    {
-                                        min_occurence = options_intern.mix_occurence_intersection;
-                                    }
-                                }
-
-                                while (!stack_union.isEmpty())
-                                {
-                                    MIX_Interval t = stack_union.pop();
-                                    t.calculate_mean("SAMPLE_LEVEL");
-
-                                    if (options_intern.mix_option.equals("INTERSECTION"))
-                                    {
-                                        if (t.merged_intervals.size() >= min_occurence)
-                                        {
-                                            chr_unions.add(t);
-                                        }
-                                    } else
-                                    {
-                                        chr_unions.add(t);
-                                    }
-                                }
-
-                                Collections.sort(chr_unions);
-
-                                all_chromosomes.put(chr, chr_unions);
-
-                                try
-                                {
-                                    chr_alpha.add(Integer.parseInt(chr));
-                                } catch (Exception e)
-                                {
-                                    chr_str.add(chr);
-                                }
-                            }
-                        }
-
-                        Collections.sort(chr_alpha);
-                        Collections.sort(chr_str);
-
-
-                        //print Sample_unions => can be used if not HM_Level is used
-                        BufferedWriter bw = new BufferedWriter(new FileWriter(
-                                f_output_union_samples_tp_hm.getAbsolutePath() + File.separator + timepoint + "_" + hm +
-                                        "." + file_ending));
-
-                        int peak_counter = 1;
-
-                        for (int chr : chr_alpha)
-                        {
-                            ArrayList<MIX_Interval> x = all_chromosomes.get("" + chr);
-                            for (int i = 0; i < x.size(); i++)
-                            {
-                                bw.write(x.get(i).meanToString(peak_counter));
-                                bw.newLine();
-                                peak_counter++;
-                            }
-                        }
-
-                        for (String chr : chr_str)
-                        {
-                            ArrayList<MIX_Interval> x = all_chromosomes.get(chr);
-                            for (int i = 0; i < x.size(); i++)
-                            {
-                                bw.write(x.get(i).meanToString(peak_counter));
-                                bw.newLine();
-                                peak_counter++;
-                            }
-                        }
-                        bw.close();
-
-
-                    }
-                }
-            }
-        }
-
-        if (options_intern.mix_level.equals("HM_LEVEL"))
-        {
-
-            logger.logLine("[MIX] Preprocess sample unions for HM mix");
-
-            File f_output_preprocessing_hm = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
-                    options_intern.folder_name_mix_option_preprocess_hm_mix);
-            f_output_preprocessing_hm.mkdir();
-
-            File f_output_hm = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
-                    options_intern.folder_name_mix_option_hm_mix);
-            f_output_hm.mkdir();
-
-            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-            options_intern.tepic_input_directory = f_output_hm.getAbsolutePath();
-
-            logger.logLine("[MIX] Identify possible Timepoints with same Histone Modifications");
-
-            HashMap<String, ArrayList<String>> timepoints_histone_modifications = new HashMap<>();
-            HashMap<String, ArrayList<String>> deleted_tps = new HashMap<>();
-            HashSet<String> available_hms = new HashSet<>();
-
-            //identify possible timepoints
-            for (File fileDir : f_sample_mix_output.listFiles())
-            {
-                if (fileDir.isDirectory())
-                {
-                    String timepoint = fileDir.getName();
-                    ArrayList hm = new ArrayList();
-
-                    for (File fileDirHM : fileDir.listFiles())
-                    {
-                        if (fileDirHM.isDirectory())
-                        {
-                            hm.add(fileDirHM.getName());
-                            available_hms.add(fileDirHM.getName());
-                        }
-                    }
-                    timepoints_histone_modifications.put(timepoint, hm);
-                }
-            }
-
-
-            for (String tp : timepoints_histone_modifications.keySet())
-            {
-                if (timepoints_histone_modifications.get(tp).size() < available_hms.size())
-                {
-                    deleted_tps.put(tp, timepoints_histone_modifications.get(tp));
-                    timepoints_histone_modifications.remove(tp);
-                    continue;
-                }
-
-                boolean all_in = true;
-                for (String hm : available_hms)
-                {
-                    if (!timepoints_histone_modifications.get(tp).contains(hm))
-                    {
-                        all_in = false;
-                    }
-                }
-
-                if (!all_in)
-                {
-                    deleted_tps.put(tp, timepoints_histone_modifications.get(tp));
-                    timepoints_histone_modifications.remove(tp);
-                }
-            }
-
-            StringBuilder sb_found_mixing_tps = new StringBuilder();
-            sb_found_mixing_tps.append("[MIX] Can perform complete mix for HMs (");
-            for (String hm : available_hms)
-            {
-                sb_found_mixing_tps.append(hm);
-                sb_found_mixing_tps.append(" ");
-            }
-            sb_found_mixing_tps.append(") in timepoints (");
-            for (String tp : timepoints_histone_modifications.keySet())
-            {
-                sb_found_mixing_tps.append(tp);
-                sb_found_mixing_tps.append(" ");
-            }
-            sb_found_mixing_tps.append("). Can perform part-mix or no-mix for timepoints (");
-            for (String tp : deleted_tps.keySet())
-            {
-                sb_found_mixing_tps.append(tp);
-                sb_found_mixing_tps.append(" ");
-            }
-            sb_found_mixing_tps.append(").");
-            logger.logLine(sb_found_mixing_tps.toString());
-
-
-            for (File fileDir : f_sample_mix_output.listFiles())
-            {
-                if (fileDir.isDirectory())
-                {
-                    String timepoint = fileDir.getName();
-                    File f_output_hm_prepro =
-                            new File(f_output_preprocessing_hm.getAbsolutePath() + File.separator + timepoint);
-                    f_output_hm_prepro.mkdir();
-
-                    for (File fileDirHM : fileDir.listFiles())
-                    {
-                        if (fileDirHM.isDirectory())
-                        {
-                            String hm = fileDirHM.getName();
-                            File f_output_hm_prepro_hm =
-                                    new File(f_output_hm_prepro.getAbsolutePath() + File.separator + "MIX");
-                            f_output_hm_prepro_hm.mkdir();
-
-                            for (File fileDirHM_samples : fileDirHM.listFiles())
-                            {
-                                if (fileDirHM_samples.isFile())
-                                {
-                                    BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-                                            f_output_hm_prepro_hm.getAbsolutePath() + File.separator + "test.txt")));
-                                    BufferedReader br = new BufferedReader(new FileReader(fileDirHM_samples));
-                                    String line = "";
-                                    String currentChr = "";
-                                    while ((line = br.readLine()) != null)
-                                    {
-                                        String[] split = line.split("\t");
-                                        if (!split[0].equals(currentChr))
-                                        {
-                                            bw.close();
-                                            currentChr = split[0];
-                                            File f_output_chr = new File(
-                                                    f_output_hm_prepro_hm.getAbsolutePath() + File.separator +
-                                                            currentChr);
-                                            f_output_chr.mkdir();
-
-                                            bw = new BufferedWriter(new FileWriter(new File(
-                                                    f_output_chr.getAbsolutePath() + File.separator +
-                                                            fileDirHM_samples.getName())));
-                                        }
-                                        bw.write(line);
-                                        bw.newLine();
-                                    }
-                                    bw.close();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            logger.logLine("[MIX] Create " + options_intern.mix_option + " of HMs");
-
-            for (File fileDir : f_output_preprocessing_hm.listFiles())
-            {
-                if (fileDir.isDirectory())
-                {
-                    String timepoint = fileDir.getName();
-                    File f_output_union_samples_tp =
-                            new File(f_output_hm.getAbsolutePath() + File.separator + timepoint);
-                    f_output_union_samples_tp.mkdir();
-
-                    for (File fileDirHM : fileDir.listFiles())
-                    {
-                        if (fileDirHM.isDirectory())
-                        {
-                            String hm = fileDirHM.getName();
-                            File f_output_union_samples_tp_hm =
-                                    new File(f_output_union_samples_tp.getAbsolutePath() + File.separator + hm);
-                            f_output_union_samples_tp_hm.mkdir();
-
-                            String file_ending = "";
-
-                            HashMap<String, ArrayList<MIX_Interval>> all_chromosomes = new HashMap();
-                            ArrayList<Integer> chr_alpha = new ArrayList<>();
-                            ArrayList<String> chr_str = new ArrayList<>();
-
-                            for (File fileDirHM_Chr : fileDirHM.listFiles())
-                            {
-                                if (fileDirHM_Chr.isDirectory())
-                                {
-                                    String chr = fileDirHM_Chr.getName();
-
-                                    ArrayList<MIX_Interval> all_intervals = new ArrayList<>();
-
-                                    int sample_number = 0;
-
-                                    for (File fileDirHM_Chr_sample : fileDirHM_Chr.listFiles())
-                                    {
-                                        if (fileDirHM_Chr_sample.isFile())
-                                        {
-                                            String[] f_ending = fileDirHM_Chr_sample.getName().split("\\.");
-                                            file_ending = f_ending[f_ending.length - 1];
-                                            //build array of a union of all peaks
-                                            BufferedReader br =
-                                                    new BufferedReader(new FileReader(fileDirHM_Chr_sample));
-                                            String line = "";
-                                            while ((line = br.readLine()) != null)
-                                            {
-                                                String[] split = line.split("\t");
-
-                                                MIX_Interval_Object mio =
-                                                        new MIX_Interval_Object(split[0], Integer.parseInt(split[1]),
-                                                                Integer.parseInt(split[2]), split[3],
-                                                                Integer.parseInt(split[4]), split[5],
-                                                                Double.parseDouble(split[6]),
-                                                                Double.parseDouble(split[7]),
-                                                                Double.parseDouble(split[8]));
-                                                MIX_Interval mi = new MIX_Interval(Integer.parseInt(split[1]),
-                                                        Integer.parseInt(split[2]));
-                                                mi.merged_intervals.add(mio);
-
-                                                all_intervals.add(mi);
-
-                                            }
-                                            br.close();
-                                            sample_number++;
-
-                                        /*
-                                        if(options_intern.mix_option.equals("INTERSECTION"))
-                                        {
-                                            ArrayList<MIX_Interval> intersec_al = new ArrayList<>();
-
-                                            BufferedReader br_intersec = new BufferedReader(new FileReader(fileDirHM_Chr_sample));
-                                            String line_intersec = "";
-                                            while((line_intersec=br_intersec.readLine())!=null)
-                                            {
-                                                String[] split = line_intersec.split("\t");
-
-                                                MIX_Interval_Object mio = new MIX_Interval_Object(split[0],Integer.parseInt(split[1]),Integer.parseInt(split[2]),split[3],Integer.parseInt(split[4]),split[5],Double.parseDouble(split[6]),Double.parseDouble(split[7]),Double.parseDouble(split[8]));
-                                                MIX_Interval mi = new MIX_Interval(Integer.parseInt(split[1]),Integer.parseInt(split[2]));
-                                                mi.merged_intervals.add(mio);
-
-                                                intersec_al.add(mi);
-
-                                            }
-                                            br.close();
-
-
-                                            intersec_vals.put(fileDirHM_Chr_sample.getName(),intersec_al);
-                                        }*/
-
-                                        }
-                                    }
-
-                                    //intersections sorting!
-                                /*if(options_intern.mix_option.equals("INTERSECTION"))
-                                {
-                                    for(String k: intersec_vals.keySet())
-                                    {
-                                        Collections.sort(intersec_vals.get(k));
-                                    }
-                                }*/
-
-                                    //unions sorting
-                                    Collections.sort(all_intervals);
-
-                                    Stack<MIX_Interval> stack_union = mergeIntervals(all_intervals);
-
-                                    ArrayList<MIX_Interval> chr_unions = new ArrayList<>();
-
-                                    int min_occurence = 0;
-                                    if (options_intern.mix_occurence_intersection == -1)
-                                    {
-                                        min_occurence = sample_number;
-                                    } else
-                                    {
-                                        if (sample_number < options_intern.mix_occurence_intersection)
-                                        {
-                                            min_occurence = sample_number;
-
-                                        } else
-                                        {
-                                            min_occurence = options_intern.mix_occurence_intersection;
-                                        }
-                                    }
-
-                                    while (!stack_union.isEmpty())
-                                    {
-                                        MIX_Interval t = stack_union.pop();
-                                        t.calculate_mean("HM_LEVEL");
-
-                                        if (options_intern.mix_option.equals("INTERSECTION"))
-                                        {
-                                            if (t.merged_intervals.size() >= min_occurence)
-                                            {
-                                                chr_unions.add(t);
-                                            }
-                                        } else
-                                        {
-                                            chr_unions.add(t);
-                                        }
-                                    }
-
-                                    Collections.sort(chr_unions);
-
-                                    all_chromosomes.put(chr, chr_unions);
-
-                                    try
-                                    {
-                                        chr_alpha.add(Integer.parseInt(chr));
-                                    } catch (Exception e)
-                                    {
-                                        chr_str.add(chr);
-                                    }
-                                }
-                            }
-
-                            Collections.sort(chr_alpha);
-                            Collections.sort(chr_str);
-
-
-                            //print Sample_unions => can be used if not HM_Level is used
-                            BufferedWriter bw = new BufferedWriter(new FileWriter(
-                                    f_output_union_samples_tp_hm.getAbsolutePath() + File.separator + timepoint + "_" +
-                                            hm + "." + file_ending));
-
-                            int peak_counter = 1;
-
-                            for (int chr : chr_alpha)
-                            {
-                                ArrayList<MIX_Interval> x = all_chromosomes.get("" + chr);
-                                for (int i = 0; i < x.size(); i++)
-                                {
-                                    bw.write(x.get(i).meanToString(peak_counter));
-                                    bw.newLine();
-                                    peak_counter++;
-                                }
-                            }
-
-                            for (String chr : chr_str)
-                            {
-                                ArrayList<MIX_Interval> x = all_chromosomes.get(chr);
-                                for (int i = 0; i < x.size(); i++)
-                                {
-                                    bw.write(x.get(i).meanToString(peak_counter));
-                                    bw.newLine();
-                                    peak_counter++;
-                                }
-                            }
-                            bw.close();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * check if chromosome are annotated without a chr prefix
-     *
-     * @throws IOException
-     */
-    public void check_chromosomes() throws IOException
-    {
-        logger.logLine("[CHECK CHROMOSOMES] Check chromosome for naming convention and alter if necessary!");
-
-        File file_root_input = new File(options_intern.tepic_input_directory);
-
-        File root_mix_working_dir = new File(
-                options_intern.com2pose_working_directory + File.separator + options_intern.folder_name_mix_option);
-        root_mix_working_dir.mkdir();
-
-        File chr_annotation_output = new File(root_mix_working_dir.getAbsolutePath() + File.separator +
-                options_intern.folder_name_mix_option_preprocessing_check_chr);
-        chr_annotation_output.mkdir();
-
-        options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-        options_intern.tepic_input_directory = chr_annotation_output.getAbsolutePath();
-
-        for (File fileDir : file_root_input.listFiles())
-        {
-            if (fileDir.isDirectory())
-            {
-                String timepoint = fileDir.getName();
-                File file_output_tp = new File(chr_annotation_output.getAbsolutePath() + File.separator + timepoint);
-                file_output_tp.mkdir();
-
-                for (File fileDirHM : fileDir.listFiles())
-                {
-                    if (fileDirHM.isDirectory())
-                    {
-                        File file_output_tp_hm =
-                                new File(file_output_tp.getAbsolutePath() + File.separator + fileDirHM.getName());
-                        file_output_tp_hm.mkdir();
-
-                        for (File fileDirHM_sample : fileDirHM.listFiles())
-                        {
-                            if (fileDirHM_sample.isFile())
-                            {
-                                BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-                                        file_output_tp_hm.getAbsolutePath() + File.separator +
-                                                fileDirHM_sample.getName())));
-                                BufferedReader br = new BufferedReader(new FileReader(fileDirHM_sample));
-                                String line = "";
-                                while ((line = br.readLine()) != null)
-                                {
-                                    String[] split = line.split("\t");
-
-                                    if (split[0].startsWith("chr"))
-                                    {
-                                        String[] split_chr = split[0].split("chr");
-                                        String chr_name = split_chr[1];
-
-                                        StringBuilder sb_line = new StringBuilder();
-                                        sb_line.append(chr_name);
-
-                                        for (int i = 1; i < split.length; i++)
-                                        {
-                                            sb_line.append("\t");
-                                            sb_line.append(split[i]);
-                                        }
-
-                                        bw.write(sb_line.toString());
-                                        bw.newLine();
-
-                                    } else
-                                    {
-                                        bw.write(line);
-                                        bw.newLine();
-                                    }
-                                }
-                                bw.close();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        logger.logLine("[CHECK CHROMOSOMES] Chromosome checking done.");
-    }
 
     /**
      * read config file
      *
      * @param check_options should options be checked for validity? Should be true if pipeline is run, should be false if analyse programms are run
      */
+    /*
     public void read_config_file(boolean check_options) throws IOException
     {
 
-        logger.logLine("Start reading config file at " + options_intern.config_data_path);
+        globalLogger.logLine("Start reading config file at " + options_intern.config_data_path);
 
         File f_check_config = new File(options_intern.config_data_path);
         if (!f_check_config.exists())
         {
-            logger.logLine("[CHECK] config file does not exist. Please check path!");
-            logger.logLine("[CHECK] " + options_intern.config_data_path);
+            globalLogger.logLine("[CHECK] config file does not exist. Please check path!");
+            globalLogger.logLine("[CHECK] " + options_intern.config_data_path);
             System.exit(1);
         }
 
         File f_check_working_dir = new File(options_intern.com2pose_working_directory);
         if (!f_check_working_dir.exists())
         {
-            logger.logLine("[CHECK] working directory does not exist. Please check path!");
-            logger.logLine("[CHECK] " + options_intern.com2pose_working_directory);
+            globalLogger.logLine("[CHECK] working directory does not exist. Please check path!");
+            globalLogger.logLine("[CHECK] " + options_intern.com2pose_working_directory);
             System.exit(1);
         }
 
@@ -14925,9 +14232,9 @@ public class COM2POSE_lib
                     options_intern.igv_species_ref_genome = split[1].substring(1, split[1].length() - 1);
                     break;
                 default:
-                    logger.logLine(
+                    globalLogger.logLine(
                             "Misformed cfg file - please use template of: /COM2POSE/config_templates/com2pose_template.cfg");
-                    logger.logLine("Do not delete unused parameters in config data!");
+                    globalLogger.logLine("Do not delete unused parameters in config data!");
                     System.exit(1);
             }
         }
@@ -14936,24 +14243,23 @@ public class COM2POSE_lib
         if (check_options)
         {
             boolean all_set = checkOptions();
-            logger.logLine("Check config file parameters for validity");
+            globalLogger.logLine("Check config file parameters for validity");
             if (!all_set)
             {
-                logger.logLine("Not all [REQ]uired options set. Please set them in config file");
-                logger.logLine("Aborting COM2POSE");
+                globalLogger.logLine("Not all [REQ]uired options set. Please set them in config file");
+                globalLogger.logLine("Aborting COM2POSE");
                 System.exit(1);
             } else
             {
-                logger.logLine("Parameters in config file valid");
+                globalLogger.logLine("Parameters in config file valid");
             }
         }
 
 
-        logger.logLine("Reading config file finished - no errors detected");
+        globalLogger.logLine("Reading config file finished - no errors detected");
 
 
-    }
-
+    }*/
     private boolean checkOptions() throws IOException
     {
 
@@ -14967,12 +14273,12 @@ public class COM2POSE_lib
         {
             if (!options_intern.mix_level.equals("HM_LEVEL") && !options_intern.mix_level.equals("SAMPLE_LEVEL"))
             {
-                logger.logLine("[MIX]: mix_level parameter must be either HM_LEVEL or SAMPLE_LEVEL");
+                globalLogger.logLine("[MIX]: mix_level parameter must be either HM_LEVEL or SAMPLE_LEVEL");
                 all_set = false;
             }
             if (!options_intern.mix_option.equals("UNION") && !options_intern.mix_option.equals("INTERSECTION"))
             {
-                logger.logLine("[MIX]: mix_option parameter must be either UNION or INTERSECTION");
+                globalLogger.logLine("[MIX]: mix_option parameter must be either UNION or INTERSECTION");
                 all_set = false;
             }
         }
@@ -14986,18 +14292,18 @@ public class COM2POSE_lib
             File f = new File(options_intern.black_list_dir);
             if (!f.exists())
             {
-                logger.logLine("[BLACKLIST] blacklist path does not exist!");
+                globalLogger.logLine("[BLACKLIST] blacklist path does not exist!");
                 all_set = false;
             }
             if (f.isDirectory())
             {
-                logger.logLine("[BLACKLIST] blacklist path is a directory but must be a file");
+                globalLogger.logLine("[BLACKLIST] blacklist path is a directory but must be a file");
                 all_set = false;
             }
 
             if (options_intern.black_list_signals.isEmpty())
             {
-                logger.logLine("[BLACKLIST] signals must not be empty");
+                globalLogger.logLine("[BLACKLIST] signals must not be empty");
                 all_set = false;
             }
         }
@@ -15008,35 +14314,36 @@ public class COM2POSE_lib
 
         if (options_intern.deseq2_input_directory.equals(""))
         {
-            logger.logLine("[DESEQ2] input directory is not given");
+            globalLogger.logLine("[DESEQ2] input directory is not given");
             all_set = false;
         } else
         {
             File f = new File(options_intern.deseq2_input_directory);
             if (!f.exists())
             {
-                logger.logLine("[DESEQ2] input path does not exist!");
+                globalLogger.logLine("[DESEQ2] input path does not exist!");
                 all_set = false;
             }
         }
 
         if (options_intern.deseq2_input_gene_id.equals(""))
         {
-            logger.logLine("[DESEQ2] gene ID file from nfcore RNA-seq is not given");
+            globalLogger.logLine("[DESEQ2] gene ID file from nfcore RNA-seq is not given");
             all_set = false;
         } else
         {
             File f = new File(options_intern.deseq2_input_gene_id);
             if (!f.exists())
             {
-                logger.logLine("[DESEQ2] gene ID file from nfcore RNA-seq path does not exist!");
+                globalLogger.logLine("[DESEQ2] gene ID file from nfcore RNA-seq path does not exist!");
                 all_set = false;
             }
         }
 
         if (options_intern.deseq2_biomart_dataset_species.equals("") && options_intern.tepic_ensg_symbol.equals(""))
         {
-            logger.logLine("[DESEQ2] deseq2_biomart_dataset_species must be filled if tepic_ensg_symbol is empty!");
+            globalLogger.logLine(
+                    "[DESEQ2] deseq2_biomart_dataset_species must be filled if tepic_ensg_symbol is empty!");
             all_set = false;
         }
 
@@ -15053,56 +14360,56 @@ public class COM2POSE_lib
          */
         if (options_intern.tepic_input_ref_genome.equals(""))
         {
-            logger.logLine("[TEPIC] Reference genome path is not given");
+            globalLogger.logLine("[TEPIC] Reference genome path is not given");
             all_set = false;
         } else
         {
             File f = new File(options_intern.tepic_input_ref_genome);
             if (!f.exists())
             {
-                logger.logLine("[TEPIC] Reference genome path does not exist!");
+                globalLogger.logLine("[TEPIC] Reference genome path does not exist!");
                 all_set = false;
             }
         }
 
         if (options_intern.tepic_gene_annot.equals(""))
         {
-            logger.logLine("[TEPIC] Gene annotation path is not given");
+            globalLogger.logLine("[TEPIC] Gene annotation path is not given");
             all_set = false;
         } else
         {
             File f = new File(options_intern.tepic_gene_annot);
             if (!f.exists())
             {
-                logger.logLine("[TEPIC] Gene annotation path does not exist!");
+                globalLogger.logLine("[TEPIC] Gene annotation path does not exist!");
                 all_set = false;
             }
         }
 
         if (options_intern.tepic_input_directory.equals(""))
         {
-            logger.logLine("[TEPIC] nfcore ChIP-seq data directory is not given");
+            globalLogger.logLine("[TEPIC] nfcore ChIP-seq data directory is not given");
             all_set = false;
         } else
         {
             File f = new File(options_intern.tepic_input_directory);
             if (!f.exists())
             {
-                logger.logLine("[TEPIC] nfcore ChIP-seq data path does not exist!");
+                globalLogger.logLine("[TEPIC] nfcore ChIP-seq data path does not exist!");
                 all_set = false;
             }
         }
 
         if (options_intern.tepic_path_pwms.equals(""))
         {
-            logger.logLine("[TEPIC] position specific energy matrix directory is not given");
+            globalLogger.logLine("[TEPIC] position specific energy matrix directory is not given");
             all_set = false;
         } else
         {
             File f = new File(options_intern.tepic_path_pwms);
             if (!f.exists())
             {
-                logger.logLine("[TEPIC] position specific energy matrix path does not exist!");
+                globalLogger.logLine("[TEPIC] position specific energy matrix path does not exist!");
                 all_set = false;
             }
         }
@@ -15112,14 +14419,14 @@ public class COM2POSE_lib
             //check for gene annotation
             if (options_intern.tepic_gene_annot.equals(""))
             {
-                logger.logLine("[TEPIC] TPM cutoff set, but no annotation file is given");
+                globalLogger.logLine("[TEPIC] TPM cutoff set, but no annotation file is given");
                 all_set = false;
             } else
             {
                 File f = new File(options_intern.tepic_gene_annot);
                 if (!f.exists())
                 {
-                    logger.logLine("[TEPIC] TPM cutoff set and gene annotation file path does not exist!");
+                    globalLogger.logLine("[TEPIC] TPM cutoff set and gene annotation file path does not exist!");
                     all_set = false;
                 }
             }
@@ -15131,12 +14438,13 @@ public class COM2POSE_lib
                         options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN")))
         {
             //check tf_binding_site_search option
-            logger.logLine("[TEPIC] tepic_tf_binding_site_search must be either INSIDE or BETWEEN or EXCL_BETWEEN");
+            globalLogger.logLine(
+                    "[TEPIC] tepic_tf_binding_site_search must be either INSIDE or BETWEEN or EXCL_BETWEEN");
             all_set = false;
         }
         if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") && options_intern.tepic_between_max_bps <= 0)
         {
-            logger.logLine(
+            globalLogger.logLine(
                     "[TEPIC] tepic_tf_binding_site_search is set to 'BETWEEN', tepic_between_max_bps must be set > 0");
             all_set = false;
         }
@@ -15147,26 +14455,27 @@ public class COM2POSE_lib
          */
         if (options_intern.tepic_ensg_symbol.equals("") && options_intern.deseq2_biomart_dataset_species.equals(""))
         {
-            logger.logLine("[TEPIC] No map of ENSG to Gene Symbol is given!");
+            globalLogger.logLine("[TEPIC] No map of ENSG to Gene Symbol is given!");
         } else if (options_intern.deseq2_biomart_dataset_species.equals(""))
         {
             File f = new File(options_intern.tepic_ensg_symbol);
             if (!f.exists())
             {
-                logger.logLine("[TEPIC] Map of ENSG to Gene Symbol file path does not exist!");
+                globalLogger.logLine("[TEPIC] Map of ENSG to Gene Symbol file path does not exist!");
                 all_set = false;
             }
         }
 
         if (!options_intern.tepic_background_seq.equals("") && !options_intern.tepic_2bit.equals(""))
         {
-            logger.logLine("[TEPIC] parameters: tepic_background_seq and tepic_2bit are mutually exclusive");
+            globalLogger.logLine("[TEPIC] parameters: tepic_background_seq and tepic_2bit are mutually exclusive");
             all_set = false;
         }
 
         if (options_intern.tepic_column_bedfile != -1 && !options_intern.tepic_bed_chr_sign.equals(""))
         {
-            logger.logLine("[TEPIC] parameters: tepic_column_bedfile and tepic_bed_chr_sign are mutually exclusive");
+            globalLogger.logLine(
+                    "[TEPIC] parameters: tepic_column_bedfile and tepic_bed_chr_sign are mutually exclusive");
             all_set = false;
         }
 
@@ -15175,7 +14484,7 @@ public class COM2POSE_lib
             File f = new File(options_intern.tepic_bed_chr_sign);
             if (!f.exists())
             {
-                logger.logLine("[TEPIC] tepic_bed_chr_sign file path does not exists!");
+                globalLogger.logLine("[TEPIC] tepic_bed_chr_sign file path does not exists!");
                 all_set = false;
             }
         }
@@ -15185,7 +14494,7 @@ public class COM2POSE_lib
             File f = new File(options_intern.tepic_psems_length);
             if (!f.exists())
             {
-                logger.logLine("[TEPIC] tepic_psems_length file path does not exists!");
+                globalLogger.logLine("[TEPIC] tepic_psems_length file path does not exists!");
                 all_set = false;
             }
         }
@@ -15195,7 +14504,7 @@ public class COM2POSE_lib
             File f = new File(options_intern.tepic_loop_list);
             if (!f.exists())
             {
-                logger.logLine("[TEPIC] tepic_loop_list file path does not exists!");
+                globalLogger.logLine("[TEPIC] tepic_loop_list file path does not exists!");
                 all_set = false;
             }
         }
@@ -15208,7 +14517,7 @@ public class COM2POSE_lib
             File file_tgen = new File(options_intern.path_tgen);
             if (!file_tgen.exists() || !file_tgen.isDirectory())
             {
-                logger.logLine("[TGENE] TGene file directory does not exist or is not a directory!");
+                globalLogger.logLine("[TGENE] TGene file directory does not exist or is not a directory!");
                 all_set = false;
             }
 
@@ -15216,19 +14525,20 @@ public class COM2POSE_lib
 
             if (!tgene_dir.exists())
             {
-                logger.logLine("[TGENE] TGene binary directory cannot be found: " + tgene_dir.getAbsolutePath());
+                globalLogger.logLine("[TGENE] TGene binary directory cannot be found: " + tgene_dir.getAbsolutePath());
                 all_set = false;
             }
 
             if (options_intern.tgen_mt_writing.equals(""))
             {
-                logger.logLine("[TGENE] Please specify spelling of Mitochondrial DNA, e.g. M or MT (default: MT)");
+                globalLogger.logLine(
+                        "[TGENE] Please specify spelling of Mitochondrial DNA, e.g. M or MT (default: MT)");
                 all_set = false;
             }
 
             if (options_intern.tgen_consensus == 0.0)
             {
-                logger.logLine(
+                globalLogger.logLine(
                         "[TGENE] tgen_consensus must be in range ]0.0,1.0], it cannot be 0.0, if you do not want to use consensus set path_tgen=\"\"");
                 all_set = false;
             }
@@ -15237,7 +14547,7 @@ public class COM2POSE_lib
             {
                 if (options_intern.tgen_consensus_calc.equals(""))
                 {
-                    logger.logLine("[TGENE] tgen_consensus_calc must be set.");
+                    globalLogger.logLine("[TGENE] tgen_consensus_calc must be set.");
                     all_set = false;
                 }
             }
@@ -15251,7 +14561,8 @@ public class COM2POSE_lib
             File f = new File(options_intern.dynamite_preprocessing_integrate_data_consider_geneFile);
             if (!f.exists())
             {
-                logger.logLine("[DYNAMITE] preprocessing consider genes file for integrateData.py does not exist!");
+                globalLogger.logLine(
+                        "[DYNAMITE] preprocessing consider genes file for integrateData.py does not exist!");
                 all_set = false;
             }
         }
@@ -15261,49 +14572,49 @@ public class COM2POSE_lib
          */
         if (options_intern.plot_th_coefficient.isEmpty())
         {
-            logger.logLine("[PLOTS] plot th coefficients is empty, please use at least one coefficient.");
+            globalLogger.logLine("[PLOTS] plot th coefficients is empty, please use at least one coefficient.");
             all_set = false;
         }
         if (options_intern.plot_cutoff_tps < 1)
         {
-            logger.logLine("[PLOTS] plot_cutoff_tps must be >= 1");
+            globalLogger.logLine("[PLOTS] plot_cutoff_tps must be >= 1");
             all_set = false;
         }
         if (options_intern.plot_cutoff_hms < 1)
         {
-            logger.logLine("[PLOTS] plot_cutoff_hms must be >= 1");
+            globalLogger.logLine("[PLOTS] plot_cutoff_hms must be >= 1");
             all_set = false;
         }
         if (options_intern.plot_cutoff_gcs < 0)
         {
-            logger.logLine("[PLOTS] plot_cutoff_gcs must be >= 0");
+            globalLogger.logLine("[PLOTS] plot_cutoff_gcs must be >= 0");
             all_set = false;
         }
         if (options_intern.plot_cutoff_tpms < 0)
         {
-            logger.logLine("[PLOTS] plot_cutoff_tpms must be >= 0.0");
+            globalLogger.logLine("[PLOTS] plot_cutoff_tpms must be >= 0.0");
             all_set = false;
         }
         if (options_intern.plot_top_k_genes < 1)
         {
-            logger.logLine("[PLOTS] plot_top_k_genes must be >= 1");
+            globalLogger.logLine("[PLOTS] plot_top_k_genes must be >= 1");
             all_set = false;
         }
         if (options_intern.plot_mann_whitneyU_pvalue_cutoff <= 0)
         {
-            logger.logLine("[PLOTS] Mann WhitneyU pvalue cutoff must be > 0");
+            globalLogger.logLine("[PLOTS] Mann WhitneyU pvalue cutoff must be > 0");
             all_set = false;
         }
         if (options_intern.plot_distribution_analysis_score_type.equals(""))
         {
-            logger.logLine(
+            globalLogger.logLine(
                     "[PLOTS] plot_distribution_analysis_score_type must be either set to GENE_COUNTS or EXCL_GENE_COUNTS");
             all_set = false;
         }
         if (!options_intern.plot_distribution_analysis_score_type.equals("GENE_COUNTS") &&
                 !options_intern.plot_distribution_analysis_score_type.equals("EXCL_GENE_COUNTS"))
         {
-            logger.logLine(
+            globalLogger.logLine(
                     "[PLOTS] plot_distribution_analysis_score_type must be either set to GENE_COUNTS or EXCL_GENE_COUNTS");
             all_set = false;
         }
@@ -15317,13 +14628,13 @@ public class COM2POSE_lib
         }
         if (options_intern.chip_atlas_tissue_type.equals("") && !options_intern.chip_atlas_genome_version.equals(""))
         {
-            logger.logLine(
+            globalLogger.logLine(
                     "[ChIP-ATLAS] Genome version specified, but no tissue type specified. (chip_atlas_tissue_type).");
             all_set = false;
         }
         if (options_intern.chip_atlas_tissue_type.equals("") && !options_intern.chip_atlas_genome_version.equals(""))
         {
-            logger.logLine(
+            globalLogger.logLine(
                     "[ChIP-ATLAS] Tissue type specified, but no genome version specified. (chip_atlas_genome_version).");
             all_set = false;
         }
@@ -15331,12 +14642,12 @@ public class COM2POSE_lib
         {
             if (options_intern.igv_path_to_igv.equals(""))
             {
-                logger.logLine("[ChIP-ATLAS-IGV] ChIP-ATLAS activated, but no IGV path set.");
+                globalLogger.logLine("[ChIP-ATLAS-IGV] ChIP-ATLAS activated, but no IGV path set.");
                 all_set = false;
             }
             if (options_intern.igv_species_ref_genome.equals(""))
             {
-                logger.logLine("[ChIP-ATLAS-IGV] ChIP-ATLAS activated, but no IGV ref genome set set.");
+                globalLogger.logLine("[ChIP-ATLAS-IGV] ChIP-ATLAS activated, but no IGV ref genome set set.");
                 all_set = false;
             }
 
@@ -15349,13 +14660,13 @@ public class COM2POSE_lib
                 String response = in.readLine();
                 if (!response.equals("OK"))
                 {
-                    logger.logLine("[IGV] igv_species_ref_genome not OK!");
+                    globalLogger.logLine("[IGV] igv_species_ref_genome not OK!");
                     all_set = false;
                 }
                 socket.close();
             } catch (Exception e)
             {
-                logger.logLine(
+                globalLogger.logLine(
                         "[IGV] IGV option is used, but IGV is not started. Please start IGV, so COM2POSE can listen to its port: " +
                                 options_intern.igv_port_number);
                 System.exit(1);
@@ -15373,20 +14684,20 @@ public class COM2POSE_lib
                 File f = new File(options_intern.igv_path_to_tf_chip_seq);
                 if (!f.exists())
                 {
-                    logger.logLine("[IGV] path to TF ChIP-seq data does not exist!");
+                    globalLogger.logLine("[IGV] path to TF ChIP-seq data does not exist!");
                     all_set = false;
                 }
             }
 
             if (options_intern.igv_path_to_tf_chip_seq.equals("") && !options_intern.chip_atlas_activated_chip_atlas)
             {
-                logger.logLine("[IGV] path to IGV set, but no TF ChIP-seq data provided.");
+                globalLogger.logLine("[IGV] path to IGV set, but no TF ChIP-seq data provided.");
                 all_set = false;
             }
 
             if (options_intern.igv_species_ref_genome.equals(""))
             {
-                logger.logLine("[IGV] reference genome not provided!");
+                globalLogger.logLine("[IGV] reference genome not provided!");
                 all_set = false;
             }
 
@@ -15394,7 +14705,7 @@ public class COM2POSE_lib
             if (!f_igv_tools.exists())
             {
                 all_set = false;
-                logger.logLine(
+                globalLogger.logLine(
                         "[IGV] igvtools does not exists. Please make sure that you download the full installation of IGV");
             }
 
@@ -15405,7 +14716,7 @@ public class COM2POSE_lib
             String response = in.readLine();
             if (!response.equals("OK"))
             {
-                logger.logLine("[IGV] igv_species_ref_genome not OK!");
+                globalLogger.logLine("[IGV] igv_species_ref_genome not OK!");
                 all_set = false;
             }
             socket.close();
@@ -15447,7 +14758,7 @@ public class COM2POSE_lib
             if (!f_igv_path_to_tdf.exists())
             {
                 all_set = false;
-                logger.logLine(
+                globalLogger.logLine(
                         "[IGV] ERROR in igv_path_to_tdf. File path does not exist! Needs to follow " + "structure of " +
                                 "tepic_input_directory.");
             }
@@ -15466,7 +14777,7 @@ public class COM2POSE_lib
                 if (!f_input_db.exists())
                 {
                     all_set = false;
-                    logger.logLine("[ENHANCER] BED for database does not exist in " + options_intern.folder_ext +
+                    globalLogger.logLine("[ENHANCER] BED for database does not exist in " + options_intern.folder_ext +
                             File.separator + options_intern.folder_enhancerDB + ": " + db);
                 } else
                 {
@@ -15478,8 +14789,8 @@ public class COM2POSE_lib
                     if (!line.equals(options_intern.enhancerDB_bed_format))
                     {
                         all_set = false;
-                        logger.logLine("[ENHANCER] BED format corrupted. Needs to have this format: ");
-                        logger.logLine("[ENHANCER] " + options_intern.enhancerDB_bed_format);
+                        globalLogger.logLine("[ENHANCER] BED format corrupted. Needs to have this format: ");
+                        globalLogger.logLine("[ENHANCER] " + options_intern.enhancerDB_bed_format);
                     }
 
                 }
@@ -15583,8 +14894,8 @@ public class COM2POSE_lib
             if (!rnaseq_tp_names.contains(control_tp))
             {
                 all_set = false;
-                logger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_tp);
-                logger.logLine(
+                globalLogger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_tp);
+                globalLogger.logLine(
                         "[NAMING-CONVENTIONS] ERROR: RNA-seq namings do not match ChIP-seq namings. (Timepoints or Groups)");
                 break;
             }
@@ -15595,8 +14906,8 @@ public class COM2POSE_lib
             if (!chipseq_tp_names.contains(control_tp))
             {
                 all_set = false;
-                logger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_tp);
-                logger.logLine(
+                globalLogger.logLine("[NAMING-CONVENTIONS] ERROR: there is a naming mistake for: " + control_tp);
+                globalLogger.logLine(
                         "[NAMING-CONVENTIONS] ERROR: RNA-seq namings do not match ChIP-seq namings. (Timepoints or Groups)");
                 break;
             }
@@ -15699,43 +15010,6 @@ public class COM2POSE_lib
 
         }
         return newly_ordered;
-    }
-
-    /**
-     * mixes the samples of one folder into one file, based on mix_option (UNION or INTERSECTION)
-     */
-    private static Stack<MIX_Interval> mergeIntervals(ArrayList<MIX_Interval> interval)
-    {
-        Stack<MIX_Interval> stack = new Stack<>();
-
-        if (stack.empty())
-        {
-            stack.push(interval.get(0));
-        }
-
-        for (int i = 1; i < interval.size(); i++)
-        {
-            MIX_Interval top = stack.peek();
-
-            if (top.end < interval.get(i).start)
-            {
-                stack.push(interval.get(i));
-            } else if (top.end < interval.get(i).end)
-            {
-                top.end = interval.get(i).end;
-                top.merged_intervals.addAll(interval.get(i).merged_intervals);
-
-                stack.pop();
-                stack.push(top);
-            } else
-            {
-                top.merged_intervals.addAll(interval.get(i).merged_intervals);
-
-                stack.pop();
-                stack.push(top);
-            }
-        }
-        return stack;
     }
 
     private void write_target_genes_of_tf(File f_input_target_genes_hm_group_clash, String timepoint,
@@ -16717,7 +15991,7 @@ public class COM2POSE_lib
         bw_rscript_hypergeometric_test.close();
 
         String command = "Rscript " + f_out_rscript_hypergeometric_test;
-        logger.logLine("[DISTRIBUTION ANALYSIS] Perform hypergeometric test: " + command);
+        globalLogger.logLine("[DISTRIBUTION ANALYSIS] Perform hypergeometric test: " + command);
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();
         switch (code)

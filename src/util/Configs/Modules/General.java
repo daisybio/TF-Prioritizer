@@ -24,6 +24,8 @@ public class General extends AbstractModule
     public final Config<Boolean> performAllBackgroundDistributionAnalysis = new Config<>(false);
     public final Config<String> distributionAnalysisAllName = new Config<>("ALL");
 
+    public final Config<Integer> threadLimit = new Config<>(10, true);
+
 
     public General(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException

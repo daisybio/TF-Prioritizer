@@ -12,7 +12,7 @@ public class MixOptions extends AbstractModule
     public FileStructure fileStructure;
 
     public final Config<String> level = new Config<>(String.class);
-    public final Config<String> option = new Config<>(String.class);
+    public final Config<String> option = new Config<>("UNION", true);
     public final Config<Integer> occurrenceIntersection = new Config<>(2, true);
     public final Config<Boolean> mutuallyExclusive = new Config<>(false, true);
     public final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals = new Config<>(true, true);

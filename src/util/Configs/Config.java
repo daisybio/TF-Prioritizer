@@ -118,4 +118,9 @@ public class Config<T>
     {
         return writeable;
     }
+
+    public boolean isSet()
+    {
+        return actualValue != null;
+    }
 }

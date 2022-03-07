@@ -1,10 +1,11 @@
 package com2pose;
 
+import lib.CheckChromosomes;
+import lib.MixOptions.MixOptions;
 import org.apache.commons.cli.*;
 
 import util.Configs.Configs;
 import util.Options_intern;
-import util.Report.Report;
 
 import java.io.File;
 
@@ -25,14 +26,14 @@ public class COM2POSE
                 "configsTemplate.json"));
 
         //prepare pipeline
-        COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
-        com2pose_lib.read_config_file(true);
-        com2pose_lib.check_chromosomes();
+        //COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
+        //com2pose_lib.read_config_file(true);
+        new CheckChromosomes().execute();
 
         //mix histone modifications
-        if (!options_intern.mix_level.equals(""))
+        if (configs.mixOptions.level.isSet())
         {
-            com2pose_lib.mix_option();
+            new MixOptions().execute();
         }
 
         //create footprints if needed
