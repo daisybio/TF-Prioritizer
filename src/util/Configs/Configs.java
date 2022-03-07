@@ -60,8 +60,7 @@ public class Configs
         this.workingDirectory = new Config<>(extend(workingDirectory, "working_dir"));
         this.sourceDirectory = new Config<>(sourceDirectory);
 
-        logger = new Logger("Configs", true,
-                new File(workingDirectory.getAbsolutePath() + File.separator + "logfile.txt"));
+        logger = new Logger("Configs", true, new File(workingDirectory.getAbsolutePath() + File.separator + "log.txt"));
 
         Field[] fields = this.getClass().getFields();
         for (Field field : fields)
@@ -83,6 +82,7 @@ public class Configs
     {
         String content = FileManagement.readFile(configFile);
         JSONObject combined = new JSONObject();
+        boolean allModulesWorked = true;
 
         try
         {
@@ -100,11 +100,16 @@ public class Configs
             if (configs.containsKey(moduleName))
             {
                 AbstractModule module = configs.get(moduleName);
-                module.merge(moduleJSONObject);
+                allModulesWorked = module.merge(moduleJSONObject) && allModulesWorked;
             } else
             {
                 logger.warn("Trying to set config for unknown module: " + moduleName);
             }
+        }
+        if (!allModulesWorked)
+        {
+            logger.error("There were errors during config file merging. Aborting.");
+            System.exit(1);
         }
         logger.info("Merged configuration file from " + configFile.getAbsolutePath());
     }
@@ -133,6 +138,23 @@ public class Configs
         }
 
         return combined;
+    }
+
+    public void validate()
+    {
+        boolean allValid = true;
+        for (AbstractModule module : configs.values())
+        {
+            allValid = module.validate() && allValid;
+        }
+        if (allValid)
+        {
+            logger.info("Configs are valid.");
+        } else
+        {
+            logger.error("Configs are invalid. Aborting.");
+            System.exit(0);
+        }
     }
 
     public void save(File file, boolean onlyWriteable) throws IOException

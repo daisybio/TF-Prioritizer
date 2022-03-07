@@ -2,6 +2,7 @@ package com2pose;
 
 import lib.MixOptions.MIX_Interval;
 import lib.MixOptions.MIX_Interval_Object;
+import lib.MixOptions.MixOptions;
 import org.apache.commons.compress.utils.IOUtils;
 import util.*;
 import util.FileFilters.DirectoryFilter;
@@ -12841,7 +12842,7 @@ public class COM2POSE_lib
                             options_intern.mix_option = "UNION";
                             options_intern.mix_level = "SAMPLE_LEVEL";
 
-                            mix_option();
+                            new MixOptions().execute();
                             if (!options_intern.black_list_dir.equals(""))
                             {
                                 globalLogger.logLine("[MUTUALLY-EXCLUSIVE-PEAKS] Redo blacklist on unioned samples");
@@ -13889,8 +13890,9 @@ public class COM2POSE_lib
 
     /**
      * read config file
-     *
-     * @param check_options should options be checked for validity? Should be true if pipeline is run, should be false if analyse programms are run
+     * <p>
+     * check_options should options be checked for validity? Should be true if pipeline is run, should be
+     * false if analyse programms are run
      */
     /*
     public void read_config_file(boolean check_options) throws IOException

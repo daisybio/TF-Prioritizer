@@ -70,8 +70,9 @@ public abstract class AbstractModule
         }
     }
 
-    public void merge(JSONObject mergeObject)
+    public boolean merge(JSONObject mergeObject)
     {
+        boolean worked = true;
         for (String key : mergeObject.keySet())
         {
             if (mergeObject.get(key).getClass().equals(JSONObject.class) && subModules.containsKey(key))
@@ -81,7 +82,8 @@ public abstract class AbstractModule
                     subModules.get(key).merge(mergeObject.getJSONObject(key));
                 } catch (ClassCastException e)
                 {
-                    logger.warn(key + ": " + e.getMessage());
+                    worked = false;
+                    logger.warn(this.getClass().getSimpleName() + ": " + key + ": " + e.getMessage());
                 }
 
             } else if (entries.containsKey(key))
@@ -89,15 +91,18 @@ public abstract class AbstractModule
                 try
                 {
                     entries.get(key).setValue(mergeObject.get(key));
-                } catch (IllegalAccessException | ClassCastException e)
+                } catch (IllegalAccessException | ClassCastException | IllegalArgumentException e)
                 {
-                    logger.warn(key + ": " + e.getMessage());
+                    worked = false;
+                    logger.warn(this.getClass().getSimpleName() + ": " + key + ": " + e.getMessage());
                 }
             } else
             {
-                logger.warn("Trying to set unknown config: " + key);
+                worked = false;
+                logger.warn(this.getClass().getSimpleName() + ": Trying to set unknown config: " + key);
             }
         }
+        return worked;
     }
 
     public JSONObject toJSONObject(boolean onlyWriteable)
@@ -126,5 +131,15 @@ public abstract class AbstractModule
         }
 
         return combined;
+    }
+
+    public boolean validate()
+    {
+        boolean subModulesValid = true;
+        for (AbstractModule subModule : subModules.values())
+        {
+            subModulesValid = subModule.validate() && subModulesValid;
+        }
+        return subModulesValid;
     }
 }

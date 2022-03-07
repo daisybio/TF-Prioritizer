@@ -369,7 +369,7 @@ public class TPM_GC_Filter_Analysis
                 options_this_run.com2pose_working_directory =
                         fileDir.getAbsolutePath() + File.separator + options_intern.folder_name_usual_working_dir_name;
                 COM2POSE_lib com2pose = new COM2POSE_lib(options_this_run, logger);
-                com2pose.read_config_file(false);
+                //com2pose.read_config_file(false);
 
                 file_com2pose_obj.put(fileDir.getAbsolutePath(), com2pose);
             }
