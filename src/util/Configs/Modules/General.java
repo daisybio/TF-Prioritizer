@@ -11,7 +11,7 @@ import static util.FileManagement.extend;
 public class General extends AbstractModule
 {
     public final Config<Boolean> fileLogging = new Config<>(true, true);
-    public final Config<File> logFile = extend(workingDirectory, "log.txt");
+    public final Config<File> logFile = extend(workingDirectory, "logfile.txt");
     public final Config<Boolean> ensgMappingEnabled = new Config<>(true, true);
     public final Config<Boolean> calculateTpmLengthsEnabled = new Config<>(true, true);
     public final Config<Boolean> calculateGenePositionsEnabled = new Config<>(true, true);

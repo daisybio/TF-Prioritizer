@@ -11,6 +11,7 @@ import java.util.*;
 import com2pose.COM2POSE;
 import org.json.JSONObject;
 import util.FileManagement;
+import util.Comparators.IntegerStringComparator;
 
 public class StructureElements
 {
@@ -526,7 +527,7 @@ public class StructureElements
             }
 
             Collections.sort(fileNames);
-            fileNames.sort(new StringComparator());
+            fileNames.sort(new IntegerStringComparator());
 
             sb_result.append("[");
 
@@ -555,24 +556,5 @@ public class StructureElements
         }
 
         return sb_result.toString();
-    }
-
-    static class StringComparator implements Comparator<String>
-    {
-        @Override public int compare(String a, String b)
-        {
-            return prefixNum(a) - prefixNum(b);
-        }
-
-        private int prefixNum(String a)
-        {
-            if (a.matches("[0-9]+_.*"))
-            {
-                return Integer.parseInt(a.split("_")[0]);
-            } else
-            {
-                return 0;
-            }
-        }
     }
 }

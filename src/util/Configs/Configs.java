@@ -60,7 +60,8 @@ public class Configs
         this.workingDirectory = new Config<>(extend(workingDirectory, "working_dir"));
         this.sourceDirectory = new Config<>(sourceDirectory);
 
-        logger = new Logger("Configs", true, new File(workingDirectory.getAbsolutePath() + File.separator + "log.txt"));
+        logger = new Logger("Configs", true,
+                new File(workingDirectory.getAbsolutePath() + File.separator + "logfile.txt"));
 
         Field[] fields = this.getClass().getFields();
         for (Field field : fields)

@@ -86,7 +86,7 @@
       0.5,
       0.6
     ],
-    "cutoffTpms": 0,
+    "cutoffTpms": 0.0,
     "mannWhitneyUPvalueCutoff": 0.01,
     "topKGenes": 30,
     "cutoffHms": 1,
