@@ -1,6 +1,8 @@
 package com2pose;
 
+import lib.Blacklist.Blacklist;
 import lib.CheckChromosomes;
+import lib.FootprintIntervals.CreateFootprintsBetweenPeaks;
 import lib.MixOptions.MixOptions;
 import org.apache.commons.cli.*;
 
@@ -27,9 +29,6 @@ public class COM2POSE
 
         configs.validate();
 
-        //prepare pipeline
-        //COM2POSE_lib com2pose_lib = new COM2POSE_lib(options_intern);
-        //com2pose_lib.read_config_file(true);
         new CheckChromosomes().execute();
 
         //mix histone modifications
@@ -39,17 +38,17 @@ public class COM2POSE
         }
 
         //create footprints if needed
-        if (options_intern.tepic_tf_binding_site_search.equals("BETWEEN") ||
-                options_intern.tepic_tf_binding_site_search.equals("EXCL_BETWEEN"))
+        if (configs.tepic.tfBindingSiteSearch.isSet() && (configs.tepic.tfBindingSiteSearch.get().equals("BETWEEN") ||
+                configs.tepic.tfBindingSiteSearch.get().equals("EXCL_BETWEEN")))
         {
-            com2pose_lib.create_footprints_between_peaks();
+            new CreateFootprintsBetweenPeaks().execute();
         }
 
+
         //black listed regions filter
-        if (!options_intern.black_list_dir.equals(""))
+        if (configs.blacklist.bedFilePath.isSet())
         {
-            com2pose_lib.preprocess_blacklist();
-            com2pose_lib.filter_blacklist();
+            new Blacklist().execute();
         }
 
         if (options_intern.mix_mutually_exclusive)

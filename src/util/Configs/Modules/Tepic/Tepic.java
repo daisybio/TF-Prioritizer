@@ -6,6 +6,8 @@ import util.Logger;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static util.FileManagement.extend;
 
@@ -51,7 +53,8 @@ public class Tepic extends AbstractModule
     public final Config<File> ensgSymbolFile = new Config<>(File.class);
     public final Config<Boolean> tgeneTargetGenes = new Config<>(true, true);
     public final Config<Boolean> randomizeTfGeneMatrix = new Config<>(false, true);
-    public final Config<String> tfBindingSiteSearch = new Config<>("INSIDE", true);
+    public final Config<String> tfBindingSiteSearch =
+            new Config<>("INSIDE", new ArrayList<>(Arrays.asList("INSIDE", "BETWEEN", "EXCL_BETWEEN")), true);
     public final Config<Integer> betweenMaxBps = new Config<>(500, true);
 
     public Tepic(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
