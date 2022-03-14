@@ -1,6 +1,7 @@
 package lib.Blacklist;
 
 import com2pose.COM2POSE;
+import lib.BinaryTree.RegionNode;
 import lib.Region;
 import util.FileFilters.Filters;
 import util.Logger;
@@ -137,7 +138,7 @@ public class Blacklist
         logger.info("Used input: " + d_input);
         logger.info("Create chromosome binary trees.");
         //CREATE BINARY TREES
-        HashMap<String, BinaryTreeNode> chromosomeTree = new HashMap<>();
+        HashMap<String, RegionNode> chromosomeTree = new HashMap<>();
 
         File d_blacklistInput = COM2POSE.configs.blacklist.fileStructure.d_preprocessing_sorted.get();
 
@@ -145,7 +146,7 @@ public class Blacklist
         {
             String chromosome = f_chromosome.getName().substring(0, f_chromosome.getName().lastIndexOf("."));
 
-            ArrayList<BlacklistedRegion> region = new ArrayList<>();
+            ArrayList<BlacklistedRegion> regions = new ArrayList<>();
 
             try (BufferedReader blacklistReader = new BufferedReader(new FileReader(f_chromosome)))
             {
@@ -154,19 +155,19 @@ public class Blacklist
 
                 while ((line_chr = blacklistReader.readLine()) != null)
                 {
-                    BlacklistedRegion iu = new BlacklistedRegion(line_chr.split("\t"));
-                    region.add(iu);
+                    BlacklistedRegion region = new BlacklistedRegion(line_chr.split("\t"));
+                    regions.add(region);
                 }
             } catch (IOException e)
             {
                 e.printStackTrace();
             }
 
-            BinaryTreeNode tree = new BinaryTreeNode(region.get(0));
+            RegionNode tree = new RegionNode(regions.get(0));
 
-            for (int i = 1; i < region.size(); i++)
+            for (int i = 1; i < regions.size(); i++)
             {
-                tree.add(region.get(i));
+                tree.add(regions.get(i));
             }
 
             chromosomeTree.put(chromosome, tree);
@@ -209,12 +210,11 @@ public class Blacklist
 
                             String chromosome = split[0];
 
-                            Region region =
-                                    new Region(chromosome, Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+                            Region region = new Region(split);
 
                             if (chromosomeTree.containsKey(chromosome))
                             {
-                                BinaryTreeNode tree = chromosomeTree.get(chromosome);
+                                RegionNode tree = chromosomeTree.get(chromosome);
 
                                 if (!tree.contains(region))
                                 {
@@ -230,23 +230,30 @@ public class Blacklist
                 }
             }
         }
+        try
+        {
+            COM2POSE.configs.general.latestInputDirectory.setValue(d_output);
+        } catch (IllegalAccessException e)
+        {
+            logger.error(e.getMessage());
+        }
         logger.info("Finished filtering for blacklisted regions.");
     }
 
-    private void recursive_split_BL(ArrayList<BlacklistedRegion> region, ArrayList<BlacklistedRegion> newly_ordered)
+    public static <T extends Region> void recursive_split_BL(ArrayList<T> region, ArrayList<T> newly_ordered)
     {
         if (region.size() > 0)
         {
-            BlacklistedRegion median = region.get(region.size() / 2);
+            T median = region.get(region.size() / 2);
             newly_ordered.add(median);
 
-            ArrayList<BlacklistedRegion> region_left = new ArrayList<>();
+            ArrayList<T> region_left = new ArrayList<>();
 
             for (int i = 0; i < region.size() / 2; i++)
             {
                 region_left.add(region.get(i));
             }
-            ArrayList<BlacklistedRegion> region_right = new ArrayList<>();
+            ArrayList<T> region_right = new ArrayList<>();
             for (int i = region.size() / 2 + 1; i < region.size(); i++)
             {
                 region_right.add(region.get(i));

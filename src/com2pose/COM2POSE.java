@@ -3,6 +3,7 @@ package com2pose;
 import lib.Blacklist.Blacklist;
 import lib.CheckChromosomes;
 import lib.FootprintIntervals.CreateFootprintsBetweenPeaks;
+import lib.MixOptions.MixMutuallyExclusive;
 import lib.MixOptions.MixOptions;
 import org.apache.commons.cli.*;
 
@@ -10,11 +11,15 @@ import util.Configs.Configs;
 import util.Options_intern;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 public class COM2POSE
 {
     public static Configs configs;
+    public static Map<String, Set<String>> groupsToHms = new HashMap<>();
 
     public static void main(String[] args) throws Exception
     {
@@ -51,12 +56,13 @@ public class COM2POSE
             new Blacklist().execute();
         }
 
-        if (options_intern.mix_mutually_exclusive)
+        if (configs.mixOptions.mutuallyExclusive.get())
         {
-            com2pose_lib.mix_mutually_exclusive_peaks();
+            new MixMutuallyExclusive().execute();
         }
+        System.exit(0);
 
-
+        /*
         //DESeq2
         if (options_intern.tepic_ensg_symbol.equals("") || !options_intern.deseq2_biomart_dataset_species.equals(""))
         {
@@ -177,7 +183,7 @@ public class COM2POSE
         }
 
         new Report(options_intern).generate();
-
+        */
         System.out.println("X");
     }
 

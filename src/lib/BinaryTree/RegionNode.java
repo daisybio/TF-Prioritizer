@@ -1,15 +1,19 @@
-package lib.Blacklist;
+package lib.BinaryTree;
 
 import lib.Region;
 import util.BinarySearchTree.Node;
 
-public class BinaryTreeNode extends Node<Region>
+public class RegionNode extends Node<Region>
 {
-    public BinaryTreeNode(Region data)
+    public RegionNode(Region region)
     {
-        super(data);
+        super(region);
     }
 
+    public RegionNode(Iterable<Region> regions)
+    {
+        super(regions);
+    }
 
     @Override public boolean matches(Region term)
     {
@@ -19,6 +23,6 @@ public class BinaryTreeNode extends Node<Region>
 
     @Override public void add(Region value)
     {
-        super.add(new BinaryTreeNode(value));
+        super.add(new RegionNode(value));
     }
 }

@@ -24,7 +24,7 @@ public class MixOptions
     /**
      * preprocess mix histones, search for same peaks and use either the union or the intersection of all
      */
-    public void execute() throws IOException
+    public void execute()
     {
         logger.info("Used data: " + COM2POSE.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get());
         preprocess();
@@ -74,6 +74,7 @@ public class MixOptions
                     writer.newLine();
                 }
             }
+            assert writer != null;
             writer.close();
         } catch (IOException e)
         {
@@ -251,7 +252,7 @@ public class MixOptions
                         String fileExtension = "";
 
 
-                        for (File f_sample : d_chromosome.listFiles(Filters.fileFilter))
+                        for (File f_sample : Objects.requireNonNull(d_chromosome.listFiles(Filters.fileFilter)))
                         {
                             fileExtension = f_sample.getName().substring(f_sample.getName().lastIndexOf("."));
 
@@ -389,6 +390,14 @@ public class MixOptions
         } catch (InterruptedException e)
         {
             logger.error("Running mix option did not finished within time limit. Message: " + e.getMessage());
+        }
+
+        try
+        {
+            COM2POSE.configs.general.latestInputDirectory.setValue(d_target);
+        } catch (IllegalAccessException e)
+        {
+            logger.error(e.getMessage());
         }
     }
 

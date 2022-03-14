@@ -29,6 +29,4 @@ public class MIX_Interval_Object
     public MIX_Interval_Object()
     {
     }
-
-    ;
 }

@@ -322,6 +322,14 @@ public class CreateFootprintsBetweenPeaks
             System.exit(1);
         }
 
+        try
+        {
+            COM2POSE.configs.general.latestInputDirectory.setValue(output_folder_new_input);
+        } catch (IllegalAccessException e)
+        {
+            logger.error(e.getMessage());
+        }
+
         logger.logLine("Finished footprints");
     }
 }

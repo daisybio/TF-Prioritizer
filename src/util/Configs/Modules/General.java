@@ -26,6 +26,7 @@ public class General extends AbstractModule
 
     public final Config<Integer> threadLimit = new Config<>(10, true);
 
+    public final Config<File> latestInputDirectory = new Config<>(File.class);
 
     public General(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException

@@ -247,8 +247,14 @@ public class FileManagement
         return new Config<>(extend(fileConfig.get(), extension));
     }
 
-    public static File extend(File file, String extension)
+    public static File extend(File file, String... extensions)
     {
-        return new File(file.getAbsolutePath() + File.separator + extension);
+        File extended = new File(file.getAbsolutePath());
+
+        for (String extension : extensions)
+        {
+            extended = new File(extended.getAbsolutePath() + File.separator + extension);
+        }
+        return extended;
     }
 }

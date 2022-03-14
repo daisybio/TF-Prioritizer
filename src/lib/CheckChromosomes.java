@@ -7,6 +7,8 @@ import util.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -36,11 +38,13 @@ public class CheckChromosomes
         for (File fileDir : Objects.requireNonNull(file_root_input.listFiles(new DirectoryFilter())))
         {
             String group = fileDir.getName();
+            COM2POSE.groupsToHms.put(group, new HashSet<>());
 
             File d_outputGroup = extend(chr_annotation_output, group);
 
             for (File d_hm : Objects.requireNonNull(fileDir.listFiles(new DirectoryFilter())))
             {
+                COM2POSE.groupsToHms.get(group).add(d_hm.getName());
                 File d_outputGroupHm = extend(d_outputGroup, d_hm.getName());
 
                 for (File f_sample : Objects.requireNonNull(d_hm.listFiles(new FileFilter())))
@@ -96,6 +100,14 @@ public class CheckChromosomes
             logger.error(
                     "Chromosome annotation checking did not finish within the time limit. Message: " + e.getMessage());
             System.exit(1);
+        }
+
+        try
+        {
+            COM2POSE.configs.general.latestInputDirectory.setValue(chr_annotation_output);
+        } catch (IllegalAccessException e)
+        {
+            logger.error(e.getMessage());
         }
 
         logger.logLine("Chromosome checking done.");

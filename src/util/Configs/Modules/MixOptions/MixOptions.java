@@ -39,10 +39,20 @@ public class MixOptions extends AbstractModule
         {
             if (!option.isSet())
             {
-                logger.error("If MixOption level is set, also an option has to be set.");
+                logger.error("If MixOption>level is set, also an option has to be set.");
                 return false;
             }
         }
+
+        if (mutuallyExclusive.get())
+        {
+            if (!level.isSet())
+            {
+                logger.error("If MixOption>mutuallyExclusive is set, also MixOption>level has to be set.");
+                return false;
+            }
+        }
+
         return true;
     }
 }

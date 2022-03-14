@@ -28,12 +28,9 @@ public class BlacklistedRegion extends Region
         output += getStart();
         output += "\t";
         output += getEnd();
+        output += "\t";
+        output += signal;
 
-        if (!signal.equals(""))
-        {
-            output += "\t";
-            output += signal;
-        }
 
         if (score != null)
         {

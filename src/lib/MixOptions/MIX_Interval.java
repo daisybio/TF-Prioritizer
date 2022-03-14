@@ -2,7 +2,7 @@ package lib.MixOptions;
 
 import java.util.ArrayList;
 
-public class MIX_Interval implements Comparable
+public class MIX_Interval implements Comparable<MIX_Interval>
 {
     public int start;
     public int end;
@@ -56,12 +56,12 @@ public class MIX_Interval implements Comparable
         double val4_mean = 0;
         double val5_mean = 0;
 
-        for (int i = 0; i < merged_intervals.size(); i++)
+        for (MIX_Interval_Object merged_interval : merged_intervals)
         {
-            val1_mean += merged_intervals.get(i).val1;
-            val3_mean += merged_intervals.get(i).val3;
-            val4_mean += merged_intervals.get(i).val4;
-            val5_mean += merged_intervals.get(i).val5;
+            val1_mean += merged_interval.val1;
+            val3_mean += merged_interval.val3;
+            val4_mean += merged_interval.val4;
+            val5_mean += merged_interval.val5;
         }
 
         val1_mean /= merged_intervals.size();
@@ -77,34 +77,12 @@ public class MIX_Interval implements Comparable
 
     public String meanToString(int peak)
     {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(means.chr);
-        sb.append("\t");
-        sb.append(means.start);
-        sb.append("\t");
-        sb.append(means.end);
-        sb.append("\t");
-        sb.append(means.description);
-        sb.append(peak);
-        sb.append("\t");
-        sb.append(means.val1);
-        sb.append("\t");
-        sb.append(means.val2);
-        sb.append("\t");
-        sb.append(means.val3);
-        sb.append("\t");
-        sb.append(means.val4);
-        sb.append("\t");
-        sb.append(means.val5);
-
-        return sb.toString();
+        return means.chr + "\t" + means.start + "\t" + means.end + "\t" + means.description + peak + "\t" + means.val1 +
+                "\t" + means.val2 + "\t" + means.val3 + "\t" + means.val4 + "\t" + means.val5;
     }
 
-    @Override public int compareTo(Object o)
+    @Override public int compareTo(MIX_Interval compare)
     {
-        int compare = ((MIX_Interval) o).start;
-
-        return this.start - compare;
+        return this.start - compare.start;
     }
 }
