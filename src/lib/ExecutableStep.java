@@ -12,8 +12,8 @@ public abstract class ExecutableStep
     protected ExecutorService executorService =
             Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
 
-    private int shutDownTimeOut = 5;
-    private TimeUnit shutDownTimeUnit = TimeUnit.MINUTES;
+    private final int shutDownTimeOut = 5;
+    private final TimeUnit shutDownTimeUnit = TimeUnit.MINUTES;
     protected final Logger logger = new Logger(this.getClass().getSimpleName());
 
     public ExecutableStep()
@@ -39,6 +39,12 @@ public abstract class ExecutableStep
                     "Process did not finished within the defined limit of " + shutDownTimeOut + " " + shutDownTimeUnit);
             System.exit(1);
         }
+    }
+
+    protected void finishAllQueuedThreads()
+    {
+        shutdown();
+        executorService = Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
     }
 
     protected abstract void execute();

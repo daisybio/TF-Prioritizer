@@ -20,7 +20,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_preprocessing_single = extend(d_preprocessing, "single");
     public final Config<File> d_preprocessing_combined = extend(d_preprocessing, "combined");
     public final Config<File> d_preprocessing_combinedOriginal = extend(d_preprocessing, "combined_original");
-    public final Config<File> d_preprocessing_geneSymbols = extend(d_preprocessing, "symbols_ensg_mean_counts");
+    public final Config<File> d_preprocessing_meanCounts = extend(d_preprocessing, "symbols_ensg_mean_counts");
 
     public final Config<File> d_preprocessing_tpm = extend(d_preprocessing, "tpm_mapping");
     public final Config<File> f_preprocessing_tpm_getGeneLengthsScript =

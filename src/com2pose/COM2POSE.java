@@ -2,6 +2,7 @@ package com2pose;
 
 import lib.Blacklist.Blacklist;
 import lib.CheckChromosomes;
+import lib.CreateDeseq2Scripts;
 import lib.FootprintIntervals.CreateFootprintsBetweenPeaks;
 import lib.MixOptions.MixMutuallyExclusive;
 import lib.MixOptions.MixOptions;
@@ -72,8 +73,9 @@ public class COM2POSE
             mapSymbolAndEnsg = new MapSymbolAndEnsg();
         }
 
+        new CreateDeseq2Scripts();
+
         /*
-        com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.create_TPM_mappings();
         com2pose_lib.create_gene_positions();
 

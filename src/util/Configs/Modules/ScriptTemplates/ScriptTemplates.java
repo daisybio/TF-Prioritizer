@@ -14,6 +14,9 @@ public class ScriptTemplates extends AbstractModule
     public final Config<File> d_root = extend(sourceDirectory, "scripts");
     public final Config<File> f_heatmaps = extend(d_root, "heatmap.R");
     public final Config<File> f_mapping = extend(d_root, "mapping.R");
+    public final Config<File> f_deseq2 = extend(d_root, "deseq2.R");
+    public final Config<File> f_deseq2PreprocessingSingle = extend(d_root, "deseq2_preprocessing_single.py");
+    public final Config<File> f_deseq2PreprocessingCombined = extend(d_root, "deseq2_preprocessing_combined.py");
 
     public ScriptTemplates(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException

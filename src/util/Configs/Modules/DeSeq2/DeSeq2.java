@@ -15,7 +15,7 @@ public class DeSeq2 extends AbstractModule
     public FileStructure fileStructure;
 
     public final Config<File> inputDirectory = new Config<>(File.class);
-    public final Config<String> inputGeneID = new Config<>(String.class);
+    public final Config<File> inputGeneID = new Config<>(File.class);
     public final Config<String> biomartDatasetSpecies = new Config<>(String.class);
     public final Config<String> biomartDatasetSymbolColumn = new RequiredConfig<>(String.class);
     public final Config<Integer> countThreshold = new Config<>(Integer.class);

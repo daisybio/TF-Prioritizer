@@ -40,7 +40,7 @@ public class MapSymbolAndEnsg
     {
         String script = readFile(COM2POSE.configs.scriptTemplates.f_mapping.get());
 
-        script = script.replace("{INPUTFILE}", COM2POSE.configs.deSeq2.inputGeneID.get());
+        script = script.replace("{INPUTFILE}", COM2POSE.configs.deSeq2.inputGeneID.get().getAbsolutePath());
         script = script.replace("{DATASET_SPECIES}", COM2POSE.configs.deSeq2.biomartDatasetSpecies.get());
         script = script.replace("{SYMBOL_COLUMN}", COM2POSE.configs.deSeq2.biomartDatasetSymbolColumn.get());
         script =

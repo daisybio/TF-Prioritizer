@@ -3,7 +3,6 @@ package lib.Report;
 import com2pose.COM2POSE;
 import util.FileManagement;
 import util.Logger;
-import util.MapSymbolAndEnsg;
 import util.Options_intern;
 
 import java.io.File;
@@ -172,7 +171,7 @@ public class Report
                         }   //TPM
 
                         {   //Normalized expression
-                            File d_normex = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_geneSymbols.get();
+                            File d_normex = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get();
 
 
                             for (File entry : Objects.requireNonNull(d_normex.listFiles()))
