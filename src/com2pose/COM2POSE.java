@@ -23,6 +23,7 @@ public class COM2POSE
 
     public static void main(String[] args) throws Exception
     {
+        long startTime = System.currentTimeMillis();
         Options_intern options_intern = new Options_intern();
         parseArguments(args, options_intern);
 
@@ -60,7 +61,6 @@ public class COM2POSE
         {
             new MixMutuallyExclusive();
         }
-        System.exit(0);
 
         /*
         //DESeq2
@@ -184,7 +184,8 @@ public class COM2POSE
 
         new Report(options_intern).generate();
         */
-        System.out.println("X");
+        double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
+        System.out.println("COM2POSE finished. Execution took " + deltaSeconds + " seconds.");
     }
 
 
