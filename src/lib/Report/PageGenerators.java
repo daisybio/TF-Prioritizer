@@ -667,7 +667,7 @@ public class PageGenerators
                         sb_hm.append(",");
                         try
                         {
-                            sb_hm.append(MapSymbolAndEnsg.symbolToEnsg(targetGeneSymbol));
+                            sb_hm.append(COM2POSE.mapSymbolAndEnsg.symbolToEnsg(targetGeneSymbol));
                         } catch (NoSuchFieldException | FileNotFoundException e)
                         {
                             Report.logger.warn(e.getMessage());

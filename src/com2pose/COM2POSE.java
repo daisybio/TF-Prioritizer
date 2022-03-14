@@ -8,6 +8,7 @@ import lib.MixOptions.MixOptions;
 import org.apache.commons.cli.*;
 
 import util.Configs.Configs;
+import util.MapSymbolAndEnsg;
 import util.Options_intern;
 
 import java.io.File;
@@ -20,6 +21,7 @@ public class COM2POSE
 {
     public static Configs configs;
     public static Map<String, Set<String>> groupsToHms = new HashMap<>();
+    public static MapSymbolAndEnsg mapSymbolAndEnsg;
 
     public static void main(String[] args) throws Exception
     {
@@ -62,15 +64,15 @@ public class COM2POSE
             new MixMutuallyExclusive();
         }
 
-        /*
+
         //DESeq2
-        if (options_intern.tepic_ensg_symbol.equals("") || !options_intern.deseq2_biomart_dataset_species.equals(""))
+        if ((!configs.tepic.ensgSymbolFile.isSet() || configs.deSeq2.biomartDatasetSpecies.isSet()) &&
+                configs.general.ensgMappingEnabled.get())
         {
-            if (options_intern.do_ensg_mapping)
-            {
-                com2pose_lib.get_ensg_symbol_mapping();
-            }
+            mapSymbolAndEnsg = new MapSymbolAndEnsg();
         }
+
+        /*
         com2pose_lib.create_DESeq2_scripts();
         com2pose_lib.create_TPM_mappings();
         com2pose_lib.create_gene_positions();

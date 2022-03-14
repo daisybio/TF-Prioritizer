@@ -11,11 +11,11 @@ import java.math.BigDecimal;
 
 public class Config<T>
 {
-    private final T defaultValue;
-    private T actualValue;
-    private final boolean writeable;
-    private final Class configClass;
-    private final List<T> acceptedValues;
+    protected final T defaultValue;
+    protected T actualValue;
+    protected final boolean writeable;
+    protected final Class configClass;
+    protected final List<T> acceptedValues;
 
     public Config(Class<T> configClass)
     {
@@ -70,7 +70,7 @@ public class Config<T>
 
     public void setValue(Object value) throws IllegalAccessException, ClassCastException
     {
-        if (writeable)
+        if (isWriteable())
         {
             if (value.getClass().equals(configClass))
             {
@@ -149,5 +149,10 @@ public class Config<T>
     public boolean isSet()
     {
         return actualValue != null;
+    }
+
+    public boolean isValid()
+    {
+        return true;
     }
 }

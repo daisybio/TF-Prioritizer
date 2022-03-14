@@ -4,20 +4,55 @@ import com2pose.COM2POSE;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import static util.FileManagement.readFile;
+import static util.FileManagement.writeFile;
+import static util.ScriptExecution.executeAndWait;
+
 public class MapSymbolAndEnsg
 {
-    private static final Map<String, String> symbolEnsg = new HashMap<>();
-    private static final Map<String, String> ensgSymbol = new HashMap<>();
-    private static boolean initialized = false;
+    private final Map<String, String> symbolEnsg = new HashMap<>();
+    private final Map<String, String> ensgSymbol = new HashMap<>();
+    private final Logger logger = new Logger(this.getClass().getSimpleName());
 
-    private static void initialize() throws FileNotFoundException
+    private final File map = COM2POSE.configs.deSeq2.fileStructure.f_mapping.get();
+
+    public MapSymbolAndEnsg()
     {
-        File map = COM2POSE.configs.deSeq2.fileStructure.f_mapping.get();
+        try
+        {
+            if (!map.exists())
+            {
+                createMappingFile();
+            }
+            loadMappingFile();
+        } catch (IOException | InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
+    private void createMappingFile() throws IOException, InterruptedException
+    {
+        String script = readFile(COM2POSE.configs.scriptTemplates.f_mapping.get());
+
+        script = script.replace("{INPUTFILE}", COM2POSE.configs.deSeq2.inputGeneID.get());
+        script = script.replace("{DATASET_SPECIES}", COM2POSE.configs.deSeq2.biomartDatasetSpecies.get());
+        script = script.replace("{SYMBOL_COLUMN}", COM2POSE.configs.deSeq2.biomartDatasetSymbolColumn.get());
+        script =
+                script.replace("{OUTPUTFILE}", COM2POSE.configs.deSeq2.fileStructure.f_mapping.get().getAbsolutePath());
+
+        writeFile(COM2POSE.configs.deSeq2.fileStructure.f_mappingScript.get(), script);
+
+        executeAndWait(COM2POSE.configs.deSeq2.fileStructure.f_mappingScript.get(), logger);
+    }
+
+    private void loadMappingFile() throws FileNotFoundException
+    {
         try (Scanner scanner = new Scanner(map))
         {
             while (scanner.hasNextLine())
@@ -30,16 +65,10 @@ public class MapSymbolAndEnsg
                 }
             }
         }
-
-        initialized = true;
     }
 
-    public static String symbolToEnsg(String symbol) throws FileNotFoundException, NoSuchFieldException
+    public String symbolToEnsg(String symbol) throws FileNotFoundException, NoSuchFieldException
     {
-        if (!initialized)
-        {
-            initialize();
-        }
         if (symbolEnsg.containsKey(symbol.toUpperCase()))
         {
             return symbolEnsg.get(symbol.toUpperCase());
@@ -49,12 +78,8 @@ public class MapSymbolAndEnsg
         }
     }
 
-    public static String ensgToSymbol(String ensg) throws FileNotFoundException, NoSuchFieldException
+    public String ensgToSymbol(String ensg) throws FileNotFoundException, NoSuchFieldException
     {
-        if (!initialized)
-        {
-            initialize();
-        }
         if (ensgSymbol.containsKey(ensg.toUpperCase()))
         {
             return ensgSymbol.get(ensg.toUpperCase());

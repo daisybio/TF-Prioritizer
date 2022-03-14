@@ -140,6 +140,11 @@ public abstract class AbstractModule
         {
             subModulesValid = subModule.validate() && subModulesValid;
         }
-        return subModulesValid;
+        boolean configsValid = true;
+        for (Config<?> config : entries.values())
+        {
+            configsValid = config.isValid() && configsValid;
+        }
+        return subModulesValid && configsValid;
     }
 }

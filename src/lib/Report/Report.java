@@ -109,7 +109,7 @@ public class Report
                 {
                     try
                     {
-                        String geneID = MapSymbolAndEnsg.symbolToEnsg(tf_name);
+                        String geneID = COM2POSE.mapSymbolAndEnsg.symbolToEnsg(tf_name);
                         Map<String, Map<String, Number>> log2fc = new HashMap<>();
                         Map<String, Number> tpm = new HashMap<>();
                         Map<String, Number> normex = new HashMap<>();

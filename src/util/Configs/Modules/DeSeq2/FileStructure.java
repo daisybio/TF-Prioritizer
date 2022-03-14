@@ -14,6 +14,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_preprocessing = extend(workingDirectory, "02_A_DESeq2_preprocessing");
 
     public final Config<File> f_mapping = extend(d_preprocessing, "ENSG_SYMBOL_MAP.csv");
+    public final Config<File> f_mappingScript = extend(d_preprocessing, "ENSG_SYMBOL_MAP.R");
     public final Config<String> s_preprocessing_MeanCounts = new Config<>("_meanCounts.txt");
 
     public final Config<File> d_preprocessing_single = extend(d_preprocessing, "single");
