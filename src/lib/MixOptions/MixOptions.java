@@ -1,6 +1,7 @@
 package lib.MixOptions;
 
 import com2pose.COM2POSE;
+import lib.ExecutableStep;
 import util.FileFilters.Filters;
 import util.Logger;
 
@@ -12,15 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 
-public class MixOptions
+public class MixOptions extends ExecutableStep
 {
-    private final Logger logger;
-
-    public MixOptions()
-    {
-        logger = new Logger("MIX");
-    }
-
     /**
      * preprocess mix histones, search for same peaks and use either the union or the intersection of all
      */
@@ -87,20 +81,6 @@ public class MixOptions
 
     private void preprocess()
     {
-        ExecutorService executorService = Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
-
-        /*
-        I do not understand the purpose of this assignments
-        options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
-        options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-
-        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
-        {
-            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-            options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
-        }
-        */
-
         logger.info("Preprocess input data for sample mix - split chromosomes.");
 
         for (File d_group : Objects.requireNonNull(
@@ -125,14 +105,8 @@ public class MixOptions
             }
         }
 
-        executorService.shutdown();
-        try
-        {
-            executorService.awaitTermination(5, TimeUnit.MINUTES);
-        } catch (InterruptedException e)
-        {
-            logger.error("Preprocessing did not finished within time limit. Message: " + e.getMessage());
-        }
+        shutdown();
+        executorService = Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
     }
 
     private void mainStep()
@@ -223,8 +197,6 @@ public class MixOptions
     private void runMixOption(File d_source, File d_target, String mixLevel)
     {
         logger.info("Create " + COM2POSE.configs.mixOptions.option.get() + " of " + mixLevel);
-
-        ExecutorService executorService = Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
 
         for (File d_group : Objects.requireNonNull(d_source.listFiles(Filters.directoryFilter)))
         {
@@ -381,15 +353,6 @@ public class MixOptions
                     }
                 });
             }
-        }
-
-        executorService.shutdown();
-        try
-        {
-            executorService.awaitTermination(5, TimeUnit.MINUTES);
-        } catch (InterruptedException e)
-        {
-            logger.error("Running mix option did not finished within time limit. Message: " + e.getMessage());
         }
 
         try

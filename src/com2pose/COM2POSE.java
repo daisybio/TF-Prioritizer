@@ -34,31 +34,31 @@ public class COM2POSE
 
         configs.validate();
 
-        new CheckChromosomes().execute();
+        new CheckChromosomes();
 
         //mix histone modifications
         if (configs.mixOptions.level.isSet())
         {
-            new MixOptions().execute();
+            new MixOptions();
         }
 
         //create footprints if needed
         if (configs.tepic.tfBindingSiteSearch.isSet() && (configs.tepic.tfBindingSiteSearch.get().equals("BETWEEN") ||
                 configs.tepic.tfBindingSiteSearch.get().equals("EXCL_BETWEEN")))
         {
-            new CreateFootprintsBetweenPeaks().execute();
+            new CreateFootprintsBetweenPeaks();
         }
 
 
         //black listed regions filter
         if (configs.blacklist.bedFilePath.isSet())
         {
-            new Blacklist().execute();
+            new Blacklist();
         }
 
         if (configs.mixOptions.mutuallyExclusive.get())
         {
-            new MixMutuallyExclusive().execute();
+            new MixMutuallyExclusive();
         }
         System.exit(0);
 

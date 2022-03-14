@@ -19,6 +19,11 @@ public class BlacklistedRegion extends Region
         signal = split[3].replace(" ", "_").toUpperCase();
     }
 
+    public BlacklistedRegion(String inputLine)
+    {
+        this(inputLine.split("\t"));
+    }
+
     public String toString()
     {
         String output = "";

@@ -1,6 +1,7 @@
 package lib.FootprintIntervals;
 
 import com2pose.COM2POSE;
+import lib.ExecutableStep;
 import util.Comparators.ChromosomeComparator;
 import util.FileFilters.Filters;
 import util.Logger;
@@ -10,14 +11,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.extend;
 import static util.FileManagement.makeSureFileExists;
 
-public class CreateFootprintsBetweenPeaks
+public class CreateFootprintsBetweenPeaks extends ExecutableStep
 {
     private final Logger logger = new Logger("FOOTPRINTS");
 
@@ -26,24 +24,6 @@ public class CreateFootprintsBetweenPeaks
         logger.logLine(
                 "OPTION tfBindingSiteSearch=\"" + COM2POSE.configs.tepic.tfBindingSiteSearch.get() + "\" was set.");
         logger.logLine("Creating footprints");
-
-        ExecutorService executorService = Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
-
-
-        File f_sample_mix_preprocess = COM2POSE.configs.mixOptions.fileStructure.d_sampleMixPreprocessing.get();
-
-        File f_sample_mix_output = COM2POSE.configs.mixOptions.fileStructure.d_sampleMix.get();
-
-        File f_annotation_check = COM2POSE.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get();
-
-        /*
-        options_intern.tepic_input_directory = f_annotation_check.getAbsolutePath();
-
-        if (options_intern.mix_level.equals("SAMPLE_LEVEL"))
-        {
-            options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-            options_intern.tepic_input_directory = f_sample_mix_output.getAbsolutePath();
-        } */
 
 
         File d_input;
@@ -66,12 +46,6 @@ public class CreateFootprintsBetweenPeaks
 
 
         File output_folder_new_input = COM2POSE.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks.get();
-
-        /*
-        //set new folder directory for tepic input and save old one
-        options_intern.tepic_input_prev = options_intern.tepic_input_directory;
-        options_intern.tepic_input_directory = output_folder_new_input.getAbsolutePath();
-        */
 
         for (File d_group : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
         {
@@ -312,16 +286,6 @@ public class CreateFootprintsBetweenPeaks
             }
         }
 
-        executorService.shutdown();
-        try
-        {
-            executorService.awaitTermination(5, TimeUnit.MINUTES);
-        } catch (InterruptedException e)
-        {
-            logger.error("Creating footprints did not finish within the specified time: " + e.getMessage());
-            System.exit(1);
-        }
-
         try
         {
             COM2POSE.configs.general.latestInputDirectory.setValue(output_folder_new_input);
@@ -329,7 +293,5 @@ public class CreateFootprintsBetweenPeaks
         {
             logger.error(e.getMessage());
         }
-
-        logger.logLine("Finished footprints");
     }
 }

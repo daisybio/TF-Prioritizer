@@ -2,31 +2,20 @@ package lib.MixOptions;
 
 import com2pose.COM2POSE;
 import lib.BinaryTree.ChromosomePeakTrees;
+import lib.ExecutableStep;
 import lib.Peak;
 import lib.Region;
 import util.Comparators.ChromosomeComparator;
-import util.Logger;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 
-public class MixMutuallyExclusive
+public class MixMutuallyExclusive extends ExecutableStep
 {
-    private final Logger logger;
-
-    public MixMutuallyExclusive()
-    {
-        this.logger = new Logger("MUTUALLY-EXCLUSIVE-PEAKS");
-    }
-
     public void execute()
     {
-        ExecutorService executorService = Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
         logger.info("Start mutually exclusive peaks calculation.");
 
         logger.info("Preprocessing mutually exclusive peaks for binary tree comparison.");
@@ -82,17 +71,6 @@ public class MixMutuallyExclusive
                 }
             }
         }
-
-        executorService.shutdown();
-        try
-        {
-            executorService.awaitTermination(5, TimeUnit.MINUTES);
-        } catch (InterruptedException e)
-        {
-            logger.error("Binary tree filtering did not finish in time.");
-            System.exit(1);
-        }
-        logger.info("Finished binary tree filtering.");
     }
 
     private void filter(File f_source, File f_filter, File f_output)
