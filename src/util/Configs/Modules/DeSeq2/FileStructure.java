@@ -23,9 +23,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_preprocessing_meanCounts = extend(d_preprocessing, "symbols_ensg_mean_counts");
 
     public final Config<File> d_preprocessing_tpm = extend(d_preprocessing, "tpm_mapping");
-    public final Config<File> f_preprocessing_tpm_getGeneLengthsScript =
-            extend(d_preprocessing_tpm, "get_gene_lengths.R");
-    public final Config<File> f_preprocessing_tpm_geneLengths = extend(d_preprocessing_tpm, "gene_lengths.csv");
+    public final Config<File> f_preprocessing_tpm_geneLengths = extend(d_preprocessing_tpm, "gene_lengths.tsv");
     public final Config<File> d_preprocessing_tpm_scripts = extend(d_preprocessing_tpm, "01_scripts");
     public final Config<String> s_preprocessing_tpm_scripts = new Config<>("_get_tpms.R");
     public final Config<File> d_preprocessing_tpm_tpmResults = extend(d_preprocessing_tpm, "02_tpm_mappings");

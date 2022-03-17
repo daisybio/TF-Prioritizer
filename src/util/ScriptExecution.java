@@ -1,5 +1,7 @@
 package util;
 
+import com2pose.COM2POSE;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,35 +9,56 @@ import java.util.List;
 
 public class ScriptExecution
 {
-    public static int executeAndWait(File file, Logger logger) throws InterruptedException, IOException
+    public static void executeAndWait(File file, Logger logger) throws ExternalScriptException
     {
         List<String> command = getExecutionCommand(file);
         logger.info("Executing command: " + command);
 
-        return executeAndWait(command);
-    }
-
-    private static int executeAndWait(List<String> command) throws IOException, InterruptedException
-    {
-        ProcessBuilder pb = new ProcessBuilder(command);
-        pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-        Process process = pb.start();
-        return process.waitFor();
-    }
-
-    public static int executeAndWait(String executable, String fileExtension)
-    {
-        List<String> command = getExecutionCommand(executable, fileExtension);
-        int ret;
         try
         {
-            ret = executeAndWait(command);
-        } catch (IOException | InterruptedException e)
+            executeAndWait(command);
+        } catch (ExternalScriptException e)
         {
-            ret = 1;
+            throw e;
+        } catch (InterruptedException | IOException e)
+        {
+            logger.error("Execution of command was not successful. Message: " + e.getMessage());
         }
-        return ret;
+    }
+
+    private static void executeAndWait(List<String> command) throws IOException, InterruptedException
+    {
+        ProcessBuilder pb = new ProcessBuilder(command);
+        if (COM2POSE.configs.general.redirectExternalScriptOutputStream.get())
+        {
+            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        }
+        if (COM2POSE.configs.general.redirectExternalScriptErrorStream.get())
+        {
+            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+        }
+        Process process = pb.start();
+        int returnCode = process.waitFor();
+
+        if (returnCode != 0)
+        {
+            throw new ExternalScriptException(returnCode, process.getErrorStream().toString());
+        }
+    }
+
+    public static void executeAndWait(String executable, String fileExtension) throws ExternalScriptException
+    {
+        List<String> command = getExecutionCommand(executable, fileExtension);
+        try
+        {
+            executeAndWait(command);
+        } catch (ExternalScriptException e)
+        {
+            throw e;
+        } catch (InterruptedException | IOException e)
+        {
+            System.out.println("Execution of command was not successful. Message: " + e.getMessage());
+        }
     }
 
     private static List<String> getExecutionPrefix(String fileExtension, boolean fileExecution)

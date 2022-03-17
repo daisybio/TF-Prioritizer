@@ -1,6 +1,7 @@
 package lib;
 
 import com2pose.COM2POSE;
+import util.ExternalScriptException;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -39,7 +40,14 @@ public class CreateDeseq2Scripts extends ExecutableStep
 
                 executorService.execute(() ->
                 {
-                    executeAndWait(finalScript, ".py");
+                    try
+                    {
+                        executeAndWait(finalScript, ".py");
+                    } catch (ExternalScriptException e)
+                    {
+                        logger.error(e.getMessage());
+                        System.exit(1);
+                    }
                 });
             }
         } catch (IOException e)
@@ -72,7 +80,14 @@ public class CreateDeseq2Scripts extends ExecutableStep
 
                     executorService.execute(() ->
                     {
-                        executeAndWait(finalScript, ".py");
+                        try
+                        {
+                            executeAndWait(finalScript, ".py");
+                        } catch (ExternalScriptException e)
+                        {
+                            logger.error(e.getMessage());
+                            System.exit(1);
+                        }
                     });
                 }
             }
