@@ -1,6 +1,6 @@
 package lib.Report;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import util.FileManagement;
 import util.Logger;
 import util.Options_intern;
@@ -39,7 +39,7 @@ public class Report
     {
         Map<String, Map<String, Map<String, Double>>> coefficients = new HashMap<>();
 
-        File parentDir = COM2POSE.configs.dynamite.fileStructure.d_output.get();
+        File parentDir = TFPRIO.configs.dynamite.fileStructure.d_output.get();
 
         for (File hm_dir : Objects.requireNonNull(parentDir.listFiles()))
         {
@@ -49,8 +49,8 @@ public class Report
             {
                 coefficients.get(hm_dir.getName()).put(groups_dir.getName(), new HashMap<>());
 
-                File f_data = new File(groups_dir + File.separator +
-                        COM2POSE.configs.dynamite.fileStructure.s_output_toBePlotted.get());
+                File f_data = new File(
+                        groups_dir + File.separator + TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted.get());
 
                 String data = FileManagement.readFile(f_data);
 
@@ -75,9 +75,9 @@ public class Report
 
     private void loadTFs() throws IOException
     {
-        File tf_file = COM2POSE.configs.distributionAnalysis.fileStructure.f_dcg_stats.get();
+        File tf_file = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats.get();
 
-        File d_plots = COM2POSE.configs.plots.fileStructure.d_output.get();
+        File d_plots = TFPRIO.configs.plots.fileStructure.d_output.get();
 
         Map<String, Map<String, Map<String, Double>>> allRegressionCoefficients = loadRegressionCoefficients();
 
@@ -108,13 +108,13 @@ public class Report
                 {
                     try
                     {
-                        String geneID = COM2POSE.mapSymbolAndEnsg.symbolToEnsg(tf_name);
+                        String geneID = TFPRIO.mapSymbolAndEnsg.symbolToEnsg(tf_name);
                         Map<String, Map<String, Number>> log2fc = new HashMap<>();
                         Map<String, Number> tpm = new HashMap<>();
                         Map<String, Number> normex = new HashMap<>();
 
                         {   //LOG2FC
-                            File d_log2fs = COM2POSE.configs.deSeq2.fileStructure.d_output.get();
+                            File d_log2fs = TFPRIO.configs.deSeq2.fileStructure.d_output.get();
 
                             for (File entry : Objects.requireNonNull(d_log2fs.listFiles()))
                             {
@@ -150,7 +150,7 @@ public class Report
                         }   //LOG2FC
 
                         {   //TPM
-                            File d_tpm = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get();
+                            File d_tpm = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get();
 
                             for (File entry : Objects.requireNonNull(d_tpm.listFiles()))
                             {
@@ -171,7 +171,7 @@ public class Report
                         }   //TPM
 
                         {   //Normalized expression
-                            File d_normex = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get();
+                            File d_normex = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get();
 
 
                             for (File entry : Objects.requireNonNull(d_normex.listFiles()))
@@ -230,7 +230,7 @@ public class Report
 
     private void loadTargetGenes() throws FileNotFoundException
     {
-        File tfsDirectory = COM2POSE.configs.distributionAnalysis.fileStructure.d_heatmaps.get();
+        File tfsDirectory = TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps.get();
 
         for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
         {
@@ -320,20 +320,20 @@ public class Report
     private void copyDependencies() throws IOException
     {
         logger.logLine("Start copying dependencies");
-        FileManagement.copyFile(COM2POSE.configs.report.inputStructure.f_style.get(),
-                COM2POSE.configs.report.outputStructure.f_style.get());
-        FileManagement.copyFile(COM2POSE.configs.report.inputStructure.f_script.get(),
-                COM2POSE.configs.report.outputStructure.f_script.get());
+        FileManagement.copyFile(TFPRIO.configs.report.inputStructure.f_style.get(),
+                TFPRIO.configs.report.outputStructure.f_style.get());
+        FileManagement.copyFile(TFPRIO.configs.report.inputStructure.f_script.get(),
+                TFPRIO.configs.report.outputStructure.f_script.get());
 
-        FileManagement.copyDirectory(COM2POSE.configs.report.inputStructure.d_media.get(),
-                COM2POSE.configs.report.outputStructure.d_media.get(), false);
+        FileManagement.copyDirectory(TFPRIO.configs.report.inputStructure.d_media.get(),
+                TFPRIO.configs.report.outputStructure.d_media.get(), false);
         logger.logLine("Finished copying dependencies");
     }
 
     private void findExistingValues()
     {
         {
-            File pairings = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_combined.get();
+            File pairings = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combined.get();
 
             for (File pairing : Objects.requireNonNull(pairings.listFiles()))
             {
@@ -343,11 +343,11 @@ public class Report
 
         existingValues.get(SelectorTypes.PERFORMANCE_CUTOFFS).addAll(List.of("1", "2", "3"));
 
-        existingValues.get(SelectorTypes.IMPORTANT_LOCI).addAll(COM2POSE.configs.igv.importantLociAllPrioTf.get());
+        existingValues.get(SelectorTypes.IMPORTANT_LOCI).addAll(TFPRIO.configs.igv.importantLociAllPrioTf.get());
 
         existingValues.get(SelectorTypes.TOP_LOG2FC).addAll(Arrays.asList("downregulated", "upregulated"));
 
-        for (Double cutoff : COM2POSE.configs.plots.thresholds.get())
+        for (Double cutoff : TFPRIO.configs.plots.thresholds.get())
         {
             existingValues.get(SelectorTypes.REGRESSION_CUTOFFS).add(String.valueOf(cutoff));
         }

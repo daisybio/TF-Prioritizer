@@ -1,18 +1,13 @@
 package lib.Blacklist;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import lib.BinaryTree.ChromosomeBlacklistTrees;
-import lib.BinaryTree.RegionNode;
 import lib.ExecutableStep;
 import lib.Region;
 import util.FileFilters.Filters;
-import util.Logger;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 
@@ -20,15 +15,15 @@ public class Blacklist extends ExecutableStep
 {
     public void execute()
     {
-        File d_input = COM2POSE.configs.general.latestInputDirectory.get();
+        File d_input = TFPRIO.configs.general.latestInputDirectory.get();
 
-        File d_output = COM2POSE.configs.blacklist.fileStructure.d_newInput.get();
+        File d_output = TFPRIO.configs.blacklist.fileStructure.d_newInput.get();
 
         logger.info("Used input: " + d_input);
         logger.info("Create chromosome binary trees.");
         //CREATE BINARY TREES
         ChromosomeBlacklistTrees chromosomeTrees =
-                new ChromosomeBlacklistTrees(COM2POSE.configs.blacklist.bedFilePath.get());
+                new ChromosomeBlacklistTrees(TFPRIO.configs.blacklist.bedFilePath.get());
 
         logger.info("Filter input files for blacklisted regions.");
         //now filter all files
@@ -86,7 +81,7 @@ public class Blacklist extends ExecutableStep
         }
         try
         {
-            COM2POSE.configs.general.latestInputDirectory.setValue(d_output);
+            TFPRIO.configs.general.latestInputDirectory.setValue(d_output);
         } catch (IllegalAccessException e)
         {
             logger.error(e.getMessage());

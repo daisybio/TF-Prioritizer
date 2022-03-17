@@ -1,6 +1,6 @@
 package lib;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import util.ExternalScriptException;
 import util.FileFilters.Filters;
 
@@ -14,17 +14,17 @@ public class CreateDeseq2Scripts extends ExecutableStep
 {
     @Override protected void execute()
     {
-        File d_outputCombined = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_combined.get();
-        File d_outputSingle = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_single.get();
-        File d_outputMeanCounts = COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get();
+        File d_outputCombined = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combined.get();
+        File d_outputSingle = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_single.get();
+        File d_outputMeanCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get();
 
-        File input = COM2POSE.configs.deSeq2.inputDirectory.get();
+        File input = TFPRIO.configs.deSeq2.inputDirectory.get();
 
 
         // Single
         try
         {
-            String scriptTemplate = readFile(COM2POSE.configs.scriptTemplates.f_deseq2PreprocessingSingle.get());
+            String scriptTemplate = readFile(TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingSingle.get());
             for (File d_group : Objects.requireNonNull(input.listFiles(Filters.directoryFilter)))
             {
                 File d_outputGroup = extend(d_outputSingle, d_group.getName());
@@ -34,9 +34,9 @@ public class CreateDeseq2Scripts extends ExecutableStep
                 makeSureFileExists(meansFile);
                 script = script.replace("{OUTPUT_MEANS_FILE}", meansFile.getAbsolutePath());
                 script = script.replace("{SYMBOL_MAP_FILE}",
-                        COM2POSE.configs.deSeq2.fileStructure.f_mapping.get().getAbsolutePath());
+                        TFPRIO.configs.deSeq2.fileStructure.f_mapping.get().getAbsolutePath());
                 String finalScript =
-                        script.replace("{GENE_ID_FILE}", COM2POSE.configs.deSeq2.inputGeneID.get().getAbsolutePath());
+                        script.replace("{GENE_ID_FILE}", TFPRIO.configs.deSeq2.inputGeneID.get().getAbsolutePath());
 
                 executorService.execute(() ->
                 {
@@ -61,7 +61,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
         // Combined
         try
         {
-            String scriptTemplate = readFile(COM2POSE.configs.scriptTemplates.f_deseq2PreprocessingCombined.get());
+            String scriptTemplate = readFile(TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingCombined.get());
             for (File d_group1 : Objects.requireNonNull(d_outputSingle.listFiles(Filters.directoryFilter)))
             {
                 for (File d_group2 : Objects.requireNonNull(d_outputSingle.listFiles(Filters.directoryFilter)))
@@ -73,7 +73,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
                     String combination = d_group1.getName() + "_" + d_group2.getName();
                     String script = scriptTemplate.replace("{INPUT_DIRECTORY1}", d_group1.getAbsolutePath());
                     script = script.replace("{INPUT_DIRECTORY2}", d_group2.getAbsolutePath());
-                    script = script.replace("{GENE_ID}", COM2POSE.configs.deSeq2.inputGeneID.get().getAbsolutePath());
+                    script = script.replace("{GENE_ID}", TFPRIO.configs.deSeq2.inputGeneID.get().getAbsolutePath());
                     File targetFile = extend(d_outputCombined, combination + ".tsv");
                     makeSureFileExists(targetFile);
                     String finalScript = script.replace("{OUTPUT_FILE}", targetFile.getAbsolutePath());
@@ -101,11 +101,11 @@ public class CreateDeseq2Scripts extends ExecutableStep
 
         logger.info("Start creating RScripts for running DESeq2");
         // Scripts
-        File r_scripts = COM2POSE.configs.deSeq2.fileStructure.d_rScripts.get();
+        File r_scripts = TFPRIO.configs.deSeq2.fileStructure.d_rScripts.get();
 
         try
         {
-            String scriptTemplate = readFile(COM2POSE.configs.scriptTemplates.f_deseq2.get());
+            String scriptTemplate = readFile(TFPRIO.configs.scriptTemplates.f_deseq2.get());
             for (File f_combination : Objects.requireNonNull(d_outputCombined.listFiles(Filters.fileFilter)))
             {
                 executorService.execute(() ->
@@ -132,7 +132,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
                         script = script.replace("{ GROUPS }", sb_groups);
                         script = script.replace("{INPUTFILE}", f_combination.getAbsolutePath());
                         File targetFile =
-                                extend(COM2POSE.configs.deSeq2.fileStructure.d_outputRaw.get(), combination + ".tsv");
+                                extend(TFPRIO.configs.deSeq2.fileStructure.d_outputRaw.get(), combination + ".tsv");
                         makeSureFileExists(targetFile);
                         script = script.replace("{OUTPUTFILE}", targetFile.getAbsolutePath());
 

@@ -1,6 +1,6 @@
 package lib;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -164,13 +164,13 @@ public class CreateTpmMappings extends ExecutableStep
     {
         logger.info("Create TPM values for all RNA-seq data.");
 
-        File f_lengths = COM2POSE.configs.deSeq2.fileStructure.f_preprocessing_tpm_geneLengths.get();
-        File f_geneIDs = COM2POSE.configs.deSeq2.inputGeneID.get();
+        File f_lengths = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_tpm_geneLengths.get();
+        File f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID.get();
 
         logger.info("Get gene lengths ...");
 
 
-        if (COM2POSE.configs.general.calculateTpmLengthsEnabled.get())
+        if (TFPRIO.configs.general.calculateTpmLengthsEnabled.get())
         {
             List<String> lengthCols =
                     Arrays.asList("ensembl_gene_id", "ensembl_exon_id", "chromosome_name", "exon_chrom_start",
@@ -183,7 +183,7 @@ public class CreateTpmMappings extends ExecutableStep
                 geneIDs.remove(0);
                 Map<String, Map<String, Number>> result = new HashMap<>();
 
-                int splitNumber = COM2POSE.configs.general.threadLimit.get() * 2;
+                int splitNumber = TFPRIO.configs.general.threadLimit.get() * 2;
                 int splitSize = (geneIDs.size() + splitNumber - 1) / splitNumber;
                 logger.info("GeneIDs: " + geneIDs.size() + ", batches: " + splitNumber + ", batchSize: " + splitSize);
 
@@ -304,27 +304,25 @@ public class CreateTpmMappings extends ExecutableStep
 
         try
         {
-            String scriptTemplate = readFile(COM2POSE.configs.scriptTemplates.f_deseq2PreprocessingTpm.get());
+            String scriptTemplate = readFile(TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingTpm.get());
 
             for (File f_group : Objects.requireNonNull(
-                    COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get()
-                            .listFiles(Filters.fileFilter)))
+                    TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get().listFiles(Filters.fileFilter)))
             {
                 executorService.submit(() ->
                 {
                     String group = f_group.getName().substring(0, f_group.getName().lastIndexOf("."));
                     String script = scriptTemplate.replace("{COUNTFILE}", f_group.getAbsolutePath());
                     script = script.replace("{LENGTHSFILE}", f_lengths.getAbsolutePath());
-                    File targetFile = extend(COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get(),
+                    File targetFile = extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get(),
                             group + ".tsv");
                     try
                     {
                         makeSureFileExists(targetFile);
                         script = script.replace("{TARGETFILE}", targetFile.getAbsolutePath());
 
-                        File scriptFile =
-                                extend(COM2POSE.configs.deSeq2.fileStructure.d_preprocessing_tpm_scripts.get(),
-                                        group + ".py");
+                        File scriptFile = extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_scripts.get(),
+                                group + ".py");
 
                         writeFile(scriptFile, script);
                         executeAndWait(scriptFile, logger);

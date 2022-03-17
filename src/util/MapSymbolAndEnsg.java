@@ -1,6 +1,6 @@
 package util;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +19,7 @@ public class MapSymbolAndEnsg
     private final Map<String, String> ensgSymbol = new HashMap<>();
     private final Logger logger = new Logger(this.getClass().getSimpleName());
 
-    private final File map = COM2POSE.configs.deSeq2.fileStructure.f_mapping.get();
+    private final File map = TFPRIO.configs.deSeq2.fileStructure.f_mapping.get();
 
     public MapSymbolAndEnsg()
     {
@@ -38,17 +38,16 @@ public class MapSymbolAndEnsg
 
     private void createMappingFile() throws IOException, InterruptedException
     {
-        String script = readFile(COM2POSE.configs.scriptTemplates.f_mapping.get());
+        String script = readFile(TFPRIO.configs.scriptTemplates.f_mapping.get());
 
-        script = script.replace("{INPUTFILE}", COM2POSE.configs.deSeq2.inputGeneID.get().getAbsolutePath());
-        script = script.replace("{DATASET_SPECIES}", COM2POSE.configs.deSeq2.biomartDatasetSpecies.get());
-        script = script.replace("{SYMBOL_COLUMN}", COM2POSE.configs.deSeq2.biomartDatasetSymbolColumn.get());
-        script =
-                script.replace("{OUTPUTFILE}", COM2POSE.configs.deSeq2.fileStructure.f_mapping.get().getAbsolutePath());
+        script = script.replace("{INPUTFILE}", TFPRIO.configs.deSeq2.inputGeneID.get().getAbsolutePath());
+        script = script.replace("{DATASET_SPECIES}", TFPRIO.configs.deSeq2.biomartDatasetSpecies.get());
+        script = script.replace("{SYMBOL_COLUMN}", TFPRIO.configs.deSeq2.biomartDatasetSymbolColumn.get());
+        script = script.replace("{OUTPUTFILE}", TFPRIO.configs.deSeq2.fileStructure.f_mapping.get().getAbsolutePath());
 
-        writeFile(COM2POSE.configs.deSeq2.fileStructure.f_mappingScript.get(), script);
+        writeFile(TFPRIO.configs.deSeq2.fileStructure.f_mappingScript.get(), script);
 
-        executeAndWait(COM2POSE.configs.deSeq2.fileStructure.f_mappingScript.get(), logger);
+        executeAndWait(TFPRIO.configs.deSeq2.fileStructure.f_mappingScript.get(), logger);
     }
 
     private void loadMappingFile() throws FileNotFoundException

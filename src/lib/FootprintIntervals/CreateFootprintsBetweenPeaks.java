@@ -1,6 +1,6 @@
 package lib.FootprintIntervals;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import lib.ExecutableStep;
 import util.Comparators.ChromosomeComparator;
 import util.FileFilters.Filters;
@@ -22,30 +22,30 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
     public void execute()
     {
         logger.logLine(
-                "OPTION tfBindingSiteSearch=\"" + COM2POSE.configs.tepic.tfBindingSiteSearch.get() + "\" was set.");
+                "OPTION tfBindingSiteSearch=\"" + TFPRIO.configs.tepic.tfBindingSiteSearch.get() + "\" was set.");
         logger.logLine("Creating footprints");
 
 
         File d_input;
 
-        if (COM2POSE.configs.mixOptions.level.isSet())
+        if (TFPRIO.configs.mixOptions.level.isSet())
         {
-            if (COM2POSE.configs.mixOptions.level.get().equals("SAMPLE_LEVEL"))
+            if (TFPRIO.configs.mixOptions.level.get().equals("SAMPLE_LEVEL"))
             {
-                d_input = COM2POSE.configs.mixOptions.fileStructure.d_sampleMix.get();
+                d_input = TFPRIO.configs.mixOptions.fileStructure.d_sampleMix.get();
             } else
             {
-                d_input = COM2POSE.configs.mixOptions.fileStructure.d_hmMix.get();
+                d_input = TFPRIO.configs.mixOptions.fileStructure.d_hmMix.get();
             }
         } else
         {
-            d_input = COM2POSE.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get();
+            d_input = TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get();
         }
 
         logger.logLine("Used data: " + d_input.getAbsolutePath());
 
 
-        File output_folder_new_input = COM2POSE.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks.get();
+        File output_folder_new_input = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks.get();
 
         for (File d_group : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
         {
@@ -125,7 +125,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
 
                         //see if gaps between Footprint Intervals are < tepic_between_max_bps if so connect to one region for TEPIC
 
-                        if (COM2POSE.configs.tepic.tfBindingSiteSearch.get().equals("BETWEEN"))
+                        if (TFPRIO.configs.tepic.tfBindingSiteSearch.get().equals("BETWEEN"))
                         {
                             for (String chromosome : chromosomeRegions.keySet())
                             {
@@ -157,8 +157,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
                                         {
                                             Footprint_Interval next = intervals.get(currentIndex + 1);
 
-                                            if (next.start - lastEndPosition <
-                                                    COM2POSE.configs.tepic.betweenMaxBps.get())
+                                            if (next.start - lastEndPosition < TFPRIO.configs.tepic.betweenMaxBps.get())
                                             {
                                                 lastEndPosition = next.end;
                                                 name.append(";").append(next.name);
@@ -205,7 +204,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
                             }
                         }
 
-                        if (COM2POSE.configs.tepic.tfBindingSiteSearch.get().equals("EXCL_BETWEEN"))
+                        if (TFPRIO.configs.tepic.tfBindingSiteSearch.get().equals("EXCL_BETWEEN"))
                         {
                             for (String key_chr : chromosomeRegions.keySet())
                             {
@@ -225,7 +224,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
                                     double qValue = first.qValue;
 
                                     if (i + 1 < intervals.size() && (intervals.get(i + 1)).start - first.end <
-                                            COM2POSE.configs.tepic.betweenMaxBps.get())
+                                            TFPRIO.configs.tepic.betweenMaxBps.get())
                                     {
                                         Footprint_Interval next = intervals.get(i + 1);
 
@@ -288,7 +287,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
 
         try
         {
-            COM2POSE.configs.general.latestInputDirectory.setValue(output_folder_new_input);
+            TFPRIO.configs.general.latestInputDirectory.setValue(output_folder_new_input);
         } catch (IllegalAccessException e)
         {
             logger.error(e.getMessage());

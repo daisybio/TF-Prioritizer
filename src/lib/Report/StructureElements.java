@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import org.json.JSONObject;
 import util.FileManagement;
 import util.Comparators.IntegerStringComparator;
@@ -19,10 +19,10 @@ public class StructureElements
 
     static String getBasicData(TranscriptionFactor transcriptionFactor) throws IOException
     {
-        String template = FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_basicData.get());
+        String template = FileManagement.readFile(TFPRIO.configs.report.inputStructure.f_basicData.get());
 
 
-        String log2fcTemplate = FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_basicDataEntry.get());
+        String log2fcTemplate = FileManagement.readFile(TFPRIO.configs.report.inputStructure.f_basicDataEntry.get());
 
         log2fcTemplate = log2fcTemplate.replace("{NAME}", "LOG2FC");
 
@@ -32,10 +32,10 @@ public class StructureElements
         log2fcTemplate = log2fcTemplate.replace("{INFO-ID}", transcriptionFactor.getName() + "-" + "log2fc");
 
         template = template.replace("{GENEID}",
-                FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_basicDataGeneID.get()));
+                FileManagement.readFile(TFPRIO.configs.report.inputStructure.f_basicDataGeneID.get()));
         template = template.replace("{GENE-ID}", transcriptionFactor.getGeneID());
         template = template.replace("{GENECARDS-LINK}",
-                COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", transcriptionFactor.getName()));
+                TFPRIO.configs.report.genecardsUrl.get().replace("{GENE}", transcriptionFactor.getName()));
         template = template.replace("{TF-NAME}", transcriptionFactor.getName());
 
         template = template.replace("{LOG2FC}",
@@ -63,7 +63,7 @@ public class StructureElements
         }
 
         StringBuilder basicData = new StringBuilder();
-        String tfTemplate = FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_home_tf.get());
+        String tfTemplate = FileManagement.readFile(TFPRIO.configs.report.inputStructure.f_home_tf.get());
 
         for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
         {
@@ -85,7 +85,7 @@ public class StructureElements
             return "";
         }
 
-        String template = FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_basicDataEntry.get());
+        String template = FileManagement.readFile(TFPRIO.configs.report.inputStructure.f_basicDataEntry.get());
 
         template = template.replace("{ANALYSIS-NAME}", name);
 
@@ -235,7 +235,7 @@ public class StructureElements
 
     static String getButtonBar(TranscriptionFactorGroup tfGroup) throws IOException
     {
-        String buttonbar = FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_home_buttonbar.get());
+        String buttonbar = FileManagement.readFile(TFPRIO.configs.report.inputStructure.f_home_buttonbar.get());
 
         buttonbar = buttonbar.replace("{VALIDATION}",
                 "VALIDATION" + File.separator + tfGroup.getName() + File.separator + tfGroup.getName() + ".html");
@@ -253,7 +253,7 @@ public class StructureElements
 
     static String getFrame(String title, File bodyFile) throws IOException
     {
-        String frame = FileManagement.readFile(COM2POSE.configs.report.inputStructure.f_frame.get());
+        String frame = FileManagement.readFile(TFPRIO.configs.report.inputStructure.f_frame.get());
 
         frame = frame.replace("{TITLE}", title);
 
@@ -278,7 +278,7 @@ public class StructureElements
             for (TranscriptionFactor tf : tfGroup.getTranscriptionFactors())
             {
                 sb_links.append("<a class='dropdown geneCards' href='" +
-                        COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", tf.getName()) + "', target" +
+                        TFPRIO.configs.report.genecardsUrl.get().replace("{GENE}", tf.getName()) + "', target" +
                         "='_blank'>");
                 sb_links.append(tf.getName());
                 sb_links.append("</a>");
@@ -289,7 +289,7 @@ public class StructureElements
         } else
         {
             sb_links.append(
-                    "<a href='" + COM2POSE.configs.report.genecardsUrl.get().replace("{GENE}", tfGroup.getName()) +
+                    "<a href='" + TFPRIO.configs.report.genecardsUrl.get().replace("{GENE}", tfGroup.getName()) +
                             "' target" + "='_blank'>");
             sb_links.append("GeneCards");
             sb_links.append("</a>");

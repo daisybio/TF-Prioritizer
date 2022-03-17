@@ -1,6 +1,6 @@
 package util;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class Logger
 
     public Logger(String module)
     {
-        this(module, COM2POSE.configs.general.fileLogging.get(), COM2POSE.configs.general.logFile.get());
+        this(module, TFPRIO.configs.general.fileLogging.get(), TFPRIO.configs.general.logFile.get());
     }
 
     public Logger(String module, boolean fileLoggingEnabled, File logFile)

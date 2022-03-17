@@ -1,4 +1,4 @@
-package com2pose;
+package tfprio;
 
 import lib.Blacklist.Blacklist;
 import lib.CheckChromosomes;
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class COM2POSE
+public class TFPRIO
 {
     public static Configs configs;
     public static Map<String, Set<String>> groupsToHms = new HashMap<>();
@@ -73,6 +73,13 @@ public class COM2POSE
         {
             mapSymbolAndEnsg = new MapSymbolAndEnsg();
         }
+
+        /*
+        Kann BatchVariablen akzeptieren
+        Wenn entsprechende Config gesetzt ist, soll File übergeben werden, wo dann samples Batches zugeordnet sind.
+        Diese Zuordnungen sollen dann DESeq2 übergeben werden
+        */
+
 
         new CreateDeseq2Scripts();
 

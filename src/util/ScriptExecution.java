@@ -1,6 +1,6 @@
 package util;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,11 +29,11 @@ public class ScriptExecution
     private static void executeAndWait(List<String> command) throws IOException, InterruptedException
     {
         ProcessBuilder pb = new ProcessBuilder(command);
-        if (COM2POSE.configs.general.redirectExternalScriptOutputStream.get())
+        if (TFPRIO.configs.general.redirectExternalScriptOutputStream.get())
         {
             pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         }
-        if (COM2POSE.configs.general.redirectExternalScriptErrorStream.get())
+        if (TFPRIO.configs.general.redirectExternalScriptErrorStream.get())
         {
             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
         }

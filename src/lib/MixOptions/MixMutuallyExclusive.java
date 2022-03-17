@@ -1,6 +1,6 @@
 package lib.MixOptions;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import lib.BinaryTree.ChromosomePeakTrees;
 import lib.ExecutableStep;
 import lib.Peak;
@@ -20,15 +20,15 @@ public class MixMutuallyExclusive extends ExecutableStep
 
         logger.info("Preprocessing mutually exclusive peaks for binary tree comparison.");
 
-        File d_input = COM2POSE.configs.general.latestInputDirectory.get();
+        File d_input = TFPRIO.configs.general.latestInputDirectory.get();
 
         logger.info("Used data: " + d_input);
 
         logger.info("Starting binary tree filtering.");
 
-        for (String group1 : COM2POSE.groupsToHms.keySet())
+        for (String group1 : TFPRIO.groupsToHms.keySet())
         {
-            for (String group2 : COM2POSE.groupsToHms.keySet())
+            for (String group2 : TFPRIO.groupsToHms.keySet())
             {
                 if (group1.compareTo(group2) >= 0)
                 {
@@ -36,15 +36,15 @@ public class MixMutuallyExclusive extends ExecutableStep
                 }
                 String combined = group1 + "_" + group2;
 
-                for (String hm : COM2POSE.groupsToHms.get(group1))
+                for (String hm : TFPRIO.groupsToHms.get(group1))
                 {
-                    if (!COM2POSE.groupsToHms.get(group2).contains(hm))
+                    if (!TFPRIO.groupsToHms.get(group2).contains(hm))
                     {
                         continue;
                     }
 
                     File d_combinedOutput =
-                            extend(COM2POSE.configs.mixOptions.fileStructure.d_mutuallyExclusive_input.get(), combined,
+                            extend(TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input.get(), combined,
                                     hm);
 
                     //input files
@@ -130,7 +130,7 @@ public class MixMutuallyExclusive extends ExecutableStep
                 continue;
             }
 
-            if (COM2POSE.configs.mixOptions.mutuallyExclusiveDifferentialPeakSignals.get())
+            if (TFPRIO.configs.mixOptions.mutuallyExclusiveDifferentialPeakSignals.get())
             {
                 Peak match = (Peak) peakTrees.getMatchingChild(peak);
 

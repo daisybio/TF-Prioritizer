@@ -1,6 +1,6 @@
 package lib;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import util.Logger;
 
 import java.util.concurrent.ExecutorService;
@@ -9,8 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class ExecutableStep
 {
-    protected ExecutorService executorService =
-            Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
+    protected ExecutorService executorService = Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
 
     private final int shutDownTimeOut = 5;
     private final TimeUnit shutDownTimeUnit = TimeUnit.MINUTES;
@@ -44,7 +43,7 @@ public abstract class ExecutableStep
     protected void finishAllQueuedThreads()
     {
         shutdown();
-        executorService = Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
+        executorService = Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
     }
 
     protected abstract void execute();

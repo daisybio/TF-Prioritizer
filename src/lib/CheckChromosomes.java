@@ -1,16 +1,14 @@
 package lib;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import util.FileFilters.DirectoryFilter;
 import util.FileFilters.FileFilter;
-import util.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 
@@ -21,8 +19,8 @@ public class CheckChromosomes extends ExecutableStep
      */
     public void execute()
     {
-        File file_root_input = COM2POSE.configs.tepic.inputDirectory.get();
-        File chr_annotation_output = COM2POSE.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get();
+        File file_root_input = TFPRIO.configs.tepic.inputDirectory.get();
+        File chr_annotation_output = TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get();
 
         // I do not really know why this assignments have to take place
         //options_intern.tepic_input_prev = options_intern.tepic_input_directory;
@@ -31,13 +29,13 @@ public class CheckChromosomes extends ExecutableStep
         for (File fileDir : Objects.requireNonNull(file_root_input.listFiles(new DirectoryFilter())))
         {
             String group = fileDir.getName();
-            COM2POSE.groupsToHms.put(group, new HashSet<>());
+            TFPRIO.groupsToHms.put(group, new HashSet<>());
 
             File d_outputGroup = extend(chr_annotation_output, group);
 
             for (File d_hm : Objects.requireNonNull(fileDir.listFiles(new DirectoryFilter())))
             {
-                COM2POSE.groupsToHms.get(group).add(d_hm.getName());
+                TFPRIO.groupsToHms.get(group).add(d_hm.getName());
                 File d_outputGroupHm = extend(d_outputGroup, d_hm.getName());
 
                 for (File f_sample : Objects.requireNonNull(d_hm.listFiles(new FileFilter())))
@@ -85,7 +83,7 @@ public class CheckChromosomes extends ExecutableStep
         }
         try
         {
-            COM2POSE.configs.general.latestInputDirectory.setValue(chr_annotation_output);
+            TFPRIO.configs.general.latestInputDirectory.setValue(chr_annotation_output);
         } catch (IllegalAccessException e)
         {
             logger.error(e.getMessage());

@@ -1,15 +1,12 @@
 package lib.MixOptions;
 
-import com2pose.COM2POSE;
+import tfprio.TFPRIO;
 import lib.ExecutableStep;
 import util.FileFilters.Filters;
-import util.Logger;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 
@@ -20,10 +17,10 @@ public class MixOptions extends ExecutableStep
      */
     public void execute()
     {
-        logger.info("Used data: " + COM2POSE.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get());
+        logger.info("Used data: " + TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get());
         preprocess();
         mainStep();
-        if (COM2POSE.configs.mixOptions.level.get().equals("HM_LEVEL"))
+        if (TFPRIO.configs.mixOptions.level.get().equals("HM_LEVEL"))
         {
             hmLevel();
         }
@@ -83,13 +80,11 @@ public class MixOptions extends ExecutableStep
     {
         logger.info("Preprocess input data for sample mix - split chromosomes.");
 
-        for (File d_group : Objects.requireNonNull(
-                COM2POSE.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get()
-                        .listFiles(Filters.directoryFilter)))
+        for (File d_group : Objects.requireNonNull(TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get()
+                .listFiles(Filters.directoryFilter)))
         {
             String group = d_group.getName();
-            File d_outputGroup =
-                    extend(COM2POSE.configs.mixOptions.fileStructure.d_sampleMixPreprocessing.get(), group);
+            File d_outputGroup = extend(TFPRIO.configs.mixOptions.fileStructure.d_sampleMixPreprocessing.get(), group);
 
             for (File d_hm : d_group.listFiles(Filters.directoryFilter))
             {
@@ -106,13 +101,13 @@ public class MixOptions extends ExecutableStep
         }
 
         shutdown();
-        executorService = Executors.newFixedThreadPool(COM2POSE.configs.general.threadLimit.get());
+        executorService = Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
     }
 
     private void mainStep()
     {
-        runMixOption(COM2POSE.configs.mixOptions.fileStructure.d_sampleMixPreprocessing.get(),
-                COM2POSE.configs.mixOptions.fileStructure.d_sampleMix.get(), "SAMPLE_LEVEL");
+        runMixOption(TFPRIO.configs.mixOptions.fileStructure.d_sampleMixPreprocessing.get(),
+                TFPRIO.configs.mixOptions.fileStructure.d_sampleMix.get(), "SAMPLE_LEVEL");
     }
 
     private void hmLevelPreprocess()
@@ -126,7 +121,7 @@ public class MixOptions extends ExecutableStep
 
         //identify possible timepoints
         for (File d_group : Objects.requireNonNull(
-                COM2POSE.configs.mixOptions.fileStructure.d_sampleMix.get().listFiles(Filters.directoryFilter)))
+                TFPRIO.configs.mixOptions.fileStructure.d_sampleMix.get().listFiles(Filters.directoryFilter)))
         {
             String group = d_group.getName();
             ArrayList<String> hmList = new ArrayList<>();
@@ -176,11 +171,11 @@ public class MixOptions extends ExecutableStep
 
 
         for (File d_group : Objects.requireNonNull(
-                COM2POSE.configs.mixOptions.fileStructure.d_sampleMix.get().listFiles(Filters.directoryFilter)))
+                TFPRIO.configs.mixOptions.fileStructure.d_sampleMix.get().listFiles(Filters.directoryFilter)))
         {
             String group = d_group.getName();
             File d_output_hmPreprocessing =
-                    extend(COM2POSE.configs.mixOptions.fileStructure.d_preprocessingHmMix.get(), group);
+                    extend(TFPRIO.configs.mixOptions.fileStructure.d_preprocessingHmMix.get(), group);
 
             for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
             {
@@ -196,7 +191,7 @@ public class MixOptions extends ExecutableStep
 
     private void runMixOption(File d_source, File d_target, String mixLevel)
     {
-        logger.info("Create " + COM2POSE.configs.mixOptions.option.get() + " of " + mixLevel);
+        logger.info("Create " + TFPRIO.configs.mixOptions.option.get() + " of " + mixLevel);
 
         for (File d_group : Objects.requireNonNull(d_source.listFiles(Filters.directoryFilter)))
         {
@@ -265,13 +260,13 @@ public class MixOptions extends ExecutableStep
                         ArrayList<MIX_Interval> chromosomeUnions = new ArrayList<>();
 
                         int min_occurence;
-                        if (!COM2POSE.configs.mixOptions.occurrenceIntersection.isSet())
+                        if (!TFPRIO.configs.mixOptions.occurrenceIntersection.isSet())
                         {
                             min_occurence = sample_number;
                         } else
                         {
                             min_occurence =
-                                    Math.min(sample_number, COM2POSE.configs.mixOptions.occurrenceIntersection.get());
+                                    Math.min(sample_number, TFPRIO.configs.mixOptions.occurrenceIntersection.get());
                         }
 
                         while (!stack_union.isEmpty())
@@ -279,7 +274,7 @@ public class MixOptions extends ExecutableStep
                             MIX_Interval t = stack_union.pop();
                             t.calculate_mean(mixLevel);
 
-                            if (COM2POSE.configs.mixOptions.option.get().equals("INTERSECTION"))
+                            if (TFPRIO.configs.mixOptions.option.get().equals("INTERSECTION"))
                             {
                                 if (t.merged_intervals.size() >= min_occurence)
                                 {
@@ -357,7 +352,7 @@ public class MixOptions extends ExecutableStep
 
         try
         {
-            COM2POSE.configs.general.latestInputDirectory.setValue(d_target);
+            TFPRIO.configs.general.latestInputDirectory.setValue(d_target);
         } catch (IllegalAccessException e)
         {
             logger.error(e.getMessage());
@@ -368,8 +363,8 @@ public class MixOptions extends ExecutableStep
     {
         hmLevelPreprocess();
 
-        runMixOption(COM2POSE.configs.mixOptions.fileStructure.d_preprocessingHmMix.get(),
-                COM2POSE.configs.mixOptions.fileStructure.d_hmMix.get(), "HM_LEVEL");
+        runMixOption(TFPRIO.configs.mixOptions.fileStructure.d_preprocessingHmMix.get(),
+                TFPRIO.configs.mixOptions.fileStructure.d_hmMix.get(), "HM_LEVEL");
     }
 
 
