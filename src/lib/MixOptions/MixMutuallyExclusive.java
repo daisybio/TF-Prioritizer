@@ -6,6 +6,7 @@ import lib.ExecutableStep;
 import lib.Peak;
 import lib.Region;
 import util.Comparators.ChromosomeComparator;
+import util.Configs.Config;
 
 import java.io.*;
 import java.util.*;
@@ -14,13 +15,31 @@ import static util.FileManagement.*;
 
 public class MixMutuallyExclusive extends ExecutableStep
 {
+    private final Config<File> d_input = TFPRIO.latestInputDirectory;
+    private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input;
+    private final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals =
+            TFPRIO.configs.mixOptions.mutuallyExclusiveDifferentialPeakSignals;
+
+    @Override protected Set<Config<File>> getRequiredFileStructure()
+    {
+        return new HashSet<>(List.of(d_input));
+    }
+
+    @Override protected Set<Config<File>> getCreatedFileStructure()
+    {
+        return new HashSet<>(List.of(d_output));
+    }
+
+    @Override protected Set<Config<?>> getRequiredConfigs()
+    {
+        return new HashSet<>(List.of(mutuallyExclusiveDifferentialPeakSignals));
+    }
+
     public void execute()
     {
         logger.info("Start mutually exclusive peaks calculation.");
 
         logger.info("Preprocessing mutually exclusive peaks for binary tree comparison.");
-
-        File d_input = TFPRIO.configs.general.latestInputDirectory.get();
 
         logger.info("Used data: " + d_input);
 
@@ -43,13 +62,11 @@ public class MixMutuallyExclusive extends ExecutableStep
                         continue;
                     }
 
-                    File d_combinedOutput =
-                            extend(TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input.get(), combined,
-                                    hm);
+                    File d_combinedOutput = extend(d_output.get(), combined, hm);
 
                     //input files
-                    File d_unfilteredInput1 = extend(d_input, group1, hm);
-                    File d_unfilteredInput2 = extend(d_input, group2, hm);
+                    File d_unfilteredInput1 = extend(d_input.get(), group1, hm);
+                    File d_unfilteredInput2 = extend(d_input.get(), group2, hm);
                     File[] inputFiles1 = Objects.requireNonNull(d_unfilteredInput1.listFiles());
                     File[] inputFiles2 = Objects.requireNonNull(d_unfilteredInput2.listFiles());
                     assert inputFiles1.length == 1;
@@ -130,7 +147,7 @@ public class MixMutuallyExclusive extends ExecutableStep
                 continue;
             }
 
-            if (TFPRIO.configs.mixOptions.mutuallyExclusiveDifferentialPeakSignals.get())
+            if (mutuallyExclusiveDifferentialPeakSignals.get())
             {
                 Peak match = (Peak) peakTrees.getMatchingChild(peak);
 

@@ -1,37 +1,56 @@
 package lib;
 
 import tfprio.TFPRIO;
+import util.Configs.Config;
 import util.FileFilters.DirectoryFilter;
 import util.FileFilters.FileFilter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static util.FileManagement.*;
 
 public class CheckChromosomes extends ExecutableStep
 {
+    private final Config<File> d_input = TFPRIO.configs.tepic.inputDirectory;
+    private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr;
+
+    @Override protected Set<Config<File>> getRequiredFileStructure()
+    {
+        return new HashSet<>(List.of(d_input));
+    }
+
+    @Override protected Set<Config<File>> getCreatedFileStructure()
+    {
+        return new HashSet<>(List.of(d_output));
+    }
+
+    @Override protected Set<Config<?>> getRequiredConfigs()
+    {
+        return new HashSet<>();
+    }
+
+    @Override protected void updateInputDirectory()
+    {
+        TFPRIO.latestInputDirectory = d_output;
+    }
+
     /**
      * Make sure that chromosomes are annotated without a "chr" prefix
      */
     public void execute()
     {
-        File file_root_input = TFPRIO.configs.tepic.inputDirectory.get();
-        File chr_annotation_output = TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get();
-
         // I do not really know why this assignments have to take place
         //options_intern.tepic_input_prev = options_intern.tepic_input_directory;
         //options_intern.tepic_input_directory = chr_annotation_output.getAbsolutePath();
 
-        for (File fileDir : Objects.requireNonNull(file_root_input.listFiles(new DirectoryFilter())))
+        for (File fileDir : Objects.requireNonNull(d_input.get().listFiles(new DirectoryFilter())))
         {
             String group = fileDir.getName();
             TFPRIO.groupsToHms.put(group, new HashSet<>());
 
-            File d_outputGroup = extend(chr_annotation_output, group);
+            File d_outputGroup = extend(d_output.get(), group);
 
             for (File d_hm : Objects.requireNonNull(fileDir.listFiles(new DirectoryFilter())))
             {
@@ -80,13 +99,6 @@ public class CheckChromosomes extends ExecutableStep
 
                 }
             }
-        }
-        try
-        {
-            TFPRIO.configs.general.latestInputDirectory.setValue(chr_annotation_output);
-        } catch (IllegalAccessException e)
-        {
-            logger.error(e.getMessage());
         }
     }
 }

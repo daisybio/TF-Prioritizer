@@ -2,6 +2,7 @@ package lib.Deseq2;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
+import util.Configs.Config;
 import util.ExternalScriptException;
 import util.FileFilters.Filters;
 
@@ -13,31 +14,54 @@ import static util.ScriptExecution.executeAndWait;
 
 public class CreateDeseq2Scripts extends ExecutableStep
 {
+    private final Config<File> d_input = TFPRIO.configs.deSeq2.inputDirectory;
+    private final Config<File> d_outputCombined = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combined;
+    private final Config<File> d_outputSingle = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_single;
+    private final Config<File> d_outputMeanCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
+    private final Config<File> d_outputScripts = TFPRIO.configs.deSeq2.fileStructure.d_rScripts;
+
+    private final Config<File> f_scriptSingle = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingSingle;
+    private final Config<File> f_scriptCombined = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingCombined;
+    private final Config<File> f_scriptDeseq = TFPRIO.configs.scriptTemplates.f_deseq2;
+
+    private final Config<File> f_geneID = TFPRIO.configs.deSeq2.inputGeneID;
+    private final Config<File> f_mapping = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
+
+    @Override protected Set<Config<File>> getRequiredFileStructure()
+    {
+        return new HashSet<>(
+                Arrays.asList(d_input, f_scriptCombined, f_scriptDeseq, f_scriptSingle, f_geneID, f_mapping));
+    }
+
+    @Override protected Set<Config<File>> getCreatedFileStructure()
+    {
+        return new HashSet<>(Arrays.asList(d_outputSingle, d_outputCombined, d_outputMeanCounts, d_outputScripts));
+    }
+
+    @Override protected Set<Config<?>> getRequiredConfigs()
+    {
+        return new HashSet<>();
+    }
+
     @Override protected void execute()
     {
-        File d_outputCombined = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combined.get();
-        File d_outputSingle = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_single.get();
-        File d_outputMeanCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get();
-
-        File input = TFPRIO.configs.deSeq2.inputDirectory.get();
 
 
         // Single
         try
         {
-            String scriptTemplate = readFile(TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingSingle.get());
-            for (File d_group : Objects.requireNonNull(input.listFiles(Filters.directoryFilter)))
+            String scriptTemplate = readFile(f_scriptSingle.get());
+
+            for (File d_group : Objects.requireNonNull(d_input.get().listFiles(Filters.directoryFilter)))
             {
-                File d_outputGroup = extend(d_outputSingle, d_group.getName());
+                File d_outputGroup = extend(d_outputSingle.get(), d_group.getName());
                 String script = scriptTemplate.replace("{INPUT_DIRECTORY}", d_group.getAbsolutePath());
                 script = script.replace("{OUTPUT_DIRECTORY}", d_outputGroup.getAbsolutePath());
-                File meansFile = extend(d_outputMeanCounts, d_group.getName() + ".tsv");
+                File meansFile = extend(d_outputMeanCounts.get(), d_group.getName() + ".tsv");
                 makeSureFileExists(meansFile);
                 script = script.replace("{OUTPUT_MEANS_FILE}", meansFile.getAbsolutePath());
-                script = script.replace("{SYMBOL_MAP_FILE}",
-                        TFPRIO.configs.deSeq2.fileStructure.f_mapping.get().getAbsolutePath());
-                String finalScript =
-                        script.replace("{GENE_ID_FILE}", TFPRIO.configs.deSeq2.inputGeneID.get().getAbsolutePath());
+                script = script.replace("{SYMBOL_MAP_FILE}", f_mapping.get().getAbsolutePath());
+                String finalScript = script.replace("{GENE_ID_FILE}", f_geneID.get().getAbsolutePath());
 
                 executorService.execute(() ->
                 {
@@ -62,10 +86,10 @@ public class CreateDeseq2Scripts extends ExecutableStep
         // Combined
         try
         {
-            String scriptTemplate = readFile(TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingCombined.get());
-            for (File d_group1 : Objects.requireNonNull(d_outputSingle.listFiles(Filters.directoryFilter)))
+            String scriptTemplate = readFile(f_scriptCombined.get());
+            for (File d_group1 : Objects.requireNonNull(d_outputSingle.get().listFiles(Filters.directoryFilter)))
             {
-                for (File d_group2 : Objects.requireNonNull(d_outputSingle.listFiles(Filters.directoryFilter)))
+                for (File d_group2 : Objects.requireNonNull(d_outputSingle.get().listFiles(Filters.directoryFilter)))
                 {
                     if (d_group1.getName().compareTo(d_group2.getName()) >= 0)
                     {
@@ -74,8 +98,8 @@ public class CreateDeseq2Scripts extends ExecutableStep
                     String combination = d_group1.getName() + "_" + d_group2.getName();
                     String script = scriptTemplate.replace("{INPUT_DIRECTORY1}", d_group1.getAbsolutePath());
                     script = script.replace("{INPUT_DIRECTORY2}", d_group2.getAbsolutePath());
-                    script = script.replace("{GENE_ID}", TFPRIO.configs.deSeq2.inputGeneID.get().getAbsolutePath());
-                    File targetFile = extend(d_outputCombined, combination + ".tsv");
+                    script = script.replace("{GENE_ID}", f_geneID.get().getAbsolutePath());
+                    File targetFile = extend(d_outputCombined.get(), combination + ".tsv");
                     makeSureFileExists(targetFile);
                     String finalScript = script.replace("{OUTPUT_FILE}", targetFile.getAbsolutePath());
 
@@ -101,13 +125,12 @@ public class CreateDeseq2Scripts extends ExecutableStep
         finishAllQueuedThreads();
 
         logger.info("Start creating RScripts for running DESeq2");
-        // Scripts
-        File r_scripts = TFPRIO.configs.deSeq2.fileStructure.d_rScripts.get();
 
+        // Scripts
         try
         {
-            String scriptTemplate = readFile(TFPRIO.configs.scriptTemplates.f_deseq2.get());
-            for (File f_combination : Objects.requireNonNull(d_outputCombined.listFiles(Filters.fileFilter)))
+            String scriptTemplate = readFile(f_scriptDeseq.get());
+            for (File f_combination : Objects.requireNonNull(d_outputCombined.get().listFiles(Filters.fileFilter)))
             {
                 executorService.execute(() ->
                 {
@@ -124,8 +147,8 @@ public class CreateDeseq2Scripts extends ExecutableStep
                         for (String sample : samples)
                         {
                             String group = sample.substring(0, sample.indexOf("_"));
-                            sb_samples.append("'" + sample + "', ");
-                            sb_groups.append("'" + group + "', ");
+                            sb_samples.append("'").append(sample).append("', ");
+                            sb_groups.append("'").append(group).append("', ");
                         }
                         sb_samples.setLength(sb_samples.length() - 2);
                         sb_groups.setLength(sb_groups.length() - 2);
@@ -137,7 +160,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
                         makeSureFileExists(targetFile);
                         script = script.replace("{OUTPUTFILE}", targetFile.getAbsolutePath());
 
-                        writeFile(extend(r_scripts, combination + ".R"), script);
+                        writeFile(extend(d_outputScripts.get(), combination + ".R"), script);
                     } catch (IOException e)
                     {
                         e.printStackTrace();

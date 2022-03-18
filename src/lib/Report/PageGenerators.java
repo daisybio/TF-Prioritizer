@@ -667,7 +667,7 @@ public class PageGenerators
                         try
                         {
                             sb_hm.append(TFPRIO.mapSymbolAndEnsg.symbolToEnsg(targetGeneSymbol));
-                        } catch (NoSuchFieldException | FileNotFoundException e)
+                        } catch (NoSuchFieldException e)
                         {
                             Report.logger.warn(e.getMessage());
                         }

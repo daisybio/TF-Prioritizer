@@ -3,54 +3,55 @@ package lib.FootprintIntervals;
 import tfprio.TFPRIO;
 import lib.ExecutableStep;
 import util.Comparators.ChromosomeComparator;
+import util.Configs.Config;
 import util.FileFilters.Filters;
-import util.Logger;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 import static util.FileManagement.extend;
 import static util.FileManagement.makeSureFileExists;
 
 public class CreateFootprintsBetweenPeaks extends ExecutableStep
 {
-    private final Logger logger = new Logger("FOOTPRINTS");
+    private final Config<File> d_input = TFPRIO.latestInputDirectory;
+    private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks;
+    private final Config<String> option = TFPRIO.configs.tepic.tfBindingSiteSearch;
+
+
+    @Override protected Set<Config<File>> getRequiredFileStructure()
+    {
+        return new HashSet<>(List.of(d_input));
+    }
+
+    @Override protected Set<Config<File>> getCreatedFileStructure()
+    {
+        return new HashSet<>(List.of(d_output));
+    }
+
+    @Override protected Set<Config<?>> getRequiredConfigs()
+    {
+        return new HashSet<>(List.of(option));
+    }
+
+    @Override protected void updateInputDirectory()
+    {
+        TFPRIO.latestInputDirectory = d_output;
+    }
 
     public void execute()
     {
-        logger.logLine(
-                "OPTION tfBindingSiteSearch=\"" + TFPRIO.configs.tepic.tfBindingSiteSearch.get() + "\" was set.");
+        logger.logLine("OPTION tfBindingSiteSearch=\"" + option.get() + "\" was set.");
         logger.logLine("Creating footprints");
 
 
-        File d_input;
-
-        if (TFPRIO.configs.mixOptions.level.isSet())
-        {
-            if (TFPRIO.configs.mixOptions.level.get().equals("SAMPLE_LEVEL"))
-            {
-                d_input = TFPRIO.configs.mixOptions.fileStructure.d_sampleMix.get();
-            } else
-            {
-                d_input = TFPRIO.configs.mixOptions.fileStructure.d_hmMix.get();
-            }
-        } else
-        {
-            d_input = TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get();
-        }
-
-        logger.logLine("Used data: " + d_input.getAbsolutePath());
+        logger.logLine("Used data: " + d_input.get().getAbsolutePath());
 
 
-        File output_folder_new_input = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks.get();
-
-        for (File d_group : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
+        for (File d_group : Objects.requireNonNull(d_input.get().listFiles(Filters.directoryFilter)))
         {
             String group = d_group.getName();
-            File d_outputGroup = extend(output_folder_new_input, group);
+            File d_outputGroup = extend(d_output.get(), group);
 
             for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
             {
@@ -125,7 +126,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
 
                         //see if gaps between Footprint Intervals are < tepic_between_max_bps if so connect to one region for TEPIC
 
-                        if (TFPRIO.configs.tepic.tfBindingSiteSearch.get().equals("BETWEEN"))
+                        if (option.get().equals("BETWEEN"))
                         {
                             for (String chromosome : chromosomeRegions.keySet())
                             {
@@ -283,14 +284,6 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
                     });
                 }
             }
-        }
-
-        try
-        {
-            TFPRIO.configs.general.latestInputDirectory.setValue(output_folder_new_input);
-        } catch (IllegalAccessException e)
-        {
-            logger.error(e.getMessage());
         }
     }
 }

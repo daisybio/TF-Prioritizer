@@ -1,10 +1,12 @@
 package util;
 
 import tfprio.TFPRIO;
+import util.Configs.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -19,13 +21,13 @@ public class MapSymbolAndEnsg
     private final Map<String, String> ensgSymbol = new HashMap<>();
     private final Logger logger = new Logger(this.getClass().getSimpleName());
 
-    private final File map = TFPRIO.configs.deSeq2.fileStructure.f_mapping.get();
+    private final Config<File> f_map = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
 
     public MapSymbolAndEnsg()
     {
         try
         {
-            if (!map.exists())
+            if (!f_map.get().exists())
             {
                 createMappingFile();
             }
@@ -39,20 +41,23 @@ public class MapSymbolAndEnsg
     private void createMappingFile() throws IOException, InterruptedException
     {
         String script = readFile(TFPRIO.configs.scriptTemplates.f_mapping.get());
+        Config<File> f_script = TFPRIO.configs.deSeq2.fileStructure.f_mappingScript;
 
         script = script.replace("{INPUTFILE}", TFPRIO.configs.deSeq2.inputGeneID.get().getAbsolutePath());
         script = script.replace("{DATASET_SPECIES}", TFPRIO.configs.deSeq2.biomartDatasetSpecies.get());
         script = script.replace("{SYMBOL_COLUMN}", TFPRIO.configs.deSeq2.biomartDatasetSymbolColumn.get());
-        script = script.replace("{OUTPUTFILE}", TFPRIO.configs.deSeq2.fileStructure.f_mapping.get().getAbsolutePath());
+        script = script.replace("{OUTPUTFILE}", f_map.get().getAbsolutePath());
 
-        writeFile(TFPRIO.configs.deSeq2.fileStructure.f_mappingScript.get(), script);
+        writeFile(f_script.get(), script);
+
+        TFPRIO.createdFileStructure.addAll(Arrays.asList(f_script, f_map));
 
         executeAndWait(TFPRIO.configs.deSeq2.fileStructure.f_mappingScript.get(), logger);
     }
 
     private void loadMappingFile() throws FileNotFoundException
     {
-        try (Scanner scanner = new Scanner(map))
+        try (Scanner scanner = new Scanner(f_map.get()))
         {
             while (scanner.hasNextLine())
             {
@@ -66,7 +71,7 @@ public class MapSymbolAndEnsg
         }
     }
 
-    public String symbolToEnsg(String symbol) throws FileNotFoundException, NoSuchFieldException
+    public String symbolToEnsg(String symbol) throws NoSuchFieldException
     {
         if (symbolEnsg.containsKey(symbol.toUpperCase()))
         {
@@ -77,7 +82,7 @@ public class MapSymbolAndEnsg
         }
     }
 
-    public String ensgToSymbol(String ensg) throws FileNotFoundException, NoSuchFieldException
+    public String ensgToSymbol(String ensg) throws NoSuchFieldException
     {
         if (ensgSymbol.containsKey(ensg.toUpperCase()))
         {

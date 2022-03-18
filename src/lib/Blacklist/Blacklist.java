@@ -4,6 +4,7 @@ import tfprio.TFPRIO;
 import lib.BinaryTree.ChromosomeBlacklistTrees;
 import lib.ExecutableStep;
 import lib.Region;
+import util.Configs.Config;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,12 +14,31 @@ import static util.FileManagement.*;
 
 public class Blacklist extends ExecutableStep
 {
+    private final Config<File> d_input = TFPRIO.latestInputDirectory;
+    private final Config<File> d_output = TFPRIO.configs.blacklist.fileStructure.d_newInput;
+
+    @Override protected Set<Config<File>> getRequiredFileStructure()
+    {
+        return new HashSet<>(List.of(d_input));
+    }
+
+    @Override protected Set<Config<File>> getCreatedFileStructure()
+    {
+        return new HashSet<>(List.of(d_output));
+    }
+
+    @Override protected Set<Config<?>> getRequiredConfigs()
+    {
+        return new HashSet<>();
+    }
+
+    @Override protected void updateInputDirectory()
+    {
+        TFPRIO.latestInputDirectory = d_output;
+    }
+
     public void execute()
     {
-        File d_input = TFPRIO.configs.general.latestInputDirectory.get();
-
-        File d_output = TFPRIO.configs.blacklist.fileStructure.d_newInput.get();
-
         logger.info("Used input: " + d_input);
         logger.info("Create chromosome binary trees.");
         //CREATE BINARY TREES
@@ -28,9 +48,9 @@ public class Blacklist extends ExecutableStep
         logger.info("Filter input files for blacklisted regions.");
         //now filter all files
 
-        for (File d_group : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
+        for (File d_group : Objects.requireNonNull(d_input.get().listFiles(Filters.directoryFilter)))
         {
-            File d_output_group = extend(d_output, d_group.getName());
+            File d_output_group = extend(d_output.get(), d_group.getName());
 
             for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
             {
@@ -78,13 +98,6 @@ public class Blacklist extends ExecutableStep
                     });
                 }
             }
-        }
-        try
-        {
-            TFPRIO.configs.general.latestInputDirectory.setValue(d_output);
-        } catch (IllegalAccessException e)
-        {
-            logger.error(e.getMessage());
         }
     }
 }

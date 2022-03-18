@@ -2,40 +2,75 @@ package lib.Deseq2;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
+import util.Configs.Config;
 import util.ExternalScriptException;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static util.FileManagement.*;
 import static util.ScriptExecution.executeAndWait;
 
 public class CreateGenePositions extends ExecutableStep
 {
+    private final Config<File> f_script = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_script;
+    private final Config<File> f_data_prev =
+            TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_genePositionsPrev;
+    private final Config<File> f_data_version =
+            TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_version;
+    private final Config<File> f_mapping = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
+    private final Config<File> f_data = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_data;
+    private final Config<File> f_upliftScriptTemplate = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingUplift;
+    private final Config<File> f_upliftScript =
+            TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_uplift;
+
+    private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingGetGenePositions;
+
+    private final Config<Boolean> calculateGenePositionsEnabled = TFPRIO.configs.general.calculateGenePositionsEnabled;
+    private final Config<String> speciesReferenceGenome = TFPRIO.configs.igv.speciesReferenceGenome;
+    private final Config<String> speciesBiomart = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
+    private final Config<Map> synonymDict = TFPRIO.configs.igv.grcSynonymDict;
+
+
+    @Override protected Set<Config<File>> getRequiredFileStructure()
+    {
+        return new HashSet<>(Arrays.asList(f_scriptTemplate, f_mapping, f_upliftScriptTemplate));
+    }
+
+    @Override protected Set<Config<File>> getCreatedFileStructure()
+    {
+        return new HashSet<>(Arrays.asList(f_script, f_data_prev, f_data_version, f_data));
+    }
+
+    @Override protected Set<Config<?>> getRequiredConfigs()
+    {
+        return new HashSet<>(
+                Arrays.asList(calculateGenePositionsEnabled, speciesBiomart, speciesReferenceGenome, synonymDict));
+    }
+
     @Override protected void execute()
     {
-        File f_script = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_script.get();
-        File f_data_prev = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_genePositionsPrev.get();
-        File f_data_version = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_version.get();
-        File f_mapping = TFPRIO.configs.deSeq2.fileStructure.f_mapping.get();
-
         //get biomart gene positions
-        if (TFPRIO.configs.general.calculateGenePositionsEnabled.get())
+        if (calculateGenePositionsEnabled.get())
         {
             try
             {
-                String script = readFile(TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingGetGenePositions.get());
-                script = script.replace("{INPUTFILE}", f_mapping.getAbsolutePath());
-                script = script.replace("{SPECIES}", TFPRIO.configs.deSeq2.biomartDatasetSpecies.get());
-                script = script.replace("{DATA_PREV_FILE}", f_data_prev.getAbsolutePath());
-                script = script.replace("{VERSIONFILE}", f_data_version.getAbsolutePath());
-                writeFile(f_script, script);
+                String script = readFile(f_scriptTemplate.get());
+                script = script.replace("{INPUTFILE}", f_mapping.get().getAbsolutePath());
+                script = script.replace("{SPECIES}", speciesBiomart.get());
+                script = script.replace("{DATA_PREV_FILE}", f_data_prev.get().getAbsolutePath());
+                script = script.replace("{VERSIONFILE}", f_data_version.get().getAbsolutePath());
+                writeFile(f_script.get(), script);
             } catch (IOException e)
             {
                 e.printStackTrace();
             }
             try
             {
-                executeAndWait(f_script, logger);
+                executeAndWait(f_script.get(), logger);
             } catch (ExternalScriptException e)
             {
                 e.printStackTrace();
@@ -45,32 +80,28 @@ public class CreateGenePositions extends ExecutableStep
             logger.info("Gene positions were not fetched since command line parameter -b was set.");
         }
 
-        File f_data = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_data.get();
-        File f_upliftScript = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_uplift.get();
-
         try
         {
-            makeSureFileExists(f_data);
+            makeSureFileExists(f_data.get());
 
-            String script = readFile(TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingUplift.get());
-            script = script.replace("{INPUTFILE}", f_data_prev.getAbsolutePath());
-            script = script.replace("{VERSIONFILE}", f_data_version.getAbsolutePath());
-            script = script.replace("{OUTPUTFILE}", f_data.getAbsolutePath());
-            script = script.replace("{REFERENCE_GENOME}", TFPRIO.configs.igv.speciesReferenceGenome.isSet() ?
-                    TFPRIO.configs.igv.speciesReferenceGenome.get() : "");
+            String script = readFile(f_upliftScriptTemplate.get());
+            script = script.replace("{INPUTFILE}", f_data_prev.get().getAbsolutePath());
+            script = script.replace("{VERSIONFILE}", f_data_version.get().getAbsolutePath());
+            script = script.replace("{OUTPUTFILE}", f_data.get().getAbsolutePath());
+            script = script.replace("{REFERENCE_GENOME}", speciesReferenceGenome.get());
 
             StringBuilder sb_grc = new StringBuilder();
 
-            for (Object keyObject : TFPRIO.configs.igv.grcSynonymDict.get().keySet())
+            for (Object keyObject : synonymDict.get().keySet())
             {
                 String key = (String) keyObject;
                 sb_grc.append("'").append(key).append("':");
-                sb_grc.append("'").append(TFPRIO.configs.igv.grcSynonymDict.get().get(key)).append("',");
+                sb_grc.append("'").append(synonymDict.get().get(key)).append("',");
             }
             sb_grc.deleteCharAt(sb_grc.lastIndexOf(","));
 
             script = script.replace("{REFERENCE_GENOME_DICT}", sb_grc.toString());
-            writeFile(f_upliftScript, script);
+            writeFile(f_upliftScript.get(), script);
         } catch (IOException e)
         {
             e.printStackTrace();
@@ -78,7 +109,7 @@ public class CreateGenePositions extends ExecutableStep
         }
 
         String line_biomart_version = null;
-        try (BufferedReader versionReader = new BufferedReader(new FileReader(f_data_version)))
+        try (BufferedReader versionReader = new BufferedReader(new FileReader(f_data_version.get())))
         {
             line_biomart_version = versionReader.readLine();
         } catch (IOException e)
@@ -91,22 +122,20 @@ public class CreateGenePositions extends ExecutableStep
         String biomartVersion = line_biomart_version.split("\\.")[0];
 
         logger.info("Uplift positions to correct genome version");
-        logger.info("Our genome: " + TFPRIO.configs.igv.speciesReferenceGenome.get());
+        logger.info("Our genome: " + speciesBiomart.get());
 
-        if (TFPRIO.configs.igv.grcSynonymDict.get().containsKey(biomartVersion))
+        if (synonymDict.get().containsKey(biomartVersion))
         {
-            logger.info("Genome got from biomaRt: " + biomartVersion + " = " +
-                    TFPRIO.configs.igv.grcSynonymDict.get().get(biomartVersion));
+            logger.info("Genome got from biomaRt: " + biomartVersion + " = " + synonymDict.get().get(biomartVersion));
 
-            if (TFPRIO.configs.igv.speciesReferenceGenome.get()
-                    .equals(TFPRIO.configs.igv.grcSynonymDict.get().get(biomartVersion)))
+            if (speciesBiomart.get().equals(synonymDict.get().get(biomartVersion)))
             {
                 logger.info("equal genome versions. No uplifted needed. Skipping this step.");
             } else
             {
                 try
                 {
-                    executeAndWait(f_upliftScript, logger);
+                    executeAndWait(f_upliftScript.get(), logger);
                 } catch (ExternalScriptException e)
                 {
                     e.printStackTrace();

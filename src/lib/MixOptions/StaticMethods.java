@@ -2,194 +2,20 @@ package lib.MixOptions;
 
 import tfprio.TFPRIO;
 import lib.ExecutableStep;
+import util.Configs.Config;
 import util.FileFilters.Filters;
+import util.Logger;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import static util.FileManagement.*;
 
-public class MixOptions extends ExecutableStep
+public class StaticMethods
 {
-    /**
-     * preprocess mix histones, search for same peaks and use either the union or the intersection of all
-     */
-    public void execute()
-    {
-        logger.info("Used data: " + TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get());
-        preprocess();
-        mainStep();
-        if (TFPRIO.configs.mixOptions.level.get().equals("HM_LEVEL"))
-        {
-            hmLevel();
-        }
-    }
-
-    private void splitFileByChromosome(File sourceFile, File targetDir)
-    {
-        BufferedWriter writer = null;
-        String currentChromosome = null;
-        boolean first = true;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(sourceFile)))
-        {
-            String inputLine;
-
-            while ((inputLine = reader.readLine()) != null)
-            {
-                String chromosome = inputLine.substring(0, inputLine.indexOf("\t"));
-
-                if (first)
-                {
-                    currentChromosome = chromosome;
-                    File targetFile = extend(extend(targetDir, currentChromosome), sourceFile.getName());
-                    makeSureFileExists(targetFile);
-                    writer = new BufferedWriter(new FileWriter(targetFile));
-                    first = false;
-                }
-
-                if (chromosome.equals(currentChromosome))
-                {
-                    writer.write(inputLine);
-                    writer.newLine();
-                }
-                if (!chromosome.equals(currentChromosome))
-                {
-                    writer.close();
-                    currentChromosome = chromosome;
-                    File targetFile = extend(extend(targetDir, currentChromosome), sourceFile.getName());
-                    makeSureFileExists(targetFile);
-                    writer = new BufferedWriter(new FileWriter(targetFile));
-                    writer.write(inputLine);
-                    writer.newLine();
-                }
-            }
-            assert writer != null;
-            writer.close();
-        } catch (IOException e)
-        {
-            logger.error(e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-    }
-
-    private void preprocess()
-    {
-        logger.info("Preprocess input data for sample mix - split chromosomes.");
-
-        for (File d_group : Objects.requireNonNull(TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr.get()
-                .listFiles(Filters.directoryFilter)))
-        {
-            String group = d_group.getName();
-            File d_outputGroup = extend(TFPRIO.configs.mixOptions.fileStructure.d_sampleMixPreprocessing.get(), group);
-
-            for (File d_hm : d_group.listFiles(Filters.directoryFilter))
-            {
-                File d_outputGroupHm = extend(d_outputGroup, d_hm.getName());
-
-                for (File f_sample : d_hm.listFiles(Filters.fileFilter))
-                {
-                    executorService.execute(() ->
-                    {
-                        splitFileByChromosome(f_sample, d_outputGroupHm);
-                    });
-                }
-            }
-        }
-
-        shutdown();
-        executorService = Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
-    }
-
-    private void mainStep()
-    {
-        runMixOption(TFPRIO.configs.mixOptions.fileStructure.d_sampleMixPreprocessing.get(),
-                TFPRIO.configs.mixOptions.fileStructure.d_sampleMix.get(), "SAMPLE_LEVEL");
-    }
-
-    private void hmLevelPreprocess()
-    {
-        logger.info("Preprocess sample unions for HM mix");
-        logger.info("Identify possible groups with same histone modifications");
-
-        HashMap<String, ArrayList<String>> groups_histoneModifications = new HashMap<>();
-        HashMap<String, ArrayList<String>> deleted_groups = new HashMap<>();
-        HashSet<String> available_histoneModifications = new HashSet<>();
-
-        //identify possible timepoints
-        for (File d_group : Objects.requireNonNull(
-                TFPRIO.configs.mixOptions.fileStructure.d_sampleMix.get().listFiles(Filters.directoryFilter)))
-        {
-            String group = d_group.getName();
-            ArrayList<String> hmList = new ArrayList<>();
-
-            for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
-            {
-                hmList.add(d_hm.getName());
-                available_histoneModifications.add(d_hm.getName());
-            }
-            groups_histoneModifications.put(group, hmList);
-        }
-
-
-        for (String group : groups_histoneModifications.keySet())
-        {
-            if (groups_histoneModifications.get(group).size() < available_histoneModifications.size())
-            {
-                deleted_groups.put(group, groups_histoneModifications.get(group));
-                continue;
-            }
-
-            if (!groups_histoneModifications.get(group).containsAll(available_histoneModifications))
-            {
-                deleted_groups.put(group, groups_histoneModifications.get(group));
-            }
-        }
-
-        deleted_groups.keySet().forEach(groups_histoneModifications::remove);
-
-        StringBuilder sb_foundMixingGroups = new StringBuilder();
-
-        sb_foundMixingGroups.append("Can perform complete mix for HMs (");
-
-        available_histoneModifications.forEach(
-                histoneModification -> sb_foundMixingGroups.append(histoneModification).append(" "));
-
-        sb_foundMixingGroups.append(") in timepoints (");
-
-        groups_histoneModifications.keySet().forEach(group -> sb_foundMixingGroups.append(group).append(" "));
-
-        sb_foundMixingGroups.append("). Can perform part-mix or no-mix for timepoints (");
-
-        deleted_groups.keySet().forEach(deletedGroup -> sb_foundMixingGroups.append(deletedGroup).append(" "));
-
-        sb_foundMixingGroups.append(").");
-        logger.info(sb_foundMixingGroups.toString());
-
-
-        for (File d_group : Objects.requireNonNull(
-                TFPRIO.configs.mixOptions.fileStructure.d_sampleMix.get().listFiles(Filters.directoryFilter)))
-        {
-            String group = d_group.getName();
-            File d_output_hmPreprocessing =
-                    extend(TFPRIO.configs.mixOptions.fileStructure.d_preprocessingHmMix.get(), group);
-
-            for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
-            {
-                File d_output_hmPreprocessingMix = extend(d_output_hmPreprocessing, "MIX");
-
-                for (File f_sample : Objects.requireNonNull(d_hm.listFiles(Filters.fileFilter)))
-                {
-                    splitFileByChromosome(f_sample, d_output_hmPreprocessingMix);
-                }
-            }
-        }
-    }
-
-    private void runMixOption(File d_source, File d_target, String mixLevel)
+    static void runMixOption(File d_source, File d_target, String mixLevel, Logger logger,
+                             ExecutorService executorService)
     {
         logger.info("Create " + TFPRIO.configs.mixOptions.option.get() + " of " + mixLevel);
 
@@ -349,29 +175,12 @@ public class MixOptions extends ExecutableStep
                 });
             }
         }
-
-        try
-        {
-            TFPRIO.configs.general.latestInputDirectory.setValue(d_target);
-        } catch (IllegalAccessException e)
-        {
-            logger.error(e.getMessage());
-        }
     }
-
-    private void hmLevel()
-    {
-        hmLevelPreprocess();
-
-        runMixOption(TFPRIO.configs.mixOptions.fileStructure.d_preprocessingHmMix.get(),
-                TFPRIO.configs.mixOptions.fileStructure.d_hmMix.get(), "HM_LEVEL");
-    }
-
 
     /**
      * mixes the samples of one folder into one file, based on mix_option (UNION or INTERSECTION)
      */
-    private static Stack<MIX_Interval> mergeIntervals(ArrayList<MIX_Interval> interval)
+    static Stack<MIX_Interval> mergeIntervals(ArrayList<MIX_Interval> interval)
     {
         Stack<MIX_Interval> stack = new Stack<>();
 
@@ -403,5 +212,55 @@ public class MixOptions extends ExecutableStep
             }
         }
         return stack;
+    }
+
+    static void splitFileByChromosome(File sourceFile, File targetDir, Logger logger)
+    {
+        BufferedWriter writer = null;
+        String currentChromosome = null;
+        boolean first = true;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(sourceFile)))
+        {
+            String inputLine;
+
+            while ((inputLine = reader.readLine()) != null)
+            {
+                String chromosome = inputLine.substring(0, inputLine.indexOf("\t"));
+
+                if (first)
+                {
+                    currentChromosome = chromosome;
+                    File targetFile = extend(extend(targetDir, currentChromosome), sourceFile.getName());
+                    makeSureFileExists(targetFile);
+                    writer = new BufferedWriter(new FileWriter(targetFile));
+                    first = false;
+                }
+
+                if (chromosome.equals(currentChromosome))
+                {
+                    writer.write(inputLine);
+                    writer.newLine();
+                }
+                if (!chromosome.equals(currentChromosome))
+                {
+                    writer.close();
+                    currentChromosome = chromosome;
+                    File targetFile = extend(extend(targetDir, currentChromosome), sourceFile.getName());
+                    makeSureFileExists(targetFile);
+                    writer = new BufferedWriter(new FileWriter(targetFile));
+                    writer.write(inputLine);
+                    writer.newLine();
+                }
+            }
+            assert writer != null;
+            writer.close();
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            System.exit(1);
+        }
+
     }
 }

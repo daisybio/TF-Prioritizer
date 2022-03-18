@@ -1,21 +1,15 @@
 package tfprio;
 
-import lib.Blacklist.Blacklist;
-import lib.CheckChromosomes;
-import lib.Deseq2.CreateDeseq2Scripts;
-import lib.Deseq2.CreateGenePositions;
-import lib.Deseq2.CreateTpmMappings;
-import lib.FootprintIntervals.CreateFootprintsBetweenPeaks;
-import lib.MixOptions.MixMutuallyExclusive;
-import lib.MixOptions.MixOptions;
 import org.apache.commons.cli.*;
 
+import util.Configs.Config;
 import util.Configs.Configs;
 import util.MapSymbolAndEnsg;
 import util.Options_intern;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +19,8 @@ public class TFPRIO
     public static Configs configs;
     public static Map<String, Set<String>> groupsToHms = new HashMap<>();
     public static MapSymbolAndEnsg mapSymbolAndEnsg;
+    public static Set<Config<File>> createdFileStructure = new HashSet<>();
+    public static Config<File> latestInputDirectory;
 
     public static void main(String[] args) throws Exception
     {
@@ -43,59 +39,24 @@ public class TFPRIO
 
         configs.validate();
 
-        new CheckChromosomes();
+        latestInputDirectory = configs.tepic.inputDirectory;
+        mapSymbolAndEnsg = new MapSymbolAndEnsg();
 
-        //mix histone modifications
-        if (configs.mixOptions.level.isSet())
+        Workflow workflow = new Workflow();
+
+        if (workflow.simulationSuccessful())
         {
-            new MixOptions();
-        }
-
-        //create footprints if needed
-        if (configs.tepic.tfBindingSiteSearch.isSet() && (configs.tepic.tfBindingSiteSearch.get().equals("BETWEEN") ||
-                configs.tepic.tfBindingSiteSearch.get().equals("EXCL_BETWEEN")))
-        {
-            new CreateFootprintsBetweenPeaks();
-        }
-
-
-        //black listed regions filter
-        if (configs.blacklist.bedFilePath.isSet())
-        {
-            new Blacklist();
-        }
-
-        if (configs.mixOptions.mutuallyExclusive.get())
-        {
-            new MixMutuallyExclusive();
-        }
-
-
-        //DESeq2
-        if ((!configs.tepic.ensgSymbolFile.isSet() || configs.deSeq2.biomartDatasetSpecies.isSet()) &&
-                configs.general.ensgMappingEnabled.get())
-        {
-            mapSymbolAndEnsg = new MapSymbolAndEnsg();
+            workflow.run();
         }
 
         /*
-        Kann BatchVariablen akzeptieren
+        DESEQ2 Kann BatchVariablen akzeptieren
         Wenn entsprechende Config gesetzt ist, soll File übergeben werden, wo dann samples Batches zugeordnet sind.
         Diese Zuordnungen sollen dann DESeq2 übergeben werden
         */
 
 
-        new CreateDeseq2Scripts();
-
-        new CreateTpmMappings();
-
-        new CreateGenePositions();
-
         /*
-        if (options_intern.deseq2_tpm_filter > 0)
-        {
-            com2pose_lib.preprocess_deseq2_input_tpm();
-        }
         com2pose_lib.run_and_postprocess_DESeq2();
 
 

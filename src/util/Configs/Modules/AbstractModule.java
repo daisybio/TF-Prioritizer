@@ -1,10 +1,12 @@
 package util.Configs.Modules;
 
 import org.json.JSONObject;
+import tfprio.TFPRIO;
 import util.Configs.Config;
 import util.Logger;
 
 import java.io.File;
+import java.io.ObjectInputFilter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -144,6 +146,16 @@ public abstract class AbstractModule
         for (Config<?> config : entries.values())
         {
             configsValid = config.isValid() && configsValid;
+
+            if (config.isValid() && config.isSet() && config.get().getClass().equals(File.class))
+            {
+                Config<File> fileConfig = (Config<File>) config;
+
+                if (fileConfig.get().exists())
+                {
+                    TFPRIO.createdFileStructure.add(fileConfig);
+                }
+            }
         }
         return subModulesValid && configsValid;
     }
