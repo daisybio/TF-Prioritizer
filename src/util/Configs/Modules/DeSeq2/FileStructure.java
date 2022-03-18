@@ -33,7 +33,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> f_preprocessing_genePositions_script =
             extend(d_preprocessing_genePositions, "get_gene_positions.R");
     public final Config<File> f_preprocessing_genePositions_genePositionsPrev =
-            extend(d_preprocessing_genePositions, "gene_positions_prev.csv");
+            extend(d_preprocessing_genePositions, "gene_positions_prev.tsv");
     public final Config<File> f_preprocessing_genePositions_version =
             extend(d_preprocessing_genePositions, "version.csv");
     public final Config<File> f_preprocessing_genePositions_uplift =

@@ -123,7 +123,7 @@
     "pathToTfChipSeq": null,
     "pathToIGV": null,
     "topLog2fc": 15,
-    "speciesReferenceGenome": null,
+    "speciesReferenceGenome": "mm10",
     "includePredictionData": null,
     "importantLociAllPrioTf": [
       "CSN",
@@ -132,7 +132,13 @@
       "WAP"
     ],
     "enhancerDatabases": null,
-    "grcSynonymDict": null
+    "grcSynonymDict": {
+      "GRCm39": "mm39",
+      "GRCm38": "mm10",
+      "GRCm37": "mm9",
+      "GRCh38": "hg38",
+      "GRCh37": "hg19"
+    }
   },
   "Blacklist": {
     "bedFilePath": "/home/nico/Software/COM2POSE_raw_data/05_black_listed_regions/mm10-blacklist.v2.txt",

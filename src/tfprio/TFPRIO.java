@@ -37,6 +37,9 @@ public class TFPRIO
         configs.merge(new File(options_intern.path_to_COM2POSE + File.separator + "config_templates" + File.separator +
                 "configsTemplate.json"));
 
+        configs.merge(new File(
+                options_intern.path_to_COM2POSE + File.separator + "config_templates" + File.separator + "test.json"));
+
         configs.validate();
 
         new CheckChromosomes();
