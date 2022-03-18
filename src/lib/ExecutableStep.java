@@ -20,8 +20,6 @@ public abstract class ExecutableStep
 
     public boolean simulate()
     {
-        logger.info("Simulating.");
-
         if (checkRequirements())
         {
             broadcastCreatedFileStructure();

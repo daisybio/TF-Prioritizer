@@ -1,5 +1,6 @@
 package tfprio;
 
+import lib.Deseq2.Deseq2;
 import lib.ExecutableStep;
 
 import java.util.ArrayList;
@@ -49,6 +50,8 @@ public class Workflow
         {
             steps.add(new lib.Deseq2.PreprocessTpm());
         }
+        steps.add(new lib.Deseq2.Deseq2());
+        steps.add(new lib.Deseq2.PostProcessing());
     }
 
     public boolean simulationSuccessful()
