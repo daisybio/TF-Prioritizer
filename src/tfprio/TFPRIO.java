@@ -2,8 +2,9 @@ package tfprio;
 
 import lib.Blacklist.Blacklist;
 import lib.CheckChromosomes;
-import lib.CreateDeseq2Scripts;
-import lib.CreateTpmMappings;
+import lib.Deseq2.CreateDeseq2Scripts;
+import lib.Deseq2.CreateGenePositions;
+import lib.Deseq2.CreateTpmMappings;
 import lib.FootprintIntervals.CreateFootprintsBetweenPeaks;
 import lib.MixOptions.MixMutuallyExclusive;
 import lib.MixOptions.MixOptions;
@@ -87,9 +88,10 @@ public class TFPRIO
         new CreateDeseq2Scripts();
 
         new CreateTpmMappings();
-        /*
-        com2pose_lib.create_gene_positions();
 
+        new CreateGenePositions();
+
+        /*
         if (options_intern.deseq2_tpm_filter > 0)
         {
             com2pose_lib.preprocess_deseq2_input_tpm();
