@@ -194,132 +194,147 @@ public class CreateTpmMappings extends ExecutableStep
     {
         logger.info("Create TPM values for all RNA-seq data.");
 
-
         logger.info("Get gene lengths ...");
+        boolean hasAlreadyBeenGenerated = false;
 
-
-        List<String> lengthCols =
-                Arrays.asList("ensembl_gene_id", "ensembl_exon_id", "chromosome_name", "exon_chrom_start",
-                        "exon_chrom_end");
-        List<String> gcCols = Arrays.asList("gene_exon_intron", "ensembl_gene_id", "start_position", "end_position");
         try
         {
-            List<String> geneIDs = readLines(f_geneIDs.get());
-            geneIDs.remove(0);
-            Map<String, Map<String, Number>> result = new HashMap<>();
-
-            int splitNumber = threadLimit.get() * 2;
-            int splitSize = (geneIDs.size() + splitNumber - 1) / splitNumber;
-            logger.info("GeneIDs: " + geneIDs.size() + ", batches: " + splitNumber + ", batchSize: " + splitSize);
-
-            for (int splitIndex = 0; splitIndex < splitNumber; splitIndex++)
+            if (hasValidSourceFile(f_lengths.get(), hashFileContent(f_geneIDs.get())))
             {
-                int finalSplitIndex = splitIndex;
-                executorService.submit(() ->
-                {
-                    int startIndex = finalSplitIndex * splitSize;
-                    int endIndex = Math.min((finalSplitIndex + 1) * splitSize, geneIDs.size());
-                    List<String> selectedIDs = geneIDs.subList(startIndex, endIndex);
-                    List<String[]> r_length = null;
-                    List<String[]> r_gc = null;
-                    try
-                    {
-                        r_length = query(species.get(), selectedIDs, lengthCols);
-                        r_gc = query(species.get(), selectedIDs, gcCols);
-                    } catch (IOException | InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    assert r_length != null;
-                    assert r_gc != null;
-
-                    Map<String, List<String[]>> m_length = mapIds(lengthCols, r_length);
-                    Map<String, List<String[]>> m_gc = mapIds(gcCols, r_gc);
-
-                    for (String id : m_length.keySet())
-                    {
-                        List<String[]> l_length = m_length.get(id);
-                        List<String[]> l_length_reduced = reduce(l_length, lengthCols);
-                        result.put(id, new HashMap<>());
-
-                        int length = 0;
-                        for (String[] entry : l_length_reduced)
-                        {
-                            length += Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_end")]) -
-                                    Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]) + 1;
-                        }
-                        result.get(id).put("Length", length);
-
-                        if (m_gc.containsKey(id))
-                        {
-                            List<String[]> l_gc = m_gc.get(id);
-
-                            assert l_gc.size() == 1;
-
-                            String sequence = l_gc.get(0)[gcCols.indexOf("gene_exon_intron")];
-
-                            int offset = Integer.MAX_VALUE;
-                            for (String[] entry : l_length_reduced)
-                            {
-                                int start = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]);
-                                offset = Math.min(start, offset);
-                            }
-                            StringBuilder sb_exonSequence = new StringBuilder();
-                            for (String[] entry : l_length_reduced)
-                            {
-                                int start = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]);
-                                int end = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_end")]);
-
-                                sb_exonSequence.append(sequence, start - offset, end - offset + 1);
-                            }
-
-                            String exonSequence = sb_exonSequence.toString();
-
-                            double gcContent =
-                                    (double) Pattern.compile("[GC]").matcher(exonSequence).results().count() /
-                                            exonSequence.length();
-
-                            result.get(id).put("gcContent", gcContent);
-                        }
-                    }
-                    logger.debug("Batch finished: " + startIndex + "-" + endIndex);
-                });
+                logger.info("Gene lengths have already been fetched for the given input data. Skipping.");
+                hasAlreadyBeenGenerated = true;
             }
+        } catch (IOException ignore)
+        {
+        }
 
-            finishAllQueuedThreads();
-
-            makeSureFileExists(f_lengths.get());
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(f_lengths.get())))
+        if (!hasAlreadyBeenGenerated)
+        {
+            List<String> lengthCols =
+                    Arrays.asList("ensembl_gene_id", "ensembl_exon_id", "chromosome_name", "exon_chrom_start",
+                            "exon_chrom_end");
+            List<String> gcCols =
+                    Arrays.asList("gene_exon_intron", "ensembl_gene_id", "start_position", "end_position");
+            try
             {
-                writer.write("ENSG\tlength\tgc");
-                writer.newLine();
-                for (String geneID : geneIDs)
+                List<String> geneIDs = readLines(f_geneIDs.get());
+                geneIDs.remove(0);
+                Map<String, Map<String, Number>> result = new HashMap<>();
+
+                int splitNumber = threadLimit.get() * 2;
+                int splitSize = (geneIDs.size() + splitNumber - 1) / splitNumber;
+                logger.info("GeneIDs: " + geneIDs.size() + ", batches: " + splitNumber + ", batchSize: " + splitSize);
+
+                for (int splitIndex = 0; splitIndex < splitNumber; splitIndex++)
                 {
-                    writer.write(geneID);
-                    writer.write("\t");
-                    if (result.containsKey(geneID))
+                    int finalSplitIndex = splitIndex;
+                    executorService.submit(() ->
                     {
-                        writer.write(String.valueOf(result.get(geneID).get("Length")));
-                        writer.write("\t");
-                        if (result.get(geneID).containsKey("gcContent"))
+                        int startIndex = finalSplitIndex * splitSize;
+                        int endIndex = Math.min((finalSplitIndex + 1) * splitSize, geneIDs.size());
+                        List<String> selectedIDs = geneIDs.subList(startIndex, endIndex);
+                        List<String[]> r_length = null;
+                        List<String[]> r_gc = null;
+                        try
                         {
-                            writer.write(String.valueOf(result.get(geneID).get("gcContent")));
+                            r_length = query(species.get(), selectedIDs, lengthCols);
+                            r_gc = query(species.get(), selectedIDs, gcCols);
+                        } catch (IOException | InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
+                        assert r_length != null;
+                        assert r_gc != null;
+
+                        Map<String, List<String[]>> m_length = mapIds(lengthCols, r_length);
+                        Map<String, List<String[]>> m_gc = mapIds(gcCols, r_gc);
+
+                        for (String id : m_length.keySet())
+                        {
+                            List<String[]> l_length = m_length.get(id);
+                            List<String[]> l_length_reduced = reduce(l_length, lengthCols);
+                            result.put(id, new HashMap<>());
+
+                            int length = 0;
+                            for (String[] entry : l_length_reduced)
+                            {
+                                length += Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_end")]) -
+                                        Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]) + 1;
+                            }
+                            result.get(id).put("Length", length);
+
+                            if (m_gc.containsKey(id))
+                            {
+                                List<String[]> l_gc = m_gc.get(id);
+
+                                assert l_gc.size() == 1;
+
+                                String sequence = l_gc.get(0)[gcCols.indexOf("gene_exon_intron")];
+
+                                int offset = Integer.MAX_VALUE;
+                                for (String[] entry : l_length_reduced)
+                                {
+                                    int start = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]);
+                                    offset = Math.min(start, offset);
+                                }
+                                StringBuilder sb_exonSequence = new StringBuilder();
+                                for (String[] entry : l_length_reduced)
+                                {
+                                    int start = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]);
+                                    int end = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_end")]);
+
+                                    sb_exonSequence.append(sequence, start - offset, end - offset + 1);
+                                }
+
+                                String exonSequence = sb_exonSequence.toString();
+
+                                double gcContent =
+                                        (double) Pattern.compile("[GC]").matcher(exonSequence).results().count() /
+                                                exonSequence.length();
+
+                                result.get(id).put("gcContent", gcContent);
+                            }
+                        }
+                        logger.debug("Batch finished: " + startIndex + "-" + endIndex);
+                    });
+                }
+
+                finishAllQueuedThreads();
+
+                makeSureFileExists(f_lengths.get());
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(f_lengths.get())))
+                {
+                    writer.write("ENSG\tlength\tgc");
+                    writer.newLine();
+                    for (String geneID : geneIDs)
+                    {
+                        writer.write(geneID);
+                        writer.write("\t");
+                        if (result.containsKey(geneID))
+                        {
+                            writer.write(String.valueOf(result.get(geneID).get("Length")));
+                            writer.write("\t");
+                            if (result.get(geneID).containsKey("gcContent"))
+                            {
+                                writer.write(String.valueOf(result.get(geneID).get("gcContent")));
+                            } else
+                            {
+                                writer.write("NA");
+                            }
                         } else
                         {
                             writer.write("NA");
+                            writer.write("\t");
+                            writer.write("NA");
                         }
-                    } else
-                    {
-                        writer.write("NA");
-                        writer.write("\t");
-                        writer.write("NA");
+                        writer.newLine();
                     }
-                    writer.newLine();
                 }
+                createSourceFile(f_lengths.get(), hashFileContent(f_geneIDs.get()));
+            } catch (IOException e)
+            {
+                e.printStackTrace();
             }
-        } catch (IOException e)
-        {
-            e.printStackTrace();
         }
 
 

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -256,5 +257,48 @@ public class FileManagement
             extended = new File(extended.getAbsolutePath() + File.separator + extension);
         }
         return extended;
+    }
+
+    public static String hashFileContent(File file) throws IOException
+    {
+        String content = readFile(file);
+        return String.valueOf(content.hashCode());
+    }
+
+    public static void createSourceFile(File file, String hash) throws IOException
+    {
+        File sourceFile = getSourceFile(file);
+        writeFile(sourceFile, hash);
+    }
+
+    public static boolean hasValidSourceFile(File file, String hash)
+    {
+        File sourceFile = getSourceFile(file);
+
+        if (file.exists() && sourceFile.exists() && sourceFile.isFile() && sourceFile.canRead())
+        {
+            try
+            {
+                if (Files.readAttributes(file.toPath(), BasicFileAttributes.class).lastModifiedTime().compareTo(
+                        Files.readAttributes(sourceFile.toPath(), BasicFileAttributes.class).lastModifiedTime()) > 0)
+                {
+                    // File has been modified since last generation
+                    return false;
+                }
+                if (readFile(sourceFile).equals(hash))
+                {
+                    return true;
+                }
+            } catch (IOException e)
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private static File getSourceFile(File file)
+    {
+        return extend(file.getParentFile(), "." + file.getName());
     }
 }
