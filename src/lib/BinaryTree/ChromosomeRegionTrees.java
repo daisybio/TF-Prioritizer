@@ -33,7 +33,7 @@ public class ChromosomeRegionTrees
         return new RegionNode(regions);
     }
 
-    public Map<String, List<Region>> getAllPeaksSorted()
+    public Map<String, List<Region>> getAllRegionsSorted()
     {
         Map<String, List<Region>> chromosomeLists = new HashMap<>();
 

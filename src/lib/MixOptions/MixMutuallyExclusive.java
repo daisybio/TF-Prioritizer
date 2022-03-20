@@ -15,7 +15,7 @@ import static util.FileManagement.*;
 
 public class MixMutuallyExclusive extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.latestInputDirectory;
+    private Config<File> d_input;
     private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input;
     private final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals =
             TFPRIO.configs.mixOptions.mutuallyExclusiveDifferentialPeakSignals;
@@ -33,6 +33,12 @@ public class MixMutuallyExclusive extends ExecutableStep
     @Override protected Set<Config<?>> getRequiredConfigs()
     {
         return new HashSet<>(List.of(mutuallyExclusiveDifferentialPeakSignals));
+    }
+
+    @Override protected void updateInputDirectory()
+    {
+        d_input = TFPRIO.latestInputDirectory;
+        TFPRIO.latestInputDirectory = d_output;
     }
 
     public void execute()
@@ -100,7 +106,6 @@ public class MixMutuallyExclusive extends ExecutableStep
             try (BufferedReader reader = new BufferedReader(new FileReader(f_source)))
             {
                 String inputLine;
-
 
                 while ((inputLine = reader.readLine()) != null)
                 {

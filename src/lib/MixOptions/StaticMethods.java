@@ -1,7 +1,5 @@
 package lib.MixOptions;
 
-import tfprio.TFPRIO;
-import lib.ExecutableStep;
 import util.Configs.Config;
 import util.FileFilters.Filters;
 import util.Logger;
@@ -15,9 +13,10 @@ import static util.FileManagement.*;
 public class StaticMethods
 {
     static void runMixOption(File d_source, File d_target, String mixLevel, Logger logger,
-                             ExecutorService executorService)
+                             ExecutorService executorService, Config<String> option,
+                             Config<Integer> occurrenceIntersection)
     {
-        logger.info("Create " + TFPRIO.configs.mixOptions.option.get() + " of " + mixLevel);
+        logger.info("Create " + option.get() + " of " + mixLevel);
 
         for (File d_group : Objects.requireNonNull(d_source.listFiles(Filters.directoryFilter)))
         {
@@ -86,13 +85,12 @@ public class StaticMethods
                         ArrayList<MIX_Interval> chromosomeUnions = new ArrayList<>();
 
                         int min_occurence;
-                        if (!TFPRIO.configs.mixOptions.occurrenceIntersection.isSet())
+                        if (!occurrenceIntersection.isSet())
                         {
                             min_occurence = sample_number;
                         } else
                         {
-                            min_occurence =
-                                    Math.min(sample_number, TFPRIO.configs.mixOptions.occurrenceIntersection.get());
+                            min_occurence = Math.min(sample_number, occurrenceIntersection.get());
                         }
 
                         while (!stack_union.isEmpty())
@@ -100,7 +98,7 @@ public class StaticMethods
                             MIX_Interval t = stack_union.pop();
                             t.calculate_mean(mixLevel);
 
-                            if (TFPRIO.configs.mixOptions.option.get().equals("INTERSECTION"))
+                            if (option.get().equals("INTERSECTION"))
                             {
                                 if (t.merged_intervals.size() >= min_occurence)
                                 {

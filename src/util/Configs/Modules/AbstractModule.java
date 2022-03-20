@@ -68,6 +68,7 @@ public abstract class AbstractModule
             if (field.getType().equals(Config.class))
             {
                 entries.put(field.getName(), (Config<?>) field.get(this));
+                ((Config<?>) field.get(this)).setName(this.getClass().getSimpleName() + " > " + field.getName());
             }
         }
     }
@@ -151,7 +152,8 @@ public abstract class AbstractModule
             {
                 Config<File> fileConfig = (Config<File>) config;
 
-                if (fileConfig.get().exists())
+                if (fileConfig.get().exists() &&
+                        !(fileConfig.get().getAbsolutePath().startsWith(workingDirectory.get().getAbsolutePath())))
                 {
                     TFPRIO.createdFileStructure.add(fileConfig);
                 }

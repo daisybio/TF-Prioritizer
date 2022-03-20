@@ -46,6 +46,19 @@ public class ScriptExecution
         }
     }
 
+    public static void executeAndWait(String command, Logger logger) throws IOException, InterruptedException
+    {
+        logger.info("Executing command: " + command);
+        Process child = Runtime.getRuntime().exec(command);
+        
+        int code = child.waitFor();
+        if (code != 0)
+        {
+            String message = child.getErrorStream().toString();
+            throw new ExternalScriptException(code, message);
+        }
+    }
+
     public static void executeAndWait(String executable, String fileExtension) throws ExternalScriptException
     {
         List<String> command = getExecutionCommand(executable, fileExtension);

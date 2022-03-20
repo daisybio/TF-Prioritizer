@@ -27,32 +27,4 @@ public class MixOptions extends AbstractModule
         super(workingDirectory, sourceDirectory, logger);
         init();
     }
-
-    @Override public boolean validate()
-    {
-        if (!super.validate())
-        {
-            return false;
-        }
-
-        if (level.isSet())
-        {
-            if (!option.isSet())
-            {
-                logger.error("If MixOption>level is set, also an option has to be set.");
-                return false;
-            }
-        }
-
-        if (mutuallyExclusive.get())
-        {
-            if (!level.isSet())
-            {
-                logger.error("If MixOption>mutuallyExclusive is set, also MixOption>level has to be set.");
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

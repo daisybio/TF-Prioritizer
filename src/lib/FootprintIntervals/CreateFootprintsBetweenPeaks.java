@@ -14,7 +14,7 @@ import static util.FileManagement.makeSureFileExists;
 
 public class CreateFootprintsBetweenPeaks extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.latestInputDirectory;
+    private Config<File> d_input;
     private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks;
     private final Config<String> option = TFPRIO.configs.tepic.tfBindingSiteSearch;
 
@@ -36,16 +36,17 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
 
     @Override protected void updateInputDirectory()
     {
+        d_input = TFPRIO.latestInputDirectory;
         TFPRIO.latestInputDirectory = d_output;
     }
 
     public void execute()
     {
-        logger.logLine("OPTION tfBindingSiteSearch=\"" + option.get() + "\" was set.");
-        logger.logLine("Creating footprints");
+        logger.info("OPTION tfBindingSiteSearch=\"" + option.get() + "\" was set.");
+        logger.info("Creating footprints");
 
 
-        logger.logLine("Used data: " + d_input.get().getAbsolutePath());
+        logger.info("Used data: " + d_input.get().getAbsolutePath());
 
 
         for (File d_group : Objects.requireNonNull(d_input.get().listFiles(Filters.directoryFilter)))

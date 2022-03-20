@@ -230,6 +230,21 @@ public class FileManagement
         }
     }
 
+    public static synchronized void makeSureDirectoryExists(File directory) throws IOException
+    {
+        if (directory.isFile())
+        {
+            throw new IllegalArgumentException("Can not handle files. Received: " + directory.getAbsolutePath());
+        }
+        if (!directory.exists())
+        {
+            if (!directory.mkdirs())
+            {
+                throw new IOException("Could not create directory: " + directory.getAbsolutePath());
+            }
+        }
+    }
+
     public static void appendToFile(File file, String content) throws IOException
     {
         makeSureFileExists(file);
@@ -295,6 +310,12 @@ public class FileManagement
             }
         }
         return false;
+    }
+
+    public static boolean isEmpty(File file) throws IOException
+    {
+        String content = readFile(file);
+        return content.isBlank();
     }
 
     private static File getSourceFile(File file)

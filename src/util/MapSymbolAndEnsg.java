@@ -6,10 +6,7 @@ import util.Configs.Config;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import static util.FileManagement.readFile;
 import static util.FileManagement.writeFile;
@@ -20,8 +17,14 @@ public class MapSymbolAndEnsg
     private final Map<String, String> symbolEnsg = new HashMap<>();
     private final Map<String, String> ensgSymbol = new HashMap<>();
     private final Logger logger = new Logger(this.getClass().getSimpleName());
+    private List<String> ensgList = new ArrayList<>();
 
     private final Config<File> f_map = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
+    private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_mapping;
+    private final Config<File> f_script = TFPRIO.configs.deSeq2.fileStructure.f_mappingScript;
+    private final Config<File> f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID;
+    private final Config<String> datasetSpecies = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
+    private final Config<String> datasetSymbolColumn = TFPRIO.configs.deSeq2.biomartDatasetSymbolColumn;
 
     public MapSymbolAndEnsg()
     {
@@ -40,19 +43,18 @@ public class MapSymbolAndEnsg
 
     private void createMappingFile() throws IOException, InterruptedException
     {
-        String script = readFile(TFPRIO.configs.scriptTemplates.f_mapping.get());
-        Config<File> f_script = TFPRIO.configs.deSeq2.fileStructure.f_mappingScript;
+        String script = readFile(f_scriptTemplate.get());
 
-        script = script.replace("{INPUTFILE}", TFPRIO.configs.deSeq2.inputGeneID.get().getAbsolutePath());
-        script = script.replace("{DATASET_SPECIES}", TFPRIO.configs.deSeq2.biomartDatasetSpecies.get());
-        script = script.replace("{SYMBOL_COLUMN}", TFPRIO.configs.deSeq2.biomartDatasetSymbolColumn.get());
+        script = script.replace("{INPUTFILE}", f_geneIDs.get().getAbsolutePath());
+        script = script.replace("{DATASET_SPECIES}", datasetSpecies.get());
+        script = script.replace("{SYMBOL_COLUMN}", datasetSymbolColumn.get());
         script = script.replace("{OUTPUTFILE}", f_map.get().getAbsolutePath());
 
         writeFile(f_script.get(), script);
 
         TFPRIO.createdFileStructure.addAll(Arrays.asList(f_script, f_map));
 
-        executeAndWait(TFPRIO.configs.deSeq2.fileStructure.f_mappingScript.get(), logger);
+        executeAndWait(f_script.get(), logger);
     }
 
     private void loadMappingFile() throws FileNotFoundException
@@ -64,8 +66,11 @@ public class MapSymbolAndEnsg
                 String[] line = scanner.nextLine().split("\t");
                 if (line.length > 1)
                 {
-                    symbolEnsg.put(line[1].toUpperCase(), line[0].toUpperCase());
-                    ensgSymbol.put(line[0].toUpperCase(), line[1].toUpperCase());
+                    String ensg = line[0].toUpperCase();
+                    String symbol = line[1].toUpperCase();
+                    symbolEnsg.put(symbol, ensg);
+                    ensgSymbol.put(ensg, symbol);
+                    ensgList.add(ensg);
                 }
             }
         }
@@ -91,5 +96,20 @@ public class MapSymbolAndEnsg
         {
             throw new NoSuchFieldException("Could not find ensg " + ensg + " in the map file.");
         }
+    }
+
+    public boolean hasEnsg(String ensg)
+    {
+        return ensgSymbol.containsKey(ensg.toUpperCase());
+    }
+
+    public boolean hasSymbol(String symbol)
+    {
+        return symbolEnsg.containsKey(symbol.toUpperCase());
+    }
+
+    public String getEnsgByIndex(int index)
+    {
+        return ensgList.get(index);
     }
 }

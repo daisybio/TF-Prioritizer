@@ -14,7 +14,7 @@ import static util.FileManagement.*;
 
 public class Blacklist extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.latestInputDirectory;
+    private Config<File> d_input;
     private final Config<File> d_output = TFPRIO.configs.blacklist.fileStructure.d_newInput;
 
     @Override protected Set<Config<File>> getRequiredFileStructure()
@@ -34,6 +34,7 @@ public class Blacklist extends ExecutableStep
 
     @Override protected void updateInputDirectory()
     {
+        d_input = TFPRIO.latestInputDirectory;
         TFPRIO.latestInputDirectory = d_output;
     }
 

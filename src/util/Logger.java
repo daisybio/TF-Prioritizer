@@ -58,6 +58,7 @@ public class Logger
     public void error(String message)
     {
         logLine(message, LogLevel.ERROR);
+        System.exit(1);
     }
 
     private void logLine(String message, LogLevel level)
@@ -79,10 +80,5 @@ public class Logger
         }
 
         System.out.println(line);
-    }
-
-    public void logLine(String message)
-    {
-        logLine(message, LogLevel.INFO);
     }
 }

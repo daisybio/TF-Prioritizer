@@ -13,6 +13,8 @@ public class HmLevel extends ExecutableStep
 {
     private final Config<File> d_input = TFPRIO.configs.mixOptions.fileStructure.d_preprocessingHmMix;
     private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_hmMix;
+    private final Config<String> option = TFPRIO.configs.mixOptions.option;
+    private final Config<Integer> occurrenceIntersection = TFPRIO.configs.mixOptions.occurrenceIntersection;
 
     @Override protected Set<Config<File>> getRequiredFileStructure()
     {
@@ -36,6 +38,7 @@ public class HmLevel extends ExecutableStep
 
     @Override protected void execute()
     {
-        StaticMethods.runMixOption(d_input.get(), d_output.get(), "HM_LEVEL", logger, executorService);
+        StaticMethods.runMixOption(d_input.get(), d_output.get(), "HM_LEVEL", logger, executorService, option,
+                occurrenceIntersection);
     }
 }

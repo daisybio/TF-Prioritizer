@@ -47,7 +47,6 @@ public class Configs
     public Plots plots;
     public ScriptTemplates scriptTemplates;
     public ChipAtlas chipAtlas;
-    public TpmGcFilterAnalysis tpmGcFilterAnalysis;
     public Misc misc;
 
     private final Logger logger;

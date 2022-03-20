@@ -16,6 +16,7 @@ public class Config<T>
     protected final boolean writeable;
     protected final Class configClass;
     protected final List<T> acceptedValues;
+    private String name;
 
     public Config(Class<T> configClass)
     {
@@ -139,6 +140,16 @@ public class Config<T>
             return ((File) actualValue).getAbsolutePath();
         }
         return actualValue;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
     }
 
     public boolean isWriteable()

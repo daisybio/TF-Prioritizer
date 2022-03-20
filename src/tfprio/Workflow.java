@@ -1,6 +1,5 @@
 package tfprio;
 
-import lib.Deseq2.Deseq2;
 import lib.ExecutableStep;
 
 import java.util.ArrayList;
@@ -12,7 +11,19 @@ public class Workflow
 
     public Workflow()
     {
+        steps.add(new tfprio.InitStaticVariables());
         steps.add(new lib.CheckChromosomes());
+
+        if (TFPRIO.configs.mixOptions.mutuallyExclusive.get() && !TFPRIO.configs.mixOptions.level.isSet())
+        {
+            try
+            {
+                TFPRIO.configs.mixOptions.level.setValue("SAMPLE_LEVEL");
+            } catch (IllegalAccessException ignore)
+            {
+            }
+        }
+
         if (TFPRIO.configs.mixOptions.level.isSet())
         {
             steps.add(new lib.MixOptions.SampleLevelPreprocess());
@@ -42,16 +53,24 @@ public class Workflow
             steps.add(new lib.MixOptions.MixMutuallyExclusive());
         }
 
-        steps.add(new lib.Deseq2.CreateDeseq2Scripts());
-        steps.add(new lib.Deseq2.CreateTpmMappings());
-        steps.add(new lib.Deseq2.CreateGenePositions());
-
-        if (TFPRIO.configs.deSeq2.tpmFilter.isSet())
         {
-            steps.add(new lib.Deseq2.PreprocessTpm());
+            steps.add(new lib.Deseq2.CreateDeseq2Scripts());
+            steps.add(new lib.Deseq2.CreateTpmMappings());
+            steps.add(new lib.Deseq2.CreateGenePositions());
+
+            if (TFPRIO.configs.deSeq2.tpmFilter.isSet())
+            {
+                steps.add(new lib.Deseq2.PreprocessTpm());
+            }
+            steps.add(new lib.Deseq2.Deseq2());
+            steps.add(new lib.Deseq2.PostProcessing());
         }
-        steps.add(new lib.Deseq2.Deseq2());
-        steps.add(new lib.Deseq2.PostProcessing());
+
+        if (TFPRIO.configs.tgene.pathToExecutable.isSet())
+        {
+            steps.add(new lib.Tgene.RunTgene());
+            steps.add(new lib.Tgene.Postprocessing());
+        }
     }
 
     public boolean simulationSuccessful()

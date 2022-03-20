@@ -28,10 +28,10 @@ public class Report
         logger = new Logger("Report", true,
                 new File(options_intern.com2pose_working_directory + File.separator + "logfile.txt"));
 
-        logger.logLine("[REPORT] Start loading TF data");
+        logger.info("Start loading TF data");
         loadTFs();
         findExistingValues();
-        logger.logLine("[REPORT] Finished loading TF data");
+        logger.info("Finished loading TF data");
     }
 
 
@@ -291,7 +291,7 @@ public class Report
 
     public void generate() throws IOException, InterruptedException
     {
-        logger.logLine("[REPORT] Start generating report");
+        logger.info("Start generating report");
 
         copyDependencies();
 
@@ -314,12 +314,12 @@ public class Report
             i++;
         }
 
-        logger.logLine("Finished generating report");
+        logger.info("Finished generating report");
     }
 
     private void copyDependencies() throws IOException
     {
-        logger.logLine("Start copying dependencies");
+        logger.info("Start copying dependencies");
         FileManagement.copyFile(TFPRIO.configs.report.inputStructure.f_style.get(),
                 TFPRIO.configs.report.outputStructure.f_style.get());
         FileManagement.copyFile(TFPRIO.configs.report.inputStructure.f_script.get(),
@@ -327,7 +327,7 @@ public class Report
 
         FileManagement.copyDirectory(TFPRIO.configs.report.inputStructure.d_media.get(),
                 TFPRIO.configs.report.outputStructure.d_media.get(), false);
-        logger.logLine("Finished copying dependencies");
+        logger.info("Finished copying dependencies");
     }
 
     private void findExistingValues()

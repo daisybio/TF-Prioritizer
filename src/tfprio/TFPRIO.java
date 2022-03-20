@@ -13,13 +13,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static util.FileManagement.extend;
+
 
 public class TFPRIO
 {
     public static Configs configs;
     public static Map<String, Set<String>> groupsToHms = new HashMap<>();
-    public static MapSymbolAndEnsg mapSymbolAndEnsg;
     public static Set<Config<File>> createdFileStructure = new HashSet<>();
+    public static MapSymbolAndEnsg mapSymbolAndEnsg;
     public static Config<File> latestInputDirectory;
 
     public static void main(String[] args) throws Exception
@@ -31,16 +33,9 @@ public class TFPRIO
         configs = new Configs(new File(options_intern.com2pose_working_directory),
                 new File(options_intern.path_to_COM2POSE));
 
-        configs.merge(new File(options_intern.path_to_COM2POSE + File.separator + "config_templates" + File.separator +
-                "configsTemplate.json"));
-
-        configs.merge(new File(
-                options_intern.path_to_COM2POSE + File.separator + "config_templates" + File.separator + "test.json"));
-
+        configs.merge(extend(new File(options_intern.path_to_COM2POSE), "config_templates", "configsTemplate.json"));
+        configs.merge(extend(new File(options_intern.path_to_COM2POSE), "config_templates", "test.json"));
         configs.validate();
-
-        latestInputDirectory = configs.tepic.inputDirectory;
-        mapSymbolAndEnsg = new MapSymbolAndEnsg();
 
         Workflow workflow = new Workflow();
 
@@ -57,15 +52,6 @@ public class TFPRIO
 
 
         /*
-        com2pose_lib.run_and_postprocess_DESeq2();
-
-
-        if (!options_intern.path_tgen.equals(""))
-        {
-            com2pose_lib.preprocess_tgen();
-            com2pose_lib.run_tgen();
-            com2pose_lib.merge_tgen();
-        }
 
 
         //TEPIC

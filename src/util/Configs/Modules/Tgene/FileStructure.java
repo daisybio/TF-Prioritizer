@@ -11,9 +11,10 @@ import static util.FileManagement.extend;
 
 public class FileStructure extends AbstractModule
 {
-    public final Config<File> d_root = extend(workingDirectory, "04_TGEN");
+    public final Config<File> d_root = extend(workingDirectory, "04_TGENE");
     public final Config<File> d_preprocessing = extend(d_root, "01_preprocessing");
     public final Config<File> d_preprocessing_gtf = extend(d_preprocessing, "01_GTF");
+    public final Config<File> f_transcripts_gtf = extend(d_preprocessing, "transcripts.gtf");
     public final Config<String> s_preprocessing_gtf = new Config<>("_transcripts_only.gtf");
 
     public final Config<File> d_preprocessing_binaryTrees = extend(d_preprocessing, "02_BINARY_TREES");
@@ -25,7 +26,7 @@ public class FileStructure extends AbstractModule
 
     public final Config<File> d_merged = extend(d_root, "03_merged");
     public final Config<File> d_groups = extend(d_root, "04_groups");
-    public final Config<String> s_groupts_mergedGroupts = new Config<>("tgene_merged_groups.txt");
+    public final Config<String> s_groups_mergedGroups = new Config<>("tgene_merged_groups.txt");
 
     public final Config<File> d_filteredTargetGenes = extend(d_root, "05_filtered_target_genes");
     public final Config<File> d_integrate = extend(d_root, "06_integrate_affinities_self_regulatory");

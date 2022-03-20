@@ -20,15 +20,16 @@ public abstract class ExecutableStep
 
     public boolean simulate()
     {
+        logger.debug("Simulation starting.");
+        updateInputDirectory();
         if (checkRequirements())
         {
             broadcastCreatedFileStructure();
-            updateInputDirectory();
-            logger.info("Simulation successful");
+            logger.debug("Simulation successful.");
             return true;
         } else
         {
-            logger.info("Simulation failed.");
+            logger.error("Simulation failed.");
             return false;
         }
     }
@@ -38,7 +39,6 @@ public abstract class ExecutableStep
         logger.info("Starting.");
         long startTime = System.currentTimeMillis();
         execute();
-        updateInputDirectory();
         shutdown();
         double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
         logger.info("Finished. Step took " + deltaSeconds + " seconds.");
@@ -70,7 +70,7 @@ public abstract class ExecutableStep
             if (!config.isSet())
             {
                 allGood = false;
-                logger.error("A required config is not set.");
+                logger.warn("A required config is not set: " + config.getName());
             }
         }
 
@@ -79,7 +79,7 @@ public abstract class ExecutableStep
             if (!TFPRIO.createdFileStructure.contains(fileConfig))
             {
                 allGood = false;
-                logger.error("Required FileStructure has not been created: " + fileConfig.get().getAbsolutePath());
+                logger.warn("Required FileStructure has not been created: " + fileConfig.get().getAbsolutePath());
             }
         }
         return allGood;
