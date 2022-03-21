@@ -2,6 +2,7 @@ package lib;
 
 import tfprio.TFPRIO;
 import util.Configs.Config;
+import util.ExecutionTimeMeasurement;
 import util.Logger;
 
 import java.io.BufferedWriter;
@@ -44,12 +45,11 @@ public abstract class ExecutableStep
 
     public void run()
     {
+        ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Starting.");
-        long startTime = System.currentTimeMillis();
         execute();
         shutdown();
-        double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
-        logger.info("Finished. Step took " + deltaSeconds + " seconds.");
+        logger.info("Finished. Step took " + timer.stopAndGetDeltaSeconds() + " seconds.");
     }
 
     protected abstract Set<Config<File>> getRequiredFileStructure();

@@ -1,6 +1,7 @@
 package tfprio;
 
 import lib.ExecutableStep;
+import util.ExecutionTimeMeasurement;
 import util.Logger;
 
 import java.util.ArrayList;
@@ -77,17 +78,20 @@ public class Workflow
 
     public boolean simulationSuccessful()
     {
+        ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
+        logger.info("Start simulation.");
         boolean allWorked = true;
         for (ExecutableStep step : steps)
         {
             allWorked = allWorked && step.simulate();
         }
+        logger.info("Finished simulation. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
         return allWorked;
     }
 
     public void filterByHashes()
     {
-        long startTime = System.currentTimeMillis();
+        ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Start filtering by hashes.");
 
         ArrayList<ExecutableStep> filtered = new ArrayList<>();
@@ -116,20 +120,18 @@ public class Workflow
         steps.clear();
         steps.addAll(filtered);
 
-        double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
-        logger.info("Finished filtering by hashes. Execution took " + deltaSeconds + " seconds.");
+        logger.info("Finished filtering by hashes. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
     }
 
     public void createHashes()
     {
-        long startTime = System.currentTimeMillis();
+        ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Start creating hashes.");
         for (ExecutableStep step : steps)
         {
             step.createHash();
         }
-        double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
-        logger.info("Finished creating hashes. Execution took " + deltaSeconds + " seconds.");
+        logger.info("Finished creating hashes. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
     }
 
     public void run()
@@ -139,12 +141,14 @@ public class Workflow
             filterByHashes();
         }
 
+        ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Start running executable steps.");
         for (ExecutableStep step : steps)
         {
             step.run();
         }
-        logger.info("Finished running executable steps.");
+        logger.info(
+                "Finished running executable steps. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
 
         if (TFPRIO.configs.general.hashingEnabled.get())
         {

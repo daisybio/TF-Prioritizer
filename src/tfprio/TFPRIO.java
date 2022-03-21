@@ -4,6 +4,7 @@ import org.apache.commons.cli.*;
 
 import util.Configs.Config;
 import util.Configs.Configs;
+import util.ExecutionTimeMeasurement;
 import util.MapSymbolAndEnsg;
 import util.Options_intern;
 
@@ -26,7 +27,7 @@ public class TFPRIO
 
     public static void main(String[] args) throws Exception
     {
-        long startTime = System.currentTimeMillis();
+        ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         Options_intern options_intern = new Options_intern();
         parseArguments(args, options_intern);
 
@@ -148,8 +149,7 @@ public class TFPRIO
 
         new Report(options_intern).generate();
         */
-        double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
-        System.out.println("TFPRIO finished. Execution took " + deltaSeconds + " seconds.");
+        System.out.println("TFPRIO finished. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
     }
 
 
