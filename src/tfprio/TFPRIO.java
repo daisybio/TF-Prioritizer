@@ -1,5 +1,6 @@
 package tfprio;
 
+import lib.CheckChromosomes;
 import org.apache.commons.cli.*;
 
 import util.Configs.Config;

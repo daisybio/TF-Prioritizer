@@ -80,6 +80,7 @@ public class Configs
 
     public void merge(File configFile) throws IOException
     {
+        logger.info("Merging file: " + configFile.getAbsolutePath());
         String content = FileManagement.readFile(configFile);
         JSONObject combined = new JSONObject();
         boolean allModulesWorked = true;

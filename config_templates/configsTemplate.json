@@ -40,7 +40,6 @@
     "columnBedfile": null,
     "windowSize": 50000,
     "loopListFile": null,
-    "cores": 4,
     "loopWindows": 5000,
     "geneAnnotationFile": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/gencode.vM25.annotation.gtf",
     "ensgSymbolFile": null,

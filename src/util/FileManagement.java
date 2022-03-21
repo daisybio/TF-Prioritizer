@@ -280,51 +280,31 @@ public class FileManagement
         return extended;
     }
 
-    public static String hashFileContent(File file) throws IOException
-    {
-        String content = readFile(file);
-        return String.valueOf(content.hashCode());
-    }
-
-    public static void createSourceFile(File file, String hash) throws IOException
-    {
-        File sourceFile = getSourceFile(file);
-        writeFile(sourceFile, hash);
-    }
-
-    public static boolean hasValidSourceFile(File file, String hash)
-    {
-        File sourceFile = getSourceFile(file);
-
-        if (file.exists() && sourceFile.exists() && sourceFile.isFile() && sourceFile.canRead())
-        {
-            try
-            {
-                if (file.lastModified() > sourceFile.lastModified())
-                {
-                    // File has been modified since last generation
-                    return false;
-                }
-                if (readFile(sourceFile).equals(hash))
-                {
-                    return true;
-                }
-            } catch (IOException e)
-            {
-                return false;
-            }
-        }
-        return false;
-    }
-
     public static boolean isEmpty(File file) throws IOException
     {
         String content = readFile(file);
         return content.isBlank();
     }
 
-    private static File getSourceFile(File file)
+    public static void deleteFile(File file) throws IOException
     {
-        return extend(file.getParentFile(), "." + file.getName());
+        if (file.exists())
+        {
+            if (file.isFile())
+            {
+                if (!file.delete())
+                {
+                    throw new IOException("Could not delete file: " + file.getAbsolutePath());
+                }
+            } else
+            {
+                File[] subFiles = file.listFiles();
+                assert subFiles != null;
+                for (File subFile : subFiles)
+                {
+                    deleteFile(subFile);
+                }
+            }
+        }
     }
 }

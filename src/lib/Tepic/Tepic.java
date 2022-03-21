@@ -1,0 +1,323 @@
+package lib.Tepic;
+
+import lib.ExecutableStep;
+import tfprio.TFPRIO;
+import util.Configs.Config;
+import util.FileFilters.Filters;
+
+import java.io.*;
+import java.util.*;
+
+import static util.FileManagement.*;
+import static util.ScriptExecution.executeAndWait;
+
+public class Tepic extends ExecutableStep
+{
+    private Config<File> d_input;
+    private final Config<File> d_output = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
+
+    private final Config<File> f_referenceGenome = TFPRIO.configs.tepic.inputReferenceGenome;
+    private final Config<File> f_pwms = TFPRIO.configs.tepic.pathPwms;
+    private final Config<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final Config<File> tepicExecutable = TFPRIO.configs.tepic.executable;
+    private final Config<String> tfBindingSiteSearch = TFPRIO.configs.tepic.tfBindingSiteSearch;
+    private final Config<Boolean> mixMutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
+    private final Config<Boolean> tgeneTargetGenes = TFPRIO.configs.tepic.tgeneTargetGenes;
+    private final Config<String> s_tgene_links = TFPRIO.configs.tgene.fileStructure.s_output_links;
+    private final Config<File> d_deseq2_meanCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
+    private final Config<File> d_tgene_output = TFPRIO.configs.tgene.fileStructure.d_output;
+    private final Config<String> s_outputRaw_trapSequences =
+            TFPRIO.configs.tepic.fileStructure.s_outputRaw_trapSequences;
+
+    // if tpmCut > 0
+    private final Config<File> ensgSymbolFile = TFPRIO.configs.tepic.ensgSymbolFile;
+    private final Config<File> inputGeneID = TFPRIO.configs.deSeq2.inputGeneID;
+
+    @Override protected Set<Config<File>> getRequiredFileStructure()
+    {
+        Set<Config<File>> requirements = new HashSet<>(
+                Arrays.asList(d_input, f_referenceGenome, f_pwms, tepicExecutable, d_deseq2_meanCounts,
+                        d_tgene_output));
+
+        if (tpmCutoff.get() > 0)
+        {
+            requirements.add(ensgSymbolFile);
+            requirements.add(inputGeneID);
+        }
+        return requirements;
+    }
+
+    @Override protected Set<Config<File>> getCreatedFileStructure()
+    {
+        return new HashSet<>(List.of(d_output));
+    }
+
+    @Override protected Set<Config<?>> getRequiredConfigs()
+    {
+        return new HashSet<>(
+                Arrays.asList(tpmCutoff, tfBindingSiteSearch, mixMutuallyExclusive, tgeneTargetGenes, s_tgene_links,
+                        s_outputRaw_trapSequences));
+    }
+
+    @Override protected void updateInputDirectory()
+    {
+        d_input = TFPRIO.latestInputDirectory;
+    }
+
+    @Override protected void execute()
+    {
+        //check_tepic_input_with_options();
+
+        logger.info("Used data: " + d_input.get());
+
+        File output_TEPIC = d_output.get();
+
+        for (File d_group : Objects.requireNonNull(d_input.get().listFiles(Filters.directoryFilter)))
+        {
+            logger.debug("Start group: " + d_group.getName());
+
+            for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
+            {
+                logger.debug("Start histone modification: " + d_hm.getName());
+
+                for (File f_sample : Objects.requireNonNull(d_hm.listFiles(Filters.fileFilter)))
+                {
+                    logger.debug("Start sample " + f_sample.getName());
+                    Map<String, String> sampleConfigs = new HashMap<>();
+                    String sampleName;
+                    if (f_sample.getName().contains("."))
+                    {
+                        sampleName = f_sample.getName().substring(0, f_sample.getName().lastIndexOf("."));
+                    } else
+                    {
+                        sampleName = f_sample.getName();
+                    }
+
+                    File d_output = extend(output_TEPIC, d_group.getName(), d_hm.getName(), sampleName);
+                    File d_output_combined = extend(d_output, sampleName);
+
+                    try
+                    {
+                        makeSureDirectoryExists(d_output);
+                        makeSureDirectoryExists(d_output_combined);
+                    } catch (IOException e)
+                    {
+                        logger.error(e.getMessage());
+                    }
+
+                    sampleConfigs.put("b", f_sample.getAbsolutePath());
+                    sampleConfigs.put("o", d_output_combined.getAbsolutePath());
+
+                    if (tpmCutoff.get() > 0)
+                    {
+                        File n_dir;
+
+                        if (!mixMutuallyExclusive.get())
+                        {
+                            n_dir = extend(d_deseq2_meanCounts.get(), d_group.getName() + ".tsv");
+
+                        } else
+                        {
+                            String[] names_sample = f_sample.getName().split("_");
+                            String name_sample = names_sample[0];
+                            n_dir = extend(d_deseq2_meanCounts.get(), name_sample + ".tsv");
+                        }
+
+                        sampleConfigs.put("G", n_dir.getAbsolutePath());
+                    }
+
+                    if (TFPRIO.configs.tgene.pathToExecutable.isSet() && tgeneTargetGenes.get())
+                    {
+                        File f_tgene_input;
+
+                        if (!mixMutuallyExclusive.get())
+                        {
+                            String sample_name = f_sample.getName();
+
+                            if (sample_name.contains("."))
+                            {
+                                sample_name = sample_name.substring(0, sample_name.lastIndexOf("."));
+                            }
+                            f_tgene_input = extend(d_tgene_output.get(), d_group.getName(), d_hm.getName(), sample_name,
+                                    s_tgene_links.get());
+                        } else
+                        {
+                            String[] names_sample = f_sample.getName().split("_");
+                            String name_sample = names_sample[0];
+
+                            f_tgene_input = extend(d_tgene_output.get(), d_group.getName(), d_hm.getName(),
+                                    name_sample + "_" + d_hm.getName(), s_tgene_links.get());
+                        }
+                        sampleConfigs.put("L", f_tgene_input.getAbsolutePath());
+                        logger.info("Using only tgene linked target genes for TF-Gene score calculation.");
+                    }
+
+                    sampleConfigs.put("S", extend(d_output, s_outputRaw_trapSequences.get()).getAbsolutePath());
+                    try
+                    {
+                        executeAndWait(getCommand(sampleConfigs), logger);
+                    } catch (IOException | InterruptedException e)
+                    {
+                        logger.error(e.getMessage());
+                    }
+
+                    //correct TPMs
+                    HashMap<String, String> ensgTF_tpm = new HashMap<>();
+
+                    File d_output_tpms = d_output_combined.getParentFile();
+
+                    for (File f_dir : Objects.requireNonNull(d_output_tpms.listFiles(Filters.fileFilter)))
+                    {
+                        String name = f_dir.getName();
+                        if (name.endsWith("_TPM_values.txt"))
+                        {
+                            try (BufferedReader reader = new BufferedReader(new FileReader(f_dir)))
+                            {
+                                String line_tpms;
+                                reader.readLine();
+                                while ((line_tpms = reader.readLine()) != null)
+                                {
+                                    String[] split = line_tpms.split("\t");
+                                    ensgTF_tpm.put(split[0], split[2]);
+                                }
+                            } catch (IOException e)
+                            {
+                                logger.error(e.getMessage());
+                            }
+                        }
+                    }
+                    //get correct TPM file
+                    File f_tpm_toBeChanged =
+                            extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get(),
+                                    d_group.getName() + ".tsv");
+                    File f_tpmChanged = extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_updated.get(),
+                            d_group.getName() + ".tsv");
+                    try
+                    {
+                        makeSureFileExists(f_tpmChanged);
+                    } catch (IOException e)
+                    {
+                        logger.error(e.getMessage());
+                    }
+
+                    try (BufferedReader reader = new BufferedReader(new FileReader(f_tpm_toBeChanged));
+                         BufferedWriter writer = new BufferedWriter(new FileWriter(f_tpmChanged)))
+                    {
+                        String inputLine;
+                        writer.write(reader.readLine());
+                        writer.newLine();
+
+                        while ((inputLine = reader.readLine()) != null)
+                        {
+                            String[] split = inputLine.split("\t");
+                            String ensg = split[0];
+
+                            if (ensgTF_tpm.containsKey(ensg))
+                            {
+                                String tpm_exchanged = ensgTF_tpm.get(ensg);
+                                split[3] = tpm_exchanged;
+
+                                StringBuilder sb_tf_line = new StringBuilder();
+                                sb_tf_line.append(ensg);
+
+                                for (int i = 1; i < split.length; i++)
+                                {
+                                    sb_tf_line.append("\t");
+                                    sb_tf_line.append(split[i]);
+                                }
+
+                                writer.write(sb_tf_line.toString());
+                                writer.newLine();
+                            } else
+                            {
+                                writer.write(inputLine);
+                                writer.newLine();
+                            }
+                        }
+                    } catch (IOException e)
+                    {
+                        logger.error(e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    private String getCommand(Map<String, String> firstConfigs)
+    {
+        StringBuilder sb_command = new StringBuilder();
+        sb_command.append(tepicExecutable.get().getAbsolutePath());
+
+        Map<String, Config<?>> configs = new HashMap<>()
+        {{
+            put("g", f_referenceGenome);
+            put("p", f_pwms);
+            put("c", TFPRIO.configs.general.threadLimit);
+            put("d", TFPRIO.configs.tepic.bedChromatinSignal);
+            put("n", TFPRIO.configs.tepic.columnBedfile);
+            put("a", TFPRIO.configs.tepic.geneAnnotationFile);
+            put("w", TFPRIO.configs.tepic.windowSize);
+            put("f", TFPRIO.configs.tepic.onlyDNasePeaks);
+            put("e", TFPRIO.configs.tepic.exponentialDecay);
+            put("l", TFPRIO.configs.tepic.doNotNormalizePeakLength);
+            put("u", TFPRIO.configs.tepic.doNotGenerate);
+            put("x", TFPRIO.configs.tepic.originalDecay);
+            put("m", TFPRIO.configs.tepic.psemsLengthFile);
+            put("y", TFPRIO.configs.tepic.entireGeneBody);
+            put("z", TFPRIO.configs.tepic.doZip);
+            put("r", TFPRIO.configs.tepic.twoBitFile);
+            put("v", TFPRIO.configs.tepic.pValue);
+            put("i", TFPRIO.configs.tepic.maxMinutesPerChromosome);
+            put("j", TFPRIO.configs.tepic.chromosomePrefix);
+            put("t", TFPRIO.configs.tepic.transcriptBased);
+            put("h", TFPRIO.configs.tepic.loopListFile);
+            put("s", TFPRIO.configs.tepic.loopWindows);
+            put("q", TFPRIO.configs.tepic.onlyPeakFeatures);
+
+            if (tpmCutoff.get() > 0)
+            {
+                put("T", tpmCutoff);
+                put("E", ensgSymbolFile);
+                put("A", inputGeneID);
+            }
+
+            put("B", tfBindingSiteSearch);
+        }};
+
+        Map<String, String> stringConfigs = new HashMap<>();
+
+        for (Map.Entry<String, Config<?>> entry : configs.entrySet())
+        {
+            if (entry.getValue().isSet())
+            {
+                if (entry.getValue().get().getClass().equals(Boolean.class))
+                {
+                    if ("eq".contains(entry.getKey()))
+                    {
+                        // Boolean parameters
+                        stringConfigs.put(entry.getKey(), entry.getValue().toString().toUpperCase());
+                    } else
+                    {
+                        // Flags
+                        if ((boolean) entry.getValue().get())
+                        {
+                            stringConfigs.put(entry.getKey(), "");
+                        }
+                    }
+                } else
+                {
+                    stringConfigs.put(entry.getKey(), entry.getValue().toString());
+                }
+            }
+        }
+
+        stringConfigs.putAll(firstConfigs);
+
+        for (Map.Entry<String, String> entry : stringConfigs.entrySet())
+        {
+            sb_command.append(" -").append(entry.getKey()).append(" ").append(entry.getValue());
+        }
+
+        return sb_command.toString();
+    }
+}

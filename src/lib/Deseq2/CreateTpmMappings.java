@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.Config;
 import util.FileFilters.Filters;
+import util.Hashing;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -124,7 +125,7 @@ public class CreateTpmMappings extends ExecutableStep
                 }
             } catch (IOException e)
             {
-                logger.warn("Retrying: " + geneIDs.hashCode());
+                logger.warn("Retrying: " + Hashing.hash(String.valueOf(geneIDs.hashCode())));
             }
         }
         return content;
@@ -195,146 +196,130 @@ public class CreateTpmMappings extends ExecutableStep
         logger.info("Create TPM values for all RNA-seq data.");
 
         logger.info("Get gene lengths ...");
-        boolean hasAlreadyBeenGenerated = false;
 
+        List<String> lengthCols =
+                Arrays.asList("ensembl_gene_id", "ensembl_exon_id", "chromosome_name", "exon_chrom_start",
+                        "exon_chrom_end");
+        List<String> gcCols = Arrays.asList("gene_exon_intron", "ensembl_gene_id", "start_position", "end_position");
         try
         {
-            if (hasValidSourceFile(f_lengths.get(), hashFileContent(f_geneIDs.get())))
+            List<String> geneIDs = readLines(f_geneIDs.get());
+            geneIDs.remove(0);
+            Map<String, Map<String, Number>> result = new HashMap<>();
+
+            int splitNumber = threadLimit.get() * 2;
+            int splitSize = (geneIDs.size() + splitNumber - 1) / splitNumber;
+            logger.info("GeneIDs: " + geneIDs.size() + ", batches: " + splitNumber + ", batchSize: " + splitSize);
+
+            for (int splitIndex = 0; splitIndex < splitNumber; splitIndex++)
             {
-                logger.info("Gene lengths have already been fetched for the given input data. Skipping.");
-                hasAlreadyBeenGenerated = true;
-            }
-        } catch (IOException ignore)
-        {
-        }
-
-        if (!hasAlreadyBeenGenerated)
-        {
-            List<String> lengthCols =
-                    Arrays.asList("ensembl_gene_id", "ensembl_exon_id", "chromosome_name", "exon_chrom_start",
-                            "exon_chrom_end");
-            List<String> gcCols =
-                    Arrays.asList("gene_exon_intron", "ensembl_gene_id", "start_position", "end_position");
-            try
-            {
-                List<String> geneIDs = readLines(f_geneIDs.get());
-                geneIDs.remove(0);
-                Map<String, Map<String, Number>> result = new HashMap<>();
-
-                int splitNumber = threadLimit.get() * 2;
-                int splitSize = (geneIDs.size() + splitNumber - 1) / splitNumber;
-                logger.info("GeneIDs: " + geneIDs.size() + ", batches: " + splitNumber + ", batchSize: " + splitSize);
-
-                for (int splitIndex = 0; splitIndex < splitNumber; splitIndex++)
+                int finalSplitIndex = splitIndex;
+                executorService.submit(() ->
                 {
-                    int finalSplitIndex = splitIndex;
-                    executorService.submit(() ->
+                    int startIndex = finalSplitIndex * splitSize;
+                    int endIndex = Math.min((finalSplitIndex + 1) * splitSize, geneIDs.size());
+                    List<String> selectedIDs = geneIDs.subList(startIndex, endIndex);
+                    List<String[]> r_length = null;
+                    List<String[]> r_gc = null;
+                    try
                     {
-                        int startIndex = finalSplitIndex * splitSize;
-                        int endIndex = Math.min((finalSplitIndex + 1) * splitSize, geneIDs.size());
-                        List<String> selectedIDs = geneIDs.subList(startIndex, endIndex);
-                        List<String[]> r_length = null;
-                        List<String[]> r_gc = null;
-                        try
+                        r_length = query(species.get(), selectedIDs, lengthCols);
+                        r_gc = query(species.get(), selectedIDs, gcCols);
+                    } catch (IOException | InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    assert r_length != null;
+                    assert r_gc != null;
+
+                    Map<String, List<String[]>> m_length = mapIds(lengthCols, r_length);
+                    Map<String, List<String[]>> m_gc = mapIds(gcCols, r_gc);
+
+                    for (String id : m_length.keySet())
+                    {
+                        List<String[]> l_length = m_length.get(id);
+                        List<String[]> l_length_reduced = reduce(l_length, lengthCols);
+                        result.put(id, new HashMap<>());
+
+                        int length = 0;
+                        for (String[] entry : l_length_reduced)
                         {
-                            r_length = query(species.get(), selectedIDs, lengthCols);
-                            r_gc = query(species.get(), selectedIDs, gcCols);
-                        } catch (IOException | InterruptedException e)
-                        {
-                            e.printStackTrace();
+                            length += Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_end")]) -
+                                    Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]) + 1;
                         }
-                        assert r_length != null;
-                        assert r_gc != null;
+                        result.get(id).put("Length", length);
 
-                        Map<String, List<String[]>> m_length = mapIds(lengthCols, r_length);
-                        Map<String, List<String[]>> m_gc = mapIds(gcCols, r_gc);
-
-                        for (String id : m_length.keySet())
+                        if (m_gc.containsKey(id))
                         {
-                            List<String[]> l_length = m_length.get(id);
-                            List<String[]> l_length_reduced = reduce(l_length, lengthCols);
-                            result.put(id, new HashMap<>());
+                            List<String[]> l_gc = m_gc.get(id);
 
-                            int length = 0;
+                            assert l_gc.size() == 1;
+
+                            String sequence = l_gc.get(0)[gcCols.indexOf("gene_exon_intron")];
+
+                            int offset = Integer.MAX_VALUE;
                             for (String[] entry : l_length_reduced)
                             {
-                                length += Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_end")]) -
-                                        Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]) + 1;
+                                int start = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]);
+                                offset = Math.min(start, offset);
                             }
-                            result.get(id).put("Length", length);
-
-                            if (m_gc.containsKey(id))
+                            StringBuilder sb_exonSequence = new StringBuilder();
+                            for (String[] entry : l_length_reduced)
                             {
-                                List<String[]> l_gc = m_gc.get(id);
+                                int start = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]);
+                                int end = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_end")]);
 
-                                assert l_gc.size() == 1;
-
-                                String sequence = l_gc.get(0)[gcCols.indexOf("gene_exon_intron")];
-
-                                int offset = Integer.MAX_VALUE;
-                                for (String[] entry : l_length_reduced)
-                                {
-                                    int start = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]);
-                                    offset = Math.min(start, offset);
-                                }
-                                StringBuilder sb_exonSequence = new StringBuilder();
-                                for (String[] entry : l_length_reduced)
-                                {
-                                    int start = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_start")]);
-                                    int end = Integer.parseInt(entry[lengthCols.indexOf("exon_chrom_end")]);
-
-                                    sb_exonSequence.append(sequence, start - offset, end - offset + 1);
-                                }
-
-                                String exonSequence = sb_exonSequence.toString();
-
-                                double gcContent =
-                                        (double) Pattern.compile("[GC]").matcher(exonSequence).results().count() /
-                                                exonSequence.length();
-
-                                result.get(id).put("gcContent", gcContent);
+                                sb_exonSequence.append(sequence, start - offset, end - offset + 1);
                             }
+
+                            String exonSequence = sb_exonSequence.toString();
+
+                            double gcContent =
+                                    (double) Pattern.compile("[GC]").matcher(exonSequence).results().count() /
+                                            exonSequence.length();
+
+                            result.get(id).put("gcContent", gcContent);
                         }
-                        logger.debug("Batch finished: " + startIndex + "-" + endIndex);
-                    });
-                }
+                    }
+                    logger.debug("Batch finished: " + startIndex + "-" + endIndex);
+                });
+            }
 
-                finishAllQueuedThreads();
+            finishAllQueuedThreads();
 
-                makeSureFileExists(f_lengths.get());
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(f_lengths.get())))
+            makeSureFileExists(f_lengths.get());
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(f_lengths.get())))
+            {
+                writer.write("ENSG\tlength\tgc");
+                writer.newLine();
+                for (String geneID : geneIDs)
                 {
-                    writer.write("ENSG\tlength\tgc");
-                    writer.newLine();
-                    for (String geneID : geneIDs)
+                    writer.write(geneID);
+                    writer.write("\t");
+                    if (result.containsKey(geneID))
                     {
-                        writer.write(geneID);
+                        writer.write(String.valueOf(result.get(geneID).get("Length")));
                         writer.write("\t");
-                        if (result.containsKey(geneID))
+                        if (result.get(geneID).containsKey("gcContent"))
                         {
-                            writer.write(String.valueOf(result.get(geneID).get("Length")));
-                            writer.write("\t");
-                            if (result.get(geneID).containsKey("gcContent"))
-                            {
-                                writer.write(String.valueOf(result.get(geneID).get("gcContent")));
-                            } else
-                            {
-                                writer.write("NA");
-                            }
+                            writer.write(String.valueOf(result.get(geneID).get("gcContent")));
                         } else
                         {
                             writer.write("NA");
-                            writer.write("\t");
-                            writer.write("NA");
                         }
-                        writer.newLine();
+                    } else
+                    {
+                        writer.write("NA");
+                        writer.write("\t");
+                        writer.write("NA");
                     }
+                    writer.newLine();
                 }
-                createSourceFile(f_lengths.get(), hashFileContent(f_geneIDs.get()));
-            } catch (IOException e)
-            {
-                e.printStackTrace();
             }
+
+        } catch (IOException e)
+        {
+            e.printStackTrace();
         }
 
 

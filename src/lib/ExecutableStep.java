@@ -9,7 +9,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -30,6 +32,7 @@ public abstract class ExecutableStep
     public boolean simulate()
     {
         logger.debug("Simulation starting.");
+        verifyConfigUsage();
         updateInputDirectory();
         if (checkRequirements())
         {
@@ -47,8 +50,32 @@ public abstract class ExecutableStep
     {
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Starting.");
-        execute();
+        boolean executed = false;
+        if (TFPRIO.configs.general.hashingEnabled.get())
+        {
+            logger.debug("Verifying hash...");
+            if (!verifyHash())
+            {
+                logger.debug("Hash is invalid. Clearing output.");
+                deleteAllOutputs();
+                logger.debug("Cleared outputs. Starting full execution.");
+                execute();
+                executed = true;
+            } else
+            {
+                logger.debug("Skipped execution since hash is valid.");
+            }
+        } else
+        {
+            execute();
+            executed = true;
+        }
         shutdown();
+
+        if (TFPRIO.configs.general.hashingEnabled.get() && executed)
+        {
+            createHash();
+        }
         logger.info("Finished. Step took " + timer.stopAndGetDeltaSeconds() + " seconds.");
     }
 
@@ -64,7 +91,16 @@ public abstract class ExecutableStep
 
     private void broadcastCreatedFileStructure()
     {
-        TFPRIO.createdFileStructure.addAll(getCreatedFileStructure());
+        for (Config<File> createdStructure : getCreatedFileStructure())
+        {
+            if (TFPRIO.createdFileStructure.contains(createdStructure))
+            {
+                logger.error("Writing to already existing structure: " + createdStructure.getName());
+            } else
+            {
+                TFPRIO.createdFileStructure.add(createdStructure);
+            }
+        }
     }
 
     private boolean checkRequirements()
@@ -93,6 +129,21 @@ public abstract class ExecutableStep
         return allGood;
     }
 
+    private void deleteAllOutputs()
+    {
+        Set<Config<File>> outputFiles = getCreatedFileStructure();
+        for (Config<File> outputFile : outputFiles)
+        {
+            try
+            {
+                deleteFile(outputFile.get());
+            } catch (IOException e)
+            {
+                logger.error(e.getMessage());
+            }
+        }
+    }
+
     private String hashInputs() throws IOException
     {
         Set<Config<File>> requiredFileStructure = getRequiredFileStructure();
@@ -112,7 +163,7 @@ public abstract class ExecutableStep
         return util.Hashing.hashConfigs(requiredConfigs);
     }
 
-    private String hashOutputs() throws IOException
+    public String hashOutputs() throws IOException
     {
         Set<Config<File>> createdFileStructure = getCreatedFileStructure();
         ArrayList<File> createdFiles = new ArrayList<>();
@@ -138,28 +189,28 @@ public abstract class ExecutableStep
             List<String> content = readLines(hashFile);
             assert content.size() == 3;
 
-            String input = content.get(0);
-            String config = content.get(1);
-            String output = content.get(2);
+            String oldInputHash = content.get(0);
+            String oldConfigHash = content.get(1);
+            String oldOutputHash = content.get(2);
 
             String inputHash = hashInputs();
-            if (!inputHash.equals(input))
+            if (!inputHash.equals(oldInputHash))
             {
                 logger.warn("Input changed");
                 return false;
             }
 
             String configHash = hashConfigs();
-            if (!configHash.equals(config))
+            if (!configHash.equals(oldConfigHash))
             {
                 logger.warn("Configs changed");
                 return false;
             }
 
             String outputHash = hashOutputs();
-            if (!outputHash.equals(output))
+            if (!outputHash.equals(oldOutputHash))
             {
-                logger.warn("Output has changed since last run");
+                logger.warn("Output has changed since last run.");
                 return false;
             }
             return true;
@@ -194,15 +245,6 @@ public abstract class ExecutableStep
         }
     }
 
-    public void deleteHash()
-    {
-        File hashFile = getHashFile();
-        if (hashFile.exists())
-        {
-            hashFile.delete();
-        }
-    }
-
     private File getHashFile()
     {
         return extend(TFPRIO.configs.general.d_workflowHashes.get(), this.getClass().getName() + ".md5");
@@ -227,6 +269,32 @@ public abstract class ExecutableStep
     {
         shutdown();
         executorService = Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
+    }
+
+    private void verifyConfigUsage()
+    {
+        Set<Config<?>> registeredConfigs = new HashSet<>();
+        registeredConfigs.addAll(getCreatedFileStructure());
+        registeredConfigs.addAll(getRequiredConfigs());
+        registeredConfigs.addAll(getRequiredFileStructure());
+
+        for (Field field : this.getClass().getFields())
+        {
+            if (field.getType().equals(Config.class))
+            {
+                try
+                {
+                    Config<?> current = (Config<?>) field.get(this);
+                    if (!registeredConfigs.contains(current))
+                    {
+                        logger.error("Config not registered: " + current.getName());
+                    }
+                } catch (IllegalAccessException e)
+                {
+                    logger.error(e.getMessage());
+                }
+            }
+        }
     }
 
     protected abstract void execute();

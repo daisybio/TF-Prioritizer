@@ -74,6 +74,8 @@ public class Workflow
             steps.add(new lib.Tgene.RunTgene());
             steps.add(new lib.Tgene.Postprocessing());
         }
+
+        steps.add(new lib.Tepic.Tepic());
     }
 
     public boolean simulationSuccessful()
@@ -89,58 +91,8 @@ public class Workflow
         return allWorked;
     }
 
-    public void filterByHashes()
-    {
-        ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
-        logger.info("Start filtering by hashes.");
-
-        ArrayList<ExecutableStep> filtered = new ArrayList<>();
-        boolean previousFailed = false;
-
-        for (ExecutableStep step : steps)
-        {
-            if (!previousFailed)
-            {
-                if (step.verifyHash())
-                {
-                    logger.info("Found valid hash for: " + step.getClass().getName());
-                } else
-                {
-                    logger.info("Hash for " + step.getClass().getName() +
-                            " is invalid. Not using hashed files from now on.");
-                    filtered.add(step);
-                    previousFailed = true;
-                }
-            } else
-            {
-                filtered.add(step);
-            }
-        }
-
-        steps.clear();
-        steps.addAll(filtered);
-
-        logger.info("Finished filtering by hashes. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
-    }
-
-    public void createHashes()
-    {
-        ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
-        logger.info("Start creating hashes.");
-        for (ExecutableStep step : steps)
-        {
-            step.createHash();
-        }
-        logger.info("Finished creating hashes. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
-    }
-
     public void run()
     {
-        if (TFPRIO.configs.general.hashingEnabled.get())
-        {
-            filterByHashes();
-        }
-
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Start running executable steps.");
         for (ExecutableStep step : steps)
@@ -149,11 +101,6 @@ public class Workflow
         }
         logger.info(
                 "Finished running executable steps. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
-
-        if (TFPRIO.configs.general.hashingEnabled.get())
-        {
-            createHashes();
-        }
     }
 
     public String toString()

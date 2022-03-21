@@ -27,6 +27,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_preprocessing_tpm_scripts = extend(d_preprocessing_tpm, "01_scripts");
     public final Config<String> s_preprocessing_tpm_scripts = new Config<>("_get_tpms.R");
     public final Config<File> d_preprocessing_tpm_tpmResults = extend(d_preprocessing_tpm, "02_tpm_mappings");
+    public final Config<File> d_preprocessing_tpm_updated = extend(d_preprocessing_tpm, "03_tpm_updated");
     public final Config<String> s_preprocessing_tpm_mappings = new Config<>("_tpms.csv");
 
     public final Config<File> d_preprocessing_genePositions = extend(d_preprocessing, "gene_positions");

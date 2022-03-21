@@ -27,7 +27,6 @@ public class Tepic extends AbstractModule
 
     public final Config<File> inputReferenceGenome = new Config<>(File.class);
     public final Config<File> pathPwms = new Config<>(File.class);
-    public final Config<Integer> cores = new Config<>(1, true);
     public final Config<File> bedChromatinSignal = new Config<>(File.class);
     public final Config<Integer> columnBedfile = new Config<>(Integer.class);
     public final Config<File> geneAnnotationFile = new Config<>(File.class);
