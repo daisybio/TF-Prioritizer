@@ -27,7 +27,13 @@ public class FileManagement
 
     public static List<String> readLines(File file) throws IOException
     {
-        return Files.readAllLines(file.toPath());
+        List<String> raw = Files.readAllLines(file.toPath());
+        List<String> trimmed = new ArrayList<>();
+        for (String rawLine : raw)
+        {
+            trimmed.add(rawLine.replace("\n", "").replace("\r", ""));
+        }
+        return trimmed;
     }
 
     public static void copyFile(File source, File target) throws IOException
@@ -294,8 +300,7 @@ public class FileManagement
         {
             try
             {
-                if (Files.readAttributes(file.toPath(), BasicFileAttributes.class).lastModifiedTime().compareTo(
-                        Files.readAttributes(sourceFile.toPath(), BasicFileAttributes.class).lastModifiedTime()) > 0)
+                if (file.lastModified() > sourceFile.lastModified())
                 {
                     // File has been modified since last generation
                     return false;

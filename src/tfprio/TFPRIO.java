@@ -149,7 +149,7 @@ public class TFPRIO
         new Report(options_intern).generate();
         */
         double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
-        System.out.println("COM2POSE finished. Execution took " + deltaSeconds + " seconds.");
+        System.out.println("TFPRIO finished. Execution took " + deltaSeconds + " seconds.");
     }
 
 

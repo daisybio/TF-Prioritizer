@@ -29,6 +29,9 @@ public class General extends AbstractModule
     public final Config<Boolean> redirectExternalScriptOutputStream = new Config<>(false, true);
     public final Config<Boolean> redirectExternalScriptErrorStream = new Config<>(false, true);
 
+    public final Config<File> d_workflowHashes = extend(workingDirectory, ".hashes");
+    public final Config<Boolean> hashingEnabled = new Config<>(false, true);
+
     public General(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {

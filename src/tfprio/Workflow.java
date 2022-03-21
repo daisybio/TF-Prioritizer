@@ -1,6 +1,7 @@
 package tfprio;
 
 import lib.ExecutableStep;
+import util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 public class Workflow
 {
     private final List<ExecutableStep> steps = new ArrayList<>();
+    private final Logger logger = new Logger("Workflow");
 
     public Workflow()
     {
@@ -83,11 +85,70 @@ public class Workflow
         return allWorked;
     }
 
+    public void filterByHashes()
+    {
+        long startTime = System.currentTimeMillis();
+        logger.info("Start filtering by hashes.");
+
+        ArrayList<ExecutableStep> filtered = new ArrayList<>();
+        boolean previousFailed = false;
+
+        for (ExecutableStep step : steps)
+        {
+            if (!previousFailed)
+            {
+                if (step.verifyHash())
+                {
+                    logger.info("Found valid hash for: " + step.getClass().getName());
+                } else
+                {
+                    logger.info("Hash for " + step.getClass().getName() +
+                            " is invalid. Not using hashed files from now on.");
+                    filtered.add(step);
+                    previousFailed = true;
+                }
+            } else
+            {
+                filtered.add(step);
+            }
+        }
+
+        steps.clear();
+        steps.addAll(filtered);
+
+        double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
+        logger.info("Finished filtering by hashes. Execution took " + deltaSeconds + " seconds.");
+    }
+
+    public void createHashes()
+    {
+        long startTime = System.currentTimeMillis();
+        logger.info("Start creating hashes.");
+        for (ExecutableStep step : steps)
+        {
+            step.createHash();
+        }
+        double deltaSeconds = (double) (System.currentTimeMillis() - startTime) / 1e3;
+        logger.info("Finished creating hashes. Execution took " + deltaSeconds + " seconds.");
+    }
+
     public void run()
     {
+        if (TFPRIO.configs.general.hashingEnabled.get())
+        {
+            filterByHashes();
+        }
+
+        logger.info("Start running executable steps.");
         for (ExecutableStep step : steps)
         {
             step.run();
+        }
+        logger.info("Finished running executable steps.");
+
+        if (TFPRIO.configs.general.hashingEnabled.get())
+        {
+            createHashes();
         }
     }
 
