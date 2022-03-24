@@ -56,13 +56,6 @@ public class TFPRIO
         /*
 
 
-        //TEPIC
-        com2pose_lib.run_tepic();
-        if (options_intern.tepic_randomize_tf_gene_matrix)
-        {
-            com2pose_lib.randomize_tepic();
-        }
-
         com2pose_lib.postprocess_tepic_output();
         com2pose_lib.create_open_regions_violin_plots();
 

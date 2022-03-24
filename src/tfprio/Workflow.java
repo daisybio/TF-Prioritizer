@@ -76,6 +76,11 @@ public class Workflow
         }
 
         steps.add(new lib.Tepic.Tepic());
+
+        if (TFPRIO.configs.tepic.randomizeTfGeneMatrix.isSet() && TFPRIO.configs.tepic.randomizeTfGeneMatrix.get())
+        {
+            steps.add(new lib.Tepic.Randomize());
+        }
     }
 
     public boolean simulationSuccessful()
