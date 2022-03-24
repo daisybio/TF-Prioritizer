@@ -42,7 +42,7 @@ public class CreateGenePositions extends ExecutableStep
 
     @Override protected Set<Config<File>> getCreatedFileStructure()
     {
-        return new HashSet<>(Arrays.asList(f_script, f_data_prev, f_data_version, f_data));
+        return new HashSet<>(Arrays.asList(f_script, f_data_prev, f_data_version, f_data, f_upliftScript));
     }
 
     @Override protected Set<Config<?>> getRequiredConfigs()

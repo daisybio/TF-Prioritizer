@@ -206,7 +206,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
                             }
                         }
 
-                        if (TFPRIO.configs.tepic.tfBindingSiteSearch.get().equals("EXCL_BETWEEN"))
+                        if (option.get().equals("EXCL_BETWEEN"))
                         {
                             for (String key_chr : chromosomeRegions.keySet())
                             {

@@ -31,12 +31,17 @@ public class Postprocessing extends ExecutableStep
 
     @Override protected Set<Config<File>> getRequiredFileStructure()
     {
-        return new HashSet<>(Arrays.asList(d_input, d_preprocessingMeanCounts));
+        return new HashSet<>(Arrays.asList(d_input, d_preprocessingMeanCounts, f_transcripts_gtf));
     }
 
     @Override protected Set<Config<File>> getCreatedFileStructure()
     {
-        return new HashSet<>();
+        Set<Config<File>> createdFileStructure = new HashSet<>(List.of(d_output));
+        if (mutuallyExclusive.get())
+        {
+            createdFileStructure.add(d_outputGroups);
+        }
+        return createdFileStructure;
     }
 
     @Override protected Set<Config<?>> getRequiredConfigs()

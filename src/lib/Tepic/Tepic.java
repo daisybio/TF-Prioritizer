@@ -33,6 +33,29 @@ public class Tepic extends ExecutableStep
     private final Config<File> ensgSymbolFile = TFPRIO.configs.tepic.ensgSymbolFile;
     private final Config<File> inputGeneID = TFPRIO.configs.deSeq2.inputGeneID;
 
+    // Optional configs
+    private final Config<Integer> threadLimit = TFPRIO.configs.general.threadLimit;
+    private final Config<File> bedChromatinSignal = TFPRIO.configs.tepic.bedChromatinSignal;
+    private final Config<Integer> columnBedfile = TFPRIO.configs.tepic.columnBedfile;
+    private final Config<File> geneAnnotationFile = TFPRIO.configs.tepic.geneAnnotationFile;
+    private final Config<Integer> windowSize = TFPRIO.configs.tepic.windowSize;
+    private final Config<File> onlyDNasePeaks = TFPRIO.configs.tepic.onlyDNasePeaks;
+    private final Config<Boolean> exponentialDecay = TFPRIO.configs.tepic.exponentialDecay;
+    private final Config<Boolean> doNotNormalizePeakLength = TFPRIO.configs.tepic.doNotNormalizePeakLength;
+    private final Config<Boolean> doNotGenerate = TFPRIO.configs.tepic.doNotGenerate;
+    private final Config<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
+    private final Config<File> psemsLengthFile = TFPRIO.configs.tepic.psemsLengthFile;
+    private final Config<Boolean> entireGeneBody = TFPRIO.configs.tepic.entireGeneBody;
+    private final Config<Boolean> doZip = TFPRIO.configs.tepic.doZip;
+    private final Config<File> twoBitFile = TFPRIO.configs.tepic.twoBitFile;
+    private final Config<Double> pValue = TFPRIO.configs.tepic.pValue;
+    private final Config<Integer> maxMinutesPerChromosome = TFPRIO.configs.tepic.maxMinutesPerChromosome;
+    private final Config<Boolean> chromosomePrefix = TFPRIO.configs.tepic.chromosomePrefix;
+    private final Config<Boolean> transcriptBased = TFPRIO.configs.tepic.transcriptBased;
+    private final Config<File> loopListFile = TFPRIO.configs.tepic.loopListFile;
+    private final Config<Integer> loopWindows = TFPRIO.configs.tepic.loopWindows;
+    private final Config<Boolean> onlyPeakFeatures = TFPRIO.configs.tepic.onlyPeakFeatures;
+
     @Override protected Set<Config<File>> getRequiredFileStructure()
     {
         Set<Config<File>> requirements = new HashSet<>(
@@ -57,6 +80,15 @@ public class Tepic extends ExecutableStep
         return new HashSet<>(
                 Arrays.asList(tpmCutoff, tfBindingSiteSearch, mixMutuallyExclusive, tgeneTargetGenes, s_tgene_links,
                         s_outputRaw_trapSequences));
+    }
+
+    @Override protected Set<Config<?>> getOptionalConfigs()
+    {
+        return new HashSet<>(
+                Arrays.asList(threadLimit, bedChromatinSignal, columnBedfile, geneAnnotationFile, windowSize,
+                        onlyDNasePeaks, exponentialDecay, doNotNormalizePeakLength, doNotGenerate, originalDecay,
+                        psemsLengthFile, entireGeneBody, doZip, twoBitFile, pValue, maxMinutesPerChromosome,
+                        chromosomePrefix, transcriptBased, loopListFile, loopWindows, onlyPeakFeatures));
     }
 
     @Override protected void updateInputDirectory()
@@ -153,97 +185,104 @@ public class Tepic extends ExecutableStep
                     }
 
                     sampleConfigs.put("S", extend(d_output, s_outputRaw_trapSequences.get()).getAbsolutePath());
-                    try
-                    {
-                        executeAndWait(getCommand(sampleConfigs), logger);
-                    } catch (IOException | InterruptedException e)
-                    {
-                        logger.error(e.getMessage());
-                    }
 
-                    //correct TPMs
-                    HashMap<String, String> ensgTF_tpm = new HashMap<>();
-
-                    File d_output_tpms = d_output_combined.getParentFile();
-
-                    for (File f_dir : Objects.requireNonNull(d_output_tpms.listFiles(Filters.fileFilter)))
+                    executorService.submit(() ->
                     {
-                        String name = f_dir.getName();
-                        if (name.endsWith("_TPM_values.txt"))
+                        try
                         {
-                            try (BufferedReader reader = new BufferedReader(new FileReader(f_dir)))
-                            {
-                                String line_tpms;
-                                reader.readLine();
-                                while ((line_tpms = reader.readLine()) != null)
-                                {
-                                    String[] split = line_tpms.split("\t");
-                                    ensgTF_tpm.put(split[0], split[2]);
-                                }
-                            } catch (IOException e)
-                            {
-                                logger.error(e.getMessage());
-                            }
-                        }
-                    }
-                    //get correct TPM file
-                    File f_tpm_toBeChanged =
-                            extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get(),
-                                    d_group.getName() + ".tsv");
-                    File f_tpmChanged = extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_updated.get(),
-                            d_group.getName() + ".tsv");
-                    try
-                    {
-                        makeSureFileExists(f_tpmChanged);
-                    } catch (IOException e)
-                    {
-                        logger.error(e.getMessage());
-                    }
-
-                    try (BufferedReader reader = new BufferedReader(new FileReader(f_tpm_toBeChanged));
-                         BufferedWriter writer = new BufferedWriter(new FileWriter(f_tpmChanged)))
-                    {
-                        String inputLine;
-                        writer.write(reader.readLine());
-                        writer.newLine();
-
-                        while ((inputLine = reader.readLine()) != null)
+                            executeAndWait(getCommand(sampleConfigs), logger);
+                        } catch (IOException | InterruptedException e)
                         {
-                            String[] split = inputLine.split("\t");
-                            String ensg = split[0];
-
-                            if (ensgTF_tpm.containsKey(ensg))
-                            {
-                                String tpm_exchanged = ensgTF_tpm.get(ensg);
-                                split[3] = tpm_exchanged;
-
-                                StringBuilder sb_tf_line = new StringBuilder();
-                                sb_tf_line.append(ensg);
-
-                                for (int i = 1; i < split.length; i++)
-                                {
-                                    sb_tf_line.append("\t");
-                                    sb_tf_line.append(split[i]);
-                                }
-
-                                writer.write(sb_tf_line.toString());
-                                writer.newLine();
-                            } else
-                            {
-                                writer.write(inputLine);
-                                writer.newLine();
-                            }
+                            logger.error(e.getMessage());
                         }
-                    } catch (IOException e)
-                    {
-                        logger.error(e.getMessage());
-                    }
+                    });
                 }
             }
         }
     }
 
-    private String getCommand(Map<String, String> firstConfigs)
+    private void updateTPM(File d_group, File d_output_combined)
+    {
+        //correct TPMs
+        HashMap<String, String> ensgTF_tpm = new HashMap<>();
+
+        File d_output_tpms = d_output_combined.getParentFile();
+
+        for (File f_dir : Objects.requireNonNull(d_output_tpms.listFiles(Filters.fileFilter)))
+        {
+            String name = f_dir.getName();
+            if (name.endsWith("_TPM_values.txt"))
+            {
+                try (BufferedReader reader = new BufferedReader(new FileReader(f_dir)))
+                {
+                    String line_tpms;
+                    reader.readLine();
+                    while ((line_tpms = reader.readLine()) != null)
+                    {
+                        String[] split = line_tpms.split("\t");
+                        ensgTF_tpm.put(split[0], split[2]);
+                    }
+                } catch (IOException e)
+                {
+                    logger.error(e.getMessage());
+                }
+            }
+        }
+
+        //get correct TPM file
+        File f_tpm_toBeChanged = extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get(),
+                d_group.getName() + ".tsv");
+        File f_tpmChanged = extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_updated.get(),
+                d_group.getName() + ".tsv");
+        try
+        {
+            makeSureFileExists(f_tpmChanged);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(f_tpm_toBeChanged));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(f_tpmChanged)))
+        {
+            String inputLine;
+            writer.write(reader.readLine());
+            writer.newLine();
+
+            while ((inputLine = reader.readLine()) != null)
+            {
+                String[] split = inputLine.split("\t");
+                String ensg = split[0];
+
+                if (ensgTF_tpm.containsKey(ensg))
+                {
+                    String tpm_exchanged = ensgTF_tpm.get(ensg);
+                    split[3] = tpm_exchanged;
+
+                    StringBuilder sb_tf_line = new StringBuilder();
+                    sb_tf_line.append(ensg);
+
+                    for (int i = 1; i < split.length; i++)
+                    {
+                        sb_tf_line.append("\t");
+                        sb_tf_line.append(split[i]);
+                    }
+
+                    writer.write(sb_tf_line.toString());
+                    writer.newLine();
+                } else
+                {
+                    writer.write(inputLine);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private String getCommand(Map<String, String> sampleConfigs)
     {
         StringBuilder sb_command = new StringBuilder();
         sb_command.append(tepicExecutable.get().getAbsolutePath());
@@ -252,27 +291,26 @@ public class Tepic extends ExecutableStep
         {{
             put("g", f_referenceGenome);
             put("p", f_pwms);
-            put("c", TFPRIO.configs.general.threadLimit);
-            put("d", TFPRIO.configs.tepic.bedChromatinSignal);
-            put("n", TFPRIO.configs.tepic.columnBedfile);
-            put("a", TFPRIO.configs.tepic.geneAnnotationFile);
-            put("w", TFPRIO.configs.tepic.windowSize);
-            put("f", TFPRIO.configs.tepic.onlyDNasePeaks);
-            put("e", TFPRIO.configs.tepic.exponentialDecay);
-            put("l", TFPRIO.configs.tepic.doNotNormalizePeakLength);
-            put("u", TFPRIO.configs.tepic.doNotGenerate);
-            put("x", TFPRIO.configs.tepic.originalDecay);
-            put("m", TFPRIO.configs.tepic.psemsLengthFile);
-            put("y", TFPRIO.configs.tepic.entireGeneBody);
-            put("z", TFPRIO.configs.tepic.doZip);
-            put("r", TFPRIO.configs.tepic.twoBitFile);
-            put("v", TFPRIO.configs.tepic.pValue);
-            put("i", TFPRIO.configs.tepic.maxMinutesPerChromosome);
-            put("j", TFPRIO.configs.tepic.chromosomePrefix);
-            put("t", TFPRIO.configs.tepic.transcriptBased);
-            put("h", TFPRIO.configs.tepic.loopListFile);
-            put("s", TFPRIO.configs.tepic.loopWindows);
-            put("q", TFPRIO.configs.tepic.onlyPeakFeatures);
+            put("d", bedChromatinSignal);
+            put("n", columnBedfile);
+            put("a", geneAnnotationFile);
+            put("w", windowSize);
+            put("f", onlyDNasePeaks);
+            put("e", exponentialDecay);
+            put("l", doNotNormalizePeakLength);
+            put("u", doNotGenerate);
+            put("x", originalDecay);
+            put("m", psemsLengthFile);
+            put("y", entireGeneBody);
+            put("z", doZip);
+            put("r", twoBitFile);
+            put("v", pValue);
+            put("i", maxMinutesPerChromosome);
+            put("j", chromosomePrefix);
+            put("t", transcriptBased);
+            put("h", loopListFile);
+            put("s", loopWindows);
+            put("q", onlyPeakFeatures);
 
             if (tpmCutoff.get() > 0)
             {
@@ -311,7 +349,8 @@ public class Tepic extends ExecutableStep
             }
         }
 
-        stringConfigs.putAll(firstConfigs);
+        stringConfigs.putAll(sampleConfigs);
+        stringConfigs.put("c", "1");
 
         for (Map.Entry<String, String> entry : stringConfigs.entrySet())
         {

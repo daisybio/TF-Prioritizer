@@ -85,6 +85,11 @@ public abstract class ExecutableStep
 
     protected abstract Set<Config<?>> getRequiredConfigs();
 
+    protected Set<Config<?>> getOptionalConfigs()
+    {
+        return new HashSet<>();
+    }
+
     protected void updateInputDirectory()
     {
     }
@@ -157,10 +162,16 @@ public abstract class ExecutableStep
         return hashFiles(requiredFiles);
     }
 
-    private String hashConfigs()
+    private String hashRequiredConfigs()
     {
         Set<Config<?>> requiredConfigs = getRequiredConfigs();
         return util.Hashing.hashConfigs(requiredConfigs);
+    }
+
+    private String hashOptionalConfigs()
+    {
+        Set<Config<?>> optionalConfigs = getOptionalConfigs();
+        return util.Hashing.hashConfigs(optionalConfigs);
     }
 
     public String hashOutputs() throws IOException
@@ -187,11 +198,12 @@ public abstract class ExecutableStep
                 return false;
             }
             List<String> content = readLines(hashFile);
-            assert content.size() == 3;
+            assert content.size() == 4;
 
             String oldInputHash = content.get(0);
-            String oldConfigHash = content.get(1);
-            String oldOutputHash = content.get(2);
+            String oldRequiredConfigHash = content.get(1);
+            String oldOptionalConfigHash = content.get(2);
+            String oldOutputHash = content.get(3);
 
             String inputHash = hashInputs();
             if (!inputHash.equals(oldInputHash))
@@ -200,10 +212,17 @@ public abstract class ExecutableStep
                 return false;
             }
 
-            String configHash = hashConfigs();
-            if (!configHash.equals(oldConfigHash))
+            String configHash = hashRequiredConfigs();
+            if (!configHash.equals(oldRequiredConfigHash))
             {
-                logger.warn("Configs changed");
+                logger.warn("Required configs changed");
+                return false;
+            }
+
+            String optionalConfigHash = hashOptionalConfigs();
+            if (!optionalConfigHash.equals(oldOptionalConfigHash))
+            {
+                logger.warn("Optional configs changed.");
                 return false;
             }
 
@@ -226,7 +245,8 @@ public abstract class ExecutableStep
         try
         {
             String inputHash = hashInputs();
-            String configHash = hashConfigs();
+            String requiredConfigHash = hashRequiredConfigs();
+            String optionalConfigHash = hashOptionalConfigs();
             String outputHash = hashOutputs();
 
             File hashFile = getHashFile();
@@ -235,7 +255,9 @@ public abstract class ExecutableStep
             {
                 writer.write(inputHash);
                 writer.newLine();
-                writer.write(configHash);
+                writer.write(requiredConfigHash);
+                writer.newLine();
+                writer.write(optionalConfigHash);
                 writer.newLine();
                 writer.write(outputHash);
             }
@@ -276,22 +298,27 @@ public abstract class ExecutableStep
         Set<Config<?>> registeredConfigs = new HashSet<>();
         registeredConfigs.addAll(getCreatedFileStructure());
         registeredConfigs.addAll(getRequiredConfigs());
+        registeredConfigs.addAll(getOptionalConfigs());
         registeredConfigs.addAll(getRequiredFileStructure());
 
-        for (Field field : this.getClass().getFields())
+        for (Field field : this.getClass().getDeclaredFields())
         {
-            if (field.getType().equals(Config.class))
+            if (Config.class.isAssignableFrom(field.getType()))
             {
                 try
                 {
+                    field.setAccessible(true);
                     Config<?> current = (Config<?>) field.get(this);
                     if (!registeredConfigs.contains(current))
                     {
-                        logger.error("Config not registered: " + current.getName());
+                        logger.warn("Config not assigned to a category: " + field.getName());
                     }
                 } catch (IllegalAccessException e)
                 {
                     logger.error(e.getMessage());
+                } finally
+                {
+                    field.setAccessible(false);
                 }
             }
         }

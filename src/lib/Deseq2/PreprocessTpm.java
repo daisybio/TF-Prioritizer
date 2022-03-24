@@ -164,9 +164,6 @@ public class PreprocessTpm extends ExecutableStep
                                 if (tp_gene_tpm_value.containsKey(group_name))
                                 {
                                     lookup = tp_gene_tpm_value.get(group_name);
-                                } else
-                                {
-                                    System.out.println("X");
                                 }
 
 

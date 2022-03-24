@@ -54,6 +54,7 @@ public class Tepic extends AbstractModule
     public final Config<Boolean> randomizeTfGeneMatrix = new Config<>(false, true);
     public final Config<String> tfBindingSiteSearch =
             new Config<>("INSIDE", new ArrayList<>(Arrays.asList("INSIDE", "BETWEEN", "EXCL_BETWEEN")), true);
+    // TODO: Add optional map to set bindingSiteSearch for each histone modification
     public final Config<Integer> betweenMaxBps = new Config<>(500, true);
 
     public Tepic(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
