@@ -25,7 +25,6 @@ public abstract class ExecutableStep
 {
     protected ExecutorService executorService = Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
 
-    private final int shutDownTimeOut = 5;
     private final TimeUnit shutDownTimeUnit = TimeUnit.MINUTES;
     protected final Logger logger = new Logger(this.getClass().getSimpleName());
 
@@ -275,14 +274,20 @@ public abstract class ExecutableStep
     protected void shutdown()
     {
         executorService.shutdown();
+        int timeOutMinutes = getShutDownTimeOutMinutes();
 
         try
         {
-            executorService.awaitTermination(shutDownTimeOut, shutDownTimeUnit);
+            boolean ret = executorService.awaitTermination(timeOutMinutes, shutDownTimeUnit);
+            if (!ret)
+            {
+                logger.error("Process did not finished within the defined limit of " + timeOutMinutes + " " +
+                        shutDownTimeUnit);
+                System.exit(1);
+            }
         } catch (InterruptedException e)
         {
-            logger.error(
-                    "Process did not finished within the defined limit of " + shutDownTimeOut + " " + shutDownTimeUnit);
+            logger.error("Process was interrupted");
             System.exit(1);
         }
     }
@@ -322,6 +327,11 @@ public abstract class ExecutableStep
                 }
             }
         }
+    }
+
+    protected int getShutDownTimeOutMinutes()
+    {
+        return 5;
     }
 
     protected abstract void execute();

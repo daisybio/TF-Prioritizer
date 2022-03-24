@@ -100,21 +100,14 @@ public class Tepic extends ExecutableStep
     {
         //check_tepic_input_with_options();
 
-        logger.info("Used data: " + d_input.get());
-
         File output_TEPIC = d_output.get();
 
         for (File d_group : Objects.requireNonNull(d_input.get().listFiles(Filters.directoryFilter)))
         {
-            logger.debug("Start group: " + d_group.getName());
-
             for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
             {
-                logger.debug("Start histone modification: " + d_hm.getName());
-
                 for (File f_sample : Objects.requireNonNull(d_hm.listFiles(Filters.fileFilter)))
                 {
-                    logger.debug("Start sample " + f_sample.getName());
                     Map<String, String> sampleConfigs = new HashMap<>();
                     String sampleName;
                     if (f_sample.getName().contains("."))
@@ -181,7 +174,6 @@ public class Tepic extends ExecutableStep
                                     name_sample + "_" + d_hm.getName(), s_tgene_links.get());
                         }
                         sampleConfigs.put("L", f_tgene_input.getAbsolutePath());
-                        logger.info("Using only tgene linked target genes for TF-Gene score calculation.");
                     }
 
                     sampleConfigs.put("S", extend(d_output, s_outputRaw_trapSequences.get()).getAbsolutePath());
@@ -358,5 +350,10 @@ public class Tepic extends ExecutableStep
         }
 
         return sb_command.toString();
+    }
+
+    @Override protected int getShutDownTimeOutMinutes()
+    {
+        return Integer.MAX_VALUE;
     }
 }
