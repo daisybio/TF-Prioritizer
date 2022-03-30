@@ -48,13 +48,11 @@ public class CheckChromosomes extends ExecutableStep
         for (File fileDir : Objects.requireNonNull(d_input.get().listFiles(new DirectoryFilter())))
         {
             String group = fileDir.getName();
-            TFPRIO.groupsToHms.put(group, new HashSet<>());
 
             File d_outputGroup = extend(d_output.get(), group);
 
             for (File d_hm : Objects.requireNonNull(fileDir.listFiles(new DirectoryFilter())))
             {
-                TFPRIO.groupsToHms.get(group).add(d_hm.getName());
                 File d_outputGroupHm = extend(d_outputGroup, d_hm.getName());
 
                 for (File f_sample : Objects.requireNonNull(d_hm.listFiles(new FileFilter())))

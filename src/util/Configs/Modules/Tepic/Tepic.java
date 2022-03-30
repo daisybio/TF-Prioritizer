@@ -15,11 +15,12 @@ public class Tepic extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<File> d_ext_tepic = extend(extDirectory, "TEPIC" + File.separator + "TEPIC");
-    public final Config<File> executable = new Config<>(
-            new File(d_ext_tepic.get().getAbsolutePath() + File.separator + "Code" + File.separator + "TEPIC.sh"));
+    public final Config<File> d_ext_tepic = extend(extDirectory, "TEPIC", "TEPIC");
+    public final Config<File> executable = new Config<>(extend(d_ext_tepic.get(), "Code", "TEPIC.sh"));
     public final Config<File> d_dynamiteScripts =
-            extend(d_ext_tepic, "MachineLearningPipelines" + File.separator + "DYNAMITE" + File.separator + "Scripts");
+            extend(d_ext_tepic, "MachineLearningPipelines", "DYNAMITE", "Scripts");
+    public final Config<File> f_dynamite_computeMeanRatioTFAffinities =
+            extend(d_dynamiteScripts, "computeMeanRatioTFAffinities.py");
 
     public final Config<File> inputDirectory = new Config<>(File.class);
     public final Config<File> inputPrevious = new Config<>(File.class);

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
@@ -23,25 +24,32 @@ import static util.Hashing.*;
 
 public abstract class ExecutableStep
 {
-    protected ExecutorService executorService = Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
+    protected ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreadNumber());
 
     private final TimeUnit shutDownTimeUnit = TimeUnit.MINUTES;
-    protected final Logger logger = new Logger(this.getClass().getSimpleName());
+    protected final Logger logger = new Logger(this.getClass().getName().replace("lib.", ""));
 
     public boolean simulate()
     {
-        logger.debug("Simulation starting.");
-        verifyConfigUsage();
-        updateInputDirectory();
-        if (checkRequirements())
+        if (!TFPRIO.configs.general.developmentMode.get())
         {
-            broadcastCreatedFileStructure();
-            logger.debug("Simulation successful.");
-            return true;
+            logger.debug("Simulation starting.");
+            updateInputDirectory();
+            verifyConfigUsage();
+            if (checkRequirements())
+            {
+                broadcastCreatedFileStructure();
+                logger.debug("Simulation successful.");
+                return true;
+            } else
+            {
+                logger.error("Simulation failed.");
+                return false;
+            }
         } else
         {
-            logger.error("Simulation failed.");
-            return false;
+            updateInputDirectory();
+            return true;
         }
     }
 
@@ -49,8 +57,8 @@ public abstract class ExecutableStep
     {
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Starting.");
-        boolean executed = false;
-        if (TFPRIO.configs.general.hashingEnabled.get())
+        boolean executed;
+        if (!TFPRIO.configs.general.developmentMode.get())
         {
             logger.debug("Verifying hash...");
             if (!verifyHash())
@@ -63,6 +71,7 @@ public abstract class ExecutableStep
             } else
             {
                 logger.debug("Skipped execution since hash is valid.");
+                executed = false;
             }
         } else
         {
@@ -71,7 +80,7 @@ public abstract class ExecutableStep
         }
         shutdown();
 
-        if (TFPRIO.configs.general.hashingEnabled.get() && executed)
+        if (executed && !TFPRIO.configs.general.developmentMode.get())
         {
             createHash();
         }
@@ -273,29 +282,36 @@ public abstract class ExecutableStep
 
     protected void shutdown()
     {
-        executorService.shutdown();
-        int timeOutMinutes = getShutDownTimeOutMinutes();
+        long total = executorService.getTaskCount();
+        if (total > 0)
+        {
+            ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
 
-        try
-        {
-            boolean ret = executorService.awaitTermination(timeOutMinutes, shutDownTimeUnit);
-            if (!ret)
+            executorService.shutdown();
+            int timeOutMinutes = getShutDownTimeOutMinutes();
+
+
+            while (!executorService.isTerminated())
             {
-                logger.error("Process did not finished within the defined limit of " + timeOutMinutes + " " +
-                        shutDownTimeUnit);
-                System.exit(1);
+                long finished = executorService.getCompletedTaskCount();
+                double percentage = 100 * (double) finished / total;
+                logger.progress(percentage);
+                try
+                {
+                    Thread.sleep(10);
+                } catch (InterruptedException e)
+                {
+                    logger.error(e.getMessage());
+                }
             }
-        } catch (InterruptedException e)
-        {
-            logger.error("Process was interrupted");
-            System.exit(1);
+            timer.stop();
         }
     }
 
     protected void finishAllQueuedThreads()
     {
         shutdown();
-        executorService = Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
+        executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
     }
 
     private void verifyConfigUsage()
@@ -332,6 +348,11 @@ public abstract class ExecutableStep
     protected int getShutDownTimeOutMinutes()
     {
         return 5;
+    }
+
+    protected int getThreadNumber()
+    {
+        return TFPRIO.configs.general.threadLimit.get();
     }
 
     protected abstract void execute();

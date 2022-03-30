@@ -22,6 +22,7 @@ public class TFPRIO
 {
     public static Configs configs;
     public static Map<String, Set<String>> groupsToHms = new HashMap<>();
+    public static Map<String, Set<String>> groupCombinationsToHms = new HashMap<>();
     public static Set<Config<File>> createdFileStructure = new HashSet<>();
     public static MapSymbolAndEnsg mapSymbolAndEnsg;
     public static Config<File> latestInputDirectory;

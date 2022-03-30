@@ -17,7 +17,7 @@ public class Logger
 
     private enum LogLevel
     {
-        DEBUG, INFO, WARN, ERROR
+        DEBUG, INFO, WARN, ERROR, PROG
     }
 
     public Logger(String module)
@@ -61,11 +61,14 @@ public class Logger
         System.exit(1);
     }
 
+    private String getLine(String message, LogLevel level)
+    {
+        return "[" + formatter.format(new Date()) + "]\t" + level + "\t[" + module + "]\t" + message;
+    }
+
     private void logLine(String message, LogLevel level)
     {
-        Date date = new Date();
-
-        String line = "[" + formatter.format(date) + "]\t" + level + "\t[" + module + "]\t" + message;
+        String line = getLine(message, level);
 
         if (fileLoggingEnabled)
         {
@@ -80,5 +83,16 @@ public class Logger
         }
 
         System.out.println(line);
+    }
+
+    public void progress(double percentage)
+    {
+        String message = String.format("Progress: %.2f %%", percentage);
+        System.out.print(getLine(message, LogLevel.PROG) + "\r");
+    }
+
+    @Deprecated public void logLine(String message)
+    {
+        logLine(message, LogLevel.INFO);
     }
 }

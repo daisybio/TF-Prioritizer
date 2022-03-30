@@ -41,6 +41,17 @@ public class FileManagement
         copyFile(source, target, false);
     }
 
+    public static void copyFile(File source, File target, Logger logger)
+    {
+        try
+        {
+            copyFile(source, target);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
     public static void copyFile(File source, File target, boolean compression) throws IOException
     {
         if (target.exists())
@@ -236,6 +247,17 @@ public class FileManagement
         }
     }
 
+    public static void makeSureFileExists(File file, Logger logger)
+    {
+        try
+        {
+            makeSureFileExists(file);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
     public static synchronized void makeSureDirectoryExists(File directory) throws IOException
     {
         if (directory.isFile())
@@ -264,9 +286,9 @@ public class FileManagement
         }
     }
 
-    public static Config<File> extend(Config<File> fileConfig, String extension)
+    public static Config<File> extend(Config<File> fileConfig, String... extensions)
     {
-        return new Config<>(extend(fileConfig.get(), extension));
+        return new Config<>(extend(fileConfig.get(), extensions));
     }
 
     public static File extend(File file, String... extensions)
@@ -284,6 +306,39 @@ public class FileManagement
     {
         String content = readFile(file);
         return content.isBlank();
+    }
+
+    public static void hardLink(File newLink, File existingData) throws IOException
+    {
+        makeSureDirectoryExists(newLink.getParentFile());
+
+        if (newLink.exists())
+        {
+            deleteFile(newLink);
+        }
+        Files.createLink(newLink.toPath(), existingData.toPath());
+    }
+
+    public static void softLink(File newLink, File existingData) throws IOException
+    {
+        makeSureDirectoryExists(newLink.getParentFile());
+
+        if (newLink.exists())
+        {
+            deleteFile(newLink);
+        }
+        Files.createSymbolicLink(newLink.toPath(), existingData.toPath());
+    }
+
+    public static void softLink(File newLink, File existingData, Logger logger)
+    {
+        try
+        {
+            softLink(newLink, existingData);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
     }
 
     public static void deleteFile(File file) throws IOException

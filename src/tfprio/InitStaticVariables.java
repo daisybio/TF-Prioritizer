@@ -2,11 +2,13 @@ package tfprio;
 
 import lib.ExecutableStep;
 import util.Configs.Config;
+import util.FileFilters.Filters;
 import util.MapSymbolAndEnsg;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class InitStaticVariables extends ExecutableStep
@@ -41,5 +43,41 @@ public class InitStaticVariables extends ExecutableStep
     {
         TFPRIO.latestInputDirectory = TFPRIO.configs.tepic.inputDirectory;
         TFPRIO.mapSymbolAndEnsg = new MapSymbolAndEnsg();
+        initExistingGroups();
+    }
+
+    private void initExistingGroups()
+    {
+        for (File d_group : Objects.requireNonNull(inputDirectory.get().listFiles(Filters.directoryFilter)))
+        {
+            TFPRIO.groupsToHms.put(d_group.getName(), new HashSet<>());
+            for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
+            {
+                TFPRIO.groupsToHms.get(d_group.getName()).add(d_hm.getName());
+            }
+        }
+
+        for (String first : TFPRIO.groupsToHms.keySet())
+        {
+            for (String second : TFPRIO.groupsToHms.keySet())
+            {
+                if (first.compareTo(second) >= 0)
+                {
+                    continue;
+                }
+
+                String combination = first + "_" + second;
+
+                TFPRIO.groupCombinationsToHms.put(combination, new HashSet<>());
+
+                for (String hm : TFPRIO.groupsToHms.get(first))
+                {
+                    if (TFPRIO.groupsToHms.get(second).contains(hm))
+                    {
+                        TFPRIO.groupCombinationsToHms.get(combination).add(hm);
+                    }
+                }
+            }
+        }
     }
 }

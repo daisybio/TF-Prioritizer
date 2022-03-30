@@ -1,6 +1,7 @@
 package tfprio;
 
 import lib.ExecutableStep;
+import lib.Tepic.Postprocessing;
 import util.ExecutionTimeMeasurement;
 import util.Logger;
 
@@ -14,7 +15,12 @@ public class Workflow
 
     public Workflow()
     {
+        /*
+        In order to skip steps without checking their hash, development mode has to be active.
+         */
+
         steps.add(new tfprio.InitStaticVariables());
+        /*
         steps.add(new lib.CheckChromosomes());
 
         if (TFPRIO.configs.mixOptions.mutuallyExclusive.get() && !TFPRIO.configs.mixOptions.level.isSet())
@@ -76,11 +82,12 @@ public class Workflow
         }
 
         steps.add(new lib.Tepic.Tepic());
-
         if (TFPRIO.configs.tepic.randomizeTfGeneMatrix.isSet() && TFPRIO.configs.tepic.randomizeTfGeneMatrix.get())
         {
             steps.add(new lib.Tepic.Randomize());
         }
+        */
+        steps.add(new Postprocessing());
     }
 
     public boolean simulationSuccessful()
