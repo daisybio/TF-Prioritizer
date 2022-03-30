@@ -1,7 +1,6 @@
 package tfprio;
 
 import lib.ExecutableStep;
-import lib.Tepic.Postprocessing;
 import util.ExecutionTimeMeasurement;
 import util.Logger;
 
@@ -86,8 +85,10 @@ public class Workflow
         {
             steps.add(new lib.Tepic.Randomize());
         }
-        */
-        steps.add(new Postprocessing());
+        steps.add(new lib.Tepic.Postprocessing());
+         */
+
+        steps.add(new lib.Plots.OpenRegionsViolinPlots());
     }
 
     public boolean simulationSuccessful()
