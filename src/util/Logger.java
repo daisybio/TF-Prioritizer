@@ -17,7 +17,28 @@ public class Logger
 
     private enum LogLevel
     {
-        DEBUG, INFO, WARN, ERROR, PROG
+        DEBUG(TerminalColors.WHITE), INFO(TerminalColors.DEFAULT), WARN(TerminalColors.YELLOW),
+        ERROR(TerminalColors.RED), PROG(TerminalColors.BLUE);
+
+        public final String color;
+
+        LogLevel(TerminalColors color)
+        {
+            this.color = color.code;
+        }
+    }
+
+    private enum TerminalColors
+    {
+        RED("\u001B[31m"), GREEN("\u001B[32m"), YELLOW("\u001B[33m"), BLUE("\u001B[34m"), PURPLE("\u001B[35m"),
+        CYAN("\u001B[36m"), WHITE("\u001B[37m"), DEFAULT("\u001B[0m");
+
+        public final String code;
+
+        TerminalColors(String code)
+        {
+            this.code = code;
+        }
     }
 
     public Logger(String module)
@@ -63,7 +84,8 @@ public class Logger
 
     private String getLine(String message, LogLevel level)
     {
-        return "[" + formatter.format(new Date()) + "]\t" + level + "\t[" + module + "]\t" + message;
+        return level.color + "[" + formatter.format(new Date()) + "]\t" + level + "\t[" + module + "]\t" + message +
+                TerminalColors.DEFAULT.code;
     }
 
     private void logLine(String message, LogLevel level)
