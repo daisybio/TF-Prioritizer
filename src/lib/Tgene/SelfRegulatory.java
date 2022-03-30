@@ -38,7 +38,7 @@ public class SelfRegulatory extends ExecutableStep
 
     @Override protected Set<Config<?>> getRequiredConfigs()
     {
-        return new HashSet<>(Arrays.asList(s_tgene_groups, s_tepic_ratios));
+        return new HashSet<>(Arrays.asList(s_tgene_groups, s_tepic_ratios, consensusCalc, consensus));
     }
 
     @Override protected void execute()

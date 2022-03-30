@@ -4,22 +4,21 @@ import lib.ExecutableStep;
 import util.ExecutionTimeMeasurement;
 import util.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Workflow
 {
     private final List<ExecutableStep> steps = new ArrayList<>();
     private final Logger logger = new Logger("Workflow");
 
+    private final HashSet<Class<? extends ExecutableStep>> developmentStepFilter = new HashSet<>()
+    {{
+        addAll(Arrays.asList(tfprio.InitStaticVariables.class, lib.Dynamite.Preprocessing.class));
+    }};
+
     public Workflow()
     {
-        /*
-        In order to skip steps without checking their hash, development mode has to be active.
-         */
-
         steps.add(new tfprio.InitStaticVariables());
-        /*
         steps.add(new lib.CheckChromosomes());
 
         if (TFPRIO.configs.mixOptions.mutuallyExclusive.get() && !TFPRIO.configs.mixOptions.level.isSet())
@@ -88,23 +87,22 @@ public class Workflow
         }
         steps.add(new lib.Tepic.Postprocessing());
         steps.add(new lib.Plots.OpenRegionsViolinPlots());
-         */
 
         if (TFPRIO.configs.tgene.pathToExecutable.isSet())
         {
-            /*
             if (!TFPRIO.configs.mixOptions.mutuallyExclusive.get())
             {
                 steps.add(new lib.Tgene.CreateGroups());
             }
             steps.add(new lib.Tgene.filterTargetGenes());
-            */
 
             if (TFPRIO.configs.tgene.selfRegulatory.get())
             {
                 steps.add(new lib.Tgene.SelfRegulatory());
             }
         }
+
+        steps.add(new lib.Dynamite.Preprocessing());
     }
 
     public boolean simulationSuccessful()
@@ -126,8 +124,11 @@ public class Workflow
         logger.info("Start running executable steps.");
         for (ExecutableStep step : steps)
         {
-            step.run();
-            System.gc(); // Trigger garbage collection
+            if (!TFPRIO.configs.general.developmentMode.get() || developmentStepFilter.contains(step.getClass()))
+            {
+                step.run();
+                System.gc(); // Trigger garbage collection
+            }
         }
         logger.info(
                 "Finished running executable steps. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");

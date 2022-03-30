@@ -12,7 +12,7 @@ public class ScriptExecution
     public static void executeAndWait(File file, Logger logger) throws ExternalScriptException
     {
         List<String> command = getExecutionCommand(file);
-        logger.info("Executing command: " + command);
+        logger.debug("Executing command: " + command);
 
         try
         {
@@ -48,9 +48,9 @@ public class ScriptExecution
 
     public static void executeAndWait(String command, Logger logger) throws IOException, InterruptedException
     {
-        logger.info("Executing command: " + command);
+        logger.debug("Executing command: " + command);
         Process child = Runtime.getRuntime().exec(command);
-        
+
         int code = child.waitFor();
         if (code != 0)
         {

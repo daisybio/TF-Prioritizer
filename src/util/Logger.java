@@ -84,8 +84,7 @@ public class Logger
 
     private String getLine(String message, LogLevel level)
     {
-        return level.color + "[" + formatter.format(new Date()) + "]\t" + level + "\t[" + module + "]\t" + message +
-                TerminalColors.DEFAULT.code;
+        return "[" + formatter.format(new Date()) + "]\t" + level + "\t[" + module + "]\t" + message;
     }
 
     private void logLine(String message, LogLevel level)
@@ -104,13 +103,13 @@ public class Logger
             }
         }
 
-        System.out.println(line);
+        System.out.println(level.color + line + TerminalColors.DEFAULT.code);
     }
 
     public void progress(double percentage)
     {
         String message = String.format("Progress: %.2f %%", percentage);
-        System.out.print(getLine(message, LogLevel.PROG) + "\r");
+        System.out.print(LogLevel.PROG.color + getLine(message, LogLevel.PROG) + TerminalColors.DEFAULT.code + "\r");
     }
 
     @Deprecated public void logLine(String message)

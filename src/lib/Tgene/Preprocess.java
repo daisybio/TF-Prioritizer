@@ -1,6 +1,5 @@
 package lib.Tgene;
 
-import lib.BinaryTree.ChromosomeRegionTrees;
 import lib.ExecutableStep;
 import lib.GeneRegion;
 import lib.Region;
@@ -8,10 +7,7 @@ import tfprio.TFPRIO;
 import util.Configs.Config;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static util.FileManagement.makeSureFileExists;
 
@@ -31,7 +27,7 @@ public class Preprocess extends ExecutableStep
 
     @Override protected Set<Config<File>> getCreatedFileStructure()
     {
-        return new HashSet<>(List.of(f_output_gtf));
+        return new HashSet<>(Arrays.asList(f_output_gtf, f_output_regions));
     }
 
     @Override protected Set<Config<?>> getRequiredConfigs()

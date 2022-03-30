@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -31,25 +30,18 @@ public abstract class ExecutableStep
 
     public boolean simulate()
     {
-        if (!TFPRIO.configs.general.developmentMode.get())
+        logger.debug("Simulation starting.");
+        updateInputDirectory();
+        verifyConfigUsage();
+        if (checkRequirements())
         {
-            logger.debug("Simulation starting.");
-            updateInputDirectory();
-            verifyConfigUsage();
-            if (checkRequirements())
-            {
-                broadcastCreatedFileStructure();
-                logger.debug("Simulation successful.");
-                return true;
-            } else
-            {
-                logger.error("Simulation failed.");
-                return false;
-            }
+            broadcastCreatedFileStructure();
+            logger.debug("Simulation successful.");
+            return true;
         } else
         {
-            updateInputDirectory();
-            return true;
+            logger.error("Simulation failed.");
+            return false;
         }
     }
 
@@ -353,6 +345,18 @@ public abstract class ExecutableStep
     protected int getThreadNumber()
     {
         return TFPRIO.configs.general.threadLimit.get();
+    }
+
+    protected Config<File> getFirstExisting(List<Config<File>> priorities)
+    {
+        for (Config<File> priority : priorities)
+        {
+            if (TFPRIO.createdFileStructure.contains(priority))
+            {
+                return priority;
+            }
+        }
+        return null;
     }
 
     protected abstract void execute();
