@@ -17,10 +17,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> f_transcripts_gtf = extend(d_preprocessing, "transcripts.gtf");
     public final Config<String> s_preprocessing_gtf = new Config<>("_transcripts_only.gtf");
 
-    public final Config<File> d_preprocessing_binaryTrees = extend(d_preprocessing, "02_BINARY_TREES");
-    public final Config<File> d_preprocessing_binaryTrees_unmerged = extend(d_preprocessing_binaryTrees, "unmerged");
-    public final Config<File> d_preprocessing_binaryTrees_merged = extend(d_preprocessing_binaryTrees, "merged");
-    public final Config<File> d_preprocessing_binaryTrees_sorted = extend(d_preprocessing_binaryTrees, "sorted");
+    public final Config<File> f_preprocessing_regions = extend(d_preprocessing, "regions.tsv");
     public final Config<File> d_output = extend(d_root, "02_output");
     public final Config<String> s_output_links = new Config<>("links.tsv");
 

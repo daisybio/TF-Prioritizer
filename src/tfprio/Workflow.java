@@ -76,6 +76,7 @@ public class Workflow
 
         if (TFPRIO.configs.tgene.pathToExecutable.isSet())
         {
+            steps.add(new lib.Tgene.Preprocess());
             steps.add(new lib.Tgene.RunTgene());
             steps.add(new lib.Tgene.Postprocessing());
         }
@@ -91,19 +92,18 @@ public class Workflow
 
         if (TFPRIO.configs.tgene.pathToExecutable.isSet())
         {
+            /*
             if (!TFPRIO.configs.mixOptions.mutuallyExclusive.get())
             {
                 steps.add(new lib.Tgene.CreateGroups());
             }
             steps.add(new lib.Tgene.filterTargetGenes());
+            */
 
-            /*
-            com2pose_lib.filter_target_genes_tgen();
-
-            if (options_intern.tgen_self_regulatory)
+            if (TFPRIO.configs.tgene.selfRegulatory.get())
             {
-                com2pose_lib.integrate_self_regulatory_tgen();
-            } */
+                steps.add(new lib.Tgene.SelfRegulatory());
+            }
         }
     }
 

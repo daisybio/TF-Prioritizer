@@ -27,7 +27,7 @@ public abstract class ExecutableStep
     protected ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreadNumber());
 
     private final TimeUnit shutDownTimeUnit = TimeUnit.MINUTES;
-    protected final Logger logger = new Logger(this.getClass().getName().replace("lib.", ""));
+    protected final Logger logger = new Logger(this.getClass().getName().replace("lib.", "").replace("tfprio.", ""));
 
     public boolean simulate()
     {

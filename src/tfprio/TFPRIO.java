@@ -53,25 +53,7 @@ public class TFPRIO
         Diese Zuordnungen sollen dann DESeq2 übergeben werden
         */
 
-
         /*
-
-        //TGen
-        if (!options_intern.path_tgen.equals(""))
-        {
-            if (!options_intern.mix_mutually_exclusive)
-            {
-                com2pose_lib.create_tgen_groups();
-            }
-
-            com2pose_lib.filter_target_genes_tgen();
-
-            if (options_intern.tgen_self_regulatory)
-            {
-                com2pose_lib.integrate_self_regulatory_tgen();
-            }
-        }
-
         //DYNAMITE
         com2pose_lib.preprocess_dynamite();
         //install Rscripts needed for DYNAMITE
@@ -110,7 +92,6 @@ public class TFPRIO
             com2pose_lib.get_chip_atlas_data();
             //com2pose_lib.run_igv_chip_atlas_data();
             //com2pose_lib.run_igv_chr_wide_data();
-
         }
 
         //shoot IGV for own TF ChIP-seq data
