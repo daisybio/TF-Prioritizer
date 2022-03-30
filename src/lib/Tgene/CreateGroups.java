@@ -14,7 +14,6 @@ import static util.FileManagement.*;
 public class CreateGroups extends ExecutableStep
 {
     private final Config<File> d_input = TFPRIO.configs.tgene.fileStructure.d_merged;
-    private final Config<File> d_tepicPostprocess = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
 
     private final Config<File> d_output = TFPRIO.configs.tgene.fileStructure.d_groups;
 
@@ -23,7 +22,7 @@ public class CreateGroups extends ExecutableStep
 
     @Override protected Set<Config<File>> getRequiredFileStructure()
     {
-        return new HashSet<>(Arrays.asList(d_input, d_tepicPostprocess));
+        return new HashSet<>(List.of(d_input));
     }
 
     @Override protected Set<Config<File>> getCreatedFileStructure()

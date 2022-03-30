@@ -95,6 +95,7 @@ public class Workflow
             {
                 steps.add(new lib.Tgene.CreateGroups());
             }
+            steps.add(new lib.Tgene.filterTargetGenes());
 
             /*
             com2pose_lib.filter_target_genes_tgen();
@@ -126,6 +127,7 @@ public class Workflow
         for (ExecutableStep step : steps)
         {
             step.run();
+            System.gc(); // Trigger garbage collection
         }
         logger.info(
                 "Finished running executable steps. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
