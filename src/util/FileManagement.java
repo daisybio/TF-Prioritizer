@@ -273,6 +273,17 @@ public class FileManagement
         }
     }
 
+    public static void makeSureDirectoryExists(File directory, Logger logger)
+    {
+        try
+        {
+            makeSureDirectoryExists(directory);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
     public static void appendToFile(File file, String content) throws IOException
     {
         makeSureFileExists(file);

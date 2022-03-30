@@ -86,9 +86,24 @@ public class Workflow
             steps.add(new lib.Tepic.Randomize());
         }
         steps.add(new lib.Tepic.Postprocessing());
+        steps.add(new lib.Plots.OpenRegionsViolinPlots());
          */
 
-        steps.add(new lib.Plots.OpenRegionsViolinPlots());
+        if (TFPRIO.configs.tgene.pathToExecutable.isSet())
+        {
+            if (!TFPRIO.configs.mixOptions.mutuallyExclusive.get())
+            {
+                steps.add(new lib.Tgene.CreateGroups());
+            }
+
+            /*
+            com2pose_lib.filter_target_genes_tgen();
+
+            if (options_intern.tgen_self_regulatory)
+            {
+                com2pose_lib.integrate_self_regulatory_tgen();
+            } */
+        }
     }
 
     public boolean simulationSuccessful()

@@ -56,10 +56,6 @@ public class TFPRIO
 
         /*
 
-
-        com2pose_lib.postprocess_tepic_output();
-        com2pose_lib.create_open_regions_violin_plots();
-
         //TGen
         if (!options_intern.path_tgen.equals(""))
         {

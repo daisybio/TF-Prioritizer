@@ -29,9 +29,9 @@ public class GeneRegion extends Region
         end = Math.max(end, other.getEnd());
     }
 
-    public boolean isIdentical(GeneRegion other)
+    public boolean isIdentical(GeneRegion other, boolean idMatters)
     {
-        return other.getId().equals(getId()) && other.getChromosome().equals(getChromosome()) &&
+        return (!idMatters || other.getId().equals(getId())) && other.getChromosome().equals(getChromosome()) &&
                 other.getStart() == getStart() && other.getEnd() == getEnd();
     }
 
@@ -49,7 +49,7 @@ public class GeneRegion extends Region
         }
     }
 
-    public static List<GeneRegion> removeGeneRegionDuplicates(List<GeneRegion> input)
+    public static List<GeneRegion> removeGeneRegionDuplicates(List<GeneRegion> input, boolean idMatters)
     {
         Collections.sort(input);
         List<GeneRegion> output = new ArrayList<>();
@@ -59,7 +59,7 @@ public class GeneRegion extends Region
             for (int j = i + 1; j < input.size(); j++)
             {
                 GeneRegion other = input.get(j);
-                if (!other.isIdentical(region))
+                if (!other.isIdentical(region, idMatters))
                 {
                     i = j - 1;
                     break;
@@ -68,6 +68,11 @@ public class GeneRegion extends Region
             output.add(region);
         }
         return output;
+    }
+
+    public Region getRegion()
+    {
+        return new Region(getChromosome(), getStart(), getEnd());
     }
 
     public String toString()

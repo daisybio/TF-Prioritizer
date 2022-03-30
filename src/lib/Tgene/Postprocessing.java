@@ -109,11 +109,11 @@ public class Postprocessing extends ExecutableStep
                             System.exit(1);
                         }
                         List<GeneRegion> currentSampleRegionsNoDuplicates =
-                                removeGeneRegionDuplicates(currentSampleRegions);
+                                removeGeneRegionDuplicates(currentSampleRegions, true);
                         allRegions.addAll(currentSampleRegionsNoDuplicates);
                         sampleSpecificRegions.put(sampleName, currentSampleRegionsNoDuplicates);
                     }
-                    List<GeneRegion> allRegionsNoDuplicates = removeGeneRegionDuplicates(allRegions);
+                    List<GeneRegion> allRegionsNoDuplicates = removeGeneRegionDuplicates(allRegions, true);
                     List<GeneRegion> allRegionsFiltered = allRegionsNoDuplicates;
 
                     if (tpmCutoff.get() > 0)
