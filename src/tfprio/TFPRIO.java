@@ -1,6 +1,5 @@
 package tfprio;
 
-import lib.CheckChromosomes;
 import org.apache.commons.cli.*;
 
 import util.Configs.Config;
@@ -26,6 +25,7 @@ public class TFPRIO
     public static Set<Config<File>> createdFileStructure = new HashSet<>();
     public static MapSymbolAndEnsg mapSymbolAndEnsg;
     public static Config<File> latestInputDirectory;
+    public static Set<String> existingHms = new HashSet<>();
 
     public static void main(String[] args) throws Exception
     {
@@ -54,11 +54,7 @@ public class TFPRIO
         */
 
         /*
-        //DYNAMITE
-        com2pose_lib.preprocess_dynamite();
-        //install Rscripts needed for DYNAMITE
-        com2pose_lib.install_required_packages();
-        com2pose_lib.run_DYNAMITE();
+
 
         //PLOTS
         com2pose_lib.create_tp_plots();

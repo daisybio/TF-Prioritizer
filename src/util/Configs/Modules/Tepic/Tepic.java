@@ -22,6 +22,7 @@ public class Tepic extends AbstractModule
     public final Config<File> f_dynamite_integrateDate = extend(d_dynamiteScripts, "integrateData.py");
     public final Config<File> f_dynamite_prepareForClassification =
             extend(d_dynamiteScripts, "prepareForClassification.R");
+    public final Config<File> f_dynamite = extend(d_dynamiteScripts, "DYNAMITE.R");
 
     public final Config<File> inputDirectory = new Config<>(File.class);
     public final Config<File> inputPrevious = new Config<>(File.class);

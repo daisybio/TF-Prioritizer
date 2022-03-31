@@ -26,7 +26,12 @@ public class ExecutionTimeMeasurement
 
     public double getDeltaSeconds()
     {
+        return (double) getDeltaMillis() / 1e3;
+    }
+
+    public long getDeltaMillis()
+    {
         long compareTime = running ? System.currentTimeMillis() : stopTimeMillis;
-        return (double) (compareTime - startTimeMillis) / 1e3;
+        return compareTime - startTimeMillis;
     }
 }

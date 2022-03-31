@@ -282,12 +282,27 @@ public abstract class ExecutableStep
             executorService.shutdown();
             int timeOutMinutes = getShutDownTimeOutMinutes();
 
-
             while (!executorService.isTerminated())
             {
                 long finished = executorService.getCompletedTaskCount();
+                long remaining = total - finished;
                 double percentage = 100 * (double) finished / total;
-                logger.progress(percentage);
+
+                String message = String.format("Progress: %.2f %%", percentage);
+
+                if (finished > 0)
+                {
+                    long passedTime = timer.getDeltaMillis();
+                    long millisPerStep = passedTime / finished;
+                    long remainingMillis = millisPerStep * remaining;
+
+                    message +=
+                            String.format(", ETA: %02d min %02d sec", TimeUnit.MILLISECONDS.toMinutes(remainingMillis),
+                                    TimeUnit.MILLISECONDS.toSeconds(remainingMillis) - TimeUnit.MINUTES.toSeconds(
+                                            TimeUnit.MILLISECONDS.toMinutes(remainingMillis)));
+                }
+
+                logger.progress(message);
                 try
                 {
                     Thread.sleep(10);

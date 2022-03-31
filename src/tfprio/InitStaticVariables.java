@@ -53,6 +53,7 @@ public class InitStaticVariables extends ExecutableStep
             TFPRIO.groupsToHms.put(d_group.getName(), new HashSet<>());
             for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
             {
+                TFPRIO.existingHms.add(d_hm.getName());
                 TFPRIO.groupsToHms.get(d_group.getName()).add(d_hm.getName());
             }
         }

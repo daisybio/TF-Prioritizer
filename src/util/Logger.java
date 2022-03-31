@@ -106,9 +106,8 @@ public class Logger
         System.out.println(level.color + line + TerminalColors.DEFAULT.code);
     }
 
-    public void progress(double percentage)
+    public void progress(String message)
     {
-        String message = String.format("Progress: %.2f %%", percentage);
         System.out.print(LogLevel.PROG.color + getLine(message, LogLevel.PROG) + TerminalColors.DEFAULT.code + "\r");
     }
 
