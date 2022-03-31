@@ -153,7 +153,8 @@ public abstract class AbstractModule
                 Config<File> fileConfig = (Config<File>) config;
 
                 if (fileConfig.get().exists() &&
-                        !(fileConfig.get().getAbsolutePath().startsWith(workingDirectory.get().getAbsolutePath())))
+                        (!(fileConfig.get().getAbsolutePath().startsWith(workingDirectory.get().getAbsolutePath())) ||
+                                TFPRIO.configs.general.developmentMode.get()))
                 {
                     TFPRIO.createdFileStructure.add(fileConfig);
                 }

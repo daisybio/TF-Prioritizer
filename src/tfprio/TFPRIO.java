@@ -54,69 +54,6 @@ public class TFPRIO
         Diese Zuordnungen sollen dann DESeq2 übergeben werden
         */
 
-        /*
-
-
-        //PLOTS
-        com2pose_lib.analyze_plots_data();
-        com2pose_lib.get_top_k_target_genes_plots();
-
-
-        //PREPARE DISTR ANALYSIS
-        com2pose_lib.prepare_distribution_analysis();
-
-        //DISTRIBUTION ANALYSIS
-        com2pose_lib.perform_distribution_analysis();
-        com2pose_lib.create_distribution_plots();
-        //com2pose_lib.create_overview_html_report_distribution();
-        com2pose_lib.calculate_discounted_cumulative_gain_rank_distribution_analysis();
-
-        //get target genes of TFs based on dcg analysis
-        com2pose_lib.get_top_k_target_genes_dcg();
-
-        //generate DCG target genes heatmap
-        com2pose_lib.generateHeatmaps();
-
-        //create energy motifs of dcg genes
-        com2pose_lib.create_tf_binding_logos_biophysical_tfSequence();
-        com2pose_lib.create_tf_binding_logos_predicted_binding_sites();
-
-        //check for ChIP-seq data for TFs on ChIP-Atlas
-        if (options_intern.chip_atlas_activated_chip_atlas)
-        {
-            com2pose_lib.get_chip_atlas_data_list();
-            com2pose_lib.get_chip_atlas_data();
-            //com2pose_lib.run_igv_chip_atlas_data();
-            //com2pose_lib.run_igv_chr_wide_data();
-        }
-
-        //shoot IGV for own TF ChIP-seq data
-        if (!options_intern.igv_path_to_igv.equals("") && !options_intern.igv_path_to_tf_chip_seq.equals(""))
-        {
-            //com2pose_lib.run_igv_own_data();
-        }
-
-        //shot IGV for dcg target gene heatmaps
-        com2pose_lib.run_igv_on_dcg_targetgenes_heatmaps();
-
-        if (options_intern.igv_important_locus_all_prio_tf.size() > 0)
-        {
-            com2pose_lib.run_igv_on_important_loci();
-        }
-
-        if (options_intern.igv_top_log2fc > 0)
-        {
-            com2pose_lib.run_igv_top_log2gc();
-        }
-
-        //run co-occurence analysis of ChIP-ATLAS .bed files
-        if (options_intern.chip_atlas_activated_chip_atlas)
-        {
-            com2pose_lib.run_cooccurence_analysis();
-        }
-
-        new Report(options_intern).generate();
-        */
         System.out.println("TFPRIO finished. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
     }
 

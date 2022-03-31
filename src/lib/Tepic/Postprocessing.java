@@ -128,7 +128,7 @@ public class Postprocessing extends ExecutableStep
                     d_input1 = extend(d_postprocessingInput.get(), pairing, hm);
                     d_input2 = extend(d_postprocessingInput.get(), pairing, hm);
                 }
-                
+
                 File[] samples_group1_check_tfs = d_input1.listFiles();
                 File[] samples_group2_check_tfs = d_input2.listFiles();
                 assert samples_group1_check_tfs != null;
@@ -189,12 +189,7 @@ public class Postprocessing extends ExecutableStep
 
                     for (File f : Objects.requireNonNull(folder_group1.listFiles()))
                     {
-                        if (mutuallyExclusive.get())
-                        {
-                            f = Objects.requireNonNull(folder_group1.listFiles())[0];
-                        }
-
-                        copyFile(f, extend(d_output1, f.getName()), logger);
+                        softLink(extend(d_output1, f.getName()), f, logger);
 
                         if (mutuallyExclusive.get())
                         {
@@ -205,12 +200,7 @@ public class Postprocessing extends ExecutableStep
 
                     for (File f : Objects.requireNonNull(folder_group2.listFiles()))
                     {
-                        if (mutuallyExclusive.get())
-                        {
-                            f = Objects.requireNonNull(folder_group1.listFiles())[1];
-                        }
-
-                        copyFile(f, extend(d_output2, f.getName()), logger);
+                        softLink(extend(d_output2, f.getName()), f, logger);
 
                         if (mutuallyExclusive.get())
                         {

@@ -12,7 +12,7 @@ plt.figure(figsize=(26, 20))
 
 def generate(sourcePath: str, threshold: float, targetPath: str, hm: str, group1: str, group2: str):
     df = pd.read_table(sourcePath).sort_values(['value'], ascending=False)
-    name = hm + ": " + group1 + " VS " + group2
+    name = hm + ":" + group1 + "_" + group2
 
     # Remove suffix
     df['TF'] = df['TF'].str.split('_', expand=True)[0]
@@ -43,6 +43,7 @@ def generate(sourcePath: str, threshold: float, targetPath: str, hm: str, group1
     plt.figure(figsize=(26, 20))
     return df
 
+
 def stages(dataPath: str, plotPath: str, df: pd.DataFrame):
     df.to_csv(dataPath, index=True, header=True)
 
@@ -61,18 +62,19 @@ def stages(dataPath: str, plotPath: str, df: pd.DataFrame):
         for column_name in column_names:
             split1 = column_name.split(":")
             hm = split1[0]
-            split2 = split1[1].split("VS")
+            split2 = split1[1].split("_")
             group1 = split2[0]
             group2 = split2[1]
             if change_colnames:
                 n_column_names.append(hm + "\n" + group1 + ":" + group2)
             else:
-                n_column_names.append(hm + " -" + group1 + ":" + group2)
+                n_column_names.append(hm + "-" + group1 + ":" + group2)
         df.columns = n_column_names
         plot = sns.heatmap(df.transpose(), cmap="Paired", square=True, vmin=1, vmax=1, cbar=False, linewidths=0.5,
-                        linecolor='black', xticklabels=True)
+                           linecolor='black', xticklabels=True)
         plot.set_xlabel('Transcription Factor')
         plt.savefig(plotPath)
+
 
 {CALLS}
 

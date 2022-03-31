@@ -11,14 +11,10 @@ public class Workflow
     private final List<ExecutableStep> steps = new ArrayList<>();
     private final Logger logger = new Logger("Workflow");
 
-    private final HashSet<Class<? extends ExecutableStep>> developmentStepFilter = new HashSet<>()
-    {{
-        addAll(Arrays.asList(tfprio.InitStaticVariables.class, lib.Plots.TopKTargetGenes.class));
-    }};
-
     public Workflow()
     {
         steps.add(new tfprio.InitStaticVariables());
+        /*
         steps.add(new lib.CheckChromosomes());
 
         if (TFPRIO.configs.mixOptions.mutuallyExclusive.get() && !TFPRIO.configs.mixOptions.level.isSet())
@@ -107,6 +103,7 @@ public class Workflow
 
         steps.add(new lib.Plots.GroupPlots());
         steps.add(new lib.Plots.AnalyzeData());
+*/
         steps.add(new lib.Plots.TopKTargetGenes());
     }
 
@@ -129,11 +126,8 @@ public class Workflow
         logger.info("Start running executable steps.");
         for (ExecutableStep step : steps)
         {
-            if (!TFPRIO.configs.general.developmentMode.get() || developmentStepFilter.contains(step.getClass()))
-            {
-                step.run();
-                System.gc(); // Trigger garbage collection
-            }
+            step.run();
+            System.gc(); // Trigger garbage collection
         }
         logger.info(
                 "Finished running executable steps. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");

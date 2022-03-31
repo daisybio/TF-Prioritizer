@@ -32,7 +32,12 @@ public abstract class ExecutableStep
     {
         logger.debug("Simulation starting.");
         updateInputDirectory();
-        verifyConfigUsage();
+
+        if (TFPRIO.configs.general.developmentMode.get())
+        {
+            verifyConfigUsage();
+        }
+
         if (checkRequirements())
         {
             broadcastCreatedFileStructure();
@@ -98,7 +103,7 @@ public abstract class ExecutableStep
     {
         for (Config<File> createdStructure : getCreatedFileStructure())
         {
-            if (TFPRIO.createdFileStructure.contains(createdStructure))
+            if (TFPRIO.createdFileStructure.contains(createdStructure) && !TFPRIO.configs.general.developmentMode.get())
             {
                 logger.error("Writing to already existing structure: " + createdStructure.getName());
             } else
@@ -293,22 +298,18 @@ public abstract class ExecutableStep
                 if (finished > lastFinished)
                 {
                     long millisPerStep = passedTime / finished;
-                    latestTotalTimeGuessMillis = Math.min(millisPerStep * total,
-                            latestTotalTimeGuessMillis == null ? Long.MAX_VALUE : latestTotalTimeGuessMillis);
+                    latestTotalTimeGuessMillis = millisPerStep * total;
 
                     lastFinished = finished;
                 }
 
                 double percentage = 100 * (double) finished / total;
-                String message = String.format("Progress: %.2f %%", percentage);
+                String message = String.format("Progress: %.2f%%", percentage);
 
                 if (lastFinished > 0)
                 {
-                    long remainingMillis = latestTotalTimeGuessMillis - passedTime;
-                    message +=
-                            String.format(", ETA: %02d min %02d sec", TimeUnit.MILLISECONDS.toMinutes(remainingMillis),
-                                    TimeUnit.MILLISECONDS.toSeconds(remainingMillis) - TimeUnit.MINUTES.toSeconds(
-                                            TimeUnit.MILLISECONDS.toMinutes(remainingMillis)));
+                    long remainingMillis = Math.max(latestTotalTimeGuessMillis - passedTime, 0);
+                    message += ", ETA: " + ExecutionTimeMeasurement.formatMillis(remainingMillis);
                 }
 
                 logger.progress(message);
