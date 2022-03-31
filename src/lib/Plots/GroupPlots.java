@@ -8,13 +8,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static util.FileManagement.*;
 import static util.ScriptExecution.executeAndWait;
 
-public class groupPlots extends ExecutableStep
+public class GroupPlots extends ExecutableStep
 {
     private final Config<File> d_input = TFPRIO.configs.dynamite.fileStructure.d_output;
     private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_plots_groupPlots;

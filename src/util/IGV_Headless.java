@@ -1,5 +1,7 @@
 package util;
 
+import tfprio.TFPRIO;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -8,12 +10,10 @@ import java.io.IOException;
 public class IGV_Headless
 {
     private final StringBuilder commandBuilder = new StringBuilder();
-    private final Options_intern options_intern;
     private final String name;
 
-    public IGV_Headless(Options_intern options_intern, String name)
+    public IGV_Headless(String name)
     {
-        this.options_intern = options_intern;
         this.name = name;
         addCommand("new");
     }
@@ -38,8 +38,9 @@ public class IGV_Headless
 
         save(batchFile);
 
-        String command = "xvfb-run --auto-servernum --server-num=1 " + options_intern.igv_path_to_igv + "/igv.sh -b " +
-                batchFile.getAbsolutePath();
+        String command =
+                "xvfb-run --auto-servernum --server-num=1 " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
+                        "/igv.sh" + " -b " + batchFile.getAbsolutePath();
 
         Process child = Runtime.getRuntime().exec(command);
         int code = child.waitFor();

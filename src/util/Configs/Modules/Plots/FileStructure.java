@@ -21,8 +21,7 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_analysisData_tpLevel = extend(d_analysisData, "01_TP_LEVEL");
     public final Config<File> d_analysisData_hmLevel = extend(d_analysisData, "02_HM_LEVEL");
     public final Config<File> d_analysisData_websiteOverview = extend(d_analysisData, "03_WEBSITE_OVERVIEW");
-    public final Config<File> f_analysisData_websiteOverview_tfAvailable =
-            extend(d_analysisData_websiteOverview, "available_tfs.csv");
+    public final Config<String> s_analysisData_websiteOverview_tfAvailable = new Config<>("available_tfs.csv");
 
     public final Config<File> d_analysisData_websiteNumberTfs = extend(d_analysisData, "04_WEBSITE_NUMBER_TFs");
 

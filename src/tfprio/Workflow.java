@@ -13,7 +13,7 @@ public class Workflow
 
     private final HashSet<Class<? extends ExecutableStep>> developmentStepFilter = new HashSet<>()
     {{
-        addAll(Arrays.asList(tfprio.InitStaticVariables.class, lib.Plots.groupPlots.class));
+        addAll(Arrays.asList(tfprio.InitStaticVariables.class, lib.Plots.TopKTargetGenes.class));
     }};
 
     public Workflow()
@@ -105,7 +105,9 @@ public class Workflow
         steps.add(new lib.Dynamite.Preprocessing());
         steps.add(new lib.Dynamite.RunDynamite());
 
-        steps.add(new lib.Plots.groupPlots());
+        steps.add(new lib.Plots.GroupPlots());
+        steps.add(new lib.Plots.AnalyzeData());
+        steps.add(new lib.Plots.TopKTargetGenes());
     }
 
     public boolean simulationSuccessful()

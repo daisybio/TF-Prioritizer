@@ -3,7 +3,6 @@ package lib.Report;
 import tfprio.TFPRIO;
 import util.FileManagement;
 import util.Logger;
-import util.Options_intern;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,15 +17,14 @@ public class Report
     static final DecimalFormat formatter = new DecimalFormat("0.###");
     static Map<SelectorTypes, ArrayList<String>> existingValues = new HashMap<>();
 
-    public Report(Options_intern options_intern) throws IOException
+    public Report() throws IOException
     {
         for (SelectorTypes type : SelectorTypes.values())
         {
             existingValues.put(type, new ArrayList<>());
         }
 
-        logger = new Logger("Report", true,
-                new File(options_intern.com2pose_working_directory + File.separator + "logfile.txt"));
+        logger = new Logger("Report", true, TFPRIO.configs.general.logFile.get());
 
         logger.info("Start loading TF data");
         loadTFs();
