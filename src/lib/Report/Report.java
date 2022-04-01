@@ -106,7 +106,13 @@ public class Report
                 {
                     try
                     {
-                        String geneID = TFPRIO.mapSymbolAndEnsg.symbolToEnsg(tf_name);
+                        String geneID = null;
+                        for (String id : TFPRIO.mapSymbolAndEnsg.symbolToEnsg(tf_name))
+                        {
+                            geneID = id;
+                            break;
+                        }
+
                         Map<String, Map<String, Number>> log2fc = new HashMap<>();
                         Map<String, Number> tpm = new HashMap<>();
                         Map<String, Number> normex = new HashMap<>();

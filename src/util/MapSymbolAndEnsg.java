@@ -14,7 +14,7 @@ import static util.ScriptExecution.executeAndWait;
 
 public class MapSymbolAndEnsg
 {
-    private final Map<String, String> symbolEnsg = new HashMap<>();
+    private final Map<String, Set<String>> symbolEnsg = new HashMap<>();
     private final Map<String, String> ensgSymbol = new HashMap<>();
     private final Logger logger = new Logger(this.getClass().getSimpleName());
     private List<String> ensgList = new ArrayList<>();
@@ -68,7 +68,7 @@ public class MapSymbolAndEnsg
                 {
                     String ensg = line[0].toUpperCase();
                     String symbol = line[1].toUpperCase();
-                    symbolEnsg.put(symbol, ensg);
+                    symbolEnsg.put(symbol, new HashSet<>(List.of(ensg)));
                     ensgSymbol.put(ensg, symbol);
                     ensgList.add(ensg);
                 }
@@ -76,11 +76,32 @@ public class MapSymbolAndEnsg
         }
     }
 
-    public String symbolToEnsg(String symbol) throws NoSuchFieldException
+    public Set<String> symbolToEnsg(String symbol) throws NoSuchFieldException
     {
-        if (symbolEnsg.containsKey(symbol.toUpperCase()))
+        Map<String, String> groupSeparators = new HashMap<>()
+        {{
+            put("..", "\\.\\.");
+            put("::", "::");
+        }};
+        String upper = symbol.toUpperCase();
+
+        for (Map.Entry<String, String> separatorEntry : groupSeparators.entrySet())
         {
-            return symbolEnsg.get(symbol.toUpperCase());
+            Set<String> geneIDs = new HashSet<>();
+            if (upper.contains(separatorEntry.getKey()))
+            {
+                String[] parts = upper.split(separatorEntry.getValue());
+                for (String part : parts)
+                {
+                    geneIDs.addAll(symbolToEnsg(part));
+                }
+                return geneIDs;
+            }
+        }
+
+        if (symbolEnsg.containsKey(upper))
+        {
+            return symbolEnsg.get(upper);
         } else
         {
             throw new NoSuchFieldException("Could not find symbol " + symbol + " in the map file.");

@@ -329,15 +329,17 @@ public class AnalyzeData extends ExecutableStep
                 }
 
                 // TODO: Handling of non-mappable genes has to be improved
-                String ensg_name;
+                Set<String> geneIDs;
                 try
                 {
-                    ensg_name = TFPRIO.mapSymbolAndEnsg.symbolToEnsg(split[0]);
+                    geneIDs = TFPRIO.mapSymbolAndEnsg.symbolToEnsg(split[0]);
                 } catch (NoSuchFieldException e)
                 {
                     logger.warn(e.getMessage());
-                    ensg_name = null;
+                    geneIDs = null;
                 }
+
+                assert geneIDs != null;
 
                 if (count > TFPRIO.configs.plots.cutoffTps.get())
                 {
@@ -364,9 +366,13 @@ public class AnalyzeData extends ExecutableStep
                     for (String key_group : group_geneID_tpm.keySet())
                     {
                         HashMap<String, Double> lookup = group_geneID_tpm.get(key_group);
-                        if (lookup.containsKey(ensg_name))
+                        for (String geneID : geneIDs)
                         {
-                            cumm_tpm += lookup.get(ensg_name);
+                            if (lookup.containsKey(geneID))
+                            {
+                                cumm_tpm += lookup.get(geneID);
+                                break;
+                            }
                         }
                     }
 

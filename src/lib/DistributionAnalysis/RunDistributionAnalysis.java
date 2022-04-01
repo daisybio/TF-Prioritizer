@@ -168,10 +168,10 @@ public class RunDistributionAnalysis extends ExecutableStep
 
         for (String tfSymbol : distinct_tfs_hms.keySet())
         {
-            List<String> geneIDs;
+            Set<String> geneIDs;
             try
             {
-                geneIDs = List.of(TFPRIO.mapSymbolAndEnsg.symbolToEnsg(tfSymbol));
+                geneIDs = TFPRIO.mapSymbolAndEnsg.symbolToEnsg(tfSymbol);
             } catch (NoSuchFieldException e)
             {
                 logger.warn(e.getMessage());
