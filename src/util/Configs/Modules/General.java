@@ -21,9 +21,6 @@ public class General extends AbstractModule
 
     public final Config<String> shebang = new Config<>("#!/bin/bash");
 
-    public final Config<Boolean> performAllBackgroundDistributionAnalysis = new Config<>(false);
-    public final Config<String> distributionAnalysisAllName = new Config<>("ALL");
-
     public final Config<Integer> threadLimit = new Config<>(10, true);
 
     public final Config<Boolean> redirectExternalScriptOutputStream = new Config<>(false, true);

@@ -1,10 +1,4 @@
 {
-  "TpmGcFilterAnalysis": {
-    "FileStructure": {
-      "d_wd": null
-    },
-    "tfList": null
-  },
   "DeSeq2": {
     "FileStructure": {
       "s_preprocessing_genePositions_mergedEnhancerDbs_bedSuffix": ".bed",
@@ -89,7 +83,7 @@
     "mannWhitneyUPvalueCutoff": 0.01,
     "topKGenes": 30,
     "cutoffHms": 1,
-    "distributionAnalysisScoreType": "ECVL_GENE_COUNTS",
+    "distributionAnalysisScoreType": "EXCL_GENE_COUNTS",
     "trapPredictedSequenceLogosAffinityCutoff": 0.05
   },
   "Misc": {

@@ -104,8 +104,9 @@ public class Workflow
         steps.add(new lib.Plots.GroupPlots());
         steps.add(new lib.Plots.AnalyzeData());
         steps.add(new lib.Plots.TopKTargetGenes());
-        */
         steps.add(new lib.DistributionAnalysis.Preprocessing());
+         */
+        steps.add(new lib.DistributionAnalysis.RunDistributionAnalysis());
     }
 
     public boolean simulationSuccessful()

@@ -11,6 +11,9 @@ public class DistributionAnalysis extends AbstractModule
 {
     public FileStructure fileStructure;
 
+    public final Config<Boolean> performAllAnalysis = new Config<>(false);
+    public final Config<String> allName = new Config<>("ALL");
+
     public DistributionAnalysis(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {

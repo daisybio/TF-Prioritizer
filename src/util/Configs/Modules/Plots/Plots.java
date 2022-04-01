@@ -23,7 +23,7 @@ public class Plots extends AbstractModule
     public final Config<Double> cutoffTpms = new Config<>(0.0, true);
     public final Config<Integer> topKGenes = new Config<>(30, true);
     public final Config<Double> mannWhitneyUPvalueCutoff = new Config<>(0.01, true);
-    public final Config<String> distributionAnalysisScoreType = new Config<>("ECVL_GENE_COUNTS", true);
+    public final Config<String> distributionAnalysisScoreType = new Config<>("EXCL_GENE_COUNTS", true);
     public final Config<Double> trapPredictedSequenceLogosAffinityCutoff = new Config<>(0.05, true);
 
     public Plots(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
