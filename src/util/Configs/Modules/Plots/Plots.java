@@ -8,6 +8,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Plots extends AbstractModule
@@ -30,5 +31,11 @@ public class Plots extends AbstractModule
     {
         super(workingDirectory, sourceDirectory, logger);
         init();
+    }
+
+    @Override public boolean validate()
+    {
+        Collections.sort(thresholds.get());
+        return super.validate();
     }
 }
