@@ -57,6 +57,7 @@ public class FileStructure extends AbstractModule
 
     public final Config<File> d_dcg = extend(d_root, "09_DISCOUNTED_CUMULATIVE_GAIN");
     public final Config<File> f_dcg_stats = extend(d_dcg, "dcg_stats.csv");
+    public final Config<File> d_dcg_targetGenes = extend(d_dcg, "targetGenes");
 
 
     public final Config<File> d_logos = extend(d_root, "10_LOGOS");

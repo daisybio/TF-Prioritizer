@@ -108,7 +108,8 @@ public class Workflow
         //steps.add(new lib.DistributionAnalysis.RunDistributionAnalysis());
 
         //steps.add(new lib.DistributionAnalysis.CreatePlots());
-        steps.add(new lib.DistributionAnalysis.CalculateDcgRank());
+        //steps.add(new lib.DistributionAnalysis.CalculateDcgRank());
+        steps.add(new lib.DistributionAnalysis.getTopKTargetGenes());
     }
 
     public boolean simulationSuccessful()
