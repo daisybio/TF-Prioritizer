@@ -30,4 +30,6 @@ if (!requireNamespace("doMC", quietly = TRUE))
 if (!requireNamespace("methods", quietly = TRUE))
   BiocManager::install("methods")
 
+install.packages("pheatmap")
+
 BiocManager::install(version = "3.13", force = TRUE, ask = FALSE)
