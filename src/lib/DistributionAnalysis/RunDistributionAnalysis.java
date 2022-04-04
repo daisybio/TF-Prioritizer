@@ -20,6 +20,7 @@ public class RunDistributionAnalysis extends ExecutableStep
     private final Config<File> d_inputTepicProcessed = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
     private final Config<File> d_inputTepicRaw = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
 
+    private final Config<File> d_outputRaw = TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_raw;
     private final Config<File> d_outputBackgroundDistributionAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_all;
     private final Config<File> d_outputBackgroundDistributionHm =
@@ -62,7 +63,7 @@ public class RunDistributionAnalysis extends ExecutableStep
 
     @Override protected Set<Config<File>> getCreatedFileStructure()
     {
-        return new HashSet<>(List.of(d_outputBackgroundDistributionHm, d_outputTFScoresHm))
+        return new HashSet<>(List.of(d_outputBackgroundDistributionHm, d_outputTFScoresHm, d_outputRaw))
         {{
             if (performAllAnalysis.get())
             {
@@ -285,7 +286,7 @@ public class RunDistributionAnalysis extends ExecutableStep
                             Map<String, Double> geneID_score_1 = averageGeneScores(inputFiles1, acceptedTfNames);
                             Map<String, Double> geneID_score_2 = averageGeneScores(inputFiles2, acceptedTfNames);
 
-                            File targetFile = extend(d_outputTFScoresHm.get(), hm, tfSymbol + ".tsv");
+                            File targetFile = extend(d_outputRaw.get(), hm, tfSymbol, groupPairing + ".tsv");
                             makeSureFileExists(targetFile, logger);
 
                             try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetFile)))
@@ -395,28 +396,37 @@ public class RunDistributionAnalysis extends ExecutableStep
 
                 for (String tfsymbol : tfSymbols)
                 {
-                    File sourceFile = extend(d_outputTFScoresHm.get(), hm, tfsymbol + ".tsv");
-                    if (sourceFile.exists())
+                    StringBuilder sb_tf = new StringBuilder(getHeader(hm, tfsymbol));
+
+                    for (String pairing : TFPRIO.groupCombinationsToHms.keySet())
                     {
-                        String content = readFile(sourceFile);
+                        File sourceFile = extend(d_outputRaw.get(), hm, tfsymbol, pairing + ".tsv");
 
-                        writeFile(sourceFile, getHeader(hm, tfsymbol) + content);
-                        sb_allTfs.append(content);
-
-                        if (performAllAnalysis.get())
+                        if (sourceFile.exists())
                         {
-                            sb_all.append(content);
+                            String content = readFile(sourceFile);
 
-                            if (!map_sbAllHms.containsKey(tfsymbol))
+                            sb_tf.append(content);
+                            sb_allTfs.append(content);
+
+                            if (performAllAnalysis.get())
                             {
-                                map_sbAllHms.put(tfsymbol, new StringBuilder(getHeader("ALL", tfsymbol)));
+                                sb_all.append(content);
+
+                                if (!map_sbAllHms.containsKey(tfsymbol))
+                                {
+                                    map_sbAllHms.put(tfsymbol, new StringBuilder(getHeader("ALL", tfsymbol)));
+                                }
+                                map_sbAllHms.get(tfsymbol).append(content);
                             }
-                            map_sbAllHms.get(tfsymbol).append(content);
                         }
                     }
+
+                    File f_tf = extend(d_outputTFScoresHm.get(), hm, tfsymbol + ".tsv");
+                    writeFile(f_tf, sb_tf.toString());
                 }
 
-                File f_allTfs = extend(d_outputBackgroundDistributionHm.get(), s_output.get());
+                File f_allTfs = extend(d_outputBackgroundDistributionHm.get(), hm, s_output.get());
                 writeFile(f_allTfs, sb_allTfs.toString());
             }
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ScriptExecution
 {
-    public static void executeAndWait(File file, Logger logger) throws ExternalScriptException
+    public static void executeAndWait(File file, Logger logger)
     {
         List<String> command = getExecutionCommand(file);
         logger.debug("Executing command: " + command);
@@ -17,9 +17,6 @@ public class ScriptExecution
         try
         {
             executeAndWait(command);
-        } catch (ExternalScriptException e)
-        {
-            throw e;
         } catch (InterruptedException | IOException e)
         {
             logger.error("Execution of command was not successful. Message: " + e.getMessage());
@@ -59,15 +56,12 @@ public class ScriptExecution
         }
     }
 
-    public static void executeAndWait(String executable, String fileExtension) throws ExternalScriptException
+    public static void executeAndWait(String executable, String fileExtension)
     {
         List<String> command = getExecutionCommand(executable, fileExtension);
         try
         {
             executeAndWait(command);
-        } catch (ExternalScriptException e)
-        {
-            throw e;
         } catch (InterruptedException | IOException e)
         {
             System.out.println("Execution of command was not successful. Message: " + e.getMessage());

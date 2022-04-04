@@ -127,15 +127,6 @@ public class OpenRegionsViolinPlots extends ExecutableStep
             logger.error(e.getMessage());
         }
 
-        executorService.submit(() ->
-        {
-            try
-            {
-                executeAndWait(f_output_script.get(), logger);
-            } catch (ExternalScriptException e)
-            {
-                logger.error(e.getMessage());
-            }
-        });
+        executorService.submit(() -> executeAndWait(f_output_script.get(), logger));
     }
 }

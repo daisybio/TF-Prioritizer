@@ -81,7 +81,7 @@ public abstract class ExecutableStep
         {
             createHash();
         }
-        logger.info("Finished. Step took " + timer.stopAndGetDeltaSeconds() + " seconds.");
+        logger.info("Finished. Step took " + timer.stopAndGetDeltaFormatted() + " seconds.");
     }
 
     protected abstract Set<Config<File>> getRequiredFileStructure();

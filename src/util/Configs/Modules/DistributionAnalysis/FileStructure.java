@@ -28,6 +28,8 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_tfTgScores_tfDistribution_all = extend(d_tfTgScores_tfDistribution, "01_ALL");
     public final Config<File> d_tfTgScores_tfDistribution_hm = extend(d_tfTgScores_tfDistribution, "02_HM");
 
+    public final Config<File> d_tfTgScores_raw = extend(d_tfTgScores, "00_RAW");
+
     public final Config<File> d_plotsScripts = extend(d_root, "03_PLOT_SCRIPTS");
     public final Config<File> d_plotsScripts_all = extend(d_plotsScripts, "01_ALL");
     public final Config<File> d_plotsScripts_hm = extend(d_plotsScripts, "02_HM");
@@ -39,7 +41,7 @@ public class FileStructure extends AbstractModule
 
     public final Config<File> d_stats = extend(d_root, "05_STATS");
     public final Config<File> d_stats_all = extend(d_stats, "01_ALL");
-    public final Config<File> d_stats_hm = extend(d_stats, "01_HM");
+    public final Config<File> d_stats_hm = extend(d_stats, "02_HM");
     public final Config<String> s_stats_csv = new Config<>("stats.csv");
 
     public final Config<File> d_hypergeometricTest = extend(d_root, "06_HYPERGEOMETRIC_TEST");
@@ -47,6 +49,8 @@ public class FileStructure extends AbstractModule
     public final Config<File> f_hypergeometricTest_output = extend(d_hypergeometricTest, "STATS.csv");
 
     public final Config<File> d_mwuScripts = extend(d_root, "07_SCRIPTS_MANN_WHITNEYU_PLOTS");
+    public final Config<File> d_mwuScriptsHm = extend(d_mwuScripts, "02_HM");
+    public final Config<File> d_mwuScriptsAll = extend(d_mwuScripts, "01_ALL");
     public final Config<String> s_mwuScripts_script = new Config<>("mann_whitneyU_plots.R");
 
     public final Config<File> d_mwuPlots = extend(d_root, "08_PLOTS_MANN_WHITNEYU_PLOTS");

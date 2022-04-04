@@ -38,17 +38,7 @@ public class Deseq2 extends ExecutableStep
     {
         for (File f_script : Objects.requireNonNull(d_scripts.get().listFiles(Filters.fileFilter)))
         {
-            executorService.submit(() ->
-            {
-                try
-                {
-                    executeAndWait(f_script, logger);
-                } catch (ExternalScriptException e)
-                {
-                    logger.error(e.getMessage());
-                    System.exit(1);
-                }
-            });
+            executorService.submit(() -> executeAndWait(f_script, logger));
         }
     }
 }

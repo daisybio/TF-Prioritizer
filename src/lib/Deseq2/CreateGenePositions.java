@@ -68,13 +68,7 @@ public class CreateGenePositions extends ExecutableStep
             {
                 e.printStackTrace();
             }
-            try
-            {
-                executeAndWait(f_script.get(), logger);
-            } catch (ExternalScriptException e)
-            {
-                e.printStackTrace();
-            }
+            executeAndWait(f_script.get(), logger);
         } else
         {
             logger.info("Gene positions were not fetched since command line parameter -b was set.");
@@ -133,14 +127,7 @@ public class CreateGenePositions extends ExecutableStep
                 logger.info("equal genome versions. No uplifted needed. Skipping this step.");
             } else
             {
-                try
-                {
-                    executeAndWait(f_upliftScript.get(), logger);
-                } catch (ExternalScriptException e)
-                {
-                    e.printStackTrace();
-                    System.exit(1);
-                }
+                executeAndWait(f_upliftScript.get(), logger);
             }
         } else
         {

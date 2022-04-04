@@ -23,6 +23,8 @@ public class ScriptTemplates extends AbstractModule
     public final Config<File> f_deseq2PreprocessingUplift = extend(d_root, "deseq2_upliftPositions.py");
     public final Config<File> f_plots_openChromatinViolinPlots = extend(d_root, "openChromatinViolinPlots.R");
     public final Config<File> f_plots_groupPlots = extend(d_root, "groupPlots.py");
+    public final Config<File> f_distributionPlots = extend(d_root, "distributionPlots.py");
+    public final Config<File> f_distributionMwuPlots = extend(d_root, "distributionMwuPlots.R");
 
     public ScriptTemplates(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException

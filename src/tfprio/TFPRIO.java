@@ -1,7 +1,5 @@
 package tfprio;
 
-import org.apache.commons.cli.*;
-
 import util.Configs.Config;
 import util.Configs.Configs;
 import util.ExecutionTimeMeasurement;
@@ -54,6 +52,6 @@ public class TFPRIO
         Diese Zuordnungen sollen dann DESeq2 übergeben werden
         */
 
-        System.out.println("TFPRIO finished. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
+        System.out.println("TFPRIO finished. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
     }
 }

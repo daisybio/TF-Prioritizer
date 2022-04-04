@@ -37,6 +37,12 @@ public class ExecutionTimeMeasurement
         return compareTime - startTimeMillis;
     }
 
+    public String stopAndGetDeltaFormatted()
+    {
+        stop();
+        return getDeltaFormatted();
+    }
+
     public String getDeltaFormatted()
     {
         long delta = getDeltaMillis();
