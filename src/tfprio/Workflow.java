@@ -110,9 +110,10 @@ public class Workflow
         steps.add(new lib.DistributionAnalysis.CreatePlots());
         steps.add(new lib.DistributionAnalysis.CalculateDcgRank());
         steps.add(new lib.DistributionAnalysis.getTopKTargetGenes());
-        steps.add(new lib.DistributionAnalysis.GenerateTargetGenesHeatmaps());*/
+        steps.add(new lib.DistributionAnalysis.GenerateTargetGenesHeatmaps());
 
-        steps.add(new lib.Logos.TfBindingLogoBiophysicalSequence());
+        steps.add(new lib.Logos.TfBindingLogoBiophysicalSequence());*/
+        steps.add(new lib.Logos.PredictedBindingSites());
     }
 
     public boolean simulationSuccessful()

@@ -43,17 +43,19 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
 
     @Override protected Set<Config<File>> getRequiredFileStructure()
     {
-        return new HashSet<>();
+        return new HashSet<>(Arrays.asList(f_input_dcgResult, f_input_pwmFile, f_scriptTemplate_biophysicalModel));
     }
 
     @Override protected Set<Config<File>> getCreatedFileStructure()
     {
-        return new HashSet<>();
+        return new HashSet<>(Arrays.asList(d_output_biophysicalModel, d_output_tfSequence, f_output_jaspar));
     }
 
     @Override protected Set<Config<?>> getRequiredConfigs()
     {
-        return new HashSet<>();
+        return new HashSet<>(
+                Arrays.asList(s_biophysicalModel_data, s_biophysicalModel_script, s_biophysicalModel_plot, jasparUrl,
+                        jasparApi, jasparLogoDownloadUrl, s_jasparJson, s_jasparImage));
     }
 
     @Override protected void execute()

@@ -79,7 +79,7 @@ public class FileStructure extends AbstractModule
     public final Config<String> s_logos_tfBindingSequence_script = new Config<>("calc_frequencies.R");
     public final Config<String> s_logos_tfBindingSequence_motif = new Config<>("_frequencies.motif");
 
-    public final Config<File> d_logos_tfBindingSequence_data = extend(d_logos, "00_DATA");
+    public final Config<File> d_logos_tfBindingSequence_data = extend(d_logos_tfBindingSequence, "00_DATA");
 
     public final Config<File> d_heatmaps = extend(d_root, "11_DCG_TARGET_GENES_HEATMAP");
     public final Config<File> f_heatmaps_script = extend(d_heatmaps, "heatmap.R");

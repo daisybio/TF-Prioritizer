@@ -30,6 +30,12 @@ if (!requireNamespace("doMC", quietly = TRUE))
 if (!requireNamespace("methods", quietly = TRUE))
   BiocManager::install("methods")
 
+ if (!requireNamespace("DiffLogo", quietly = TRUE))
+   BiocManager::install("DiffLogo")
+
+ if (!requireNamespace("seqLogo", quietly = TRUE))
+   BiocManager::install("seqLogo")
+
 install.packages("pheatmap")
 
 BiocManager::install(version = "3.13", force = TRUE, ask = FALSE)
