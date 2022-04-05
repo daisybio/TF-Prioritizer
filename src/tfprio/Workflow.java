@@ -90,7 +90,7 @@ public class Workflow
             {
                 steps.add(new lib.Tgene.CreateGroups());
             }
-            steps.add(new lib.Tgene.filterTargetGenes());
+            steps.add(new lib.Tgene.FilterTargetGenes());
 
             if (TFPRIO.configs.tgene.selfRegulatory.get())
             {
@@ -112,8 +112,13 @@ public class Workflow
         steps.add(new lib.DistributionAnalysis.getTopKTargetGenes());
         steps.add(new lib.DistributionAnalysis.GenerateTargetGenesHeatmaps());
 
-        steps.add(new lib.Logos.TfBindingLogoBiophysicalSequence());*/
-        steps.add(new lib.Logos.PredictedBindingSites());
+        steps.add(new lib.Logos.TfBindingLogoBiophysicalSequence());
+        steps.add(new lib.Logos.PredictedBindingSites());*/
+
+        if (TFPRIO.configs.chipAtlas.isEnabled.get())
+        {
+            steps.add(new lib.ChiPAtlas.GetDataList());
+        }
     }
 
     public boolean simulationSuccessful()

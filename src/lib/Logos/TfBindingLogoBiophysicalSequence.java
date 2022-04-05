@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import org.apache.commons.compress.utils.IOUtils;
 import tfprio.TFPRIO;
 import util.Configs.Config;
+import util.TrustAllManager;
 
 import javax.net.ssl.*;
 import java.io.*;
@@ -180,7 +181,7 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
         logger.info("Download JASPAR matrix ids from: " + jasparUrl.get());
 
         // Create a new trust manager that trust all certificates
-        TrustManager[] trustAllCerts = getTrustManager();
+        TrustManager[] trustAllCerts = new TrustManager[]{new TrustAllManager()};
         // Activate the new trust manager
         try
         {
@@ -287,24 +288,5 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
                 }
             }
         }
-    }
-
-    private TrustManager[] getTrustManager()
-    {
-        return new TrustManager[]{new X509TrustManager()
-        {
-            public java.security.cert.X509Certificate[] getAcceptedIssuers()
-            {
-                return null;
-            }
-
-            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
-            {
-            }
-
-            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
-            {
-            }
-        }};
     }
 }

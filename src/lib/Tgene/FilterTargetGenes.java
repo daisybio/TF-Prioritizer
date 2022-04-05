@@ -10,7 +10,7 @@ import java.util.*;
 import static util.FileManagement.extend;
 import static util.FileManagement.makeSureFileExists;
 
-public class filterTargetGenes extends ExecutableStep
+public class FilterTargetGenes extends ExecutableStep
 {
     private final Config<File> d_input_tgene = TFPRIO.configs.tgene.fileStructure.d_groups;
     private final Config<File> d_input_tepic = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
