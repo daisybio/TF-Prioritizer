@@ -63,7 +63,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
                 script = script.replace("{SYMBOL_MAP_FILE}", f_mapping.get().getAbsolutePath());
                 String finalScript = script.replace("{GENE_ID_FILE}", f_geneID.get().getAbsolutePath());
 
-                executorService.execute(() -> executeAndWait(finalScript, ".py"));
+                executorService.execute(() -> executeAndWait(finalScript, ".py", logger));
             }
         } catch (IOException e)
         {
@@ -93,7 +93,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
                     makeSureFileExists(targetFile);
                     String finalScript = script.replace("{OUTPUT_FILE}", targetFile.getAbsolutePath());
 
-                    executorService.execute(() -> executeAndWait(finalScript, ".py"));
+                    executorService.execute(() -> executeAndWait(finalScript, ".py", logger));
                 }
             }
         } catch (IOException e)

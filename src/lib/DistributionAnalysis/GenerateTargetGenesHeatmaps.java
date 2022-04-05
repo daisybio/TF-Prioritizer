@@ -69,6 +69,8 @@ public class GenerateTargetGenesHeatmaps extends ExecutableStep
             logger.error(e.getMessage());
         }
 
+        // TODO: Implement multithreading
+
         executeAndWait(f_script.get(), logger);
     }
 }

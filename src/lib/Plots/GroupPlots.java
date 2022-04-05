@@ -116,16 +116,7 @@ public class GroupPlots extends ExecutableStep
                 String command = "python3 " + f_script.getAbsolutePath();
 
 
-                executorService.submit(() ->
-                {
-                    try
-                    {
-                        executeAndWait(command, logger);
-                    } catch (IOException | InterruptedException e)
-                    {
-                        logger.error(e.getMessage());
-                    }
-                });
+                executorService.submit(() -> executeAndWait(command, logger));
             }
         }
     }

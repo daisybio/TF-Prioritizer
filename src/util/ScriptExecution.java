@@ -14,17 +14,13 @@ public class ScriptExecution
         List<String> command = getExecutionCommand(file);
         logger.debug("Executing command: " + command);
 
-        try
-        {
-            executeAndWait(command);
-        } catch (InterruptedException | IOException e)
-        {
-            logger.error("Execution of command was not successful. Message: " + e.getMessage());
-        }
+        executeAndWait(command, logger);
+
     }
 
-    private static void executeAndWait(List<String> command) throws IOException, InterruptedException
+    public static void executeAndWait(List<String> command, Logger logger)
     {
+        logger.debug("Executing command: " + command);
         ProcessBuilder pb = new ProcessBuilder(command);
         if (TFPRIO.configs.general.redirectExternalScriptOutputStream.get())
         {
@@ -34,38 +30,48 @@ public class ScriptExecution
         {
             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
         }
-        Process process = pb.start();
-        int returnCode = process.waitFor();
-
-        if (returnCode != 0)
-        {
-            throw new ExternalScriptException(returnCode, process.getErrorStream().toString());
-        }
-    }
-
-    public static void executeAndWait(String command, Logger logger) throws IOException, InterruptedException
-    {
-        logger.debug("Executing command: " + command);
-        Process child = Runtime.getRuntime().exec(command);
-
-        int code = child.waitFor();
-        if (code != 0)
-        {
-            String message = child.getErrorStream().toString();
-            throw new ExternalScriptException(code, message);
-        }
-    }
-
-    public static void executeAndWait(String executable, String fileExtension)
-    {
-        List<String> command = getExecutionCommand(executable, fileExtension);
         try
         {
-            executeAndWait(command);
-        } catch (InterruptedException | IOException e)
+            Process process = pb.start();
+            int returnCode = process.waitFor();
+
+            if (returnCode != 0)
+            {
+                String message = new String(process.getErrorStream().readAllBytes());
+                logger.error("Received return code " + returnCode + ":\n\n" + message);
+            }
+        } catch (IOException | InterruptedException e)
         {
-            System.out.println("Execution of command was not successful. Message: " + e.getMessage());
+            e.printStackTrace();
         }
+
+
+    }
+
+    public static void executeAndWait(String command, Logger logger)
+    {
+        logger.debug("Executing command: " + command);
+        try
+        {
+            Process child = Runtime.getRuntime().exec(command);
+
+            int code = child.waitFor();
+            if (code != 0)
+            {
+                String message = new String(child.getErrorStream().readAllBytes());
+                logger.error("Received return code " + code + ":\n\n" + message);
+            }
+        } catch (IOException | InterruptedException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public static void executeAndWait(String executable, String fileExtension, Logger logger)
+    {
+        List<String> command = getExecutionCommand(executable, fileExtension);
+
+        executeAndWait(command, logger);
     }
 
     private static List<String> getExecutionPrefix(String fileExtension, boolean fileExecution)

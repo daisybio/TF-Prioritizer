@@ -99,19 +99,8 @@ public class RunTgene extends ExecutableStep
                     command_execute += " --max-link-distances " + maxLinkDistance.get();
                     command_execute += " --max-pvalue " + pValue.get();
 
-                    //now execute TGENE:
                     String finalCommand_execute = command_execute;
-                    executorService.submit(() ->
-                    {
-                        try
-                        {
-                            executeAndWait(finalCommand_execute, logger);
-                        } catch (IOException | InterruptedException e)
-                        {
-                            e.printStackTrace();
-                            System.exit(1);
-                        }
-                    });
+                    executorService.submit(() -> executeAndWait(finalCommand_execute, logger));
                 }
             }
         }

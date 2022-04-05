@@ -26,6 +26,8 @@ public class ScriptTemplates extends AbstractModule
     public final Config<File> f_distributionPlots = extend(d_root, "distributionPlots.py");
     public final Config<File> f_distributionMwuPlots = extend(d_root, "distributionMwuPlots.R");
 
+    public final Config<File> f_logos_biophysicalModel = extend(d_root, "logos_biophysicalModel.py");
+
     public ScriptTemplates(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {

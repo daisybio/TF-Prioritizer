@@ -63,9 +63,9 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_logos = extend(d_root, "10_LOGOS");
 
     public final Config<File> d_logos_biophysicalModel = extend(d_logos, "01_BIOPHYSICAL_MODEL");
-    public final Config<String> s_logos_biophysicalModel_data = new Config<>("_energy_matrix.csv");
-    public final Config<String> s_logos_biophysicalModel_script = new Config<>("_create_biophysical_model.py");
-    public final Config<String> s_logos_biophysicalModel_image = new Config<>("_biophysical_model.png");
+    public final Config<String> s_logos_biophysicalModel_data = new Config<>("energy_matrix.csv");
+    public final Config<String> s_logos_biophysicalModel_script = new Config<>("biophysical_model.py");
+    public final Config<String> s_logos_biophysicalModel_image = new Config<>("biophysical_model.png");
 
     public final Config<File> d_logos_tfSequence = extend(d_logos, "02_TF_SEQUENCE");
     public final Config<File> d_logos_tfSequence_jaspar = extend(d_logos_tfSequence, "00_JASPAR");

@@ -77,16 +77,7 @@ public class RunDynamite extends ExecutableStep
                         performance.get() + " --alpha=" + alpha.get() + " --cores=" + cores.get() + " --randomise=" +
                         randomize.get();
 
-                executorService.submit(() ->
-                {
-                    try
-                    {
-                        executeAndWait(command_edited, logger);
-                    } catch (IOException | InterruptedException e)
-                    {
-                        logger.error(e.getMessage());
-                    }
-                });
+                executorService.submit(() -> executeAndWait(command_edited, logger));
             }
         }
     }

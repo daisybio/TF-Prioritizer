@@ -15,8 +15,9 @@ public class Jaspar extends AbstractModule
             new Config<>("https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_redundant_pfms_jaspar.txt",
                     false);
 
-    public final Config<String> apiCallStart = new Config<>("https://jaspar.genereg.net/api/v1/matrix/", false);
-    public final Config<String> apiCallEnd = new Config<>(" -H 'Accept: application/json'", false);
+    public final Config<String> apiCall = new Config<>(
+            "curl -X GET https://jaspar.genereg.net/api/v1/matrix/{MATRIXID}/ -H " +
+                    "'Accept:application/json' -o '{OUTPUTFILE}' --create-dirs", false);
     public final Config<String> logoDownloadUrl =
             new Config<>("https://jaspar.genereg.net/static/logos/all/svg/", false);
 

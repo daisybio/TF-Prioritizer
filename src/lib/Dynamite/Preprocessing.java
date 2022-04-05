@@ -96,16 +96,7 @@ public class Preprocessing extends ExecutableStep
 
                 String command = "python3 " + f_script.get().getAbsolutePath() + " " + String.join(" ", parameters);
 
-                executorService.submit(() ->
-                {
-                    try
-                    {
-                        executeAndWait(command, logger);
-                    } catch (IOException | InterruptedException e)
-                    {
-                        logger.error(e.getMessage());
-                    }
-                });
+                executorService.submit(() -> executeAndWait(command, logger));
             }
         }
 
@@ -119,21 +110,12 @@ public class Preprocessing extends ExecutableStep
             {
                 File targetFile = extend(d_outputClassification.get(), pairing, hm, s_prepClass.get());
                 makeSureFileExists(targetFile, logger);
-                
+
                 String command = "Rscript " + f_scriptClassification.get().getAbsolutePath() + " " +
                         extend(d_output.get(), pairing, hm, s_log2coeff.get()).getAbsolutePath() + " " +
                         targetFile.getAbsolutePath();
 
-                executorService.submit(() ->
-                {
-                    try
-                    {
-                        executeAndWait(command, logger);
-                    } catch (IOException | InterruptedException e)
-                    {
-                        logger.error(e.getMessage());
-                    }
-                });
+                executorService.submit(() -> executeAndWait(command, logger));
             }
         }
     }

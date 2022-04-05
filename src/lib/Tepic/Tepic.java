@@ -178,16 +178,7 @@ public class Tepic extends ExecutableStep
 
                     sampleConfigs.put("S", extend(d_output, s_outputRaw_trapSequences.get()).getAbsolutePath());
 
-                    executorService.submit(() ->
-                    {
-                        try
-                        {
-                            executeAndWait(getCommand(sampleConfigs), logger);
-                        } catch (IOException | InterruptedException e)
-                        {
-                            logger.error(e.getMessage());
-                        }
-                    });
+                    executorService.submit(() -> executeAndWait(getCommand(sampleConfigs), logger));
                 }
             }
         }
