@@ -128,12 +128,20 @@ public abstract class ExecutableStep
             }
         }
 
+        System.out.println(requiredFileStructure);
+
         for (Config<File> fileConfig : requiredFileStructure)
         {
             if (!TFPRIO.createdFileStructure.contains(fileConfig))
             {
                 allGood = false;
-                logger.warn("Required FileStructure has not been created: " + fileConfig.get().getAbsolutePath());
+                if (fileConfig.get() == null)
+                {
+                    logger.warn("Required FileStructure is null: " + fileConfig.getName());
+                } else
+                {
+                    logger.warn("Required FileStructure has not been created: " + fileConfig.get().getAbsolutePath());
+                }
             }
         }
         return allGood;
@@ -372,7 +380,7 @@ public abstract class ExecutableStep
         return TFPRIO.configs.general.threadLimit.get();
     }
 
-    protected Config<File> getFirstExisting(List<Config<File>> priorities)
+    @Deprecated protected static Config<File> getFirstExisting(List<Config<File>> priorities)
     {
         for (Config<File> priority : priorities)
         {

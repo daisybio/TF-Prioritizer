@@ -3,9 +3,9 @@ package lib.Dynamite;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.Config;
+import util.FileManagement;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 import static util.FileManagement.extend;
@@ -56,7 +56,7 @@ public class Preprocessing extends ExecutableStep
 
     @Override protected void updateInputDirectory()
     {
-        d_input = getFirstExisting(Arrays.asList(TFPRIO.configs.tgene.fileStructure.d_integrate,
+        d_input = FileManagement.getFirstExisting(Arrays.asList(TFPRIO.configs.tgene.fileStructure.d_integrate,
                 TFPRIO.configs.tgene.fileStructure.d_filteredTargetGenes,
                 TFPRIO.configs.tepic.fileStructure.d_postprocessing_output));
         logger.debug("Input: " + d_input.get().getAbsolutePath());

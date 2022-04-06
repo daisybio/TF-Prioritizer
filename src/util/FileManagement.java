@@ -1,5 +1,6 @@
 package util;
 
+import tfprio.TFPRIO;
 import util.Configs.Config;
 
 import java.io.File;
@@ -373,5 +374,17 @@ public class FileManagement
                 }
             }
         }
+    }
+
+    public static Config<File> getFirstExisting(List<Config<File>> priorities)
+    {
+        for (Config<File> priority : priorities)
+        {
+            if (TFPRIO.createdFileStructure.contains(priority))
+            {
+                return priority;
+            }
+        }
+        return null;
     }
 }

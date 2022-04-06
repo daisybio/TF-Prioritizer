@@ -1,10 +1,14 @@
 package tfprio;
 
 import lib.ExecutableStep;
+import util.Configs.Config;
 import util.ExecutionTimeMeasurement;
 import util.Logger;
 
+import java.io.File;
 import java.util.*;
+
+import static util.FileManagement.getFirstExisting;
 
 public class Workflow
 {
@@ -113,13 +117,15 @@ public class Workflow
         steps.add(new lib.DistributionAnalysis.GenerateTargetGenesHeatmaps());
 
         steps.add(new lib.Logos.TfBindingLogoBiophysicalSequence());
-        steps.add(new lib.Logos.PredictedBindingSites());*/
+        steps.add(new lib.Logos.PredictedBindingSites());
 
         if (TFPRIO.configs.chipAtlas.isEnabled.get())
         {
-            //steps.add(new lib.ChiPAtlas.GetDataList());
+            steps.add(new lib.ChiPAtlas.GetDataList());
             steps.add(new lib.ChiPAtlas.GetData());
-        }
+        }*/
+
+        steps.add(new lib.Igv.DcgTargetGenes());
     }
 
     public boolean simulationSuccessful()
@@ -157,5 +163,19 @@ public class Workflow
             sb_out.append(step.getClass().getName()).append("\n");
         }
         return sb_out.toString();
+    }
+
+    public static Config<File> getLatestInputDirectory()
+    {
+        List<Config<File>> inputDirectories =
+                Arrays.asList(TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input,
+                        TFPRIO.configs.blacklist.fileStructure.d_newInput,
+                        TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks,
+                        TFPRIO.configs.mixOptions.fileStructure.d_hmMix,
+                        TFPRIO.configs.mixOptions.fileStructure.d_sampleMix,
+                        TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr,
+                        TFPRIO.configs.tepic.inputDirectory);
+
+        return getFirstExisting(inputDirectories);
     }
 }

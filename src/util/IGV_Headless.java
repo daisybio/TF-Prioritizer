@@ -2,18 +2,22 @@ package util;
 
 import tfprio.TFPRIO;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.List;
+
+import static util.FileManagement.extend;
+import static util.FileManagement.writeFile;
+import static util.ScriptExecution.executeAndWait;
 
 public class IGV_Headless
 {
     private final StringBuilder commandBuilder = new StringBuilder();
     private final String name;
+    private final Logger logger;
 
-    public IGV_Headless(String name)
+    public IGV_Headless(String name, Logger logger)
     {
+        this.logger = logger;
         this.name = name;
         addCommand("new");
     }
@@ -23,18 +27,22 @@ public class IGV_Headless
         commandBuilder.append(command).append("\n");
     }
 
-    private void save(File file) throws IOException
+    private void save(File file)
     {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        writer.write(commandBuilder.toString());
-        writer.close();
+        try
+        {
+            writeFile(file, commandBuilder.toString());
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
     }
 
-    public void run(File workingDirectory) throws Exception
+    public void run(File workingDirectory)
     {
         addCommand("exit");
 
-        File batchFile = new File(workingDirectory.getAbsolutePath() + File.separator + name + ".bat");
+        File batchFile = extend(workingDirectory, name + ".bat");
 
         save(batchFile);
 
@@ -42,15 +50,50 @@ public class IGV_Headless
                 "xvfb-run --auto-servernum --server-num=1 " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
                         "/igv.sh" + " -b " + batchFile.getAbsolutePath();
 
-        Process child = Runtime.getRuntime().exec(command);
-        int code = child.waitFor();
-        switch (code)
+        executeAndWait(command, logger);
+    }
+
+    public static void createSession(File f_output, String loadCommand, List<File> tdfFiles, Logger logger)
+    {
+        IGV_Headless igv = new IGV_Headless("create_session", logger);
+
+        igv.addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
+
+        igv.addCommand(loadCommand);
+
+        //remodel tdf files if available
+
+        for (File f_tdf : tdfFiles)
         {
-            case 0:
-                break;
-            case 1:
-                String message = child.getErrorStream().toString();
-                throw new Exception(message);
+            igv.addCommand("setLogScale " + f_tdf.getName());
+            igv.addCommand("setDataRange auto " + f_tdf.getName());
+            igv.addCommand("setTrackHeight " + f_tdf.getName() + " 60");
         }
+
+        //include enhancer regions of interest if available
+        if (TFPRIO.configs.igv.enhancerDatabases.isSet() && TFPRIO.configs.igv.enhancerDatabases.get().size() > 0)
+        {
+            File f_merged_databases =
+                    TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_genePositions_enhancerDBs.get();
+
+            try (BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases)))
+            {
+                String line_mergedDB;
+                br_mergedDB.readLine();
+                while ((line_mergedDB = br_mergedDB.readLine()) != null)
+                {
+                    String[] split = line_mergedDB.split("\t");
+
+                    igv.addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
+                }
+            } catch (IOException e)
+            {
+                logger.error(e.getMessage());
+            }
+        }
+
+        igv.addCommand("saveSession " + f_output);
+
+        igv.run(f_output.getParentFile());
     }
 }
