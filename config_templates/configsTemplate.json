@@ -114,7 +114,6 @@
     "topLog2fcIncludeLncRnaPseudogenes": true,
     "pathToTdf": null,
     "pathToTfChipSeq": null,
-    "pathToIGV": null,
     "topLog2fc": 15,
     "speciesReferenceGenome": "mm10",
     "includePredictionData": null,

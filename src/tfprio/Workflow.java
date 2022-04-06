@@ -117,7 +117,8 @@ public class Workflow
 
         if (TFPRIO.configs.chipAtlas.isEnabled.get())
         {
-            steps.add(new lib.ChiPAtlas.GetDataList());
+            //steps.add(new lib.ChiPAtlas.GetDataList());
+            steps.add(new lib.ChiPAtlas.GetData());
         }
     }
 
