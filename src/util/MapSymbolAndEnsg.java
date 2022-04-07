@@ -16,8 +16,10 @@ public class MapSymbolAndEnsg
 {
     private final Map<String, Set<String>> symbolEnsg = new HashMap<>();
     private final Map<String, String> ensgSymbol = new HashMap<>();
+    private final Map<String, String> ensgDescription = new HashMap<>();
+    private final Map<String, String> symbolDescription = new HashMap<>();
     private final Logger logger = new Logger(this.getClass().getSimpleName());
-    private List<String> ensgList = new ArrayList<>();
+    private final List<String> ensgList = new ArrayList<>();
 
     private final Config<File> f_map = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
     private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_mapping;
@@ -71,6 +73,9 @@ public class MapSymbolAndEnsg
                     symbolEnsg.put(symbol, new HashSet<>(List.of(ensg)));
                     ensgSymbol.put(ensg, symbol);
                     ensgList.add(ensg);
+                    String description = line.length > 2 ? line[2] : "";
+                    ensgDescription.put(ensg, description);
+                    symbolDescription.put(symbol, description);
                 }
             }
         }
@@ -116,6 +121,42 @@ public class MapSymbolAndEnsg
         } else
         {
             throw new NoSuchFieldException("Could not find ensg " + ensg + " in the map file.");
+        }
+    }
+
+    public String ensgToDescription(String ensg) throws NoSuchFieldException
+    {
+        if (ensgDescription.containsKey(ensg.toUpperCase()))
+        {
+            return ensgDescription.get(ensg.toUpperCase());
+        } else
+        {
+            throw new NoSuchFieldException("Could not find ensg " + ensg + " in the map file.");
+        }
+    }
+
+    public String symbolToDescription(String symbol) throws NoSuchFieldException
+    {
+        if (symbolDescription.containsKey(symbol.toUpperCase()))
+        {
+            return symbolDescription.get(symbol.toUpperCase());
+        } else
+        {
+            throw new NoSuchFieldException("Could not find symbol " + symbol + " in the map file.");
+        }
+    }
+
+    public String anyToDescription(String any) throws NoSuchFieldException
+    {
+        if (symbolDescription.containsKey(any.toUpperCase()))
+        {
+            return symbolDescription.get(any.toUpperCase());
+        } else if (ensgDescription.containsKey(any.toUpperCase()))
+        {
+            return ensgDescription.get(any.toUpperCase());
+        } else
+        {
+            throw new NoSuchFieldException("Could not find symbol or ensg " + any + " in the map file.");
         }
     }
 
