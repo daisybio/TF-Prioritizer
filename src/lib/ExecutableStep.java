@@ -128,8 +128,6 @@ public abstract class ExecutableStep
             }
         }
 
-        System.out.println(requiredFileStructure);
-
         for (Config<File> fileConfig : requiredFileStructure)
         {
             if (!TFPRIO.createdFileStructure.contains(fileConfig))

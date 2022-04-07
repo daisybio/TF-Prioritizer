@@ -10,6 +10,8 @@ import util.IGV_Headless;
 import java.io.*;
 import java.util.*;
 
+import static lib.Igv.Helpers.getGeneCoordinates;
+import static lib.Igv.Helpers.getInputFiles;
 import static util.FileManagement.extend;
 
 public class DcgTargetGenes extends ExecutableStep
@@ -71,46 +73,7 @@ public class DcgTargetGenes extends ExecutableStep
 
     @Override protected void execute()
     {
-        HashMap<String, String> gene_coordinates = new HashMap<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(f_input_geneCoordinates.get())))
-        {
-            String inputLine;
-            reader.readLine();
-
-            while ((inputLine = reader.readLine()) != null)
-            {
-                String[] split = inputLine.split("\t");
-
-                if (split[1].startsWith("CHR"))
-                {
-                    continue;
-                }
-
-                String gene_name;
-                if (split[0].equals(""))
-                {
-                    gene_name = split[6];
-                } else
-                {
-                    gene_name = split[0];
-                }
-
-                String chr = "chr" + split[1];
-                int begin = Integer.parseInt(split[2]);
-                int end = Integer.parseInt(split[3]);
-
-                begin -= 50000;
-                end += 50000;
-
-                String position_string = chr + ":" + begin + "-" + end;
-                gene_coordinates.put(gene_name.toUpperCase(), position_string);
-            }
-        } catch (IOException e)
-        {
-            logger.error(e.getMessage());
-        }
-
+        Map<String, String> gene_coordinates = getGeneCoordinates(f_input_geneCoordinates.get(), logger);
 
         for (File d_tf : Objects.requireNonNull(d_input_heatmaps.get().listFiles(Filters.directoryFilter)))
         {
@@ -124,8 +87,6 @@ public class DcgTargetGenes extends ExecutableStep
                 {
                     executorService.submit(() ->
                     {
-
-
                         String groupPairing =
                                 f_groupPairing.getName().substring(0, f_groupPairing.getName().lastIndexOf("."));
 
@@ -163,89 +124,11 @@ public class DcgTargetGenes extends ExecutableStep
                         //create IGV load for both groups
                         ArrayList<File> tdf_files = new ArrayList<>();
 
-                        ArrayList<String> loadFiles = new ArrayList<>();
+                        List<String> loadFiles =
+                                getInputFiles(List.of(groupsSplit), includePredictionData, d_input_tepic,
+                                        pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdf_files);
 
-                        for (String group : groupsSplit)
-                        {
-                            //include predictive HMs
-                            if (includePredictionData.isSet() && includePredictionData.get().size() > 0)
-                            {
-                                for (Object includingHmObject : includePredictionData.get())
-                                {
-                                    String includingHm = (String) includingHmObject;
-
-                                    File d_input = extend(d_input_tepic.get(), group, includingHm);
-
-                                    if (d_input.exists())
-                                    {
-                                        for (File f_input : Objects.requireNonNull(
-                                                d_input.listFiles(Filters.fileFilter)))
-                                        {
-                                            loadFiles.add(f_input.getAbsolutePath());
-                                        }
-                                    }
-                                }
-                            }
-
-                            //add all own TF ChIP-seq if available
-                            if (pathToTfChipSeq.isSet())
-                            {
-                                File d_input = extend(pathToTfChipSeq.get(), group);
-                                if (d_input.exists() && d_input.isDirectory())
-                                {
-                                    for (File d_input_tf : Objects.requireNonNull(
-                                            d_input.listFiles(Filters.directoryFilter)))
-                                    {
-                                        for (File f_input : Objects.requireNonNull(
-                                                d_input_tf.listFiles(Filters.fileFilter)))
-                                        {
-                                            loadFiles.add(f_input.getAbsolutePath());
-                                        }
-                                    }
-                                }
-                            }
-
-
-                            //add TDF if available
-                            if (pathToTdf.isSet())
-                            {
-                                File d_input = extend(pathToTdf.get(), group);
-                                if (d_input.exists() && d_input.isDirectory())
-                                {
-                                    for (File d_input_hm : Objects.requireNonNull(
-                                            d_input.listFiles(Filters.directoryFilter)))
-                                    {
-                                        for (File f_input : Objects.requireNonNull(
-                                                d_input_hm.listFiles(Filters.fileFilter)))
-                                        {
-                                            loadFiles.add(f_input.getAbsolutePath());
-                                            tdf_files.add(f_input);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (d_input_peakFiles.get().exists())
-                        {
-                            for (File d_input_tf : Objects.requireNonNull(
-                                    d_input_peakFiles.get().listFiles(Filters.directoryFilter)))
-                            {
-                                for (File f_input : Objects.requireNonNull(d_input_tf.listFiles(Filters.fileFilter)))
-                                {
-                                    String file_name = f_input.getName();
-
-                                    if (file_name.endsWith("idx") || file_name.endsWith("bam"))
-                                    {
-                                        continue;
-                                    }
-
-                                    loadFiles.add(f_input.getAbsolutePath());
-                                }
-                            }
-                        }
-
-                        String loadCommand = "load " + String.join(", ", loadFiles);
+                        String loadCommand = "load " + String.join("\nload ", loadFiles);
 
                         //save session
                         File f_save_session = extend(d_output_groupPairing, s_session.get());
@@ -254,8 +137,9 @@ public class DcgTargetGenes extends ExecutableStep
 
                         IGV_Headless igv = new IGV_Headless(groupPairing, logger);
 
-                        igv.addCommand("genome" + speciesReferenceGenome);
+                        igv.addCommand("genome " + speciesReferenceGenome);
                         igv.addCommand("load " + f_save_session.getAbsolutePath());
+                        igv.addCommand("snapshotDirectory " + d_output_groupPairing.getAbsolutePath());
 
                         for (int i = 0; i < regulated_genes.size(); i++)
                         {
@@ -267,7 +151,6 @@ public class DcgTargetGenes extends ExecutableStep
                                 continue;
                             }
 
-                            igv.addCommand("snapshotDirectory " + d_output_groupPairing.getAbsolutePath());
                             igv.addCommand("goto " + gene_coordinates.get(locus));
                             igv.addCommand("snapshot " + rank + "_" + regulated_genes.get(i) + ".png");
                         }

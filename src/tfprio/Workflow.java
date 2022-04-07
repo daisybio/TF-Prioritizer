@@ -123,9 +123,15 @@ public class Workflow
         {
             steps.add(new lib.ChiPAtlas.GetDataList());
             steps.add(new lib.ChiPAtlas.GetData());
-        }*/
+        }
 
-        steps.add(new lib.Igv.DcgTargetGenes());
+        steps.add(new lib.Igv.DcgTargetGenes());*/
+
+        if (TFPRIO.configs.igv.importantLociAllPrioTf.isSet() &&
+                TFPRIO.configs.igv.importantLociAllPrioTf.get().size() > 0)
+        {
+            steps.add(new lib.Igv.ImportantLoci());
+        }
     }
 
     public boolean simulationSuccessful()
