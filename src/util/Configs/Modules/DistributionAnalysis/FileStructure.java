@@ -85,10 +85,10 @@ public class FileStructure extends AbstractModule
     public final Config<File> f_heatmaps_script = extend(d_heatmaps, "heatmap.R");
 
     public final Config<File> d_cooccurrence = extend(d_root, "12_COOCCURENCE");
-    public final Config<File> f_cooccurrence_mergedBed = extend(d_cooccurrence, "cooccurence_merged.bed");
-    public final Config<File> f_cooccurrence_mergedBedSorted = extend(d_cooccurrence, "cooccurence_merged_sorted.bed");
-    public final Config<File> f_cooccurrence_script = extend(d_cooccurrence, "sort_and_merge.sh");
-    public final Config<File> f_cooccurrence_frequencies = extend(d_cooccurrence, "cooccurence_frequencies.csv");
+    public final Config<File> f_cooccurrence_concatenatedBed = extend(d_cooccurrence, "concatenated.bed");
+    public final Config<File> f_cooccurrence_sortedBed = extend(d_cooccurrence, "sorted.bed");
+    public final Config<File> f_cooccurrence_mergedBed = extend(d_cooccurrence, "merged.bed");
+    public final Config<File> f_cooccurrence_frequencies = extend(d_cooccurrence, "frequencies.csv");
 
 
     public FileStructure(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)

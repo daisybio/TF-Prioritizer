@@ -131,11 +131,12 @@ public class Workflow
                 TFPRIO.configs.igv.importantLociAllPrioTf.get().size() > 0)
         {
             steps.add(new lib.Igv.ImportantLoci());
-        }*/
+        }
         if (TFPRIO.configs.igv.topLog2fc.get() > 0)
         {
             steps.add(new lib.Igv.TopLog2FC());
-        }
+        }*/
+        steps.add(new lib.DistributionAnalysis.CoOccurrenceAnalysis());
     }
 
     public boolean simulationSuccessful()
