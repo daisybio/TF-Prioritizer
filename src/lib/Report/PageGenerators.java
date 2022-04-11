@@ -156,7 +156,7 @@ public class PageGenerators
 
     static void generateParameters() throws IOException
     {
-        Report.logger.info("Start generating report parameters page");
+        Report.staticLogger.info("Start generating report parameters page");
         String parameters =
                 StructureElements.getFrame("Parameters", TFPRIO.configs.report.inputStructure.f_parameters.get());
 
@@ -230,12 +230,12 @@ public class PageGenerators
         //        FileManagement.loadFile(COM2POSE.configs.report.inputStructure.f_parameters_parameter.get()));
 
         FileManagement.writeHTML(TFPRIO.configs.report.outputStructure.f_parameters.get(), parameters, 0);
-        Report.logger.info("Finished generating report parameters page");
+        Report.staticLogger.info("Finished generating report parameters page");
     }
 
     static void generateHome(ArrayList<TranscriptionFactorGroup> transcriptionFactorGroups) throws IOException
     {
-        Report.logger.info("Start generating report home page");
+        Report.staticLogger.info("Start generating report home page");
         String home =
                 StructureElements.getFrame("Transcription factors", TFPRIO.configs.report.inputStructure.f_home.get());
 
@@ -290,7 +290,7 @@ public class PageGenerators
         home = home.replace("{TFS}", sb_tfs.toString());
 
         FileManagement.writeHTML(TFPRIO.configs.report.outputStructure.f_home.get(), home, 0);
-        Report.logger.info("Finished generating report home page");
+        Report.staticLogger.info("Finished generating report home page");
     }
 
     static void generateRegressionPerformance() throws IOException
@@ -669,7 +669,7 @@ public class PageGenerators
                             sb_hm.append(TFPRIO.mapSymbolAndEnsg.symbolToEnsg(targetGeneSymbol));
                         } catch (NoSuchFieldException e)
                         {
-                            Report.logger.warn(e.getMessage());
+                            Report.staticLogger.warn(e.getMessage());
                         }
                         sb_hm.append("\n");
                     }

@@ -135,8 +135,9 @@ public class Workflow
         if (TFPRIO.configs.igv.topLog2fc.get() > 0)
         {
             steps.add(new lib.Igv.TopLog2FC());
-        }*/
-        steps.add(new lib.DistributionAnalysis.CoOccurrenceAnalysis());
+        }
+        steps.add(new lib.DistributionAnalysis.CoOccurrenceAnalysis());*/
+        steps.add(new lib.Report.Report());
     }
 
     public boolean simulationSuccessful()

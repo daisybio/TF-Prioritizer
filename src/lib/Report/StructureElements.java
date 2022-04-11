@@ -77,7 +77,7 @@ public class StructureElements
         return basicData.toString();
     }
 
-    private static String getBasicDataEntry(String tfName, String name, Map<String, Map<String, Number>> data)
+    private static String getBasicDataEntry(String tfName, String analysisName, Map<String, Map<String, Number>> data)
             throws IOException
     {
         if (data.size() == 0)
@@ -87,11 +87,12 @@ public class StructureElements
 
         String template = FileManagement.readFile(TFPRIO.configs.report.inputStructure.f_basicDataEntry.get());
 
-        template = template.replace("{ANALYSIS-NAME}", name);
+        template = template.replace("{ANALYSIS-NAME}", analysisName);
 
-        template = template.replace("{FILENAME}", tfName + "_" + name.replace(" ", "-"));
+        template = template.replace("{FILENAME}", tfName + "_" + analysisName.replace(" ", "-"));
 
-        template = template.replace("{DATA}", getTabularData(String.valueOf((tfName + " " + name).hashCode()), data));
+        template = template.replace("{DATA}",
+                getTabularData(String.valueOf((tfName + " " + analysisName).hashCode()), data));
 
         template = template.replace("{TF-NAME}", tfName);
 

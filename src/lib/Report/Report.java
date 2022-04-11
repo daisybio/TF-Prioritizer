@@ -1,6 +1,9 @@
 package lib.Report;
 
+import lib.ExecutableStep;
 import tfprio.TFPRIO;
+import util.Configs.Config;
+import util.FileFilters.Filters;
 import util.FileManagement;
 import util.Logger;
 
@@ -10,28 +13,77 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class Report
+public class Report extends ExecutableStep
 {
-    static Logger logger = null;
     final ArrayList<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
     static final DecimalFormat formatter = new DecimalFormat("0.###");
     static Map<SelectorTypes, ArrayList<String>> existingValues = new HashMap<>();
+    static Logger staticLogger;
 
-    public Report() throws IOException
+    @Override protected Set<Config<File>> getRequiredFileStructure()
     {
+        return new HashSet<>();
+    }
+
+    @Override protected Set<Config<File>> getCreatedFileStructure()
+    {
+        return new HashSet<>();
+    }
+
+    @Override protected Set<Config<?>> getRequiredConfigs()
+    {
+        return new HashSet<>();
+    }
+
+    @Override protected void execute()
+    {
+        staticLogger = logger;
         for (SelectorTypes type : SelectorTypes.values())
         {
             existingValues.put(type, new ArrayList<>());
         }
 
-        logger = new Logger("Report", true, TFPRIO.configs.general.logFile.get());
-
         logger.info("Start loading TF data");
-        loadTFs();
+        try
+        {
+            loadTFs();
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
         findExistingValues();
         logger.info("Finished loading TF data");
-    }
 
+        try
+        {
+            copyDependencies();
+
+            PageGenerators.generateGeneralPages();
+            PageGenerators.generateHome(transcriptionFactorGroups);
+
+            int i = 1;
+
+            for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
+            {
+                System.out.print(
+                        "Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
+                                tfGroup.getName() + ": Validation.\r");
+                tfGroup.setValidation(PageGenerators.generateValidation(tfGroup));
+                System.out.print(
+                        "Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
+                                tfGroup.getName() + ": Distribution.\r");
+                tfGroup.setDistribution(PageGenerators.generateDistribution(tfGroup));
+                System.out.print(
+                        "Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
+                                tfGroup.getName() + ": Regression.\r");
+                tfGroup.setRegression(PageGenerators.generateRegression(tfGroup));
+                i++;
+            }
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
 
     private Map<String, Map<String, Map<String, Double>>> loadRegressionCoefficients() throws IOException
     {
@@ -112,6 +164,7 @@ public class Report
                             geneID = id;
                             break;
                         }
+                        logger.debug("Loading data for TF: " + tf_name);
 
                         Map<String, Map<String, Number>> log2fc = new HashMap<>();
                         Map<String, Number> tpm = new HashMap<>();
@@ -120,35 +173,33 @@ public class Report
                         {   //LOG2FC
                             File d_log2fs = TFPRIO.configs.deSeq2.fileStructure.d_output.get();
 
-                            for (File entry : Objects.requireNonNull(d_log2fs.listFiles()))
+                            for (File entry : Objects.requireNonNull(d_log2fs.listFiles(Filters.fileFilter)))
                             {
-                                if (entry.isFile())
+                                String groupPairing = entry.getName().substring(0, entry.getName().lastIndexOf("."));
+                                String group1 = groupPairing.split("_")[0];
+                                String group2 = groupPairing.split("_")[1];
+
+                                existingValues.get(SelectorTypes.GROUPS).add(group1);
+                                existingValues.get(SelectorTypes.GROUPS).add(group2);
+
+                                try
                                 {
-                                    String group1 = entry.getName().split("_")[0];
-                                    String group2 = entry.getName().split("_")[1];
+                                    double log2fc_value = Double.parseDouble(
+                                            FileManagement.findValueInTable(geneID, 0, 1, entry, "\t", false));
 
-                                    existingValues.get(SelectorTypes.GROUPS).add(group1);
-                                    existingValues.get(SelectorTypes.GROUPS).add(group2);
-
-                                    try
+                                    if (!log2fc.containsKey(group1))
                                     {
-                                        double log2fc_value = Double.parseDouble(
-                                                FileManagement.findValueInTable(geneID, 0, 1, entry, "\t", false));
-
-                                        if (!log2fc.containsKey(group1))
-                                        {
-                                            log2fc.put(group1, new HashMap<>());
-                                        }
-                                        if (!log2fc.containsKey(group2))
-                                        {
-                                            log2fc.put(group2, new HashMap<>());
-                                        }
-
-                                        log2fc.get(group1).put(group2, log2fc_value);
-                                        log2fc.get(group2).put(group1, log2fc_value);
-                                    } catch (NoSuchFieldException ignored)
-                                    {
+                                        log2fc.put(group1, new HashMap<>());
                                     }
+                                    if (!log2fc.containsKey(group2))
+                                    {
+                                        log2fc.put(group2, new HashMap<>());
+                                    }
+
+                                    log2fc.get(group1).put(group2, log2fc_value);
+                                    log2fc.get(group2).put(group1, log2fc_value);
+                                } catch (NoSuchFieldException ignored)
+                                {
                                 }
                             }
                         }   //LOG2FC
@@ -156,20 +207,19 @@ public class Report
                         {   //TPM
                             File d_tpm = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults.get();
 
-                            for (File entry : Objects.requireNonNull(d_tpm.listFiles()))
+                            for (File f_group : Objects.requireNonNull(
+                                    d_tpm.listFiles(Filters.getSuffixFilter(".tsv"))))
                             {
-                                if (entry.isFile() && entry.getName().endsWith(".csv"))
-                                {
-                                    String group = entry.getName().split("_")[0];
+                                String group = f_group.getName().substring(0, f_group.getName().lastIndexOf("."));
 
-                                    try
-                                    {
-                                        double tpm_value = Double.parseDouble(
-                                                FileManagement.findValueInTable(geneID, 0, 3, entry, "\t", false));
-                                        tpm.put(group, tpm_value);
-                                    } catch (NoSuchFieldException ignored)
-                                    {
-                                    }
+                                try
+                                {
+                                    double tpm_value = Double.parseDouble(
+                                            FileManagement.findValueInTable(geneID, 1, 4, f_group, "\t", true));
+                                    tpm.put(group, tpm_value);
+                                } catch (NoSuchFieldException e)
+                                {
+                                    logger.warn("No tpm found for " + tf_name + " in group " + group);
                                 }
                             }
                         }   //TPM
@@ -178,20 +228,20 @@ public class Report
                             File d_normex = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts.get();
 
 
-                            for (File entry : Objects.requireNonNull(d_normex.listFiles()))
+                            for (File f_group : Objects.requireNonNull(
+                                    d_normex.listFiles(Filters.getSuffixFilter(".tsv"))))
                             {
-                                if (entry.isFile() && entry.getName().endsWith(".csv"))
-                                {
-                                    String group = entry.getName().split("\\.")[0];
+                                String group = f_group.getName().substring(0, f_group.getName().lastIndexOf("."));
 
-                                    try
-                                    {
-                                        int exp_value = Integer.parseInt(
-                                                FileManagement.findValueInTable(geneID, 1, 2, entry, "\t", false));
-                                        normex.put(group, exp_value);
-                                    } catch (NoSuchFieldException ignored)
-                                    {
-                                    }
+                                try
+                                {
+                                    int exp_value = Integer.parseInt(
+                                            FileManagement.findValueInTable(geneID, 1, 2, f_group, "\t", false));
+                                    normex.put(group, exp_value);
+                                } catch (NoSuchFieldException e)
+                                {
+                                    logger.warn("No normalized expression data found for " + tf_name + " in group " +
+                                            group);
                                 }
                             }
                         }   //Normalized expression
@@ -293,34 +343,6 @@ public class Report
         }
     }
 
-    public void generate() throws IOException, InterruptedException
-    {
-        logger.info("Start generating report");
-
-        copyDependencies();
-
-        PageGenerators.generateGeneralPages();
-        PageGenerators.generateHome(transcriptionFactorGroups);
-
-        int i = 1;
-
-        for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
-        {
-            System.out.print("Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
-                    tfGroup.getName() + ": Validation.\r");
-            tfGroup.setValidation(PageGenerators.generateValidation(tfGroup));
-            System.out.print("Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
-                    tfGroup.getName() + ": Distribution.\r");
-            tfGroup.setDistribution(PageGenerators.generateDistribution(tfGroup));
-            System.out.print("Generating report for tf " + i + " out of " + transcriptionFactorGroups.size() + ": " +
-                    tfGroup.getName() + ": Regression.\r");
-            tfGroup.setRegression(PageGenerators.generateRegression(tfGroup));
-            i++;
-        }
-
-        logger.info("Finished generating report");
-    }
-
     private void copyDependencies() throws IOException
     {
         logger.info("Start copying dependencies");
@@ -336,14 +358,7 @@ public class Report
 
     private void findExistingValues()
     {
-        {
-            File pairings = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combined.get();
-
-            for (File pairing : Objects.requireNonNull(pairings.listFiles()))
-            {
-                existingValues.get(SelectorTypes.GROUP_PAIRINGS).add(pairing.getName());
-            }
-        }
+        existingValues.get(SelectorTypes.GROUP_PAIRINGS).addAll(TFPRIO.groupCombinationsToHms.keySet());
 
         existingValues.get(SelectorTypes.PERFORMANCE_CUTOFFS).addAll(List.of("1", "2", "3"));
 
