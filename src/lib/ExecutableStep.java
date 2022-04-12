@@ -21,13 +21,47 @@ import java.util.concurrent.TimeUnit;
 import static util.FileManagement.*;
 import static util.Hashing.*;
 
+/**
+ * Abstract class for a single analysis performed as part of the pipeline.
+ * <p>
+ * The following practices should be applied to all extending classes:
+ * <ul>
+ *     <li>All the used configs should be stored as private final class data elements in the beginning of the class</li>
+ *     <li>The configs should be split to four blocks:</li>
+ *     <ol>
+ *         <li>Required file structure (input files/directories)</li>
+ *         <li>Created file structure (output files/directories)</li>
+ *         <li>Required configs (mandatory configs for this executableStep)</li>
+ *         <li>Optional configs (not mandatory but influencing the output)</li>
+ *     </ol>
+ *     <li>Each config has to be assigned to one of the following methods: </li>
+ *     <ul>
+ *         <li>{@link #getRequiredFileStructure}</li>
+ *         <li>{@link #getCreatedFileStructure}</li>
+ *         <li>{@link #getRequiredConfigs}</li>
+ *         <li>{@link #getOptionalConfigs}</li>
+ *     </ul>
+ *     <li>If a file structure or config is not required or created if a certain config constellation is active,
+ *     the config constellation should be modelled inside the corresponding get method. The get methods should model
+ *     the real execution requirements and outputs as exact as possible.</li>
+ * </ul>
+ */
 public abstract class ExecutableStep
 {
+    /**
+     * Allows multithreading with a defined number of threads.
+     * The thread number can be set by overriding the {@link #getThreadNumber} method.
+     */
     protected ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreadNumber());
 
-    private final TimeUnit shutDownTimeUnit = TimeUnit.MINUTES;
     protected final Logger logger = new Logger(this.getClass().getName().replace("lib.", "").replace("tfprio.", ""));
 
+    /**
+     * Check if all the requirements of this executableStep are met and broadcast the created file structures. Does
+     * not execute the executableStep.
+     *
+     * @return true if the simulation was successful, otherwise false.
+     */
     public boolean simulate()
     {
         logger.debug("Simulation starting.");
@@ -50,6 +84,12 @@ public abstract class ExecutableStep
         }
     }
 
+    /**
+     * Wraps the executableStep execution with some framework checks.
+     * <p>
+     * Skips the executableStep if developmentMode is not active and valid hashes are found.
+     * Stores new hashes if the executableStep has been executed and developmentMode is disabled.
+     */
     public void run()
     {
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
@@ -84,21 +124,53 @@ public abstract class ExecutableStep
         logger.info("Finished. Step took " + timer.stopAndGetDeltaFormatted() + " seconds.");
     }
 
+    /**
+     * Get the file configs whose value files or directories must have been created before execution of this
+     * executableStep.
+     *
+     * @return a set of the required file structure configs, must not be null.
+     */
     protected abstract Set<Config<File>> getRequiredFileStructure();
 
+    /**
+     * Get the file configs whose value files are created during execution of this executableStep
+     *
+     * @return a set of the created file structure configs, must not be null.
+     */
     protected abstract Set<Config<File>> getCreatedFileStructure();
 
+    /**
+     * Get the configs that are mandatory for execution of this executableStep.
+     *
+     * @return a set of the required configs, must not be null.
+     */
     protected abstract Set<Config<?>> getRequiredConfigs();
 
+    /**
+     * Get the configs that are not mandatory for execution of this executableStep but influence the outcome.
+     * Generally if a Config.isSet() check takes place before config value usage, it is an optional config.
+     *
+     * @return a set of the optional configs, must not be null.
+     */
     protected Set<Config<?>> getOptionalConfigs()
     {
         return new HashSet<>();
     }
 
+    /**
+     * Update input directories if the input directory depends on configs.
+     * This is necessary for the first steps of the pipeline, e.g. checkChromosomeAnnotation, MixOptions, ...
+     */
     protected void updateInputDirectory()
     {
     }
 
+    /**
+     * Add all the created file structures to the TFPRIO.createdFileStructure set.
+     * <p>
+     * Logs an error if an already existing file structure is written to, since this would mean an in-place
+     * manipulation of the file structure. This does not apply if developmentMode is active.
+     */
     private void broadcastCreatedFileStructure()
     {
         for (Config<File> createdStructure : getCreatedFileStructure())
@@ -113,6 +185,19 @@ public abstract class ExecutableStep
         }
     }
 
+    /**
+     * Check if the file structure and config requirements of this executableStep are met.
+     * <p>
+     * The following requirements are checked:
+     * <ul>
+     *     <li>All the required file structures are contained by the TFPRIO.createdFileStructure set</li>
+     *     <li>All the required configs are set</li>
+     * </ul>
+     * <p>
+     * Logs a warning, if a single requirement is not met.
+     *
+     * @return true if all the requirements are met, otherwise false
+     */
     private boolean checkRequirements()
     {
         boolean allGood = true;
@@ -145,6 +230,9 @@ public abstract class ExecutableStep
         return allGood;
     }
 
+    /**
+     * Delete all the file structures created by this executableStep.
+     */
     private void deleteAllOutputs()
     {
         Set<Config<File>> outputFiles = getCreatedFileStructure();
@@ -160,6 +248,12 @@ public abstract class ExecutableStep
         }
     }
 
+    /**
+     * Hash the input directories of this executableStep.
+     *
+     * @return hash string
+     * @throws IOException if the input directories cannot be read.
+     */
     private String hashInputs() throws IOException
     {
         Set<Config<File>> requiredFileStructure = getRequiredFileStructure();
@@ -173,19 +267,37 @@ public abstract class ExecutableStep
         return hashFiles(requiredFiles);
     }
 
+    /**
+     * Hash the required configs of this executableStep.
+     * Required configs have to be set in order to ensure the functionality of this executableStep
+     *
+     * @return hash string
+     */
     private String hashRequiredConfigs()
     {
         Set<Config<?>> requiredConfigs = getRequiredConfigs();
         return util.Hashing.hashConfigs(requiredConfigs);
     }
 
+    /**
+     * Hash the optional configs of this executableStep.
+     * Optional configs are configs which are checked if they are set, before their value is being used.
+     *
+     * @return hash string
+     */
     private String hashOptionalConfigs()
     {
         Set<Config<?>> optionalConfigs = getOptionalConfigs();
         return util.Hashing.hashConfigs(optionalConfigs);
     }
 
-    public String hashOutputs() throws IOException
+    /**
+     * Hash the created file structures.
+     *
+     * @return hash string
+     * @throws IOException if the created files cannot be read
+     */
+    private String hashOutputs() throws IOException
     {
         Set<Config<File>> createdFileStructure = getCreatedFileStructure();
         ArrayList<File> createdFiles = new ArrayList<>();
@@ -198,6 +310,11 @@ public abstract class ExecutableStep
         return hashFiles(createdFiles);
     }
 
+    /**
+     * Calculate the hashes of the found file structures and configs and compare them to the stored values.
+     *
+     * @return true if the hashes match, false if mismatch
+     */
     public boolean verifyHash()
     {
         try
@@ -251,6 +368,17 @@ public abstract class ExecutableStep
         return false;
     }
 
+    /**
+     * Calculate the hashes for all used configs and store them in the hash file.
+     * <p>
+     * Hashed config types:
+     * <ul>
+     *     <li>Input file structures</li>
+     *     <li>Output file structures</li>
+     *     <li>Required configs</li>
+     *     <li>Optional configs</li>
+     * </ul>
+     */
     public void createHash()
     {
         try
@@ -278,11 +406,21 @@ public abstract class ExecutableStep
         }
     }
 
+    /**
+     * Get the hash file for this executableStep.
+     *
+     * @return the hash file
+     */
     private File getHashFile()
     {
         return extend(TFPRIO.configs.general.d_workflowHashes.get(), this.getClass().getName() + ".md5");
     }
 
+    /**
+     * Wait for all queued threads in the executorService to terminate.
+     * Includes a progress and remaining time estimation.
+     * TODO: Implement timout monitoring
+     */
     protected void shutdown()
     {
         long total = executorService.getTaskCount();
@@ -331,12 +469,27 @@ public abstract class ExecutableStep
         }
     }
 
+    /**
+     * Wait for all queued threads to terminate and reinitialize the executorService.
+     */
     protected void finishAllQueuedThreads()
     {
         shutdown();
         executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(TFPRIO.configs.general.threadLimit.get());
     }
 
+    /**
+     * Iterates all class data elements in an executable step and checks if they are assigned to one of the following
+     * config types:
+     * <ul>
+     *     <li>Created file structure</li>
+     *     <li>Required file structure</li>
+     *     <li>Required config</li>
+     *     <li>Optional config</li>
+     * </ul>
+     * <p>
+     * Logs a warning if a config is not assigned.
+     */
     private void verifyConfigUsage()
     {
         Set<Config<?>> registeredConfigs = new HashSet<>();
@@ -355,7 +508,8 @@ public abstract class ExecutableStep
                     Config<?> current = (Config<?>) field.get(this);
                     if (!registeredConfigs.contains(current))
                     {
-                        logger.warn("Config not assigned to a category: " + field.getName());
+                        logger.warn("Config not assigned to a category: " + field.getName() + ". May be due to a " +
+                                "certain config constellation.");
                     }
                 } catch (IllegalAccessException e)
                 {
@@ -368,27 +522,32 @@ public abstract class ExecutableStep
         }
     }
 
+    /**
+     * Get the minutes that the executorService may take for completing all tasks.
+     *
+     * @return 5 if not overridden
+     */
     protected int getShutDownTimeOutMinutes()
     {
         return 5;
     }
 
+    /**
+     * Get the number of threads for this ExecutableStep instance.
+     *
+     * @return configs->general->threadLimit if not overridden
+     */
     protected int getThreadNumber()
     {
         return TFPRIO.configs.general.threadLimit.get();
     }
 
-    @Deprecated protected static Config<File> getFirstExisting(List<Config<File>> priorities)
-    {
-        for (Config<File> priority : priorities)
-        {
-            if (TFPRIO.createdFileStructure.contains(priority))
-            {
-                return priority;
-            }
-        }
-        return null;
-    }
-
+    /**
+     * The job performed by this executableStep.
+     * <p>
+     * If the main job consists of multiple sub jobs that require the previous sub job to be finished, splitting the
+     * process into multiple executableSteps should be considered. If this is not an option, the
+     * finishAllQueuedThreads() method should be used in order to make sure that the previous sub job is finished.
+     */
     protected abstract void execute();
 }
