@@ -17,12 +17,46 @@ import static util.FileManagement.extend;
 
 public class TFPRIO
 {
+    /**
+     * The {@link Configs} object which is referenced by all the {@link lib.ExecutableStep} instances
+     */
     public static Configs configs;
+
+    /**
+     * Mapping the existing groups to their associated histone modifications.
+     */
     public static Map<String, Set<String>> groupsToHms = new HashMap<>();
+
+    /**
+     * Mapping the existing group combinations to their associated histone modifications.
+     */
     public static Map<String, Set<String>> groupCombinationsToHms = new HashMap<>();
+
+    /**
+     * Contains all the file configs whose allocated files or directories will be created during pipeline execution.
+     * <p>
+     * Is being filled during simulation.
+     * In development mode, also existing file structures are considered as created by the pipeline. Otherwise,
+     * commenting out executableSteps inside the {@link Workflow} would lead to a simulator error.
+     */
     public static Set<Config<File>> createdFileStructure = new HashSet<>();
+
+    /**
+     * Allows disk read efficient mapping of geneSymbols, geneIDs and their descriptions.
+     */
     public static MapSymbolAndEnsg mapSymbolAndEnsg;
-    public static Config<File> latestInputDirectory;
+
+
+    /**
+     * Stores the file config pointing to the latest modification of the input files.
+     * <p>
+     * Will be replaced by the {@link Workflow} getLatestInputDirectory method.
+     */
+    @Deprecated public static Config<File> latestInputDirectory;
+
+    /**
+     * Contains all the histone modifications available in the input data.
+     */
     public static Set<String> existingHms = new HashSet<>();
 
     static File workingDirectory;
@@ -48,12 +82,6 @@ public class TFPRIO
         {
             workflow.run();
         }
-
-        /*
-        DESEQ2 Kann BatchVariablen akzeptieren
-        Wenn entsprechende Config gesetzt ist, soll File übergeben werden, wo dann samples Batches zugeordnet sind.
-        Diese Zuordnungen sollen dann DESeq2 übergeben werden
-        */
 
         logger.info("Finished. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
     }
