@@ -26,7 +26,7 @@ public class TFPRIO
     public static Set<String> existingHms = new HashSet<>();
 
     static File workingDirectory;
-    static File tfprioDirectory;
+    static File sourceDirectory;
     static File configFile;
 
     public static void main(String[] args) throws Exception
@@ -34,9 +34,9 @@ public class TFPRIO
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         ArgParser.parseArguments(args);
 
-        configs = new Configs(workingDirectory, tfprioDirectory);
+        configs = new Configs(workingDirectory, sourceDirectory);
 
-        configs.merge(extend(tfprioDirectory, "config_templates", "configsTemplate.json"));
+        configs.merge(extend(sourceDirectory, "config_templates", "configsTemplate.json"));
         configs.merge(configFile);
         configs.validate();
 
