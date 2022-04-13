@@ -6,7 +6,7 @@ else
     echo "Installing R."
 
     # Install necessary dependencies for adding a repo over HTTPS
-    sudo apt install dirmngr gnupg apt-transport-https ca-certificates software-properties-common
+    sudo apt install -y dirmngr gnupg apt-transport-https ca-certificates software-properties-common
 
     # Add repo key and repo itself
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
@@ -18,9 +18,7 @@ else
     rm libicu66_66.1-2ubuntu2_amd64.deb
 
     # Install R
-    sudo apt-get install r-base
-
-    sudo apt-get install build-essential
+    sudo apt-get install -y r-base build-essential
 
     echo "Finished R installation."
 fi
@@ -30,13 +28,13 @@ if java --version; then
 else
     echo "Installing Java."
 
-    sudo apt-get install openjdk-17-jdk openjdk-17-demo openjdk-17-doc openjdk-17-jre-headless openjdk-17-source openjdk-17-jre
+    sudo apt-get install -y openjdk-17-jdk openjdk-17-demo openjdk-17-doc openjdk-17-jre-headless openjdk-17-source openjdk-17-jre
 
     echo "Finished Java installation."
 fi
 
 # Install dependencies for R packages
-sudo apt-get install libcurl4-openssl-dev libxml2-dev libssl-dev
+sudo apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev
 
 # Make libraries writeable for active user
 sudo chown -R "$USER" /usr/local/lib/R/site-library
@@ -48,7 +46,7 @@ Rscript install/r_dependencies.R
 Rscript ext/TEPIC/TEPIC/Code/installRpackages.R
 
 # Install some more linux packages
-sudo apt-get install bedtools python3 unzip python3-pip
+sudo apt-get install -y bedtools python3 unzip python3-pip
 
 # Install required python packages
 python3 -m pip install -r install/requirements.txt
@@ -85,7 +83,7 @@ if [ ! -d "IGV_2.11.2" ]; then
 fi
 
 # Install GCC 9.3.0
-sudo apt-get install build-essential
+sudo apt-get install -y build-essential
 
 # Install additional Java packages
 mkdir -p ext/lib
