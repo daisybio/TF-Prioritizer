@@ -45,17 +45,20 @@ public class CreatePlots extends ExecutableStep
 
     @Override protected Set<Config<File>> getRequiredFileStructure()
     {
-        return new HashSet<>();
+        return new HashSet<>(
+                Arrays.asList(d_input_tfDistributionHm, d_input_backgroundDistributionHm, f_plotScriptTemplate,
+                        f_mwuScriptTemplate));
     }
 
     @Override protected Set<Config<File>> getCreatedFileStructure()
     {
-        return new HashSet<>();
+        return new HashSet<>(
+                Arrays.asList(d_output_plotsHm, d_output_statsHm, d_output_scriptsHm, d_output_mwuScriptsHm));
     }
 
     @Override protected Set<Config<?>> getRequiredConfigs()
     {
-        return new HashSet<>();
+        return new HashSet<>(Arrays.asList(s_input, s_stats));
     }
 
     @Override protected void execute()
