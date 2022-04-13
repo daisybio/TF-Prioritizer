@@ -3,6 +3,7 @@ package tfprio;
 import util.Configs.Config;
 import util.Configs.Configs;
 import util.ExecutionTimeMeasurement;
+import util.Logger;
 import util.MapSymbolAndEnsg;
 
 import java.io.File;
@@ -39,6 +40,8 @@ public class TFPRIO
         configs.merge(configFile);
         configs.validate();
 
+        Logger logger = new Logger("TFPRIO");
+
         Workflow workflow = new Workflow();
 
         if (workflow.simulationSuccessful())
@@ -52,6 +55,6 @@ public class TFPRIO
         Diese Zuordnungen sollen dann DESeq2 übergeben werden
         */
 
-        System.out.println("TFPRIO finished. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
+        logger.info("Finished. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
     }
 }

@@ -121,7 +121,7 @@ public abstract class ExecutableStep
         {
             createHash();
         }
-        logger.info("Finished. Step took " + timer.stopAndGetDeltaFormatted() + " seconds.");
+        logger.info("Finished. Step took " + timer.stopAndGetDeltaFormatted());
     }
 
     /**
