@@ -15,7 +15,6 @@ public class ScriptExecution
         logger.debug("Executing command: " + command);
 
         executeAndWait(command, logger);
-
     }
 
     public static void executeAndWait(List<String> command, Logger logger)
@@ -80,7 +79,8 @@ public class ScriptExecution
         switch (fileExtension)
         {
             case ".R" -> command.add("Rscript");
-            case ".py" -> {
+            case ".py" ->
+            {
                 command.add("python3");
                 if (!fileExecution)
                 {
