@@ -11,7 +11,7 @@ public class ChipAtlas extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<Boolean> isEnabled = new Config<>(false);
+    public final Config<Boolean> isEnabled = new Config<>(false, true);
     public final Config<String> urlToList =
             new Config<>("http://togodb.biosciencedbc.jp/togodb/release/chip_atlas_file_list.csv");
     public final Config<String> column_GeneVersion = new Config<>(".*genome.*assembly.*");

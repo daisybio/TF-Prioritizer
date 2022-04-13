@@ -6,6 +6,8 @@ import util.Logger;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static util.FileManagement.extend;
 
@@ -13,11 +15,14 @@ public class Tepic extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<File> d_ext_tepic = extend(extDirectory, "TEPIC" + File.separator + "TEPIC");
-    public final Config<File> executable = new Config<>(
-            new File(d_ext_tepic.get().getAbsolutePath() + File.separator + "Code" + File.separator + "TEPIC.sh"));
+    public final Config<File> d_ext_tepic = extend(extDirectory, "TEPIC", "TEPIC");
+    public final Config<File> executable = new Config<>(extend(d_ext_tepic.get(), "Code", "TEPIC.sh"));
     public final Config<File> d_dynamiteScripts =
-            extend(d_ext_tepic, "MachineLearningPipelines" + File.separator + "DYNAMITE" + File.separator + "Scripts");
+            extend(d_ext_tepic, "MachineLearningPipelines", "DYNAMITE", "Scripts");
+    public final Config<File> f_dynamite_integrateDate = extend(d_dynamiteScripts, "integrateData.py");
+    public final Config<File> f_dynamite_prepareForClassification =
+            extend(d_dynamiteScripts, "prepareForClassification.R");
+    public final Config<File> f_dynamite = extend(d_dynamiteScripts, "DYNAMITE.R");
 
     public final Config<File> inputDirectory = new Config<>(File.class);
     public final Config<File> inputPrevious = new Config<>(File.class);
@@ -25,7 +30,6 @@ public class Tepic extends AbstractModule
 
     public final Config<File> inputReferenceGenome = new Config<>(File.class);
     public final Config<File> pathPwms = new Config<>(File.class);
-    public final Config<Integer> cores = new Config<>(1, true);
     public final Config<File> bedChromatinSignal = new Config<>(File.class);
     public final Config<Integer> columnBedfile = new Config<>(Integer.class);
     public final Config<File> geneAnnotationFile = new Config<>(File.class);
@@ -51,7 +55,9 @@ public class Tepic extends AbstractModule
     public final Config<File> ensgSymbolFile = new Config<>(File.class);
     public final Config<Boolean> tgeneTargetGenes = new Config<>(true, true);
     public final Config<Boolean> randomizeTfGeneMatrix = new Config<>(false, true);
-    public final Config<String> tfBindingSiteSearch = new Config<>("INSIDE", true);
+    public final Config<String> tfBindingSiteSearch =
+            new Config<>("INSIDE", new ArrayList<>(Arrays.asList("INSIDE", "BETWEEN", "EXCL_BETWEEN")), true);
+    // TODO: Add optional map to set bindingSiteSearch for each histone modification
     public final Config<Integer> betweenMaxBps = new Config<>(500, true);
 
     public Tepic(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)

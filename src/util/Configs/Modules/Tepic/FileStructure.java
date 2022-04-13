@@ -30,15 +30,18 @@ public class FileStructure extends AbstractModule
 
     public final Config<File> d_postprocessing_openChromatinViolins =
             extend(d_postprocessing, "open_chromatin_violin_plots");
-    public final Config<File> d_postprocessing_openChromatinViolins_data = extend(d_postprocessing, "01_data");
+    public final Config<File> d_postprocessing_openChromatinViolins_data =
+            extend(d_postprocessing_openChromatinViolins, "01_data");
     public final Config<File> f_postprocessing_openChromatinViolins_data_csv =
             extend(d_postprocessing_openChromatinViolins_data, "hm_to_open_chromatin_lengths.csv");
 
-    public final Config<File> d_postprocessing_openChromatinViolins_script = extend(d_postprocessing, "02_script");
+    public final Config<File> d_postprocessing_openChromatinViolins_script =
+            extend(d_postprocessing_openChromatinViolins, "02_script");
     public final Config<File> f_postprocessing_openChromatinViolins_script_R =
             extend(d_postprocessing_openChromatinViolins_script, "violin_plots_hm_to_open_chromatin_lengths.R");
 
-    public final Config<File> d_postprocessing_openChromatinViolins_plots = extend(d_postprocessing, "03_plots");
+    public final Config<File> d_postprocessing_openChromatinViolins_plots =
+            extend(d_postprocessing_openChromatinViolins, "03_plots");
     public final Config<File> f_postprocessing_openChromatinViolins_plots_image =
             extend(d_postprocessing_openChromatinViolins_plots, "open_chromatin_lengths_violin.png");
 

@@ -1,5 +1,7 @@
 package util;
 
+import tfprio.TFPRIO;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -15,10 +17,36 @@ public class Logger
 
     private enum LogLevel
     {
-        DEBUG, INFO, WARN, ERROR
+        DEBUG(TerminalColors.WHITE), INFO(TerminalColors.DEFAULT), WARN(TerminalColors.YELLOW),
+        ERROR(TerminalColors.RED), PROG(TerminalColors.BLUE);
+
+        public final String color;
+
+        LogLevel(TerminalColors color)
+        {
+            this.color = color.code;
+        }
     }
 
-    public Logger(String module, boolean fileLoggingEnabled, File logFile) throws IOException
+    private enum TerminalColors
+    {
+        RED("\u001B[31m"), GREEN("\u001B[32m"), YELLOW("\u001B[33m"), BLUE("\u001B[34m"), PURPLE("\u001B[35m"),
+        CYAN("\u001B[36m"), WHITE("\u001B[37m"), DEFAULT("\u001B[0m");
+
+        public final String code;
+
+        TerminalColors(String code)
+        {
+            this.code = code;
+        }
+    }
+
+    public Logger(String module)
+    {
+        this(module, TFPRIO.configs.general.fileLogging.get(), TFPRIO.configs.general.logFile.get());
+    }
+
+    public Logger(String module, boolean fileLoggingEnabled, File logFile)
     {
         this.fileLoggingEnabled = fileLoggingEnabled;
         this.module = module;
@@ -51,19 +79,23 @@ public class Logger
     public void error(String message)
     {
         logLine(message, LogLevel.ERROR);
+        System.exit(1);
+    }
+
+    private String getLine(String message, LogLevel level)
+    {
+        return "[" + formatter.format(new Date()) + "]\t" + level + "\t[" + module + "]\t" + message;
     }
 
     private void logLine(String message, LogLevel level)
     {
-        Date date = new Date();
-
-        String line = "[" + formatter.format(date) + "]\t" + level + "\t[" + module + "]\t" + message;
+        String line = getLine(message, level);
 
         if (fileLoggingEnabled)
         {
             try
             {
-                FileManagement.appendToFile(logFile, line);
+                FileManagement.appendToFile(logFile, line + "\n");
             } catch (IOException e)
             {
                 fileLoggingEnabled = false;
@@ -71,10 +103,15 @@ public class Logger
             }
         }
 
-        System.out.println(line);
+        System.out.println(level.color + line + TerminalColors.DEFAULT.code);
     }
 
-    public void logLine(String message)
+    public void progress(String message)
+    {
+        System.out.print(LogLevel.PROG.color + getLine(message, LogLevel.PROG) + TerminalColors.DEFAULT.code + "\r");
+    }
+
+    @Deprecated public void logLine(String message)
     {
         logLine(message, LogLevel.INFO);
     }

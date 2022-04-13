@@ -1,10 +1,12 @@
 package util.Configs.Modules;
 
 import org.json.JSONObject;
+import tfprio.TFPRIO;
 import util.Configs.Config;
 import util.Logger;
 
 import java.io.File;
+import java.io.ObjectInputFilter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -66,12 +68,14 @@ public abstract class AbstractModule
             if (field.getType().equals(Config.class))
             {
                 entries.put(field.getName(), (Config<?>) field.get(this));
+                ((Config<?>) field.get(this)).setName(this.getClass().getSimpleName() + " > " + field.getName());
             }
         }
     }
 
-    public void merge(JSONObject mergeObject)
+    public boolean merge(JSONObject mergeObject)
     {
+        boolean worked = true;
         for (String key : mergeObject.keySet())
         {
             if (mergeObject.get(key).getClass().equals(JSONObject.class) && subModules.containsKey(key))
@@ -81,7 +85,8 @@ public abstract class AbstractModule
                     subModules.get(key).merge(mergeObject.getJSONObject(key));
                 } catch (ClassCastException e)
                 {
-                    logger.warn(key + ": " + e.getMessage());
+                    worked = false;
+                    logger.warn(this.getClass().getSimpleName() + ": " + key + ": " + e.getMessage());
                 }
 
             } else if (entries.containsKey(key))
@@ -89,15 +94,18 @@ public abstract class AbstractModule
                 try
                 {
                     entries.get(key).setValue(mergeObject.get(key));
-                } catch (IllegalAccessException | ClassCastException e)
+                } catch (IllegalAccessException | ClassCastException | IllegalArgumentException e)
                 {
-                    logger.warn(key + ": " + e.getMessage());
+                    worked = false;
+                    logger.warn(this.getClass().getSimpleName() + ": " + key + ": " + e.getMessage());
                 }
             } else
             {
-                logger.warn("Trying to set unknown config: " + key);
+                worked = false;
+                logger.warn(this.getClass().getSimpleName() + ": Trying to set unknown config: " + key);
             }
         }
+        return worked;
     }
 
     public JSONObject toJSONObject(boolean onlyWriteable)
@@ -126,5 +134,32 @@ public abstract class AbstractModule
         }
 
         return combined;
+    }
+
+    public boolean validate()
+    {
+        boolean subModulesValid = true;
+        for (AbstractModule subModule : subModules.values())
+        {
+            subModulesValid = subModule.validate() && subModulesValid;
+        }
+        boolean configsValid = true;
+        for (Config<?> config : entries.values())
+        {
+            configsValid = config.isValid() && configsValid;
+
+            if (config.isValid() && config.isSet() && config.get().getClass().equals(File.class))
+            {
+                Config<File> fileConfig = (Config<File>) config;
+
+                if (fileConfig.get().exists() &&
+                        (!(fileConfig.get().getAbsolutePath().startsWith(workingDirectory.get().getAbsolutePath())) ||
+                                TFPRIO.configs.general.developmentMode.get()))
+                {
+                    TFPRIO.createdFileStructure.add(fileConfig);
+                }
+            }
+        }
+        return subModulesValid && configsValid;
     }
 }

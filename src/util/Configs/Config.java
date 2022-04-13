@@ -11,16 +11,24 @@ import java.math.BigDecimal;
 
 public class Config<T>
 {
-    private final T defaultValue;
-    private T actualValue;
-    private final boolean writeable;
-    private final Class configClass;
+    protected final T defaultValue;
+    protected T actualValue;
+    protected final boolean writeable;
+    protected final Class configClass;
+    protected final List<T> acceptedValues;
+    private String name;
 
     public Config(Class<T> configClass)
+    {
+        this(configClass, null);
+    }
+
+    public Config(Class<T> configClass, List<T> acceptedValues)
     {
         this.actualValue = this.defaultValue = null;
         this.writeable = true;
         this.configClass = configClass;
+        this.acceptedValues = acceptedValues;
     }
 
     public Config(T defaultValue)
@@ -30,27 +38,47 @@ public class Config<T>
 
     public Config(T defaultValue, boolean writeable)
     {
+        this(defaultValue, null, writeable);
+    }
+
+    public Config(T defaultValue, List<T> acceptedValues, boolean writeable)
+    {
         assert defaultValue != null;
         this.actualValue = this.defaultValue = defaultValue;
         this.writeable = writeable;
         this.configClass = defaultValue.getClass();
+        this.acceptedValues = acceptedValues;
+    }
+
+    private void setActualValue(T value) throws IllegalArgumentException
+    {
+        if (acceptedValues != null)
+        {
+            if (acceptedValues.contains(value))
+            {
+                actualValue = value;
+            } else
+            {
+                throw new IllegalArgumentException(
+                        "The value " + value.toString() + " is not contained in the " + "accepted values: " +
+                                acceptedValues);
+            }
+        } else
+        {
+            actualValue = value;
+        }
     }
 
     public void setValue(Object value) throws IllegalAccessException, ClassCastException
     {
-        if (writeable)
+        if (isWriteable())
         {
             if (value.getClass().equals(configClass))
             {
-                try
-                {
-                    this.actualValue = (T) value;
-                } catch (Exception ignore)
-                {
-                }
+                setActualValue((T) value);
             } else if (configClass.equals(File.class) && value.getClass().equals(String.class))
             {
-                actualValue = (T) new File((String) value);
+                setActualValue((T) new File((String) value));
             } else if ((configClass.equals(List.class) || configClass.equals(java.util.ArrayList.class)) &&
                     value.getClass().equals(JSONArray.class))
             {
@@ -62,17 +90,17 @@ public class Config<T>
                     {
                         doubleList.add(Double.valueOf(((BigDecimal) bigDecimalValue).doubleValue()));
                     }
-                    actualValue = (T) doubleList;
+                    setActualValue((T) doubleList);
                 } else
                 {
-                    actualValue = (T) bigDecimalList;
+                    setActualValue((T) bigDecimalList);
                 }
             } else if (configClass.equals(Map.class) && value.getClass().equals(JSONObject.class))
             {
-                actualValue = (T) ((JSONObject) value).toMap();
+                setActualValue((T) ((JSONObject) value).toMap());
             } else if (configClass.equals(Double.class) && value.getClass().equals(BigDecimal.class))
             {
-                actualValue = (T) Double.valueOf(((BigDecimal) value).doubleValue());
+                setActualValue((T) Double.valueOf(((BigDecimal) value).doubleValue()));
             } else if (value == JSONObject.NULL)
             {
                 actualValue = null;
@@ -114,8 +142,28 @@ public class Config<T>
         return actualValue;
     }
 
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
     public boolean isWriteable()
     {
         return writeable;
+    }
+
+    public boolean isSet()
+    {
+        return actualValue != null;
+    }
+
+    public boolean isValid()
+    {
+        return true;
     }
 }

@@ -6,13 +6,17 @@ import util.Logger;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MixOptions extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<String> level = new Config<>(String.class);
-    public final Config<String> option = new Config<>(String.class);
+    public final Config<String> level =
+            new Config<>(String.class, new ArrayList<>(Arrays.asList("SAMPLE_LEVEL", "HM_LEVEL")));
+    public final Config<String> option =
+            new Config<>(String.class, new ArrayList<>(Arrays.asList("UNION", "INTERSECTION")));
     public final Config<Integer> occurrenceIntersection = new Config<>(2, true);
     public final Config<Boolean> mutuallyExclusive = new Config<>(false, true);
     public final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals = new Config<>(true, true);

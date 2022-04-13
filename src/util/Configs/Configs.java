@@ -47,7 +47,6 @@ public class Configs
     public Plots plots;
     public ScriptTemplates scriptTemplates;
     public ChipAtlas chipAtlas;
-    public TpmGcFilterAnalysis tpmGcFilterAnalysis;
     public Misc misc;
 
     private final Logger logger;
@@ -81,8 +80,19 @@ public class Configs
 
     public void merge(File configFile) throws IOException
     {
-        String content = FileManagement.loadFile(configFile);
-        JSONObject combined = new JSONObject(content);
+        logger.info("Merging file: " + configFile.getAbsolutePath());
+        String content = FileManagement.readFile(configFile);
+        JSONObject combined = new JSONObject();
+        boolean allModulesWorked = true;
+
+        try
+        {
+            combined = new JSONObject(content);
+        } catch (JSONException e)
+        {
+            logger.error("The config JSON-File does not match the JSON formant: " + e.getMessage());
+            System.exit(1);
+        }
 
         for (String moduleName : combined.keySet())
         {
@@ -91,13 +101,16 @@ public class Configs
             if (configs.containsKey(moduleName))
             {
                 AbstractModule module = configs.get(moduleName);
-                module.merge(moduleJSONObject);
+                allModulesWorked = module.merge(moduleJSONObject) && allModulesWorked;
             } else
             {
                 logger.warn("Trying to set config for unknown module: " + moduleName);
             }
-
-
+        }
+        if (!allModulesWorked)
+        {
+            logger.error("There were errors during config file merging. Aborting.");
+            System.exit(1);
         }
         logger.info("Merged configuration file from " + configFile.getAbsolutePath());
     }
@@ -126,6 +139,23 @@ public class Configs
         }
 
         return combined;
+    }
+
+    public void validate()
+    {
+        boolean allValid = true;
+        for (AbstractModule module : configs.values())
+        {
+            allValid = module.validate() && allValid;
+        }
+        if (allValid)
+        {
+            logger.info("Configs are valid.");
+        } else
+        {
+            logger.error("Configs are invalid. Aborting.");
+            System.exit(0);
+        }
     }
 
     public void save(File file, boolean onlyWriteable) throws IOException

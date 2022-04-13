@@ -1,5 +1,6 @@
 package util;
 
+import tfprio.TFPRIO;
 import util.Configs.Config;
 
 import java.io.File;
@@ -7,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,14 +21,36 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class FileManagement
 {
-    public static String loadFile(File file) throws IOException
+    public static String readFile(File file) throws IOException
     {
         return Files.readString(file.toPath());
+    }
+
+    public static List<String> readLines(File file) throws IOException
+    {
+        List<String> raw = Files.readAllLines(file.toPath());
+        List<String> trimmed = new ArrayList<>();
+        for (String rawLine : raw)
+        {
+            trimmed.add(rawLine.replace("\n", "").replace("\r", ""));
+        }
+        return trimmed;
     }
 
     public static void copyFile(File source, File target) throws IOException
     {
         copyFile(source, target, false);
+    }
+
+    public static void copyFile(File source, File target, Logger logger)
+    {
+        try
+        {
+            copyFile(source, target);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
     }
 
     public static void copyFile(File source, File target, boolean compression) throws IOException
@@ -63,13 +87,13 @@ public class FileManagement
         }
     }
 
-    public static void copyDirectory(File source, File target, boolean compression) throws IOException
+    public static void copyDirectory(File source, File target, boolean compression)
     {
         copyDirectory(source, target, compression, ".*", new ArrayList<>());
     }
 
     public static void copyDirectory(File source, File target, boolean compression, String fileNameRegex,
-                                     List<String> removables) throws IOException
+                                     List<String> removables)
     {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         for (File sourceFile : Objects.requireNonNull(source.listFiles()))
@@ -139,7 +163,14 @@ public class FileManagement
     public static void writeFile(File file, String content) throws IOException
     {
         makeSureFileExists(file);
-        Files.writeString(file.toPath(), content);
+        if (file.isFile())
+        {
+            Files.writeString(file.toPath(), content);
+        } else
+        {
+            System.out.println(file.getAbsolutePath());
+            throw new IllegalArgumentException("Can only process files, not directories!");
+        }
     }
 
     public static String findValueInTable(String term, int searchIndex, int resultIndex, File file, String sep,
@@ -193,7 +224,7 @@ public class FileManagement
         return null;
     }
 
-    public static void makeSureFileExists(File file) throws IOException
+    public static synchronized void makeSureFileExists(File file) throws IOException
     {
         if (!file.exists())
         {
@@ -203,17 +234,54 @@ public class FileManagement
                 {
                     if (!file.getParentFile().mkdirs())
                     {
-                        throw new IOException();
+                        throw new IOException("parent directory");
                     }
                 }
                 if (!file.createNewFile())
                 {
-                    throw new IOException();
+                    throw new IOException("file");
                 }
             } catch (IOException e)
             {
-                throw new IOException("Exception during file creation: " + file.getAbsolutePath());
+                throw new IOException("Exception during " + e.getMessage() + " creation: " + file.getAbsolutePath());
             }
+        }
+    }
+
+    public static void makeSureFileExists(File file, Logger logger)
+    {
+        try
+        {
+            makeSureFileExists(file);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public static synchronized void makeSureDirectoryExists(File directory) throws IOException
+    {
+        if (directory.isFile())
+        {
+            throw new IllegalArgumentException("Can not handle files. Received: " + directory.getAbsolutePath());
+        }
+        if (!directory.exists())
+        {
+            if (!directory.mkdirs())
+            {
+                throw new IOException("Could not create directory: " + directory.getAbsolutePath());
+            }
+        }
+    }
+
+    public static void makeSureDirectoryExists(File directory, Logger logger)
+    {
+        try
+        {
+            makeSureDirectoryExists(directory);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
         }
     }
 
@@ -230,13 +298,93 @@ public class FileManagement
         }
     }
 
-    public static Config<File> extend(Config<File> fileConfig, String extension)
+    public static Config<File> extend(Config<File> fileConfig, String... extensions)
     {
-        return new Config<>(extend(fileConfig.get(), extension));
+        return new Config<>(extend(fileConfig.get(), extensions));
     }
 
-    public static File extend(File file, String extension)
+    public static File extend(File file, String... extensions)
     {
-        return new File(file.getAbsolutePath() + File.separator + extension);
+        File extended = new File(file.getAbsolutePath());
+
+        for (String extension : extensions)
+        {
+            extended = new File(extended.getAbsolutePath() + File.separator + extension);
+        }
+        return extended;
+    }
+
+    public static boolean isEmpty(File file) throws IOException
+    {
+        String content = readFile(file);
+        return content.isBlank();
+    }
+
+    public static void hardLink(File newLink, File existingData) throws IOException
+    {
+        makeSureDirectoryExists(newLink.getParentFile());
+
+        if (newLink.exists())
+        {
+            deleteFile(newLink);
+        }
+        Files.createLink(newLink.toPath(), existingData.toPath());
+    }
+
+    public static void softLink(File newLink, File existingData) throws IOException
+    {
+        makeSureDirectoryExists(newLink.getParentFile());
+
+        if (newLink.exists())
+        {
+            deleteFile(newLink);
+        }
+        Files.createSymbolicLink(newLink.toPath(), existingData.toPath());
+    }
+
+    public static void softLink(File newLink, File existingData, Logger logger)
+    {
+        try
+        {
+            logger.warn("Creating softlink: " + newLink.getAbsolutePath() + "->" + existingData.getAbsolutePath());
+            softLink(newLink, existingData);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public static void deleteFile(File file) throws IOException
+    {
+        if (file.exists())
+        {
+            if (file.isFile())
+            {
+                if (!file.delete())
+                {
+                    throw new IOException("Could not delete file: " + file.getAbsolutePath());
+                }
+            } else
+            {
+                File[] subFiles = file.listFiles();
+                assert subFiles != null;
+                for (File subFile : subFiles)
+                {
+                    deleteFile(subFile);
+                }
+            }
+        }
+    }
+
+    public static Config<File> getFirstExisting(List<Config<File>> priorities)
+    {
+        for (Config<File> priority : priorities)
+        {
+            if (TFPRIO.createdFileStructure.contains(priority))
+            {
+                return priority;
+            }
+        }
+        return null;
     }
 }

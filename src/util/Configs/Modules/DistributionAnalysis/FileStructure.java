@@ -28,6 +28,8 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_tfTgScores_tfDistribution_all = extend(d_tfTgScores_tfDistribution, "01_ALL");
     public final Config<File> d_tfTgScores_tfDistribution_hm = extend(d_tfTgScores_tfDistribution, "02_HM");
 
+    public final Config<File> d_tfTgScores_raw = extend(d_tfTgScores, "00_RAW");
+
     public final Config<File> d_plotsScripts = extend(d_root, "03_PLOT_SCRIPTS");
     public final Config<File> d_plotsScripts_all = extend(d_plotsScripts, "01_ALL");
     public final Config<File> d_plotsScripts_hm = extend(d_plotsScripts, "02_HM");
@@ -39,7 +41,7 @@ public class FileStructure extends AbstractModule
 
     public final Config<File> d_stats = extend(d_root, "05_STATS");
     public final Config<File> d_stats_all = extend(d_stats, "01_ALL");
-    public final Config<File> d_stats_hm = extend(d_stats, "01_HM");
+    public final Config<File> d_stats_hm = extend(d_stats, "02_HM");
     public final Config<String> s_stats_csv = new Config<>("stats.csv");
 
     public final Config<File> d_hypergeometricTest = extend(d_root, "06_HYPERGEOMETRIC_TEST");
@@ -47,20 +49,23 @@ public class FileStructure extends AbstractModule
     public final Config<File> f_hypergeometricTest_output = extend(d_hypergeometricTest, "STATS.csv");
 
     public final Config<File> d_mwuScripts = extend(d_root, "07_SCRIPTS_MANN_WHITNEYU_PLOTS");
+    public final Config<File> d_mwuScriptsHm = extend(d_mwuScripts, "02_HM");
+    public final Config<File> d_mwuScriptsAll = extend(d_mwuScripts, "01_ALL");
     public final Config<String> s_mwuScripts_script = new Config<>("mann_whitneyU_plots.R");
 
     public final Config<File> d_mwuPlots = extend(d_root, "08_PLOTS_MANN_WHITNEYU_PLOTS");
 
     public final Config<File> d_dcg = extend(d_root, "09_DISCOUNTED_CUMULATIVE_GAIN");
     public final Config<File> f_dcg_stats = extend(d_dcg, "dcg_stats.csv");
+    public final Config<File> d_dcg_targetGenes = extend(d_dcg, "targetGenes");
 
 
     public final Config<File> d_logos = extend(d_root, "10_LOGOS");
 
     public final Config<File> d_logos_biophysicalModel = extend(d_logos, "01_BIOPHYSICAL_MODEL");
-    public final Config<String> s_logos_biophysicalModel_data = new Config<>("_energy_matrix.csv");
-    public final Config<String> s_logos_biophysicalModel_script = new Config<>("_create_biophysical_model.py");
-    public final Config<String> s_logos_biophysicalModel_image = new Config<>("_biophysical_model.png");
+    public final Config<String> s_logos_biophysicalModel_data = new Config<>("energy_matrix.csv");
+    public final Config<String> s_logos_biophysicalModel_script = new Config<>("biophysical_model.py");
+    public final Config<String> s_logos_biophysicalModel_image = new Config<>("biophysical_model.png");
 
     public final Config<File> d_logos_tfSequence = extend(d_logos, "02_TF_SEQUENCE");
     public final Config<File> d_logos_tfSequence_jaspar = extend(d_logos_tfSequence, "00_JASPAR");
@@ -74,16 +79,16 @@ public class FileStructure extends AbstractModule
     public final Config<String> s_logos_tfBindingSequence_script = new Config<>("calc_frequencies.R");
     public final Config<String> s_logos_tfBindingSequence_motif = new Config<>("_frequencies.motif");
 
-    public final Config<File> d_logos_tfBindingSequence_data = extend(d_logos, "00_DATA");
+    public final Config<File> d_logos_tfBindingSequence_data = extend(d_logos_tfBindingSequence, "00_DATA");
 
     public final Config<File> d_heatmaps = extend(d_root, "11_DCG_TARGET_GENES_HEATMAP");
     public final Config<File> f_heatmaps_script = extend(d_heatmaps, "heatmap.R");
 
     public final Config<File> d_cooccurrence = extend(d_root, "12_COOCCURENCE");
-    public final Config<File> f_cooccurrence_mergedBed = extend(d_cooccurrence, "cooccurence_merged.bed");
-    public final Config<File> f_cooccurrence_mergedBedSorted = extend(d_cooccurrence, "cooccurence_merged_sorted.bed");
-    public final Config<File> f_cooccurrence_script = extend(d_cooccurrence, "sort_and_merge.sh");
-    public final Config<File> f_cooccurrence_frequencies = extend(d_cooccurrence, "cooccurence_frequencies.csv");
+    public final Config<File> f_cooccurrence_concatenatedBed = extend(d_cooccurrence, "concatenated.bed");
+    public final Config<File> f_cooccurrence_sortedBed = extend(d_cooccurrence, "sorted.bed");
+    public final Config<File> f_cooccurrence_mergedBed = extend(d_cooccurrence, "merged.bed");
+    public final Config<File> f_cooccurrence_frequencies = extend(d_cooccurrence, "frequencies.csv");
 
 
     public FileStructure(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)

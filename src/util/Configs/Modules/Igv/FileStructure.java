@@ -21,8 +21,8 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_importantLoci = extend(d_root, "04_important_loci");
 
     public final Config<File> d_igvTopLog2fc = extend(d_root, "05_top_log2fc");
-    public final Config<File> d_igvTopLog2fc_upregulated = extend(d_igvTopLog2fc, "01_upregulated");
-    public final Config<File> d_igvTopLog2fc_downregulated = extend(d_igvTopLog2fc, "02_downregulated");
+    public final Config<String> s_igvTopLog2fc_upregulated = new Config<>("01_upregulated");
+    public final Config<String> s_igvTopLog2fc_downregulated = new Config<>("02_downregulated");
 
     public final Config<File> d_igvDcgTargetGenes = extend(d_root, "06_dcg_target_genes");
 

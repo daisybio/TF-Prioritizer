@@ -14,27 +14,27 @@ public class FileStructure extends AbstractModule
     public final Config<File> d_preprocessing = extend(workingDirectory, "02_A_DESeq2_preprocessing");
 
     public final Config<File> f_mapping = extend(d_preprocessing, "ENSG_SYMBOL_MAP.csv");
-    public final Config<String> s_preprocessing_MeanCounts = new Config<>("_meanCounts.txt");
+    public final Config<File> f_mappingScript = extend(d_preprocessing, "ENSG_SYMBOL_MAP.R");
+    public final Config<String> s_preprocessing_MeanCounts = new Config<>(".tsv");
 
     public final Config<File> d_preprocessing_single = extend(d_preprocessing, "single");
     public final Config<File> d_preprocessing_combined = extend(d_preprocessing, "combined");
     public final Config<File> d_preprocessing_combinedOriginal = extend(d_preprocessing, "combined_original");
-    public final Config<File> d_preprocessing_geneSymbols = extend(d_preprocessing, "symbols_ensg_mean_counts");
+    public final Config<File> d_preprocessing_meanCounts = extend(d_preprocessing, "symbols_ensg_mean_counts");
 
     public final Config<File> d_preprocessing_tpm = extend(d_preprocessing, "tpm_mapping");
-    public final Config<File> f_preprocessing_tpm_getGeneLengthsScript =
-            extend(d_preprocessing_tpm, "get_gene_lengths.R");
-    public final Config<File> f_preprocessing_tpm_geneLengths = extend(d_preprocessing_tpm, "gene_lengths.csv");
+    public final Config<File> f_preprocessing_tpm_geneLengths = extend(d_preprocessing_tpm, "gene_lengths.tsv");
     public final Config<File> d_preprocessing_tpm_scripts = extend(d_preprocessing_tpm, "01_scripts");
     public final Config<String> s_preprocessing_tpm_scripts = new Config<>("_get_tpms.R");
     public final Config<File> d_preprocessing_tpm_tpmResults = extend(d_preprocessing_tpm, "02_tpm_mappings");
+    public final Config<File> d_preprocessing_tpm_updated = extend(d_preprocessing_tpm, "03_tpm_updated");
     public final Config<String> s_preprocessing_tpm_mappings = new Config<>("_tpms.csv");
 
     public final Config<File> d_preprocessing_genePositions = extend(d_preprocessing, "gene_positions");
     public final Config<File> f_preprocessing_genePositions_script =
             extend(d_preprocessing_genePositions, "get_gene_positions.R");
     public final Config<File> f_preprocessing_genePositions_genePositionsPrev =
-            extend(d_preprocessing_genePositions, "gene_positions_prev.csv");
+            extend(d_preprocessing_genePositions, "gene_positions_prev.tsv");
     public final Config<File> f_preprocessing_genePositions_version =
             extend(d_preprocessing_genePositions, "version.csv");
     public final Config<File> f_preprocessing_genePositions_uplift =

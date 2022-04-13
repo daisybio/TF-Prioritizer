@@ -6,14 +6,17 @@ import util.Logger;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static util.FileManagement.extend;
 
 public class Igv extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<File> pathToIGV = new Config<>(File.class);
+    public final Config<File> pathToIGV = extend(sourceDirectory, "IGV_2.11.2");
     public final Config<Integer> topLog2fc = new Config<>(15, true);
     public final Config<Boolean> topLog2fcIncludeLncRnaPseudogenes = new Config<>(true, true);
     public final Config<List> includePredictionData = new Config<>(List.class);

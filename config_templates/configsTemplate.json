@@ -1,10 +1,4 @@
 {
-  "TpmGcFilterAnalysis": {
-    "FileStructure": {
-      "d_wd": null
-    },
-    "tfList": null
-  },
   "DeSeq2": {
     "FileStructure": {
       "s_preprocessing_genePositions_mergedEnhancerDbs_bedSuffix": ".bed",
@@ -40,7 +34,6 @@
     "columnBedfile": null,
     "windowSize": 50000,
     "loopListFile": null,
-    "cores": 4,
     "loopWindows": 5000,
     "geneAnnotationFile": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/gencode.vM25.annotation.gtf",
     "ensgSymbolFile": null,
@@ -86,11 +79,11 @@
       0.5,
       0.6
     ],
-    "cutoffTpms": 0,
+    "cutoffTpms": 0.0,
     "mannWhitneyUPvalueCutoff": 0.01,
     "topKGenes": 30,
     "cutoffHms": 1,
-    "distributionAnalysisScoreType": "ECVL_GENE_COUNTS",
+    "distributionAnalysisScoreType": "EXCL_GENE_COUNTS",
     "trapPredictedSequenceLogosAffinityCutoff": 0.05
   },
   "Misc": {
@@ -121,9 +114,8 @@
     "topLog2fcIncludeLncRnaPseudogenes": true,
     "pathToTdf": null,
     "pathToTfChipSeq": null,
-    "pathToIGV": null,
     "topLog2fc": 15,
-    "speciesReferenceGenome": null,
+    "speciesReferenceGenome": "mm10",
     "includePredictionData": null,
     "importantLociAllPrioTf": [
       "CSN",
@@ -132,7 +124,13 @@
       "WAP"
     ],
     "enhancerDatabases": null,
-    "grcSynonymDict": null
+    "grcSynonymDict": {
+      "GRCm39": "mm39",
+      "GRCm38": "mm10",
+      "GRCm37": "mm9",
+      "GRCh38": "hg38",
+      "GRCh37": "hg19"
+    }
   },
   "Blacklist": {
     "bedFilePath": "/home/nico/Software/COM2POSE_raw_data/05_black_listed_regions/mm10-blacklist.v2.txt",
