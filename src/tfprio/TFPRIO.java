@@ -63,13 +63,13 @@ public class TFPRIO
         configs = new Configs();
 
         configs.merge(extend(sourceDirectory, "config_templates", "defaultConfigs.json"));
-        //configs.merge(configFile);
+        configs.merge(configFile);
         configs.validate();
 
         Logger logger = new Logger("TFPRIO");
 
         Workflow workflow = new Workflow();
-
+        
         if (workflow.simulationSuccessful())
         {
             workflow.run();

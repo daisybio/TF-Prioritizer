@@ -32,7 +32,7 @@ public class OpenRegionsViolinPlots extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, f_scriptTemplate));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_output_data, f_output_script, f_output_plot));
     }

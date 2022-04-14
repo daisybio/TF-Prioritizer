@@ -2,6 +2,7 @@ package lib;
 
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.ExecutionTimeMeasurement;
 import util.Logger;
 
@@ -59,6 +60,8 @@ public abstract class ExecutableStep
      * The logger of this ExecutableStep.
      */
     protected final Logger logger = new Logger(this.getClass().getName().replace("lib.", "").replace("tfprio.", ""));
+
+    private String noExecutionReason = null;
 
     /**
      * Check if all the requirements of this executableStep are met and broadcast the created file structures. Does
@@ -123,6 +126,7 @@ public abstract class ExecutableStep
 
         if (executed && !TFPRIO.configs.general.developmentMode.get())
         {
+            logger.debug("Writing hash");
             createHash();
         }
         logger.info("Finished. Step took " + timer.stopAndGetDeltaFormatted());
@@ -141,7 +145,7 @@ public abstract class ExecutableStep
      *
      * @return a set of the created file structure configs, must not be null.
      */
-    protected abstract Set<AbstractConfig<File>> getCreatedFileStructure();
+    public abstract Set<AbstractConfig<File>> getCreatedFileStructure();
 
     /**
      * Get the configs that are mandatory for execution of this executableStep.
@@ -227,7 +231,9 @@ public abstract class ExecutableStep
                     logger.warn("Required FileStructure is null: " + fileConfig.getName());
                 } else
                 {
-                    logger.warn("Required FileStructure has not been created: " + fileConfig.get().getAbsolutePath());
+                    String reason = ((GeneratedFileStructure) fileConfig).getNoGenerationReason();
+                    logger.warn("Required FileStructure has not been created: " + fileConfig.getName() + " because: " +
+                            reason);
                 }
             }
         }
@@ -406,7 +412,7 @@ public abstract class ExecutableStep
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -554,4 +560,14 @@ public abstract class ExecutableStep
      * finishAllQueuedThreads() method should be used in order to make sure that the previous sub job is finished.
      */
     protected abstract void execute();
+
+    public void setNoExecutionReason(String noExecutionReason)
+    {
+        this.noExecutionReason = noExecutionReason;
+    }
+
+    public String getNoExecutionReason()
+    {
+        return noExecutionReason;
+    }
 }

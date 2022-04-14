@@ -31,7 +31,7 @@ public class GroupPlots extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, f_scriptTemplate));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_outputData));
     }

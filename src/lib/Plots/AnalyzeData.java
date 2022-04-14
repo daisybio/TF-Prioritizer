@@ -33,7 +33,7 @@ public class AnalyzeData extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input_readCounts, d_input_tpm, d_input_plotData, f_input_tfs));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output_groupLevel, d_output_hmLevel, d_output_website));
     }

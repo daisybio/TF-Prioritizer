@@ -72,7 +72,7 @@ public class Tepic extends ExecutableStep
         return requirements;
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
@@ -328,7 +328,7 @@ public class Tepic extends ExecutableStep
                     }
                 } else
                 {
-                    stringConfigs.put(entry.getKey(), entry.getValue().toString());
+                    stringConfigs.put(entry.getKey(), entry.getValue().get().toString());
                 }
             }
         }

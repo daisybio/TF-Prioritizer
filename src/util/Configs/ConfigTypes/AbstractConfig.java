@@ -56,4 +56,19 @@ public abstract class AbstractConfig<T>
         }
         return value;
     }
+
+    @Override public String toString()
+    {
+        if (value == null)
+        {
+            return "{NULL}";
+        }
+
+        if (value.getClass().equals(File.class))
+        {
+            return ((File) value).getAbsolutePath();
+        }
+
+        return value.toString();
+    }
 }

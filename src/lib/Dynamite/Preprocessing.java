@@ -42,7 +42,7 @@ public class Preprocessing extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, d_inputDeseq2, f_script, f_scriptClassification));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_outputClassification));
     }

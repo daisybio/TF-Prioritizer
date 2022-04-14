@@ -31,7 +31,7 @@ public class RunTgene extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, pathToTgeneExecutable, f_input_gtf));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

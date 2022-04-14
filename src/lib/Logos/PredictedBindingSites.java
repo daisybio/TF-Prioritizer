@@ -34,7 +34,7 @@ public class PredictedBindingSites extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_input_dcgResult, d_input_sequences, f_scriptTemplate));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output_data));
     }

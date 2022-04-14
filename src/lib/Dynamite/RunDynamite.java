@@ -32,7 +32,7 @@ public class RunDynamite extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_dynamite_script, d_input));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

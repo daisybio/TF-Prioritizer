@@ -4,6 +4,8 @@ import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputConfig;
 import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ClassGetter;
+import util.Configs.ConfigValidators.IntegerRangeValidator;
+import util.Configs.ConfigValidators.ListNotEmptyValidator;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -18,10 +20,12 @@ public class Igv extends AbstractModule
     public FileStructure fileStructure;
 
     public final InputFileStructure pathToIGV = extend(sourceDirectory, "IGV_2.11.2");
-    public final InputConfig<Integer> topLog2fc = new InputConfig<>(Integer.class);
+    public final InputConfig<Integer> topLog2fc =
+            new InputConfig<>(Integer.class, new IntegerRangeValidator(1, Integer.MAX_VALUE));
     public final InputConfig<Boolean> topLog2fcIncludeLncRnaPseudogenes = new InputConfig<>(Boolean.class);
     public final InputConfig<List<String>> includePredictionData = new InputConfig<>(ClassGetter.getStringList());
-    public final InputConfig<List<String>> importantLociAllPrioTf = new InputConfig<>(ClassGetter.getStringList());
+    public final InputConfig<List<String>> importantLociAllPrioTf =
+            new InputConfig<>(ClassGetter.getStringList(), new ListNotEmptyValidator<>());
     public final InputFileStructure pathToTfChipSeq = new InputFileStructure();
     public final InputFileStructure pathToTdf = new InputFileStructure();
     public final InputConfig<List<String>> enhancerDatabases = new InputConfig<>(ClassGetter.getStringList());

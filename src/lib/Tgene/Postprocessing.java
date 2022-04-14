@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import lib.GeneRegion;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -16,7 +17,7 @@ public class Postprocessing extends ExecutableStep
 {
     private final AbstractConfig<File> d_input = TFPRIO.configs.tgene.fileStructure.d_output;
     private final AbstractConfig<File> d_output = TFPRIO.configs.tgene.fileStructure.d_merged;
-    private final AbstractConfig<File> d_outputGroups = TFPRIO.configs.tgene.fileStructure.d_groups;
+    private final GeneratedFileStructure d_outputGroups = TFPRIO.configs.tgene.fileStructure.d_groups;
     private final AbstractConfig<File> f_transcripts_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
 
     private final AbstractConfig<File> d_preprocessingMeanCounts =
@@ -35,12 +36,15 @@ public class Postprocessing extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, d_preprocessingMeanCounts, f_transcripts_gtf));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         Set<AbstractConfig<File>> createdFileStructure = new HashSet<>(List.of(d_output));
         if (mutuallyExclusive.get())
         {
             createdFileStructure.add(d_outputGroups);
+        } else
+        {
+            d_outputGroups.setNoGenerationReason(mutuallyExclusive.getName() + " is set to false");
         }
         return createdFileStructure;
     }

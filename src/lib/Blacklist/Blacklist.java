@@ -23,7 +23,7 @@ public class Blacklist extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

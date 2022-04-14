@@ -33,7 +33,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
                 Arrays.asList(d_input, f_scriptCombined, f_scriptDeseq, f_scriptSingle, f_geneID, f_mapping));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_outputSingle, d_outputCombined, d_outputMeanCounts, d_outputScripts));
     }

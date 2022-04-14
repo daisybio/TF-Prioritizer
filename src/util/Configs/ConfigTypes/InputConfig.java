@@ -14,7 +14,7 @@ public class InputConfig<T> extends AbstractConfig<T>
 
     private final Class<?> configClass;
 
-    public InputConfig(Class<? extends T> configClass)
+    public InputConfig(Class<T> configClass)
     {
         this.configClass = configClass;
     }

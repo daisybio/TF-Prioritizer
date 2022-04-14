@@ -55,7 +55,7 @@ public class CreatePlots extends ExecutableStep
                         f_mwuScriptTemplate));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(
                 Arrays.asList(d_output_plotsHm, d_output_statsHm, d_output_scriptsHm, d_output_mwuScriptsHm));

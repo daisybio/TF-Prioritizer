@@ -32,7 +32,7 @@ public class GetDataList extends ExecutableStep
         return new HashSet<>();
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_zipped, f_list));
     }

@@ -16,6 +16,8 @@ public class GeneratedFileStructure extends AbstractConfig<File>
         setValue(file);
     }
 
+    private String noGenerationReason = "[no known reason]";
+
     @Override public boolean isWriteable()
     {
         return false;
@@ -29,6 +31,16 @@ public class GeneratedFileStructure extends AbstractConfig<File>
     @Override public boolean isSet()
     {
         return true;
+    }
+
+    public String getNoGenerationReason()
+    {
+        return noGenerationReason;
+    }
+
+    public void setNoGenerationReason(String noGenerationReason)
+    {
+        this.noGenerationReason = noGenerationReason;
     }
 
     @Override public void setValueObject(Object valueObject) throws IllegalAccessException

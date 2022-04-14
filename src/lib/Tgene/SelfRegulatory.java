@@ -32,7 +32,7 @@ public class SelfRegulatory extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input_tgene, d_input_tepic, f_inputRegions));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

@@ -37,7 +37,7 @@ public class CalculateDcgRank extends ExecutableStep
         }};
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(f_output_dcg));
     }

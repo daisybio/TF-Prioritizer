@@ -26,7 +26,7 @@ public class getTopKTargetGenes extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_input_dcg, d_input_affinityValues));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

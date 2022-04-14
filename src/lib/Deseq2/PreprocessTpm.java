@@ -24,7 +24,7 @@ public class PreprocessTpm extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_combined, d_input));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(f_output_copy));
     }

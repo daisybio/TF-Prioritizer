@@ -25,7 +25,7 @@ public class Preprocess extends ExecutableStep
         return new HashSet<>(List.of(f_geneAnnotation));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_output_gtf, f_output_regions));
     }

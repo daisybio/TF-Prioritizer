@@ -3,6 +3,7 @@ package lib.DistributionAnalysis;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -23,11 +24,11 @@ public class RunDistributionAnalysis extends ExecutableStep
     private final AbstractConfig<File> d_inputTepicRaw = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
 
     private final AbstractConfig<File> d_outputRaw = TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_raw;
-    private final AbstractConfig<File> d_outputBackgroundDistributionAll =
+    private final GeneratedFileStructure d_outputBackgroundDistributionAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_all;
     private final AbstractConfig<File> d_outputBackgroundDistributionHm =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_hm;
-    private final AbstractConfig<File> d_outputTFScoresAll =
+    private final GeneratedFileStructure d_outputTFScoresAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_tfDistribution_all;
     private final AbstractConfig<File> d_outputTFScoresHm =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_tfDistribution_hm;
@@ -63,7 +64,7 @@ public class RunDistributionAnalysis extends ExecutableStep
         }};
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_outputBackgroundDistributionHm, d_outputTFScoresHm, d_outputRaw))
         {{
@@ -71,6 +72,13 @@ public class RunDistributionAnalysis extends ExecutableStep
             {
                 add(d_outputBackgroundDistributionAll);
                 add(d_outputTFScoresAll);
+            } else
+            {
+                for (GeneratedFileStructure fileStructure : Arrays.asList(d_outputBackgroundDistributionAll,
+                        d_outputTFScoresAll))
+                {
+                    fileStructure.setNoGenerationReason(performAllAnalysis.getName() + " is set to false");
+                }
             }
         }};
     }

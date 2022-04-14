@@ -1,5 +1,6 @@
 package util.Configs.Modules.Blacklist;
 
+import util.Configs.ClassGetter;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputConfig;
 import util.Configs.ConfigTypes.InputFileStructure;
@@ -16,9 +17,8 @@ public class Blacklist extends AbstractModule
     public FileStructure fileStructure;
 
     public final InputFileStructure bedFilePath = new InputFileStructure();
-    public final InputConfig<List<String>> signalsToIgnore =
-            new InputConfig<>((Class<List<String>>) ((Class) List.class),
-                    new StringListValidator("Low_Mappability".toUpperCase(), "High_Signal_Region".toUpperCase()));
+    public final InputConfig<List<String>> signalsToIgnore = new InputConfig<>(ClassGetter.getStringList(),
+            new StringListValidator("Low_Mappability".toUpperCase(), "High_Signal_Region".toUpperCase()));
 
     public Blacklist(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException

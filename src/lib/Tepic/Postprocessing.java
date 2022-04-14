@@ -35,7 +35,7 @@ public class Postprocessing extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_postprocessingInput, f_output_tfs));
     }

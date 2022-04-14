@@ -29,7 +29,7 @@ public class InitStaticVariables extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_scriptTemplate, f_geneIDs, inputDirectory));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_map, f_script));
     }

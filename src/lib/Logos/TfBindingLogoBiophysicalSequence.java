@@ -48,7 +48,7 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_input_dcgResult, f_input_pwmFile, f_scriptTemplate_biophysicalModel));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output_biophysicalModel, d_output_tfSequence, f_output_jaspar));
     }

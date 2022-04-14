@@ -27,12 +27,13 @@ public class CoOccurrenceAnalysis extends ExecutableStep
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
-        return new HashSet<>();
+        return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
-        return new HashSet<>();
+        return new HashSet<>(
+                Arrays.asList(f_output_concatenated, f_output_merged, f_output_sorted, f_output_frequencies));
     }
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()

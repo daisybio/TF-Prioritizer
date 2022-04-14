@@ -25,7 +25,7 @@ public class Report extends ExecutableStep
         return new HashSet<>();
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>();
     }

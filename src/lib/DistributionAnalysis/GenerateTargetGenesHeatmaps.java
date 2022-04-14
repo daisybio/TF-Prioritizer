@@ -34,7 +34,7 @@ public class GenerateTargetGenesHeatmaps extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_scriptTemplate, f_map, d_deseq2Preprocessing, d_targetGenes));
     }
 
-    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, f_script));
     }
