@@ -1,6 +1,6 @@
 package util.Configs.Modules.ChipAtlas;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -11,18 +11,19 @@ public class ChipAtlas extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<Boolean> isEnabled = new Config<>(false, true);
-    public final Config<String> urlToList =
-            new Config<>("http://togodb.biosciencedbc.jp/togodb/release/chip_atlas_file_list.csv");
-    public final Config<String> column_GeneVersion = new Config<>(".*genome.*assembly.*");
-    public final Config<String> column_AntigenClass = new Config<>(".*antigen.*class.*");
-    public final Config<String> column_Antigen = new Config<>(".*antigen.*");
-    public final Config<String> column_CellTypeClass = new Config<>(".*cell.*type.*class.*");
-    public final Config<String> column_url = new Config<>(".*file.*url.*");
-    public final Config<String> genomeVersion = new Config<>(String.class);
-    public final Config<String> tissueType = new Config<>(String.class);
+    public final InputConfig<Boolean> isEnabled = new InputConfig<>(Boolean.class);
+    public final InternalConfig<String> urlToList =
+            new InternalConfig<>("http://togodb.biosciencedbc.jp/togodb/release/chip_atlas_file_list.csv");
+    public final InternalConfig<String> column_GeneVersion = new InternalConfig<>(".*genome.*assembly.*");
+    public final InternalConfig<String> column_AntigenClass = new InternalConfig<>(".*antigen.*class.*");
+    public final InternalConfig<String> column_Antigen = new InternalConfig<>(".*antigen.*");
+    public final InternalConfig<String> column_CellTypeClass = new InternalConfig<>(".*cell.*type.*class.*");
+    public final InternalConfig<String> column_url = new InternalConfig<>(".*file.*url.*");
+    public final InputConfig<String> genomeVersion = new InputConfig<>(String.class);
+    public final InputConfig<String> tissueType = new InputConfig<>(String.class);
 
-    public ChipAtlas(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public ChipAtlas(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                     Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

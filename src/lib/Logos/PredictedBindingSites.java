@@ -2,7 +2,8 @@ package lib.Logos;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,32 +14,33 @@ import static util.ScriptExecution.executeAndWait;
 
 public class PredictedBindingSites extends ExecutableStep
 {
-    private final Config<File> f_input_dcgResult = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
-    private final Config<File> d_input_sequences = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
-    private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_logos_tfBindingSequence;
+    private final AbstractConfig<File> f_input_dcgResult =
+            TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
+    private final AbstractConfig<File> d_input_sequences = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
+    private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_logos_tfBindingSequence;
 
-    private final Config<File> d_output_data =
+    private final GeneratedFileStructure d_output_data =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_logos_tfBindingSequence_data;
 
-    private final Config<String> s_output_script =
+    private final AbstractConfig<String> s_output_script =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_logos_tfBindingSequence_script;
-    private final Config<String> s_fasta =
+    private final AbstractConfig<String> s_fasta =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_logos_tfBindingSequence_fasta;
-    private final Config<String> allName = TFPRIO.configs.distributionAnalysis.allName;
-    private final Config<String> s_trapSequences = TFPRIO.configs.tepic.fileStructure.s_outputRaw_trapSequences;
-    private final Config<Double> affinityCutoff = TFPRIO.configs.plots.trapPredictedSequenceLogosAffinityCutoff;
+    private final AbstractConfig<String> allName = TFPRIO.configs.distributionAnalysis.allName;
+    private final AbstractConfig<String> s_trapSequences = TFPRIO.configs.tepic.fileStructure.s_outputRaw_trapSequences;
+    private final AbstractConfig<Double> affinityCutoff = TFPRIO.configs.plots.trapPredictedSequenceLogosAffinityCutoff;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_input_dcgResult, d_input_sequences, f_scriptTemplate));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output_data));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(s_output_script, s_fasta, allName, s_trapSequences, affinityCutoff));
     }

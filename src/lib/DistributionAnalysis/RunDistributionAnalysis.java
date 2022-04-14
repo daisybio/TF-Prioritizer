@@ -2,7 +2,8 @@ package lib.DistributionAnalysis;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -12,37 +13,40 @@ import static util.FileManagement.*;
 
 public class RunDistributionAnalysis extends ExecutableStep
 {
-    private final Config<File> f_inputTfs = TFPRIO.configs.distributionAnalysis.fileStructure.f_analyzedTfs;
-    private final Config<File> d_inputGeneCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
-    private final Config<File> d_inputDifferentialExpression = TFPRIO.configs.deSeq2.fileStructure.d_output;
-    private final Config<File> d_inputTgene = TFPRIO.configs.tgene.fileStructure.d_filteredTargetGenes;
-    private final Config<File> d_inputDynamite = TFPRIO.configs.dynamite.fileStructure.d_output;
-    private final Config<File> d_inputTepicProcessed = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
-    private final Config<File> d_inputTepicRaw = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
+    private final AbstractConfig<File> f_inputTfs = TFPRIO.configs.distributionAnalysis.fileStructure.f_analyzedTfs;
+    private final AbstractConfig<File> d_inputGeneCounts =
+            TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
+    private final AbstractConfig<File> d_inputDifferentialExpression = TFPRIO.configs.deSeq2.fileStructure.d_output;
+    private final AbstractConfig<File> d_inputTgene = TFPRIO.configs.tgene.fileStructure.d_filteredTargetGenes;
+    private final AbstractConfig<File> d_inputDynamite = TFPRIO.configs.dynamite.fileStructure.d_output;
+    private final AbstractConfig<File> d_inputTepicProcessed =
+            TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
+    private final AbstractConfig<File> d_inputTepicRaw = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
 
-    private final Config<File> d_outputRaw = TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_raw;
-    private final Config<File> d_outputBackgroundDistributionAll =
+    private final GeneratedFileStructure d_outputRaw =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_raw;
+    private final GeneratedFileStructure d_outputBackgroundDistributionAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_all;
-    private final Config<File> d_outputBackgroundDistributionHm =
+    private final GeneratedFileStructure d_outputBackgroundDistributionHm =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_hm;
-    private final Config<File> d_outputTFScoresAll =
+    private final GeneratedFileStructure d_outputTFScoresAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_tfDistribution_all;
-    private final Config<File> d_outputTFScoresHm =
+    private final GeneratedFileStructure d_outputTFScoresHm =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_tfDistribution_hm;
 
-    private final Config<Boolean> performAllAnalysis = TFPRIO.configs.distributionAnalysis.performAllAnalysis;
-    private final Config<String> s_dynamiteInput = TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted;
-    private final Config<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
-    private final Config<Boolean> randomizeTfGeneMatrix = TFPRIO.configs.tepic.randomizeTfGeneMatrix;
-    private final Config<String> scoreType = TFPRIO.configs.plots.distributionAnalysisScoreType;
-    private final Config<String> s_output =
+    private final AbstractConfig<Boolean> performAllAnalysis = TFPRIO.configs.distributionAnalysis.performAllAnalysis;
+    private final AbstractConfig<String> s_dynamiteInput = TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted;
+    private final AbstractConfig<Boolean> randomizeTfGeneMatrix = TFPRIO.configs.tepic.randomizeTfGeneMatrix;
+    private final AbstractConfig<String> scoreType = TFPRIO.configs.plots.distributionAnalysisScoreType;
+    private final AbstractConfig<String> s_output =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_tfTgScores_backgroundDistribution_csv;
 
     // Optional configs
-    private final Config<File> f_tgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
+    private final AbstractConfig<File> f_tgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
+    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
 
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>()
         {{
@@ -51,7 +55,7 @@ public class RunDistributionAnalysis extends ExecutableStep
             add(d_inputDifferentialExpression);
             add(d_inputTgene);
             add(d_inputDynamite);
-            if (tpmCutoff.get() > 0)
+            if (tpmCutoff.isSet())
             {
                 add(d_inputTepicProcessed);
             } else
@@ -61,7 +65,7 @@ public class RunDistributionAnalysis extends ExecutableStep
         }};
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_outputBackgroundDistributionHm, d_outputTFScoresHm, d_outputRaw))
         {{
@@ -69,20 +73,26 @@ public class RunDistributionAnalysis extends ExecutableStep
             {
                 add(d_outputBackgroundDistributionAll);
                 add(d_outputTFScoresAll);
+            } else
+            {
+                for (GeneratedFileStructure fileStructure : Arrays.asList(d_outputBackgroundDistributionAll,
+                        d_outputTFScoresAll))
+                {
+                    fileStructure.deleteAndSetNoGenerationReason(performAllAnalysis.getName() + " is set to false");
+                }
             }
         }};
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
-                Arrays.asList(performAllAnalysis, s_dynamiteInput, tpmCutoff, randomizeTfGeneMatrix, scoreType,
-                        s_output));
+                Arrays.asList(performAllAnalysis, s_dynamiteInput, randomizeTfGeneMatrix, scoreType, s_output));
     }
 
-    @Override protected Set<Config<?>> getOptionalConfigs()
+    @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
     {
-        return new HashSet<>(List.of(f_tgeneExecutable));
+        return new HashSet<>(List.of(f_tgeneExecutable, tpmCutoff));
     }
 
     @Override protected void execute()
@@ -451,7 +461,7 @@ public class RunDistributionAnalysis extends ExecutableStep
     {
         List<File> inputFiles;
         String suffix;
-        if (tpmCutoff.get() > 0)
+        if (tpmCutoff.isSet())
         {
             suffix = "_Gene_View_Filtered_TPM.txt";
 

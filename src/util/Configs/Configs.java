@@ -1,6 +1,10 @@
 package util.Configs;
 
 import tfprio.TFPRIO;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.*;
 import util.Configs.Modules.Blacklist.Blacklist;
 import util.Configs.Modules.ChipAtlas.ChipAtlas;
@@ -15,7 +19,6 @@ import util.Configs.Modules.Report.Report;
 import util.Configs.Modules.ScriptTemplates.ScriptTemplates;
 import util.Configs.Modules.Tepic.Tepic;
 import util.Configs.Modules.Tgene.Tgene;
-import util.Configs.Modules.TpmGcFilterAnalysis.TpmGcFilterAnalysis;
 import util.FileManagement;
 
 import java.io.File;
@@ -131,10 +134,10 @@ public class Configs
                 try
                 {
                     // Call the AbstractModule constructor
-                    AbstractModule module =
-                            (AbstractModule) field.getType().getConstructor(Config.class, Config.class, Logger.class)
-                                    .newInstance(new Config<>(TFPRIO.workingDirectory),
-                                            new Config<>(TFPRIO.sourceDirectory), logger);
+                    AbstractModule module = (AbstractModule) field.getType()
+                            .getConstructor(GeneratedFileStructure.class, SourceDirectoryFileStructure.class,
+                                    Logger.class).newInstance(new GeneratedFileStructure(TFPRIO.workingDirectory),
+                                    new SourceDirectoryFileStructure(TFPRIO.sourceDirectory), logger);
                     // Assign the created module to the field in this class
                     field.set(this, module);
 
@@ -143,6 +146,7 @@ public class Configs
                 } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
                          NoSuchMethodException e)
                 {
+                    e.printStackTrace();
                     // Problems during constructor call
                     logger.error(e.getMessage());
                 }
@@ -158,7 +162,7 @@ public class Configs
      */
     public void merge(File configFile) throws IOException
     {
-        logger.info("Merging file: " + configFile.getAbsolutePath());
+        logger.debug("Merging configuration file: " + configFile.getAbsolutePath());
         String content = FileManagement.readFile(configFile);
         JSONObject combined = new JSONObject();
         boolean allModulesWorked = true;
@@ -190,7 +194,7 @@ public class Configs
             logger.error("There were errors during config file merging. Aborting.");
             System.exit(1);
         }
-        logger.info("Merged configuration file from " + configFile.getAbsolutePath());
+        logger.info("Merged configuration file: " + configFile.getAbsolutePath());
     }
 
     /**
@@ -241,6 +245,7 @@ public class Configs
      */
     public void validate()
     {
+        logger.info("Validating configs");
         boolean allValid = true;
         for (AbstractModule module : configs.values())
         {
@@ -257,14 +262,15 @@ public class Configs
 
     /**
      * Save the configs to a file in json format
-     *
-     * @param file          the file to save the configs to
-     * @param onlyWriteable defines if only writeable configs should be included
-     * @throws IOException if the config file cannot be written to
      */
-    public void save(File file, boolean onlyWriteable) throws IOException
+    public void save()
     {
-        writeFile(file, getConfigsJSONString(onlyWriteable));
-        logger.info("Saved configuration JSON to " + file.getAbsolutePath());
+        try
+        {
+            writeFile(extend(TFPRIO.workingDirectory, "configs.json"), getConfigsJSONString(true));
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
     }
 }

@@ -4,7 +4,8 @@ import lib.ExecutableStep;
 import lib.GeneRegion;
 import lib.Region;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.*;
@@ -13,24 +14,24 @@ import static util.FileManagement.makeSureFileExists;
 
 public class Preprocess extends ExecutableStep
 {
-    private final Config<File> f_geneAnnotation = TFPRIO.configs.tepic.geneAnnotationFile;
+    private final AbstractConfig<File> f_geneAnnotation = TFPRIO.configs.tepic.geneAnnotationFile;
 
-    private final Config<File> f_output_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
-    private final Config<File> f_output_regions = TFPRIO.configs.tgene.fileStructure.f_preprocessing_regions;
+    private final GeneratedFileStructure f_output_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
+    private final GeneratedFileStructure f_output_regions = TFPRIO.configs.tgene.fileStructure.f_preprocessing_regions;
 
-    private final Config<String> mtWriting = TFPRIO.configs.tgene.mtWriting;
+    private final AbstractConfig<String> mtWriting = TFPRIO.configs.tgene.mtWriting;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(f_geneAnnotation));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_output_gtf, f_output_regions));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(List.of(mtWriting));
     }

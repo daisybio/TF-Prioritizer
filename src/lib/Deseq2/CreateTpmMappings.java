@@ -2,7 +2,8 @@ package lib.Deseq2;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 import util.Hashing;
 
@@ -19,29 +20,32 @@ import static util.ScriptExecution.executeAndWait;
 
 public class CreateTpmMappings extends ExecutableStep
 {
-    private final Config<File> d_meanCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
-    private final Config<File> d_output = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults;
-    private final Config<File> d_outputScripts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_scripts;
-    private final Config<File> f_lengths = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_tpm_geneLengths;
-    private final Config<File> f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID;
+    private final AbstractConfig<File> d_meanCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults;
+    private final GeneratedFileStructure d_outputScripts =
+            TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_scripts;
+    private final GeneratedFileStructure f_lengths =
+            TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_tpm_geneLengths;
+    private final AbstractConfig<File> f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID;
 
-    private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingTpm;
+    private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingTpm;
 
-    private final Config<Boolean> calculateTpmLengthsEnabled = TFPRIO.configs.general.calculateTpmLengthsEnabled;
-    private final Config<Integer> threadLimit = TFPRIO.configs.general.threadLimit;
-    private final Config<String> species = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
+    private final AbstractConfig<Boolean> calculateTpmLengthsEnabled =
+            TFPRIO.configs.general.calculateTpmLengthsEnabled;
+    private final AbstractConfig<Integer> threadLimit = TFPRIO.configs.general.threadLimit;
+    private final AbstractConfig<String> species = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_meanCounts, f_geneIDs, f_scriptTemplate));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_outputScripts, f_lengths));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(calculateTpmLengthsEnabled, threadLimit, species));
     }

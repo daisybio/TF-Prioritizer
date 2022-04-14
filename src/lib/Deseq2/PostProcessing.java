@@ -2,7 +2,8 @@ package lib.Deseq2;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -16,20 +17,20 @@ import static util.FileManagement.makeSureFileExists;
 
 public class PostProcessing extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.configs.deSeq2.fileStructure.d_outputRaw;
-    private final Config<File> d_output = TFPRIO.configs.deSeq2.fileStructure.d_output;
+    private final AbstractConfig<File> d_input = TFPRIO.configs.deSeq2.fileStructure.d_outputRaw;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.deSeq2.fileStructure.d_output;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>();
     }

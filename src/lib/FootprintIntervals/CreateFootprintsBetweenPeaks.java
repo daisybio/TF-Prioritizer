@@ -2,8 +2,10 @@ package lib.FootprintIntervals;
 
 import tfprio.TFPRIO;
 import lib.ExecutableStep;
+import tfprio.Workflow;
 import util.Comparators.ChromosomeComparator;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -14,30 +16,29 @@ import static util.FileManagement.makeSureFileExists;
 
 public class CreateFootprintsBetweenPeaks extends ExecutableStep
 {
-    private Config<File> d_input;
-    private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks;
-    private final Config<String> option = TFPRIO.configs.tepic.tfBindingSiteSearch;
+    private AbstractConfig<File> d_input;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks;
+    private final AbstractConfig<String> option = TFPRIO.configs.tepic.tfBindingSiteSearch;
 
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(List.of(option));
     }
 
     @Override protected void updateInputDirectory()
     {
-        d_input = TFPRIO.latestInputDirectory;
-        TFPRIO.latestInputDirectory = d_output;
+        d_input = Workflow.getLatestInputDirectory();
     }
 
     public void execute()

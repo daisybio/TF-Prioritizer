@@ -3,7 +3,8 @@ package lib.ChiPAtlas;
 import lib.ExecutableStep;
 import org.apache.commons.compress.utils.IOUtils;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.TrustAllManager;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -20,24 +21,24 @@ import static util.ScriptExecution.executeAndWait;
 
 public class GetDataList extends ExecutableStep
 {
-    private final Config<File> f_zipped = TFPRIO.configs.chipAtlas.fileStructure.f_list_zipped;
-    private final Config<File> f_list = TFPRIO.configs.chipAtlas.fileStructure.f_list_csv;
+    private final GeneratedFileStructure f_zipped = TFPRIO.configs.chipAtlas.fileStructure.f_list_zipped;
+    private final GeneratedFileStructure f_list = TFPRIO.configs.chipAtlas.fileStructure.f_list_csv;
 
-    private final Config<String> genomeVersion = TFPRIO.configs.chipAtlas.genomeVersion;
-    private final Config<String> tissueType = TFPRIO.configs.chipAtlas.tissueType;
-    private final Config<String> urlToList = TFPRIO.configs.chipAtlas.urlToList;
+    private final AbstractConfig<String> genomeVersion = TFPRIO.configs.chipAtlas.genomeVersion;
+    private final AbstractConfig<String> tissueType = TFPRIO.configs.chipAtlas.tissueType;
+    private final AbstractConfig<String> urlToList = TFPRIO.configs.chipAtlas.urlToList;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>();
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_zipped, f_list));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(genomeVersion, tissueType, urlToList));
     }

@@ -1,6 +1,6 @@
 package tfprio;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.Configs;
 import util.ExecutionTimeMeasurement;
 import util.Logger;
@@ -39,20 +39,12 @@ public class TFPRIO
      * In development mode, also existing file structures are considered as created by the pipeline. Otherwise,
      * commenting out executableSteps inside the {@link Workflow} would lead to a simulator error.
      */
-    public static Set<Config<File>> createdFileStructure = new HashSet<>();
+    public static Set<AbstractConfig<File>> createdFileStructure = new HashSet<>();
 
     /**
      * Allows disk read efficient mapping of geneSymbols, geneIDs and their descriptions.
      */
     public static MapSymbolAndEnsg mapSymbolAndEnsg;
-
-
-    /**
-     * Stores the file config pointing to the latest modification of the input files.
-     * <p>
-     * Will be replaced by the {@link Workflow} getLatestInputDirectory method.
-     */
-    @Deprecated public static Config<File> latestInputDirectory;
 
     /**
      * Contains all the histone modifications available in the input data.
@@ -63,6 +55,8 @@ public class TFPRIO
     public static File sourceDirectory;
     static File configFile;
 
+    public static final boolean developmentMode = false;
+
     public static void main(String[] args) throws Exception
     {
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
@@ -70,9 +64,10 @@ public class TFPRIO
 
         configs = new Configs();
 
-        configs.merge(extend(sourceDirectory, "config_templates", "configsTemplate.json"));
+        configs.merge(extend(sourceDirectory, "config_templates", "defaultConfigs.json"));
         configs.merge(configFile);
         configs.validate();
+        configs.save();
 
         Logger logger = new Logger("TFPRIO");
 

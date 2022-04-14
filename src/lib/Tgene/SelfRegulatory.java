@@ -5,7 +5,8 @@ import lib.ExecutableStep;
 import lib.GeneRegion;
 import lib.Region;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.*;
@@ -15,28 +16,29 @@ import static util.FileManagement.makeSureFileExists;
 
 public class SelfRegulatory extends ExecutableStep
 {
-    private final Config<File> d_input_tgene = TFPRIO.configs.tgene.fileStructure.d_groups;
-    private final Config<File> d_input_tepic = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
-    private final Config<File> f_inputRegions = TFPRIO.configs.tgene.fileStructure.f_preprocessing_regions;
+    private final AbstractConfig<File> d_input_tgene = TFPRIO.configs.tgene.fileStructure.d_groups;
+    private final AbstractConfig<File> d_input_tepic = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
+    private final AbstractConfig<File> f_inputRegions = TFPRIO.configs.tgene.fileStructure.f_preprocessing_regions;
 
-    private final Config<File> d_output = TFPRIO.configs.tgene.fileStructure.d_integrate;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tgene.fileStructure.d_integrate;
 
-    private final Config<String> s_tgene_groups = TFPRIO.configs.tgene.fileStructure.s_groups_mergedGroups;
-    private final Config<String> s_tepic_ratios = TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_ratiosDir;
-    private final Config<String> consensusCalc = TFPRIO.configs.tgene.consensusCalc;
-    private final Config<Double> consensus = TFPRIO.configs.tgene.consensus;
+    private final AbstractConfig<String> s_tgene_groups = TFPRIO.configs.tgene.fileStructure.s_groups_mergedGroups;
+    private final AbstractConfig<String> s_tepic_ratios =
+            TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_ratiosDir;
+    private final AbstractConfig<String> consensusCalc = TFPRIO.configs.tgene.consensusCalc;
+    private final AbstractConfig<Double> consensus = TFPRIO.configs.tgene.consensus;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_input_tgene, d_input_tepic, f_inputRegions));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(s_tgene_groups, s_tepic_ratios, consensusCalc, consensus));
     }

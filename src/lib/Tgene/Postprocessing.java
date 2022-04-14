@@ -3,7 +3,8 @@ package lib.Tgene;
 import lib.ExecutableStep;
 import lib.GeneRegion;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -14,40 +15,50 @@ import static util.FileManagement.*;
 
 public class Postprocessing extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.configs.tgene.fileStructure.d_output;
-    private final Config<File> d_output = TFPRIO.configs.tgene.fileStructure.d_merged;
-    private final Config<File> d_outputGroups = TFPRIO.configs.tgene.fileStructure.d_groups;
-    private final Config<File> f_transcripts_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
+    private final AbstractConfig<File> d_input = TFPRIO.configs.tgene.fileStructure.d_output;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tgene.fileStructure.d_merged;
+    private final GeneratedFileStructure d_outputGroups = TFPRIO.configs.tgene.fileStructure.d_groups;
+    private final GeneratedFileStructure f_transcripts_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
 
-    private final Config<File> d_preprocessingMeanCounts =
+    private final AbstractConfig<File> d_preprocessingMeanCounts =
             TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
 
-    private final Config<String> s_output_links = TFPRIO.configs.tgene.fileStructure.s_output_links;
-    private final Config<String> s_preprocessing_meanCounts =
+    private final AbstractConfig<String> s_output_links = TFPRIO.configs.tgene.fileStructure.s_output_links;
+    private final AbstractConfig<String> s_preprocessing_meanCounts =
             TFPRIO.configs.deSeq2.fileStructure.s_preprocessing_MeanCounts;
-    private final Config<String> s_groups_mergedGroups = TFPRIO.configs.tgene.fileStructure.s_groups_mergedGroups;
-    private final Config<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
-    private final Config<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
+    private final AbstractConfig<String> s_groups_mergedGroups =
+            TFPRIO.configs.tgene.fileStructure.s_groups_mergedGroups;
+    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_input, d_preprocessingMeanCounts, f_transcripts_gtf));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
-        Set<Config<File>> createdFileStructure = new HashSet<>(List.of(d_output));
-        if (mutuallyExclusive.get())
-        {
-            createdFileStructure.add(d_outputGroups);
-        }
-        return createdFileStructure;
+        return new HashSet<>(List.of(d_output))
+        {{
+            if (mutuallyExclusive.get())
+            {
+                add(d_outputGroups);
+            } else
+            {
+                d_outputGroups.deleteAndSetNoGenerationReason(mutuallyExclusive.getName() + " is set to false");
+            }
+        }};
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
-        return new HashSet<>(Arrays.asList(s_output_links, s_preprocessing_meanCounts, s_groups_mergedGroups, tpmCutoff,
-                mutuallyExclusive));
+        return new HashSet<>(
+                Arrays.asList(s_output_links, s_preprocessing_meanCounts, s_groups_mergedGroups, mutuallyExclusive));
+    }
+
+    @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
+    {
+        return new HashSet<>(List.of(tpmCutoff));
     }
 
     @Override protected void execute()
@@ -116,7 +127,7 @@ public class Postprocessing extends ExecutableStep
                     List<GeneRegion> allRegionsNoDuplicates = removeGeneRegionDuplicates(allRegions, true);
                     List<GeneRegion> allRegionsFiltered = allRegionsNoDuplicates;
 
-                    if (tpmCutoff.get() > 0)
+                    if (tpmCutoff.isSet())
                     {
                         logger.info("TPM filter is set. Filtering TGENE results: " + d_hm.getName() + " - " +
                                 d_group.getName() + ".");

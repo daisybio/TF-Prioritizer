@@ -1,13 +1,12 @@
 package util.Configs.Modules.Tepic;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.*;
+import util.Configs.ConfigValidators.IntegerRangeValidator;
+import util.Configs.ConfigValidators.StringValidator;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static util.FileManagement.extend;
 
@@ -15,52 +14,52 @@ public class Tepic extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<File> d_ext_tepic = extend(extDirectory, "TEPIC", "TEPIC");
-    public final Config<File> executable = new Config<>(extend(d_ext_tepic.get(), "Code", "TEPIC.sh"));
-    public final Config<File> d_dynamiteScripts =
+    public final InputFileStructure d_ext_tepic = extend(extDirectory, "TEPIC", "TEPIC");
+    public final InputFileStructure executable = extend(d_ext_tepic, "Code", "TEPIC.sh");
+    public final InputFileStructure d_dynamiteScripts =
             extend(d_ext_tepic, "MachineLearningPipelines", "DYNAMITE", "Scripts");
-    public final Config<File> f_dynamite_integrateDate = extend(d_dynamiteScripts, "integrateData.py");
-    public final Config<File> f_dynamite_prepareForClassification =
+    public final InputFileStructure f_dynamite_integrateDate = extend(d_dynamiteScripts, "integrateData.py");
+    public final InputFileStructure f_dynamite_prepareForClassification =
             extend(d_dynamiteScripts, "prepareForClassification.R");
-    public final Config<File> f_dynamite = extend(d_dynamiteScripts, "DYNAMITE.R");
+    public final InputFileStructure f_dynamite = extend(d_dynamiteScripts, "DYNAMITE.R");
 
-    public final Config<File> inputDirectory = new Config<>(File.class);
-    public final Config<File> inputPrevious = new Config<>(File.class);
-    public final Config<File> inputOriginal = new Config<>(File.class);
+    public final InputFileStructure inputDirectory = new InputFileStructure();
 
-    public final Config<File> inputReferenceGenome = new Config<>(File.class);
-    public final Config<File> pathPwms = new Config<>(File.class);
-    public final Config<File> bedChromatinSignal = new Config<>(File.class);
-    public final Config<Integer> columnBedfile = new Config<>(Integer.class);
-    public final Config<File> geneAnnotationFile = new Config<>(File.class);
-    public final Config<Integer> windowSize = new Config<>(50000, true);
-    public final Config<File> onlyDNasePeaks = new Config<>(File.class);
-    public final Config<Boolean> exponentialDecay = new Config<>(true, true);
-    public final Config<Boolean> doNotNormalizePeakLength = new Config<>(false, true);
-    public final Config<Boolean> doNotGenerate = new Config<>(false, true);
-    public final Config<Boolean> originalDecay = new Config<>(false, true);
-    public final Config<File> psemsLengthFile = new Config<>(File.class);
-    public final Config<Boolean> entireGeneBody = new Config<>(false, true);
-    public final Config<Boolean> doZip = new Config<>(false, true);
-    public final Config<File> backgroundSequencesDirectory = new Config<>(File.class);
-    public final Config<File> twoBitFile = new Config<>(File.class);
-    public final Config<Double> pValue = new Config<>(0.05, true);
-    public final Config<Integer> maxMinutesPerChromosome = new Config<>(3, true);
-    public final Config<Boolean> chromosomePrefix = new Config<>(false, true);
-    public final Config<Boolean> transcriptBased = new Config<>(false, true);
-    public final Config<File> loopListFile = new Config<>(File.class);
-    public final Config<Integer> loopWindows = new Config<>(5000, true);
-    public final Config<Boolean> onlyPeakFeatures = new Config<>(false, true);
-    public final Config<Integer> tpmCutoff = new Config<>(Integer.class);
-    public final Config<File> ensgSymbolFile = new Config<>(File.class);
-    public final Config<Boolean> tgeneTargetGenes = new Config<>(true, true);
-    public final Config<Boolean> randomizeTfGeneMatrix = new Config<>(false, true);
-    public final Config<String> tfBindingSiteSearch =
-            new Config<>("INSIDE", new ArrayList<>(Arrays.asList("INSIDE", "BETWEEN", "EXCL_BETWEEN")), true);
+    public final InputFileStructure inputReferenceGenome = new InputFileStructure();
+    public final InputFileStructure pathPwms = new InputFileStructure();
+    public final InputFileStructure bedChromatinSignal = new InputFileStructure();
+    public final InputConfig<Integer> columnBedfile = new InputConfig<>(Integer.class);
+    public final InputFileStructure geneAnnotationFile = new InputFileStructure();
+    public final InputConfig<Integer> windowSize = new InputConfig<>(Integer.class);
+    public final InputFileStructure onlyDNasePeaks = new InputFileStructure();
+    public final InputConfig<Boolean> exponentialDecay = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> doNotNormalizePeakLength = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> doNotGenerate = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> originalDecay = new InputConfig<>(Boolean.class);
+    public final InputFileStructure psemsLengthFile = new InputFileStructure();
+    public final InputConfig<Boolean> entireGeneBody = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> doZip = new InputConfig<>(Boolean.class);
+    public final InputFileStructure backgroundSequencesDirectory = new InputFileStructure();
+    public final InputFileStructure twoBitFile = new InputFileStructure();
+    public final InputConfig<Double> pValue = new InputConfig<>(Double.class);
+    public final InputConfig<Integer> maxMinutesPerChromosome = new InputConfig<>(Integer.class);
+    public final InputConfig<Boolean> chromosomePrefix = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> transcriptBased = new InputConfig<>(Boolean.class);
+    public final InputFileStructure loopListFile = new InputFileStructure();
+    public final InputConfig<Integer> loopWindows = new InputConfig<>(Integer.class);
+    public final InputConfig<Boolean> onlyPeakFeatures = new InputConfig<>(Boolean.class);
+    public final InputConfig<Integer> tpmCutoff =
+            new InputConfig<>(Integer.class, new IntegerRangeValidator(1, Integer.MAX_VALUE));
+    public final InputFileStructure ensgSymbolFile = new InputFileStructure();
+    public final InputConfig<Boolean> tgeneTargetGenes = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> randomizeTfGeneMatrix = new InputConfig<>(Boolean.class);
+    public final InputConfig<String> tfBindingSiteSearch =
+            new InputConfig<>(String.class, new StringValidator("INSIDE", "BETWEEN", "EXCL_BETWEEN"));
+
     // TODO: Add optional map to set bindingSiteSearch for each histone modification
-    public final Config<Integer> betweenMaxBps = new Config<>(500, true);
+    public final InputConfig<Integer> betweenMaxBps = new InputConfig<>(Integer.class);
 
-    public Tepic(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public Tepic(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

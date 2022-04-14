@@ -2,7 +2,8 @@ package lib.Dynamite;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileManagement;
 
 import java.io.File;
@@ -14,42 +15,45 @@ import static util.ScriptExecution.executeAndWait;
 
 public class Preprocessing extends ExecutableStep
 {
-    private Config<File> d_input;
-    private final Config<File> d_inputDeseq2 = TFPRIO.configs.deSeq2.fileStructure.d_output;
-    private final Config<File> f_script = TFPRIO.configs.tepic.f_dynamite_integrateDate;
-    private final Config<File> f_scriptClassification = TFPRIO.configs.tepic.f_dynamite_prepareForClassification;
+    private AbstractConfig<File> d_input;
+    private final AbstractConfig<File> d_inputDeseq2 = TFPRIO.configs.deSeq2.fileStructure.d_output;
+    private final AbstractConfig<File> f_script = TFPRIO.configs.tepic.f_dynamite_integrateDate;
+    private final AbstractConfig<File> f_scriptClassification =
+            TFPRIO.configs.tepic.f_dynamite_prepareForClassification;
 
-    private final Config<File> d_output = TFPRIO.configs.dynamite.fileStructure.d_preprocessing_integrateData;
-    private final Config<File> d_outputClassification =
+    private final GeneratedFileStructure d_output = TFPRIO.configs.dynamite.fileStructure.d_preprocessing_integrateData;
+    private final GeneratedFileStructure d_outputClassification =
             TFPRIO.configs.dynamite.fileStructure.d_preprocessing_prepareClassification;
 
-    private final Config<String> s_ratios_dir = TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_ratiosDir;
-    private final Config<String> s_log2coeff =
+    private final AbstractConfig<String> s_ratios_dir =
+            TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_ratiosDir;
+    private final AbstractConfig<String> s_log2coeff =
             TFPRIO.configs.dynamite.fileStructure.s_preprocessing_integrateData_log2coeff;
-    private final Config<String> s_prepClass =
+    private final AbstractConfig<String> s_prepClass =
             TFPRIO.configs.dynamite.fileStructure.s_preprocessing_prepareClassification_data;
-    private final Config<Integer> geneIdColumn = TFPRIO.configs.dynamite.preprocessing_IntegrateDataGeneIds;
-    private final Config<Integer> log2fcColumn = TFPRIO.configs.dynamite.preprocessing_IntegrateDataLog2fc;
+    private final AbstractConfig<Integer> geneIdColumn = TFPRIO.configs.dynamite.preprocessing_IntegrateDataGeneIds;
+    private final AbstractConfig<Integer> log2fcColumn = TFPRIO.configs.dynamite.preprocessing_IntegrateDataLog2fc;
 
-    private final Config<File> tgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
-    private final Config<File> considerGene = TFPRIO.configs.dynamite.preprocessing_IntegrateDataConsiderGeneFile;
+    private final AbstractConfig<File> tgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
+    private final AbstractConfig<File> considerGene =
+            TFPRIO.configs.dynamite.preprocessing_IntegrateDataConsiderGeneFile;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_input, d_inputDeseq2, f_script, f_scriptClassification));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_outputClassification));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(s_ratios_dir, s_log2coeff, s_prepClass, geneIdColumn, log2fcColumn));
     }
 
-    @Override protected Set<Config<?>> getOptionalConfigs()
+    @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
     {
         return new HashSet<>(Arrays.asList(tgeneExecutable, considerGene));
     }

@@ -2,7 +2,9 @@ package lib.Tgene;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import tfprio.Workflow;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,36 +15,36 @@ import static util.ScriptExecution.executeAndWait;
 
 public class RunTgene extends ExecutableStep
 {
-    private Config<File> d_input;
-    private final Config<File> f_input_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
+    private AbstractConfig<File> d_input;
+    private final AbstractConfig<File> f_input_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
 
-    private final Config<File> d_output = TFPRIO.configs.tgene.fileStructure.d_output;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tgene.fileStructure.d_output;
 
-    private final Config<File> pathToTgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
+    private final AbstractConfig<File> pathToTgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
 
-    private final Config<Boolean> noClosestLocus = TFPRIO.configs.tgene.noClosestLocus;
-    private final Config<Boolean> noClosestTss = TFPRIO.configs.tgene.noClosestTss;
-    private final Config<Integer> maxLinkDistance = TFPRIO.configs.tgene.maxLinkDistance;
-    private final Config<Double> pValue = TFPRIO.configs.tgene.pValue;
+    private final AbstractConfig<Boolean> noClosestLocus = TFPRIO.configs.tgene.noClosestLocus;
+    private final AbstractConfig<Boolean> noClosestTss = TFPRIO.configs.tgene.noClosestTss;
+    private final AbstractConfig<Integer> maxLinkDistance = TFPRIO.configs.tgene.maxLinkDistance;
+    private final AbstractConfig<Double> pValue = TFPRIO.configs.tgene.pValue;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_input, pathToTgeneExecutable, f_input_gtf));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(noClosestLocus, noClosestTss, maxLinkDistance, pValue));
     }
 
     @Override protected void updateInputDirectory()
     {
-        d_input = TFPRIO.latestInputDirectory;
+        d_input = Workflow.getLatestInputDirectory();
     }
 
     @Override protected void execute()

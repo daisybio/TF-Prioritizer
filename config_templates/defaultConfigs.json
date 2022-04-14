@@ -1,12 +1,8 @@
 {
   "DeSeq2": {
-    "FileStructure": {
-      "s_preprocessing_genePositions_mergedEnhancerDbs_bedSuffix": ".bed",
-      "s_preprocessing_genePositions_mergedEnhancerDbs_bedFormat": "chrom\tchromStart\tchromEnd\tname\treference_genome"
-    },
     "tpmFilter": null,
     "inputGeneID": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data/Gene_id.txt",
-    "biomartDatasetSymbolColumn": null,
+    "biomartDatasetSymbolColumn": "mgi_symbol",
     "countThreshold": 50,
     "biomartDatasetSpecies": "mmusculus_gene_ensembl",
     "inputDirectory": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data"
@@ -24,11 +20,11 @@
     "randomize": false
   },
   "ChipAtlas": {
-    "genomeVersion": null,
-    "tissueType": null
+    "isEnabled": true,
+    "genomeVersion": "mm10",
+    "tissueType": "breast"
   },
   "Tepic": {
-    "inputPrevious": null,
     "transcriptBased": false,
     "randomizeTfGeneMatrix": false,
     "columnBedfile": null,
@@ -56,7 +52,6 @@
     "tpmCutoff": null,
     "twoBitFile": null,
     "backgroundSequencesDirectory": null,
-    "inputOriginal": null,
     "onlyDNasePeaks": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/gencode.vM25.annotation.gtf",
     "inputReferenceGenome": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/genome.fa",
     "bedChromatinSignal": null
@@ -86,22 +81,16 @@
     "distributionAnalysisScoreType": "EXCL_GENE_COUNTS",
     "trapPredictedSequenceLogosAffinityCutoff": 0.05
   },
-  "Misc": {
-    "conversionHelpers_groups": null,
-    "conversionHelpers_conversionInput": null,
-    "conversionHelpers_inputFormat": null,
-    "conversionHelpers_biomartColumn": null
-  },
   "General": {
+    "threadLimit": 1,
     "fileLogging": true,
-    "ensgMappingEnabled": true,
     "calculateGenePositionsEnabled": true,
     "calculateTpmLengthsEnabled": true
   },
   "Tgene": {
     "selfRegulatory": false,
     "consensus": 0.5,
-    "pathToExecutable": null,
+    "pathToExecutable": "/home/nico/.meme",
     "noClosestLocus": false,
     "consensusCalc": "INCREASE_TGENE_TFS",
     "maxLinkDistance": 500000,
@@ -110,7 +99,6 @@
     "pValue": 0.05
   },
   "Igv": {
-    "port": 60151,
     "topLog2fcIncludeLncRnaPseudogenes": true,
     "pathToTdf": null,
     "pathToTfChipSeq": null,
@@ -138,5 +126,8 @@
       "LOW_MAPPABILITY",
       "HIGH_SIGNAL_REGION"
     ]
+  },
+  "DistributionAnalysis": {
+    "performAllAnalysis": false
   }
 }

@@ -1,6 +1,7 @@
 package util.Configs.Modules.MixOptions;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.*;
+import util.Configs.ConfigValidators.StringValidator;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -13,15 +14,16 @@ public class MixOptions extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<String> level =
-            new Config<>(String.class, new ArrayList<>(Arrays.asList("SAMPLE_LEVEL", "HM_LEVEL")));
-    public final Config<String> option =
-            new Config<>(String.class, new ArrayList<>(Arrays.asList("UNION", "INTERSECTION")));
-    public final Config<Integer> occurrenceIntersection = new Config<>(2, true);
-    public final Config<Boolean> mutuallyExclusive = new Config<>(false, true);
-    public final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals = new Config<>(true, true);
+    public final InputConfig<String> level =
+            new InputConfig<>(String.class, new StringValidator("SAMPLE_LEVEL", "HM_LEVEL"));
+    public final InputConfig<String> option =
+            new InputConfig<>(String.class, new StringValidator("UNION", "INTERSECTION"));
+    public final InputConfig<Integer> occurrenceIntersection = new InputConfig<>(Integer.class);
+    public final InputConfig<Boolean> mutuallyExclusive = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> mutuallyExclusiveDifferentialPeakSignals = new InputConfig<>(Boolean.class);
 
-    public MixOptions(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public MixOptions(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                      Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

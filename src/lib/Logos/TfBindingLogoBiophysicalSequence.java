@@ -3,7 +3,8 @@ package lib.Logos;
 import lib.ExecutableStep;
 import org.apache.commons.compress.utils.IOUtils;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.TrustAllManager;
 
 import javax.net.ssl.*;
@@ -16,43 +17,44 @@ import static util.ScriptExecution.executeAndWait;
 
 public class TfBindingLogoBiophysicalSequence extends ExecutableStep
 {
-    private final Config<File> f_input_dcgResult = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
-    private final Config<File> f_input_pwmFile = TFPRIO.configs.tepic.pathPwms;
-    private final Config<File> f_scriptTemplate_biophysicalModel =
+    private final AbstractConfig<File> f_input_dcgResult =
+            TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
+    private final AbstractConfig<File> f_input_pwmFile = TFPRIO.configs.tepic.pathPwms;
+    private final AbstractConfig<File> f_scriptTemplate_biophysicalModel =
             TFPRIO.configs.scriptTemplates.f_logos_biophysicalModel;
 
-    private final Config<File> d_output_biophysicalModel =
+    private final GeneratedFileStructure d_output_biophysicalModel =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_logos_biophysicalModel;
-    private final Config<File> d_output_tfSequence =
+    private final GeneratedFileStructure d_output_tfSequence =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_logos_tfSequence;
-    private final Config<File> f_output_jaspar =
+    private final GeneratedFileStructure f_output_jaspar =
             TFPRIO.configs.distributionAnalysis.fileStructure.f_logos_tfSequence_jaspar_pfms;
 
-    private final Config<String> s_biophysicalModel_data =
+    private final AbstractConfig<String> s_biophysicalModel_data =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_logos_biophysicalModel_data;
-    private final Config<String> s_biophysicalModel_script =
+    private final AbstractConfig<String> s_biophysicalModel_script =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_logos_biophysicalModel_script;
-    private final Config<String> s_biophysicalModel_plot =
+    private final AbstractConfig<String> s_biophysicalModel_plot =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_logos_biophysicalModel_image;
-    private final Config<String> jasparUrl = TFPRIO.configs.jaspar.downloadUrl;
-    private final Config<String> jasparApi = TFPRIO.configs.jaspar.apiCall;
-    private final Config<String> jasparLogoDownloadUrl = TFPRIO.configs.jaspar.logoDownloadUrl;
-    private final Config<String> s_jasparJson =
+    private final AbstractConfig<String> jasparUrl = TFPRIO.configs.jaspar.downloadUrl;
+    private final AbstractConfig<String> jasparApi = TFPRIO.configs.jaspar.apiCall;
+    private final AbstractConfig<String> jasparLogoDownloadUrl = TFPRIO.configs.jaspar.logoDownloadUrl;
+    private final AbstractConfig<String> s_jasparJson =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_logos_tfSequence_jaspar_json;
-    private final Config<String> s_jasparImage =
+    private final AbstractConfig<String> s_jasparImage =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_logos_tfSequence_jaspar_image;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_input_dcgResult, f_input_pwmFile, f_scriptTemplate_biophysicalModel));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output_biophysicalModel, d_output_tfSequence, f_output_jaspar));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
                 Arrays.asList(s_biophysicalModel_data, s_biophysicalModel_script, s_biophysicalModel_plot, jasparUrl,

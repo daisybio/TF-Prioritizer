@@ -3,7 +3,8 @@ package lib.Igv;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import tfprio.Workflow;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 import util.IGV_Headless;
 
@@ -16,26 +17,26 @@ import static util.FileManagement.extend;
 
 public class DcgTargetGenes extends ExecutableStep
 {
-    private final Config<File> f_input_geneCoordinates =
+    private final AbstractConfig<File> f_input_geneCoordinates =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_data;
-    private final Config<File> d_input_heatmaps = TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps;
-    private Config<File> d_input_tepic;
-    private final Config<File> d_input_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
+    private final AbstractConfig<File> d_input_heatmaps = TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps;
+    private AbstractConfig<File> d_input_tepic;
+    private final AbstractConfig<File> d_input_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
 
-    private final Config<File> d_output = TFPRIO.configs.igv.fileStructure.d_igvDcgTargetGenes;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.igv.fileStructure.d_igvDcgTargetGenes;
 
-    private final Config<String> speciesReferenceGenome = TFPRIO.configs.igv.speciesReferenceGenome;
-    private final Config<String> s_session = TFPRIO.configs.igv.fileStructure.s_session;
-    private final Config<File> pathToIgv = TFPRIO.configs.igv.pathToIGV;
-    private final Config<Boolean> chipAtlasEnabled = TFPRIO.configs.chipAtlas.isEnabled;
+    private final AbstractConfig<String> speciesReferenceGenome = TFPRIO.configs.igv.speciesReferenceGenome;
+    private final AbstractConfig<String> s_session = TFPRIO.configs.igv.fileStructure.s_session;
+    private final AbstractConfig<File> pathToIgv = TFPRIO.configs.igv.pathToIGV;
+    private final AbstractConfig<Boolean> chipAtlasEnabled = TFPRIO.configs.chipAtlas.isEnabled;
 
     // Optional configs
-    private final Config<List> includePredictionData = TFPRIO.configs.igv.includePredictionData;
-    private final Config<File> pathToTfChipSeq = TFPRIO.configs.igv.pathToTfChipSeq;
-    private final Config<File> pathToTdf = TFPRIO.configs.igv.pathToTdf;
-    private final Config<List> enhancerDatabases = TFPRIO.configs.igv.enhancerDatabases;
+    private final AbstractConfig<List<String>> includePredictionData = TFPRIO.configs.igv.includePredictionData;
+    private final AbstractConfig<File> pathToTfChipSeq = TFPRIO.configs.igv.pathToTfChipSeq;
+    private final AbstractConfig<File> pathToTdf = TFPRIO.configs.igv.pathToTdf;
+    private final AbstractConfig<List<String>> enhancerDatabases = TFPRIO.configs.igv.enhancerDatabases;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_heatmaps, d_input_tepic))
         {{
@@ -51,17 +52,17 @@ public class DcgTargetGenes extends ExecutableStep
         }};
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(speciesReferenceGenome, s_session, pathToIgv, chipAtlasEnabled));
     }
 
-    @Override protected Set<Config<?>> getOptionalConfigs()
+    @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
     {
         return new HashSet<>(Arrays.asList(includePredictionData, pathToTfChipSeq, pathToTdf, enhancerDatabases));
     }

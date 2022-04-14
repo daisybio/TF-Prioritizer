@@ -2,7 +2,8 @@ package lib.Plots;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,29 +14,33 @@ import static util.FileManagement.makeSureFileExists;
 
 public class AnalyzeData extends ExecutableStep
 {
-    private final Config<File> d_input_readCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
-    private final Config<File> d_input_tpm = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults;
-    private final Config<File> d_input_plotData = TFPRIO.configs.plots.fileStructure.d_data;
-    private final Config<File> f_input_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
+    private final AbstractConfig<File> d_input_readCounts =
+            TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
+    private final AbstractConfig<File> d_input_tpm = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults;
+    private final AbstractConfig<File> d_input_plotData = TFPRIO.configs.plots.fileStructure.d_data;
+    private final AbstractConfig<File> f_input_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
 
-    private final Config<File> d_output_groupLevel = TFPRIO.configs.plots.fileStructure.d_analysisData_tpLevel;
-    private final Config<File> d_output_hmLevel = TFPRIO.configs.plots.fileStructure.d_analysisData_hmLevel;
-    private final Config<File> d_output_website = TFPRIO.configs.plots.fileStructure.d_analysisData_websiteOverview;
+    private final GeneratedFileStructure d_output_groupLevel =
+            TFPRIO.configs.plots.fileStructure.d_analysisData_tpLevel;
+    private final GeneratedFileStructure d_output_hmLevel = TFPRIO.configs.plots.fileStructure.d_analysisData_hmLevel;
+    private final GeneratedFileStructure d_output_website =
+            TFPRIO.configs.plots.fileStructure.d_analysisData_websiteOverview;
 
-    private final Config<String> s_plotData_different = TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
-    private final Config<String> s_plotData_same = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
+    private final AbstractConfig<String> s_plotData_different =
+            TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
+    private final AbstractConfig<String> s_plotData_same = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_input_readCounts, d_input_tpm, d_input_plotData, f_input_tfs));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output_groupLevel, d_output_hmLevel, d_output_website));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(s_plotData_different, s_plotData_same));
     }

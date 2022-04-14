@@ -2,7 +2,8 @@ package lib.DistributionAnalysis;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,50 +14,58 @@ import static util.ScriptExecution.executeAndWait;
 
 public class CreatePlots extends ExecutableStep
 {
-    private final Config<File> d_input_tfDistributionHm =
+    private final AbstractConfig<File> d_input_tfDistributionHm =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_tfDistribution_hm;
-    private final Config<File> d_input_tfDistributionAll =
+    private final AbstractConfig<File> d_input_tfDistributionAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_tfDistribution_all;
-    private final Config<File> d_input_backgroundDistributionHm =
+    private final AbstractConfig<File> d_input_backgroundDistributionHm =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_hm;
-    private final Config<File> d_input_backgroundDistributionAll =
+    private final AbstractConfig<File> d_input_backgroundDistributionAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_all;
-    private final Config<File> f_plotScriptTemplate = TFPRIO.configs.scriptTemplates.f_distributionPlots;
-    private final Config<File> f_mwuScriptTemplate = TFPRIO.configs.scriptTemplates.f_distributionMwuPlots;
+    private final AbstractConfig<File> f_plotScriptTemplate = TFPRIO.configs.scriptTemplates.f_distributionPlots;
+    private final AbstractConfig<File> f_mwuScriptTemplate = TFPRIO.configs.scriptTemplates.f_distributionMwuPlots;
 
-    private final Config<File> d_output_plotsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_hm;
-    private final Config<File> d_output_plotsAll = TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_all;
-    private final Config<File> d_output_statsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_hm;
-    private final Config<File> d_output_statsAll = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_all;
-    private final Config<File> d_output_scriptsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_plotsScripts_hm;
-    private final Config<File> d_output_scriptsAll =
+    private final GeneratedFileStructure d_output_plotsHm =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_hm;
+    private final GeneratedFileStructure d_output_plotsAll =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_all;
+    private final GeneratedFileStructure d_output_statsHm =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_hm;
+    private final GeneratedFileStructure d_output_statsAll =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_all;
+    private final GeneratedFileStructure d_output_scriptsHm =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_plotsScripts_hm;
+    private final GeneratedFileStructure d_output_scriptsAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_plotsScripts_all;
-    private final Config<File> d_output_mwuScriptsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_mwuScriptsHm;
-    private final Config<File> d_output_mwuScriptsAll =
+    private final GeneratedFileStructure d_output_mwuScriptsHm =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_mwuScriptsHm;
+    private final GeneratedFileStructure d_output_mwuScriptsAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_mwuScriptsAll;
-    private final Config<File> d_output_mwuPlots = TFPRIO.configs.distributionAnalysis.fileStructure.d_mwuPlots;
+    private final GeneratedFileStructure d_output_mwuPlots =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_mwuPlots;
 
-    private final Config<String> s_plotScript =
+    private final AbstractConfig<String> s_plotScript =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_plotsScripts_pythonScript;
-    private final Config<String> s_mwuScript = TFPRIO.configs.distributionAnalysis.fileStructure.s_mwuScripts_script;
-    private final Config<String> s_input =
+    private final AbstractConfig<String> s_mwuScript =
+            TFPRIO.configs.distributionAnalysis.fileStructure.s_mwuScripts_script;
+    private final AbstractConfig<String> s_input =
             TFPRIO.configs.distributionAnalysis.fileStructure.s_tfTgScores_backgroundDistribution_csv;
-    private final Config<String> s_stats = TFPRIO.configs.distributionAnalysis.fileStructure.s_stats_csv;
+    private final AbstractConfig<String> s_stats = TFPRIO.configs.distributionAnalysis.fileStructure.s_stats_csv;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(
                 Arrays.asList(d_input_tfDistributionHm, d_input_backgroundDistributionHm, f_plotScriptTemplate,
                         f_mwuScriptTemplate));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(
                 Arrays.asList(d_output_plotsHm, d_output_statsHm, d_output_scriptsHm, d_output_mwuScriptsHm));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(s_input, s_stats));
     }
