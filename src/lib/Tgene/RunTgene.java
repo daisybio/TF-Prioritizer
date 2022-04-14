@@ -2,6 +2,7 @@ package lib.Tgene;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
+import tfprio.Workflow;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
@@ -42,7 +43,7 @@ public class RunTgene extends ExecutableStep
 
     @Override protected void updateInputDirectory()
     {
-        d_input = TFPRIO.latestInputDirectory;
+        d_input = Workflow.getLatestInputDirectory();
     }
 
     @Override protected void execute()

@@ -2,6 +2,7 @@ package lib.FootprintIntervals;
 
 import tfprio.TFPRIO;
 import lib.ExecutableStep;
+import tfprio.Workflow;
 import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
@@ -36,8 +37,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
 
     @Override protected void updateInputDirectory()
     {
-        d_input = TFPRIO.latestInputDirectory;
-        TFPRIO.latestInputDirectory = d_output;
+        d_input = Workflow.getLatestInputDirectory();
     }
 
     public void execute()

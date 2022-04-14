@@ -41,7 +41,6 @@ public class InitStaticVariables extends ExecutableStep
 
     @Override protected void execute()
     {
-        TFPRIO.latestInputDirectory = TFPRIO.configs.tepic.inputDirectory;
         TFPRIO.mapSymbolAndEnsg = new MapSymbolAndEnsg();
         initExistingGroups();
     }

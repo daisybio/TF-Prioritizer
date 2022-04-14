@@ -5,6 +5,7 @@ import lib.BinaryTree.ChromosomePeakTrees;
 import lib.ExecutableStep;
 import lib.Peak;
 import lib.Region;
+import tfprio.Workflow;
 import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
 
@@ -37,8 +38,7 @@ public class MixMutuallyExclusive extends ExecutableStep
 
     @Override protected void updateInputDirectory()
     {
-        d_input = TFPRIO.latestInputDirectory;
-        TFPRIO.latestInputDirectory = d_output;
+        d_input = Workflow.getLatestInputDirectory();
     }
 
     public void execute()

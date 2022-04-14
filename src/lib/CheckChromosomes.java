@@ -31,11 +31,6 @@ public class CheckChromosomes extends ExecutableStep
         return new HashSet<>();
     }
 
-    @Override protected void updateInputDirectory()
-    {
-        TFPRIO.latestInputDirectory = d_output;
-    }
-
     /**
      * Make sure that chromosomes are annotated without a "chr" prefix
      */

@@ -32,11 +32,6 @@ public class SampleLevel extends ExecutableStep
         return new HashSet<>(Arrays.asList(option, occurrenceIntersection));
     }
 
-    @Override protected void updateInputDirectory()
-    {
-        TFPRIO.latestInputDirectory = d_output;
-    }
-
     @Override protected void execute()
     {
         StaticMethods.runMixOption(d_input.get(), d_output.get(), "SAMPLE_LEVEL", logger, executorService, option,

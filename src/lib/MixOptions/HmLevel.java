@@ -31,11 +31,6 @@ public class HmLevel extends ExecutableStep
         return new HashSet<>();
     }
 
-    @Override protected void updateInputDirectory()
-    {
-        TFPRIO.latestInputDirectory = d_output;
-    }
-
     @Override protected void execute()
     {
         StaticMethods.runMixOption(d_input.get(), d_output.get(), "HM_LEVEL", logger, executorService, option,

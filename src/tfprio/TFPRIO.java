@@ -46,14 +46,6 @@ public class TFPRIO
      */
     public static MapSymbolAndEnsg mapSymbolAndEnsg;
 
-
-    /**
-     * Stores the file config pointing to the latest modification of the input files.
-     * <p>
-     * Will be replaced by the {@link Workflow} getLatestInputDirectory method.
-     */
-    @Deprecated public static AbstractConfig<File> latestInputDirectory;
-
     /**
      * Contains all the histone modifications available in the input data.
      */
@@ -73,7 +65,6 @@ public class TFPRIO
         configs.merge(extend(sourceDirectory, "config_templates", "defaultConfigs.json"));
         configs.merge(configFile);
         configs.validate();
-        System.exit(0);
 
         Logger logger = new Logger("TFPRIO");
 

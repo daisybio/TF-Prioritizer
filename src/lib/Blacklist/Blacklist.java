@@ -4,6 +4,7 @@ import tfprio.TFPRIO;
 import lib.BinaryTree.ChromosomeBlacklistTrees;
 import lib.ExecutableStep;
 import lib.Region;
+import tfprio.Workflow;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
@@ -34,8 +35,7 @@ public class Blacklist extends ExecutableStep
 
     @Override protected void updateInputDirectory()
     {
-        d_input = TFPRIO.latestInputDirectory;
-        TFPRIO.latestInputDirectory = d_output;
+        d_input = Workflow.getLatestInputDirectory();
     }
 
     public void execute()
