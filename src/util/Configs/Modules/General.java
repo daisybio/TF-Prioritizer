@@ -4,7 +4,6 @@ import util.Configs.ConfigTypes.*;
 import util.Configs.ConfigValidators.IntegerRangeValidator;
 import util.Logger;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import static util.FileManagement.extend;
@@ -26,8 +25,8 @@ public class General extends AbstractModule
     public final InputConfig<Boolean> redirectExternalScriptErrorStream = new InputConfig<>(Boolean.class);
 
     public final GeneratedFileStructure d_workflowHashes = extend(workingDirectory, ".hashes");
-    
-    public General(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+
+    public General(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

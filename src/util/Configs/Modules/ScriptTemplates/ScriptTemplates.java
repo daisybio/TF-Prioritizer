@@ -3,6 +3,7 @@ package util.Configs.Modules.ScriptTemplates;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -13,25 +14,30 @@ import static util.FileManagement.extend;
 
 public class ScriptTemplates extends AbstractModule
 {
-    public final InputFileStructure d_root = extend(sourceDirectory, "scripts");
-    public final InputFileStructure f_heatmaps = extend(d_root, "heatmap.R");
-    public final InputFileStructure f_mapping = extend(d_root, "mapping.R");
-    public final InputFileStructure f_deseq2 = extend(d_root, "deseq2.R");
-    public final InputFileStructure f_deseq2PreprocessingSingle = extend(d_root, "deseq2_preprocessing_single.py");
-    public final InputFileStructure f_deseq2PreprocessingCombined = extend(d_root, "deseq2_preprocessing_combined.py");
-    public final InputFileStructure f_deseq2PreprocessingGetGeneLengths = extend(d_root, "getGeneLengths.R");
-    public final InputFileStructure f_deseq2PreprocessingTpm = extend(d_root, "deseq2_tpm.py");
-    public final InputFileStructure f_deseq2PreprocessingGetGenePositions = extend(d_root, "getGenePositions.R");
-    public final InputFileStructure f_deseq2PreprocessingUplift = extend(d_root, "deseq2_upliftPositions.py");
-    public final InputFileStructure f_plots_openChromatinViolinPlots = extend(d_root, "openChromatinViolinPlots.R");
-    public final InputFileStructure f_plots_groupPlots = extend(d_root, "groupPlots.py");
-    public final InputFileStructure f_distributionPlots = extend(d_root, "distributionPlots.py");
-    public final InputFileStructure f_distributionMwuPlots = extend(d_root, "distributionMwuPlots.R");
+    public final SourceDirectoryFileStructure d_root = extend(sourceDirectory, "scripts");
+    public final SourceDirectoryFileStructure f_heatmaps = extend(d_root, "heatmap.R");
+    public final SourceDirectoryFileStructure f_mapping = extend(d_root, "mapping.R");
+    public final SourceDirectoryFileStructure f_deseq2 = extend(d_root, "deseq2.R");
+    public final SourceDirectoryFileStructure f_deseq2PreprocessingSingle =
+            extend(d_root, "deseq2_preprocessing_single.py");
+    public final SourceDirectoryFileStructure f_deseq2PreprocessingCombined =
+            extend(d_root, "deseq2_preprocessing_combined.py");
+    public final SourceDirectoryFileStructure f_deseq2PreprocessingGetGeneLengths = extend(d_root, "getGeneLengths.R");
+    public final SourceDirectoryFileStructure f_deseq2PreprocessingTpm = extend(d_root, "deseq2_tpm.py");
+    public final SourceDirectoryFileStructure f_deseq2PreprocessingGetGenePositions =
+            extend(d_root, "getGenePositions.R");
+    public final SourceDirectoryFileStructure f_deseq2PreprocessingUplift = extend(d_root, "deseq2_upliftPositions.py");
+    public final SourceDirectoryFileStructure f_plots_openChromatinViolinPlots =
+            extend(d_root, "openChromatinViolinPlots.R");
+    public final SourceDirectoryFileStructure f_plots_groupPlots = extend(d_root, "groupPlots.py");
+    public final SourceDirectoryFileStructure f_distributionPlots = extend(d_root, "distributionPlots.py");
+    public final SourceDirectoryFileStructure f_distributionMwuPlots = extend(d_root, "distributionMwuPlots.R");
 
-    public final InputFileStructure f_logos_biophysicalModel = extend(d_root, "logos_biophysicalModel.py");
-    public final InputFileStructure f_logos_tfBindingSequence = extend(d_root, "logos_bindingSequence.R");
+    public final SourceDirectoryFileStructure f_logos_biophysicalModel = extend(d_root, "logos_biophysicalModel.py");
+    public final SourceDirectoryFileStructure f_logos_tfBindingSequence = extend(d_root, "logos_bindingSequence.R");
 
-    public ScriptTemplates(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public ScriptTemplates(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                           Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

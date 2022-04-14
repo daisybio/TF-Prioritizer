@@ -1,9 +1,6 @@
 package util.Configs.Modules.Plots;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputFileStructure;
-import util.Configs.ConfigTypes.InternalConfig;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -36,7 +33,8 @@ public class FileStructure extends AbstractModule
 
     public final GeneratedFileStructure d_targetGenesDcg = extend(workingDirectory, "06_E_PLOTS_TARGET_GENES_DCG");
 
-    public FileStructure(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public FileStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                         Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

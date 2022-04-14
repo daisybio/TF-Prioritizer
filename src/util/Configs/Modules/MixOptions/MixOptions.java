@@ -1,9 +1,6 @@
 package util.Configs.Modules.MixOptions;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputConfig;
-import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.*;
 import util.Configs.ConfigValidators.StringValidator;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
@@ -25,7 +22,8 @@ public class MixOptions extends AbstractModule
     public final InputConfig<Boolean> mutuallyExclusive = new InputConfig<>(Boolean.class);
     public final InputConfig<Boolean> mutuallyExclusiveDifferentialPeakSignals = new InputConfig<>(Boolean.class);
 
-    public MixOptions(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public MixOptions(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                      Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

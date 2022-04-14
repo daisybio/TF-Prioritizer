@@ -67,6 +67,7 @@ public class TFPRIO
         configs.merge(extend(sourceDirectory, "config_templates", "defaultConfigs.json"));
         configs.merge(configFile);
         configs.validate();
+        configs.save();
 
         Logger logger = new Logger("TFPRIO");
 

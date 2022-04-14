@@ -4,7 +4,6 @@ import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import static util.FileManagement.extend;
@@ -51,7 +50,8 @@ public class OutputStructure extends AbstractModule
 
     public final GeneratedFileStructure f_cooccurrence_html = extend(root, "COOCCURRENCE.html");
 
-    public OutputStructure(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public OutputStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                           Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

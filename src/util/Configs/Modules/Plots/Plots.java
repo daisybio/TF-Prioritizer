@@ -2,8 +2,8 @@ package util.Configs.Modules.Plots;
 
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputConfig;
-import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ClassGetter;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -24,7 +24,7 @@ public class Plots extends AbstractModule
     public final InputConfig<String> distributionAnalysisScoreType = new InputConfig<>(String.class);
     public final InputConfig<Double> trapPredictedSequenceLogosAffinityCutoff = new InputConfig<>(Double.class);
 
-    public Plots(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public Plots(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

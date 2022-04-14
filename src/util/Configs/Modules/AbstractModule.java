@@ -4,7 +4,7 @@ import org.json.JSONObject;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Logger;
 
 import java.io.File;
@@ -24,8 +24,8 @@ import static util.FileManagement.extend;
 public abstract class AbstractModule
 {
     protected final GeneratedFileStructure workingDirectory;
-    protected final InputFileStructure sourceDirectory;
-    protected final InputFileStructure extDirectory;
+    protected final SourceDirectoryFileStructure sourceDirectory;
+    protected final SourceDirectoryFileStructure extDirectory;
     protected final Logger logger;
 
     /**
@@ -50,7 +50,8 @@ public abstract class AbstractModule
      * @param sourceDirectory  the {@link TFPRIO} source directory
      * @param logger           the {@link util.Configs.Configs} logger
      */
-    public AbstractModule(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public AbstractModule(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                          Logger logger)
     {
         this.workingDirectory = workingDirectory;
         this.sourceDirectory = sourceDirectory;
@@ -85,7 +86,7 @@ public abstract class AbstractModule
             {
                 // Call the default constructor with the same argument as this object has been created
                 AbstractModule module = (AbstractModule) field.getType()
-                        .getConstructor(GeneratedFileStructure.class, InputFileStructure.class, Logger.class)
+                        .getConstructor(GeneratedFileStructure.class, SourceDirectoryFileStructure.class, Logger.class)
                         .newInstance(workingDirectory, sourceDirectory, logger);
                 // Assign the created object to this object
                 field.set(this, module);

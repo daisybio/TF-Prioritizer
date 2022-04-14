@@ -1,9 +1,6 @@
 package util.Configs.Modules.Dynamite;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputFileStructure;
-import util.Configs.ConfigTypes.InternalConfig;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -33,7 +30,8 @@ public class FileStructure extends AbstractModule
     public final InternalConfig<String> s_output_toBePlotted =
             new InternalConfig<>("Regression_Coefficients_Entire_Data_Set_Integrated_Data_For_Classification.txt");
 
-    public FileStructure(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public FileStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                         Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

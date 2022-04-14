@@ -1,9 +1,6 @@
 package util.Configs.Modules.DistributionAnalysis;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputFileStructure;
-import util.Configs.ConfigTypes.InternalConfig;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -98,7 +95,8 @@ public class FileStructure extends AbstractModule
     public final GeneratedFileStructure f_cooccurrence_frequencies = extend(d_cooccurrence, "frequencies.csv");
 
 
-    public FileStructure(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public FileStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                         Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

@@ -1,13 +1,9 @@
 package util.Configs.Modules.Tepic;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputFileStructure;
-import util.Configs.ConfigTypes.InternalConfig;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import static util.FileManagement.extend;
@@ -51,7 +47,8 @@ public class FileStructure extends AbstractModule
     public final GeneratedFileStructure f_postprocessing_openChromatinViolins_plots_image =
             extend(d_postprocessing_openChromatinViolins_plots, "open_chromatin_lengths_violin.png");
 
-    public FileStructure(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public FileStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                         Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

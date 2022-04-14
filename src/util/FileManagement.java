@@ -4,6 +4,7 @@ import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -307,6 +308,11 @@ public class FileManagement
     public static InputFileStructure extend(InputFileStructure fileConfig, String... extensions)
     {
         return new InputFileStructure(extend(fileConfig.get(), extensions));
+    }
+
+    public static SourceDirectoryFileStructure extend(SourceDirectoryFileStructure fileConfig, String... extensions)
+    {
+        return new SourceDirectoryFileStructure(extend(fileConfig.get(), extensions));
     }
 
     public static File extend(File file, String... extensions)

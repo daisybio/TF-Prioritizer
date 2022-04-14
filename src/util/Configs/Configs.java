@@ -4,6 +4,7 @@ import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.*;
 import util.Configs.Modules.Blacklist.Blacklist;
 import util.Configs.Modules.ChipAtlas.ChipAtlas;
@@ -134,9 +135,9 @@ public class Configs
                 {
                     // Call the AbstractModule constructor
                     AbstractModule module = (AbstractModule) field.getType()
-                            .getConstructor(GeneratedFileStructure.class, InputFileStructure.class, Logger.class)
-                            .newInstance(new GeneratedFileStructure(TFPRIO.workingDirectory),
-                                    new InputFileStructure(TFPRIO.sourceDirectory), logger);
+                            .getConstructor(GeneratedFileStructure.class, SourceDirectoryFileStructure.class,
+                                    Logger.class).newInstance(new GeneratedFileStructure(TFPRIO.workingDirectory),
+                                    new SourceDirectoryFileStructure(TFPRIO.sourceDirectory), logger);
                     // Assign the created module to the field in this class
                     field.set(this, module);
 
@@ -261,14 +262,15 @@ public class Configs
 
     /**
      * Save the configs to a file in json format
-     *
-     * @param file          the file to save the configs to
-     * @param onlyWriteable defines if only writeable configs should be included
-     * @throws IOException if the config file cannot be written to
      */
-    public void save(File file, boolean onlyWriteable) throws IOException
+    public void save()
     {
-        writeFile(file, getConfigsJSONString(onlyWriteable));
-        logger.info("Saved configuration JSON to " + file.getAbsolutePath());
+        try
+        {
+            writeFile(extend(TFPRIO.workingDirectory, "configs.json"), getConfigsJSONString(true));
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
     }
 }

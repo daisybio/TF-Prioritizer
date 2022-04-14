@@ -1,9 +1,6 @@
 package util.Configs.Modules.Tgene;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputConfig;
-import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -25,7 +22,7 @@ public class Tgene extends AbstractModule
     public final InputConfig<String> consensusCalc = new InputConfig<>(String.class);
     public final InputConfig<String> mtWriting = new InputConfig<>(String.class);
 
-    public Tgene(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public Tgene(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

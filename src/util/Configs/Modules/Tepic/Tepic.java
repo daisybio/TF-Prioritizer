@@ -1,18 +1,12 @@
 package util.Configs.Modules.Tepic;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputConfig;
-import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.*;
 import util.Configs.ConfigValidators.IntegerRangeValidator;
 import util.Configs.ConfigValidators.StringValidator;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static util.FileManagement.extend;
 
@@ -65,7 +59,7 @@ public class Tepic extends AbstractModule
     // TODO: Add optional map to set bindingSiteSearch for each histone modification
     public final InputConfig<Integer> betweenMaxBps = new InputConfig<>(Integer.class);
 
-    public Tepic(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public Tepic(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

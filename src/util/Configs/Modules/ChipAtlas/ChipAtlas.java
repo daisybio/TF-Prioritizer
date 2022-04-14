@@ -22,7 +22,8 @@ public class ChipAtlas extends AbstractModule
     public final InputConfig<String> genomeVersion = new InputConfig<>(String.class);
     public final InputConfig<String> tissueType = new InputConfig<>(String.class);
 
-    public ChipAtlas(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public ChipAtlas(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                     Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

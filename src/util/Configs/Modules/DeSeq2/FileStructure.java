@@ -1,9 +1,6 @@
 package util.Configs.Modules.DeSeq2;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputFileStructure;
-import util.Configs.ConfigTypes.InternalConfig;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -63,7 +60,8 @@ public class FileStructure extends AbstractModule
     public final GeneratedFileStructure d_output = extend(workingDirectory, "02_D_DESeq2_output");
     public final InternalConfig<String> s_output_dynamite = new InternalConfig<>("_DYNAMITE.tsv");
 
-    public FileStructure(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public FileStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                         Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

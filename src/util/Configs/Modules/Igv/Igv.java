@@ -4,6 +4,7 @@ import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputConfig;
 import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ClassGetter;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.ConfigValidators.IntegerRangeValidator;
 import util.Configs.ConfigValidators.ListNotEmptyValidator;
 import util.Configs.Modules.AbstractModule;
@@ -32,7 +33,7 @@ public class Igv extends AbstractModule
     public final InputConfig<Map<String, String>> grcSynonymDict = new InputConfig<>(ClassGetter.getStringStringMap());
     public final InputConfig<String> speciesReferenceGenome = new InputConfig<>(String.class);
 
-    public Igv(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public Igv(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

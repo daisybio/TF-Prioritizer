@@ -3,6 +3,7 @@ package util.Configs.Modules.MixOptions;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -25,7 +26,8 @@ public class FileStructure extends AbstractModule
             extend(d_mutuallyExclusive, "01_PREPROCESSING");
     public final GeneratedFileStructure d_mutuallyExclusive_input = extend(d_mutuallyExclusive, "02_NEW_INPUT");
 
-    public FileStructure(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public FileStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                         Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

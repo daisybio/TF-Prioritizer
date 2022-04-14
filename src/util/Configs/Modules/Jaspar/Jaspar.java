@@ -1,9 +1,6 @@
 package util.Configs.Modules.Jaspar;
 
-import util.Configs.ConfigTypes.AbstractConfig;
-import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputFileStructure;
-import util.Configs.ConfigTypes.InternalConfig;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -24,7 +21,7 @@ public class Jaspar extends AbstractModule
             new InternalConfig<>("https://jaspar.genereg.net/static/logos/all/svg/");
 
 
-    public Jaspar(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public Jaspar(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

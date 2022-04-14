@@ -14,7 +14,7 @@ public class DistributionAnalysis extends AbstractModule
     public final InputConfig<Boolean> performAllAnalysis = new InputConfig<>(Boolean.class);
     public final InternalConfig<String> allName = new InternalConfig<>("ALL");
 
-    public DistributionAnalysis(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory,
+    public DistributionAnalysis(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
                                 Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {

@@ -4,6 +4,7 @@ import util.Configs.ClassGetter;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputConfig;
 import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.ConfigValidators.StringListValidator;
 import util.Configs.ConfigValidators.StringValidator;
 import util.Configs.Modules.AbstractModule;
@@ -20,7 +21,8 @@ public class Blacklist extends AbstractModule
     public final InputConfig<List<String>> signalsToIgnore = new InputConfig<>(ClassGetter.getStringList(),
             new StringListValidator("Low_Mappability".toUpperCase(), "High_Signal_Region".toUpperCase()));
 
-    public Blacklist(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
+    public Blacklist(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
+                     Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);
