@@ -34,7 +34,6 @@ public class RunDistributionAnalysis extends ExecutableStep
 
     private final AbstractConfig<Boolean> performAllAnalysis = TFPRIO.configs.distributionAnalysis.performAllAnalysis;
     private final AbstractConfig<String> s_dynamiteInput = TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted;
-    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
     private final AbstractConfig<Boolean> randomizeTfGeneMatrix = TFPRIO.configs.tepic.randomizeTfGeneMatrix;
     private final AbstractConfig<String> scoreType = TFPRIO.configs.plots.distributionAnalysisScoreType;
     private final AbstractConfig<String> s_output =
@@ -42,6 +41,7 @@ public class RunDistributionAnalysis extends ExecutableStep
 
     // Optional configs
     private final AbstractConfig<File> f_tgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
+    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
 
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
@@ -53,7 +53,7 @@ public class RunDistributionAnalysis extends ExecutableStep
             add(d_inputDifferentialExpression);
             add(d_inputTgene);
             add(d_inputDynamite);
-            if (tpmCutoff.get() > 0)
+            if (tpmCutoff.isSet())
             {
                 add(d_inputTepicProcessed);
             } else
@@ -78,13 +78,12 @@ public class RunDistributionAnalysis extends ExecutableStep
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
-                Arrays.asList(performAllAnalysis, s_dynamiteInput, tpmCutoff, randomizeTfGeneMatrix, scoreType,
-                        s_output));
+                Arrays.asList(performAllAnalysis, s_dynamiteInput, randomizeTfGeneMatrix, scoreType, s_output));
     }
 
     @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
     {
-        return new HashSet<>(List.of(f_tgeneExecutable));
+        return new HashSet<>(List.of(f_tgeneExecutable, tpmCutoff));
     }
 
     @Override protected void execute()
@@ -453,7 +452,7 @@ public class RunDistributionAnalysis extends ExecutableStep
     {
         List<File> inputFiles;
         String suffix;
-        if (tpmCutoff.get() > 0)
+        if (tpmCutoff.isSet())
         {
             suffix = "_Gene_View_Filtered_TPM.txt";
 

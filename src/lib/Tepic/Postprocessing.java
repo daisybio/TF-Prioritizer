@@ -43,7 +43,12 @@ public class Postprocessing extends ExecutableStep
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
-                Arrays.asList(tpmCutoff, mutuallyExclusive, originalDecay, doNotGenerate, s_meanAffinities, s_ratios));
+                Arrays.asList(mutuallyExclusive, originalDecay, doNotGenerate, s_meanAffinities, s_ratios));
+    }
+
+    @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
+    {
+        return new HashSet<>(List.of(tpmCutoff));
     }
 
     @Override protected void updateInputDirectory()

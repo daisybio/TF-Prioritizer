@@ -47,8 +47,13 @@ public class Postprocessing extends ExecutableStep
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
-        return new HashSet<>(Arrays.asList(s_output_links, s_preprocessing_meanCounts, s_groups_mergedGroups, tpmCutoff,
-                mutuallyExclusive));
+        return new HashSet<>(
+                Arrays.asList(s_output_links, s_preprocessing_meanCounts, s_groups_mergedGroups, mutuallyExclusive));
+    }
+
+    @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
+    {
+        return new HashSet<>(List.of(tpmCutoff));
     }
 
     @Override protected void execute()
@@ -117,7 +122,7 @@ public class Postprocessing extends ExecutableStep
                     List<GeneRegion> allRegionsNoDuplicates = removeGeneRegionDuplicates(allRegions, true);
                     List<GeneRegion> allRegionsFiltered = allRegionsNoDuplicates;
 
-                    if (tpmCutoff.get() > 0)
+                    if (tpmCutoff.isSet())
                     {
                         logger.info("TPM filter is set. Filtering TGENE results: " + d_hm.getName() + " - " +
                                 d_group.getName() + ".");

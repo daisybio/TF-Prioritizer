@@ -32,7 +32,7 @@ public class TopKTargetGenes extends ExecutableStep
         return new HashSet<>()
         {{
             add(d_input);
-            if (tpmCutoff.get() > 0)
+            if (tpmCutoff.isSet())
             {
                 add(d_inputTargetGenes);
             } else
@@ -49,7 +49,12 @@ public class TopKTargetGenes extends ExecutableStep
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
-        return new HashSet<>(Arrays.asList(s_plotData_different, s_plotData_same, tpmCutoff, thresholds, topKGenes));
+        return new HashSet<>(Arrays.asList(s_plotData_different, s_plotData_same, thresholds, topKGenes));
+    }
+
+    @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
+    {
+        return new HashSet<>(List.of(tpmCutoff));
     }
 
     @Override protected void execute()
@@ -118,7 +123,7 @@ public class TopKTargetGenes extends ExecutableStep
         String suffix;
 
         List<File> inputFiles;
-        if (tpmCutoff.get() > 0)
+        if (tpmCutoff.isSet())
         {
             suffix = "_Gene_View_Filtered_TPM.txt";
             parent = extend(d_inputTargetGenes.get(), pairing, hm, group);

@@ -2,7 +2,7 @@
   "DeSeq2": {
     "tpmFilter": null,
     "inputGeneID": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data/Gene_id.txt",
-    "biomartDatasetSymbolColumn": null,
+    "biomartDatasetSymbolColumn": "mgi_symbol",
     "countThreshold": 50,
     "biomartDatasetSpecies": "mmusculus_gene_ensembl",
     "inputDirectory": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data"
@@ -20,8 +20,9 @@
     "randomize": false
   },
   "ChipAtlas": {
-    "genomeVersion": null,
-    "tissueType": null
+    "isEnabled": true,
+    "genomeVersion": "mm10",
+    "tissueType": "breast"
   },
   "Tepic": {
     "transcriptBased": false,
@@ -81,6 +82,8 @@
     "trapPredictedSequenceLogosAffinityCutoff": 0.05
   },
   "General": {
+    "threadLimit": 1,
+    "developmentMode": false,
     "fileLogging": true,
     "calculateGenePositionsEnabled": true,
     "calculateTpmLengthsEnabled": true
@@ -88,7 +91,7 @@
   "Tgene": {
     "selfRegulatory": false,
     "consensus": 0.5,
-    "pathToExecutable": null,
+    "pathToExecutable": "/home/nico/.meme",
     "noClosestLocus": false,
     "consensusCalc": "INCREASE_TGENE_TFS",
     "maxLinkDistance": 500000,
@@ -124,5 +127,8 @@
       "LOW_MAPPABILITY",
       "HIGH_SIGNAL_REGION"
     ]
+  },
+  "DistributionAnalysis": {
+    "performAllAnalysis": false
   }
 }

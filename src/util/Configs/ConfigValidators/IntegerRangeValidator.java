@@ -14,6 +14,10 @@ public class IntegerRangeValidator implements Validator<Integer>
 
     @Override public boolean validate(AbstractConfig<Integer> config)
     {
+        if (config.get() == null)
+        {
+            return true;
+        }
         return min <= config.get() && config.get() <= max;
     }
 

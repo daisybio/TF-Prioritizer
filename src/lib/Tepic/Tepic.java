@@ -64,7 +64,7 @@ public class Tepic extends ExecutableStep
                 Arrays.asList(d_input, f_referenceGenome, f_pwms, tepicExecutable, d_deseq2_meanCounts,
                         d_tgene_output));
 
-        if (tpmCutoff.get() > 0)
+        if (tpmCutoff.isSet())
         {
             requirements.add(ensgSymbolFile);
             requirements.add(inputGeneID);
@@ -79,15 +79,14 @@ public class Tepic extends ExecutableStep
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
-        return new HashSet<>(
-                Arrays.asList(tpmCutoff, tfBindingSiteSearch, mixMutuallyExclusive, tgeneTargetGenes, s_tgene_links,
-                        s_outputRaw_trapSequences));
+        return new HashSet<>(Arrays.asList(tfBindingSiteSearch, mixMutuallyExclusive, tgeneTargetGenes, s_tgene_links,
+                s_outputRaw_trapSequences));
     }
 
     @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
     {
         return new HashSet<>(
-                Arrays.asList(threadLimit, bedChromatinSignal, columnBedfile, geneAnnotationFile, windowSize,
+                Arrays.asList(tpmCutoff, threadLimit, bedChromatinSignal, columnBedfile, geneAnnotationFile, windowSize,
                         onlyDNasePeaks, exponentialDecay, doNotNormalizePeakLength, doNotGenerate, originalDecay,
                         psemsLengthFile, entireGeneBody, doZip, twoBitFile, pValue, maxMinutesPerChromosome,
                         chromosomePrefix, transcriptBased, loopListFile, loopWindows, onlyPeakFeatures));
@@ -135,7 +134,7 @@ public class Tepic extends ExecutableStep
                     sampleConfigs.put("b", f_sample.getAbsolutePath());
                     sampleConfigs.put("o", d_output_combined.getAbsolutePath());
 
-                    if (tpmCutoff.get() > 0)
+                    if (tpmCutoff.isSet())
                     {
                         File n_dir;
 
@@ -297,7 +296,7 @@ public class Tepic extends ExecutableStep
             put("s", loopWindows);
             put("q", onlyPeakFeatures);
 
-            if (tpmCutoff.get() > 0)
+            if (tpmCutoff.isSet())
             {
                 put("T", tpmCutoff);
                 put("E", ensgSymbolFile);

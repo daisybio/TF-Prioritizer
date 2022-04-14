@@ -67,13 +67,10 @@ public class Workflow
             steps.add(new lib.Deseq2.Deseq2());
             steps.add(new lib.Deseq2.PostProcessing());
         }
-
-        if (TFPRIO.configs.tgene.pathToExecutable.isSet())
-        {
-            steps.add(new lib.Tgene.Preprocess());
-            steps.add(new lib.Tgene.RunTgene());
-            steps.add(new lib.Tgene.Postprocessing());
-        }
+        
+        steps.add(new lib.Tgene.Preprocess());
+        steps.add(new lib.Tgene.RunTgene());
+        steps.add(new lib.Tgene.Postprocessing());
 
         steps.add(new lib.Tepic.Tepic());
         if (TFPRIO.configs.tepic.randomizeTfGeneMatrix.isSet() && TFPRIO.configs.tepic.randomizeTfGeneMatrix.get())

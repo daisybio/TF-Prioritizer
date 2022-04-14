@@ -4,6 +4,7 @@ import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputConfig;
 import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ConfigValidators.IntegerRangeValidator;
 import util.Configs.ConfigValidators.StringValidator;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
@@ -53,13 +54,14 @@ public class Tepic extends AbstractModule
     public final InputFileStructure loopListFile = new InputFileStructure();
     public final InputConfig<Integer> loopWindows = new InputConfig<>(Integer.class);
     public final InputConfig<Boolean> onlyPeakFeatures = new InputConfig<>(Boolean.class);
-    public final InputConfig<Integer> tpmCutoff = new InputConfig<>(Integer.class);
+    public final InputConfig<Integer> tpmCutoff =
+            new InputConfig<>(Integer.class, new IntegerRangeValidator(1, Integer.MAX_VALUE));
     public final InputFileStructure ensgSymbolFile = new InputFileStructure();
     public final InputConfig<Boolean> tgeneTargetGenes = new InputConfig<>(Boolean.class);
     public final InputConfig<Boolean> randomizeTfGeneMatrix = new InputConfig<>(Boolean.class);
     public final InputConfig<String> tfBindingSiteSearch =
             new InputConfig<>(String.class, new StringValidator("INSIDE", "BETWEEN", "EXCL_BETWEEN"));
-    
+
     // TODO: Add optional map to set bindingSiteSearch for each histone modification
     public final InputConfig<Integer> betweenMaxBps = new InputConfig<>(Integer.class);
 
