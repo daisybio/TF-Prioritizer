@@ -3,6 +3,7 @@ package lib.Report;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 import util.FileManagement;
 import util.Logger;
@@ -25,7 +26,7 @@ public class Report extends ExecutableStep
         return new HashSet<>();
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>();
     }

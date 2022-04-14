@@ -3,6 +3,7 @@ package lib.Igv;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 import util.IGV_Headless;
 
@@ -23,7 +24,7 @@ public class ImportantLoci extends ExecutableStep
     private final AbstractConfig<File> d_input_dcg =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_dcg_targetGenes;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.igv.fileStructure.d_importantLoci;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.igv.fileStructure.d_importantLoci;
 
     private final AbstractConfig<List<String>> importantLoci = TFPRIO.configs.igv.importantLociAllPrioTf;
     private final AbstractConfig<String> s_session = TFPRIO.configs.igv.fileStructure.s_session;
@@ -38,7 +39,7 @@ public class ImportantLoci extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_tepic, d_input_peakFiles, d_input_dcg));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

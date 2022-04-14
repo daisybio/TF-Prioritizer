@@ -5,6 +5,7 @@ import lib.ExecutableStep;
 import tfprio.Workflow;
 import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -16,7 +17,7 @@ import static util.FileManagement.makeSureFileExists;
 public class CreateFootprintsBetweenPeaks extends ExecutableStep
 {
     private AbstractConfig<File> d_input;
-    private final AbstractConfig<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks;
     private final AbstractConfig<String> option = TFPRIO.configs.tepic.tfBindingSiteSearch;
 
 
@@ -25,7 +26,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

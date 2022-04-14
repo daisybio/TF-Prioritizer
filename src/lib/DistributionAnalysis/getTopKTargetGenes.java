@@ -5,6 +5,7 @@ import lib.DistributionAnalysis.Classes.TfTargetGeneDcg;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -19,14 +20,14 @@ public class getTopKTargetGenes extends ExecutableStep
     private final AbstractConfig<File> d_input_affinityValues =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_input;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.distributionAnalysis.fileStructure.d_dcg_targetGenes;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.distributionAnalysis.fileStructure.d_dcg_targetGenes;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_input_dcg, d_input_affinityValues));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

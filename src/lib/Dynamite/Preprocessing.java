@@ -3,6 +3,7 @@ package lib.Dynamite;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileManagement;
 
 import java.io.File;
@@ -20,8 +21,8 @@ public class Preprocessing extends ExecutableStep
     private final AbstractConfig<File> f_scriptClassification =
             TFPRIO.configs.tepic.f_dynamite_prepareForClassification;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.dynamite.fileStructure.d_preprocessing_integrateData;
-    private final AbstractConfig<File> d_outputClassification =
+    private final GeneratedFileStructure d_output = TFPRIO.configs.dynamite.fileStructure.d_preprocessing_integrateData;
+    private final GeneratedFileStructure d_outputClassification =
             TFPRIO.configs.dynamite.fileStructure.d_preprocessing_prepareClassification;
 
     private final AbstractConfig<String> s_ratios_dir =
@@ -42,7 +43,7 @@ public class Preprocessing extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, d_inputDeseq2, f_script, f_scriptClassification));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_outputClassification));
     }

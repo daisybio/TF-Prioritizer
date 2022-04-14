@@ -145,7 +145,7 @@ public abstract class ExecutableStep
      *
      * @return a set of the created file structure configs, must not be null.
      */
-    public abstract Set<AbstractConfig<File>> getCreatedFileStructure();
+    public abstract Set<GeneratedFileStructure> getCreatedFileStructure();
 
     /**
      * Get the configs that are mandatory for execution of this executableStep.
@@ -245,8 +245,8 @@ public abstract class ExecutableStep
      */
     private void deleteAllOutputs()
     {
-        Set<AbstractConfig<File>> outputFiles = getCreatedFileStructure();
-        for (AbstractConfig<File> outputFile : outputFiles)
+        Set<GeneratedFileStructure> outputFiles = getCreatedFileStructure();
+        for (GeneratedFileStructure outputFile : outputFiles)
         {
             try
             {
@@ -309,7 +309,7 @@ public abstract class ExecutableStep
      */
     private String hashOutputs() throws IOException
     {
-        Set<AbstractConfig<File>> createdFileStructure = getCreatedFileStructure();
+        Set<GeneratedFileStructure> createdFileStructure = getCreatedFileStructure();
         ArrayList<File> createdFiles = new ArrayList<>();
 
         for (AbstractConfig<File> config : createdFileStructure)

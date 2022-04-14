@@ -6,6 +6,7 @@ import lib.DistributionAnalysis.Classes.StatsCummulativeGain;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -19,7 +20,7 @@ public class CalculateDcgRank extends ExecutableStep
     private final AbstractConfig<File> d_input_statsAll = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_all;
     private final AbstractConfig<File> d_input_statsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_hm;
 
-    private final AbstractConfig<File> f_output_dcg = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
+    private final GeneratedFileStructure f_output_dcg = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
 
     private final AbstractConfig<Boolean> performAllAnalysis = TFPRIO.configs.distributionAnalysis.performAllAnalysis;
     private final AbstractConfig<String> s_stats = TFPRIO.configs.distributionAnalysis.fileStructure.s_stats_csv;
@@ -37,7 +38,7 @@ public class CalculateDcgRank extends ExecutableStep
         }};
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(f_output_dcg));
     }

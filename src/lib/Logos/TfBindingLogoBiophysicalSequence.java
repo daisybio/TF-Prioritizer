@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import org.apache.commons.compress.utils.IOUtils;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.TrustAllManager;
 
 import javax.net.ssl.*;
@@ -22,11 +23,11 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
     private final AbstractConfig<File> f_scriptTemplate_biophysicalModel =
             TFPRIO.configs.scriptTemplates.f_logos_biophysicalModel;
 
-    private final AbstractConfig<File> d_output_biophysicalModel =
+    private final GeneratedFileStructure d_output_biophysicalModel =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_logos_biophysicalModel;
-    private final AbstractConfig<File> d_output_tfSequence =
+    private final GeneratedFileStructure d_output_tfSequence =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_logos_tfSequence;
-    private final AbstractConfig<File> f_output_jaspar =
+    private final GeneratedFileStructure f_output_jaspar =
             TFPRIO.configs.distributionAnalysis.fileStructure.f_logos_tfSequence_jaspar_pfms;
 
     private final AbstractConfig<String> s_biophysicalModel_data =
@@ -48,7 +49,7 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_input_dcgResult, f_input_pwmFile, f_scriptTemplate_biophysicalModel));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output_biophysicalModel, d_output_tfSequence, f_output_jaspar));
     }

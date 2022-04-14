@@ -6,6 +6,7 @@ import lib.GeneRegion;
 import lib.Region;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.*;
@@ -19,7 +20,7 @@ public class SelfRegulatory extends ExecutableStep
     private final AbstractConfig<File> d_input_tepic = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
     private final AbstractConfig<File> f_inputRegions = TFPRIO.configs.tgene.fileStructure.f_preprocessing_regions;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.tgene.fileStructure.d_integrate;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tgene.fileStructure.d_integrate;
 
     private final AbstractConfig<String> s_tgene_groups = TFPRIO.configs.tgene.fileStructure.s_groups_mergedGroups;
     private final AbstractConfig<String> s_tepic_ratios =
@@ -32,7 +33,7 @@ public class SelfRegulatory extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input_tgene, d_input_tepic, f_inputRegions));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

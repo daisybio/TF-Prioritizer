@@ -3,6 +3,7 @@ package lib.Logos;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -18,7 +19,7 @@ public class PredictedBindingSites extends ExecutableStep
     private final AbstractConfig<File> d_input_sequences = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
     private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_logos_tfBindingSequence;
 
-    private final AbstractConfig<File> d_output_data =
+    private final GeneratedFileStructure d_output_data =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_logos_tfBindingSequence_data;
 
     private final AbstractConfig<String> s_output_script =
@@ -34,7 +35,7 @@ public class PredictedBindingSites extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_input_dcgResult, d_input_sequences, f_scriptTemplate));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output_data));
     }

@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import lib.GeneAffinity;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 import util.IGV_Headless;
 
@@ -26,7 +27,7 @@ public class TopLog2FC extends ExecutableStep
     private AbstractConfig<File> d_input_tepic;
     private final AbstractConfig<File> d_input_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.igv.fileStructure.d_igvTopLog2fc;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.igv.fileStructure.d_igvTopLog2fc;
 
     private final AbstractConfig<String> speciesReferenceGenome = TFPRIO.configs.igv.speciesReferenceGenome;
     private final AbstractConfig<String> s_session = TFPRIO.configs.igv.fileStructure.s_session;
@@ -46,7 +47,7 @@ public class TopLog2FC extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_deseq2, d_input_tepic, d_input_peakFiles));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

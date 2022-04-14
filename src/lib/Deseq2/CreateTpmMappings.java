@@ -3,6 +3,7 @@ package lib.Deseq2;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 import util.Hashing;
 
@@ -20,10 +21,11 @@ import static util.ScriptExecution.executeAndWait;
 public class CreateTpmMappings extends ExecutableStep
 {
     private final AbstractConfig<File> d_meanCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
-    private final AbstractConfig<File> d_output = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults;
-    private final AbstractConfig<File> d_outputScripts =
+    private final GeneratedFileStructure d_output = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults;
+    private final GeneratedFileStructure d_outputScripts =
             TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_scripts;
-    private final AbstractConfig<File> f_lengths = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_tpm_geneLengths;
+    private final GeneratedFileStructure f_lengths =
+            TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_tpm_geneLengths;
     private final AbstractConfig<File> f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID;
 
     private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingTpm;
@@ -38,7 +40,7 @@ public class CreateTpmMappings extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_meanCounts, f_geneIDs, f_scriptTemplate));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_outputScripts, f_lengths));
     }

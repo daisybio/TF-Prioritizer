@@ -3,6 +3,7 @@ package lib.Tepic;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -15,10 +16,10 @@ public class Postprocessing extends ExecutableStep
 {
     private AbstractConfig<File> d_input;
 
-    private final AbstractConfig<File> d_postprocessingInput =
+    private final GeneratedFileStructure d_postprocessingInput =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_input;
-    private final AbstractConfig<File> d_output = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
-    private final AbstractConfig<File> f_output_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
+    private final GeneratedFileStructure f_output_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
 
     private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
     private final AbstractConfig<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
@@ -35,7 +36,7 @@ public class Postprocessing extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_postprocessingInput, f_output_tfs));
     }

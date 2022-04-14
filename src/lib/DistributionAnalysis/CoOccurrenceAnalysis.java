@@ -3,6 +3,7 @@ package lib.DistributionAnalysis;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -16,13 +17,13 @@ public class CoOccurrenceAnalysis extends ExecutableStep
 {
     private final AbstractConfig<File> d_input = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
 
-    private final AbstractConfig<File> f_output_concatenated =
+    private final GeneratedFileStructure f_output_concatenated =
             TFPRIO.configs.distributionAnalysis.fileStructure.f_cooccurrence_concatenatedBed;
-    private final AbstractConfig<File> f_output_merged =
+    private final GeneratedFileStructure f_output_merged =
             TFPRIO.configs.distributionAnalysis.fileStructure.f_cooccurrence_mergedBed;
-    private final AbstractConfig<File> f_output_sorted =
+    private final GeneratedFileStructure f_output_sorted =
             TFPRIO.configs.distributionAnalysis.fileStructure.f_cooccurrence_sortedBed;
-    private final AbstractConfig<File> f_output_frequencies =
+    private final GeneratedFileStructure f_output_frequencies =
             TFPRIO.configs.distributionAnalysis.fileStructure.f_cooccurrence_frequencies;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
@@ -30,7 +31,7 @@ public class CoOccurrenceAnalysis extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(
                 Arrays.asList(f_output_concatenated, f_output_merged, f_output_sorted, f_output_frequencies));

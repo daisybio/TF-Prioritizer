@@ -3,6 +3,7 @@ package lib.DistributionAnalysis;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +25,8 @@ public class GenerateTargetGenesHeatmaps extends ExecutableStep
     private final AbstractConfig<File> d_targetGenes =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_dcg_targetGenes;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps;
-    private final AbstractConfig<File> f_script = TFPRIO.configs.distributionAnalysis.fileStructure.f_heatmaps_script;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps;
+    private final GeneratedFileStructure f_script = TFPRIO.configs.distributionAnalysis.fileStructure.f_heatmaps_script;
 
     private final AbstractConfig<Integer> kTargetGenes = TFPRIO.configs.plots.topKGenes;
 
@@ -34,7 +35,7 @@ public class GenerateTargetGenesHeatmaps extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_scriptTemplate, f_map, d_deseq2Preprocessing, d_targetGenes));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, f_script));
     }

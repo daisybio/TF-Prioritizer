@@ -3,6 +3,7 @@ package lib.Deseq2;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.Arrays;
@@ -15,17 +16,18 @@ import static util.ScriptExecution.executeAndWait;
 
 public class CreateGenePositions extends ExecutableStep
 {
-    private final AbstractConfig<File> f_script =
+    private final GeneratedFileStructure f_script =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_script;
-    private final AbstractConfig<File> f_data_prev =
+    private final GeneratedFileStructure f_data_prev =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_genePositionsPrev;
-    private final AbstractConfig<File> f_data_version =
+    private final GeneratedFileStructure f_data_version =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_version;
     private final AbstractConfig<File> f_mapping = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
-    private final AbstractConfig<File> f_data = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_data;
+    private final GeneratedFileStructure f_data =
+            TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_data;
     private final AbstractConfig<File> f_upliftScriptTemplate =
             TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingUplift;
-    private final AbstractConfig<File> f_upliftScript =
+    private final GeneratedFileStructure f_upliftScript =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_uplift;
 
     private final AbstractConfig<File> f_scriptTemplate =
@@ -43,7 +45,7 @@ public class CreateGenePositions extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_scriptTemplate, f_mapping, f_upliftScriptTemplate));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_script, f_data_prev, f_data_version, f_data, f_upliftScript));
     }

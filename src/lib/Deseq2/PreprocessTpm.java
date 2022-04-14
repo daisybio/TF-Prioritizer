@@ -3,6 +3,7 @@ package lib.Deseq2;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -14,7 +15,7 @@ public class PreprocessTpm extends ExecutableStep
 {
     private final AbstractConfig<File> d_input = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_tpm_tpmResults;
     private final AbstractConfig<File> d_combined = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combined;
-    private final AbstractConfig<File> f_output_copy =
+    private final GeneratedFileStructure f_output_copy =
             TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combinedOriginal;
 
     private final AbstractConfig<Double> tpmFilter = TFPRIO.configs.deSeq2.tpmFilter;
@@ -24,7 +25,7 @@ public class PreprocessTpm extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_combined, d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(f_output_copy));
     }

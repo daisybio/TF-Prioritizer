@@ -8,6 +8,7 @@ import lib.Region;
 import tfprio.Workflow;
 import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.*;
@@ -17,7 +18,7 @@ import static util.FileManagement.*;
 public class MixMutuallyExclusive extends ExecutableStep
 {
     private AbstractConfig<File> d_input;
-    private final AbstractConfig<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input;
     private final AbstractConfig<Boolean> mutuallyExclusiveDifferentialPeakSignals =
             TFPRIO.configs.mixOptions.mutuallyExclusiveDifferentialPeakSignals;
 
@@ -26,7 +27,7 @@ public class MixMutuallyExclusive extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

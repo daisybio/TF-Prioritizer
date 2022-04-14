@@ -5,6 +5,7 @@ import lib.GeneRegion;
 import lib.Region;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.*;
@@ -15,8 +16,8 @@ public class Preprocess extends ExecutableStep
 {
     private final AbstractConfig<File> f_geneAnnotation = TFPRIO.configs.tepic.geneAnnotationFile;
 
-    private final AbstractConfig<File> f_output_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
-    private final AbstractConfig<File> f_output_regions = TFPRIO.configs.tgene.fileStructure.f_preprocessing_regions;
+    private final GeneratedFileStructure f_output_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
+    private final GeneratedFileStructure f_output_regions = TFPRIO.configs.tgene.fileStructure.f_preprocessing_regions;
 
     private final AbstractConfig<String> mtWriting = TFPRIO.configs.tgene.mtWriting;
 
@@ -25,7 +26,7 @@ public class Preprocess extends ExecutableStep
         return new HashSet<>(List.of(f_geneAnnotation));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_output_gtf, f_output_regions));
     }

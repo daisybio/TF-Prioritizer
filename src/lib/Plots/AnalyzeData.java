@@ -3,6 +3,7 @@ package lib.Plots;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -19,9 +20,10 @@ public class AnalyzeData extends ExecutableStep
     private final AbstractConfig<File> d_input_plotData = TFPRIO.configs.plots.fileStructure.d_data;
     private final AbstractConfig<File> f_input_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
 
-    private final AbstractConfig<File> d_output_groupLevel = TFPRIO.configs.plots.fileStructure.d_analysisData_tpLevel;
-    private final AbstractConfig<File> d_output_hmLevel = TFPRIO.configs.plots.fileStructure.d_analysisData_hmLevel;
-    private final AbstractConfig<File> d_output_website =
+    private final GeneratedFileStructure d_output_groupLevel =
+            TFPRIO.configs.plots.fileStructure.d_analysisData_tpLevel;
+    private final GeneratedFileStructure d_output_hmLevel = TFPRIO.configs.plots.fileStructure.d_analysisData_hmLevel;
+    private final GeneratedFileStructure d_output_website =
             TFPRIO.configs.plots.fileStructure.d_analysisData_websiteOverview;
 
     private final AbstractConfig<String> s_plotData_different =
@@ -33,7 +35,7 @@ public class AnalyzeData extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input_readCounts, d_input_tpm, d_input_plotData, f_input_tfs));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output_groupLevel, d_output_hmLevel, d_output_website));
     }

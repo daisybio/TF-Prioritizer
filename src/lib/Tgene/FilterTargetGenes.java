@@ -3,6 +3,7 @@ package lib.Tgene;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.*;
@@ -15,7 +16,7 @@ public class FilterTargetGenes extends ExecutableStep
     private final AbstractConfig<File> d_input_tgene = TFPRIO.configs.tgene.fileStructure.d_groups;
     private final AbstractConfig<File> d_input_tepic = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.tgene.fileStructure.d_filteredTargetGenes;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tgene.fileStructure.d_filteredTargetGenes;
 
     private final AbstractConfig<String> s_tgene = TFPRIO.configs.tgene.fileStructure.s_groups_mergedGroups;
     private final AbstractConfig<String> s_tepicRatiosDir =
@@ -26,7 +27,7 @@ public class FilterTargetGenes extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input_tgene, d_input_tepic));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

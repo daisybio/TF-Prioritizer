@@ -6,6 +6,7 @@ import lib.ExecutableStep;
 import lib.Region;
 import tfprio.Workflow;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -16,14 +17,14 @@ import static util.FileManagement.*;
 public class Blacklist extends ExecutableStep
 {
     private AbstractConfig<File> d_input;
-    private final AbstractConfig<File> d_output = TFPRIO.configs.blacklist.fileStructure.d_newInput;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.blacklist.fileStructure.d_newInput;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

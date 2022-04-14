@@ -3,6 +3,7 @@ package lib.Dynamite;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -17,7 +18,7 @@ public class RunDynamite extends ExecutableStep
     private final AbstractConfig<File> d_input =
             TFPRIO.configs.dynamite.fileStructure.d_preprocessing_prepareClassification;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.dynamite.fileStructure.d_output;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.dynamite.fileStructure.d_output;
 
     private final AbstractConfig<String> outVar = TFPRIO.configs.dynamite.outVar;
     private final AbstractConfig<Integer> oFolds = TFPRIO.configs.dynamite.oFolds;
@@ -32,7 +33,7 @@ public class RunDynamite extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_dynamite_script, d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

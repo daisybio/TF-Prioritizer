@@ -3,6 +3,7 @@ package lib.DistributionAnalysis;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.*;
@@ -14,7 +15,7 @@ public class Preprocessing extends ExecutableStep
 {
     private final AbstractConfig<File> d_input = TFPRIO.configs.plots.fileStructure.d_data;
 
-    private final AbstractConfig<File> f_output = TFPRIO.configs.distributionAnalysis.fileStructure.f_analyzedTfs;
+    private final GeneratedFileStructure f_output = TFPRIO.configs.distributionAnalysis.fileStructure.f_analyzedTfs;
 
     private final AbstractConfig<List<Double>> thresholds = TFPRIO.configs.plots.thresholds;
     private final AbstractConfig<String> s_plotData_same = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
@@ -28,7 +29,7 @@ public class Preprocessing extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(f_output));
     }

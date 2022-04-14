@@ -3,6 +3,7 @@ package lib.Tepic;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,7 +14,7 @@ import static util.FileManagement.extend;
 public class Randomize extends ExecutableStep
 {
     private final AbstractConfig<File> d_input = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
-    private final AbstractConfig<File> d_output = TFPRIO.configs.tepic.fileStructure.d_outputRaw_shuffle;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tepic.fileStructure.d_outputRaw_shuffle;
     private final AbstractConfig<String> s_trapSequences = TFPRIO.configs.tepic.fileStructure.s_outputRaw_trapSequences;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
@@ -21,7 +22,7 @@ public class Randomize extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

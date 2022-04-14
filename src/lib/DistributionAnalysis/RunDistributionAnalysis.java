@@ -23,14 +23,15 @@ public class RunDistributionAnalysis extends ExecutableStep
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
     private final AbstractConfig<File> d_inputTepicRaw = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
 
-    private final AbstractConfig<File> d_outputRaw = TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_raw;
+    private final GeneratedFileStructure d_outputRaw =
+            TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_raw;
     private final GeneratedFileStructure d_outputBackgroundDistributionAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_all;
-    private final AbstractConfig<File> d_outputBackgroundDistributionHm =
+    private final GeneratedFileStructure d_outputBackgroundDistributionHm =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_backgroundDistribution_hm;
     private final GeneratedFileStructure d_outputTFScoresAll =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_tfDistribution_all;
-    private final AbstractConfig<File> d_outputTFScoresHm =
+    private final GeneratedFileStructure d_outputTFScoresHm =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_tfTgScores_tfDistribution_hm;
 
     private final AbstractConfig<Boolean> performAllAnalysis = TFPRIO.configs.distributionAnalysis.performAllAnalysis;
@@ -64,7 +65,7 @@ public class RunDistributionAnalysis extends ExecutableStep
         }};
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_outputBackgroundDistributionHm, d_outputTFScoresHm, d_outputRaw))
         {{

@@ -3,6 +3,7 @@ package lib.Deseq2;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -14,11 +15,12 @@ import static util.ScriptExecution.executeAndWait;
 public class CreateDeseq2Scripts extends ExecutableStep
 {
     private final AbstractConfig<File> d_input = TFPRIO.configs.deSeq2.inputDirectory;
-    private final AbstractConfig<File> d_outputCombined = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combined;
-    private final AbstractConfig<File> d_outputSingle = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_single;
-    private final AbstractConfig<File> d_outputMeanCounts =
+    private final GeneratedFileStructure d_outputCombined =
+            TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_combined;
+    private final GeneratedFileStructure d_outputSingle = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_single;
+    private final GeneratedFileStructure d_outputMeanCounts =
             TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
-    private final AbstractConfig<File> d_outputScripts = TFPRIO.configs.deSeq2.fileStructure.d_rScripts;
+    private final GeneratedFileStructure d_outputScripts = TFPRIO.configs.deSeq2.fileStructure.d_rScripts;
 
     private final AbstractConfig<File> f_scriptSingle = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingSingle;
     private final AbstractConfig<File> f_scriptCombined = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingCombined;
@@ -33,7 +35,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
                 Arrays.asList(d_input, f_scriptCombined, f_scriptDeseq, f_scriptSingle, f_geneID, f_mapping));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_outputSingle, d_outputCombined, d_outputMeanCounts, d_outputScripts));
     }

@@ -3,6 +3,7 @@ package lib.MixOptions;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.File;
 import java.util.Arrays;
@@ -13,7 +14,7 @@ import java.util.Set;
 public class SampleLevel extends ExecutableStep
 {
     private final AbstractConfig<File> d_input = TFPRIO.configs.mixOptions.fileStructure.d_sampleMixPreprocessing;
-    private final AbstractConfig<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_sampleMix;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.mixOptions.fileStructure.d_sampleMix;
     private final AbstractConfig<String> option = TFPRIO.configs.mixOptions.option;
     private final AbstractConfig<Integer> occurrenceIntersection = TFPRIO.configs.mixOptions.occurrenceIntersection;
 
@@ -22,7 +23,7 @@ public class SampleLevel extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

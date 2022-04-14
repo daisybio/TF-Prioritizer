@@ -2,6 +2,7 @@ package tfprio;
 
 import lib.ExecutableStep;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 import util.MapSymbolAndEnsg;
 
@@ -14,9 +15,9 @@ import java.util.Set;
 public class InitStaticVariables extends ExecutableStep
 {
     // Configs for map
-    private final AbstractConfig<File> f_map = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
+    private final GeneratedFileStructure f_map = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
     private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_mapping;
-    private final AbstractConfig<File> f_script = TFPRIO.configs.deSeq2.fileStructure.f_mappingScript;
+    private final GeneratedFileStructure f_script = TFPRIO.configs.deSeq2.fileStructure.f_mappingScript;
     private final AbstractConfig<File> f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID;
     private final AbstractConfig<String> datasetSpecies = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
     private final AbstractConfig<String> datasetSymbolColumn = TFPRIO.configs.deSeq2.biomartDatasetSymbolColumn;
@@ -29,7 +30,7 @@ public class InitStaticVariables extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_scriptTemplate, f_geneIDs, inputDirectory));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_map, f_script));
     }

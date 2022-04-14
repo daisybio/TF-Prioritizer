@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import lib.GeneAffinity;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -18,7 +19,7 @@ public class TopKTargetGenes extends ExecutableStep
     private final AbstractConfig<File> d_inputTargetGenes = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
     private final AbstractConfig<File> d_inputTepicRaw = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.plots.fileStructure.d_targetGenes;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.plots.fileStructure.d_targetGenes;
 
     private final AbstractConfig<String> s_plotData_different =
             TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
@@ -42,7 +43,7 @@ public class TopKTargetGenes extends ExecutableStep
         }};
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

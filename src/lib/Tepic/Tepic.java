@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import tfprio.Workflow;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -15,7 +16,7 @@ import static util.ScriptExecution.executeAndWait;
 public class Tepic extends ExecutableStep
 {
     private AbstractConfig<File> d_input;
-    private final AbstractConfig<File> d_output = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
 
     private final AbstractConfig<File> f_referenceGenome = TFPRIO.configs.tepic.inputReferenceGenome;
     private final AbstractConfig<File> f_pwms = TFPRIO.configs.tepic.pathPwms;
@@ -72,7 +73,7 @@ public class Tepic extends ExecutableStep
         return requirements;
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

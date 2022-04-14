@@ -3,6 +3,7 @@ package lib.Plots;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,8 +19,8 @@ public class GroupPlots extends ExecutableStep
     private final AbstractConfig<File> d_input = TFPRIO.configs.dynamite.fileStructure.d_output;
     private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_plots_groupPlots;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.plots.fileStructure.d_output;
-    private final AbstractConfig<File> d_outputData = TFPRIO.configs.plots.fileStructure.d_data;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.plots.fileStructure.d_output;
+    private final GeneratedFileStructure d_outputData = TFPRIO.configs.plots.fileStructure.d_data;
 
     private final AbstractConfig<String> s_input = TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted;
     private final AbstractConfig<String> s_allDataSame = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
@@ -31,7 +32,7 @@ public class GroupPlots extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, f_scriptTemplate));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_outputData));
     }

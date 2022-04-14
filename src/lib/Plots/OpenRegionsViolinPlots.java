@@ -3,6 +3,7 @@ package lib.Plots;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -17,11 +18,11 @@ public class OpenRegionsViolinPlots extends ExecutableStep
     private final AbstractConfig<File> f_scriptTemplate =
             TFPRIO.configs.scriptTemplates.f_plots_openChromatinViolinPlots;
 
-    private final AbstractConfig<File> f_output_data =
+    private final GeneratedFileStructure f_output_data =
             TFPRIO.configs.tepic.fileStructure.f_postprocessing_openChromatinViolins_data_csv;
-    private final AbstractConfig<File> f_output_script =
+    private final GeneratedFileStructure f_output_script =
             TFPRIO.configs.tepic.fileStructure.f_postprocessing_openChromatinViolins_script_R;
-    private final AbstractConfig<File> f_output_plot =
+    private final GeneratedFileStructure f_output_plot =
             TFPRIO.configs.tepic.fileStructure.f_postprocessing_openChromatinViolins_plots_image;
 
     private final AbstractConfig<String> s_regionsToTargetGenes =
@@ -32,7 +33,7 @@ public class OpenRegionsViolinPlots extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, f_scriptTemplate));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_output_data, f_output_script, f_output_plot));
     }

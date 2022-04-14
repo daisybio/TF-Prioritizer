@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import org.apache.commons.compress.utils.IOUtils;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.TrustAllManager;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -20,8 +21,8 @@ import static util.ScriptExecution.executeAndWait;
 
 public class GetDataList extends ExecutableStep
 {
-    private final AbstractConfig<File> f_zipped = TFPRIO.configs.chipAtlas.fileStructure.f_list_zipped;
-    private final AbstractConfig<File> f_list = TFPRIO.configs.chipAtlas.fileStructure.f_list_csv;
+    private final GeneratedFileStructure f_zipped = TFPRIO.configs.chipAtlas.fileStructure.f_list_zipped;
+    private final GeneratedFileStructure f_list = TFPRIO.configs.chipAtlas.fileStructure.f_list_csv;
 
     private final AbstractConfig<String> genomeVersion = TFPRIO.configs.chipAtlas.genomeVersion;
     private final AbstractConfig<String> tissueType = TFPRIO.configs.chipAtlas.tissueType;
@@ -32,7 +33,7 @@ public class GetDataList extends ExecutableStep
         return new HashSet<>();
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_zipped, f_list));
     }

@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import org.apache.commons.compress.utils.IOUtils;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.TrustAllManager;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -23,7 +24,7 @@ public class GetData extends ExecutableStep
     private final AbstractConfig<File> f_input = TFPRIO.configs.chipAtlas.fileStructure.f_list_csv;
     private final AbstractConfig<File> f_input_dcg = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
 
     private final AbstractConfig<String> tissueTypes = TFPRIO.configs.chipAtlas.tissueType;
     private final AbstractConfig<String> genomeVersion = TFPRIO.configs.chipAtlas.genomeVersion;
@@ -40,7 +41,7 @@ public class GetData extends ExecutableStep
         return new HashSet<>(Arrays.asList(f_input, f_input_dcg));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

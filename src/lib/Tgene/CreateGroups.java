@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import lib.GeneRegion;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.*;
 import java.util.*;
@@ -15,7 +16,7 @@ public class CreateGroups extends ExecutableStep
 {
     private final AbstractConfig<File> d_input = TFPRIO.configs.tgene.fileStructure.d_merged;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.tgene.fileStructure.d_groups;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tgene.fileStructure.d_groups;
 
     private final AbstractConfig<String> s_tgeneOutputGroups = TFPRIO.configs.tgene.fileStructure.s_groups_mergedGroups;
     private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
@@ -25,7 +26,7 @@ public class CreateGroups extends ExecutableStep
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }

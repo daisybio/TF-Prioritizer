@@ -4,6 +4,7 @@ import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import tfprio.Workflow;
 import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -17,7 +18,7 @@ public class RunTgene extends ExecutableStep
     private AbstractConfig<File> d_input;
     private final AbstractConfig<File> f_input_gtf = TFPRIO.configs.tgene.fileStructure.f_transcripts_gtf;
 
-    private final AbstractConfig<File> d_output = TFPRIO.configs.tgene.fileStructure.d_output;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.tgene.fileStructure.d_output;
 
     private final AbstractConfig<File> pathToTgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
 
@@ -31,7 +32,7 @@ public class RunTgene extends ExecutableStep
         return new HashSet<>(Arrays.asList(d_input, pathToTgeneExecutable, f_input_gtf));
     }
 
-    @Override public Set<AbstractConfig<File>> getCreatedFileStructure()
+    @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
