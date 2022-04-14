@@ -250,7 +250,7 @@ public abstract class ExecutableStep
         {
             try
             {
-                deleteFile(outputFile.get());
+                deleteFileStructure(outputFile.get());
             } catch (IOException e)
             {
                 logger.error(e.getMessage());

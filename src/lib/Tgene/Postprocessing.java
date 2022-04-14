@@ -45,7 +45,7 @@ public class Postprocessing extends ExecutableStep
                 add(d_outputGroups);
             } else
             {
-                d_outputGroups.setNoGenerationReason(mutuallyExclusive.getName() + " is set to false");
+                d_outputGroups.deleteAndSetNoGenerationReason(mutuallyExclusive.getName() + " is set to false");
             }
         }};
     }

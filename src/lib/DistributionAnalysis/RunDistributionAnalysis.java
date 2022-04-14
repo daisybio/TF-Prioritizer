@@ -78,7 +78,7 @@ public class RunDistributionAnalysis extends ExecutableStep
                 for (GeneratedFileStructure fileStructure : Arrays.asList(d_outputBackgroundDistributionAll,
                         d_outputTFScoresAll))
                 {
-                    fileStructure.setNoGenerationReason(performAllAnalysis.getName() + " is set to false");
+                    fileStructure.deleteAndSetNoGenerationReason(performAllAnalysis.getName() + " is set to false");
                 }
             }
         }};

@@ -7,7 +7,6 @@ import util.ExecutionTimeMeasurement;
 import util.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 import static util.FileManagement.getFirstExisting;
@@ -263,12 +262,11 @@ public class Workflow
     {
         for (ExecutableStep notExecutedStep : notExecutedSteps)
         {
-            for (AbstractConfig<File> outputFileStructure : notExecutedStep.getCreatedFileStructure())
+            for (GeneratedFileStructure outputFileStructure : notExecutedStep.getCreatedFileStructure())
             {
                 try
                 {
-                    ((GeneratedFileStructure) outputFileStructure).setNoGenerationReason(
-                            notExecutedStep.getNoExecutionReason());
+                    outputFileStructure.deleteAndSetNoGenerationReason(notExecutedStep.getNoExecutionReason());
                 } catch (ClassCastException e)
                 {
                     logger.warn("File structure could not be marked as not created: " + outputFileStructure.getName());

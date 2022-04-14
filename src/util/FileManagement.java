@@ -332,7 +332,7 @@ public class FileManagement
 
         if (newLink.exists())
         {
-            deleteFile(newLink);
+            deleteFileStructure(newLink);
         }
         Files.createLink(newLink.toPath(), existingData.toPath());
     }
@@ -343,7 +343,7 @@ public class FileManagement
 
         if (newLink.exists())
         {
-            deleteFile(newLink);
+            deleteFileStructure(newLink);
         }
         Files.createSymbolicLink(newLink.toPath(), existingData.toPath());
     }
@@ -360,7 +360,7 @@ public class FileManagement
         }
     }
 
-    public static void deleteFile(File file) throws IOException
+    public static void deleteFileStructure(File file) throws IOException
     {
         if (file.exists())
         {
@@ -376,7 +376,7 @@ public class FileManagement
                 assert subFiles != null;
                 for (File subFile : subFiles)
                 {
-                    deleteFile(subFile);
+                    deleteFileStructure(subFile);
                 }
             }
         }

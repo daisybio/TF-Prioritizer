@@ -1,8 +1,10 @@
 package util.Configs.ConfigTypes;
 
+import util.FileManagement;
 import util.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 public class GeneratedFileStructure extends AbstractConfig<File>
 {
@@ -16,7 +18,7 @@ public class GeneratedFileStructure extends AbstractConfig<File>
         setValue(file);
     }
 
-    private String noGenerationReason = "[no known reason]";
+    private String noGenerationReason = null;
 
     @Override public boolean isWriteable()
     {
@@ -38,13 +40,24 @@ public class GeneratedFileStructure extends AbstractConfig<File>
         return noGenerationReason;
     }
 
-    public void setNoGenerationReason(String noGenerationReason)
+    public void deleteAndSetNoGenerationReason(String noGenerationReason)
     {
+        tryDelete();
         this.noGenerationReason = noGenerationReason;
     }
 
     @Override public void setValueObject(Object valueObject) throws IllegalAccessException
     {
         throw new IllegalAccessException("Trying to change a generated file structure via config file: " + name);
+    }
+
+    private void tryDelete()
+    {
+        try
+        {
+            FileManagement.deleteFileStructure(get());
+        } catch (IOException ignore)
+        {
+        }
     }
 }
