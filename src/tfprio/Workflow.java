@@ -24,7 +24,7 @@ public class Workflow
         {
             try
             {
-                TFPRIO.configs.mixOptions.level.setValue("SAMPLE_LEVEL");
+                TFPRIO.configs.mixOptions.level.setValueObject("SAMPLE_LEVEL");
             } catch (IllegalAccessException ignore)
             {
             }

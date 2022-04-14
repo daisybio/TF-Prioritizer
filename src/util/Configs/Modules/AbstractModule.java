@@ -142,7 +142,7 @@ public abstract class AbstractModule
                 // Set config value
                 try
                 {
-                    entries.get(key).setValue(mergeObject.get(key));
+                    entries.get(key).setValueObject(mergeObject.get(key));
                 } catch (IllegalAccessException | ClassCastException | IllegalArgumentException e)
                 {
                     worked = false;
