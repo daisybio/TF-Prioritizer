@@ -56,6 +56,9 @@ public abstract class ExecutableStep
      */
     protected ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreadNumber());
 
+    /**
+     * The logger of this ExecutableStep.
+     */
     protected final Logger logger = new Logger(this.getClass().getName().replace("lib.", "").replace("tfprio.", ""));
 
     /**
