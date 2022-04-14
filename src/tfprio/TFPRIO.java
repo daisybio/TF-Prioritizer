@@ -59,8 +59,8 @@ public class TFPRIO
      */
     public static Set<String> existingHms = new HashSet<>();
 
-    static File workingDirectory;
-    static File sourceDirectory;
+    public static File workingDirectory;
+    public static File sourceDirectory;
     static File configFile;
 
     public static void main(String[] args) throws Exception
@@ -68,7 +68,7 @@ public class TFPRIO
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         ArgParser.parseArguments(args);
 
-        configs = new Configs(workingDirectory, sourceDirectory);
+        configs = new Configs();
 
         configs.merge(extend(sourceDirectory, "config_templates", "configsTemplate.json"));
         configs.merge(configFile);

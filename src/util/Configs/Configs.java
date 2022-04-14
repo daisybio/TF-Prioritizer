@@ -1,5 +1,6 @@
 package util.Configs;
 
+import tfprio.TFPRIO;
 import util.Configs.Modules.*;
 import util.Configs.Modules.Blacklist.Blacklist;
 import util.Configs.Modules.ChipAtlas.ChipAtlas;
@@ -31,8 +32,8 @@ import static util.FileManagement.extend;
 
 public class Configs
 {
-    public final Config<File> workingDirectory, sourceDirectory;
     private final Map<String, AbstractModule> configs = new HashMap<>();
+
     public General general;
     public Jaspar jaspar;
     public Tgene tgene;
@@ -51,15 +52,10 @@ public class Configs
     private final Logger logger;
 
 
-    public Configs(File workingDirectory, File sourceDirectory)
-            throws ClassNotFoundException, NoSuchMethodException, IOException, InvocationTargetException,
+    public Configs() throws ClassNotFoundException, NoSuchMethodException, IOException, InvocationTargetException,
             InstantiationException, IllegalAccessException
     {
-        this.workingDirectory = new Config<>(extend(workingDirectory, "working_dir"));
-        this.sourceDirectory = new Config<>(sourceDirectory);
-
-        logger = new Logger("Configs", true,
-                new File(workingDirectory.getAbsolutePath() + File.separator + "logfile.txt"));
+        logger = new Logger("Configs", true, extend(TFPRIO.workingDirectory, "logfile.txt"));
 
         Field[] fields = this.getClass().getFields();
         for (Field field : fields)
@@ -70,7 +66,8 @@ public class Configs
             {
                 AbstractModule module =
                         (AbstractModule) field.getType().getConstructor(Config.class, Config.class, Logger.class)
-                                .newInstance(new Config<>(workingDirectory), new Config<>(sourceDirectory), logger);
+                                .newInstance(new Config<>(TFPRIO.workingDirectory),
+                                        new Config<>(TFPRIO.sourceDirectory), logger);
                 field.set(this, module);
                 configs.put(field.getType().getSimpleName(), module);
             }
