@@ -2,7 +2,7 @@ package lib.DistributionAnalysis;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 
 import java.io.*;
 import java.util.*;
@@ -12,27 +12,28 @@ import static util.FileManagement.makeSureFileExists;
 
 public class Preprocessing extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.configs.plots.fileStructure.d_data;
+    private final AbstractConfig<File> d_input = TFPRIO.configs.plots.fileStructure.d_data;
 
-    private final Config<File> f_output = TFPRIO.configs.distributionAnalysis.fileStructure.f_analyzedTfs;
+    private final AbstractConfig<File> f_output = TFPRIO.configs.distributionAnalysis.fileStructure.f_analyzedTfs;
 
-    private final Config<List<Double>> thresholds = TFPRIO.configs.plots.thresholds;
-    private final Config<String> s_plotData_same = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
-    private final Config<String> s_plotData_different = TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
-    private final Config<String> sameGroups = TFPRIO.configs.general.sameTps;
-    private final Config<String> differentGroups = TFPRIO.configs.general.differentTps;
+    private final AbstractConfig<List<Double>> thresholds = TFPRIO.configs.plots.thresholds;
+    private final AbstractConfig<String> s_plotData_same = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
+    private final AbstractConfig<String> s_plotData_different =
+            TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
+    private final AbstractConfig<String> sameGroups = TFPRIO.configs.general.sameTps;
+    private final AbstractConfig<String> differentGroups = TFPRIO.configs.general.differentTps;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(f_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
                 Arrays.asList(thresholds, s_plotData_same, s_plotData_different, sameGroups, differentGroups));

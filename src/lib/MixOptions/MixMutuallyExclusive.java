@@ -6,7 +6,7 @@ import lib.ExecutableStep;
 import lib.Peak;
 import lib.Region;
 import util.Comparators.ChromosomeComparator;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 
 import java.io.*;
 import java.util.*;
@@ -15,22 +15,22 @@ import static util.FileManagement.*;
 
 public class MixMutuallyExclusive extends ExecutableStep
 {
-    private Config<File> d_input;
-    private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input;
-    private final Config<Boolean> mutuallyExclusiveDifferentialPeakSignals =
+    private AbstractConfig<File> d_input;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input;
+    private final AbstractConfig<Boolean> mutuallyExclusiveDifferentialPeakSignals =
             TFPRIO.configs.mixOptions.mutuallyExclusiveDifferentialPeakSignals;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(List.of(mutuallyExclusiveDifferentialPeakSignals));
     }

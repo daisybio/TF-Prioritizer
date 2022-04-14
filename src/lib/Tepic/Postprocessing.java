@@ -2,7 +2,7 @@ package lib.Tepic;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,32 +13,34 @@ import static util.FileManagement.*;
 
 public class Postprocessing extends ExecutableStep
 {
-    private Config<File> d_input;
+    private AbstractConfig<File> d_input;
 
-    private final Config<File> d_postprocessingInput = TFPRIO.configs.tepic.fileStructure.d_postprocessing_input;
-    private final Config<File> d_output = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
-    private final Config<File> f_output_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
+    private final AbstractConfig<File> d_postprocessingInput =
+            TFPRIO.configs.tepic.fileStructure.d_postprocessing_input;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
+    private final AbstractConfig<File> f_output_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
 
-    private final Config<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
-    private final Config<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
-    private final Config<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
-    private final Config<Boolean> doNotGenerate = TFPRIO.configs.tepic.doNotGenerate;
-    private final Config<String> s_meanAffinities =
+    private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
+    private final AbstractConfig<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
+    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<Boolean> doNotGenerate = TFPRIO.configs.tepic.doNotGenerate;
+    private final AbstractConfig<String> s_meanAffinities =
             TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_meanAffinitiesDir;
-    private final Config<String> s_ratios = TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_ratiosDir;
+    private final AbstractConfig<String> s_ratios =
+            TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_ratiosDir;
 
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_postprocessingInput, f_output_tfs));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
                 Arrays.asList(tpmCutoff, mutuallyExclusive, originalDecay, doNotGenerate, s_meanAffinities, s_ratios));

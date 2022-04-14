@@ -1,7 +1,7 @@
 package lib;
 
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.DirectoryFilter;
 import util.FileFilters.FileFilter;
 
@@ -13,20 +13,20 @@ import static util.FileManagement.*;
 
 public class CheckChromosomes extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.configs.tepic.inputDirectory;
-    private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr;
+    private final AbstractConfig<File> d_input = TFPRIO.configs.tepic.inputDirectory;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>();
     }

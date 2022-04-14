@@ -2,8 +2,7 @@ package lib.Plots;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
-import util.ExternalScriptException;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -14,30 +13,31 @@ import static util.ScriptExecution.executeAndWait;
 
 public class OpenRegionsViolinPlots extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
-    private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_plots_openChromatinViolinPlots;
+    private final AbstractConfig<File> d_input = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
+    private final AbstractConfig<File> f_scriptTemplate =
+            TFPRIO.configs.scriptTemplates.f_plots_openChromatinViolinPlots;
 
-    private final Config<File> f_output_data =
+    private final AbstractConfig<File> f_output_data =
             TFPRIO.configs.tepic.fileStructure.f_postprocessing_openChromatinViolins_data_csv;
-    private final Config<File> f_output_script =
+    private final AbstractConfig<File> f_output_script =
             TFPRIO.configs.tepic.fileStructure.f_postprocessing_openChromatinViolins_script_R;
-    private final Config<File> f_output_plot =
+    private final AbstractConfig<File> f_output_plot =
             TFPRIO.configs.tepic.fileStructure.f_postprocessing_openChromatinViolins_plots_image;
 
-    private final Config<String> s_regionsToTargetGenes =
+    private final AbstractConfig<String> s_regionsToTargetGenes =
             TFPRIO.configs.tepic.fileStructure.s_outputRaw_regionsToTargetGenes;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_input, f_scriptTemplate));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_output_data, f_output_script, f_output_plot));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(List.of(s_regionsToTargetGenes));
     }

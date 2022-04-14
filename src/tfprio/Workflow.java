@@ -1,11 +1,12 @@
 package tfprio;
 
 import lib.ExecutableStep;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.ExecutionTimeMeasurement;
 import util.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static util.FileManagement.getFirstExisting;
@@ -22,12 +23,7 @@ public class Workflow
 
         if (TFPRIO.configs.mixOptions.mutuallyExclusive.get() && !TFPRIO.configs.mixOptions.level.isSet())
         {
-            try
-            {
-                TFPRIO.configs.mixOptions.level.setValueObject("SAMPLE_LEVEL");
-            } catch (IllegalAccessException ignore)
-            {
-            }
+            TFPRIO.configs.mixOptions.level.setValueObject("SAMPLE_LEVEL");
         }
 
         if (TFPRIO.configs.mixOptions.level.isSet())
@@ -176,9 +172,9 @@ public class Workflow
         return sb_out.toString();
     }
 
-    public static Config<File> getLatestInputDirectory()
+    public static AbstractConfig<File> getLatestInputDirectory()
     {
-        List<Config<File>> inputDirectories =
+        List<AbstractConfig<File>> inputDirectories =
                 Arrays.asList(TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input,
                         TFPRIO.configs.blacklist.fileStructure.d_newInput,
                         TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks,

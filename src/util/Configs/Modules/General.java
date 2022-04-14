@@ -1,6 +1,7 @@
 package util.Configs.Modules;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.*;
+import util.Configs.ConfigValidators.IntegerRangeValidator;
 import util.Logger;
 
 import java.io.File;
@@ -10,27 +11,25 @@ import static util.FileManagement.extend;
 
 public class General extends AbstractModule
 {
-    public final Config<Boolean> fileLogging = new Config<>(true, true);
-    public final Config<File> logFile = extend(workingDirectory, "logfile.txt");
-    public final Config<Boolean> ensgMappingEnabled = new Config<>(true, true);
-    public final Config<Boolean> calculateTpmLengthsEnabled = new Config<>(true, true);
-    public final Config<Boolean> calculateGenePositionsEnabled = new Config<>(true, true);
+    public final InputConfig<Boolean> fileLogging = new InputConfig<>(Boolean.class);
+    public final GeneratedFileStructure logFile = extend(workingDirectory, "logfile.txt");
+    public final InputConfig<Boolean> calculateTpmLengthsEnabled = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> calculateGenePositionsEnabled = new InputConfig<>(Boolean.class);
 
-    public final Config<String> differentTps = new Config<>("DIFFERENT_TPS");
-    public final Config<String> sameTps = new Config<>("SAME_TPS");
+    public final InternalConfig<String> differentTps = new InternalConfig<>("DIFFERENT_TPS");
+    public final InternalConfig<String> sameTps = new InternalConfig<>("SAME_TPS");
 
-    public final Config<String> shebang = new Config<>("#!/bin/bash");
+    public final InputConfig<Integer> threadLimit =
+            new InputConfig<>(Integer.class, new IntegerRangeValidator(1, Integer.MAX_VALUE));
 
-    public final Config<Integer> threadLimit = new Config<>(10, true);
+    public final InputConfig<Boolean> redirectExternalScriptOutputStream = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> redirectExternalScriptErrorStream = new InputConfig<>(Boolean.class);
 
-    public final Config<Boolean> redirectExternalScriptOutputStream = new Config<>(false, true);
-    public final Config<Boolean> redirectExternalScriptErrorStream = new Config<>(false, true);
+    public final GeneratedFileStructure d_workflowHashes = extend(workingDirectory, ".hashes");
 
-    public final Config<File> d_workflowHashes = extend(workingDirectory, ".hashes");
+    public final InputConfig<Boolean> developmentMode = new InputConfig<>(Boolean.class);
 
-    public final Config<Boolean> developmentMode = new Config<>(false, true);
-
-    public General(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public General(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

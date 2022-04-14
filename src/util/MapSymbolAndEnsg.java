@@ -1,7 +1,7 @@
 package util;
 
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,12 +21,12 @@ public class MapSymbolAndEnsg
     private final Logger logger = new Logger(this.getClass().getSimpleName());
     private final List<String> ensgList = new ArrayList<>();
 
-    private final Config<File> f_map = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
-    private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_mapping;
-    private final Config<File> f_script = TFPRIO.configs.deSeq2.fileStructure.f_mappingScript;
-    private final Config<File> f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID;
-    private final Config<String> datasetSpecies = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
-    private final Config<String> datasetSymbolColumn = TFPRIO.configs.deSeq2.biomartDatasetSymbolColumn;
+    private final AbstractConfig<File> f_map = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
+    private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_mapping;
+    private final AbstractConfig<File> f_script = TFPRIO.configs.deSeq2.fileStructure.f_mappingScript;
+    private final AbstractConfig<File> f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID;
+    private final AbstractConfig<String> datasetSpecies = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
+    private final AbstractConfig<String> datasetSymbolColumn = TFPRIO.configs.deSeq2.biomartDatasetSymbolColumn;
 
     public MapSymbolAndEnsg()
     {

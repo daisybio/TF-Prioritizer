@@ -1,6 +1,6 @@
 package lib.Igv;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 import util.Logger;
 
@@ -58,9 +58,10 @@ public class Helpers
         return geneCoordinates;
     }
 
-    static List<String> getInputFiles(Iterable<String> groups, Config<List> includePredictionData,
-                                      Config<File> d_input_tepic, Config<File> pathToTfChipSeq, Config<File> pathToTdf,
-                                      Config<File> d_input_peakFiles, List<File> tdfFiles)
+    static List<String> getInputFiles(Iterable<String> groups, AbstractConfig<List<String>> includePredictionData,
+                                      AbstractConfig<File> d_input_tepic, AbstractConfig<File> pathToTfChipSeq,
+                                      AbstractConfig<File> pathToTdf, AbstractConfig<File> d_input_peakFiles,
+                                      List<File> tdfFiles)
     {
         List<String> loadFiles = new ArrayList<>();
 

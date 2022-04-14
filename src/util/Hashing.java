@@ -1,7 +1,7 @@
 package util;
 
 import util.Comparators.FileComparator;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -24,11 +24,11 @@ public class Hashing
         return hash(String.join("", hashes));
     }
 
-    public static String hashConfigs(Iterable<Config<?>> configs)
+    public static String hashConfigs(Iterable<AbstractConfig<?>> configs)
     {
         ArrayList<String> hashes = new ArrayList<>();
 
-        for (Config<?> config : configs)
+        for (AbstractConfig<?> config : configs)
         {
             String hash = hash(config.toString());
             hashes.add(hash);

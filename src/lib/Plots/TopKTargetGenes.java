@@ -3,7 +3,7 @@ package lib.Plots;
 import lib.ExecutableStep;
 import lib.GeneAffinity;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -14,19 +14,20 @@ import static util.FileManagement.makeSureFileExists;
 
 public class TopKTargetGenes extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.configs.plots.fileStructure.d_data;
-    private final Config<File> d_inputTargetGenes = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
-    private final Config<File> d_inputTepicRaw = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
+    private final AbstractConfig<File> d_input = TFPRIO.configs.plots.fileStructure.d_data;
+    private final AbstractConfig<File> d_inputTargetGenes = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
+    private final AbstractConfig<File> d_inputTepicRaw = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
 
-    private final Config<File> d_output = TFPRIO.configs.plots.fileStructure.d_targetGenes;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.plots.fileStructure.d_targetGenes;
 
-    private final Config<String> s_plotData_different = TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
-    private final Config<String> s_plotData_same = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
-    private final Config<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
-    private final Config<List<Double>> thresholds = TFPRIO.configs.plots.thresholds;
-    private final Config<Integer> topKGenes = TFPRIO.configs.plots.topKGenes;
+    private final AbstractConfig<String> s_plotData_different =
+            TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
+    private final AbstractConfig<String> s_plotData_same = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
+    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<List<Double>> thresholds = TFPRIO.configs.plots.thresholds;
+    private final AbstractConfig<Integer> topKGenes = TFPRIO.configs.plots.topKGenes;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>()
         {{
@@ -41,12 +42,12 @@ public class TopKTargetGenes extends ExecutableStep
         }};
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(s_plotData_different, s_plotData_same, tpmCutoff, thresholds, topKGenes));
     }

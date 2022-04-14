@@ -2,7 +2,7 @@ package lib.Dynamite;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,30 +13,31 @@ import static util.ScriptExecution.executeAndWait;
 
 public class RunDynamite extends ExecutableStep
 {
-    private final Config<File> f_dynamite_script = TFPRIO.configs.tepic.f_dynamite;
-    private final Config<File> d_input = TFPRIO.configs.dynamite.fileStructure.d_preprocessing_prepareClassification;
+    private final AbstractConfig<File> f_dynamite_script = TFPRIO.configs.tepic.f_dynamite;
+    private final AbstractConfig<File> d_input =
+            TFPRIO.configs.dynamite.fileStructure.d_preprocessing_prepareClassification;
 
-    private final Config<File> d_output = TFPRIO.configs.dynamite.fileStructure.d_output;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.dynamite.fileStructure.d_output;
 
-    private final Config<String> outVar = TFPRIO.configs.dynamite.outVar;
-    private final Config<Integer> oFolds = TFPRIO.configs.dynamite.oFolds;
-    private final Config<Integer> iFolds = TFPRIO.configs.dynamite.iFolds;
-    private final Config<Boolean> performance = TFPRIO.configs.dynamite.performance;
-    private final Config<Double> alpha = TFPRIO.configs.dynamite.alpha;
-    private final Config<Integer> cores = TFPRIO.configs.dynamite.cores;
-    private final Config<Boolean> randomize = TFPRIO.configs.dynamite.randomize;
+    private final AbstractConfig<String> outVar = TFPRIO.configs.dynamite.outVar;
+    private final AbstractConfig<Integer> oFolds = TFPRIO.configs.dynamite.oFolds;
+    private final AbstractConfig<Integer> iFolds = TFPRIO.configs.dynamite.iFolds;
+    private final AbstractConfig<Boolean> performance = TFPRIO.configs.dynamite.performance;
+    private final AbstractConfig<Double> alpha = TFPRIO.configs.dynamite.alpha;
+    private final AbstractConfig<Integer> cores = TFPRIO.configs.dynamite.cores;
+    private final AbstractConfig<Boolean> randomize = TFPRIO.configs.dynamite.randomize;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_dynamite_script, d_input));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(outVar, oFolds, iFolds, performance, alpha, cores, randomize));
     }

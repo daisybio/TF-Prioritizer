@@ -1,6 +1,6 @@
 package lib.MixOptions;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 import util.Logger;
 
@@ -13,8 +13,8 @@ import static util.FileManagement.*;
 public class StaticMethods
 {
     static void runMixOption(File d_source, File d_target, String mixLevel, Logger logger,
-                             ExecutorService executorService, Config<String> option,
-                             Config<Integer> occurrenceIntersection)
+                             ExecutorService executorService, AbstractConfig<String> option,
+                             AbstractConfig<Integer> occurrenceIntersection)
     {
         logger.info("Create " + option.get() + " of " + mixLevel);
 

@@ -1,6 +1,9 @@
 package util.Configs.Modules.Tgene;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InputConfig;
+import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -11,18 +14,18 @@ public class Tgene extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<File> pathToExecutable = new Config<>(File.class);
+    public final InputFileStructure pathToExecutable = new InputFileStructure();
 
-    public final Config<Boolean> noClosestLocus = new Config<>(false, true);
-    public final Config<Boolean> noClosestTss = new Config<>(false, true);
-    public final Config<Integer> maxLinkDistance = new Config<>(500000, true);
-    public final Config<Double> pValue = new Config<>(0.05, true);
-    public final Config<Boolean> selfRegulatory = new Config<>(false, true);
-    public final Config<Double> consensus = new Config<>(0.5, true);
-    public final Config<String> consensusCalc = new Config<>("INCREASE_TGENE_TFS", true);
-    public final Config<String> mtWriting = new Config<>("MT", true);
+    public final InputConfig<Boolean> noClosestLocus = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> noClosestTss = new InputConfig<>(Boolean.class);
+    public final InputConfig<Integer> maxLinkDistance = new InputConfig<>(Integer.class);
+    public final InputConfig<Double> pValue = new InputConfig<>(Double.class);
+    public final InputConfig<Boolean> selfRegulatory = new InputConfig<>(Boolean.class);
+    public final InputConfig<Double> consensus = new InputConfig<>(Double.class);
+    public final InputConfig<String> consensusCalc = new InputConfig<>(String.class);
+    public final InputConfig<String> mtWriting = new InputConfig<>(String.class);
 
-    public Tgene(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public Tgene(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

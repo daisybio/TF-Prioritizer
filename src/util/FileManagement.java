@@ -1,14 +1,15 @@
 package util;
 
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InputFileStructure;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -298,9 +299,14 @@ public class FileManagement
         }
     }
 
-    public static Config<File> extend(Config<File> fileConfig, String... extensions)
+    public static GeneratedFileStructure extend(GeneratedFileStructure fileConfig, String... extensions)
     {
-        return new Config<>(extend(fileConfig.get(), extensions));
+        return new GeneratedFileStructure(extend(fileConfig.get(), extensions));
+    }
+
+    public static InputFileStructure extend(InputFileStructure fileConfig, String... extensions)
+    {
+        return new InputFileStructure(extend(fileConfig.get(), extensions));
     }
 
     public static File extend(File file, String... extensions)
@@ -376,9 +382,9 @@ public class FileManagement
         }
     }
 
-    public static Config<File> getFirstExisting(List<Config<File>> priorities)
+    public static AbstractConfig<File> getFirstExisting(List<AbstractConfig<File>> priorities)
     {
-        for (Config<File> priority : priorities)
+        for (AbstractConfig<File> priority : priorities)
         {
             if (TFPRIO.createdFileStructure.contains(priority))
             {

@@ -3,7 +3,7 @@ package lib.FootprintIntervals;
 import tfprio.TFPRIO;
 import lib.ExecutableStep;
 import util.Comparators.ChromosomeComparator;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -14,22 +14,22 @@ import static util.FileManagement.makeSureFileExists;
 
 public class CreateFootprintsBetweenPeaks extends ExecutableStep
 {
-    private Config<File> d_input;
-    private final Config<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks;
-    private final Config<String> option = TFPRIO.configs.tepic.tfBindingSiteSearch;
+    private AbstractConfig<File> d_input;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks;
+    private final AbstractConfig<String> option = TFPRIO.configs.tepic.tfBindingSiteSearch;
 
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(List.of(option));
     }

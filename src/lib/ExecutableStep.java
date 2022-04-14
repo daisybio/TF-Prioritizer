@@ -1,7 +1,7 @@
 package lib;
 
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.ExecutionTimeMeasurement;
 import util.Logger;
 
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 import static util.Hashing.*;
@@ -135,21 +134,21 @@ public abstract class ExecutableStep
      *
      * @return a set of the required file structure configs, must not be null.
      */
-    protected abstract Set<Config<File>> getRequiredFileStructure();
+    protected abstract Set<AbstractConfig<File>> getRequiredFileStructure();
 
     /**
      * Get the file configs whose value files are created during execution of this executableStep
      *
      * @return a set of the created file structure configs, must not be null.
      */
-    protected abstract Set<Config<File>> getCreatedFileStructure();
+    protected abstract Set<AbstractConfig<File>> getCreatedFileStructure();
 
     /**
      * Get the configs that are mandatory for execution of this executableStep.
      *
      * @return a set of the required configs, must not be null.
      */
-    protected abstract Set<Config<?>> getRequiredConfigs();
+    protected abstract Set<AbstractConfig<?>> getRequiredConfigs();
 
     /**
      * Get the configs that are not mandatory for execution of this executableStep but influence the outcome.
@@ -157,7 +156,7 @@ public abstract class ExecutableStep
      *
      * @return a set of the optional configs, must not be null.
      */
-    protected Set<Config<?>> getOptionalConfigs()
+    protected Set<AbstractConfig<?>> getOptionalConfigs()
     {
         return new HashSet<>();
     }
@@ -178,7 +177,7 @@ public abstract class ExecutableStep
      */
     private void broadcastCreatedFileStructure()
     {
-        for (Config<File> createdStructure : getCreatedFileStructure())
+        for (AbstractConfig<File> createdStructure : getCreatedFileStructure())
         {
             if (TFPRIO.createdFileStructure.contains(createdStructure) && !TFPRIO.configs.general.developmentMode.get())
             {
@@ -206,10 +205,10 @@ public abstract class ExecutableStep
     private boolean checkRequirements()
     {
         boolean allGood = true;
-        Set<Config<?>> requiredConfigs = getRequiredConfigs();
-        Set<Config<File>> requiredFileStructure = getRequiredFileStructure();
+        Set<AbstractConfig<?>> requiredConfigs = getRequiredConfigs();
+        Set<AbstractConfig<File>> requiredFileStructure = getRequiredFileStructure();
 
-        for (Config<?> config : requiredConfigs)
+        for (AbstractConfig<?> config : requiredConfigs)
         {
             if (!config.isSet())
             {
@@ -218,7 +217,7 @@ public abstract class ExecutableStep
             }
         }
 
-        for (Config<File> fileConfig : requiredFileStructure)
+        for (AbstractConfig<File> fileConfig : requiredFileStructure)
         {
             if (!TFPRIO.createdFileStructure.contains(fileConfig))
             {
@@ -240,8 +239,8 @@ public abstract class ExecutableStep
      */
     private void deleteAllOutputs()
     {
-        Set<Config<File>> outputFiles = getCreatedFileStructure();
-        for (Config<File> outputFile : outputFiles)
+        Set<AbstractConfig<File>> outputFiles = getCreatedFileStructure();
+        for (AbstractConfig<File> outputFile : outputFiles)
         {
             try
             {
@@ -261,10 +260,10 @@ public abstract class ExecutableStep
      */
     private String hashInputs() throws IOException
     {
-        Set<Config<File>> requiredFileStructure = getRequiredFileStructure();
+        Set<AbstractConfig<File>> requiredFileStructure = getRequiredFileStructure();
         ArrayList<File> requiredFiles = new ArrayList<>();
 
-        for (Config<File> fileConfig : requiredFileStructure)
+        for (AbstractConfig<File> fileConfig : requiredFileStructure)
         {
             requiredFiles.add(fileConfig.get());
         }
@@ -280,7 +279,7 @@ public abstract class ExecutableStep
      */
     private String hashRequiredConfigs()
     {
-        Set<Config<?>> requiredConfigs = getRequiredConfigs();
+        Set<AbstractConfig<?>> requiredConfigs = getRequiredConfigs();
         return util.Hashing.hashConfigs(requiredConfigs);
     }
 
@@ -292,7 +291,7 @@ public abstract class ExecutableStep
      */
     private String hashOptionalConfigs()
     {
-        Set<Config<?>> optionalConfigs = getOptionalConfigs();
+        Set<AbstractConfig<?>> optionalConfigs = getOptionalConfigs();
         return util.Hashing.hashConfigs(optionalConfigs);
     }
 
@@ -304,10 +303,10 @@ public abstract class ExecutableStep
      */
     private String hashOutputs() throws IOException
     {
-        Set<Config<File>> createdFileStructure = getCreatedFileStructure();
+        Set<AbstractConfig<File>> createdFileStructure = getCreatedFileStructure();
         ArrayList<File> createdFiles = new ArrayList<>();
 
-        for (Config<File> config : createdFileStructure)
+        for (AbstractConfig<File> config : createdFileStructure)
         {
             createdFiles.add(config.get());
         }
@@ -497,7 +496,7 @@ public abstract class ExecutableStep
      */
     private void verifyConfigUsage()
     {
-        Set<Config<?>> registeredConfigs = new HashSet<>();
+        Set<AbstractConfig<?>> registeredConfigs = new HashSet<>();
         registeredConfigs.addAll(getCreatedFileStructure());
         registeredConfigs.addAll(getRequiredConfigs());
         registeredConfigs.addAll(getOptionalConfigs());
@@ -505,12 +504,12 @@ public abstract class ExecutableStep
 
         for (Field field : this.getClass().getDeclaredFields())
         {
-            if (Config.class.isAssignableFrom(field.getType()))
+            if (AbstractConfig.class.isAssignableFrom(field.getType()))
             {
                 try
                 {
                     field.setAccessible(true);
-                    Config<?> current = (Config<?>) field.get(this);
+                    AbstractConfig<?> current = (AbstractConfig<?>) field.get(this);
                     if (!registeredConfigs.contains(current))
                     {
                         logger.warn("Config not assigned to a category: " + field.getName() + ". May be due to a " +

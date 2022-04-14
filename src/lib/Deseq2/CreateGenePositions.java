@@ -2,8 +2,7 @@ package lib.Deseq2;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
-import util.ExternalScriptException;
+import util.Configs.ConfigTypes.AbstractConfig;
 
 import java.io.*;
 import java.util.Arrays;
@@ -16,36 +15,40 @@ import static util.ScriptExecution.executeAndWait;
 
 public class CreateGenePositions extends ExecutableStep
 {
-    private final Config<File> f_script = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_script;
-    private final Config<File> f_data_prev =
+    private final AbstractConfig<File> f_script =
+            TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_script;
+    private final AbstractConfig<File> f_data_prev =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_genePositionsPrev;
-    private final Config<File> f_data_version =
+    private final AbstractConfig<File> f_data_version =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_version;
-    private final Config<File> f_mapping = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
-    private final Config<File> f_data = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_data;
-    private final Config<File> f_upliftScriptTemplate = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingUplift;
-    private final Config<File> f_upliftScript =
+    private final AbstractConfig<File> f_mapping = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
+    private final AbstractConfig<File> f_data = TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_data;
+    private final AbstractConfig<File> f_upliftScriptTemplate =
+            TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingUplift;
+    private final AbstractConfig<File> f_upliftScript =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_uplift;
 
-    private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingGetGenePositions;
+    private final AbstractConfig<File> f_scriptTemplate =
+            TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingGetGenePositions;
 
-    private final Config<Boolean> calculateGenePositionsEnabled = TFPRIO.configs.general.calculateGenePositionsEnabled;
-    private final Config<String> speciesReferenceGenome = TFPRIO.configs.igv.speciesReferenceGenome;
-    private final Config<String> speciesBiomart = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
-    private final Config<Map> synonymDict = TFPRIO.configs.igv.grcSynonymDict;
+    private final AbstractConfig<Boolean> calculateGenePositionsEnabled =
+            TFPRIO.configs.general.calculateGenePositionsEnabled;
+    private final AbstractConfig<String> speciesReferenceGenome = TFPRIO.configs.igv.speciesReferenceGenome;
+    private final AbstractConfig<String> speciesBiomart = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
+    private final AbstractConfig<Map<String, String>> synonymDict = TFPRIO.configs.igv.grcSynonymDict;
 
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_scriptTemplate, f_mapping, f_upliftScriptTemplate));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_script, f_data_prev, f_data_version, f_data, f_upliftScript));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
                 Arrays.asList(calculateGenePositionsEnabled, speciesBiomart, speciesReferenceGenome, synonymDict));

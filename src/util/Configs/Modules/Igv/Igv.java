@@ -1,12 +1,13 @@
 package util.Configs.Modules.Igv;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InputConfig;
+import util.Configs.ConfigTypes.InputFileStructure;
+import util.Configs.ClassGetter;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,19 +17,18 @@ public class Igv extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<File> pathToIGV = extend(sourceDirectory, "IGV_2.11.2");
-    public final Config<Integer> topLog2fc = new Config<>(15, true);
-    public final Config<Boolean> topLog2fcIncludeLncRnaPseudogenes = new Config<>(true, true);
-    public final Config<List> includePredictionData = new Config<>(List.class);
-    public final Config<List> importantLociAllPrioTf = new Config<>(List.class);
-    public final Config<File> pathToTfChipSeq = new Config<>(File.class);
-    public final Config<File> pathToTdf = new Config<>(File.class);
-    public final Config<List> enhancerDatabases = new Config<>(List.class);
-    public final Config<Map> grcSynonymDict = new Config<>(Map.class);
-    public final Config<Integer> port = new Config<>(60151, true);
-    public final Config<String> speciesReferenceGenome = new Config<>(String.class);
+    public final InputFileStructure pathToIGV = extend(sourceDirectory, "IGV_2.11.2");
+    public final InputConfig<Integer> topLog2fc = new InputConfig<>(Integer.class);
+    public final InputConfig<Boolean> topLog2fcIncludeLncRnaPseudogenes = new InputConfig<>(Boolean.class);
+    public final InputConfig<List<String>> includePredictionData = new InputConfig<>(ClassGetter.getStringList());
+    public final InputConfig<List<String>> importantLociAllPrioTf = new InputConfig<>(ClassGetter.getStringList());
+    public final InputFileStructure pathToTfChipSeq = new InputFileStructure();
+    public final InputFileStructure pathToTdf = new InputFileStructure();
+    public final InputConfig<List<String>> enhancerDatabases = new InputConfig<>(ClassGetter.getStringList());
+    public final InputConfig<Map<String, String>> grcSynonymDict = new InputConfig<>(ClassGetter.getStringStringMap());
+    public final InputConfig<String> speciesReferenceGenome = new InputConfig<>(String.class);
 
-    public Igv(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public Igv(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

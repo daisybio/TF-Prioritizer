@@ -2,7 +2,7 @@ package lib.Tepic;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -13,52 +13,53 @@ import static util.ScriptExecution.executeAndWait;
 
 public class Tepic extends ExecutableStep
 {
-    private Config<File> d_input;
-    private final Config<File> d_output = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
+    private AbstractConfig<File> d_input;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.tepic.fileStructure.d_outputRaw;
 
-    private final Config<File> f_referenceGenome = TFPRIO.configs.tepic.inputReferenceGenome;
-    private final Config<File> f_pwms = TFPRIO.configs.tepic.pathPwms;
-    private final Config<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
-    private final Config<File> tepicExecutable = TFPRIO.configs.tepic.executable;
-    private final Config<String> tfBindingSiteSearch = TFPRIO.configs.tepic.tfBindingSiteSearch;
-    private final Config<Boolean> mixMutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
-    private final Config<Boolean> tgeneTargetGenes = TFPRIO.configs.tepic.tgeneTargetGenes;
-    private final Config<String> s_tgene_links = TFPRIO.configs.tgene.fileStructure.s_output_links;
-    private final Config<File> d_deseq2_meanCounts = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
-    private final Config<File> d_tgene_output = TFPRIO.configs.tgene.fileStructure.d_output;
-    private final Config<String> s_outputRaw_trapSequences =
+    private final AbstractConfig<File> f_referenceGenome = TFPRIO.configs.tepic.inputReferenceGenome;
+    private final AbstractConfig<File> f_pwms = TFPRIO.configs.tepic.pathPwms;
+    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<File> tepicExecutable = TFPRIO.configs.tepic.executable;
+    private final AbstractConfig<String> tfBindingSiteSearch = TFPRIO.configs.tepic.tfBindingSiteSearch;
+    private final AbstractConfig<Boolean> mixMutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
+    private final AbstractConfig<Boolean> tgeneTargetGenes = TFPRIO.configs.tepic.tgeneTargetGenes;
+    private final AbstractConfig<String> s_tgene_links = TFPRIO.configs.tgene.fileStructure.s_output_links;
+    private final AbstractConfig<File> d_deseq2_meanCounts =
+            TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
+    private final AbstractConfig<File> d_tgene_output = TFPRIO.configs.tgene.fileStructure.d_output;
+    private final AbstractConfig<String> s_outputRaw_trapSequences =
             TFPRIO.configs.tepic.fileStructure.s_outputRaw_trapSequences;
 
     // if tpmCut > 0
-    private final Config<File> ensgSymbolFile = TFPRIO.configs.tepic.ensgSymbolFile;
-    private final Config<File> inputGeneID = TFPRIO.configs.deSeq2.inputGeneID;
+    private final AbstractConfig<File> ensgSymbolFile = TFPRIO.configs.tepic.ensgSymbolFile;
+    private final AbstractConfig<File> inputGeneID = TFPRIO.configs.deSeq2.inputGeneID;
 
     // Optional configs
-    private final Config<Integer> threadLimit = TFPRIO.configs.general.threadLimit;
-    private final Config<File> bedChromatinSignal = TFPRIO.configs.tepic.bedChromatinSignal;
-    private final Config<Integer> columnBedfile = TFPRIO.configs.tepic.columnBedfile;
-    private final Config<File> geneAnnotationFile = TFPRIO.configs.tepic.geneAnnotationFile;
-    private final Config<Integer> windowSize = TFPRIO.configs.tepic.windowSize;
-    private final Config<File> onlyDNasePeaks = TFPRIO.configs.tepic.onlyDNasePeaks;
-    private final Config<Boolean> exponentialDecay = TFPRIO.configs.tepic.exponentialDecay;
-    private final Config<Boolean> doNotNormalizePeakLength = TFPRIO.configs.tepic.doNotNormalizePeakLength;
-    private final Config<Boolean> doNotGenerate = TFPRIO.configs.tepic.doNotGenerate;
-    private final Config<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
-    private final Config<File> psemsLengthFile = TFPRIO.configs.tepic.psemsLengthFile;
-    private final Config<Boolean> entireGeneBody = TFPRIO.configs.tepic.entireGeneBody;
-    private final Config<Boolean> doZip = TFPRIO.configs.tepic.doZip;
-    private final Config<File> twoBitFile = TFPRIO.configs.tepic.twoBitFile;
-    private final Config<Double> pValue = TFPRIO.configs.tepic.pValue;
-    private final Config<Integer> maxMinutesPerChromosome = TFPRIO.configs.tepic.maxMinutesPerChromosome;
-    private final Config<Boolean> chromosomePrefix = TFPRIO.configs.tepic.chromosomePrefix;
-    private final Config<Boolean> transcriptBased = TFPRIO.configs.tepic.transcriptBased;
-    private final Config<File> loopListFile = TFPRIO.configs.tepic.loopListFile;
-    private final Config<Integer> loopWindows = TFPRIO.configs.tepic.loopWindows;
-    private final Config<Boolean> onlyPeakFeatures = TFPRIO.configs.tepic.onlyPeakFeatures;
+    private final AbstractConfig<Integer> threadLimit = TFPRIO.configs.general.threadLimit;
+    private final AbstractConfig<File> bedChromatinSignal = TFPRIO.configs.tepic.bedChromatinSignal;
+    private final AbstractConfig<Integer> columnBedfile = TFPRIO.configs.tepic.columnBedfile;
+    private final AbstractConfig<File> geneAnnotationFile = TFPRIO.configs.tepic.geneAnnotationFile;
+    private final AbstractConfig<Integer> windowSize = TFPRIO.configs.tepic.windowSize;
+    private final AbstractConfig<File> onlyDNasePeaks = TFPRIO.configs.tepic.onlyDNasePeaks;
+    private final AbstractConfig<Boolean> exponentialDecay = TFPRIO.configs.tepic.exponentialDecay;
+    private final AbstractConfig<Boolean> doNotNormalizePeakLength = TFPRIO.configs.tepic.doNotNormalizePeakLength;
+    private final AbstractConfig<Boolean> doNotGenerate = TFPRIO.configs.tepic.doNotGenerate;
+    private final AbstractConfig<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
+    private final AbstractConfig<File> psemsLengthFile = TFPRIO.configs.tepic.psemsLengthFile;
+    private final AbstractConfig<Boolean> entireGeneBody = TFPRIO.configs.tepic.entireGeneBody;
+    private final AbstractConfig<Boolean> doZip = TFPRIO.configs.tepic.doZip;
+    private final AbstractConfig<File> twoBitFile = TFPRIO.configs.tepic.twoBitFile;
+    private final AbstractConfig<Double> pValue = TFPRIO.configs.tepic.pValue;
+    private final AbstractConfig<Integer> maxMinutesPerChromosome = TFPRIO.configs.tepic.maxMinutesPerChromosome;
+    private final AbstractConfig<Boolean> chromosomePrefix = TFPRIO.configs.tepic.chromosomePrefix;
+    private final AbstractConfig<Boolean> transcriptBased = TFPRIO.configs.tepic.transcriptBased;
+    private final AbstractConfig<File> loopListFile = TFPRIO.configs.tepic.loopListFile;
+    private final AbstractConfig<Integer> loopWindows = TFPRIO.configs.tepic.loopWindows;
+    private final AbstractConfig<Boolean> onlyPeakFeatures = TFPRIO.configs.tepic.onlyPeakFeatures;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
-        Set<Config<File>> requirements = new HashSet<>(
+        Set<AbstractConfig<File>> requirements = new HashSet<>(
                 Arrays.asList(d_input, f_referenceGenome, f_pwms, tepicExecutable, d_deseq2_meanCounts,
                         d_tgene_output));
 
@@ -70,19 +71,19 @@ public class Tepic extends ExecutableStep
         return requirements;
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
                 Arrays.asList(tpmCutoff, tfBindingSiteSearch, mixMutuallyExclusive, tgeneTargetGenes, s_tgene_links,
                         s_outputRaw_trapSequences));
     }
 
-    @Override protected Set<Config<?>> getOptionalConfigs()
+    @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
     {
         return new HashSet<>(
                 Arrays.asList(threadLimit, bedChromatinSignal, columnBedfile, geneAnnotationFile, windowSize,
@@ -270,7 +271,7 @@ public class Tepic extends ExecutableStep
         StringBuilder sb_command = new StringBuilder();
         sb_command.append(tepicExecutable.get().getAbsolutePath());
 
-        Map<String, Config<?>> configs = new HashMap<>()
+        Map<String, AbstractConfig<?>> configs = new HashMap<>()
         {{
             put("g", f_referenceGenome);
             put("p", f_pwms);
@@ -307,7 +308,7 @@ public class Tepic extends ExecutableStep
 
         Map<String, String> stringConfigs = new HashMap<>();
 
-        for (Map.Entry<String, Config<?>> entry : configs.entrySet())
+        for (Map.Entry<String, AbstractConfig<?>> entry : configs.entrySet())
         {
             if (entry.getValue().isSet())
             {

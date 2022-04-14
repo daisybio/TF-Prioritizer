@@ -2,10 +2,13 @@ package util.Configs.Modules;
 
 import org.json.JSONObject;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InputFileStructure;
 import util.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -20,9 +23,9 @@ import static util.FileManagement.extend;
  */
 public abstract class AbstractModule
 {
-    protected final Config<File> workingDirectory;
-    protected final Config<File> sourceDirectory;
-    protected final Config<File> extDirectory;
+    protected final GeneratedFileStructure workingDirectory;
+    protected final InputFileStructure sourceDirectory;
+    protected final InputFileStructure extDirectory;
     protected final Logger logger;
 
     /**
@@ -31,7 +34,7 @@ public abstract class AbstractModule
      * Required for json export.
      * The odd name is due to naming overlap with the {@link util.Configs.Configs} class.
      */
-    protected Map<String, Config<?>> entries = new HashMap<>();
+    protected Map<String, AbstractConfig<?>> entries = new HashMap<>();
 
     /**
      * Maps all the submodule names inside this class to their objects.
@@ -47,7 +50,7 @@ public abstract class AbstractModule
      * @param sourceDirectory  the {@link TFPRIO} source directory
      * @param logger           the {@link util.Configs.Configs} logger
      */
-    public AbstractModule(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public AbstractModule(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
     {
         this.workingDirectory = workingDirectory;
         this.sourceDirectory = sourceDirectory;
@@ -81,9 +84,9 @@ public abstract class AbstractModule
             if (superClass != null && superClass.equals(AbstractModule.class))
             {
                 // Call the default constructor with the same argument as this object has been created
-                AbstractModule module =
-                        (AbstractModule) field.getType().getConstructor(Config.class, Config.class, Logger.class)
-                                .newInstance(workingDirectory, sourceDirectory, logger);
+                AbstractModule module = (AbstractModule) field.getType()
+                        .getConstructor(GeneratedFileStructure.class, InputFileStructure.class, Logger.class)
+                        .newInstance(workingDirectory, sourceDirectory, logger);
                 // Assign the created object to this object
                 field.set(this, module);
 
@@ -103,13 +106,14 @@ public abstract class AbstractModule
         for (Field field : fields)
         {
             // Check if the field is a Config
-            if (field.getType().equals(Config.class))
+            if (AbstractConfig.class.isAssignableFrom(field.getType()))
             {
                 // Add the config to the entry map
-                entries.put(field.getName(), (Config<?>) field.get(this));
+                entries.put(field.getName(), (AbstractConfig<?>) field.get(this));
 
                 // Store the config name inside the config. Makes logging easier.
-                ((Config<?>) field.get(this)).setName(this.getClass().getSimpleName() + " > " + field.getName());
+                ((AbstractConfig<?>) field.get(this)).setName(
+                        this.getClass().getSimpleName() + " > " + field.getName());
             }
         }
     }
@@ -143,10 +147,10 @@ public abstract class AbstractModule
                 try
                 {
                     entries.get(key).setValueObject(mergeObject.get(key));
-                } catch (IllegalAccessException | ClassCastException | IllegalArgumentException e)
+                } catch (IllegalAccessException | ClassCastException | IllegalArgumentException | IOException e)
                 {
                     worked = false;
-                    logger.warn(this.getClass().getSimpleName() + ": " + key + ": " + e.getMessage());
+                    logger.warn(e.getMessage());
                 }
             } else
             {
@@ -178,7 +182,7 @@ public abstract class AbstractModule
         }
         for (String key : entries.keySet())
         {
-            Config<?> entry = entries.get(key);
+            AbstractConfig<?> entry = entries.get(key);
 
             if (onlyWriteable && !entry.isWriteable())
             {
@@ -208,14 +212,16 @@ public abstract class AbstractModule
         {
             subModulesValid = subModule.validate() && subModulesValid;
         }
-        boolean configsValid = true;
-        for (Config<?> config : entries.values())
-        {
-            configsValid = config.isValid() && configsValid;
 
-            if (config.isValid() && config.isSet() && config.get().getClass().equals(File.class))
+        boolean configsValid = true;
+        for (AbstractConfig<?> config : entries.values())
+        {
+            boolean thisValid = config.isValid(logger);
+            configsValid = thisValid && configsValid;
+
+            if (thisValid && config.isSet() && config.get().getClass().equals(File.class))
             {
-                Config<File> fileConfig = (Config<File>) config;
+                AbstractConfig<File> fileConfig = (AbstractConfig<File>) config;
 
                 if (fileConfig.get().exists() &&
                         (!(fileConfig.get().getAbsolutePath().startsWith(workingDirectory.get().getAbsolutePath())) ||

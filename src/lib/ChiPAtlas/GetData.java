@@ -3,7 +3,7 @@ package lib.ChiPAtlas;
 import lib.ExecutableStep;
 import org.apache.commons.compress.utils.IOUtils;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.TrustAllManager;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -12,7 +12,6 @@ import javax.net.ssl.TrustManager;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
-import java.text.DecimalFormat;
 import java.util.*;
 
 import static util.FileManagement.extend;
@@ -21,32 +20,32 @@ import static util.ScriptExecution.executeAndWait;
 
 public class GetData extends ExecutableStep
 {
-    private final Config<File> f_input = TFPRIO.configs.chipAtlas.fileStructure.f_list_csv;
-    private final Config<File> f_input_dcg = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
+    private final AbstractConfig<File> f_input = TFPRIO.configs.chipAtlas.fileStructure.f_list_csv;
+    private final AbstractConfig<File> f_input_dcg = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
 
-    private final Config<File> d_output = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
 
-    private final Config<String> tissueTypes = TFPRIO.configs.chipAtlas.tissueType;
-    private final Config<String> genomeVersion = TFPRIO.configs.chipAtlas.genomeVersion;
-    private final Config<File> igvPath = TFPRIO.configs.igv.pathToIGV;
+    private final AbstractConfig<String> tissueTypes = TFPRIO.configs.chipAtlas.tissueType;
+    private final AbstractConfig<String> genomeVersion = TFPRIO.configs.chipAtlas.genomeVersion;
+    private final AbstractConfig<File> igvPath = TFPRIO.configs.igv.pathToIGV;
     // r for regex
-    private final Config<String> r_geneVersion = TFPRIO.configs.chipAtlas.column_GeneVersion;
-    private final Config<String> r_antigenClass = TFPRIO.configs.chipAtlas.column_AntigenClass;
-    private final Config<String> r_antigen = TFPRIO.configs.chipAtlas.column_Antigen;
-    private final Config<String> r_cellTypeClass = TFPRIO.configs.chipAtlas.column_CellTypeClass;
-    private final Config<String> r_url = TFPRIO.configs.chipAtlas.column_url;
+    private final AbstractConfig<String> r_geneVersion = TFPRIO.configs.chipAtlas.column_GeneVersion;
+    private final AbstractConfig<String> r_antigenClass = TFPRIO.configs.chipAtlas.column_AntigenClass;
+    private final AbstractConfig<String> r_antigen = TFPRIO.configs.chipAtlas.column_Antigen;
+    private final AbstractConfig<String> r_cellTypeClass = TFPRIO.configs.chipAtlas.column_CellTypeClass;
+    private final AbstractConfig<String> r_url = TFPRIO.configs.chipAtlas.column_url;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(f_input, f_input_dcg));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(d_output));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
                 Arrays.asList(tissueTypes, genomeVersion, r_geneVersion, r_antigenClass, r_antigen, r_cellTypeClass,

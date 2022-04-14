@@ -1,6 +1,6 @@
 package util.Configs.Modules.Dynamite;
 
-import util.Configs.Config;
+import util.Configs.ConfigTypes.*;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -11,21 +11,21 @@ public class Dynamite extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final Config<Integer> preprocessing_IntegrateDataGeneIds = new Config<>(0);
-    public final Config<Integer> preprocessing_IntegrateDataLog2fc = new Config<>(1);
-    public final Config<File> preprocessing_IntegrateDataConsiderGeneFile = new Config<>(File.class);
+    public final InternalConfig<Integer> preprocessing_IntegrateDataGeneIds = new InternalConfig<>(0);
+    public final InternalConfig<Integer> preprocessing_IntegrateDataLog2fc = new InternalConfig<>(1);
+    public final InputFileStructure preprocessing_IntegrateDataConsiderGeneFile = new InputFileStructure();
 
-    public final Config<String> outVar = new Config<>(String.class);
-    public final Config<Integer> cores = new Config<>(1, true);
-    public final Config<Double> alpha = new Config<>(0.1, true);
-    public final Config<Double> testSize = new Config<>(0.2, true);
-    public final Config<Integer> oFolds = new Config<>(3, true);
-    public final Config<Integer> iFolds = new Config<>(6, true);
-    public final Config<Boolean> balanced = new Config<>(true, true);
-    public final Config<Boolean> performance = new Config<>(true, true);
-    public final Config<Boolean> randomize = new Config<>(false, true);
+    public final InputConfig<String> outVar = new InputConfig<>(String.class);
+    public final InputConfig<Integer> cores = new InputConfig<>(Integer.class);
+    public final InputConfig<Double> alpha = new InputConfig<>(Double.class);
+    public final InputConfig<Double> testSize = new InputConfig<>(Double.class);
+    public final InputConfig<Integer> oFolds = new InputConfig<>(Integer.class);
+    public final InputConfig<Integer> iFolds = new InputConfig<>(Integer.class);
+    public final InputConfig<Boolean> balanced = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> performance = new InputConfig<>(Boolean.class);
+    public final InputConfig<Boolean> randomize = new InputConfig<>(Boolean.class);
 
-    public Dynamite(Config<File> workingDirectory, Config<File> sourceDirectory, Logger logger)
+    public Dynamite(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException
     {
         super(workingDirectory, sourceDirectory, logger);

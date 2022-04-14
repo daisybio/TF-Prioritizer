@@ -2,7 +2,7 @@ package lib.Plots;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,27 +15,28 @@ import static util.ScriptExecution.executeAndWait;
 
 public class GroupPlots extends ExecutableStep
 {
-    private final Config<File> d_input = TFPRIO.configs.dynamite.fileStructure.d_output;
-    private final Config<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_plots_groupPlots;
+    private final AbstractConfig<File> d_input = TFPRIO.configs.dynamite.fileStructure.d_output;
+    private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_plots_groupPlots;
 
-    private final Config<File> d_output = TFPRIO.configs.plots.fileStructure.d_output;
-    private final Config<File> d_outputData = TFPRIO.configs.plots.fileStructure.d_data;
+    private final AbstractConfig<File> d_output = TFPRIO.configs.plots.fileStructure.d_output;
+    private final AbstractConfig<File> d_outputData = TFPRIO.configs.plots.fileStructure.d_data;
 
-    private final Config<String> s_input = TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted;
-    private final Config<String> s_allDataSame = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
-    private final Config<String> s_allDataDifferent = TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
+    private final AbstractConfig<String> s_input = TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted;
+    private final AbstractConfig<String> s_allDataSame = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
+    private final AbstractConfig<String> s_allDataDifferent =
+            TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_input, f_scriptTemplate));
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(Arrays.asList(d_output, d_outputData));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(s_input, s_allDataSame, s_allDataDifferent));
     }

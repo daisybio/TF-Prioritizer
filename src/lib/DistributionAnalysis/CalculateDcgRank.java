@@ -5,7 +5,7 @@ import lib.DistributionAnalysis.Classes.StatsCollection;
 import lib.DistributionAnalysis.Classes.StatsCummulativeGain;
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
-import util.Configs.Config;
+import util.Configs.ConfigTypes.AbstractConfig;
 import util.FileFilters.Filters;
 
 import java.io.*;
@@ -16,17 +16,17 @@ import static util.FileManagement.makeSureFileExists;
 
 public class CalculateDcgRank extends ExecutableStep
 {
-    private final Config<File> d_input_statsAll = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_all;
-    private final Config<File> d_input_statsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_hm;
+    private final AbstractConfig<File> d_input_statsAll = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_all;
+    private final AbstractConfig<File> d_input_statsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_hm;
 
-    private final Config<File> f_output_dcg = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
+    private final AbstractConfig<File> f_output_dcg = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
 
-    private final Config<Boolean> performAllAnalysis = TFPRIO.configs.distributionAnalysis.performAllAnalysis;
-    private final Config<String> s_stats = TFPRIO.configs.distributionAnalysis.fileStructure.s_stats_csv;
+    private final AbstractConfig<Boolean> performAllAnalysis = TFPRIO.configs.distributionAnalysis.performAllAnalysis;
+    private final AbstractConfig<String> s_stats = TFPRIO.configs.distributionAnalysis.fileStructure.s_stats_csv;
 
-    private final Config<String> allName = TFPRIO.configs.distributionAnalysis.allName;
+    private final AbstractConfig<String> allName = TFPRIO.configs.distributionAnalysis.allName;
 
-    @Override protected Set<Config<File>> getRequiredFileStructure()
+    @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
         return new HashSet<>(List.of(d_input_statsHm))
         {{
@@ -37,12 +37,12 @@ public class CalculateDcgRank extends ExecutableStep
         }};
     }
 
-    @Override protected Set<Config<File>> getCreatedFileStructure()
+    @Override protected Set<AbstractConfig<File>> getCreatedFileStructure()
     {
         return new HashSet<>(List.of(f_output_dcg));
     }
 
-    @Override protected Set<Config<?>> getRequiredConfigs()
+    @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(Arrays.asList(performAllAnalysis, s_stats))
         {{
