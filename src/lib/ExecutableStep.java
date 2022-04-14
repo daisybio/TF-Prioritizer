@@ -27,20 +27,22 @@ import static util.Hashing.*;
  * The following practices should be applied to all extending classes:
  * <ul>
  *     <li>All the used configs should be stored as private final class data elements in the beginning of the class</li>
- *     <li>The configs should be split to four blocks:</li>
+ *     <li>The configs should be split to four blocks:
  *     <ol>
  *         <li>Required file structure (input files/directories)</li>
  *         <li>Created file structure (output files/directories)</li>
  *         <li>Required configs (mandatory configs for this executableStep)</li>
  *         <li>Optional configs (not mandatory but influencing the output)</li>
  *     </ol>
- *     <li>Each config has to be assigned to one of the following methods: </li>
+ *     </li>
+ *     <li>Each config has to be assigned to one of the following methods:
  *     <ul>
  *         <li>{@link #getRequiredFileStructure}</li>
  *         <li>{@link #getCreatedFileStructure}</li>
  *         <li>{@link #getRequiredConfigs}</li>
  *         <li>{@link #getOptionalConfigs}</li>
  *     </ul>
+ *     </li>
  *     <li>If a file structure or config is not required or created if a certain config constellation is active,
  *     the config constellation should be modelled inside the corresponding get method. The get methods should model
  *     the real execution requirements and outputs as exact as possible.</li>
@@ -54,6 +56,9 @@ public abstract class ExecutableStep
      */
     protected ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(getThreadNumber());
 
+    /**
+     * The logger of this ExecutableStep.
+     */
     protected final Logger logger = new Logger(this.getClass().getName().replace("lib.", "").replace("tfprio.", ""));
 
     /**
@@ -121,7 +126,7 @@ public abstract class ExecutableStep
         {
             createHash();
         }
-        logger.info("Finished. Step took " + timer.stopAndGetDeltaFormatted() + " seconds.");
+        logger.info("Finished. Step took " + timer.stopAndGetDeltaFormatted());
     }
 
     /**

@@ -60,6 +60,8 @@ public class ExecutionTimeMeasurement
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes) -
                 TimeUnit.HOURS.toSeconds(hours);
 
+        long milliseconds = millis % 1000;
+
         StringBuilder sb_output = new StringBuilder();
         if (hours > 0)
         {
@@ -70,7 +72,7 @@ public class ExecutionTimeMeasurement
             sb_output.append(String.format(format, minutes, "min"));
         }
 
-        sb_output.append(String.format(format, seconds, "sec"));
+        sb_output.append(String.format("%02d.%03d %s", seconds, milliseconds, "sec"));
 
         return sb_output.toString();
     }

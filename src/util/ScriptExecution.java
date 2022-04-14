@@ -12,7 +12,6 @@ public class ScriptExecution
     public static void executeAndWait(File file, Logger logger)
     {
         List<String> command = getExecutionCommand(file);
-        logger.debug("Executing command: " + command);
 
         executeAndWait(command, logger);
     }

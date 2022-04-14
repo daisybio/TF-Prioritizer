@@ -35,7 +35,7 @@ public class ArgParser
 
             TFPRIO.configFile = new File(cmd.getOptionValue("com2pose-config"));
             TFPRIO.workingDirectory = new File(cmd.getOptionValue("working-directory"));
-            TFPRIO.tfprioDirectory = new File(cmd.getOptionValue("path-tfprio"));
+            TFPRIO.sourceDirectory = new File(cmd.getOptionValue("path-tfprio"));
 
         } catch (ParseException e)
         {

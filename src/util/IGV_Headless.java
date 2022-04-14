@@ -9,12 +9,21 @@ import static util.FileManagement.extend;
 import static util.FileManagement.writeFile;
 import static util.ScriptExecution.executeAndWait;
 
+/**
+ * Allows generation and headless execution of igv batch files.
+ */
 public class IGV_Headless
 {
     private final StringBuilder commandBuilder = new StringBuilder();
     private final String name;
     private final Logger logger;
 
+    /**
+     * Create a new class instance.
+     *
+     * @param name   the batch file name
+     * @param logger the {@link lib.ExecutableStep} logger
+     */
     public IGV_Headless(String name, Logger logger)
     {
         this.logger = logger;
@@ -22,6 +31,11 @@ public class IGV_Headless
         addCommand("new");
     }
 
+    /**
+     * Add a single command to an igv batch file.
+     *
+     * @param command the command to append, without line break.
+     */
     public void addCommand(String command)
     {
         commandBuilder.append(command).append("\n");
@@ -38,6 +52,12 @@ public class IGV_Headless
         }
     }
 
+    /**
+     * Save and execute the created command sequence.
+     *
+     * @param workingDirectory the directory to save the batch file in. The generated screenshots will also be saved
+     *                         to this directory, if not referenced by absolute paths.
+     */
     public void run(File workingDirectory)
     {
         addCommand("exit");
@@ -53,6 +73,14 @@ public class IGV_Headless
         executeAndWait(command, logger);
     }
 
+    /**
+     * Create a new session xml file
+     *
+     * @param f_output    the session save file
+     * @param loadCommand the string containing the load commands
+     * @param tdfFiles    the tdf files
+     * @param logger      the {@link lib.ExecutableStep} logger
+     */
     public static void createSession(File f_output, String loadCommand, List<File> tdfFiles, Logger logger)
     {
         IGV_Headless igv = new IGV_Headless("create_session", logger);
