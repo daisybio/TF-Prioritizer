@@ -55,6 +55,8 @@ public class TFPRIO
     public static File sourceDirectory;
     static File configFile;
 
+    public static final boolean developmentMode = false;
+
     public static void main(String[] args) throws Exception
     {
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
@@ -69,7 +71,7 @@ public class TFPRIO
         Logger logger = new Logger("TFPRIO");
 
         Workflow workflow = new Workflow();
-        
+
         if (workflow.simulationSuccessful())
         {
             workflow.run();

@@ -83,7 +83,6 @@
   },
   "General": {
     "threadLimit": 1,
-    "developmentMode": false,
     "fileLogging": true,
     "calculateGenePositionsEnabled": true,
     "calculateTpmLengthsEnabled": true

@@ -74,7 +74,7 @@ public abstract class ExecutableStep
         logger.debug("Simulation starting.");
         updateInputDirectory();
 
-        if (TFPRIO.configs.general.developmentMode.get())
+        if (TFPRIO.developmentMode)
         {
             verifyConfigUsage();
         }
@@ -102,7 +102,7 @@ public abstract class ExecutableStep
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Starting.");
         boolean executed;
-        if (!TFPRIO.configs.general.developmentMode.get())
+        if (!TFPRIO.developmentMode)
         {
             logger.debug("Verifying hash...");
             if (!verifyHash())
@@ -124,7 +124,7 @@ public abstract class ExecutableStep
         }
         shutdown();
 
-        if (executed && !TFPRIO.configs.general.developmentMode.get())
+        if (executed && !TFPRIO.developmentMode)
         {
             logger.debug("Writing hash");
             createHash();
@@ -183,7 +183,7 @@ public abstract class ExecutableStep
     {
         for (AbstractConfig<File> createdStructure : getCreatedFileStructure())
         {
-            if (TFPRIO.createdFileStructure.contains(createdStructure) && !TFPRIO.configs.general.developmentMode.get())
+            if (TFPRIO.createdFileStructure.contains(createdStructure) && !TFPRIO.developmentMode)
             {
                 logger.error("Writing to already existing structure: " + createdStructure.getName());
             } else

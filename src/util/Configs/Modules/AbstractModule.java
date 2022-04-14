@@ -225,7 +225,7 @@ public abstract class AbstractModule
 
                 if (fileConfig.get().exists() &&
                         (!(fileConfig.get().getAbsolutePath().startsWith(workingDirectory.get().getAbsolutePath())) ||
-                                TFPRIO.configs.general.developmentMode.get()))
+                                TFPRIO.developmentMode))
                 {
                     TFPRIO.createdFileStructure.add(fileConfig);
                 }

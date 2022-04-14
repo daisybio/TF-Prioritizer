@@ -26,9 +26,7 @@ public class General extends AbstractModule
     public final InputConfig<Boolean> redirectExternalScriptErrorStream = new InputConfig<>(Boolean.class);
 
     public final GeneratedFileStructure d_workflowHashes = extend(workingDirectory, ".hashes");
-
-    public final InputConfig<Boolean> developmentMode = new InputConfig<>(Boolean.class);
-
+    
     public General(GeneratedFileStructure workingDirectory, InputFileStructure sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException
     {
