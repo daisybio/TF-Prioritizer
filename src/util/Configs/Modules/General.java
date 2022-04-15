@@ -1,7 +1,7 @@
 package util.Configs.Modules;
 
 import util.Configs.ConfigTypes.*;
-import util.Configs.ConfigValidators.IntegerRangeValidator;
+import util.Configs.ConfigValidators.PositiveIntegerValidator;
 import util.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,8 +18,7 @@ public class General extends AbstractModule
     public final InternalConfig<String> differentTps = new InternalConfig<>("DIFFERENT_TPS");
     public final InternalConfig<String> sameTps = new InternalConfig<>("SAME_TPS");
 
-    public final InputConfig<Integer> threadLimit =
-            new InputConfig<>(Integer.class, new IntegerRangeValidator(1, Integer.MAX_VALUE));
+    public final InputConfig<Integer> threadLimit = new InputConfig<>(Integer.class, new PositiveIntegerValidator());
 
     public final InputConfig<Boolean> redirectExternalScriptOutputStream = new InputConfig<>(Boolean.class);
     public final InputConfig<Boolean> redirectExternalScriptErrorStream = new InputConfig<>(Boolean.class);
