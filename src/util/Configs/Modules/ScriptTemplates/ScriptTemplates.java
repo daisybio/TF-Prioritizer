@@ -27,6 +27,8 @@ public class ScriptTemplates extends AbstractModule
     public final SourceDirectoryFileStructure f_deseq2PreprocessingGetGenePositions =
             extend(d_root, "getGenePositions.R");
     public final SourceDirectoryFileStructure f_deseq2PreprocessingUplift = extend(d_root, "deseq2_upliftPositions.py");
+    public final SourceDirectoryFileStructure f_deseq2PreprocessingDbUplift =
+            extend(d_root, "deseq2_dbUpliftPositions.py");
     public final SourceDirectoryFileStructure f_plots_openChromatinViolinPlots =
             extend(d_root, "openChromatinViolinPlots.R");
     public final SourceDirectoryFileStructure f_plots_groupPlots = extend(d_root, "groupPlots.py");

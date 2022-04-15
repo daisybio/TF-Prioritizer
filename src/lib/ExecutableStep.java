@@ -102,7 +102,7 @@ public abstract class ExecutableStep
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
         logger.info("Starting.");
         boolean executed;
-        if (!TFPRIO.developmentMode)
+        if (!TFPRIO.developmentMode && mayBeSkipped())
         {
             logger.debug("Verifying hash...");
             if (!verifyHash())
@@ -332,7 +332,7 @@ public abstract class ExecutableStep
             File hashFile = getHashFile();
             if (!hashFile.exists() || !hashFile.canRead())
             {
-                logger.warn("Cannot read hash file.");
+                logger.debug("Cannot read hash file.");
                 return false;
             }
             List<String> content = readLines(hashFile);
@@ -569,5 +569,10 @@ public abstract class ExecutableStep
     public String getNoExecutionReason()
     {
         return noExecutionReason;
+    }
+
+    protected boolean mayBeSkipped()
+    {
+        return true;
     }
 }

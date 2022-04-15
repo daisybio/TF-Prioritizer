@@ -29,7 +29,8 @@ public class Igv extends AbstractModule
             new InputConfig<>(ClassGetter.getStringList(), new ListNotEmptyValidator<>());
     public final InputFileStructure pathToTfChipSeq = new InputFileStructure();
     public final InputFileStructure pathToTdf = new InputFileStructure();
-    public final InputConfig<List<String>> enhancerDatabases = new InputConfig<>(ClassGetter.getStringList());
+    public final InputConfig<List<String>> enhancerDatabases =
+            new InputConfig<>(ClassGetter.getStringList(), new ListNotEmptyValidator<>());
     public final InputConfig<Map<String, String>> grcSynonymDict = new InputConfig<>(ClassGetter.getStringStringMap());
     public final InputConfig<String> speciesReferenceGenome = new InputConfig<>(String.class);
 

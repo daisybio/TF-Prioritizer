@@ -85,7 +85,9 @@
     "threadLimit": 1,
     "fileLogging": true,
     "calculateGenePositionsEnabled": true,
-    "calculateTpmLengthsEnabled": true
+    "calculateTpmLengthsEnabled": true,
+    "redirectExternalScriptOutputStream": false,
+    "redirectExternalScriptErrorStream": false
   },
   "Tgene": {
     "selfRegulatory": false,

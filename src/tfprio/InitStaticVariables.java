@@ -80,5 +80,14 @@ public class InitStaticVariables extends ExecutableStep
                 }
             }
         }
+
+        logger.info("Existing hms: " + TFPRIO.existingHms);
+        logger.info("Groups to hms: " + TFPRIO.groupsToHms);
+        logger.info("Group combinations to hms: " + TFPRIO.groupCombinationsToHms);
+    }
+
+    @Override protected boolean mayBeSkipped()
+    {
+        return false;
     }
 }
