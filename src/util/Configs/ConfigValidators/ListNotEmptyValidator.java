@@ -8,6 +8,10 @@ public class ListNotEmptyValidator<T> implements Validator<List<T>>
 {
     @Override public boolean validate(AbstractConfig<List<T>> config)
     {
+        if (config.get() == null)
+        {
+            return true;
+        }
         return !config.get().isEmpty();
     }
 

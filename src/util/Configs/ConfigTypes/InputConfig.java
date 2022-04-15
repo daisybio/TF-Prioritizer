@@ -14,11 +14,6 @@ public class InputConfig<T> extends AbstractConfig<T>
 
     private final Class<?> configClass;
 
-    public InputConfig(Class<T> configClass)
-    {
-        this.configClass = configClass;
-    }
-
     @SafeVarargs public InputConfig(Class<? extends T> configClass, Validator<T>... validators)
     {
         this.configClass = configClass;
@@ -85,7 +80,8 @@ public class InputConfig<T> extends AbstractConfig<T>
         } else
         {
             throw new ClassCastException(
-                    "Trying to set a value of type " + value.getClass() + " to a config with type " + configClass);
+                    "Trying to set a value of type " + value.getClass() + " to a config with type " + configClass +
+                            ": " + getName());
         }
     }
 }

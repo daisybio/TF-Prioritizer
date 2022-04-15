@@ -17,6 +17,8 @@ public class DeSeq2 extends AbstractModule
 
     public final InputFileStructure inputDirectory = new InputFileStructure();
     public final InputFileStructure inputGeneID = new InputFileStructure();
+
+    public final InputFileStructure batchFile = new InputFileStructure();
     public final InputConfig<String> biomartDatasetSpecies = new InputConfig<>(String.class);
     public final InputConfig<String> biomartDatasetSymbolColumn = new InputConfig<>(String.class);
     public final InputConfig<Integer> countThreshold = new InputConfig<>(Integer.class);
