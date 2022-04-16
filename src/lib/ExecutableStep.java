@@ -463,7 +463,7 @@ public abstract class ExecutableStep
                 if (lastFinished > 0)
                 {
                     long remainingMillis = Math.max(latestTotalTimeGuessMillis - passedTime, 0);
-                    message += ", ETA: " + ExecutionTimeMeasurement.formatMillis(remainingMillis);
+                    message += ", ETR: " + ExecutionTimeMeasurement.formatMillis(remainingMillis);
                 }
 
                 logger.progress(message);

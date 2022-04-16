@@ -162,7 +162,7 @@ public class Postprocessing extends ExecutableStep
                 File group2_input_dir;
 
                 //if TPM filter was used we need to postprocess the TPM files. Otherwise, it will not work!
-                if (tpmCutoff.get() > 0)
+                if (tpmCutoff.isSet())
                 {
                     logger.info("TPM filter > 0, start postprocessing of TPM filtered scores");
                     File d_output1 = extend(d_output.get(), hm, pairing, group1);
@@ -284,7 +284,7 @@ public class Postprocessing extends ExecutableStep
     {
         String suffix;
 
-        if (tpmCutoff.get() > 0)
+        if (tpmCutoff.isSet())
         {
             suffix = "_Gene_View_Filtered_TPM.txt";
         } else
@@ -341,7 +341,7 @@ public class Postprocessing extends ExecutableStep
         {
             if (originalDecay.get())
             {
-                if (tpmCutoff.get() > 0)
+                if (tpmCutoff.isSet())
                 {
                     return "Three_Peak_Based_Features_Affinity_Gene_View_Filtered_TPM.txt";
                 } else
@@ -350,7 +350,7 @@ public class Postprocessing extends ExecutableStep
                 }
             } else
             {
-                if (tpmCutoff.get() > 0)
+                if (tpmCutoff.isSet())
                 {
                     return "Peak_Features_Affinity_Gene_View_Filtered_TPM.txt";
                 } else
@@ -362,7 +362,7 @@ public class Postprocessing extends ExecutableStep
         {
             if (originalDecay.get())
             {
-                if (tpmCutoff.get() > 0)
+                if (tpmCutoff.isSet())
                 {
                     return "Peak_Features_Affinity_Gene_View_Filtered_TPM.txt";
                 } else
@@ -371,7 +371,7 @@ public class Postprocessing extends ExecutableStep
                 }
             } else
             {
-                if (tpmCutoff.get() > 0)
+                if (tpmCutoff.isSet())
                 {
                     return "Affinity_Gene_View_Filtered_TPM.txt";
                 } else

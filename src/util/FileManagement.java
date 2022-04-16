@@ -197,7 +197,8 @@ public class FileManagement
                 }
             }
         }
-        throw new NoSuchFieldException();
+        throw new NoSuchFieldException(
+                "Could not find term \"" + term + "\" in column " + searchIndex + " of " + file.getAbsolutePath());
     }
 
     public static File getFileIfInDirectory(File directory, String fileNameRegex, boolean lookingForFiles)

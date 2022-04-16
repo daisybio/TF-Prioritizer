@@ -180,14 +180,13 @@ public class AnalyzeData extends ExecutableStep
                         extend(d_input_plotData.get(), hm, String.valueOf(threshold), s_plotData_different.get());
                 File f_same = extend(d_input_plotData.get(), hm, String.valueOf(threshold), s_plotData_same.get());
 
-                makeSureFileExists(f_availableTfs, logger);
-                makeSureFileExists(f_different, logger);
-                makeSureFileExists(f_same, logger);
-
                 processPlotData(f_different, threshold, hm, tf_found, group_tf_counts, group_geneID_tpm,
                         cutoff_hm_tf_counts_DIFFERENT);
-                processPlotData(f_same, threshold, hm, tf_found, group_tf_counts, group_geneID_tpm,
-                        cutoff_hm_tf_counts_SAME);
+                if (f_same.exists())
+                {
+                    processPlotData(f_same, threshold, hm, tf_found, group_tf_counts, group_geneID_tpm,
+                            cutoff_hm_tf_counts_SAME);
+                }
 
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(f_availableTfs)))
                 {
@@ -333,7 +332,6 @@ public class AnalyzeData extends ExecutableStep
 
                 }
 
-                // TODO: Handling of non-mappable genes has to be improved
                 Set<String> geneIDs;
                 try
                 {
@@ -344,12 +342,9 @@ public class AnalyzeData extends ExecutableStep
                     geneIDs = null;
                 }
 
-                assert geneIDs != null;
-
                 if (count > TFPRIO.configs.plots.cutoffTps.get())
                 {
                     HashMap<String, Double> tf_gc = new HashMap<>();
-                    //tf_gc.put(split[0],group_tf_counts.get(name).get(split[0]));
                     StringBuilder sb_intern = new StringBuilder();
                     sb_intern.append(split[0]);
                     int count_row = 0;
@@ -368,15 +363,18 @@ public class AnalyzeData extends ExecutableStep
 
                     double cumm_tpm = 0.0;
 
-                    for (String key_group : group_geneID_tpm.keySet())
+                    if (geneIDs != null)
                     {
-                        HashMap<String, Double> lookup = group_geneID_tpm.get(key_group);
-                        for (String geneID : geneIDs)
+                        for (String key_group : group_geneID_tpm.keySet())
                         {
-                            if (lookup.containsKey(geneID))
+                            HashMap<String, Double> lookup = group_geneID_tpm.get(key_group);
+                            for (String geneID : geneIDs)
                             {
-                                cumm_tpm += lookup.get(geneID);
-                                break;
+                                if (lookup.containsKey(geneID))
+                                {
+                                    cumm_tpm += lookup.get(geneID);
+                                    break;
+                                }
                             }
                         }
                     }

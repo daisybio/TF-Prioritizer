@@ -67,24 +67,29 @@ public class TopKTargetGenes extends ExecutableStep
                 for (String suffix : Arrays.asList(s_plotData_different.get(), s_plotData_same.get()))
                 {
                     File f_input = extend(d_input.get(), hm, String.valueOf(threshold), suffix);
+                    if (!f_input.exists())
+                    {
+                        continue;
+                    }
+                    logger.debug("Reading file: " + f_input.getAbsolutePath());
                     File d_out = extend(d_output.get(), hm, String.valueOf(threshold),
                             suffix.substring(0, suffix.lastIndexOf(".")));
 
                     try (BufferedReader reader = new BufferedReader(new FileReader(f_input)))
                     {
-                        String line_tf = reader.readLine();
-                        String[] split_header = line_tf.split(",");
+                        String inputLine = reader.readLine();
+                        String[] headerSplit = inputLine.split(",");
                         List<String> pairingsInHeader = new ArrayList<>();
 
-                        for (int i = 1; i < split_header.length; i++)
+                        for (int i = 1; i < headerSplit.length; i++)
                         {
-                            String pairing = split_header[i].substring(split_header[i].indexOf(":") + 1);
+                            String pairing = headerSplit[i].substring(headerSplit[i].indexOf(":") + 1);
                             pairingsInHeader.add(pairing);
                         }
 
-                        while ((line_tf = reader.readLine()) != null)
+                        while ((inputLine = reader.readLine()) != null)
                         {
-                            String[] split = line_tf.split(",");
+                            String[] split = inputLine.split(",");
                             String tfSymbol = split[0];
 
                             ArrayList<String> identifiedPairings = new ArrayList<>();

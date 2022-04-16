@@ -7,6 +7,9 @@ target_genes_path <- "{TARGET_GENES_PATH}"
 map_path <- "{MAP_PATH}"
 preprocessing_path <- "{PREPROCESSING_PATH}"
 heatmap_dir <- "{HEATMAP_DIR}"
+metaData <- data.frame(sample_id = c({ SAMPLES }), group = c({ GROUPS }), batch = c({ BATCHES }))
+row.names(metaData) <- metaData$sample_id
+metaData$sample_id <- NULL
 
 messagesfile <- file(paste(heatmap_dir, "messages.Rout", sep = "/"), open = "wt")
 sink(messagesfile, type = "message")
@@ -20,7 +23,7 @@ for (group in list.files(path = target_genes_path)) {
   for (hm in hms) {
     genes <- list.files(paste(target_genes_path, group, hm, sep = "/"))
     for (geneFileName in genes) {
-    gene <- tools::file_path_sans_ext(geneFileName)
+      gene <- tools::file_path_sans_ext(geneFileName)
       selected_genes <- read.csv(paste(target_genes_path, group, hm, geneFileName, sep = "/"),
                                  sep =
                                    "\t", nrows = number_of_genes_to_select)
@@ -77,6 +80,7 @@ for (group in list.files(path = target_genes_path)) {
 
 
         read_counts <- subset(chosen, select = -c(Geneid))
+        read_counts <- read_counts[, c(rownames(metaData))]
 
         # Add geneSymbols to data
         chosen <- transform(chosen, geneSymbol = map[, 2][match(Geneid, map$ensembl_gene_id)])
@@ -84,14 +88,9 @@ for (group in list.files(path = target_genes_path)) {
         # Store data
         write.csv(chosen, target_file, row.names = FALSE)
 
-        metaData <- data.frame(row.names = colnames(read_counts))
-
-        # Remove redundance from colnames
-        metaData$group <- gsub("_.*", "", colnames(read_counts))
-
         dds <- DESeqDataSetFromMatrix(countData = read_counts,
                                       colData = metaData,
-                                      design = ~group)
+                                      design = ~batch + group)
         dds <- DESeq(dds, quiet = TRUE)
 
         geneCounts_normalized <- counts(dds)

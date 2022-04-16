@@ -21,6 +21,7 @@ os.makedirs(outputDirectory, exist_ok=True)
 for f_sample in os.listdir(inputDirectory):
     absolutePath = os.path.join(inputDirectory, f_sample)
     df_sample = pd.read_csv(absolutePath).astype("int32")
+    df_sample = df_sample.rename(columns={df_sample.columns.to_list()[0]: os.path.splitext(f_sample)[0]})
 
     if not df_sample.size == size:
         exit(1)

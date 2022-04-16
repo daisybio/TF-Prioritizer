@@ -55,6 +55,12 @@ public class Preprocessing extends ExecutableStep
             for (String suffix : stage_name.keySet())
             {
                 File f_input = extend(d_input.get(), hm, String.valueOf(thresholds.get().get(0)), suffix);
+
+                if (!f_input.exists())
+                {
+                    continue;
+                }
+                
                 try (BufferedReader reader = new BufferedReader(new FileReader(f_input)))
                 {
                     String line_stages;

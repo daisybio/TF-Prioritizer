@@ -137,8 +137,6 @@ public class CreateDeseq2Scripts extends ExecutableStep
                 }
             }
 
-            logger.warn(String.valueOf(sample_batch));
-
             String scriptTemplate = readFile(f_scriptDeseq.get());
             for (File f_combination : Objects.requireNonNull(d_outputCombined.get().listFiles(Filters.fileFilter)))
             {
@@ -160,38 +158,14 @@ public class CreateDeseq2Scripts extends ExecutableStep
                         {
                             sb_samples.append("'").append(sample).append("', ");
 
-                            String foundGroup = null;
-                            for (String group : TFPRIO.groupsToHms.keySet())
+                            if (TFPRIO.sample_group.containsKey(sample) && TFPRIO.sample_batch.containsKey(sample))
                             {
-                                if (sample.contains(group))
-                                {
-                                    foundGroup = group;
-                                }
-                            }
-
-                            if (foundGroup == null)
-                            {
-                                logger.error("No group found in sample name: " + sample);
+                                sb_groups.append("'").append(TFPRIO.sample_group.get(sample)).append("', ");
+                                sb_batches.append("'").append(TFPRIO.sample_batch.get(sample)).append("', ");
                             } else
                             {
-                                sb_groups.append("'").append(foundGroup).append("', ");
+                                logger.error("Unknown sample: " + sample);
                             }
-
-                            sb_batches.append("'");
-                            if (!f_batches.isSet())
-                            {
-                                sb_batches.append("1");
-                            } else
-                            {
-                                if (sample_batch.containsKey(sample))
-                                {
-                                    sb_batches.append(sample_batch.get(sample));
-                                } else
-                                {
-                                    logger.error("Sample not found in the batch file: " + sample);
-                                }
-                            }
-                            sb_batches.append("', ");
                         }
                         sb_samples.setLength(sb_samples.length() - 2);
                         sb_groups.setLength(sb_groups.length() - 2);

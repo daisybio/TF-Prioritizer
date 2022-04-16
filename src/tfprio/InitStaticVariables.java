@@ -7,10 +7,13 @@ import util.FileFilters.Filters;
 import util.MapSymbolAndEnsg;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import static util.FileManagement.findValueInTable;
 
 public class InitStaticVariables extends ExecutableStep
 {
@@ -19,6 +22,8 @@ public class InitStaticVariables extends ExecutableStep
     private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_mapping;
     private final GeneratedFileStructure f_script = TFPRIO.configs.deSeq2.fileStructure.f_mappingScript;
     private final AbstractConfig<File> f_geneIDs = TFPRIO.configs.deSeq2.inputGeneID;
+    private final AbstractConfig<File> d_samples = TFPRIO.configs.deSeq2.inputDirectory;
+    private final AbstractConfig<File> f_batches = TFPRIO.configs.deSeq2.batchFile;
     private final AbstractConfig<String> datasetSpecies = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
     private final AbstractConfig<String> datasetSymbolColumn = TFPRIO.configs.deSeq2.biomartDatasetSymbolColumn;
 
@@ -27,7 +32,13 @@ public class InitStaticVariables extends ExecutableStep
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
-        return new HashSet<>(Arrays.asList(f_scriptTemplate, f_geneIDs, inputDirectory));
+        return new HashSet<>(Arrays.asList(f_scriptTemplate, f_geneIDs, inputDirectory, d_samples))
+        {{
+            if (f_batches.isSet())
+            {
+                add(f_batches);
+            }
+        }};
     }
 
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
@@ -44,6 +55,53 @@ public class InitStaticVariables extends ExecutableStep
     {
         TFPRIO.mapSymbolAndEnsg = new MapSymbolAndEnsg();
         initExistingGroups();
+        initSampleGroupMap();
+        initSampleBatchMap();
+    }
+
+    private void initSampleGroupMap()
+    {
+        for (File d_group : Objects.requireNonNull(d_samples.get().listFiles(Filters.directoryFilter)))
+        {
+            for (File f_sample : Objects.requireNonNull(d_group.listFiles(Filters.fileFilter)))
+            {
+                String sampleName = f_sample.getName().substring(0, f_sample.getName().lastIndexOf("."));
+                TFPRIO.sample_group.put(sampleName, d_group.getName());
+            }
+        }
+    }
+
+    private void initSampleBatchMap()
+    {
+        boolean foundAll = true;
+
+        for (String sample : TFPRIO.sample_group.keySet())
+        {
+            try
+            {
+                String batch;
+                if (f_batches.isSet())
+                {
+                    batch = findValueInTable(sample, 0, 1, f_batches.get(), "\t", true);
+                } else
+                {
+                    batch = "1";
+                }
+                TFPRIO.sample_batch.put(sample, batch);
+            } catch (FileNotFoundException e)
+            {
+                logger.error(e.getMessage());
+            } catch (NoSuchFieldException e)
+            {
+                foundAll = false;
+                logger.warn(e.getMessage());
+            }
+        }
+        if (!foundAll)
+        {
+            logger.error("Could not find all samples in the batch file. Fore more information inspect the previous " +
+                    "warnings.");
+        }
     }
 
     private void initExistingGroups()

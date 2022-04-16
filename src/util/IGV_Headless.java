@@ -99,24 +99,28 @@ public class IGV_Headless
         }
 
         //include enhancer regions of interest if available
-        if (TFPRIO.configs.igv.enhancerDatabases.isSet() && TFPRIO.configs.igv.enhancerDatabases.get().size() > 0)
+        if (TFPRIO.configs.igv.enhancerDatabases.isSet())
         {
-            File f_merged_databases =
-                    TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_genePositions_enhancerDBs.get();
-
-            try (BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_merged_databases)))
+            for (String enhancerDB : TFPRIO.configs.igv.enhancerDatabases.get())
             {
-                String line_mergedDB;
-                br_mergedDB.readLine();
-                while ((line_mergedDB = br_mergedDB.readLine()) != null)
+                File f_database =
+                        extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_genePositions_enhancerDBs.get(),
+                                enhancerDB + ".bed");
+
+                try (BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_database)))
                 {
-                    String[] split = line_mergedDB.split("\t");
+                    String line_mergedDB;
+                    br_mergedDB.readLine();
+                    while ((line_mergedDB = br_mergedDB.readLine()) != null)
+                    {
+                        String[] split = line_mergedDB.split("\t");
 
-                    igv.addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
+                        igv.addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
+                    }
+                } catch (IOException e)
+                {
+                    logger.error(e.getMessage());
                 }
-            } catch (IOException e)
-            {
-                logger.error(e.getMessage());
             }
         }
 

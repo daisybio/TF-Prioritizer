@@ -7,10 +7,7 @@ import util.Configs.ConfigTypes.GeneratedFileStructure;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static util.FileManagement.readFile;
 import static util.FileManagement.writeFile;
@@ -61,6 +58,22 @@ public class GenerateTargetGenesHeatmaps extends ExecutableStep
         script = script.replace("{MAP_PATH}", f_map.get().getAbsolutePath());
         script = script.replace("{PREPROCESSING_PATH}", d_deseq2Preprocessing.get().getAbsolutePath());
         script = script.replace("{HEATMAP_DIR}", d_output.get().getAbsolutePath());
+
+        StringBuilder sb_groups = new StringBuilder();
+        StringBuilder sb_samples = new StringBuilder();
+        StringBuilder sb_batches = new StringBuilder();
+        for (Map.Entry<String, String> entry : TFPRIO.sample_group.entrySet())
+        {
+            sb_samples.append("'").append(entry.getKey()).append("', ");
+            sb_groups.append("'").append(entry.getValue()).append("', ");
+            sb_batches.append("'").append(TFPRIO.sample_batch.get(entry.getKey())).append("', ");
+        }
+        sb_groups.setLength(sb_groups.length() - 2);
+        sb_samples.setLength(sb_samples.length() - 2);
+        sb_batches.setLength(sb_batches.length() - 2);
+        script = script.replace("{ GROUPS }", sb_groups.toString());
+        script = script.replace("{ SAMPLES }", sb_samples.toString());
+        script = script.replace("{ BATCHES }", sb_batches.toString());
 
         script = script.replace("{ NUMBER_OF_GENES }", String.valueOf(kTargetGenes.get()));
 

@@ -6,6 +6,7 @@ import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.*;
+import util.Configs.Modules.AngularReport.AngularReport;
 import util.Configs.Modules.Blacklist.Blacklist;
 import util.Configs.Modules.ChipAtlas.ChipAtlas;
 import util.Configs.Modules.DeSeq2.DeSeq2;
@@ -110,6 +111,11 @@ public class Configs
      * Configs for the ChipAtlas module
      */
     public ChipAtlas chipAtlas;
+
+    /**
+     * Configs for the AngularReport module
+     */
+    public AngularReport angularReport;
 
     private final Logger logger;
 
