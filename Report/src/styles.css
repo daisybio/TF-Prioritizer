@@ -26,6 +26,7 @@ button {
   margin: 1px;
   padding: 10px 15px;
   text-align: center;
+  font-size: 16px;
 }
 
 button.icon {
@@ -47,7 +48,7 @@ button:hover {
   flex-direction: row;
 }
 
-.sub-panel{
+.sub-panel {
   display: none;
   margin-left: 2%;
   margin-right: 2%;
@@ -64,4 +65,28 @@ button:hover {
 
 .flex-start {
   margin-right: auto;
+}
+
+td, th {
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 0;
+}
+
+td:hover, th.active {
+  background-color: rgba(var(--black), 0.1);
+  cursor: default;
+}
+
+.distribute-equally {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-content: stretch;
+  flex-wrap: wrap;
+}
+
+.distribute-equally button {
+  flex-grow: 1;
 }

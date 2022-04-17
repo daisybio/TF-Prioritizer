@@ -1,22 +1,23 @@
 import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
-  selector: 'data-entry',
-  templateUrl: './data-entry.component.html',
-  styleUrls: ['./data-entry.component.css']
+  selector: 'data-header',
+  templateUrl: './data-header.component.html',
+  styleUrls: ['./data-header.component.css']
 })
-export class DataEntryComponent implements OnInit {
+export class DataHeaderComponent implements OnInit {
   @Input()
-  // @ts-ignore
+    // @ts-ignore
   title: string;
 
   @Input()
-  // @ts-ignore
+    // @ts-ignore
   information: string;
 
   informationVisible: boolean = false;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
   }

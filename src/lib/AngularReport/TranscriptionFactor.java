@@ -137,7 +137,6 @@ public class TranscriptionFactor
                     }
 
                     log2fc.get(group1).put(group2, value);
-                    log2fc.get(group2).put(group1, value);
                 }
             }
         }
@@ -147,10 +146,47 @@ public class TranscriptionFactor
     {
         return new JSONObject()
         {{
+            put("name", name);
             put("geneID", geneID);
-            put("log2fc", new JSONObject(log2fc));
-            put("tpm", new JSONObject(tpm));
-            put("normalizedExpression", new JSONObject(normalizedExpression));
+
+            put("log2fc", new ArrayList<>()
+            {{
+                for (String group1 : log2fc.keySet())
+                {
+                    for (String group2 : log2fc.get(group1).keySet())
+                    {
+                        add(new JSONObject()
+                        {{
+                            put("groups", Arrays.asList(group1, group2));
+                            put("value", log2fc.get(group1).get(group2));
+                        }});
+                    }
+                }
+            }});
+
+
+            put("tpm", new ArrayList<>()
+            {{
+                for (String group : tpm.keySet())
+                {
+                    add(new JSONObject()
+                    {{
+                        put("groups", List.of(group));
+                        put("value", tpm.get(group));
+                    }});
+                }
+            }});
+            put("normalizedExpression", new ArrayList<>()
+            {{
+                for (String group : normalizedExpression.keySet())
+                {
+                    add(new JSONObject()
+                    {{
+                        put("groups", List.of(group));
+                        put("value", normalizedExpression.get(group));
+                    }});
+                }
+            }});
         }};
     }
 }

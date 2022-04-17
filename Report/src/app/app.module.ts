@@ -1,12 +1,14 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
 
-import { AppComponent } from './app.component';
-import { HeaderComponent } from './accordion/header/header.component';
-import { TfGroupAccordionComponent } from './accordion/tf-group-accordion/tf-group-accordion.component';
-import { SingleTfAccordionComponent } from './accordion/single-tf-accordion/single-tf-accordion.component';
-import { TfGroupsContainerComponent } from './accordion/tf-groups-container/tf-groups-container.component';
-import { DataEntryComponent } from './accordion/single-tf-accordion/data-entry/data-entry.component';
+import {AppComponent} from './app.component';
+import {HeaderComponent} from './accordion/header/header.component';
+import {TfGroupAccordionComponent} from './accordion/tf-group-accordion/tf-group-accordion.component';
+import {SingleTfAccordionComponent} from './accordion/single-tf-accordion/single-tf-accordion.component';
+import {TfGroupsContainerComponent} from './accordion/tf-groups-container/tf-groups-container.component';
+import {DataHeaderComponent} from './accordion/single-tf-accordion/data-header/data-header.component';
+import {GeneIDComponent} from './accordion/single-tf-accordion/gene-id/gene-id.component';
+import {DataContentComponent} from './accordion/single-tf-accordion/data-content/data-content.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +17,9 @@ import { DataEntryComponent } from './accordion/single-tf-accordion/data-entry/d
     TfGroupAccordionComponent,
     SingleTfAccordionComponent,
     TfGroupsContainerComponent,
-    DataEntryComponent,
+    DataHeaderComponent,
+    GeneIDComponent,
+    DataContentComponent,
   ],
   imports: [
     BrowserModule
@@ -23,4 +27,5 @@ import { DataEntryComponent } from './accordion/single-tf-accordion/data-entry/d
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
