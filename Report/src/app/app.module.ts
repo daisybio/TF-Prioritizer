@@ -11,6 +11,8 @@ import {DataHeaderComponent} from './accordion/single-tf-accordion/data-header/d
 import {GeneIDComponent} from './accordion/single-tf-accordion/gene-id/gene-id.component';
 import {DataContentComponent} from './accordion/single-tf-accordion/data-content/data-content.component';
 import {ValidationComponent} from './validation/validation.component';
+import { DistributionComponent } from './distribution/distribution.component';
+import { RegressionComponent } from './regression/regression.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import {ValidationComponent} from './validation/validation.component';
     GeneIDComponent,
     DataContentComponent,
     ValidationComponent,
+    DistributionComponent,
+    RegressionComponent,
   ],
   imports: [
     BrowserModule,

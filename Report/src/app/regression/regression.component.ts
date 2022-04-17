@@ -1,14 +1,14 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
 import {TranscriptionFactorGroup} from "../types/types";
+import {ActivatedRoute} from "@angular/router";
 import {TfDataGetterService} from "../services/tf-data-getter.service";
 
 @Component({
-  selector: 'app-validation',
-  templateUrl: './validation.component.html',
-  styleUrls: ['./validation.component.css']
+  selector: 'app-regression',
+  templateUrl: './regression.component.html',
+  styleUrls: ['./regression.component.css']
 })
-export class ValidationComponent implements OnInit {
+export class RegressionComponent implements OnInit {
   tfGroup: TranscriptionFactorGroup | undefined;
   routedName: string | null;
 
