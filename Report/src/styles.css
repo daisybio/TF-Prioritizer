@@ -61,6 +61,7 @@ button:hover {
 .right-flex {
   display: flex;
   align-content: flex-end;
+  align-items: center;
 }
 
 .flex-start {
@@ -89,4 +90,8 @@ td:hover, th.active {
 
 .distribute-equally button {
   flex-grow: 1;
+}
+
+img.clickable:hover {
+  cursor: pointer;
 }

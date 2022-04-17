@@ -13,6 +13,8 @@ import {DataContentComponent} from './accordion/single-tf-accordion/data-content
 import {ValidationComponent} from './validation/validation.component';
 import { DistributionComponent } from './distribution/distribution.component';
 import { RegressionComponent } from './regression/regression.component';
+import { DocumentationComponent } from './documentation/documentation.component';
+import { ParametersComponent } from './parameters/parameters.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +29,8 @@ import { RegressionComponent } from './regression/regression.component';
     ValidationComponent,
     DistributionComponent,
     RegressionComponent,
+    DocumentationComponent,
+    ParametersComponent,
   ],
   imports: [
     BrowserModule,
