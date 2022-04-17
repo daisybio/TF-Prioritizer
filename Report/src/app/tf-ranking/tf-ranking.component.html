@@ -5,8 +5,14 @@
   <button>Co-Occurrence Analysis</button>
 </div>
 <div class="distribute-equally">
-  <input type="text" placeholder="Search by name">
-  <input type="text" placeholder="Search by target gene">
+  <input (keyup)="targetGeneSearch.value=''" type="text"
+         placeholder="Search by name"
+         #nameSearch>
+  <input (keyup)="nameSearch.value=''" type="text"
+         placeholder="Search by target gene"
+         #targetGeneSearch>
 </div>
+
 <tf-group-accordion *ngFor="let tfGroup of tfGroups; let i = index" [tfGroup]="tfGroup"
-                    [index]="i"></tf-group-accordion>
+                    [index]="i"
+                    [ngClass]="{'hidden': !tfGroup.name.toUpperCase().includes(nameSearch.value.toUpperCase()) || !hasTargetGene(targetGeneSearch.value, tfGroup)}"></tf-group-accordion>
