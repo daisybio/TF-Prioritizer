@@ -9,7 +9,7 @@ import {TranscriptionFactorGroup} from "../../types/types";
 export class TfGroupsContainerComponent implements OnInit {
   @Input()
   // @ts-ignore
-  tfGroups: TranscriptionFactorGroup[]
+  tfGroups: TranscriptionFactorGroup[];
 
   constructor() { }
 

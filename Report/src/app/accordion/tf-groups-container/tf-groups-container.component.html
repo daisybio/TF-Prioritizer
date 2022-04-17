@@ -1,1 +1,1 @@
-<tf-group-accordion *ngFor="let tfGroup of tfGroups" [tfGroup]="tfGroup"></tf-group-accordion>
+<tf-group-accordion *ngFor="let tfGroup of tfGroups; let i = index" [tfGroup]="tfGroup" [index]="i"></tf-group-accordion>

@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {TranscriptionFactor} from "../../types/types";
+import {InformationGetterService} from "../../services/information-getter.service";
 
 @Component({
   selector: 'single-tf-accordion',
@@ -11,11 +12,19 @@ export class SingleTfAccordionComponent implements OnInit {
   // @ts-ignore
   transcriptionFactor: TranscriptionFactor;
 
+  @Input()
+  // @ts-ignore
+  hasSibling: boolean = false;
+
   visible: boolean = false;
 
-  constructor() { }
+  // @ts-ignore
+  information;
+
+  constructor(private informationGetter: InformationGetterService) { }
 
   ngOnInit(): void {
+    this.information = this.informationGetter.getInformation();
   }
 
   toggleVisibility() {

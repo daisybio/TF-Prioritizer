@@ -11,6 +11,10 @@ export class TfGroupAccordionComponent implements OnInit {
   // @ts-ignore
   tfGroup: TranscriptionFactorGroup
 
+  @Input()
+    // @ts-ignore
+  index: number;
+
   visible: boolean = false
 
   constructor() { }

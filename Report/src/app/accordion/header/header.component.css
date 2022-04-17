@@ -2,6 +2,7 @@ button {
   width: 100%;
   text-align: left;
   font-size: 25px;
+  padding: 18px;
 }
 
 button.sub {
