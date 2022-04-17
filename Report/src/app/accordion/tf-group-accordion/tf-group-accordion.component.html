@@ -1,0 +1,5 @@
+<accordion-header [title]="tfGroup.name" [sub]="false" (clickEmitter)="toggleVisibility()"></accordion-header>
+
+<div class="accordion-panel" [ngClass]="{'active': visible}">
+  <single-tf-accordion *ngFor="let singleTf of tfGroup.transcriptionFactors" [transcriptionFactor]="singleTf"></single-tf-accordion>
+</div>

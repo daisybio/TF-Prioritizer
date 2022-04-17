@@ -187,6 +187,7 @@ public class AnalyzeData extends ExecutableStep
                     processPlotData(f_same, threshold, hm, tf_found, group_tf_counts, group_geneID_tpm,
                             cutoff_hm_tf_counts_SAME);
                 }
+                makeSureFileExists(f_availableTfs, logger);
 
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(f_availableTfs)))
                 {

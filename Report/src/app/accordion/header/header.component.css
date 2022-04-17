@@ -1,0 +1,9 @@
+button {
+  width: 100%;
+  text-align: left;
+  font-size: 25px;
+}
+
+button.sub {
+  background-color: var(--light);
+}
