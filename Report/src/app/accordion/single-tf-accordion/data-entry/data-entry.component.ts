@@ -14,9 +14,14 @@ export class DataEntryComponent implements OnInit {
   // @ts-ignore
   information: string;
 
+  informationVisible: boolean = false;
+
   constructor() { }
 
   ngOnInit(): void {
   }
 
+  toggleInformationVisibility() {
+    this.informationVisible = !this.informationVisible;
+  }
 }

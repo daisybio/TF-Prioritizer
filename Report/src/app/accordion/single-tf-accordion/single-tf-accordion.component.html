@@ -1,5 +1,5 @@
 <accordion-header *ngIf="hasSibling" [title]="transcriptionFactor.name" [sub]="true" (clickEmitter)="toggleVisibility()"></accordion-header>
-<div class="accordion-panel" [ngClass]="{'active': visible || !hasSibling}">
+<div class="sub-panel" [ngClass]="{'visible': visible || !hasSibling}">
   <data-entry [title]="'GeneID'" [information]="information['basicData']['geneID']"></data-entry>
   <data-entry [title]="'Log2fc'" [information]="information['basicData']['Log2fc']"></data-entry>
   <data-entry [title]="'Normalized expression'" [information]="information['basicData']['NormEx']"></data-entry>

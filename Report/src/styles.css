@@ -28,6 +28,14 @@ button {
   text-align: center;
 }
 
+button.icon {
+  background-color: transparent;
+}
+
+button.icon:hover {
+  background-color: rgba(var(--black), 0.1);
+}
+
 button:hover {
   cursor: pointer;
   opacity: 1;
@@ -39,12 +47,21 @@ button:hover {
   flex-direction: row;
 }
 
-.accordion-panel {
+.sub-panel{
   display: none;
   margin-left: 2%;
   margin-right: 2%;
 }
 
-.accordion-panel.active {
+.sub-panel.visible {
   display: block;
+}
+
+.right-flex {
+  display: flex;
+  align-content: flex-end;
+}
+
+.flex-start {
+  margin-right: auto;
 }

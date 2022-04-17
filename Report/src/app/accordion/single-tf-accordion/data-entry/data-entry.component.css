@@ -4,3 +4,8 @@
   border-radius: 8px;
   margin: 2px;
 }
+
+img {
+  max-width: 40px;
+  max-height: 40px;
+}
