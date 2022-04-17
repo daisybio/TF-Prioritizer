@@ -10,6 +10,10 @@
   --border-radius: 8px;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 body {
   font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
   max-width: 900px;
@@ -17,7 +21,7 @@ body {
   margin-right: auto;
 }
 
-button {
+button, input {
   border-radius: var(--border-radius);
   border: none;
   background-color: var(--standard-background);
@@ -27,6 +31,11 @@ button {
   padding: 10px 15px;
   text-align: center;
   font-size: 16px;
+  text-decoration: none;
+}
+
+input:focus {
+  outline: none;
 }
 
 button.icon {
@@ -88,10 +97,22 @@ td:hover, th.active {
   flex-wrap: wrap;
 }
 
-.distribute-equally button {
+.distribute-equally button, .distribute-equally input {
   flex-grow: 1;
 }
 
 img.clickable:hover {
   cursor: pointer;
+}
+
+::placeholder { /* Everything that is not from microsoft */
+  color: var(--standard-text);
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: var(--standard-text);
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: var(--standard-text);
 }
