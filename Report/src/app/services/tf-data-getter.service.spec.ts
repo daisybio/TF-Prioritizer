@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MapToTableService } from './map-to-table.service';
+import { TfDataGetterService } from './tf-data-getter.service';
 
-describe('MapToTableService', () => {
-  let service: MapToTableService;
+describe('TfDataGetterService', () => {
+  let service: TfDataGetterService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(MapToTableService);
+    service = TestBed.inject(TfDataGetterService);
   });
 
   it('should be created', () => {
