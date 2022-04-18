@@ -17,6 +17,7 @@ export class ImageSelectorComponent implements OnInit {
   activeOptions: string[] = [];
   allowedOptions: string[][] = [];
 
+  hasDropDown: boolean = false;
   hasData: boolean = false;
   hasPlots: boolean = false;
 
@@ -39,6 +40,8 @@ export class ImageSelectorComponent implements OnInit {
     this.availableOptions.pop();
     this.activeOptions.pop();
 
+    this.hasDropDown = this.availableOptions[this.activeOptions.length - 1].length > 7;
+
     this.updateAllowedOptions();
     this.updateImage();
   }
@@ -58,7 +61,12 @@ export class ImageSelectorComponent implements OnInit {
       Object.keys(subMap).forEach(key => this.allowedOptions[level].push(key));
 
       if (!this.allowedOptions[level].includes(this.activeOptions[level])) {
-        this.activeOptions[level] = this.allowedOptions[level][0];
+        for (let availableOption of this.availableOptions[level]) {
+          if (this.allowedOptions[level].includes(availableOption)) {
+            this.activeOptions[level] = availableOption;
+            break;
+          }
+        }
       }
 
       level = level + 1;
@@ -117,5 +125,20 @@ export class ImageSelectorComponent implements OnInit {
         this.collectLevels(sub, level + 1);
       }
     }
+  }
+
+  moveDropdown(delta: number) {
+    let dropDownLevel = this.activeOptions.length - 1;
+    let currentIndex = this.allowedOptions[dropDownLevel].indexOf(this.activeOptions[dropDownLevel]);
+
+    let newIndex = currentIndex + delta;
+
+    if (newIndex < 0) {
+      newIndex = this.allowedOptions[dropDownLevel].length - 1;
+    } else if (newIndex >= this.allowedOptions[dropDownLevel].length) {
+      newIndex = 0;
+    }
+
+    this.updateActiveOption(dropDownLevel, this.allowedOptions[dropDownLevel][newIndex]);
   }
 }

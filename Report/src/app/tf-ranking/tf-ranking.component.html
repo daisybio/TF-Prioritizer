@@ -14,5 +14,5 @@
 </div>
 
 <tf-group-accordion *ngFor="let tfGroup of tfGroups; let i = index" [tfGroup]="tfGroup"
-                    [index]="i"
+                    [index]="i+1"
                     [ngClass]="{'hidden': !tfGroup.name.toUpperCase().includes(nameSearch.value.toUpperCase()) || !hasTargetGene(targetGeneSearch.value, tfGroup)}"></tf-group-accordion>

@@ -1,4 +1,4 @@
-<accordion-header [title]="(index+1) + '. ' + tfGroup.name" [sub]="false"
+<accordion-header [title]="title" [sub]="false"
                   (clickEmitter)="toggleVisibility()"></accordion-header>
 
 <div class="sub-panel" [ngClass]="{'visible': visible}">

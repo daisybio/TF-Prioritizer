@@ -1,5 +1,6 @@
 <ng-container *ngIf="tfGroup; else tfUndefined">
   <h2>{{tfGroup.name}}: Validation</h2>
+  <tf-group-accordion [tfGroup]="tfGroup"></tf-group-accordion>
   <accordion-header [title]="'Heatmap'" (click)="heatmapsVisible=!heatmapsVisible"></accordion-header>
   <image-selector [data]="tfGroup.validation.heatmap" [visible]="heatmapsVisible"></image-selector>
   <accordion-header [title]="'IGV'" (click)="igvVisible=!igvVisible"></accordion-header>

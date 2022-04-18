@@ -1,6 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {TranscriptionFactorGroup} from "../../types/types";
-import {Router} from "@angular/router";
 
 @Component({
   selector: 'tf-group-accordion',
@@ -10,15 +9,15 @@ import {Router} from "@angular/router";
 export class TfGroupAccordionComponent implements OnInit {
   @Input()
     // @ts-ignore
-  tfGroup: TranscriptionFactorGroup
+  tfGroup: TranscriptionFactorGroup;
 
   @Input()
-    // @ts-ignore
-  index: number;
+  index: number | undefined;
 
   visible: boolean = false
+  title: string = "Undefined";
 
-  constructor(private router: Router) {
+  constructor() {
   }
 
   toggleVisibility() {
@@ -26,5 +25,10 @@ export class TfGroupAccordionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.index) {
+      this.title = this.index + ". " + this.tfGroup.name;
+    } else {
+      this.title = "Basic data";
+    }
   }
 }

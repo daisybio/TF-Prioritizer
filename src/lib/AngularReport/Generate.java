@@ -6,6 +6,7 @@ import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Logger;
+import util.ScriptExecution;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 import static util.FileManagement.*;
+import static util.ScriptExecution.executeAndWait;
 
 public class Generate extends ExecutableStep
 {
@@ -70,9 +72,22 @@ public class Generate extends ExecutableStep
         finishAllQueuedThreads();
         saveJson(transcriptionFactorGroups);
 
-        softLink(TFPRIO.configs.angularReport.d_dataLink.get(), TFPRIO.configs.angularReport.fileStructure.d_root.get(),
-                logger);
+        softLink(TFPRIO.configs.angularReport.d_dataLink.get(),
+                TFPRIO.configs.angularReport.fileStructure.d_preprocessing.get(), logger);
 
+        String script =
+                "cd " + TFPRIO.configs.angularReport.d_angularSource.get().getAbsolutePath() + "\n" + "ng build " +
+                        "--output-path=" + TFPRIO.configs.angularReport.fileStructure.d_output.get().getAbsolutePath();
+
+        try
+        {
+            writeFile(TFPRIO.configs.angularReport.fileStructure.f_script.get(), script);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+
+        executeAndWait(TFPRIO.configs.angularReport.fileStructure.f_script.get(), logger);
     }
 
     private void saveJson(List<TranscriptionFactorGroup> transcriptionFactorGroups)

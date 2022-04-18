@@ -222,6 +222,7 @@ public class Workflow
          */
 
         steps.add(new lib.AngularReport.Generate());
+        steps.add(new lib.AngularReport.PostProcessing());
 
         markNotGeneratedFileStructures();
     }
