@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, ElementRef, HostListener, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'image-selector',
@@ -21,10 +21,12 @@ export class ImageSelectorComponent implements OnInit {
   hasData: boolean = false;
   hasPlots: boolean = false;
 
+  dropdownVisible: boolean = false;
+
   imageSource: string = "";
   dataPrefix: string = "assets/input/data"
 
-  constructor() {
+  constructor(private eRef: ElementRef) {
   }
 
   isAllowed(level: number, option: string) {
@@ -44,6 +46,13 @@ export class ImageSelectorComponent implements OnInit {
 
     this.updateAllowedOptions();
     this.updateImage();
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: { target: any; }) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.dropdownVisible = false;
+    }
   }
 
   updateActiveOption(level: number, newValue: string) {

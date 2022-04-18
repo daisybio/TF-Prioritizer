@@ -16,11 +16,20 @@
 </div>
 
 <ng-template #dropdown>
-  <div class="distribute-equally">
+  <div class="symmetric">
     <button class="lighter" *ngIf="hasData" (click)="downloadData()">Download data</button>
     <button class="lighter" *ngIf="!hasData">Zoom in</button>
     <button class="lighter" (click)="moveDropdown(-1)"><</button>
-    <button class="lighter" [textContent]="activeOptions[activeOptions.length-1]"></button>
+    <div class="wrapper">
+      <button style="min-width: 280px" class="light" (click)="dropdownVisible=!dropdownVisible"
+              [textContent]="activeOptions[activeOptions.length-1]"></button>
+      <div class="dropdown" [ngClass]="{'visible': dropdownVisible}">
+        <button class="lighter" *ngFor="let option of availableOptions[availableOptions.length-1]"
+                [ngClass]="{'active': activeOptions[activeOptions.length-1]==option}"
+                [disabled]="!isAllowed(activeOptions.length-1, option)"
+                (click)="updateActiveOption(activeOptions.length-1, option)">{{option}}</button>
+      </div>
+    </div>
     <button class="lighter" (click)="moveDropdown(1)">></button>
     <button class="lighter">Open in new tab</button>
   </div>
