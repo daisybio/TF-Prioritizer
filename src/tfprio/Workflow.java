@@ -25,6 +25,7 @@ public class Workflow
         }
 
         steps.add(new tfprio.InitStaticVariables());
+        /*
         steps.add(new lib.CheckChromosomes());
 
         if (TFPRIO.configs.mixOptions.level.isSet())
@@ -218,6 +219,8 @@ public class Workflow
         steps.add(new lib.DistributionAnalysis.CoOccurrenceAnalysis());
 
         steps.add(new lib.Report.Report());
+         */
+
         steps.add(new lib.AngularReport.Generate());
 
         markNotGeneratedFileStructures();
@@ -245,8 +248,7 @@ public class Workflow
             step.run();
             System.gc(); // Trigger garbage collection
         }
-        logger.info(
-                "Finished running executable steps. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
+        logger.info("Finished running executable steps. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
     }
 
     public String toString()

@@ -58,7 +58,7 @@ public class TFPRIO
     public static File sourceDirectory;
     static File configFile;
 
-    public static final boolean developmentMode = false;
+    public static final boolean developmentMode = true;
 
     public static void main(String[] args) throws Exception
     {

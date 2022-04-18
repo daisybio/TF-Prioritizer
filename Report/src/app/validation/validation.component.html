@@ -1,6 +1,8 @@
-<div *ngIf="tfGroup; else tfUndefined">
+<ng-container *ngIf="tfGroup; else tfUndefined">
   <h2>{{tfGroup.name}}: Validation</h2>
-</div>
+  <accordion-header [title]="'Heatmap'" (click)="heatmapsVisible=!heatmapsVisible"></accordion-header>
+  <image-selector [data]="tfGroup.validation.heatmap" [visible]="heatmapsVisible"></image-selector>
+</ng-container>
 
 <ng-template #tfUndefined>
   <h2>Unknown transcription factor: {{routedName}}</h2>

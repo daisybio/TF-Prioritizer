@@ -7,7 +7,7 @@ target_genes_path <- "{TARGET_GENES_PATH}"
 map_path <- "{MAP_PATH}"
 preprocessing_path <- "{PREPROCESSING_PATH}"
 heatmap_dir <- "{HEATMAP_DIR}"
-metaData <- data.frame(sample_id = c({ SAMPLES }), group = c({ GROUPS }), batch = c({ BATCHES }))
+metaData <- data.frame(sample_id = c({ SAMPLES }), group = c({ GROUPS }){ BATCHES })
 row.names(metaData) <- metaData$sample_id
 metaData$sample_id <- NULL
 
@@ -90,7 +90,7 @@ for (group in list.files(path = target_genes_path)) {
 
         dds <- DESeqDataSetFromMatrix(countData = read_counts,
                                       colData = metaData,
-                                      design = ~batch + group)
+                                      design = ~{ DESIGN })
         dds <- DESeq(dds, quiet = TRUE)
 
         geneCounts_normalized <- counts(dds)

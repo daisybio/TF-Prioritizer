@@ -19,4 +19,9 @@ public class ClassGetter
     {
         return (Class<Map<String, String>>) ((Class) Map.class);
     }
+
+    public static Class<Map<String, Object>> getStringObjectMap()
+    {
+        return (Class<Map<String, Object>>) ((Class) Map.class);
+    }
 }

@@ -4,17 +4,19 @@ import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from "./app-routing";
 import {AppComponent} from './app.component';
 import {HeaderComponent} from './accordion/header/header.component';
-import {TfGroupAccordionComponent} from './accordion/tf-group-accordion/tf-group-accordion.component';
-import {SingleTfAccordionComponent} from './accordion/single-tf-accordion/single-tf-accordion.component';
+import {TfGroupAccordionComponent} from './tf-ranking/tf-group-accordion/tf-group-accordion.component';
+import {SingleTfAccordionComponent} from './tf-ranking/single-tf-accordion/single-tf-accordion.component';
 import {TfRankingComponent} from './tf-ranking/tf-ranking.component';
-import {DataHeaderComponent} from './accordion/single-tf-accordion/data-header/data-header.component';
-import {GeneIDComponent} from './accordion/single-tf-accordion/gene-id/gene-id.component';
-import {DataContentComponent} from './accordion/single-tf-accordion/data-content/data-content.component';
+import {DataHeaderComponent} from './tf-ranking/single-tf-accordion/data-header/data-header.component';
+import {GeneIDComponent} from './tf-ranking/single-tf-accordion/gene-id/gene-id.component';
+import {DataContentComponent} from './tf-ranking/single-tf-accordion/data-content/data-content.component';
 import {ValidationComponent} from './validation/validation.component';
-import { DistributionComponent } from './distribution/distribution.component';
-import { RegressionComponent } from './regression/regression.component';
-import { DocumentationComponent } from './documentation/documentation.component';
-import { ParametersComponent } from './parameters/parameters.component';
+import {DistributionComponent} from './distribution/distribution.component';
+import {RegressionComponent} from './regression/regression.component';
+import {DocumentationComponent} from './documentation/documentation.component';
+import {ParametersComponent} from './parameters/parameters.component';
+import {ImageSelectorComponent} from './accordion/image-selector/image-selector.component';
+import {HashLocationStrategy, LocationStrategy} from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -31,12 +33,15 @@ import { ParametersComponent } from './parameters/parameters.component';
     RegressionComponent,
     DocumentationComponent,
     ParametersComponent,
+    ImageSelectorComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [
+    {provide: LocationStrategy, useClass: HashLocationStrategy}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

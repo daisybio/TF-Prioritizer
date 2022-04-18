@@ -69,38 +69,45 @@ public class InitStaticVariables extends ExecutableStep
                 TFPRIO.sample_group.put(sampleName, d_group.getName());
             }
         }
+
+        logger.info("Samples to batches: " + TFPRIO.sample_group);
     }
 
     private void initSampleBatchMap()
     {
-        boolean foundAll = true;
+        if (f_batches.isSet())
+        {
+            boolean foundAll = true;
 
-        for (String sample : TFPRIO.sample_group.keySet())
-        {
-            try
+            for (String sample : TFPRIO.sample_group.keySet())
             {
-                String batch;
-                if (f_batches.isSet())
+                try
                 {
+                    String batch;
                     batch = findValueInTable(sample, 0, 1, f_batches.get(), "\t", true);
-                } else
+                    TFPRIO.sample_batch.put(sample, batch);
+                } catch (FileNotFoundException e)
                 {
-                    batch = "1";
+                    logger.error(e.getMessage());
+                } catch (NoSuchFieldException e)
+                {
+                    foundAll = false;
+                    logger.warn(e.getMessage());
                 }
-                TFPRIO.sample_batch.put(sample, batch);
-            } catch (FileNotFoundException e)
-            {
-                logger.error(e.getMessage());
-            } catch (NoSuchFieldException e)
-            {
-                foundAll = false;
-                logger.warn(e.getMessage());
             }
-        }
-        if (!foundAll)
+
+            if (!foundAll)
+            {
+                logger.error(
+                        "Could not find all samples in the batch file. Fore more information inspect the previous " +
+                                "warnings.");
+            } else
+            {
+                logger.info("Sample to batch: " + TFPRIO.sample_batch);
+            }
+        } else
         {
-            logger.error("Could not find all samples in the batch file. Fore more information inspect the previous " +
-                    "warnings.");
+            TFPRIO.sample_batch = null;
         }
     }
 

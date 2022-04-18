@@ -116,27 +116,6 @@ public class CreateDeseq2Scripts extends ExecutableStep
         // Scripts
         try
         {
-            Map<String, String> sample_batch = new HashMap<>();
-
-            if (f_batches.isSet())
-            {
-                try (BufferedReader reader = new BufferedReader(new FileReader(f_batches.get())))
-                {
-                    String inputLine;
-                    reader.readLine();
-
-                    while ((inputLine = reader.readLine()) != null)
-                    {
-                        String[] split = inputLine.split("\t");
-                        if (split.length != 2)
-                        {
-                            logger.warn("Irregular line length in batch file detected.");
-                        }
-                        sample_batch.put(split[0], split[1]);
-                    }
-                }
-            }
-
             String scriptTemplate = readFile(f_scriptDeseq.get());
             for (File f_combination : Objects.requireNonNull(d_outputCombined.get().listFiles(Filters.fileFilter)))
             {
@@ -152,16 +131,20 @@ public class CreateDeseq2Scripts extends ExecutableStep
 
                         StringBuilder sb_samples = new StringBuilder();
                         StringBuilder sb_groups = new StringBuilder();
-                        StringBuilder sb_batches = new StringBuilder();
+                        StringBuilder sb_batches = new StringBuilder(", batch = c(");
 
                         for (String sample : samples)
                         {
                             sb_samples.append("'").append(sample).append("', ");
 
-                            if (TFPRIO.sample_group.containsKey(sample) && TFPRIO.sample_batch.containsKey(sample))
+                            if (TFPRIO.sample_group.containsKey(sample) &&
+                                    (TFPRIO.sample_batch == null || TFPRIO.sample_batch.containsKey(sample)))
                             {
                                 sb_groups.append("'").append(TFPRIO.sample_group.get(sample)).append("', ");
-                                sb_batches.append("'").append(TFPRIO.sample_batch.get(sample)).append("', ");
+                                if (TFPRIO.sample_batch != null)
+                                {
+                                    sb_batches.append("'").append(TFPRIO.sample_batch.get(sample)).append("', ");
+                                }
                             } else
                             {
                                 logger.error("Unknown sample: " + sample);
@@ -169,10 +152,18 @@ public class CreateDeseq2Scripts extends ExecutableStep
                         }
                         sb_samples.setLength(sb_samples.length() - 2);
                         sb_groups.setLength(sb_groups.length() - 2);
-                        sb_batches.setLength(sb_batches.length() - 2);
+                        if (TFPRIO.sample_batch != null)
+                        {
+                            sb_batches.setLength(sb_batches.length() - 2);
+                            sb_batches.append(")");
+                            script = script.replace("{ BATCHES }", sb_batches);
+                        } else
+                        {
+                            script = script.replace("{ BATCHES }", "");
+                        }
+                        script = script.replace("{ DESIGN }", TFPRIO.sample_batch != null ? "batch+group" : "group");
                         script = script.replace("{ SAMPLES }", sb_samples);
                         script = script.replace("{ GROUPS }", sb_groups);
-                        script = script.replace("{ BATCHES }", sb_batches);
                         script = script.replace("{INPUTFILE}", f_combination.getAbsolutePath());
                         File targetFile =
                                 extend(TFPRIO.configs.deSeq2.fileStructure.d_outputRaw.get(), combination + ".tsv");

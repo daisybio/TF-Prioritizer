@@ -16,6 +16,7 @@ public class FileStructure extends AbstractModule
     public final GeneratedFileStructure d_root = extend(workingDirectory, "AngularReport");
 
     public final GeneratedFileStructure f_data = extend(d_root, "data.json");
+    public final GeneratedFileStructure d_data = extend(d_root, "data");
 
     /**
      * The default constructor.

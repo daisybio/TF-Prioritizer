@@ -1,0 +1,12 @@
+<div class="sub-panel" [ngClass]="{'visible': visible}">
+  <div class="distribute-equally" *ngFor="let levelOptions of levels; let level = index">
+    <button class="lighter" (click)="activeLevels[level]=option; updateImage()" *ngFor="let option of levelOptions"
+            [ngClass]="{'active': activeLevels[level]==option}">{{option}}</button>
+  </div>
+  <div class="distribute-equally">
+    <button class="lighter">Zoom in</button>
+    <button class="lighter" *ngIf="hasData" (click)="downloadData()">Download data</button>
+    <button class="lighter">Open in new tab</button>
+  </div>
+  <img [src]="imageSource">
+</div>

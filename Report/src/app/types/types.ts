@@ -5,7 +5,11 @@ export interface InputData {
 export interface TranscriptionFactorGroup {
   "transcriptionFactors": TranscriptionFactor[],
   "name": string,
-  "targetGenes": TargetGene[]
+  "targetGenes": TargetGene[],
+  "validation": {
+    "heatmap": {},
+    "igv": {}
+  }
 }
 
 export interface TranscriptionFactor {

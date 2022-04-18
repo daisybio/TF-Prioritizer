@@ -350,7 +350,7 @@ public class FileManagement
 
         if (newLink.exists())
         {
-            deleteFileStructure(newLink);
+            Files.delete(newLink.toPath());
         }
         Files.createSymbolicLink(newLink.toPath(), existingData.toPath());
     }
@@ -359,7 +359,6 @@ public class FileManagement
     {
         try
         {
-            logger.warn("Creating softlink: " + newLink.getAbsolutePath() + "->" + existingData.getAbsolutePath());
             softLink(newLink, existingData);
         } catch (IOException e)
         {

@@ -61,19 +61,30 @@ public class GenerateTargetGenesHeatmaps extends ExecutableStep
 
         StringBuilder sb_groups = new StringBuilder();
         StringBuilder sb_samples = new StringBuilder();
-        StringBuilder sb_batches = new StringBuilder();
+        StringBuilder sb_batches = new StringBuilder(", batch = c(");
         for (Map.Entry<String, String> entry : TFPRIO.sample_group.entrySet())
         {
             sb_samples.append("'").append(entry.getKey()).append("', ");
             sb_groups.append("'").append(entry.getValue()).append("', ");
-            sb_batches.append("'").append(TFPRIO.sample_batch.get(entry.getKey())).append("', ");
+            if (TFPRIO.sample_batch != null)
+            {
+                sb_batches.append("'").append(TFPRIO.sample_batch.get(entry.getKey())).append("', ");
+            }
         }
         sb_groups.setLength(sb_groups.length() - 2);
         sb_samples.setLength(sb_samples.length() - 2);
-        sb_batches.setLength(sb_batches.length() - 2);
+        if (TFPRIO.sample_batch != null)
+        {
+            sb_batches.setLength(sb_batches.length() - 2);
+            sb_batches.append(")");
+            script = script.replace("{ BATCHES }", sb_batches.toString());
+        } else
+        {
+            script = script.replace("{ BATCHES }", "");
+        }
         script = script.replace("{ GROUPS }", sb_groups.toString());
         script = script.replace("{ SAMPLES }", sb_samples.toString());
-        script = script.replace("{ BATCHES }", sb_batches.toString());
+        script = script.replace("{ DESIGN }", TFPRIO.sample_batch != null ? "batch+group" : "group");
 
         script = script.replace("{ NUMBER_OF_GENES }", String.valueOf(kTargetGenes.get()));
 

@@ -12,6 +12,8 @@ export class ValidationComponent implements OnInit {
   tfGroup: TranscriptionFactorGroup | undefined;
   routedName: string | null;
 
+  heatmapsVisible: boolean = false;
+
   constructor(private route: ActivatedRoute, private tfGetter: TfDataGetterService) {
     this.routedName = this.route.snapshot.queryParamMap.get("tf");
     if (this.routedName) {
@@ -21,5 +23,4 @@ export class ValidationComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
 }
