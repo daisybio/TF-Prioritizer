@@ -1,7 +1,8 @@
 <div class="sub-panel" [ngClass]="{'visible': visible}">
-  <div class="distribute-equally" *ngFor="let levelOptions of levels; let level = index">
-    <button class="lighter" (click)="activeLevels[level]=option; updateImage()" *ngFor="let option of levelOptions"
-            [ngClass]="{'active': activeLevels[level]==option}">{{option}}</button>
+  <div class="distribute-equally" *ngFor="let levelOptions of availableOptions; let level = index">
+    <button class="lighter" (click)="updateActiveOption(level, option)" *ngFor="let option of levelOptions"
+            [ngClass]="{'active': activeOptions[level]==option}"
+            [disabled]="!isAllowed(level, option)">{{option}}</button>
   </div>
   <div class="distribute-equally">
     <button class="lighter">Zoom in</button>

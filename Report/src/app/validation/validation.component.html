@@ -2,6 +2,8 @@
   <h2>{{tfGroup.name}}: Validation</h2>
   <accordion-header [title]="'Heatmap'" (click)="heatmapsVisible=!heatmapsVisible"></accordion-header>
   <image-selector [data]="tfGroup.validation.heatmap" [visible]="heatmapsVisible"></image-selector>
+  <accordion-header [title]="'IGV'" (click)="igvVisible=!igvVisible"></accordion-header>
+  <image-selector [data]="tfGroup.validation.igv" [visible]="igvVisible"></image-selector>
 </ng-container>
 
 <ng-template #tfUndefined>

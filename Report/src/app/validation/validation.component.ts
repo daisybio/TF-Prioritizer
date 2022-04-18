@@ -13,6 +13,7 @@ export class ValidationComponent implements OnInit {
   routedName: string | null;
 
   heatmapsVisible: boolean = false;
+  igvVisible: boolean = false;
 
   constructor(private route: ActivatedRoute, private tfGetter: TfDataGetterService) {
     this.routedName = this.route.snapshot.queryParamMap.get("tf");

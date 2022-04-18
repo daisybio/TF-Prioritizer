@@ -13,8 +13,9 @@ export class ImageSelectorComponent implements OnInit {
   @Input()
   visible: boolean = false;
 
-  levels: Set<string>[] = [];
-  activeLevels: string[] = [];
+  availableOptions: string[][] = [];
+  activeOptions: string[] = [];
+  allowedOptions: string[][] = [];
 
   hasData: boolean = false;
   hasPlots: boolean = false;
@@ -25,22 +26,51 @@ export class ImageSelectorComponent implements OnInit {
   constructor() {
   }
 
+  isAllowed(level: number, option: string) {
+    return this.allowedOptions[level].includes(option);
+  }
+
   ngOnInit(): void {
     this.collectLevels(this.data, 0);
 
-    this.hasData = this.levels[this.levels.length - 1].has("data");
-    this.hasPlots = this.levels[this.levels.length - 1].has("plot");
+    this.hasData = this.availableOptions[this.availableOptions.length - 1].includes("data");
+    this.hasPlots = this.availableOptions[this.availableOptions.length - 1].includes("plot");
 
-    this.levels.pop();
-    this.activeLevels.pop();
+    this.availableOptions.pop();
+    this.activeOptions.pop();
 
+    this.updateAllowedOptions();
     this.updateImage();
+  }
+
+  updateActiveOption(level: number, newValue: string) {
+    this.activeOptions[level] = newValue;
+    this.updateAllowedOptions();
+    this.updateImage();
+  }
+
+  updateAllowedOptions() {
+    let subMap = this.data;
+    let level = 0;
+
+    for (let activeOption of this.activeOptions) {
+      this.allowedOptions[level] = [];
+      Object.keys(subMap).forEach(key => this.allowedOptions[level].push(key));
+
+      if (!this.allowedOptions[level].includes(this.activeOptions[level])) {
+        this.activeOptions[level] = this.allowedOptions[level][0];
+      }
+
+      level = level + 1;
+      // @ts-ignore
+      subMap = subMap[activeOption];
+    }
   }
 
   updateImage() {
     let subMap = this.data;
 
-    for (let level of this.activeLevels) {
+    for (let level of this.activeOptions) {
       // @ts-ignore
       subMap = subMap[level];
     }
@@ -52,7 +82,7 @@ export class ImageSelectorComponent implements OnInit {
   downloadData() {
     let subMap = this.data;
 
-    for (let level of this.activeLevels) {
+    for (let level of this.activeOptions) {
       // @ts-ignore
       subMap = subMap[level];
     }
@@ -69,14 +99,16 @@ export class ImageSelectorComponent implements OnInit {
   }
 
   collectLevels(map: {}, level: number) {
-    if (this.levels.length <= level) {
-      this.levels.push(new Set());
+    if (this.availableOptions.length <= level) {
+      this.availableOptions[level] = [];
     }
 
     for (let key of Object.keys(map)) {
-      this.levels[level].add(key);
-      if (this.activeLevels.length <= level) {
-        this.activeLevels.push(key);
+      if (!this.availableOptions[level].includes(key)) {
+        this.availableOptions[level].push(key);
+      }
+      if (this.activeOptions.length <= level) {
+        this.activeOptions.push(key);
       }
 
       // @ts-ignore
