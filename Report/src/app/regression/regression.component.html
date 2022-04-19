@@ -1,0 +1,7 @@
+<div *ngIf="tfGroup; else tfUndefined">
+  <h2>{{tfGroup.name}}: Regression analysis</h2>
+</div>
+
+<ng-template #tfUndefined>
+  <h2>Unknown transcription factor: {{routedName}}</h2>
+</ng-template>

@@ -1,0 +1,18 @@
+<h2>Prioritized transcription factors</h2>
+<div class="distribute-equally">
+  <button>Important loci</button>
+  <button>Top LOG2FC</button>
+  <button>Co-Occurrence Analysis</button>
+</div>
+<div class="distribute-equally">
+  <input (keyup)="targetGeneSearch.value=''" type="text"
+         placeholder="Search by name"
+         #nameSearch>
+  <input (keyup)="nameSearch.value=''" type="text"
+         placeholder="Search by target gene"
+         #targetGeneSearch>
+</div>
+
+<tf-group-accordion *ngFor="let tfGroup of tfGroups; let i = index" [tfGroup]="tfGroup"
+                    [index]="i+1"
+                    [ngClass]="{'hidden': !tfGroup.name.toUpperCase().includes(nameSearch.value.toUpperCase()) || !hasTargetGene(targetGeneSearch.value, tfGroup)}"></tf-group-accordion>

@@ -25,6 +25,7 @@ public class Workflow
         }
 
         steps.add(new tfprio.InitStaticVariables());
+        /*
         steps.add(new lib.CheckChromosomes());
 
         if (TFPRIO.configs.mixOptions.level.isSet())
@@ -164,7 +165,6 @@ public class Workflow
 
         steps.add(new lib.Dynamite.Preprocessing());
         steps.add(new lib.Dynamite.RunDynamite());
-
         steps.add(new lib.Plots.GroupPlots());
         steps.add(new lib.Plots.AnalyzeData());
         steps.add(new lib.Plots.TopKTargetGenes());
@@ -195,6 +195,7 @@ public class Workflow
 
         steps.add(new lib.Igv.DcgTargetGenes());
 
+
         if (TFPRIO.configs.igv.importantLociAllPrioTf.isSet() && TFPRIO.configs.igv.importantLociAllPrioTf.isSet())
         {
             steps.add(new lib.Igv.ImportantLoci());
@@ -216,7 +217,12 @@ public class Workflow
             notExecutedSteps.add(notExecutedStep);
         }
         steps.add(new lib.DistributionAnalysis.CoOccurrenceAnalysis());
+
         steps.add(new lib.Report.Report());
+         */
+
+        steps.add(new lib.AngularReport.Generate());
+        steps.add(new lib.AngularReport.PostProcessing());
 
         markNotGeneratedFileStructures();
     }
@@ -243,8 +249,7 @@ public class Workflow
             step.run();
             System.gc(); // Trigger garbage collection
         }
-        logger.info(
-                "Finished running executable steps. Execution took " + timer.stopAndGetDeltaSeconds() + " seconds.");
+        logger.info("Finished running executable steps. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
     }
 
     public String toString()

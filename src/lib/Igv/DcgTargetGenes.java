@@ -40,7 +40,7 @@ public class DcgTargetGenes extends ExecutableStep
     {
         return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_heatmaps, d_input_tepic))
         {{
-            if (TFPRIO.configs.igv.enhancerDatabases.isSet() && TFPRIO.configs.igv.enhancerDatabases.get().size() > 0)
+            if (TFPRIO.configs.igv.enhancerDatabases.isSet())
             {
                 add(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_genePositions_enhancerDBs);
             }
@@ -116,7 +116,7 @@ public class DcgTargetGenes extends ExecutableStep
                             }
                         } catch (IOException e)
                         {
-                            logger.error(e.getMessage());
+                            logger.error("Cannot read file: " + e.getMessage());
                         }
 
                         File d_output_groupPairing = extend(d_output.get(), tfSymbol, hm, groupPairing);

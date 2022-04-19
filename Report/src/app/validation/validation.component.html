@@ -1,0 +1,21 @@
+<ng-container *ngIf="tfGroup; else tfUndefined">
+  <h2>{{tfGroup.name}}: Validation Analysis</h2>
+  <tf-group-accordion [tfGroup]="tfGroup"></tf-group-accordion>
+  <accordion-header [title]="'Logos'" (click)="logosVisible=!logosVisible"></accordion-header>
+  <div class="sub-panel" [ngClass]="{'visible': logosVisible}">
+    <accordion-header [title]="'Biophysical model'" [sub]="true"
+                      (click)="logosBiophysicalVisible=!logosBiophysicalVisible"></accordion-header>
+    <image-selector [data]="tfGroup.validation.logos.biophysical" [visible]="logosBiophysicalVisible"></image-selector>
+    <accordion-header [title]="'TF sequence (JASPAR)'" [sub]="true"></accordion-header>
+    <image-selector [data]="tfGroup.validation.logos.tfSequence" [visible]="logosBiophysicalVisible"></image-selector>
+  </div>
+  <accordion-header [title]="'Differential gene expression of top target genes'"
+                    (click)="heatmapsVisible=!heatmapsVisible"></accordion-header>
+  <image-selector [data]="tfGroup.validation.heatmap" [visible]="heatmapsVisible"></image-selector>
+  <accordion-header [title]="'IGV screenshots of top target genes'" (click)="igvVisible=!igvVisible"></accordion-header>
+  <image-selector [data]="tfGroup.validation.igv" [visible]="igvVisible"></image-selector>
+</ng-container>
+
+<ng-template #tfUndefined>
+  <h2>Unknown transcription factor: {{routedName}}</h2>
+</ng-template>

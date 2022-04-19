@@ -5,6 +5,7 @@ import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
+import util.FileFilters.Filters;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -197,7 +198,8 @@ public class FileManagement
                 }
             }
         }
-        throw new NoSuchFieldException();
+        throw new NoSuchFieldException(
+                "Could not find term \"" + term + "\" in column " + searchIndex + " of " + file.getAbsolutePath());
     }
 
     public static File getFileIfInDirectory(File directory, String fileNameRegex, boolean lookingForFiles)
@@ -212,12 +214,9 @@ public class FileManagement
             return null;
         }
 
-        for (File entry : directory.listFiles())
+        for (File entry : Objects.requireNonNull(
+                directory.listFiles(lookingForFiles ? Filters.fileFilter : Filters.directoryFilter)))
         {
-            if (lookingForFiles != entry.isFile())
-            {
-                continue;
-            }
             if (entry.getName().matches(fileNameRegex))
             {
                 return entry;
@@ -349,7 +348,7 @@ public class FileManagement
 
         if (newLink.exists())
         {
-            deleteFileStructure(newLink);
+            Files.delete(newLink.toPath());
         }
         Files.createSymbolicLink(newLink.toPath(), existingData.toPath());
     }
@@ -358,7 +357,6 @@ public class FileManagement
     {
         try
         {
-            logger.warn("Creating softlink: " + newLink.getAbsolutePath() + "->" + existingData.getAbsolutePath());
             softLink(newLink, existingData);
         } catch (IOException e)
         {

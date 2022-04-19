@@ -76,6 +76,14 @@ public class MapSymbolAndEnsg
                     String description = line.length > 2 ? line[2] : "";
                     ensgDescription.put(ensg, description);
                     symbolDescription.put(symbol, description);
+
+                    if (symbol.contains("-"))
+                    {
+                        String correctedSymbol = symbol.replace("-", ".");
+
+                        symbolEnsg.put(correctedSymbol, new HashSet<>(List.of(ensg)));
+                        symbolDescription.put(correctedSymbol, description);
+                    }
                 }
             }
         }
@@ -107,6 +115,10 @@ public class MapSymbolAndEnsg
         if (symbolEnsg.containsKey(upper))
         {
             return symbolEnsg.get(upper);
+        } else if (upper.matches("[A-Z\\d]+\\.VAR\\.\\d+.*"))
+        {
+            logger.debug("Removed VAR part from " + symbol);
+            return symbolEnsg.get(upper.substring(0, upper.indexOf(".")));
         } else
         {
             throw new NoSuchFieldException("Could not find symbol " + symbol + " in the map file.");

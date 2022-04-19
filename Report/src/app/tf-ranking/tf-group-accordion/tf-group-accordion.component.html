@@ -1,0 +1,14 @@
+<accordion-header [title]="title" [sub]="false"
+                  (click)="visible=!visible"></accordion-header>
+
+<div class="sub-panel" [ngClass]="{'visible': visible}">
+
+  <div class="distribute-equally">
+    <button [routerLink]="'validation'" [queryParams]="{'tf': tfGroup.name}">Validation</button>
+    <button [routerLink]="'distribution'" [queryParams]="{'tf': tfGroup.name}">Distribution</button>
+    <button [routerLink]="'regression'" [queryParams]="{'tf': tfGroup.name}">Regression</button>
+  </div>
+
+  <single-tf-accordion *ngFor="let singleTf of tfGroup.transcriptionFactors" [transcriptionFactor]="singleTf"
+                       [hasSibling]="tfGroup.transcriptionFactors.length>1"></single-tf-accordion>
+</div>

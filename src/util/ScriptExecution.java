@@ -86,6 +86,10 @@ public class ScriptExecution
                     command.add("-c");
                 }
             }
+            case ".sh" ->
+            {
+                command.add("sh");
+            }
             default -> throw new RuntimeException("This file type is not supported.");
         }
 

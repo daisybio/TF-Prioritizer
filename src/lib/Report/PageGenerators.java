@@ -11,6 +11,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static util.FileManagement.extend;
+
 
 public class PageGenerators
 {
@@ -497,14 +499,15 @@ public class PageGenerators
                                 File.separator +
                                 TFPRIO.configs.report.outputStructure.s_validation_logos_biophysicalModel_png);
 
-                File tempDir = FileManagement.getFileIfInDirectory(sourceDir, "[0-9]+_" + tfGroup.getName(), false);
+                File d_transcriptionFactor =
+                        FileManagement.getFileIfInDirectory(sourceDir, "[0-9]+_" + tfGroup.getName(), false);
 
-                File sourceFile = FileManagement.getFileIfInDirectory(tempDir, ".+\\.png$", true);
-                File csvFile = FileManagement.getFileIfInDirectory(tempDir, ".+energy_matrix\\.csv$", true);
+                File f_image = extend(d_transcriptionFactor, "biophysical_model.png");
+                File f_data = extend(d_transcriptionFactor, "energy_matrix.csv");
 
-                if (sourceFile != null)
+                if (f_image.exists())
                 {
-                    FileManagement.copyFile(sourceFile, targetFile);
+                    FileManagement.copyFile(f_image, targetFile);
 
                     List<List<String>> options = new ArrayList<>();
 
@@ -513,7 +516,7 @@ public class PageGenerators
                     JSONObject data = new JSONObject();
                     data.put(targetFile.getName().replace(".png", ""), new JSONObject(new HashMap<>()
                     {{
-                        put("content", FileManagement.readFile(csvFile).replace("\t", ","));
+                        put("content", FileManagement.readFile(f_data).replace("\t", ","));
                         put("fileExtension", ".csv");
                     }}));
 

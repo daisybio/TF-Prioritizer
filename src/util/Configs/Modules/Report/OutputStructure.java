@@ -50,6 +50,8 @@ public class OutputStructure extends AbstractModule
 
     public final GeneratedFileStructure f_cooccurrence_html = extend(root, "COOCCURRENCE.html");
 
+    public final GeneratedFileStructure f_reportJson = extend(root, "data.json");
+
     public OutputStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
                            Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException

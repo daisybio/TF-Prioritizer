@@ -32,6 +32,9 @@ public class TFPRIO
      */
     public static Map<String, Set<String>> groupCombinationsToHms = new HashMap<>();
 
+    public static Map<String, String> sample_group = new HashMap<>();
+    public static Map<String, String> sample_batch = new HashMap<>();
+
     /**
      * Contains all the file configs whose allocated files or directories will be created during pipeline execution.
      * <p>
@@ -55,7 +58,7 @@ public class TFPRIO
     public static File sourceDirectory;
     static File configFile;
 
-    public static final boolean developmentMode = false;
+    public static final boolean developmentMode = true;
 
     public static void main(String[] args) throws Exception
     {
@@ -70,6 +73,11 @@ public class TFPRIO
         configs.save();
 
         Logger logger = new Logger("TFPRIO");
+
+        if (developmentMode)
+        {
+            logger.warn("Development mode active.");
+        }
 
         Workflow workflow = new Workflow();
 

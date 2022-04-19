@@ -1,6 +1,6 @@
 library(DESeq2)
 
-metadata_df <- data.frame(sample_id = c({ SAMPLES }), group = c({ GROUPS }), batch = c({ BATCHES }))
+metadata_df <- data.frame(sample_id = c({ SAMPLES }), group = c({ GROUPS }) { BATCHES })
 input_groups <- "{COMBINATION}"
 group_one <- strsplit(input_groups, "_")[[1]][1]
 group_two <- strsplit(input_groups, "_")[[1]][2]
@@ -14,7 +14,7 @@ count_df$Geneid <- NULL
 dds <- DESeqDataSetFromMatrix(
   countData = count_df,
   colData = metadata_df,
-  design = ~batch+group
+  design = ~{ DESIGN }
 )
 threshold <- 50
 keep <- rowSums(counts(dds)) >= threshold

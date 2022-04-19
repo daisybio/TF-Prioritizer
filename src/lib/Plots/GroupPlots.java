@@ -98,14 +98,18 @@ public class GroupPlots extends ExecutableStep
                 File f_plotSame = extend(d_output.get(), hm, String.valueOf(threshold), "same_stages.png");
                 File f_plotDifferent = extend(d_output.get(), hm, String.valueOf(threshold), "different_stages.png");
 
-                makeSureFileExists(f_outputData_same, logger);
+                if (!pairings_sameStages.isEmpty())
+                {
+                    makeSureFileExists(f_outputData_same, logger);
+                }
+                makeSureFileExists(f_outputData_different, logger);
 
                 script = script.replace("{DIFFERENT_STAGES}",
                         getStageCommands("different", f_outputData_different, f_plotDifferent,
                                 pairings_differentStages));
 
-                script = script.replace("{SAME_STAGES}",
-                        getStageCommands("same", f_outputData_same, f_plotSame, pairings_sameStages));
+                script = script.replace("{SAME_STAGES}", !pairings_sameStages.isEmpty() ?
+                        getStageCommands("same", f_outputData_same, f_plotSame, pairings_sameStages) : "");
 
                 try
                 {
