@@ -66,3 +66,7 @@ body {
 img.clickable:hover {
   cursor: pointer;
 }
+
+img {
+  max-width: 100%;
+}

@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+
+import {loremIpsum} from "../../assets/information";
 
 @Component({
   selector: 'app-documentation',
@@ -6,8 +8,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./documentation.component.css']
 })
 export class DocumentationComponent implements OnInit {
+  loremIpsum: string = loremIpsum;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
   }
