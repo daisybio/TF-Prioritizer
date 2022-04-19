@@ -5,7 +5,8 @@
     "biomartDatasetSymbolColumn": "mgi_symbol",
     "countThreshold": 50,
     "biomartDatasetSpecies": "mmusculus_gene_ensembl",
-    "inputDirectory": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data"
+    "inputDirectory": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data",
+    "batchFile": null
   },
   "Dynamite": {
     "iFolds": 6,
