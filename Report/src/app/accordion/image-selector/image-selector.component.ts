@@ -19,6 +19,9 @@ export class ImageSelectorComponent implements OnInit {
   @Input()
   sub: boolean = false;
 
+  @Input()
+  information: string | undefined;
+
   availableOptions: string[][] = [];
   activeOptions: string[] = [];
   allowedOptions: string[][] = [];

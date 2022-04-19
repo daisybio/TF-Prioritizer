@@ -1,4 +1,5 @@
-<accordion-header [title]="title" (click)="visible=!visible" [sub]="sub" [disabled]="!isEnabled"></accordion-header>
+<accordion-header [title]="title" (togglePanel)="visible=$event" [sub]="sub" [disabled]="!isEnabled"
+                  [information]="information"></accordion-header>
 <div class="sub-panel" [ngClass]="{'visible': visible}">
   <div class="distribute-equally" *ngFor="let levelOptions of availableOptions; let level = index">
     <ng-container *ngIf="!(level==availableOptions.length-1 && hasDropDown); else dropdown">

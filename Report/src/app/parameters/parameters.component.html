@@ -1,1 +1,7 @@
-<p>parameters works!</p>
+<ng-container *ngFor="let module of modules">
+  <accordion-header [title]="module"
+                    (togglePanel)="visibilities[module]=!visibilities[module]"></accordion-header>
+  <div class="sub-panel" [ngClass]="{'visible': visibilities[module]}">
+    <p *ngFor="let parameter of getParameters(module)">{{parameter}}: {{getValue(module, parameter)}}</p>
+  </div>
+</ng-container>

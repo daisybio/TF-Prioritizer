@@ -6,5 +6,14 @@ export const INFORMATION = {
     "Log2fc": loremIpsum,
     "NormEx": loremIpsum,
     "tpm": loremIpsum
+  },
+  "validation": {
+    "logos": {
+      "general": loremIpsum,
+      "biophysical": loremIpsum,
+      "tfSequence": loremIpsum
+    },
+    "heatmap": loremIpsum,
+    "igv": loremIpsum
   }
 }

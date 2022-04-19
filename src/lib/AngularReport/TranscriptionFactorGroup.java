@@ -5,7 +5,6 @@ import tfprio.TFPRIO;
 import util.FileFilters.Filters;
 import util.Logger;
 
-import javax.print.attribute.standard.JobStateReasons;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -161,7 +160,8 @@ public class TranscriptionFactorGroup
 
                     if (d_groupPairing.exists())
                     {
-                        for (File plotFile : d_groupPairing.listFiles(Filters.getSuffixFilter(".png")))
+                        for (File plotFile : Objects.requireNonNull(
+                                d_groupPairing.listFiles(Filters.getSuffixFilter(".png"))))
                         {
                             String targetGene = plotFile.getName().replaceAll("\\d+_", "").replace(".png", "");
 

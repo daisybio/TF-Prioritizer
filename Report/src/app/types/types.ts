@@ -1,5 +1,10 @@
 export interface InputData {
-  "transcriptionFactorGroups": TranscriptionFactorGroup[]
+  "transcriptionFactorGroups": TranscriptionFactorGroup[],
+  "configs": {
+    [module: string]: {
+      [parameter: string]: boolean | number | [] | string
+    }
+  }
 }
 
 export interface TranscriptionFactorGroup {

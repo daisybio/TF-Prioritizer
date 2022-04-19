@@ -12,6 +12,9 @@ export class TfGroupAccordionComponent implements OnInit {
   tfGroup: TranscriptionFactorGroup;
 
   @Input()
+  showAnalysisLinks: boolean = true;
+
+  @Input()
   index: number | undefined;
 
   visible: boolean = false

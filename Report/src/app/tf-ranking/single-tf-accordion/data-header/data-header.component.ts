@@ -11,8 +11,7 @@ export class DataHeaderComponent implements OnInit {
   title: string;
 
   @Input()
-    // @ts-ignore
-  information: string;
+  information: string | undefined;
 
   informationVisible: boolean = false;
 

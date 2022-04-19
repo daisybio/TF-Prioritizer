@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'accordion-header',
@@ -16,15 +16,24 @@ export class HeaderComponent implements OnInit {
   @Input()
   sub: boolean = false;
 
+  @Input()
+  information: string | undefined;
+
+  @Output()
+  togglePanel = new EventEmitter<boolean>();
+
+  informationVisible: boolean = false;
+  panelVisible: boolean = false;
+
   constructor() {
   }
 
   ngOnInit(): void {
   }
 
-  getClasses() {
-    return {
-      "light": this.sub
-    }
+  onPanelClick() {
+    this.panelVisible = !this.panelVisible;
+
+    this.togglePanel.emit(this.panelVisible);
   }
 }

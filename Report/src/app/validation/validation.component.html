@@ -1,17 +1,23 @@
 <ng-container *ngIf="tfGroup; else tfUndefined">
   <h2>{{tfGroup.name}}: Validation Analysis</h2>
-  <tf-group-accordion [tfGroup]="tfGroup"></tf-group-accordion>
-  <accordion-header [title]="'Logos'" (click)="logosVisible=!logosVisible"></accordion-header>
+  <tf-group-accordion [tfGroup]="tfGroup" [showAnalysisLinks]="false"></tf-group-accordion>
+
+  <accordion-header [title]="'Logos'" (togglePanel)="logosVisible=!logosVisible"
+                    [information]="information['logos']['general']"></accordion-header>
   <div class="sub-panel" [ngClass]="{'visible': logosVisible}">
     <image-selector [data]="tfGroup.validation.logos.biophysical" [sub]="true" [title]="'Biophysical model'"
-                    [visible]="logosBiophysicalVisible"></image-selector>
+                    [visible]="logosBiophysicalVisible"
+                    [information]="information['logos']['biophysical']"></image-selector>
     <image-selector [data]="tfGroup.validation.logos.tfSequence" [sub]="true" [title]="'TF Sequence (JASPAR)'"
-                    [visible]="logosTfSequenceVisible"></image-selector>
+                    [visible]="logosTfSequenceVisible"
+                    [information]="information['logos']['tfSequence']"></image-selector>
   </div>
+
   <image-selector [data]="tfGroup.validation.heatmap" [title]="'Differential expression of top target genes'"
+                  [information]="information['heatmap']"
                   [visible]="heatmapsVisible"></image-selector>
   <image-selector [data]="tfGroup.validation.igv" [title]="'IGV screenshots of top target genes'"
-                  [visible]="igvVisible"></image-selector>
+                  [visible]="igvVisible" [information]="information['igv']"></image-selector>
 </ng-container>
 
 <ng-template #tfUndefined>
