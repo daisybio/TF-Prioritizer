@@ -16,6 +16,7 @@ export class ValidationComponent implements OnInit {
   igvVisible: boolean = false;
   logosVisible: boolean = false;
   logosBiophysicalVisible: boolean = false;
+  logosTfSequenceVisible: boolean = false;
 
   constructor(private route: ActivatedRoute, private tfGetter: TfDataGetterService) {
     this.routedName = this.route.snapshot.queryParamMap.get("tf");

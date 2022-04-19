@@ -8,12 +8,13 @@ import {Component, Input, OnInit} from '@angular/core';
 export class HeaderComponent implements OnInit {
 
   @Input()
-    // @ts-ignore
-  title: string;
+  title: string = "undefined";
 
   @Input()
-    // @ts-ignore
-  sub: boolean;
+  disabled: boolean = false;
+
+  @Input()
+  sub: boolean = false;
 
   constructor() {
   }
@@ -23,7 +24,7 @@ export class HeaderComponent implements OnInit {
 
   getClasses() {
     return {
-      "sub": this.sub
+      "light": this.sub
     }
   }
 }
