@@ -15,5 +15,9 @@ export const INFORMATION = {
     },
     "heatmap": loremIpsum,
     "igv": loremIpsum
+  },
+  "distribution": {
+    "plots": loremIpsum,
+    "ranks": loremIpsum
   }
 }

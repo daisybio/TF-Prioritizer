@@ -18,6 +18,14 @@ export interface TranscriptionFactorGroup {
       "biophysical": {},
       "tfSequence": {}
     }
+  },
+  "distribution": {
+    "plots": {},
+    "ranks": {
+      [hm: string]: {
+        [entryType: string]: number
+      }
+    }
   }
 }
 
