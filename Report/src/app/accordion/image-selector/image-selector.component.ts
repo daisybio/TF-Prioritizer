@@ -13,6 +13,12 @@ export class ImageSelectorComponent implements OnInit {
   @Input()
   visible: boolean = false;
 
+  @Input()
+  title: string = "undefined";
+
+  @Input()
+  sub: boolean = false;
+
   availableOptions: string[][] = [];
   activeOptions: string[] = [];
   allowedOptions: string[][] = [];
@@ -20,6 +26,8 @@ export class ImageSelectorComponent implements OnInit {
   hasDropDown: boolean = false;
   hasData: boolean = false;
   hasPlots: boolean = false;
+
+  isEnabled: boolean = true;
 
   dropdownVisible: boolean = false;
 
@@ -39,15 +47,19 @@ export class ImageSelectorComponent implements OnInit {
     this.hasData = this.availableOptions[this.availableOptions.length - 1].includes("data");
     this.hasPlots = this.availableOptions[this.availableOptions.length - 1].includes("plot");
 
-    this.availableOptions.pop();
-    this.activeOptions.pop();
+    this.isEnabled = this.hasData || this.hasPlots;
 
-    if (this.activeOptions.length > 0) {
-      this.hasDropDown = this.availableOptions[this.activeOptions.length - 1].length > 7;
+    if (this.isEnabled) {
+      this.availableOptions.pop();
+      this.activeOptions.pop();
+
+      if (this.activeOptions.length > 0) {
+        this.hasDropDown = this.availableOptions[this.activeOptions.length - 1].length > 7;
+      }
+
+      this.updateAllowedOptions();
+      this.updateImage();
     }
-
-    this.updateAllowedOptions();
-    this.updateImage();
   }
 
   @HostListener('document:click', ['$event'])

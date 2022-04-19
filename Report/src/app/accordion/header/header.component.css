@@ -4,7 +4,3 @@ button {
   font-size: 25px;
   padding: 18px;
 }
-
-button.sub {
-  background-color: var(--light);
-}
