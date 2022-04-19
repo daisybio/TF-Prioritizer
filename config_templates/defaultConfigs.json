@@ -1,11 +1,11 @@
 {
   "DeSeq2": {
     "tpmFilter": null,
-    "inputGeneID": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data/Gene_id.txt",
+    "inputGeneID": null,
     "biomartDatasetSymbolColumn": "mgi_symbol",
     "countThreshold": 50,
     "biomartDatasetSpecies": "mmusculus_gene_ensembl",
-    "inputDirectory": "/home/nico/Software/COM2POSE_raw_data/02_RNAseq_data",
+    "inputDirectory": null,
     "batchFile": null
   },
   "Dynamite": {
@@ -32,14 +32,14 @@
     "windowSize": 50000,
     "loopListFile": null,
     "loopWindows": 5000,
-    "geneAnnotationFile": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/gencode.vM25.annotation.gtf",
+    "geneAnnotationFile": null,
     "ensgSymbolFile": null,
     "exponentialDecay": true,
     "doNotNormalizePeakLength": false,
     "doNotGenerate": false,
-    "inputDirectory": "/home/nico/Software/COM2POSE_raw_data/01_ChIP_seq/03_broadPeaks_inc_Pol2",
+    "inputDirectory": null,
     "maxMinutesPerChromosome": 3,
-    "pathPwms": "/home/nico/Software/COM2POSE/ext/TEPIC/TEPIC/PWMs/2.1/Merged_PSEMs/Merged_JASPAR_HOCOMOCO_KELLIS_Mus_musculus.PSEM",
+    "pathPwms": null,
     "doZip": false,
     "originalDecay": false,
     "psemsLengthFile": null,
@@ -53,8 +53,8 @@
     "tpmCutoff": null,
     "twoBitFile": null,
     "backgroundSequencesDirectory": null,
-    "onlyDNasePeaks": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/gencode.vM25.annotation.gtf",
-    "inputReferenceGenome": "/home/nico/Software/COM2POSE_raw_data/04_requiredData/genome.fa",
+    "onlyDNasePeaks": null,
+    "inputReferenceGenome": null,
     "bedChromatinSignal": null
   },
   "MixOptions": {
@@ -93,7 +93,7 @@
   "Tgene": {
     "selfRegulatory": false,
     "consensus": 0.5,
-    "pathToExecutable": "/home/nico/.meme",
+    "pathToExecutable": null,
     "noClosestLocus": false,
     "consensusCalc": "INCREASE_TGENE_TFS",
     "maxLinkDistance": 500000,
@@ -124,7 +124,7 @@
     }
   },
   "Blacklist": {
-    "bedFilePath": "/home/nico/Software/COM2POSE_raw_data/05_black_listed_regions/mm10-blacklist.v2.txt",
+    "bedFilePath": null,
     "signalsToIgnore": [
       "LOW_MAPPABILITY",
       "HIGH_SIGNAL_REGION"
