@@ -8,7 +8,11 @@ export interface TranscriptionFactorGroup {
   "targetGenes": TargetGene[],
   "validation": {
     "heatmap": {},
-    "igv": {}
+    "igv": {},
+    "logos": {
+      "biophysical": {},
+      "tfSequence": {}
+    }
   }
 }
 

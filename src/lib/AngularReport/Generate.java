@@ -114,7 +114,6 @@ public class Generate extends ExecutableStep
     }
 
     public static void linkFiles(JSONObject map, File d_target, ExecutorService executorService, Logger logger)
-            throws IOException
     {
         for (String key : map.keySet())
         {
@@ -139,7 +138,7 @@ public class Generate extends ExecutableStep
                 linkFiles((JSONObject) value, newTarget, executorService, logger);
             } else
             {
-                throw new IllegalArgumentException("Illegal map structure detected");
+                logger.error("Illegal map structure detected");
             }
         }
     }

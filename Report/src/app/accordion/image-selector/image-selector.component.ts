@@ -42,7 +42,9 @@ export class ImageSelectorComponent implements OnInit {
     this.availableOptions.pop();
     this.activeOptions.pop();
 
-    this.hasDropDown = this.availableOptions[this.activeOptions.length - 1].length > 7;
+    if (this.activeOptions.length > 0) {
+      this.hasDropDown = this.availableOptions[this.activeOptions.length - 1].length > 7;
+    }
 
     this.updateAllowedOptions();
     this.updateImage();

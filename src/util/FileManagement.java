@@ -5,6 +5,7 @@ import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
+import util.FileFilters.Filters;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -213,12 +214,9 @@ public class FileManagement
             return null;
         }
 
-        for (File entry : directory.listFiles())
+        for (File entry : Objects.requireNonNull(
+                directory.listFiles(lookingForFiles ? Filters.fileFilter : Filters.directoryFilter)))
         {
-            if (lookingForFiles != entry.isFile())
-            {
-                continue;
-            }
             if (entry.getName().matches(fileNameRegex))
             {
                 return entry;

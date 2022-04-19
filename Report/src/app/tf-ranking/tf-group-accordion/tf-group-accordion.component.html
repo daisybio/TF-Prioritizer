@@ -1,5 +1,5 @@
 <accordion-header [title]="title" [sub]="false"
-                  (clickEmitter)="toggleVisibility()"></accordion-header>
+                  (click)="visible=!visible"></accordion-header>
 
 <div class="sub-panel" [ngClass]="{'visible': visible}">
 

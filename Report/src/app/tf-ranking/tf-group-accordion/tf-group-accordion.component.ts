@@ -20,10 +20,6 @@ export class TfGroupAccordionComponent implements OnInit {
   constructor() {
   }
 
-  toggleVisibility() {
-    this.visible = !this.visible;
-  }
-
   ngOnInit(): void {
     if (this.index) {
       this.title = this.index + ". " + this.tfGroup.name;

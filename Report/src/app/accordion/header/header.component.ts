@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'accordion-header',
@@ -15,17 +15,10 @@ export class HeaderComponent implements OnInit {
     // @ts-ignore
   sub: boolean;
 
-  @Output()
-  clickEmitter = new EventEmitter();
-
-  constructor() { }
-
-  ngOnInit(): void {
+  constructor() {
   }
 
-  onClick()
-  {
-    this.clickEmitter.emit();
+  ngOnInit(): void {
   }
 
   getClasses() {

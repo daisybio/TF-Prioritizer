@@ -1,8 +1,8 @@
-import {Injectable} from '@angular/core'
+import {Injectable} from '@angular/core';
 import {InputData, TranscriptionFactorGroup} from "../types/types";
-import data from '../../assets/data.json'
+//import data from '../../assets/data.json';
 
-//import data from '../../assets/input/data.json';
+import data from '../../assets/input/data.json';
 
 
 @Injectable({
