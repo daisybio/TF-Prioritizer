@@ -70,7 +70,7 @@ public class InitStaticVariables extends ExecutableStep
             }
         }
 
-        logger.info("Samples to batches: " + TFPRIO.sample_group);
+        logger.info("Samples to groups: " + TFPRIO.sample_group);
     }
 
     private void initSampleBatchMap()
