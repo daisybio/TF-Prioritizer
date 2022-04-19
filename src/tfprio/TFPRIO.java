@@ -6,7 +6,10 @@ import util.ExecutionTimeMeasurement;
 import util.Logger;
 import util.MapSymbolAndEnsg;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -74,6 +77,8 @@ public class TFPRIO
 
         Logger logger = new Logger("TFPRIO");
 
+        logCurrentCommit(logger);
+
         if (developmentMode)
         {
             logger.warn("Development mode active.");
@@ -87,5 +92,24 @@ public class TFPRIO
         }
 
         logger.info("Finished. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
+    }
+
+    private static void logCurrentCommit(Logger logger)
+    {
+        String command = "git rev-parse HEAD";
+
+        try
+        {
+            Process p = Runtime.getRuntime().exec(command);
+            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String result = input.readLine();
+
+            logger.info("Current commit: " + result);
+        } catch (IOException e)
+        {
+            logger.warn("Could not get current commit: " + e.getMessage());
+        }
+
     }
 }
