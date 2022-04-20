@@ -31,9 +31,13 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onPanelClick() {
+  onTogglePanel() {
     this.panelVisible = !this.panelVisible;
 
     this.togglePanel.emit(this.panelVisible);
+
+    if (!this.panelVisible) {
+      this.informationVisible = false;
+    }
   }
 }

@@ -3,11 +3,7 @@
 
 <div class="sub-panel" [ngClass]="{'visible': visible}">
 
-  <div class="distribute-equally" *ngIf="showAnalysisLinks">
-    <button [routerLink]="'validation'" [queryParams]="{'tf': tfGroup.name}">Validation</button>
-    <button [routerLink]="'distribution'" [queryParams]="{'tf': tfGroup.name}">Distribution</button>
-    <button [routerLink]="'regression'" [queryParams]="{'tf': tfGroup.name}">Regression</button>
-  </div>
+  <cross-links *ngIf="showAnalysisLinks" [tfGroup]="tfGroup" [exclude]="'geneCards'"></cross-links>
 
   <single-tf-accordion *ngFor="let singleTf of tfGroup.transcriptionFactors" [transcriptionFactor]="singleTf"
                        [hasSibling]="tfGroup.transcriptionFactors.length>1"></single-tf-accordion>

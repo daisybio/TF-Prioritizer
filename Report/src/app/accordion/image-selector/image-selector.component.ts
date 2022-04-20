@@ -1,4 +1,5 @@
 import {Component, ElementRef, HostListener, Input, OnInit} from '@angular/core';
+import {dataPrefix} from "../../../assets/constants";
 
 @Component({
   selector: 'image-selector',
@@ -35,7 +36,6 @@ export class ImageSelectorComponent implements OnInit {
   dropdownVisible: boolean = false;
 
   imageSource: string = "";
-  dataPrefix: string = "assets/input/data"
 
   constructor(private eRef: ElementRef) {
   }
@@ -110,7 +110,7 @@ export class ImageSelectorComponent implements OnInit {
     }
 
     // @ts-ignore
-    this.imageSource = this.dataPrefix + subMap["plot"];
+    this.imageSource = dataPrefix + subMap["plot"];
   }
 
   downloadData() {
@@ -125,7 +125,7 @@ export class ImageSelectorComponent implements OnInit {
     link.setAttribute("target", "_blank");
     // @ts-ignore
     let file: string = subMap["data"];
-    link.setAttribute("href", this.dataPrefix + file);
+    link.setAttribute("href", dataPrefix + file);
     link.setAttribute("download", "test.csv");
     document.body.appendChild(link);
     link.click();

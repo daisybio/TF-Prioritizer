@@ -17,6 +17,7 @@ import {DocumentationComponent} from './documentation/documentation.component';
 import {ParametersComponent} from './parameters/parameters.component';
 import {ImageSelectorComponent} from './accordion/image-selector/image-selector.component';
 import {HashLocationStrategy, LocationStrategy} from "@angular/common";
+import { CrossLinksComponent } from './accordion/cross-links/cross-links.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import {HashLocationStrategy, LocationStrategy} from "@angular/common";
     DocumentationComponent,
     ParametersComponent,
     ImageSelectorComponent,
+    CrossLinksComponent,
   ],
   imports: [
     BrowserModule,

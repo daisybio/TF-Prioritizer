@@ -1,6 +1,6 @@
 <div class="header">
   <button class="text" [ngClass]="{'light': sub, 'hasInformation': information}" [disabled]="disabled"
-          (click)="onPanelClick()">{{title}}</button>
+          (click)="onTogglePanel()">{{title}}</button>
   <button *ngIf="information" class="icon" [ngClass]="{'light': sub}"><img src="assets/icons/info.svg"
                                                                            (click)="informationVisible=!informationVisible">
   </button>

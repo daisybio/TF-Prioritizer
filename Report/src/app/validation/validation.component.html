@@ -1,5 +1,6 @@
 <ng-container *ngIf="tfGroup; else tfUndefined">
   <h2>{{tfGroup.name}}: Validation Analysis</h2>
+  <cross-links [tfGroup]="tfGroup" [exclude]="'validation'"></cross-links>
   <tf-group-accordion [tfGroup]="tfGroup" [showAnalysisLinks]="false"></tf-group-accordion>
 
   <accordion-header [title]="'Logos'" (togglePanel)="logosVisible=!logosVisible"
