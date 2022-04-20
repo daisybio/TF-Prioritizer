@@ -4,7 +4,10 @@ export interface InputData {
     [module: string]: {
       [parameter: string]: boolean | number | [] | string
     }
-  }
+  },
+  "importantLoci": {},
+  "topLog2fc": {},
+  "coOccurrenceAnalysis": Data[]
 }
 
 export interface TranscriptionFactorGroup {

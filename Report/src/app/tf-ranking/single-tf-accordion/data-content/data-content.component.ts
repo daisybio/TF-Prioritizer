@@ -24,12 +24,18 @@ export class DataContentComponent implements OnInit {
   ngOnInit(): void {
     this.dimensions = this.data[0].groups.length;
 
+    let accessorSet = new Set<string>();
+
     for (let entry of this.data) {
       if (entry.groups.length != this.dimensions) {
         console.error("Dimensions are not uniform")
       }
-      this.accessors.push(...entry.groups);
+      entry.groups.forEach(accessor => accessorSet.add(accessor));
     }
+
+    accessorSet.forEach(accessor => this.accessors.push(accessor));
+
+    this.accessors.sort();
   }
 
   highLightAccessors(accessors: string[]) {
