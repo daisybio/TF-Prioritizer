@@ -77,7 +77,7 @@ public class TFPRIO
 
         Logger logger = new Logger("TFPRIO");
 
-        logCurrentCommit(logger);
+        logSetupInformation(logger);
 
         if (developmentMode)
         {
@@ -94,7 +94,7 @@ public class TFPRIO
         logger.info("Finished. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
     }
 
-    private static void logCurrentCommit(Logger logger)
+    private static void logSetupInformation(Logger logger)
     {
         String command = "git rev-parse HEAD";
 
@@ -111,5 +111,7 @@ public class TFPRIO
             logger.warn("Could not get current commit: " + e.getMessage());
         }
 
+        logger.info(
+                "Available memory: " + String.format("%.2f", (double) Runtime.getRuntime().maxMemory() / 1e9) + " GB");
     }
 }
