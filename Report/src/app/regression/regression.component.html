@@ -1,5 +1,6 @@
 <div *ngIf="tfGroup; else tfUndefined">
   <h2>{{tfGroup.name}}: Regression analysis</h2>
+  <cross-links [tfGroup]="tfGroup" [exclude]="'regression'"></cross-links>
 </div>
 
 <ng-template #tfUndefined>

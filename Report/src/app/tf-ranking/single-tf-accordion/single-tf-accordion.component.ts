@@ -9,22 +9,21 @@ import {InformationGetterService} from "../../services/information-getter.servic
 })
 export class SingleTfAccordionComponent implements OnInit {
   @Input()
-  // @ts-ignore
+    // @ts-ignore
   transcriptionFactor: TranscriptionFactor;
 
   @Input()
-  // @ts-ignore
   hasSibling: boolean = false;
 
   visible: boolean = false;
 
-  // @ts-ignore
   information;
 
-  constructor(private informationGetter: InformationGetterService) { }
+  constructor(private informationGetter: InformationGetterService) {
+    this.information = informationGetter.getInformation();
+  }
 
   ngOnInit(): void {
-    this.information = this.informationGetter.getInformation();
   }
 
   toggleVisibility() {

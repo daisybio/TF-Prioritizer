@@ -1,5 +1,13 @@
 export interface InputData {
-  "transcriptionFactorGroups": TranscriptionFactorGroup[]
+  "transcriptionFactorGroups": TranscriptionFactorGroup[],
+  "configs": {
+    [module: string]: {
+      [parameter: string]: boolean | number | [] | string
+    }
+  },
+  "importantLoci": {},
+  "topLog2fc": {},
+  "coOccurrenceAnalysis": Data[]
 }
 
 export interface TranscriptionFactorGroup {
@@ -12,6 +20,14 @@ export interface TranscriptionFactorGroup {
     "logos": {
       "biophysical": {},
       "tfSequence": {}
+    }
+  },
+  "distribution": {
+    "plots": {},
+    "ranks": {
+      [hm: string]: {
+        [entryType: string]: number
+      }
     }
   }
 }

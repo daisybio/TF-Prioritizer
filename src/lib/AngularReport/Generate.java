@@ -5,8 +5,8 @@ import org.json.JSONObject;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.FileFilters.Filters;
 import util.Logger;
-import util.ScriptExecution;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,6 +23,12 @@ public class Generate extends ExecutableStep
     AbstractConfig<File> f_input_transcriptionFactors = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
     GeneratedFileStructure f_output_reportJson = TFPRIO.configs.angularReport.fileStructure.f_data;
     GeneratedFileStructure d_output_data = TFPRIO.configs.angularReport.fileStructure.d_data;
+
+    JSONObject importantLoci;
+
+    JSONObject topLog2fc;
+
+    ArrayList<JSONObject> coOccurrence;
 
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
@@ -42,6 +48,10 @@ public class Generate extends ExecutableStep
 
     @Override protected void execute()
     {
+        collectImportantLoci();
+        collectTopLog2fc();
+        collectCoOccurrence();
+
         List<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(f_input_transcriptionFactors.get())))
@@ -90,19 +100,173 @@ public class Generate extends ExecutableStep
         executeAndWait(TFPRIO.configs.angularReport.fileStructure.f_script.get(), logger);
     }
 
-    private void saveJson(List<TranscriptionFactorGroup> transcriptionFactorGroups)
+    private void collectImportantLoci()
     {
-        JSONObject jsonObject = new JSONObject();
+        File d_source = TFPRIO.configs.igv.fileStructure.d_importantLoci.get();
 
-        List<JSONObject> tfGroupObjects = new ArrayList<>();
+        Map<String, Map<String, Map<String, Map<String, File>>>> group_importantLocus_targetGene_fileType_file =
+                new HashMap<>();
 
-        for (TranscriptionFactorGroup transcriptionFactorGroup : transcriptionFactorGroups)
+        for (String group : TFPRIO.groupsToHms.keySet())
         {
-            tfGroupObjects.add(transcriptionFactorGroup.toJSONObject());
+            File d_hm = extend(d_source, group);
+
+            group_importantLocus_targetGene_fileType_file.put(group, new HashMap<>());
+
+            for (File f_plot : Objects.requireNonNull(d_hm.listFiles(Filters.getSuffixFilter(".png"))))
+            {
+                String targetGene = f_plot.getName().substring(0, f_plot.getName().lastIndexOf("."));
+
+                for (String importantLocus : TFPRIO.configs.igv.importantLociAllPrioTf.get())
+                {
+                    if (targetGene.contains(importantLocus))
+                    {
+                        if (!group_importantLocus_targetGene_fileType_file.get(group).containsKey(importantLocus))
+                        {
+                            group_importantLocus_targetGene_fileType_file.get(group)
+                                    .put(importantLocus, new HashMap<>());
+                        }
+
+                        group_importantLocus_targetGene_fileType_file.get(group).get(importantLocus)
+                                .put(targetGene, new HashMap<>());
+
+                        group_importantLocus_targetGene_fileType_file.get(group).get(importantLocus).get(targetGene)
+                                .put("plot", f_plot);
+                    }
+                }
+            }
         }
 
-        jsonObject.put("configs", TFPRIO.configs.getConfigsJSONObject(true));
-        jsonObject.put("transcriptionFactorGroups", tfGroupObjects);
+        importantLoci = new JSONObject(group_importantLocus_targetGene_fileType_file);
+
+        linkFiles(importantLoci, extend(d_output_data.get(), "importantLoci"), executorService, logger);
+    }
+
+    private void collectTopLog2fc()
+    {
+        File d_source = TFPRIO.configs.igv.fileStructure.d_igvTopLog2fc.get();
+
+        Map<String, Map<String, Map<String, Map<String, File>>>> groupPairing_regulationType_targetGene_fileType_file =
+                new HashMap<>();
+
+
+        for (String groupPairing : TFPRIO.groupCombinationsToHms.keySet())
+        {
+            groupPairing_regulationType_targetGene_fileType_file.put(groupPairing, new HashMap<>());
+
+            File d_groupPairing = extend(d_source, groupPairing);
+
+            if (!d_groupPairing.exists())
+            {
+                continue;
+            }
+
+            for (File d_regulationType : Objects.requireNonNull(d_groupPairing.listFiles(Filters.directoryFilter)))
+            {
+                String regulationType = d_regulationType.getName().replaceAll("\\d+_", "");
+
+                groupPairing_regulationType_targetGene_fileType_file.get(groupPairing)
+                        .put(regulationType, new HashMap<>());
+
+                for (File f_targetGenePlot : Objects.requireNonNull(
+                        d_regulationType.listFiles(Filters.getSuffixFilter(".png"))))
+                {
+                    String targetGene = f_targetGenePlot.getName().replaceAll("\\d+_", "");
+                    targetGene = targetGene.substring(0, targetGene.lastIndexOf("."));
+
+                    groupPairing_regulationType_targetGene_fileType_file.get(groupPairing).get(regulationType)
+                            .put(targetGene, new HashMap<>()
+                            {{
+                                put("plot", f_targetGenePlot);
+                            }});
+                }
+            }
+        }
+        topLog2fc = new JSONObject(groupPairing_regulationType_targetGene_fileType_file);
+
+        linkFiles(topLog2fc, extend(d_output_data.get(), "topLog2fc"), executorService, logger);
+    }
+
+    private void collectCoOccurrence()
+    {
+        File f_source = TFPRIO.configs.distributionAnalysis.fileStructure.f_cooccurrence_frequencies.get();
+
+        List<String> transcriptionFactors = new ArrayList<>();
+
+        Map<String, Map<String, Double>> tf_tf_value = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(f_source)))
+        {
+            String firstLine = reader.readLine();
+
+            for (String transcriptionFactor : firstLine.split("\t"))
+            {
+                if (!transcriptionFactor.isBlank())
+                {
+                    transcriptionFactors.add(transcriptionFactor);
+                }
+            }
+
+            String inputLine;
+            while ((inputLine = reader.readLine()) != null)
+            {
+                String[] split = inputLine.split("\t");
+                String rowTfName = split[0];
+
+                Map<String, Double> tf_value = new HashMap<>();
+
+                for (int i = 1; i < split.length; i++)
+                {
+                    double value = Double.parseDouble(split[i]);
+                    String columnTfName = transcriptionFactors.get(i - 1);
+
+                    tf_value.put(columnTfName, value);
+                }
+
+                tf_tf_value.put(rowTfName, tf_value);
+            }
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+
+        coOccurrence = new ArrayList<>()
+        {{
+            for (String tf1 : tf_tf_value.keySet())
+            {
+                for (String tf2 : tf_tf_value.get(tf1).keySet())
+                {
+                    if (tf1.compareTo(tf2) >= 0)
+                    {
+                        continue;
+                    }
+
+                    add(new JSONObject()
+                    {{
+                        put("groups", Arrays.asList(tf1, tf2));
+                        put("value", tf_tf_value.get(tf1).get(tf2));
+                    }});
+                }
+            }
+        }};
+    }
+
+    private void saveJson(List<TranscriptionFactorGroup> transcriptionFactorGroups)
+    {
+        JSONObject jsonObject = new JSONObject()
+        {{
+            put("configs", TFPRIO.configs.getConfigsJSONObject(true, true));
+            put("importantLoci", importantLoci);
+            put("topLog2fc", topLog2fc);
+            put("coOccurrenceAnalysis", coOccurrence);
+
+            put("transcriptionFactorGroups", new ArrayList<>()
+            {{
+                transcriptionFactorGroups.forEach(
+                        transcriptionFactorGroup -> add(transcriptionFactorGroup.toJSONObject()));
+            }});
+        }};
+
 
         try
         {

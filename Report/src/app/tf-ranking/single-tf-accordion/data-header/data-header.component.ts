@@ -1,4 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {geneCardUrl} from "../../../../assets/constants";
+import {TranscriptionFactor} from "../../../types/types";
+import {OpenExternalUrlService} from "../../../services/open-external-url.service";
 
 @Component({
   selector: 'data-header',
@@ -11,12 +14,19 @@ export class DataHeaderComponent implements OnInit {
   title: string;
 
   @Input()
+  information: string | undefined;
+
+  @Input()
     // @ts-ignore
-  information: string;
+  transcriptionFactor: TranscriptionFactor;
 
   informationVisible: boolean = false;
+  geneCardUrl = geneCardUrl;
 
-  constructor() {
+  urlOpener: OpenExternalUrlService;
+
+  constructor(urlOpener: OpenExternalUrlService) {
+    this.urlOpener = urlOpener;
   }
 
   ngOnInit(): void {

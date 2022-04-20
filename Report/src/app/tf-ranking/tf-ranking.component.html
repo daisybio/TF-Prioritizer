@@ -1,8 +1,8 @@
 <h2>Prioritized transcription factors</h2>
 <div class="distribute-equally">
-  <button>Important loci</button>
-  <button>Top LOG2FC</button>
-  <button>Co-Occurrence Analysis</button>
+  <button [routerLink]="'/importantLoci'">Important loci</button>
+  <button [routerLink]="'/topLog2fc'">Top LOG2FC</button>
+  <button [routerLink]="'/coOccurrenceAnalysis'">Co-Occurrence Analysis</button>
 </div>
 <div class="distribute-equally">
   <input (keyup)="targetGeneSearch.value=''" type="text"

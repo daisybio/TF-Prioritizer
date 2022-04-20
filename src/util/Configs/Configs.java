@@ -232,11 +232,16 @@ public class Configs
      */
     public JSONObject getConfigsJSONObject(boolean onlyWriteable)
     {
+        return getConfigsJSONObject(onlyWriteable, false);
+    }
+
+    public JSONObject getConfigsJSONObject(boolean onlyWriteable, boolean excludeFiles)
+    {
         JSONObject combined = new JSONObject();
 
         for (String key : configs.keySet())
         {
-            JSONObject module = configs.get(key).toJSONObject(onlyWriteable);
+            JSONObject module = configs.get(key).toJSONObject(onlyWriteable, excludeFiles);
             if (!module.isEmpty())
             {
                 combined.accumulate(key, module);

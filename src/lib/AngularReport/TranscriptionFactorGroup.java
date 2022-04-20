@@ -3,18 +3,14 @@ package lib.AngularReport;
 import org.json.JSONObject;
 import tfprio.TFPRIO;
 import util.FileFilters.Filters;
+import util.FileManagement;
 import util.Logger;
 
-import javax.print.attribute.standard.JobStateReasons;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
-import static util.FileManagement.extend;
-import static util.FileManagement.getFileIfInDirectory;
+import static util.FileManagement.*;
 
 public class TranscriptionFactorGroup
 {
@@ -30,6 +26,9 @@ public class TranscriptionFactorGroup
     JSONObject validation_igv;
     JSONObject validation_logos_biophysicalModel;
     JSONObject validation_logos_tfSequence;
+
+    JSONObject distribution_plots;
+    JSONObject distribution_ranks;
 
     final File d_tfData;
 
@@ -60,6 +59,7 @@ public class TranscriptionFactorGroup
         transcriptionFactors.forEach(TranscriptionFactor::collectData);
         collectTargetGenes();
         collectValidationFiles();
+        collectDistributionFiles();
     }
 
     private void collectTargetGenes()
@@ -161,7 +161,8 @@ public class TranscriptionFactorGroup
 
                     if (d_groupPairing.exists())
                     {
-                        for (File plotFile : d_groupPairing.listFiles(Filters.getSuffixFilter(".png")))
+                        for (File plotFile : Objects.requireNonNull(
+                                d_groupPairing.listFiles(Filters.getSuffixFilter(".png"))))
                         {
                             String targetGene = plotFile.getName().replaceAll("\\d+_", "").replace(".png", "");
 
@@ -252,6 +253,82 @@ public class TranscriptionFactorGroup
         } // Logos
     }
 
+    private void collectDistributionFiles()
+    {
+        {
+            File d_source = TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_hm.get();
+
+            Map<String, Map<String, Map<String, File>>> hm_targetGene_filetype_file = new HashMap<>();
+
+            for (String hm : TFPRIO.existingHms)
+            {
+                hm_targetGene_filetype_file.put(hm, new HashMap<>());
+
+                File d_hm = extend(d_source, hm);
+
+                if (d_hm.exists())
+                {
+                    for (File f_targetGenePlot : Objects.requireNonNull(d_hm.listFiles(Filters.fileFilter)))
+                    {
+                        String targetGene =
+                                f_targetGenePlot.getName().substring(0, f_targetGenePlot.getName().lastIndexOf("."));
+
+                        hm_targetGene_filetype_file.get(hm).put(targetGene, new HashMap<>()
+                        {{
+                            put("plot", f_targetGenePlot);
+                        }});
+                    }
+                }
+            }
+
+            distribution_plots = new JSONObject(hm_targetGene_filetype_file);
+
+            Generate.linkFiles(distribution_plots, extend(d_tfData, "distribution", "plots"), executorService, logger);
+        } // Plots
+
+        {
+            File d_source = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_hm.get();
+            Map<String, Map<String, Integer>> hm_entryType_value = new HashMap<>();
+
+            for (String hm : TFPRIO.existingHms)
+            {
+                File f_stats =
+                        extend(d_source, hm, TFPRIO.configs.distributionAnalysis.fileStructure.s_stats_csv.get());
+
+                hm_entryType_value.put(hm, new HashMap<>());
+
+                Integer rank = null;
+
+                try
+                {
+                    rank = Integer.parseInt(findValueInTable(name, 1, 0, f_stats, "\t", true));
+                } catch (FileNotFoundException e)
+                {
+                    logger.error(e.getMessage());
+                } catch (NoSuchFieldException ignore)
+                {
+                }
+
+                Integer size = null;
+
+                try
+                {
+                    String[] lines = FileManagement.readFile(f_stats).split("\n");
+                    String lastLine = lines[lines.length - 1];
+                    size = Integer.parseInt(lastLine.split("\t")[0]);
+                } catch (IOException e)
+                {
+                    logger.error(e.getMessage());
+                }
+
+                hm_entryType_value.get(hm).put("rank", rank);
+                hm_entryType_value.get(hm).put("size", size);
+            }
+
+            distribution_ranks = new JSONObject(hm_entryType_value);
+        } // Scores
+    }
+
     public JSONObject toJSONObject()
     {
         return new JSONObject()
@@ -280,6 +357,12 @@ public class TranscriptionFactorGroup
                     put("biophysical", validation_logos_biophysicalModel);
                     put("tfSequence", validation_logos_tfSequence);
                 }});
+            }});
+
+            put("distribution", new JSONObject()
+            {{
+                put("plots", distribution_plots);
+                put("ranks", distribution_ranks);
             }});
             put("targetGenes", targetGeneJsonObjects);
         }};

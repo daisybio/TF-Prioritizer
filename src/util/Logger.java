@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
+
+import static util.FileManagement.appendToFile;
 
 public class Logger
 {
@@ -71,6 +74,20 @@ public class Logger
 
         debug("Initialised logger " +
                 (fileLoggingEnabled ? "with file logging to " + logFile.getAbsolutePath() : "without file logging."));
+
+        if (fileLoggingEnabled && this.logFile.exists() && this.module.equals("TFPRIO"))
+        {
+            try
+            {
+                appendToFile(this.logFile, "###########################################################\n");
+                appendToFile(this.logFile, "######################### NEW RUN #########################\n");
+                appendToFile(this.logFile, "###########################################################\n");
+            } catch (IOException e)
+            {
+                this.fileLoggingEnabled = false;
+                warn("File logging not possible: " + e.getMessage());
+            }
+        }
     }
 
     /**
@@ -138,11 +155,11 @@ public class Logger
         {
             try
             {
-                FileManagement.appendToFile(logFile, line + "\n");
+                appendToFile(logFile, line + "\n");
             } catch (IOException e)
             {
                 fileLoggingEnabled = false;
-                logLine("File logging not possible: " + e.getMessage(), LogLevel.ERROR);
+                warn("File logging not possible: " + e.getMessage());
             }
         }
 

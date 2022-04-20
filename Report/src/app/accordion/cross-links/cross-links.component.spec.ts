@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GeneIDComponent } from './gene-id.component';
+import { CrossLinksComponent } from './cross-links.component';
 
-describe('GeneIDComponent', () => {
-  let component: GeneIDComponent;
-  let fixture: ComponentFixture<GeneIDComponent>;
+describe('CrossLinksComponent', () => {
+  let component: CrossLinksComponent;
+  let fixture: ComponentFixture<CrossLinksComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GeneIDComponent ]
+      declarations: [ CrossLinksComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(GeneIDComponent);
+    fixture = TestBed.createComponent(CrossLinksComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

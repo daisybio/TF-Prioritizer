@@ -1,6 +1,22 @@
-button {
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-items: right;
+}
+
+button.hasInformation {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+button.text {
   width: 100%;
-  text-align: left;
   font-size: 25px;
+  text-align: left;
   padding: 18px;
+}
+
+button.icon {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
 }
