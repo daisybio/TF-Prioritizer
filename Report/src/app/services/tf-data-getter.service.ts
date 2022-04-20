@@ -8,7 +8,7 @@ import data from '../../assets/input/data.json';
   providedIn: 'root'
 })
 export class TfDataGetterService {
-  inputData: InputData;
+  private readonly inputData: InputData;
   tfMap: { [name: string]: TranscriptionFactorGroup } = {};
 
   constructor() {

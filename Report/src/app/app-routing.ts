@@ -7,6 +7,9 @@ import {RegressionComponent} from "./regression/regression.component";
 import {DistributionComponent} from "./distribution/distribution.component";
 import {DocumentationComponent} from "./documentation/documentation.component";
 import {ParametersComponent} from "./parameters/parameters.component";
+import {ImportantLociComponent} from "./important-loci/important-loci.component";
+import {TopLog2fcComponent} from "./top-log2fc/top-log2fc.component";
+import {CoOccurrenceAnalysisComponent} from "./co-occurrence-analysis/co-occurrence-analysis.component";
 
 const routes: Routes = [
   {path: '', component: TfRankingComponent},
@@ -15,6 +18,9 @@ const routes: Routes = [
   {path: 'distribution', component: DistributionComponent},
   {path: 'documentation', component: DocumentationComponent},
   {path: 'parameters', component: ParametersComponent},
+  {path: 'importantLoci', component: ImportantLociComponent},
+  {path: 'topLog2fc', component: TopLog2fcComponent},
+  {path: 'coOccurrenceAnalysis', component: CoOccurrenceAnalysisComponent},
 
   // otherwise redirect to home
   {path: '**', redirectTo: ''}

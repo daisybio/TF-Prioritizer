@@ -23,6 +23,9 @@ export class ImageSelectorComponent implements OnInit {
   @Input()
   information: string | undefined;
 
+  @Input()
+  hideHeader: boolean = false;
+
   availableOptions: string[][] = [];
   activeOptions: string[] = [];
   allowedOptions: string[][] = [];
