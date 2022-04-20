@@ -8,7 +8,6 @@ import {TfGroupAccordionComponent} from './tf-ranking/tf-group-accordion/tf-grou
 import {SingleTfAccordionComponent} from './tf-ranking/single-tf-accordion/single-tf-accordion.component';
 import {TfRankingComponent} from './tf-ranking/tf-ranking.component';
 import {DataHeaderComponent} from './tf-ranking/single-tf-accordion/data-header/data-header.component';
-import {GeneIDComponent} from './tf-ranking/single-tf-accordion/gene-id/gene-id.component';
 import {DataContentComponent} from './tf-ranking/single-tf-accordion/data-content/data-content.component';
 import {ValidationComponent} from './validation/validation.component';
 import {DistributionComponent} from './distribution/distribution.component';
@@ -17,7 +16,10 @@ import {DocumentationComponent} from './documentation/documentation.component';
 import {ParametersComponent} from './parameters/parameters.component';
 import {ImageSelectorComponent} from './accordion/image-selector/image-selector.component';
 import {HashLocationStrategy, LocationStrategy} from "@angular/common";
-import { CrossLinksComponent } from './accordion/cross-links/cross-links.component';
+import {CrossLinksComponent} from './accordion/cross-links/cross-links.component';
+import {ImportantLociComponent} from './important-loci/important-loci.component';
+import {TopLog2fcComponent} from './top-log2fc/top-log2fc.component';
+import {CoOccurrenceAnalysisComponent} from './co-occurrence-analysis/co-occurrence-analysis.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +29,6 @@ import { CrossLinksComponent } from './accordion/cross-links/cross-links.compone
     SingleTfAccordionComponent,
     TfRankingComponent,
     DataHeaderComponent,
-    GeneIDComponent,
     DataContentComponent,
     ValidationComponent,
     DistributionComponent,
@@ -36,6 +37,9 @@ import { CrossLinksComponent } from './accordion/cross-links/cross-links.compone
     ParametersComponent,
     ImageSelectorComponent,
     CrossLinksComponent,
+    ImportantLociComponent,
+    TopLog2fcComponent,
+    CoOccurrenceAnalysisComponent,
   ],
   imports: [
     BrowserModule,

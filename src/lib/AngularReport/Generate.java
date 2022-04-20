@@ -101,7 +101,7 @@ public class Generate extends ExecutableStep
             tfGroupObjects.add(transcriptionFactorGroup.toJSONObject());
         }
 
-        jsonObject.put("configs", TFPRIO.configs.getConfigsJSONObject(true));
+        jsonObject.put("configs", TFPRIO.configs.getConfigsJSONObject(true, true));
         jsonObject.put("transcriptionFactorGroups", tfGroupObjects);
 
         try

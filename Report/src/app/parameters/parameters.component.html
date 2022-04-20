@@ -2,6 +2,15 @@
   <accordion-header [title]="module"
                     (togglePanel)="visibilities[module]=!visibilities[module]"></accordion-header>
   <div class="sub-panel" [ngClass]="{'visible': visibilities[module]}">
-    <p *ngFor="let parameter of getParameters(module)">{{parameter}}: {{getValue(module, parameter)}}</p>
+    <table>
+      <tr>
+        <th>Parameter name</th>
+        <th>Value</th>
+      </tr>
+      <tr *ngFor="let parameter of getParameters(module)">
+        <th>{{parameter}}</th>
+        <td>{{getValue(module, parameter)}}</td>
+      </tr>
+    </table>
   </div>
 </ng-container>

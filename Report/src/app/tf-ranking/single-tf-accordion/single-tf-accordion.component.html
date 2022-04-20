@@ -2,7 +2,8 @@
                   (click)="toggleVisibility()"></accordion-header>
 <div class="sub-panel" [ngClass]="{'visible': visible || !hasSibling}">
   <div class="data">
-    <data-header [title]="'GeneID'" [information]="information['basicData']['geneID']"></data-header>
+    <data-header [title]="'GeneID'" [information]="information['basicData']['geneID']"
+                 [transcriptionFactor]="transcriptionFactor"></data-header>
     <p>{{transcriptionFactor.geneID}}</p>
   </div>
   <div class="data">

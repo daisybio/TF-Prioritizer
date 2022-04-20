@@ -169,13 +169,13 @@ public abstract class AbstractModule
      * @param onlyWriteable defines if only writeable configs should be included
      * @return the json object
      */
-    public JSONObject toJSONObject(boolean onlyWriteable)
+    public JSONObject toJSONObject(boolean onlyWriteable, boolean excludeFiles)
     {
         JSONObject combined = new JSONObject();
 
         for (String key : subModules.keySet())
         {
-            JSONObject subModuleJSONObject = subModules.get(key).toJSONObject(onlyWriteable);
+            JSONObject subModuleJSONObject = subModules.get(key).toJSONObject(onlyWriteable, excludeFiles);
             if (!subModuleJSONObject.keySet().isEmpty())
             {
                 combined.accumulate(key, subModuleJSONObject);
@@ -185,7 +185,8 @@ public abstract class AbstractModule
         {
             AbstractConfig<?> entry = entries.get(key);
 
-            if (onlyWriteable && !entry.isWriteable())
+            if (onlyWriteable && !entry.isWriteable() ||
+                    excludeFiles && entry.isSet() && entry.get().getClass().equals(File.class))
             {
                 continue;
             }
