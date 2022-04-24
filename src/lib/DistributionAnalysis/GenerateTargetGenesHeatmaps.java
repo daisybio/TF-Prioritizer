@@ -64,7 +64,7 @@ public class GenerateTargetGenesHeatmaps extends ExecutableStep
         StringBuilder sb_batches = new StringBuilder(", batch = c(");
         for (Map.Entry<String, String> entry : TFPRIO.sample_group.entrySet())
         {
-            sb_samples.append("'").append(entry.getKey()).append("', ");
+            sb_samples.append("'").append(entry.getKey().replace("-", ".")).append("', ");
             sb_groups.append("'").append(entry.getValue()).append("', ");
             if (TFPRIO.sample_batch != null)
             {

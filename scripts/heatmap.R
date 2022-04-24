@@ -9,7 +9,6 @@ preprocessing_path <- "{PREPROCESSING_PATH}"
 heatmap_dir <- "{HEATMAP_DIR}"
 metaData <- data.frame(sample_id = c({ SAMPLES }), group = c({ GROUPS }){ BATCHES })
 row.names(metaData) <- metaData$sample_id
-metaData$sample_id <- NULL
 
 messagesfile <- file(paste(heatmap_dir, "messages.Rout", sep = "/"), open = "wt")
 sink(messagesfile, type = "message")
@@ -80,7 +79,8 @@ for (group in list.files(path = target_genes_path)) {
 
 
         read_counts <- subset(chosen, select = -c(Geneid))
-        read_counts <- read_counts[, c(rownames(metaData))]
+        metaData_groupPairing <- metaData[colnames(read_counts), ]
+        metaData_groupPairing$sample_id <- NULL
 
         # Add geneSymbols to data
         chosen <- transform(chosen, geneSymbol = map[, 2][match(Geneid, map$ensembl_gene_id)])
@@ -89,13 +89,15 @@ for (group in list.files(path = target_genes_path)) {
         write.csv(chosen, target_file, row.names = FALSE)
 
         dds <- DESeqDataSetFromMatrix(countData = read_counts,
-                                      colData = metaData,
+                                      colData = metaData_groupPairing,
                                       design = ~{ DESIGN })
         dds <- DESeq(dds, quiet = TRUE)
 
         geneCounts_normalized <- counts(dds)
 
-        pheatmap(geneCounts_normalized, scale = "row", filename = plot_file, labels_row = chosen$geneSymbol, legend = TRUE, annotation_legend = TRUE, angle_col = 45, show_row_dend = FALSE, show_col_dend = FALSE, show_rownames = TRUE, show_colnames = FALSE, treeheight_row = 0, treeheight_col = 0, annotation_col = metaData)
+        pheatmap(geneCounts_normalized, scale = "row", filename = plot_file, labels_row = chosen$geneSymbol, legend =
+         TRUE, annotation_legend = TRUE, angle_col = 45, show_row_dend = FALSE, show_col_dend = FALSE, show_rownames
+         = TRUE, show_colnames = FALSE, treeheight_row = 0, treeheight_col = 0, annotation_col = metaData_groupPairing)
       }
     }
   }

@@ -36,7 +36,7 @@ public class ScriptExecution
             if (returnCode != 0)
             {
                 String message = new String(process.getErrorStream().readAllBytes());
-                logger.error("Received return code " + returnCode + ":\n\n" + message);
+                logger.error("Received return code " + returnCode + "\n\n Command was: " + command + "\n\n" + message);
             }
         } catch (IOException | InterruptedException e)
         {
@@ -57,7 +57,7 @@ public class ScriptExecution
             if (code != 0)
             {
                 String message = new String(child.getErrorStream().readAllBytes());
-                logger.error("Received return code " + code + ":\n\n" + message);
+                logger.error("Received return code " + code + "\n\n Command was: " + command + "\n\n" + message);
             }
         } catch (IOException | InterruptedException e)
         {

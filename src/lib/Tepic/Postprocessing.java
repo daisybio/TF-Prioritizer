@@ -554,6 +554,6 @@ public class Postprocessing extends ExecutableStep
 
     @Override protected int getThreadNumber()
     {
-        return 2;
+        return 1;
     }
 }
