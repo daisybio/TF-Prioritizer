@@ -386,4 +386,9 @@ public class Report extends ExecutableStep
             }
         }
     }
+
+    @Override protected boolean mayBeSkipped()
+    {
+        return false;
+    }
 }

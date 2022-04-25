@@ -28,8 +28,7 @@ background_mean = background_sum / background_length
 background_median = sts.median(background['TF_TG_SCORE'])
 background_quantile = np.percentile(background["TF_TG_SCORE"], 95)
 background_quantile_99 = np.percentile(background["TF_TG_SCORE"], 99)
-df_interesting_stats.loc[0] = ['background', background_sum, background_length, background_mean, background_median,
-                               background_quantile, background_quantile_99]
+
 row_counter = 1
 
 
@@ -71,6 +70,11 @@ def generate(inputFile: str, plotFile: str, tfName: str):
 
 {CALLS}
 
+df_interesting_stats.sort_values("median", ascending=False, inplace=True)
+
+df_interesting_stats.loc[0] = ['background', background_sum, background_length, background_mean, background_median,
+                               background_quantile, background_quantile_99]
+df_interesting_stats.sort_index(inplace=True)
 df_interesting_stats.to_csv(
     '{STATSFILE}',
     sep='\t')
