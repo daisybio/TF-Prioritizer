@@ -2,6 +2,7 @@ package util.Configs.Modules.Tepic;
 
 import util.Configs.ConfigTypes.*;
 import util.Configs.ConfigValidators.IntegerRangeValidator;
+import util.Configs.ConfigValidators.PositiveDoubleValidator;
 import util.Configs.ConfigValidators.PositiveIntegerValidator;
 import util.Configs.ConfigValidators.StringValidator;
 import util.Configs.Modules.AbstractModule;
@@ -49,8 +50,7 @@ public class Tepic extends AbstractModule
     public final InputFileStructure loopListFile = new InputFileStructure();
     public final InputConfig<Integer> loopWindows = new InputConfig<>(Integer.class);
     public final InputConfig<Boolean> onlyPeakFeatures = new InputConfig<>(Boolean.class);
-    public final InputConfig<Integer> tpmCutoff = new InputConfig<>(Integer.class, new PositiveIntegerValidator());
-    public final InputFileStructure ensgSymbolFile = new InputFileStructure();
+    public final InputConfig<Double> tpmCutoff = new InputConfig<>(Double.class, new PositiveDoubleValidator());
     public final InputConfig<Boolean> tgeneTargetGenes = new InputConfig<>(Boolean.class);
     public final InputConfig<Boolean> randomizeTfGeneMatrix = new InputConfig<>(Boolean.class);
     public final InputConfig<String> tfBindingSiteSearch =

@@ -28,7 +28,7 @@ public class Postprocessing extends ExecutableStep
             TFPRIO.configs.deSeq2.fileStructure.s_preprocessing_MeanCounts;
     private final AbstractConfig<String> s_groups_mergedGroups =
             TFPRIO.configs.tgene.fileStructure.s_groups_mergedGroups;
-    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<Double> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
     private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()

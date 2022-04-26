@@ -46,7 +46,7 @@ Rscript install/r_dependencies.R
 Rscript ext/TEPIC/TEPIC/Code/installRpackages.R
 
 # Install some more linux packages
-sudo apt-get install -y bedtools python3 unzip python3-pip
+sudo apt-get install -y bedtools python3 unzip python3-pip xvfb
 
 # Install required python packages
 python3 -m pip install -r install/requirements.txt
@@ -117,4 +117,14 @@ fi
 if [ ! -f "ext/lib/json/json.jar" ]; then
     mkdir -p ext/lib/json
     wget 'https://search.maven.org/remotecontent?filepath=org/json/json/20211205/json-20211205.jar' -O ext/lib/json/json.jar
+fi
+
+# Install angular cli
+if ng --version; then
+  echo "Angular already installed."
+else
+  curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+  sudo apt-get install -y nodejs
+  sudo npm install npm@latest -g
+  sudo npm install -g @angular/cli
 fi

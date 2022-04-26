@@ -24,7 +24,7 @@ public class TopKTargetGenes extends ExecutableStep
     private final AbstractConfig<String> s_plotData_different =
             TFPRIO.configs.plots.fileStructure.s_data_hmLevelDifferent;
     private final AbstractConfig<String> s_plotData_same = TFPRIO.configs.plots.fileStructure.s_data_hmLevelSame;
-    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<Double> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
     private final AbstractConfig<List<Double>> thresholds = TFPRIO.configs.plots.thresholds;
     private final AbstractConfig<Integer> topKGenes = TFPRIO.configs.plots.topKGenes;
 

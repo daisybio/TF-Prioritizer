@@ -23,7 +23,7 @@ public class Postprocessing extends ExecutableStep
 
     private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
     private final AbstractConfig<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
-    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<Double> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
     private final AbstractConfig<Boolean> doNotGenerate = TFPRIO.configs.tepic.doNotGenerate;
     private final AbstractConfig<String> s_meanAffinities =
             TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_meanAffinitiesDir;
