@@ -33,7 +33,7 @@ public class Tepic extends ExecutableStep
             TFPRIO.configs.tepic.fileStructure.s_outputRaw_trapSequences;
 
     // if tpmCut > 0
-    private final AbstractConfig<File> ensgSymbolFile = TFPRIO.configs.tepic.ensgSymbolFile;
+    private final AbstractConfig<File> ensgSymbolFile = TFPRIO.configs.deSeq2.fileStructure.f_mapping;
     private final AbstractConfig<File> inputGeneID = TFPRIO.configs.deSeq2.inputGeneID;
 
     // Optional configs
