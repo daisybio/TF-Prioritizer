@@ -20,7 +20,7 @@ public class Tepic extends ExecutableStep
 
     private final AbstractConfig<File> f_referenceGenome = TFPRIO.configs.tepic.inputReferenceGenome;
     private final AbstractConfig<File> f_pwms = TFPRIO.configs.tepic.pathPwms;
-    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<Double> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
     private final AbstractConfig<File> tepicExecutable = TFPRIO.configs.tepic.executable;
     private final AbstractConfig<String> tfBindingSiteSearch = TFPRIO.configs.tepic.tfBindingSiteSearch;
     private final AbstractConfig<Boolean> mixMutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;

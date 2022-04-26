@@ -43,7 +43,7 @@ public class RunDistributionAnalysis extends ExecutableStep
 
     // Optional configs
     private final AbstractConfig<File> f_tgeneExecutable = TFPRIO.configs.tgene.pathToExecutable;
-    private final AbstractConfig<Integer> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<Double> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
 
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
