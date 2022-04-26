@@ -33,7 +33,6 @@
     "loopListFile": null,
     "loopWindows": 5000,
     "geneAnnotationFile": null,
-    "ensgSymbolFile": null,
     "exponentialDecay": true,
     "doNotNormalizePeakLength": false,
     "doNotGenerate": false,
