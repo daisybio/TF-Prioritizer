@@ -6,7 +6,11 @@ import java.io.File;
 
 public class ArgParser
 {
-    static void parseArguments(String[] args)
+    private File configFile;
+    private File workingDirectory;
+    private File sourceDirectory;
+
+    public ArgParser(String[] args)
     {
         Options options = new Options();
 
@@ -33,9 +37,9 @@ public class ArgParser
         {
             cmd = parser.parse(options, args);
 
-            TFPRIO.configFile = new File(cmd.getOptionValue("com2pose-config"));
-            TFPRIO.workingDirectory = new File(cmd.getOptionValue("working-directory"));
-            TFPRIO.sourceDirectory = new File(cmd.getOptionValue("path-tfprio"));
+            configFile = new File(cmd.getOptionValue("com2pose-config"));
+            workingDirectory = new File(cmd.getOptionValue("working-directory"));
+            sourceDirectory = new File(cmd.getOptionValue("path-tfprio"));
 
         } catch (ParseException e)
         {
@@ -45,5 +49,20 @@ public class ArgParser
                     options);
             System.exit(1);
         }
+    }
+
+    public File getConfigFile()
+    {
+        return configFile;
+    }
+
+    public File getWorkingDirectory()
+    {
+        return workingDirectory;
+    }
+
+    public File getSourceDirectory()
+    {
+        return sourceDirectory;
     }
 }

@@ -66,7 +66,11 @@ public class TFPRIO
     public static void main(String[] args) throws Exception
     {
         ExecutionTimeMeasurement timer = new ExecutionTimeMeasurement();
-        ArgParser.parseArguments(args);
+        ArgParser argParser = new ArgParser(args);
+
+        configFile = argParser.getConfigFile();
+        workingDirectory = argParser.getWorkingDirectory();
+        sourceDirectory = argParser.getSourceDirectory();
 
         configs = new Configs();
 
