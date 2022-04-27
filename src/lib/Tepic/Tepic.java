@@ -121,19 +121,17 @@ public class Tepic extends ExecutableStep
                     }
 
                     File d_output = extend(output_TEPIC, d_group.getName(), d_hm.getName(), sampleName);
-                    File d_output_combined = extend(d_output, sampleName);
 
                     try
                     {
                         makeSureDirectoryExists(d_output);
-                        makeSureDirectoryExists(d_output_combined);
                     } catch (IOException e)
                     {
                         logger.error(e.getMessage());
                     }
 
                     sampleConfigs.put("b", f_sample.getAbsolutePath());
-                    sampleConfigs.put("o", d_output_combined.getAbsolutePath());
+                    sampleConfigs.put("o", sampleName);
 
                     if (tpmCutoff.isSet())
                     {
