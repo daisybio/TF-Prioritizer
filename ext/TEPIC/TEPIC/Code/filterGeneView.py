@@ -109,7 +109,7 @@ def main():
         infile_counts.readline()
         counts = []
         for l in infile_counts:
-            counts.append(int(l.replace("\n", "")).split("\t")[2])
+            counts.append(int(l.replace("\n", "").split("\t")[2]))
         infile_counts.close()
 
         infile_annot_counts = open(sys.argv[4], "r")
