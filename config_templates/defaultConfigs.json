@@ -1,4 +1,26 @@
 {
+  "General": {
+    "threadLimit": 1,
+    "fileLogging": true,
+    "calculateGenePositionsEnabled": true,
+    "calculateTpmLengthsEnabled": true,
+    "redirectExternalScriptOutputStream": false,
+    "redirectExternalScriptErrorStream": false
+  },
+  "MixOptions": {
+    "mutuallyExclusiveDifferentialPeakSignals": true,
+    "level": null,
+    "mutuallyExclusive": false,
+    "occurrenceIntersection": 2,
+    "option": null
+  },
+  "Blacklist": {
+    "bedFilePath": null,
+    "signalsToIgnore": [
+      "LOW_MAPPABILITY",
+      "HIGH_SIGNAL_REGION"
+    ]
+  },
   "DeSeq2": {
     "tpmFilter": null,
     "inputGeneID": null,
@@ -8,22 +30,16 @@
     "inputDirectory": null,
     "batchFile": null
   },
-  "Dynamite": {
-    "iFolds": 6,
-    "cores": 1,
-    "performance": true,
-    "preprocessing_IntegrateDataConsiderGeneFile": null,
-    "alpha": 0.1,
-    "testSize": 0.2,
-    "outVar": "Expression",
-    "oFolds": 3,
-    "balanced": true,
-    "randomize": false
-  },
-  "ChipAtlas": {
-    "isEnabled": true,
-    "genomeVersion": "mm10",
-    "tissueType": "breast"
+  "Tgene": {
+    "selfRegulatory": false,
+    "consensus": 0.5,
+    "pathToExecutable": null,
+    "noClosestLocus": false,
+    "consensusCalc": "INCREASE_TGENE_TFS",
+    "maxLinkDistance": 500000,
+    "noClosestTss": false,
+    "mtWriting": "MT",
+    "pValue": 0.05
   },
   "Tepic": {
     "transcriptBased": false,
@@ -56,13 +72,6 @@
     "inputReferenceGenome": null,
     "bedChromatinSignal": null
   },
-  "MixOptions": {
-    "mutuallyExclusiveDifferentialPeakSignals": true,
-    "level": null,
-    "mutuallyExclusive": false,
-    "occurrenceIntersection": 2,
-    "option": null
-  },
   "Plots": {
     "cutoffTps": 1,
     "cutoffGcs": 100,
@@ -81,24 +90,25 @@
     "distributionAnalysisScoreType": "EXCL_GENE_COUNTS",
     "trapPredictedSequenceLogosAffinityCutoff": 0.05
   },
-  "General": {
-    "threadLimit": 1,
-    "fileLogging": true,
-    "calculateGenePositionsEnabled": true,
-    "calculateTpmLengthsEnabled": true,
-    "redirectExternalScriptOutputStream": false,
-    "redirectExternalScriptErrorStream": false
+  "Dynamite": {
+    "iFolds": 6,
+    "cores": 1,
+    "performance": true,
+    "preprocessing_IntegrateDataConsiderGeneFile": null,
+    "alpha": 0.1,
+    "testSize": 0.2,
+    "outVar": "Expression",
+    "oFolds": 3,
+    "balanced": true,
+    "randomize": false
   },
-  "Tgene": {
-    "selfRegulatory": false,
-    "consensus": 0.5,
-    "pathToExecutable": null,
-    "noClosestLocus": false,
-    "consensusCalc": "INCREASE_TGENE_TFS",
-    "maxLinkDistance": 500000,
-    "noClosestTss": false,
-    "mtWriting": "MT",
-    "pValue": 0.05
+  "DistributionAnalysis": {
+    "performAllAnalysis": false
+  },
+  "ChipAtlas": {
+    "isEnabled": true,
+    "genomeVersion": "mm10",
+    "tissueType": "breast"
   },
   "Igv": {
     "topLog2fcIncludeLncRnaPseudogenes": true,
@@ -121,15 +131,5 @@
       "GRCh38": "hg38",
       "GRCh37": "hg19"
     }
-  },
-  "Blacklist": {
-    "bedFilePath": null,
-    "signalsToIgnore": [
-      "LOW_MAPPABILITY",
-      "HIGH_SIGNAL_REGION"
-    ]
-  },
-  "DistributionAnalysis": {
-    "performAllAnalysis": false
   }
 }
