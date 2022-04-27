@@ -51,7 +51,7 @@ public class Logger
      */
     public Logger(String module)
     {
-        this(module, TFPRIO.configs.general.fileLogging.get(), TFPRIO.configs.general.logFile.get());
+        this(module, TFPRIO.configs.general.fileLogging.get(), TFPRIO.configs.getLogFile());
     }
 
     /**

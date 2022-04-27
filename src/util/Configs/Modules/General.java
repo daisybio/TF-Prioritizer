@@ -11,7 +11,6 @@ import static util.FileManagement.extend;
 public class General extends AbstractModule
 {
     public final InputConfig<Boolean> fileLogging = new InputConfig<>(Boolean.class);
-    public final GeneratedFileStructure logFile = extend(workingDirectory, "logfile.txt");
     public final InputConfig<Boolean> calculateTpmLengthsEnabled = new InputConfig<>(Boolean.class);
     public final InputConfig<Boolean> calculateGenePositionsEnabled = new InputConfig<>(Boolean.class);
 

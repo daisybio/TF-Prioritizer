@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Logger;
 
@@ -12,7 +13,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static util.FileManagement.extend;
 
@@ -234,5 +237,25 @@ public abstract class AbstractModule
             }
         }
         return subModulesValid && configsValid;
+    }
+
+    public Set<InputFileStructure> getInputFileStructure()
+    {
+        Set<InputFileStructure> inputFileStructures = new HashSet<>();
+
+        for (Map.Entry<String, AbstractConfig<?>> entry : entries.entrySet())
+        {
+            if (entry.getValue().getClass().equals(InputFileStructure.class))
+            {
+                inputFileStructures.add((InputFileStructure) entry.getValue());
+            }
+        }
+
+        for (Map.Entry<String, AbstractModule> entry : subModules.entrySet())
+        {
+            inputFileStructures.addAll(entry.getValue().getInputFileStructure());
+        }
+
+        return inputFileStructures;
     }
 }

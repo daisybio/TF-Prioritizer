@@ -1,7 +1,5 @@
 package util.Configs;
 
-import tfprio.TFPRIO;
-import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
@@ -27,13 +25,14 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.*;
 import util.Logger;
 
-import static util.FileManagement.extend;
-import static util.FileManagement.writeFile;
+import static util.FileManagement.*;
 
 public class Configs
 {
@@ -119,14 +118,21 @@ public class Configs
 
     private final Logger logger;
 
+    private final File logFile;
+
     /**
      * The default constructor.
      */
-    public Configs()
+    public Configs(File workingDirectory, File sourceDirectory, File logFile)
     {
+        File outputDirectory = extend(workingDirectory, "output");
+        this.logFile = logFile;
+
         // Using the manual constructor since the TFPRIO.configs object is not yet available, since we are currently
         // inside the constructor of it.
-        logger = new Logger("Configs", true, extend(TFPRIO.workingDirectory, "logfile.txt"));
+        logger = new Logger("Configs", true, logFile);
+
+        makeSureDirectoryExists(outputDirectory, logger);
 
         // Iterate all the fields inside this class
         Field[] fields = this.getClass().getFields();
@@ -142,8 +148,8 @@ public class Configs
                     // Call the AbstractModule constructor
                     AbstractModule module = (AbstractModule) field.getType()
                             .getConstructor(GeneratedFileStructure.class, SourceDirectoryFileStructure.class,
-                                    Logger.class).newInstance(new GeneratedFileStructure(TFPRIO.workingDirectory),
-                                    new SourceDirectoryFileStructure(TFPRIO.sourceDirectory), logger);
+                                    Logger.class).newInstance(new GeneratedFileStructure(outputDirectory),
+                                    new SourceDirectoryFileStructure(sourceDirectory), logger);
                     // Assign the created module to the field in this class
                     field.set(this, module);
 
@@ -274,14 +280,31 @@ public class Configs
     /**
      * Save the configs to a file in json format
      */
-    public void save()
+    public void save(File saveFile)
     {
         try
         {
-            writeFile(extend(TFPRIO.workingDirectory, "configs.json"), getConfigsJSONString(true));
+            writeFile(saveFile, getConfigsJSONString(true));
         } catch (IOException e)
         {
             logger.error(e.getMessage());
         }
+    }
+
+    public File getLogFile()
+    {
+        return logFile;
+    }
+
+    public Set<InputFileStructure> getInputFileStructure()
+    {
+        Set<InputFileStructure> inputFileStructures = new HashSet<>();
+
+        for (Map.Entry<String, AbstractModule> entry : configs.entrySet())
+        {
+            inputFileStructures.addAll(entry.getValue().getInputFileStructure());
+        }
+
+        return inputFileStructures;
     }
 }

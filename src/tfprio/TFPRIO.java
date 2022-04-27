@@ -72,12 +72,14 @@ public class TFPRIO
         workingDirectory = argParser.getWorkingDirectory();
         sourceDirectory = argParser.getSourceDirectory();
 
-        configs = new Configs();
+        File logFile = extend(workingDirectory, "logfile.txt");
+
+        configs = new Configs(workingDirectory, sourceDirectory, logFile);
 
         configs.merge(extend(sourceDirectory, "config_templates", "defaultConfigs.json"));
         configs.merge(configFile);
         configs.validate();
-        configs.save();
+        configs.save(extend(workingDirectory, "configs.json"));
 
         Logger logger = new Logger("TFPRIO");
 

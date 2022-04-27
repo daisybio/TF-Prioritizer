@@ -18,7 +18,7 @@ public class AngularReport extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final InputFileStructure d_angularSource = extend(sourceDirectory, "Report");
+    public final SourceDirectoryFileStructure d_angularSource = extend(sourceDirectory, "Report");
     public final AbstractConfig<File> d_dataLink = extend(d_angularSource, "src", "assets", "input");
 
     /**

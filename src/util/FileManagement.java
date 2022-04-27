@@ -360,29 +360,28 @@ public class FileManagement
             softLink(newLink, existingData);
         } catch (IOException e)
         {
-            logger.error(e.getMessage());
+            logger.error("Error during softLink creation: " + e.getMessage());
         }
     }
 
     public static void deleteFileStructure(File file) throws IOException
     {
+        if (Files.isSymbolicLink(file.toPath()))
+        {
+            Files.delete(file.toPath());
+            return;
+        }
+
         if (file.exists())
         {
-            if (file.isFile())
+            if (file.isDirectory() && Objects.requireNonNull(file.listFiles()).length > 0)
             {
-                if (!file.delete())
-                {
-                    throw new IOException("Could not delete file: " + file.getAbsolutePath());
-                }
-            } else
-            {
-                File[] subFiles = file.listFiles();
-                assert subFiles != null;
-                for (File subFile : subFiles)
+                for (File subFile : Objects.requireNonNull(file.listFiles()))
                 {
                     deleteFileStructure(subFile);
                 }
             }
+            Files.delete(file.toPath());
         }
     }
 
