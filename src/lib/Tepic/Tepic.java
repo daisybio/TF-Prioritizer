@@ -121,6 +121,7 @@ public class Tepic extends ExecutableStep
                     }
 
                     File d_output = extend(output_TEPIC, d_group.getName(), d_hm.getName(), sampleName);
+                    File outputPrefix = extend(d_output, sampleName);
 
                     try
                     {
@@ -131,7 +132,7 @@ public class Tepic extends ExecutableStep
                     }
 
                     sampleConfigs.put("b", f_sample.getAbsolutePath());
-                    sampleConfigs.put("o", sampleName);
+                    sampleConfigs.put("o", outputPrefix.getAbsolutePath());
 
                     if (tpmCutoff.isSet())
                     {
