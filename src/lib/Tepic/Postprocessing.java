@@ -443,15 +443,17 @@ public class Postprocessing extends ExecutableStep
         int count1 = Objects.requireNonNull(d_input1.listFiles(filter)).length;
         int count2 = Objects.requireNonNull(d_input2.listFiles(filter)).length;
 
-        String header = null;
+        Set<String> tfs = new HashSet<>();
 
         for (File f_input : Objects.requireNonNull(d_input1.listFiles(filter)))
         {
+            addTfsInHeader(f_input, tfs);
             mergeAffinityFile(f_input, affinities1);
         }
 
         for (File f_input : Objects.requireNonNull(d_input2.listFiles(filter)))
         {
+            addTfsInHeader(f_input, tfs);
             mergeAffinityFile(f_input, affinities2);
         }
 
@@ -461,24 +463,25 @@ public class Postprocessing extends ExecutableStep
             addAll(affinities2.keySet());
         }};
 
-        List<String> tfs = Arrays.asList(header.split("\t")).subList(1, header.split("\t").length);
-
         for (String gene : allGenes)
         {
             if (!affinities1.containsKey(gene))
             {
                 affinities1.put(gene, new HashMap<>());
-
-                for (String tf : tfs)
-                {
-                    affinities1.get(gene).put(tf, 0.0);
-                }
             }
             if (!affinities2.containsKey(gene))
             {
                 affinities2.put(gene, new HashMap<>());
+            }
 
-                for (String tf : tfs)
+
+            for (String tf : tfs)
+            {
+                if (!affinities1.get(gene).containsKey(tf))
+                {
+                    affinities1.get(gene).put(tf, 0.0);
+                }
+                if (!affinities2.get(gene).containsKey(tf))
                 {
                     affinities2.get(gene).put(tf, 0.0);
                 }
@@ -499,35 +502,71 @@ public class Postprocessing extends ExecutableStep
             ratios.put(gene, new HashMap<>());
             for (String tf : tfs)
             {
-                ratios.get(gene).put(tf, (affinities1.get(gene).get(tf) + 1) / (affinities2.get(gene).get(tf) + 1));
+                double affinity1 = affinities1.get(gene).get(tf);
+                double affinity2 = affinities2.get(gene).get(tf);
+                double ratio = (affinity1 + 1) / (affinity2 + 1);
+                ratios.get(gene).put(tf, ratio);
             }
         }
-
-        affinityMapToFile(affinities1, header, tfs, f_output1);
-        affinityMapToFile(affinities2, header, tfs, f_output2);
-        affinityMapToFile(ratios, header, tfs, f_ratios);
+        affinityMapToFile(affinities1, f_output1);
+        affinityMapToFile(affinities2, f_output2);
+        affinityMapToFile(ratios, f_ratios);
     }
 
-    private synchronized void affinityMapToFile(Map<String, Map<String, Double>> map, String header, List<String> tfs,
-                                                File target)
+    private void affinityMapToFile(Map<String, Map<String, Double>> map, File target)
     {
         makeSureFileExists(target, logger);
 
         logger.debug("Writing affinity file: " + target.getAbsolutePath());
 
+        StringBuilder header = new StringBuilder("geneID");
+        List<String> tfList = new ArrayList<>();
+
+        for (Map.Entry<String, Map<String, Double>> entry : map.entrySet())
+        {
+            for (String tf : entry.getValue().keySet())
+            {
+                if (!tfList.contains(tf))
+                {
+                    tfList.add(tf);
+                    header.append("\t").append(tf);
+                }
+            }
+        }
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(target)))
         {
-            writer.write(header);
+            writer.write(header.toString());
             writer.newLine();
             for (Map.Entry<String, Map<String, Double>> gene : map.entrySet())
             {
                 writer.write(gene.getKey());
-                for (String tf : tfs)
+
+                for (String tf : tfList)
                 {
                     writer.write("\t");
                     writer.write(String.valueOf(gene.getValue().get(tf)));
                 }
                 writer.newLine();
+            }
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void addTfsInHeader(File file, Set<String> tfs)
+    {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+        {
+            String header = reader.readLine();
+
+            for (String tf : header.split("\t"))
+            {
+                if (!tf.equals("geneID"))
+                {
+                    tfs.add(tf);
+                }
             }
         } catch (IOException e)
         {
