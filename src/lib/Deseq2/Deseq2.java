@@ -17,7 +17,6 @@ import static util.ScriptExecution.executeAndWait;
 public class Deseq2 extends ExecutableStep
 {
     private final AbstractConfig<File> d_scripts = TFPRIO.configs.deSeq2.fileStructure.d_rScripts;
-    private final GeneratedFileStructure d_output = TFPRIO.configs.deSeq2.fileStructure.d_outputRaw;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
@@ -26,7 +25,7 @@ public class Deseq2 extends ExecutableStep
 
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
-        return new HashSet<>(List.of(d_output));
+        return new HashSet<>();
     }
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()

@@ -22,6 +22,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
     private final GeneratedFileStructure d_outputMeanCounts =
             TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
     private final GeneratedFileStructure d_outputScripts = TFPRIO.configs.deSeq2.fileStructure.d_rScripts;
+    private final GeneratedFileStructure d_outputRaw = TFPRIO.configs.deSeq2.fileStructure.d_outputRaw;
 
     private final AbstractConfig<File> f_scriptSingle = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingSingle;
     private final AbstractConfig<File> f_scriptCombined = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingCombined;
@@ -44,7 +45,8 @@ public class CreateDeseq2Scripts extends ExecutableStep
 
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
-        return new HashSet<>(Arrays.asList(d_outputSingle, d_outputCombined, d_outputMeanCounts, d_outputScripts));
+        return new HashSet<>(
+                Arrays.asList(d_outputSingle, d_outputCombined, d_outputMeanCounts, d_outputScripts, d_outputRaw));
     }
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
@@ -165,8 +167,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
                         script = script.replace("{ SAMPLES }", sb_samples);
                         script = script.replace("{ GROUPS }", sb_groups);
                         script = script.replace("{INPUTFILE}", f_combination.getAbsolutePath());
-                        File targetFile =
-                                extend(TFPRIO.configs.deSeq2.fileStructure.d_outputRaw.get(), combination + ".tsv");
+                        File targetFile = extend(d_outputRaw.get(), combination + ".tsv");
                         makeSureFileExists(targetFile);
                         script = script.replace("{OUTPUTFILE}", targetFile.getAbsolutePath());
 
