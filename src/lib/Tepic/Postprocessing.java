@@ -382,20 +382,15 @@ public class Postprocessing extends ExecutableStep
         }
     }
 
-    private synchronized void mergeAffinityFile(File file, Map<String, Map<String, Double>> affinityMap,
-                                                String headerTemplate)
+    private synchronized void mergeAffinityFile(File file, Map<String, Map<String, Double>> affinityMap)
     {
         logger.debug("Loading affinity file: " + file.getAbsolutePath());
         try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
             String header = reader.readLine();
 
-            if (!header.equals(headerTemplate))
-            {
-                logger.error("File header does not match template header.");
-            }
 
-            String[] headerSplit = headerTemplate.split("\t");
+            String[] headerSplit = header.split("\t");
 
             String inputLine;
             while ((inputLine = reader.readLine()) != null)
@@ -452,24 +447,12 @@ public class Postprocessing extends ExecutableStep
 
         for (File f_input : Objects.requireNonNull(d_input1.listFiles(filter)))
         {
-            if (header == null)
-            {
-                try (BufferedReader reader = new BufferedReader(new FileReader(f_input)))
-                {
-                    header = reader.readLine();
-                } catch (IOException e)
-                {
-                    logger.error(e.getMessage());
-                }
-                assert header != null;
-            }
-            mergeAffinityFile(f_input, affinities1, header);
+            mergeAffinityFile(f_input, affinities1);
         }
-        assert header != null;
 
         for (File f_input : Objects.requireNonNull(d_input2.listFiles(filter)))
         {
-            mergeAffinityFile(f_input, affinities2, header);
+            mergeAffinityFile(f_input, affinities2);
         }
 
         Set<String> allGenes = new HashSet<>()
