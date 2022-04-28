@@ -165,8 +165,8 @@ public class Postprocessing extends ExecutableStep
                 if (tpmCutoff.isSet())
                 {
                     logger.info("TPM filter > 0, start postprocessing of TPM filtered scores");
-                    File d_output1 = extend(d_output.get(), hm, pairing, group1);
-                    File d_output2 = extend(d_output.get(), hm, pairing, group2);
+                    File d_output1 = extend(d_output.get(), pairing, hm, group1);
+                    File d_output2 = extend(d_output.get(), pairing, hm, group2);
 
                     //build intersect and write new files with filter
 
@@ -195,9 +195,9 @@ public class Postprocessing extends ExecutableStep
                     assert samples_group1 != null;
                     assert samples_group2 != null;
 
-                    for (File f : Objects.requireNonNull(folder_group1.listFiles()))
+                    for (File f_sample : Objects.requireNonNull(folder_group1.listFiles()))
                     {
-                        softLink(extend(d_output1, f.getName()), f, logger);
+                        softLink(extend(d_output1, f_sample.getName()), f_sample, logger);
 
                         if (mutuallyExclusive.get())
                         {
@@ -217,7 +217,7 @@ public class Postprocessing extends ExecutableStep
                     }
                     logger.info("TPM filter > 0, end postprocessing of TPM filtered scores");
 
-                    // Set to post processed TMP filtered data
+                    // Set to post processed TPM filtered data
                     group1_input_dir = d_output1;
                     group2_input_dir = d_output2;
                 } else
