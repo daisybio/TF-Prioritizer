@@ -103,7 +103,7 @@ public class StructureElements
 
     static String getCsvData(Map<String, Map<String, Number>> data) throws UnsupportedEncodingException
     {
-        if (data.size() == 0)
+        if (data.size() == 0 || (data.size() == 1 && data.containsKey("")))
         {
             return "";
         }
