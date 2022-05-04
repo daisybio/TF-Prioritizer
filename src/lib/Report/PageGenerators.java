@@ -658,7 +658,7 @@ public class PageGenerators
                     }
                 }
 
-                for (String hm : Report.existingValues.get(SelectorTypes.HISTONE_MODIFICATIONS))
+                for (String hm : csvSetData.keySet())
                 {
                     StringBuilder sb_hm = new StringBuilder();
                     sb_hm.append("GeneSymbol,ENSG\n");
