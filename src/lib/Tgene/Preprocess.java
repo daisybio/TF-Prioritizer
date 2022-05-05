@@ -1,8 +1,8 @@
 package lib.Tgene;
 
 import lib.ExecutableStep;
-import lib.GeneRegion;
-import lib.Region;
+import util.Regions.GeneRegion;
+import util.Regions.Region;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;

@@ -1,9 +1,9 @@
 package lib.Tgene;
 
-import lib.BinaryTree.ChromosomeRegionTrees;
+import util.RegionSearchTree.ChromosomeRegionTrees;
 import lib.ExecutableStep;
-import lib.GeneRegion;
-import lib.Region;
+import util.Regions.GeneRegion;
+import util.Regions.Region;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
@@ -76,7 +76,7 @@ public class SelfRegulatory extends ExecutableStep
                         for (Region region : tgeneRegions)
                         {
                             GeneRegion geneRegion = (GeneRegion) region;
-                            GeneRegion match = (GeneRegion) trees.getMatchingChild(region);
+                            GeneRegion match = (GeneRegion) trees.getOverlappingChild(region);
                             if (match != null)
                             {
                                 if (!geneID_tf.containsKey(match.getId()))

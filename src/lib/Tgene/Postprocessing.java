@@ -1,7 +1,7 @@
 package lib.Tgene;
 
 import lib.ExecutableStep;
-import lib.GeneRegion;
+import util.Regions.GeneRegion;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
@@ -10,7 +10,7 @@ import util.FileFilters.Filters;
 import java.io.*;
 import java.util.*;
 
-import static lib.GeneRegion.removeGeneRegionDuplicates;
+import static util.Regions.GeneRegion.removeGeneRegionDuplicates;
 import static util.FileManagement.*;
 
 public class Postprocessing extends ExecutableStep

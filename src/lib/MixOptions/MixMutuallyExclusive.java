@@ -1,10 +1,10 @@
 package lib.MixOptions;
 
 import tfprio.TFPRIO;
-import lib.BinaryTree.ChromosomePeakTrees;
+import util.RegionSearchTree.ChromosomePeakTrees;
 import lib.ExecutableStep;
-import lib.Peak;
-import lib.Region;
+import util.Regions.PeakRegion;
+import util.Regions.Region;
 import tfprio.Workflow;
 import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
@@ -103,17 +103,17 @@ public class MixMutuallyExclusive extends ExecutableStep
         {
             ChromosomePeakTrees chromosomeTreesGroup1 = new ChromosomePeakTrees(f_filter);
             makeSureFileExists(f_output);
-            Set<Peak> peaks = new HashSet<>();
+            Set<PeakRegion> peaks = new HashSet<>();
             try (BufferedReader reader = new BufferedReader(new FileReader(f_source)))
             {
                 String inputLine;
 
                 while ((inputLine = reader.readLine()) != null)
                 {
-                    peaks.add(new Peak(inputLine));
+                    peaks.add(new PeakRegion(inputLine));
                 }
             }
-            Map<String, Set<Peak>> filteredPeaks = filterPeaksByChromosomeTree(peaks, chromosomeTreesGroup1);
+            Map<String, Set<PeakRegion>> filteredPeaks = filterPeaksByChromosomeTree(peaks, chromosomeTreesGroup1);
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(f_output)))
             {
@@ -122,9 +122,9 @@ public class MixMutuallyExclusive extends ExecutableStep
 
                 for (String chromosome : chromosomes)
                 {
-                    ArrayList<Peak> peakList = new ArrayList<>(filteredPeaks.get(chromosome));
+                    ArrayList<PeakRegion> peakList = new ArrayList<>(filteredPeaks.get(chromosome));
                     Collections.sort(peakList);
-                    for (Peak peak : peakList)
+                    for (PeakRegion peak : peakList)
                     {
                         writer.write(peak.toString());
                         writer.newLine();
@@ -137,16 +137,17 @@ public class MixMutuallyExclusive extends ExecutableStep
         }
     }
 
-    private Map<String, Set<Peak>> filterPeaksByChromosomeTree(Iterable<Peak> peaks, ChromosomePeakTrees peakTrees)
+    private Map<String, Set<PeakRegion>> filterPeaksByChromosomeTree(Iterable<PeakRegion> peaks,
+                                                                     ChromosomePeakTrees peakTrees)
     {
-        Map<String, Set<Peak>> output = new HashMap<>();
+        Map<String, Set<PeakRegion>> output = new HashMap<>();
 
         for (String chromosome : peakTrees.getChromosomes())
         {
             output.put(chromosome, new HashSet<>());
         }
 
-        for (Peak peak : peaks)
+        for (PeakRegion peak : peaks)
         {
             if (!peakTrees.hasChromosome(peak.getChromosome()))
             {
@@ -155,7 +156,7 @@ public class MixMutuallyExclusive extends ExecutableStep
 
             if (mutuallyExclusiveDifferentialPeakSignals.get())
             {
-                Peak match = (Peak) peakTrees.getMatchingChild(peak);
+                PeakRegion match = (PeakRegion) peakTrees.getOverlappingChild(peak);
 
                 if (match == null)
                 {
@@ -175,7 +176,7 @@ public class MixMutuallyExclusive extends ExecutableStep
                 }
             } else
             {
-                Region match = peakTrees.getMatchingChild(peak);
+                Region match = peakTrees.getOverlappingChild(peak);
                 if (match == null)
                 {
                     //this peak is mutually exclusive
