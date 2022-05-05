@@ -23,6 +23,11 @@ public class RegionNode extends Node<Region>
 
     @Override public void add(Region value)
     {
-        super.add(new RegionNode(value));
+        super.add(new RegionNode(value), false);
+    }
+
+    @Override public void add(Region value, boolean merge)
+    {
+        super.add(new RegionNode(value), merge);
     }
 }

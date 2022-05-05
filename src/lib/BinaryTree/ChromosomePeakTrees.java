@@ -44,11 +44,6 @@ public class ChromosomePeakTrees extends ChromosomeRegionTrees
         return ((PeakNode) chromosomeTrees.get(chromosome)).getAveragePeakScore();
     }
 
-    @Override protected Node<Region> getNewNode(Region region)
-    {
-        return new PeakNode(region);
-    }
-
     @Override protected Node<Region> getNewNode(Iterable<Region> regions)
     {
         return new PeakNode(regions);

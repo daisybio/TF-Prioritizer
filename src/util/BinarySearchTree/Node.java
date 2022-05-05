@@ -1,8 +1,10 @@
 package util.BinarySearchTree;
 
+import lib.Region;
+
 import java.util.*;
 
-public abstract class Node<T extends Comparable>
+public abstract class Node<T extends Region>
 {
     private Node<T> lower = null, higher = null;
     public T value;
@@ -62,12 +64,39 @@ public abstract class Node<T extends Comparable>
 
     public abstract void add(T value);
 
+    public abstract void add(T value, boolean merge);
+
     public void add(Node<T> node)
+    {
+        add(node, false);
+    }
+
+    public void add(Node<T> node, boolean merge)
     {
         if (this.value == null)
         {
             this.value = node.value;
+            return;
         }
+
+        if (merge && this.value.overlaps(node.value))
+        {
+            this.value.merge(node.value);
+
+            while (this.higher.value != null && (this.higher.value.getStart() <= this.value.getEnd()))
+            {
+                this.value.merge(this.higher.value);
+                this.higher = this.higher.higher;
+            }
+
+            while (this.lower.value != null && (this.lower.value.getEnd() >= this.value.getStart()))
+            {
+                this.value.merge(this.lower.value);
+                this.lower = this.lower.lower;
+            }
+            return;
+        }
+
         if (this.value.compareTo(node.value) < 0)
         {
             if (higher != null)
@@ -91,6 +120,11 @@ public abstract class Node<T extends Comparable>
 
     public void addAllOptimized(Iterable<T> values)
     {
+        addAllOptimized(values, false);
+    }
+
+    public void addAllOptimized(Iterable<T> values, boolean merge)
+    {
         HashSet<T> valuesSet = new HashSet<>();
         values.forEach(valuesSet::add);
         valuesSet.addAll(getAllValues());
@@ -99,10 +133,10 @@ public abstract class Node<T extends Comparable>
 
         Collections.sort(valuesList);
 
-        addOptimizedRecursive(valuesList);
+        addOptimizedRecursive(valuesList, merge);
     }
 
-    private void addOptimizedRecursive(List<T> elements)
+    private void addOptimizedRecursive(List<T> elements, boolean merge)
     {
         if (elements.isEmpty())
         {
@@ -114,9 +148,9 @@ public abstract class Node<T extends Comparable>
         List<T> lower = elements.subList(0, center);
         List<T> higher = elements.subList(center + 1, elements.size());
 
-        add(elements.get(center));
-        addOptimizedRecursive(lower);
-        addOptimizedRecursive(higher);
+        add(elements.get(center), merge);
+        addOptimizedRecursive(lower, merge);
+        addOptimizedRecursive(higher, merge);
     }
 
     public List<T> getAllValuesSorted()

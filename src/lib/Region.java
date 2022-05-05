@@ -60,4 +60,15 @@ public class Region implements Comparable
         return other.getChromosome().equals(getChromosome()) && other.getStart() == getStart() &&
                 other.getEnd() == getEnd();
     }
+
+    public void merge(Region other)
+    {
+        if (!getChromosome().equals(other.getChromosome()))
+        {
+            throw new IllegalArgumentException("Trying to merge regions of different chromosomes");
+        }
+
+        this.start = Math.min(getStart(), other.getStart());
+        this.end = Math.max(getEnd(), other.getEnd());
+    }
 }

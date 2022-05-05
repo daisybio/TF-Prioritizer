@@ -23,11 +23,6 @@ public class ChromosomeRegionTrees
         return getMatchingChild(region) != null;
     }
 
-    protected Node<Region> getNewNode(Region region)
-    {
-        return new RegionNode(region);
-    }
-
     protected Node<Region> getNewNode(Iterable<Region> regions)
     {
         return new RegionNode(regions);
@@ -45,6 +40,11 @@ public class ChromosomeRegionTrees
     }
 
     public void addAllOptimized(Iterable<Region> regions)
+    {
+        addAllOptimized(regions, false);
+    }
+
+    public void addAllOptimized(Iterable<Region> regions, boolean merge)
     {
         Map<String, Set<Region>> chromosomeSets = new HashMap<>();
 
@@ -64,7 +64,7 @@ public class ChromosomeRegionTrees
                 chromosomeTrees.put(chromosome, getNewNode(chromosomeSets.get(chromosome)));
             } else
             {
-                chromosomeTrees.get(chromosome).addAllOptimized(chromosomeSets.get(chromosome));
+                chromosomeTrees.get(chromosome).addAllOptimized(chromosomeSets.get(chromosome), merge);
             }
         }
     }
