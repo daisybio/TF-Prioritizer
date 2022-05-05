@@ -1,22 +1,32 @@
 package util.RegionSearchTree;
 
-import lib.Peak;
-import lib.Region;
+import util.Regions.PeakRegion;
+import util.Regions.Region;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
+/**
+ * Stores a binary search tree for {@link PeakRegion} objects for each chromosome.
+ */
 public class ChromosomePeakTrees extends ChromosomeRegionTrees
 {
-    public ChromosomePeakTrees(File source)
+    /**
+     * Builds a new search tree based on a peak file
+     *
+     * @param source the file containing the peaks
+     */
+    public ChromosomePeakTrees(File source) throws IOException
     {
         addFile(source);
     }
 
-    public void addFile(File source)
+    /**
+     * Add a peak file to this object
+     *
+     * @param source the file to add to read the input data from
+     */
+    public void addFile(File source) throws IOException
     {
         Set<Region> peaks = new HashSet<>();
 
@@ -25,15 +35,18 @@ public class ChromosomePeakTrees extends ChromosomeRegionTrees
             String inputLine;
             while ((inputLine = reader.readLine()) != null)
             {
-                peaks.add(new Peak(inputLine));
+                peaks.add(new PeakRegion(inputLine));
             }
-        } catch (IOException e)
-        {
-            e.printStackTrace();
         }
         addAllOptimized(peaks);
     }
 
+    /**
+     * Get the average peak score for a given chromosome.
+     *
+     * @param chromosome the chromosome to get the average peak score for
+     * @return the average peak score for the given chromosome
+     */
     public Double getAveragePeakScore(String chromosome)
     {
         if (!hasChromosome(chromosome))
@@ -43,6 +56,12 @@ public class ChromosomePeakTrees extends ChromosomeRegionTrees
         return ((PeakNode) chromosomeTrees.get(chromosome)).getAveragePeakScore();
     }
 
+    /**
+     * Create a new RegionNode based on multiple regions
+     *
+     * @param regions the regions to consider
+     * @return the new RegionNode
+     */
     @Override protected RegionNode getNewNode(Iterable<Region> regions)
     {
         return new PeakNode(regions);

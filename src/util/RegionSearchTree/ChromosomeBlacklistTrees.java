@@ -1,7 +1,7 @@
 package util.RegionSearchTree;
 
 import lib.Blacklist.BlacklistedRegion;
-import lib.Region;
+import util.Regions.Region;
 
 import java.io.BufferedReader;
 import java.io.File;

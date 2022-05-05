@@ -3,7 +3,7 @@ package lib.Blacklist;
 import tfprio.TFPRIO;
 import util.RegionSearchTree.ChromosomeBlacklistTrees;
 import lib.ExecutableStep;
-import lib.Region;
+import util.Regions.Region;
 import tfprio.Workflow;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
@@ -84,7 +84,7 @@ public class Blacklist extends ExecutableStep
 
                                     if (chromosomeTrees.hasChromosome(chromosome))
                                     {
-                                        if (!chromosomeTrees.contains(region))
+                                        if (!chromosomeTrees.hasOverlap(region))
                                         {
                                             writer.write(inputLine);
                                             writer.newLine();

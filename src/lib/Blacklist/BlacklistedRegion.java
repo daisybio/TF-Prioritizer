@@ -1,6 +1,6 @@
 package lib.Blacklist;
 
-import lib.Region;
+import util.Regions.Region;
 
 public class BlacklistedRegion extends Region
 {
