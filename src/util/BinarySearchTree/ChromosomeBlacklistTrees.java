@@ -1,4 +1,4 @@
-package lib.BinaryTree;
+package util.BinarySearchTree;
 
 import lib.Blacklist.BlacklistedRegion;
 import lib.Region;

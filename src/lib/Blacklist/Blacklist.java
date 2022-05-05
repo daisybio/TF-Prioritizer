@@ -1,7 +1,7 @@
 package lib.Blacklist;
 
 import tfprio.TFPRIO;
-import lib.BinaryTree.ChromosomeBlacklistTrees;
+import util.BinarySearchTree.ChromosomeBlacklistTrees;
 import lib.ExecutableStep;
 import lib.Region;
 import tfprio.Workflow;

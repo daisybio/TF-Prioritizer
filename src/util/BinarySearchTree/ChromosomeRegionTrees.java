@@ -1,7 +1,6 @@
-package lib.BinaryTree;
+package util.BinarySearchTree;
 
 import lib.Region;
-import util.BinarySearchTree.Node;
 
 import java.util.*;
 

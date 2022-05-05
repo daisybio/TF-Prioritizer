@@ -1,8 +1,7 @@
-package lib.BinaryTree;
+package util.BinarySearchTree;
 
 import lib.Peak;
 import lib.Region;
-import util.BinarySearchTree.Node;
 
 import java.io.BufferedReader;
 import java.io.File;

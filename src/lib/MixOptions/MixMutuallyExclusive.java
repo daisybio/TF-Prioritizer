@@ -1,7 +1,7 @@
 package lib.MixOptions;
 
 import tfprio.TFPRIO;
-import lib.BinaryTree.ChromosomePeakTrees;
+import util.BinarySearchTree.ChromosomePeakTrees;
 import lib.ExecutableStep;
 import lib.Peak;
 import lib.Region;
