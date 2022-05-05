@@ -24,15 +24,14 @@ public class RegionNode
         return getMatchingChild(value) != null;
     }
 
-    public boolean matches(Region term)
+    public boolean overlaps(Region term)
     {
-        return !(Math.max(term.getStart(), term.getEnd()) < Math.min(value.getStart(), value.getEnd()) ||
-                Math.min(term.getStart(), term.getEnd()) > Math.max(value.getStart(), value.getEnd()));
+        return value.overlaps(term);
     }
 
     public Region getMatchingChild(Region searchValue)
     {
-        if (matches(searchValue))
+        if (overlaps(searchValue))
         {
             return value;
         } else
