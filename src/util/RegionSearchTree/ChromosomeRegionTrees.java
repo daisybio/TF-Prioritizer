@@ -1,4 +1,4 @@
-package util.BinarySearchTree;
+package util.RegionSearchTree;
 
 import lib.Region;
 
@@ -6,7 +6,7 @@ import java.util.*;
 
 public class ChromosomeRegionTrees
 {
-    final Map<String, Node<Region>> chromosomeTrees = new HashMap<>();
+    final Map<String, RegionNode> chromosomeTrees = new HashMap<>();
 
     public Region getMatchingChild(Region region)
     {
@@ -22,7 +22,7 @@ public class ChromosomeRegionTrees
         return getMatchingChild(region) != null;
     }
 
-    protected Node<Region> getNewNode(Iterable<Region> regions)
+    protected RegionNode getNewNode(Iterable<Region> regions)
     {
         return new RegionNode(regions);
     }

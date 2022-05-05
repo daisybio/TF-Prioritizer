@@ -1,4 +1,4 @@
-package util.BinarySearchTree;
+package util.RegionSearchTree;
 
 import lib.Peak;
 import lib.Region;
@@ -43,7 +43,7 @@ public class ChromosomePeakTrees extends ChromosomeRegionTrees
         return ((PeakNode) chromosomeTrees.get(chromosome)).getAveragePeakScore();
     }
 
-    @Override protected Node<Region> getNewNode(Iterable<Region> regions)
+    @Override protected RegionNode getNewNode(Iterable<Region> regions)
     {
         return new PeakNode(regions);
     }

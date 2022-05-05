@@ -1,35 +1,36 @@
-package util.BinarySearchTree;
+package util.RegionSearchTree;
 
 import lib.Region;
 
 import java.util.*;
 
-public abstract class Node<T extends Region>
+public class RegionNode
 {
-    private Node<T> lower = null, higher = null;
-    public T value;
+    private RegionNode lower = null, higher = null;
+    public Region value;
 
-    public Node(T value)
+    public RegionNode(Region value)
     {
         this.value = value;
     }
 
-    public Node(Iterable<T> values)
+    public RegionNode(Iterable<Region> values)
     {
         addAllOptimized(values);
     }
 
-    public boolean matches(T term)
-    {
-        return value.equals(term);
-    }
-
-    public boolean contains(T value)
+    public boolean contains(Region value)
     {
         return getMatchingChild(value) != null;
     }
 
-    public T getMatchingChild(T searchValue)
+    public boolean matches(Region term)
+    {
+        return !(Math.max(term.getStart(), term.getEnd()) < Math.min(value.getStart(), value.getEnd()) ||
+                Math.min(term.getStart(), term.getEnd()) > Math.max(value.getStart(), value.getEnd()));
+    }
+
+    public Region getMatchingChild(Region searchValue)
     {
         if (matches(searchValue))
         {
@@ -62,16 +63,12 @@ public abstract class Node<T extends Region>
         }
     }
 
-    public abstract void add(T value);
-
-    public abstract void add(T value, boolean merge);
-
-    public void add(Node<T> node)
+    public void add(RegionNode node)
     {
         add(node, false);
     }
 
-    public void add(Node<T> node, boolean merge)
+    public void add(RegionNode node, boolean merge)
     {
         if (this.value == null)
         {
@@ -118,25 +115,25 @@ public abstract class Node<T extends Region>
         }
     }
 
-    public void addAllOptimized(Iterable<T> values)
+    public void addAllOptimized(Iterable<Region> values)
     {
         addAllOptimized(values, false);
     }
 
-    public void addAllOptimized(Iterable<T> values, boolean merge)
+    public void addAllOptimized(Iterable<Region> values, boolean merge)
     {
-        HashSet<T> valuesSet = new HashSet<>();
+        HashSet<Region> valuesSet = new HashSet<>();
         values.forEach(valuesSet::add);
         valuesSet.addAll(getAllValues());
 
-        ArrayList<T> valuesList = new ArrayList<>(valuesSet);
+        ArrayList<Region> valuesList = new ArrayList<>(valuesSet);
 
         Collections.sort(valuesList);
 
         addOptimizedRecursive(valuesList, merge);
     }
 
-    private void addOptimizedRecursive(List<T> elements, boolean merge)
+    private void addOptimizedRecursive(List<Region> elements, boolean merge)
     {
         if (elements.isEmpty())
         {
@@ -145,29 +142,29 @@ public abstract class Node<T extends Region>
 
         int center = elements.size() / 2;
 
-        List<T> lower = elements.subList(0, center);
-        List<T> higher = elements.subList(center + 1, elements.size());
+        List<Region> lower = elements.subList(0, center);
+        List<Region> higher = elements.subList(center + 1, elements.size());
 
-        add(elements.get(center), merge);
+        add(new RegionNode(elements.get(center)), merge);
         addOptimizedRecursive(lower, merge);
         addOptimizedRecursive(higher, merge);
     }
 
-    public List<T> getAllValuesSorted()
+    public List<Region> getAllValuesSorted()
     {
-        List<T> list = new ArrayList<>(getAllValues());
+        List<Region> list = new ArrayList<>(getAllValues());
         Collections.sort(list);
         return list;
     }
 
-    public Set<T> getAllValues()
+    public Set<Region> getAllValues()
     {
-        Set<T> values = new HashSet<>();
+        Set<Region> values = new HashSet<>();
         getAllValuesRecursive(values, this);
         return values;
     }
 
-    private void getAllValuesRecursive(Set<T> values, Node<T> parent)
+    private void getAllValuesRecursive(Set<Region> values, RegionNode parent)
     {
         if (parent.value != null)
         {

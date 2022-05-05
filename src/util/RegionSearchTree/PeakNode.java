@@ -1,4 +1,4 @@
-package util.BinarySearchTree;
+package util.RegionSearchTree;
 
 import lib.Peak;
 import lib.Region;

@@ -1,6 +1,6 @@
 package lib.Tgene;
 
-import util.BinarySearchTree.ChromosomeRegionTrees;
+import util.RegionSearchTree.ChromosomeRegionTrees;
 import lib.ExecutableStep;
 import lib.GeneRegion;
 import lib.Region;
