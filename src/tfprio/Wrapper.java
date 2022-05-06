@@ -11,7 +11,7 @@ import static util.FileManagement.*;
 
 public class Wrapper
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         ArgParser argParser = new ArgParser(args);
 
@@ -50,5 +50,7 @@ public class Wrapper
             }
         }
         configs.save(extend(d_links, "configs.json"));
+
+        TFPRIO.execute(argParser);
     }
 }
