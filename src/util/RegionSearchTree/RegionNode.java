@@ -145,14 +145,14 @@ public class RegionNode
             this.value.merge(node.value);
 
             // Merge all higher child nodes which overlap the newly merged region
-            while (this.higher.value != null && this.value.overlaps(this.higher.value))
+            while (this.higher != null && this.value.overlaps(this.higher.value))
             {
                 this.value.merge(this.higher.value);
                 this.higher = this.higher.higher;
             }
 
             // Merge all lower child nodes which overlap the newly merged region
-            while (this.lower.value != null && (this.lower.value.getEnd() >= this.value.getStart()))
+            while (this.lower != null && (this.lower.value.getEnd() >= this.value.getStart()))
             {
                 this.value.merge(this.lower.value);
                 this.lower = this.lower.lower;
