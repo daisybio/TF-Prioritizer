@@ -4,7 +4,10 @@ import lib.ExecutableStep;
 import tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InternalConfig;
 import util.FileFilters.Filters;
+import util.RegionSearchTree.ChromosomeRegionTrees;
+import util.Regions.Region;
 
 import java.io.*;
 import java.util.*;
@@ -19,16 +22,24 @@ public class Postprocessing extends ExecutableStep
     private final GeneratedFileStructure d_postprocessingInput =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_input;
     private final GeneratedFileStructure d_output = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
+
+    private final GeneratedFileStructure d_postprocessing_trap_predicted_beds =
+            TFPRIO.configs.tepic.fileStructure.d_postprocessing_trap_predicted_beds;
     private final GeneratedFileStructure f_output_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
 
     private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
     private final AbstractConfig<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
     private final AbstractConfig<Double> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
+    private final AbstractConfig<Double> trapPredictedSequenceLogosAffinityCutoff =
+            TFPRIO.configs.plots.trapPredictedSequenceLogosAffinityCutoff;
     private final AbstractConfig<Boolean> doNotGenerate = TFPRIO.configs.tepic.doNotGenerate;
     private final AbstractConfig<String> s_meanAffinities =
             TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_meanAffinitiesDir;
     private final AbstractConfig<String> s_ratios =
             TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_ratiosDir;
+
+    private final InternalConfig<String> s_outputRaw_trapSequences =
+            TFPRIO.configs.tepic.fileStructure.s_outputRaw_trapSequences;
 
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
@@ -38,13 +49,14 @@ public class Postprocessing extends ExecutableStep
 
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
-        return new HashSet<>(Arrays.asList(d_output, d_postprocessingInput, f_output_tfs));
+        return new HashSet<>(Arrays.asList(d_output, d_postprocessingInput, f_output_tfs,d_postprocessing_trap_predicted_beds));
     }
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
-                Arrays.asList(mutuallyExclusive, originalDecay, doNotGenerate, s_meanAffinities, s_ratios));
+                Arrays.asList(mutuallyExclusive, originalDecay, doNotGenerate, s_meanAffinities, s_ratios,
+                        trapPredictedSequenceLogosAffinityCutoff,s_outputRaw_trapSequences));
     }
 
     @Override protected Set<AbstractConfig<?>> getOptionalConfigs()
@@ -104,6 +116,119 @@ public class Postprocessing extends ExecutableStep
                 } catch (IOException e)
                 {
                     logger.error(e.getMessage());
+                }
+            }
+        }
+
+        //generate output structure for d_postprocessing_trap_predicted_beds and create bed files for predicted regions
+        for(String group: TFPRIO.groupsToHms.keySet())
+        {
+            File directory_group = extend(d_postprocessing_trap_predicted_beds.get(),group);
+
+            try
+            {
+                makeSureDirectoryExists(directory_group);
+            } catch (IOException e)
+            {
+                logger.error(e.getMessage());
+            }
+
+            for(String hm : TFPRIO.groupsToHms.get(group))
+            {
+                File directory_group_hm = extend(directory_group,hm);
+
+                try
+                {
+                    makeSureDirectoryExists(directory_group_hm);
+                } catch (IOException e)
+                {
+                    logger.error(e.getMessage());
+                }
+
+                //get important inputs
+                File f_input_group_hm = new File(d_input+File.separator+group+File.separator+hm);
+
+                HashMap<String,HashMap<String, HashSet<Region>>> sample_tf_region = new HashMap<>();
+                HashSet<String> availableTfs = new HashSet<>();
+
+                for(File sample : Objects.requireNonNull(f_input_group_hm.listFiles(Filters.directoryFilter)))
+                {
+                    HashMap<String,HashSet<Region>> tf_region = new HashMap<>();
+                    sample_tf_region.put(sample.getName(),tf_region);
+
+                    for(File file : Objects.requireNonNull(sample.listFiles(Filters.fileFilter)))
+                    {
+                        String name = file.getName();
+                        if(name.equals(s_outputRaw_trapSequences.get()))
+                        {
+                            try(BufferedReader br_sequence = new BufferedReader(new FileReader(file))){
+                                String line ="";
+                                while((line = br_sequence.readLine())!=null){
+                                    if(line.startsWith("#") || line.startsWith("TF"))
+                                    {
+                                        continue;
+                                    }
+
+                                    String[] split = line.split("\t");
+                                    String tf = split[0];
+                                    availableTfs.add(tf);
+
+                                    //get chromosome region tree
+                                    HashSet<Region> tfRegions;
+                                    if(!tf_region.containsKey(tf)){
+                                        tfRegions=new HashSet<>();
+                                        tf_region.put(tf,tfRegions);
+                                    }else {
+                                        tfRegions=tf_region.get(tf);
+                                    }
+
+                                    Double affinity = Double.parseDouble(split[1]);
+
+                                    if(affinity<trapPredictedSequenceLogosAffinityCutoff.get())
+                                    {
+                                        continue;
+                                    }
+
+                                    int tf_start_pos = Integer.parseInt(split[3]);
+                                    int length = Integer.parseInt(split[4]);
+                                    String current_area = split[6];
+                                    current_area=current_area.substring(1,current_area.length());
+
+                                    String[] split_area = current_area.split(":");
+                                    String chromosome = split_area[0];
+                                    String[] split_area_positions=split_area[1].split("-");
+                                    int area_start = Integer.parseInt(split_area_positions[0]);
+                                    int area_end = Integer.parseInt(split_area_positions[1]);
+
+                                    int predicted_start=area_start+tf_start_pos;
+                                    int predicted_end=predicted_start+length;
+
+                                    Region current_region = new Region(chromosome,predicted_start,predicted_end);
+                                    tfRegions.add(current_region);
+                                }
+                            }catch (IOException e)
+                            {
+                                logger.error(e.getMessage());
+                            }
+                        }
+                    }
+                }
+
+                //create tree for each tf
+                HashMap<String, ChromosomeRegionTrees> tf_chrRegion = new HashMap<>();
+                for(String tf : availableTfs)
+                {
+                    ChromosomeRegionTrees tfTree = new ChromosomeRegionTrees();
+                    tf_chrRegion.put(tf,tfTree);
+                }
+
+                //fill each tree with all samples
+                for(String sample : sample_tf_region.keySet())
+                {
+                    for(String tf : sample_tf_region.get(sample).keySet())
+                    {
+                        tf_chrRegion.get(tf).addAllOptimized(sample_tf_region.get(sample).get(tf),true);
+                    }
                 }
             }
         }

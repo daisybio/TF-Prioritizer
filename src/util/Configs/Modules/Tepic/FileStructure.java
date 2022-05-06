@@ -21,6 +21,10 @@ public class FileStructure extends AbstractModule
 
     public final GeneratedFileStructure d_postprocessing_input = extend(d_postprocessing, "input");
     public final GeneratedFileStructure d_postprocessing_output = extend(d_postprocessing, "output");
+
+    public final GeneratedFileStructure d_postprocessing_trap_predicted_beds = extend(d_postprocessing,
+            "trap_predicted_tf_bindings");
+
     public final InternalConfig<String> s_postprocessing_output_meanAffinitiesDir =
             new InternalConfig<>("Mean_Affinities");
     public final InternalConfig<String> s_postprocessing_output_ratiosDir = new InternalConfig<>("Ratio");
