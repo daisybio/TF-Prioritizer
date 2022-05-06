@@ -2,6 +2,7 @@ package lib.Tepic;
 
 import lib.ExecutableStep;
 import tfprio.TFPRIO;
+import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InternalConfig;
@@ -229,6 +230,40 @@ public class Postprocessing extends ExecutableStep
                             tf_chrRegion.put(tf, new ChromosomeRegionTrees());
                         }
                         tf_chrRegion.get(tf).addAllOptimized(sample_tf_regions.get(sample).get(tf), true);
+                    }
+                }
+
+                for(String tf : tf_chrRegion.keySet())
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("track name=\"");
+                    sb.append(tf);
+                    sb.append("(@PREDICTED)\"\n");
+
+                    Map<String,List<Region>> regions = tf_chrRegion.get(tf).getAllRegionsSorted();
+
+                    ArrayList<String> chrKeysSorted = new ArrayList<>(regions.keySet());
+                    Collections.sort(chrKeysSorted, new ChromosomeComparator());
+
+                    for(String chr : chrKeysSorted)
+                    {
+                        List<Region> chrRegion = regions.get(chr);
+                        for(Region region: chrRegion)
+                        {
+                            sb.append(region.getChromosome());
+                            sb.append("\t");
+                            sb.append(region.getStart());
+                            sb.append("\t");
+                            sb.append(region.getEnd());
+                            sb.append("\n");
+                        }
+                    }
+
+                    try(BufferedWriter bw = new BufferedWriter(new FileWriter(extend(directory_group_hm,tf+".csv")))){
+                        bw.write(sb.toString());
+                    } catch (IOException e)
+                    {
+                        logger.error(e.getMessage());
                     }
                 }
             }
