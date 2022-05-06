@@ -19,7 +19,7 @@ COPY scripts /srv/dependencies/scripts
 COPY install/ /srv/install
 COPY out/artifacts/COM2POSE_jar/COM2POSE.jar /srv/app
 
-RUN bash -c "/srv/install/install.sh"
+RUN bash -c "/srv/install/install.sh -d"
 
 USER docker
 

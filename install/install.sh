@@ -1,6 +1,19 @@
 #!/bin/sh
 
-apt install -y wget apt-utils
+docker=false
+
+while getopts ':d' OPTION; do
+  case "$OPTION" in
+    d)
+      docker=true
+      ;;
+    ?)
+      echo "Unknown parameter: $OPTION"
+      ;;
+  esac
+done
+
+apt-get install -y wget apt-utils curl
 
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
 
@@ -12,7 +25,7 @@ else
     echo "Installing R."
 
     # Install necessary dependencies for adding a repo over HTTPS
-    apt install -y dirmngr gnupg apt-transport-https ca-certificates software-properties-common
+    apt-get install -y dirmngr gnupg apt-transport-https ca-certificates software-properties-common
 
     # Add repo key and repo itself
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
@@ -20,11 +33,11 @@ else
 
     # Install libicu66
     wget http://security.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb
-    apt update && dpkg -i libicu66_66.1-2ubuntu2_amd64.deb
+    apt-get update && dpkg -i libicu66_66.1-2ubuntu2_amd64.deb
     rm libicu66_66.1-2ubuntu2_amd64.deb
 
     # Install R
-    apt install -y r-base build-essential
+    apt-get install -y r-base build-essential
 
     echo "Finished R installation."
 fi
@@ -34,14 +47,14 @@ if java --version; then
 else
     echo "Installing Java."
 
-    apt install -y openjdk-17-jdk openjdk-17-demo openjdk-17-doc openjdk-17-jre-headless openjdk-17-source \
+    apt-get install -y openjdk-17-jdk openjdk-17-demo openjdk-17-doc openjdk-17-jre-headless openjdk-17-source \
     openjdk-17-jre
 
     echo "Finished Java installation."
 fi
 
 # Install dependencies for R packages
-apt install -y libcurl4-openssl-dev libxml2-dev libssl-dev
+apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev
 
 # Make libraries writeable for active user
 chown -R "$USER" /usr/local/lib/R/site-library
@@ -53,7 +66,7 @@ Rscript "$d_install/r_dependencies.R"
 Rscript ../ext/TEPIC/TEPIC/Code/installRpackages.R
 
 # Install some more linux packages
-apt install -y bedtools python3 unzip python3-pip xvfb
+apt-get install -y bedtools python3 unzip python3-pip xvfb python-software-properties
 
 # Install required python packages
 python3 -m pip install -r "$d_install/requirements.txt"
@@ -90,41 +103,44 @@ if [ ! -d "IGV_2.11.2" ]; then
 fi
 
 # Install GCC 9.3.0
-apt install -y build-essential
+apt-get install -y build-essential
 
-# Install additional Java packages
-mkdir -p ../ext/lib
 
-# Install org.apache.commons.compress
-if [ ! -d "../ext/lib/commons-compress-1.21" ]; then
-    wget https://dlcdn.apache.org//commons/compress/binaries/commons-compress-1.21-bin.tar.gz
-    tar -xf commons-compress-1.21-bin.tar.gz
-    rm commons-compress-1.21-bin.tar.gz
-    mv commons-compress-1.21 ../ext/lib/commons-compress-1.21
-fi
+if [ ! $docker ]; then
+  # Install additional Java packages
+  mkdir -p ../ext/lib
 
-# Install org.apache.commons.cli
-if [ ! -d "../ext/lib/commons-cli-1.5.0" ]; then
-    wget https://dlcdn.apache.org//commons/cli/binaries/commons-cli-1.5.0-bin.tar.gz
-    tar -xf commons-cli-1.5.0-bin.tar.gz
-    rm commons-cli-1.5.0-bin.tar.gz
-    mv commons-cli-1.5.0 ../ext/lib/commons-cli-1.5.0
-fi
+  # Install org.apache.commons.compress
+  if [ ! -d "../ext/lib/commons-compress-1.21" ]; then
+      wget https://dlcdn.apache.org//commons/compress/binaries/commons-compress-1.21-bin.tar.gz
+      tar -xf commons-compress-1.21-bin.tar.gz
+      rm commons-compress-1.21-bin.tar.gz
+      mv commons-compress-1.21 ../ext/lib/commons-compress-1.21
+  fi
 
-# Install weka classifier
-if [ ! -f "../ext/lib/weka/weka.jar" ]; then
-    wget http://www.java2s.com/Code/JarDownload/weka/weka.jar.zip
-    unzip weka.jar.zip
-    rm weka.jar.zip
-    mkdir -p ../ext/lib/weka
-    mv weka.jar ../ext/lib/weka/weka.jar
-fi
+  # Install org.apache.commons.cli
+  if [ ! -d "../ext/lib/commons-cli-1.5.0" ]; then
+      wget https://dlcdn.apache.org//commons/cli/binaries/commons-cli-1.5.0-bin.tar.gz
+      tar -xf commons-cli-1.5.0-bin.tar.gz
+      rm commons-cli-1.5.0-bin.tar.gz
+      mv commons-cli-1.5.0 ../ext/lib/commons-cli-1.5.0
+  fi
 
-# Install json parser
-if [ ! -f "../ext/lib/json/json.jar" ]; then
-    mkdir -p ../ext/lib/json
-    wget 'https://search.maven.org/remotecontent?filepath=org/json/json/20211205/json-20211205.jar' -O
-    ../ext/lib/json/json.jar
+  # Install weka classifier
+  if [ ! -f "../ext/lib/weka/weka.jar" ]; then
+      wget http://www.java2s.com/Code/JarDownload/weka/weka.jar.zip
+      unzip weka.jar.zip
+      rm weka.jar.zip
+      mkdir -p ../ext/lib/weka
+      mv weka.jar ../ext/lib/weka/weka.jar
+  fi
+
+  # Install json parser
+  if [ ! -f "../ext/lib/json/json.jar" ]; then
+      mkdir -p ../ext/lib/json
+      wget 'https://search.maven.org/remotecontent?filepath=org/json/json/20211205/json-20211205.jar' -O \
+      ../ext/lib/json/json.jar
+  fi
 fi
 
 # Install angular cli
@@ -132,8 +148,9 @@ if ng --version; then
   echo "Angular already installed."
 else
   echo "Installing Angular"
-  sudo apt-get install -y nodejs npm
-  sudo npm install npm@latest -g
-  sudo npm install -g @angular/cli
+  curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash
+  apt-get install -y nodejs
+  npm install npm@latest -g
+  npm install -g @angular/cli
   echo "Finished Angular installation"
 fi
