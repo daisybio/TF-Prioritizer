@@ -2,6 +2,7 @@ package tfprio;
 
 import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.Configs;
+import util.ExecutionTimeMeasurement;
 import util.Logger;
 
 import java.io.File;
@@ -33,8 +34,10 @@ public class Wrapper
 
         File f_compose = buildCompose(configs, argParser, logger);
 
-        executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " build", logger);
-        executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " up", logger);
+        ExecutionTimeMeasurement buildTimer = new ExecutionTimeMeasurement();
+        executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " build", logger, true);
+        logger.info("Finished building container. Process took " + buildTimer.stopAndGetDeltaFormatted());
+        executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " up", logger, true);
     }
 
     private static File buildCompose(Configs configs, ArgParser argParser, Logger logger)

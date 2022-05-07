@@ -15,13 +15,13 @@ RUN for i in \
     /srv/wd \
     ; do mkdir -p $i && chown -R 1000:1000 $i; done
 
+COPY install/ /srv/install
+RUN bash -c "/srv/install/install.sh -d"
+
 COPY ext/ /srv/dependencies/ext
 COPY scripts /srv/dependencies/scripts
-COPY install/ /srv/install
 COPY config_templates/ /srv/dependencies/config_templates
 COPY out/artifacts/COM2POSE_jar/COM2POSE.jar /srv/app
-
-RUN bash -c "/srv/install/install.sh -d"
 
 USER docker
 

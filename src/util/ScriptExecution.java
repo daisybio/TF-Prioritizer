@@ -18,51 +18,48 @@ public class ScriptExecution
 
     public static void executeAndWait(List<String> command, Logger logger)
     {
-        logger.debug("Executing command: " + command);
         ProcessBuilder pb = new ProcessBuilder(command);
-        if (TFPRIO.configs.general.redirectExternalScriptOutputStream.get())
+        executeProcessBuilder(pb, logger, false);
+    }
+
+    private static void executeProcessBuilder(ProcessBuilder builder, Logger logger, boolean redirectOutput)
+    {
+        logger.debug("Executing command: " + builder.command());
+        if (redirectOutput ||
+                (TFPRIO.configs != null && TFPRIO.configs.general.redirectExternalScriptOutputStream.get()))
         {
-            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         }
-        if (TFPRIO.configs.general.redirectExternalScriptErrorStream.get())
+        if (redirectOutput ||
+                (TFPRIO.configs != null && TFPRIO.configs.general.redirectExternalScriptErrorStream.get()))
         {
-            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         }
         try
         {
-            Process process = pb.start();
+            Process process = builder.start();
             int returnCode = process.waitFor();
 
             if (returnCode != 0)
             {
                 String message = new String(process.getErrorStream().readAllBytes());
-                logger.error("Received return code " + returnCode + "\n\n Command was: " + command + "\n\n" + message);
-            }
-        } catch (IOException | InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    public static void executeAndWait(String command, Logger logger)
-    {
-        logger.debug("Executing command: " + command);
-        try
-        {
-            Process child = Runtime.getRuntime().exec(command);
-
-            int code = child.waitFor();
-            if (code != 0)
-            {
-                String message = new String(child.getErrorStream().readAllBytes());
-                logger.error("Received return code " + code + "\n\n Command was: " + command + "\n\n" + message);
+                logger.error("Received return code " + returnCode + "\n\n Command was: " + builder.command() + "\n\n" +
+                        message);
             }
         } catch (IOException | InterruptedException e)
         {
             logger.error(e.getMessage());
         }
+    }
+
+    public static void executeAndWait(String command, Logger logger)
+    {
+        executeAndWait(command, logger, false);
+    }
+
+    public static void executeAndWait(String command, Logger logger, boolean redirectOutput)
+    {
+        executeProcessBuilder(new ProcessBuilder(command.split(" ")), logger, redirectOutput);
     }
 
     public static void executeAndWait(String executable, String fileExtension, Logger logger)
