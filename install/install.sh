@@ -83,15 +83,16 @@ else
     rm meme-5.4.1.tar.gz
 
     cd meme-5.4.1
-    ./configure --prefix=$HOME/.meme --enable-build-libxml2 --enable-build-libxslt
+    if [ ! $docker ]; then
+      ./configure --prefix=$HOME/.meme --enable-build-libxml2 --enable-build-libxslt
+    else
+      ./configure --prefix=/srv/dependencies/meme --enable-build-libxml2 --enable-build-libxslt
+    fi
     make
     make test
     make install
     cd ..
 
-    touch $HOME/.profile
-
-    echo "PATH=\"\$PATH:$HOME/.meme/libexec/meme-5.4.1:$HOME/.meme/bin\"" >>"$HOME"/.profile
     rm -rf meme-5.4.1
 
     echo "Finished MEME installation."
@@ -100,7 +101,11 @@ fi
 # Install command line IGV and igvtools
 if [ ! -d "IGV_2.11.2" ]; then
     wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
-    unzip IGV_2.11.2.zip
+    if [ ! $docker ]; then
+      unzip IGV_2.11.2.zip -d igv
+    else
+      unzip IGV_2.11.2.zip -d /srv/dependencies/igv
+    fi
     rm IGV_2.11.2.zip
 fi
 

@@ -73,6 +73,9 @@ public class Wrapper
             }
         }
 
+        configs.tgene.pathToExecutable.setValue(new File("/srv/dependencies/meme"));
+        configs.igv.pathToIGV.setValue(new File("/srv/dependencies/igv"));
+
         File f_compose = extend(argParser.getWorkingDirectory(), "docker-compose.yml");
         File f_configs = extend(d_input, "configs.json");
         configs.save(f_configs);
