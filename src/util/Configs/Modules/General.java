@@ -4,6 +4,7 @@ import util.Configs.ConfigTypes.*;
 import util.Configs.ConfigValidators.PositiveIntegerValidator;
 import util.Logger;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import static util.FileManagement.extend;
@@ -23,6 +24,9 @@ public class General extends AbstractModule
     public final InputConfig<Boolean> redirectExternalScriptErrorStream = new InputConfig<>(Boolean.class);
 
     public final GeneratedFileStructure d_workflowHashes = extend(workingDirectory, ".hashes");
+
+    public final GeneratedFileStructure d_docker_wd = new GeneratedFileStructure(new File("/srv/wd"));
+    public final GeneratedFileStructure d_docker_wd_input = extend(d_docker_wd, "input");
 
     public General(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException

@@ -342,6 +342,17 @@ public class FileManagement
         Files.createLink(newLink.toPath(), existingData.toPath());
     }
 
+    public static void hardLink(File newLink, File existingData, Logger logger)
+    {
+        try
+        {
+            hardLink(newLink, existingData);
+        } catch (IOException e)
+        {
+            logger.error("Error during hardLink creation: " + e.getMessage());
+        }
+    }
+
     public static void softLink(File newLink, File existingData) throws IOException
     {
         makeSureDirectoryExists(newLink.getParentFile());

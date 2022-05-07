@@ -19,13 +19,15 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
 
 d_install=$(dirname "$0")
 
+apt-get install -y python3 python3-pip software-properties-common
+
 if R --version; then
     echo "R already installed."
 else
     echo "Installing R."
 
     # Install necessary dependencies for adding a repo over HTTPS
-    apt-get install -y dirmngr gnupg apt-transport-https ca-certificates software-properties-common
+    apt-get install -y dirmngr gnupg apt-transport-https ca-certificates
 
     # Add repo key and repo itself
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
@@ -66,7 +68,7 @@ Rscript "$d_install/r_dependencies.R"
 Rscript ../ext/TEPIC/TEPIC/Code/installRpackages.R
 
 # Install some more linux packages
-apt-get install -y bedtools python3 unzip python3-pip xvfb python-software-properties
+apt-get install -y bedtools unzip xvfb
 
 # Install required python packages
 python3 -m pip install -r "$d_install/requirements.txt"

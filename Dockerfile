@@ -9,6 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN for i in \
     /srv/dependencies/ext \
     /srv/dependencies/scripts \
+    /srv/dependencies/config_templates \
     /src/install \
     /srv/app \
     /srv/wd \
@@ -17,10 +18,12 @@ RUN for i in \
 COPY ext/ /srv/dependencies/ext
 COPY scripts /srv/dependencies/scripts
 COPY install/ /srv/install
+COPY config_templates/ /srv/dependencies/config_templates
 COPY out/artifacts/COM2POSE_jar/COM2POSE.jar /srv/app
 
 RUN bash -c "/srv/install/install.sh -d"
 
 USER docker
 
-CMD "java -jar /srv/app/COM2POSE.jar -c /srv/wd/configs.json -w /srv/wd -p /srv/dependencies"
+CMD ["java", "-jar", "/srv/app/COM2POSE.jar", "-c", "/srv/wd/input/configs.json", "-w", "/srv/wd", "-p", \
+"/srv/dependencies"]
