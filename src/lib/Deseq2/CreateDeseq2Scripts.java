@@ -137,7 +137,7 @@ public class CreateDeseq2Scripts extends ExecutableStep
 
                         for (String sample : samples)
                         {
-                            sb_samples.append("'").append(sample).append("', ");
+                            sb_samples.append("'").append(sample.replace("-", ".")).append("', ");
 
                             if (TFPRIO.sample_group.containsKey(sample) &&
                                     (TFPRIO.sample_batch == null || TFPRIO.sample_batch.containsKey(sample)))
