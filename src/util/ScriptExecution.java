@@ -93,20 +93,25 @@ public class ScriptExecution
         List<String> command = new ArrayList<>();
         switch (fileExtension)
         {
-            case ".R" -> command.add("Rscript");
-            case ".py" ->
-            {
+            case ".R":
+                command.add("Rscript");
+                break;
+            case ".py":
+
                 command.add("python3");
                 if (!fileExecution)
                 {
                     command.add("-c");
                 }
-            }
-            case ".sh" ->
+                break;
+
+            case ".sh":
             {
                 command.add("sh");
             }
-            default -> throw new RuntimeException("This file type is not supported.");
+            break;
+            default:
+                throw new RuntimeException("This file type is not supported.");
         }
 
         return command;

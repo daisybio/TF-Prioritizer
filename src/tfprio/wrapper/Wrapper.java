@@ -89,7 +89,7 @@ public class Wrapper
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         com.sun.management.OperatingSystemMXBean os =
                 (com.sun.management.OperatingSystemMXBean) java.lang.management.ManagementFactory.getOperatingSystemMXBean();
-        int availableMemoryMb = (int) (os.getTotalMemorySize() / 1e6);
+        int availableMemoryMb = (int) (os.getTotalPhysicalMemorySize() / 1e6);
         int maxUsableMemoryMb = (int) (availableMemoryMb * 0.8);
 
         if (availableProcessors < configs.general.threadLimit.get())
