@@ -59,7 +59,7 @@ public class Wrapper
         String gid = new String(Runtime.getRuntime().exec("id -g " + System.getProperty("user.name")).getInputStream()
                 .readAllBytes()).replace("\n", "");
 
-        sb_compose.append("version: \"2.4\"\n");
+        sb_compose.append("version: \"2.2\"\n");
         sb_compose.append("services:\n");
         sb_compose.append("\tcom2pose:\n");
         sb_compose.append("\t\tbuild:\n");
