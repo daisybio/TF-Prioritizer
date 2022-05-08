@@ -19,6 +19,7 @@ public class General extends AbstractModule
     public final InternalConfig<String> sameTps = new InternalConfig<>("SAME_TPS");
 
     public final InputConfig<Integer> threadLimit = new InputConfig<>(Integer.class, new PositiveIntegerValidator());
+    public final InputConfig<Integer> memoryLimitMb = new InputConfig<>(Integer.class, new PositiveIntegerValidator());
 
     public final InputConfig<Boolean> redirectExternalScriptOutputStream = new InputConfig<>(Boolean.class);
     public final InputConfig<Boolean> redirectExternalScriptErrorStream = new InputConfig<>(Boolean.class);

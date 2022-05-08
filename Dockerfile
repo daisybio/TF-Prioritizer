@@ -20,7 +20,7 @@ RUN bash -c "/srv/install/install.sh -d"
 
 COPY ext/ /srv/dependencies/ext
 COPY scripts /srv/dependencies/scripts
-COPY config_templates/ /srv/dependencies/config_templates
+COPY config_templates/defaultConfigs.json /srv/dependencies/config_templates/defaultConfigs.json
 COPY out/artifacts/COM2POSE_jar/COM2POSE.jar /srv/app
 
 USER docker

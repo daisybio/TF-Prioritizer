@@ -44,7 +44,7 @@ public class Wrapper
     {
         StringBuilder sb_compose = new StringBuilder();
 
-        sb_compose.append("version: \"3\"\n");
+        sb_compose.append("version: \"2.2\"\n");
         sb_compose.append("services:\n");
         sb_compose.append("\tcom2pose:\n");
         sb_compose.append("\t\tbuild: ").append(argParser.getSourceDirectory().getAbsolutePath()).append("\n");
@@ -75,6 +75,39 @@ public class Wrapper
                 structure.setValue(f_docker);
             }
         }
+
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        com.sun.management.OperatingSystemMXBean os =
+                (com.sun.management.OperatingSystemMXBean) java.lang.management.ManagementFactory.getOperatingSystemMXBean();
+        int availableMemoryMb = (int) (os.getTotalMemorySize() / 1e6);
+        int maxUsableMemoryMb = (int) (availableMemoryMb * 0.8);
+
+        if (availableProcessors < configs.general.threadLimit.get())
+        {
+            logger.warn("The thread limit was set to " + configs.general.threadLimit.get() + " but this system only " +
+                    "offers " + availableProcessors + " logical cores. The thread limit was reduced to " +
+                    availableProcessors + ".");
+            configs.general.threadLimit.setValue(availableProcessors);
+        }
+        if (maxUsableMemoryMb < configs.general.memoryLimitMb.get())
+        {
+            logger.warn("The memory limit was set to " + configs.general.memoryLimitMb.get() + "mb but this system " +
+                    "only offers " + availableMemoryMb + "mb of memory. In order to leave some space for the os, the " +
+                    "memory limit was set to " + maxUsableMemoryMb + "mb.");
+            configs.general.memoryLimitMb.setValue(maxUsableMemoryMb);
+        }
+
+        if (configs.general.memoryLimitMb.get() < 8000)
+        {
+            logger.error("The memory limit has to be at least 8000mb. The set memory limit is " +
+                    configs.general.memoryLimitMb + "mb.");
+        }
+
+        sb_compose.append("\t\tcpus: ").append(configs.general.threadLimit.get()).append("\n");
+        sb_compose.append("\t\tmem_limit: ").append(configs.general.memoryLimitMb.get()).append("m\n");
+
+        sb_compose.append("\t\tenvironment:\n");
+        sb_compose.append("\t\t\t- _JAVA_OPTIONS=-Xmx").append(configs.general.memoryLimitMb.get()).append("m");
 
         configs.tgene.pathToExecutable.setValue(new File("/srv/dependencies/meme"));
         configs.igv.pathToIGV.setValue(new File("/srv/dependencies/igv"));
