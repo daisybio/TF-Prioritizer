@@ -1,10 +1,10 @@
 package lib.Blacklist;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.RegionSearchTree.ChromosomeBlacklistTrees;
 import lib.ExecutableStep;
 import util.Regions.Region;
-import tfprio.Workflow;
+import tfprio.tfprio.Workflow;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;

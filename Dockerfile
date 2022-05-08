@@ -21,9 +21,9 @@ RUN bash -c "/srv/install/install.sh -d"
 COPY ext/ /srv/dependencies/ext
 COPY scripts /srv/dependencies/scripts
 COPY config_templates/defaultConfigs.json /srv/dependencies/config_templates/defaultConfigs.json
-COPY out/artifacts/COM2POSE_jar/COM2POSE.jar /srv/app
+COPY build/TFPRIO.jar /srv/app
 
 USER docker
 
-CMD ["java", "-jar", "/srv/app/COM2POSE.jar", "-c", "/srv/wd/input/configs.json", "-w", "/srv/wd", "-p", \
+CMD ["java", "-jar", "/srv/app/TFPRIO.jar", "-c", "/srv/wd/input/configs.json", "-w", "/srv/wd", "-p", \
 "/srv/dependencies"]

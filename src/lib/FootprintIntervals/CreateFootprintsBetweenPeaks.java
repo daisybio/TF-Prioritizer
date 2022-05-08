@@ -1,8 +1,8 @@
 package lib.FootprintIntervals;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import lib.ExecutableStep;
-import tfprio.Workflow;
+import tfprio.tfprio.Workflow;
 import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;

@@ -1,7 +1,7 @@
 package lib.Tepic;
 
 import lib.ExecutableStep;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
@@ -233,22 +233,22 @@ public class Postprocessing extends ExecutableStep
                     }
                 }
 
-                for(String tf : tf_chrRegion.keySet())
+                for (String tf : tf_chrRegion.keySet())
                 {
                     StringBuilder sb = new StringBuilder();
                     sb.append("track name=\"");
                     sb.append(tf);
                     sb.append("(@PREDICTED)\"\n");
 
-                    Map<String,List<Region>> regions = tf_chrRegion.get(tf).getAllRegionsSorted();
+                    Map<String, List<Region>> regions = tf_chrRegion.get(tf).getAllRegionsSorted();
 
                     ArrayList<String> chrKeysSorted = new ArrayList<>(regions.keySet());
                     Collections.sort(chrKeysSorted, new ChromosomeComparator());
 
-                    for(String chr : chrKeysSorted)
+                    for (String chr : chrKeysSorted)
                     {
                         List<Region> chrRegion = regions.get(chr);
-                        for(Region region: chrRegion)
+                        for (Region region : chrRegion)
                         {
                             sb.append(region.getChromosome());
                             sb.append("\t");
@@ -259,7 +259,9 @@ public class Postprocessing extends ExecutableStep
                         }
                     }
 
-                    try(BufferedWriter bw = new BufferedWriter(new FileWriter(extend(directory_group_hm,tf+".csv")))){
+                    try (BufferedWriter bw = new BufferedWriter(
+                            new FileWriter(extend(directory_group_hm, tf + ".csv"))))
+                    {
                         bw.write(sb.toString());
                     } catch (IOException e)
                     {

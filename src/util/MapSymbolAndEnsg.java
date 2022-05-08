@@ -1,6 +1,6 @@
 package util;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 
 import java.io.File;

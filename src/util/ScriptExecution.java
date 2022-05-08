@@ -1,6 +1,6 @@
 package util;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,18 +12,13 @@ public class ScriptExecution
     public static void executeAndWait(File file, Logger logger)
     {
         Process process = execute(file, logger);
-        waitFor(process, logger);
+        waitFor(process, logger, List.of(file.getAbsolutePath()));
     }
 
     public static void executeAndWait(List<String> command, Logger logger)
     {
         Process process = execute(command, logger, false);
-        int returnCode = waitFor(process, logger);
-
-        if (returnCode != 0)
-        {
-            logger.error("Received return code " + returnCode + "\n\n Command was: " + command);
-        }
+        waitFor(process, logger, command);
     }
 
     private static Process executeProcessBuilder(ProcessBuilder builder, Logger logger, boolean redirectOutput)
@@ -58,7 +53,7 @@ public class ScriptExecution
     public static void executeAndWait(String command, Logger logger, boolean redirectOutput)
     {
         Process process = execute(command, logger, redirectOutput);
-        int returnCode = waitFor(process, logger);
+        int returnCode = waitFor(process, logger, new ArrayList<>(List.of(command)));
 
         if (returnCode != 0)
         {
@@ -73,12 +68,18 @@ public class ScriptExecution
         executeAndWait(command, logger);
     }
 
-    private static int waitFor(Process process, Logger logger)
+    private static int waitFor(Process process, Logger logger, List<String> command)
     {
         try
         {
-            return process.waitFor();
-        } catch (InterruptedException e)
+            int returnCode = process.waitFor();
+            if (returnCode != 0)
+            {
+                logger.warn("Received return code " + returnCode + " Command was: " + command);
+                logger.error(new String(process.getErrorStream().readAllBytes()));
+            }
+            return returnCode;
+        } catch (InterruptedException | IOException e)
         {
             logger.error(e.getMessage());
         }

@@ -2,7 +2,7 @@ package lib.Igv;
 
 import lib.ExecutableStep;
 import lib.GeneAffinity;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
@@ -16,7 +16,7 @@ import java.util.*;
 
 import static lib.Igv.Helpers.getGeneCoordinates;
 import static lib.Igv.Helpers.getInputFiles;
-import static tfprio.Workflow.getLatestInputDirectory;
+import static tfprio.tfprio.Workflow.getLatestInputDirectory;
 import static util.FileManagement.extend;
 
 public class TopLog2FC extends ExecutableStep

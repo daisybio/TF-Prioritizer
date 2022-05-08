@@ -1,7 +1,7 @@
 package lib.AngularReport;
 
 import lib.ExecutableStep;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 
