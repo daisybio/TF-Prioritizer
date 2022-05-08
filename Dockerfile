@@ -6,7 +6,7 @@ ARG USER_ID
 ARG GROUP_ID
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN groupadd --gid $GROUP_ID docker && useradd --ingroup docker --disabled-password --uid $USER_ID docker
+RUN groupadd --gid $GROUP_ID docker && useradd --gid docker --disabled-password --uid $USER_ID docker
 
 RUN for i in \
     /srv/dependencies/ext \
