@@ -2,7 +2,10 @@ FROM ubuntu:20.04
 
 RUN apt-get update && apt-get -y install sudo
 
-RUN addgroup --gid 1000 docker && adduser --ingroup docker --disabled-password --uid 1000 docker
+ARG USER_ID
+ARG GROUP_ID
+
+RUN addgroup --gid $GROUP_ID docker && adduser --ingroup docker --disabled-password --uid $USER_ID docker
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -13,10 +16,9 @@ RUN for i in \
     /src/install \
     /srv/app \
     /srv/wd \
-    ; do mkdir -p $i && chown -R 1000:1000 $i; done
+    ; do mkdir -p $i && chown -R docker:docker $i; done
 
 COPY install/ /srv/install
-RUN ["chmod", "+x", "/srv/install/install.sh"]
 RUN bash -c "/srv/install/install.sh -d"
 
 COPY ext/ /srv/dependencies/ext

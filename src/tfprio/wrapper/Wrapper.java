@@ -50,14 +50,23 @@ public class Wrapper
         statLogging.destroy();
     }
 
-    private static File buildCompose(Configs configs, ArgParser argParser, Logger logger)
+    private static File buildCompose(Configs configs, ArgParser argParser, Logger logger) throws IOException
     {
         StringBuilder sb_compose = new StringBuilder();
 
-        sb_compose.append("version: \"2.2\"\n");
+        String uid = new String(Runtime.getRuntime().exec("id -u " + System.getProperty("user.name")).getInputStream()
+                .readAllBytes()).replace("\n", "");
+        String gid = new String(Runtime.getRuntime().exec("id -g " + System.getProperty("user.name")).getInputStream()
+                .readAllBytes()).replace("\n", "");
+
+        sb_compose.append("version: \"2.4\"\n");
         sb_compose.append("services:\n");
         sb_compose.append("\tcom2pose:\n");
-        sb_compose.append("\t\tbuild: ").append(argParser.getSourceDirectory().getAbsolutePath()).append("\n");
+        sb_compose.append("\t\tbuild:\n");
+        sb_compose.append("\t\t\tcontext: ").append(argParser.getSourceDirectory().getAbsolutePath()).append("\n");
+        sb_compose.append("\t\t\targs:\n");
+        sb_compose.append("\t\t\t\t- USER_ID=").append(uid).append("\n");
+        sb_compose.append("\t\t\t\t- GROUP_ID=").append(gid).append("\n");
         sb_compose.append("\t\tvolumes:\n");
 
         sb_compose.append("\t\t\t- ").append(argParser.getWorkingDirectory().getAbsolutePath()).append(":")
