@@ -4,10 +4,9 @@ RUN apt-get update && apt-get -y install sudo
 
 ARG USER_ID
 ARG GROUP_ID
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN addgroup --gid $GROUP_ID docker && adduser --ingroup docker --disabled-password --uid $USER_ID docker
-
-ARG DEBIAN_FRONTEND=noninteractive
 
 RUN for i in \
     /srv/dependencies/ext \
