@@ -15,13 +15,13 @@ RUN for i in \
     /srv/wd \
     ; do mkdir -p $i && chown -R 1000:1000 $i; done
 
-COPY install/ /srv/install
+COPY --chown=docker:docker install/ /srv/install
 RUN bash -c "/srv/install/install.sh -d"
 
-COPY ext/ /srv/dependencies/ext
-COPY scripts /srv/dependencies/scripts
-COPY config_templates/defaultConfigs.json /srv/dependencies/config_templates/defaultConfigs.json
-COPY build/TFPRIO.jar /srv/app
+COPY --chown=docker:docker ext/ /srv/dependencies/ext
+COPY --chown=docker:docker scripts /srv/dependencies/scripts
+COPY --chown=docker:docker config_templates/defaultConfigs.json /srv/dependencies/config_templates/defaultConfigs.json
+COPY --chown=docker:docker build/TFPRIO.jar /srv/app
 
 USER docker
 
