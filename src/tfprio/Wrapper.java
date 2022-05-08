@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static util.FileManagement.*;
+import static util.ScriptExecution.execute;
 import static util.ScriptExecution.executeAndWait;
 
 public class Wrapper
@@ -34,10 +35,18 @@ public class Wrapper
 
         File f_compose = buildCompose(configs, argParser, logger);
 
+        File statsFile = extend(argParser.getWorkingDirectory(), "stats.tsv");
+        File statsExecutable = extend(argParser.getWorkingDirectory(), ".logDockerStats.sh");
+        String statLogCommand = readFile(configs.scriptTemplates.f_logDockerStats.get()).replace("{STATSFILE}",
+                statsFile.getAbsolutePath());
+        writeFile(statsExecutable, statLogCommand);
+
         ExecutionTimeMeasurement buildTimer = new ExecutionTimeMeasurement();
         executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " build", logger, true);
         logger.info("Finished building container. Process took " + buildTimer.stopAndGetDeltaFormatted());
+        Process statLogging = execute(statsExecutable, logger);
         executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " up", logger, true);
+        statLogging.destroy();
     }
 
     private static File buildCompose(Configs configs, ArgParser argParser, Logger logger)
