@@ -118,6 +118,8 @@ fi
 
 cmake $PREFIX/TEPIC/TEPIC/Code
 make -C $PREFIX/TEPIC/TEPIC/Code
+cmake $PREFIX/TEPIC/TEPIC/Code/TRAP
+make -C $PREFIX/TEPIC/TEPIC/Code/TRAP
 
 # Install GCC 9.3.0
 sudo apt-get install -y build-essential
