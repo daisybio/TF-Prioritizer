@@ -23,15 +23,6 @@ fi
 
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends tzdata
 
-# Compile tepic
-pushd $d_ext/TEPIC/TEPIC/Code
-cmake .
-make
-cd TRAP
-cmake .
-make
-popd
-
 sudo sudo apt-get install -y wget apt-utils curl python3 python3-pip software-properties-common
 
 if R --version; then
@@ -127,6 +118,14 @@ fi
 # Install GCC 9.3.0
 sudo apt-get install -y build-essential
 
+# Compile tepic
+pushd $d_ext/TEPIC/TEPIC/Code
+cmake .
+make
+cd TRAP
+cmake .
+make
+popd
 
 if ! $docker ; then
   # Install additional Java packages
