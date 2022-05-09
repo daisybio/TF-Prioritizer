@@ -13,13 +13,18 @@ while getopts ':d' OPTION; do
   esac
 done
 
-# Compile tepic
-if ! $docker ; then
-  pushd ext/TEPIC/TEPIC/Code
+d_install=$(dirname "$0")
+
+if ! $docker; then
+  d_ext=$(dirname "$d_install")/ext
 else
-  pushd /srv/dependencies/ext/TEPIC/TEPIC/Code
+  d_ext=/srv/dependencies/ext
 fi
 
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends tzdata
+
+# Compile tepic
+pushd $d_ext/TEPIC/TEPIC/Code
 cmake .
 make
 cd TRAP
@@ -27,13 +32,7 @@ cmake .
 make
 popd
 
-sudo sudo apt-get install -y wget apt-utils curl
-
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends tzdata
-
-d_install=$(dirname "$0")
-
-sudo apt-get install -y python3 python3-pip software-properties-common
+sudo sudo apt-get install -y wget apt-utils curl python3 python3-pip software-properties-common
 
 if R --version; then
     echo "R already installed."
@@ -79,7 +78,7 @@ sudo chown -R "$USER" /usr/local/lib/R/site-library
 Rscript "$d_install/r_dependencies.R"
 
 # Install R packages required for TEPIC
-Rscript ../ext/TEPIC/TEPIC/Code/installRpackages.R
+Rscript $d_ext/TEPIC/TEPIC/Code/installRpackages.R
 
 # Install some more linux packages
 sudo apt-get install -y bedtools unzip xvfb
@@ -129,38 +128,38 @@ sudo apt-get install -y build-essential
 
 if ! $docker ; then
   # Install additional Java packages
-  mkdir -p ../ext/lib
+  mkdir -p $d_ext/lib
 
   # Install org.apache.commons.compress
-  if [ ! -d "../ext/lib/commons-compress-1.21" ]; then
+  if [ ! -d "$d_ext/lib/commons-compress-1.21" ]; then
       wget https://dlcdn.apache.org//commons/compress/binaries/commons-compress-1.21-bin.tar.gz
       tar -xf commons-compress-1.21-bin.tar.gz
       rm commons-compress-1.21-bin.tar.gz
-      mv commons-compress-1.21 ../ext/lib/commons-compress-1.21
+      mv commons-compress-1.21 $d_ext/lib/commons-compress-1.21
   fi
 
   # Install org.apache.commons.cli
-  if [ ! -d "../ext/lib/commons-cli-1.5.0" ]; then
+  if [ ! -d "$d_ext/lib/commons-cli-1.5.0" ]; then
       wget https://dlcdn.apache.org//commons/cli/binaries/commons-cli-1.5.0-bin.tar.gz
       tar -xf commons-cli-1.5.0-bin.tar.gz
       rm commons-cli-1.5.0-bin.tar.gz
-      mv commons-cli-1.5.0 ../ext/lib/commons-cli-1.5.0
+      mv commons-cli-1.5.0 $d_ext/lib/commons-cli-1.5.0
   fi
 
   # Install weka classifier
-  if [ ! -f "../ext/lib/weka/weka.jar" ]; then
+  if [ ! -f "$d_ext/lib/weka/weka.jar" ]; then
       wget http://www.java2s.com/Code/JarDownload/weka/weka.jar.zip
       unzip weka.jar.zip
       rm weka.jar.zip
-      mkdir -p ../ext/lib/weka
-      mv weka.jar ../ext/lib/weka/weka.jar
+      mkdir -p $d_ext/lib/weka
+      mv weka.jar $d_ext/lib/weka/weka.jar
   fi
 
   # Install json parser
-  if [ ! -f "../ext/lib/json/json.jar" ]; then
-      mkdir -p ../ext/lib/json
+  if [ ! -f "$d_ext/lib/json/json.jar" ]; then
+      mkdir -p $d_ext/lib/json
       wget 'https://search.maven.org/remotecontent?filepath=org/json/json/20211205/json-20211205.jar' -O \
-      ../ext/lib/json/json.jar
+      $d_ext/lib/json/json.jar
   fi
 fi
 
