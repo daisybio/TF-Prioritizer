@@ -118,7 +118,7 @@ public class Wrapper
         File f_configs = extend(argParser.getWorkingDirectory(), "dockerConfigs.json");
         configs.save(f_configs);
 
-        sb_compose.append("\t\t\t- ").append(argParser.getWorkingDirectory()).append(":")
+        sb_compose.append("\t\t\t- ").append(argParser.getWorkingDirectory().getAbsolutePath()).append(":")
                 .append(configs.general.d_docker_wd.get().getAbsolutePath()).append("\n");
 
         try
