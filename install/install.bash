@@ -87,7 +87,7 @@ sudo apt-get install -y bedtools unzip xvfb
 python3 -m pip install -r "$d_install/requirements.txt"
 
 # Install MEME Suite
-if meme -version; then
+if [ ! -d "$HOME/.meme" ]; then
     echo "MEME already installed."
 else
     echo "Installing MEME."
@@ -95,7 +95,7 @@ else
     tar -xf meme-5.4.1.tar.gz
     rm meme-5.4.1.tar.gz
 
-    cd meme-5.4.1
+    pushd meme-5.4.1
     if ! $docker ; then
       ./configure --prefix="$HOME/.meme" --enable-build-libxml2 --enable-build-libxslt
     else
@@ -104,7 +104,7 @@ else
     sudo make
     sudo make test
     sudo make install
-    cd ..
+    popd
 
     rm -rf meme-5.4.1
 
@@ -112,7 +112,7 @@ else
 fi
 
 # Install command line IGV and igvtools
-if [ ! -d "IGV_2.11.2" ]; then
+if [ ! -d "$HOME/.igv" ]; then
     wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
     if ! $docker ; then
       unzip IGV_2.11.2.zip -d "$HOME/.igv"
