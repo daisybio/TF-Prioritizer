@@ -28,5 +28,5 @@ COPY build/TFPRIO.jar /srv/app
 
 USER docker
 
-CMD ["java", "-jar", "/srv/app/TFPRIO.jar", "-c", "/srv/wd/input/dockerConfigs.json", "-w", "/srv/wd", "-p", \
+CMD ["java", "-jar", "/srv/app/TFPRIO.jar", "-c", "/srv/wd/dockerConfigs.json", "-w", "/srv/wd", "-p", \
 "/srv/dependencies"]
