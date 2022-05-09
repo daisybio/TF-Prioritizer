@@ -118,6 +118,20 @@ fi
 # Install GCC 9.3.0
 sudo apt-get install -y build-essential
 
+# Install cmake
+if cmake --version; then
+  echo "CMake already installed"
+else
+  wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz
+  tar -zxvf cmake-3.20.0.tar.gz
+  pushd cmake-3.20.0
+  ./bootstrap
+  make
+  sudo make install
+  popd
+  rm -rf cmake-3.20.0
+fi
+
 # Compile tepic
 pushd $d_ext/TEPIC/TEPIC/Code
 cmake .
