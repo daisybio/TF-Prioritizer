@@ -1,9 +1,3 @@
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-
-if (!requireNamespace("biomaRt", quietly = TRUE))
-  BiocManager::install("biomaRt")
-
 library('biomaRt')
 httr::set_config(httr::config(ssl_verifypeer = FALSE))
 df <- read.csv('{INPUTFILE}')
