@@ -67,33 +67,6 @@ public class Wrapper
         sb_compose.append("\t\t\targs:\n");
         sb_compose.append("\t\t\t\t- USER_ID=").append(uid).append("\n");
         sb_compose.append("\t\t\t\t- GROUP_ID=").append(gid).append("\n");
-        sb_compose.append("\t\tvolumes:\n");
-
-        sb_compose.append("\t\t\t- ").append(argParser.getWorkingDirectory().getAbsolutePath()).append(":")
-                .append(configs.general.d_docker_wd.get().getAbsolutePath()).append("\n");
-
-        File d_input = extend(argParser.getWorkingDirectory(), "input");
-
-        try
-        {
-            deleteFileStructure(d_input);
-        } catch (IOException e)
-        {
-            logger.error(e.getMessage());
-        }
-
-        for (InputFileStructure structure : configs.getInputFileStructure())
-        {
-            if (structure.isSet())
-            {
-                File f_docker = extend(configs.general.d_docker_wd_input.get(), structure.get().getName());
-
-                sb_compose.append("\t\t\t- ").append(structure.get().getAbsolutePath()).append(":")
-                        .append(f_docker.getAbsolutePath()).append("\n");
-
-                structure.setValue(f_docker);
-            }
-        }
 
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         com.sun.management.OperatingSystemMXBean os =
@@ -126,14 +99,43 @@ public class Wrapper
         sb_compose.append("\t\tmem_limit: ").append(configs.general.memoryLimitMb.get()).append("m\n");
 
         sb_compose.append("\t\tenvironment:\n");
-        sb_compose.append("\t\t\t- _JAVA_OPTIONS=-Xmx").append(configs.general.memoryLimitMb.get()).append("m");
+        sb_compose.append("\t\t\t- _JAVA_OPTIONS=-Xmx").append(configs.general.memoryLimitMb.get()).append("m\n");
 
         configs.tgene.pathToExecutable.setValue(new File("/srv/dependencies/meme"));
         configs.igv.pathToIGV.setValue(new File("/srv/dependencies/igv"));
 
+        sb_compose.append("\t\tvolumes:\n");
+
+        File d_input = extend(argParser.getWorkingDirectory(), "input");
+
+        try
+        {
+            deleteFileStructure(d_input);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+
+        for (InputFileStructure structure : configs.getInputFileStructure())
+        {
+            if (structure.isSet())
+            {
+                File f_docker = extend(configs.general.d_docker_wd_input.get(), structure.get().getName());
+
+                sb_compose.append("\t\t\t- ").append(structure.get().getAbsolutePath()).append(":")
+                        .append(f_docker.getAbsolutePath()).append("\n");
+
+                structure.setValue(f_docker);
+            }
+        }
+
         File f_compose = extend(argParser.getWorkingDirectory(), "docker-compose.yml");
         File f_configs = extend(d_input, "configs.json");
         configs.save(f_configs);
+
+        sb_compose.append("\t\t\t- ").append(f_configs.getAbsolutePath()).append(":")
+                .append(extend(configs.general.d_docker_wd_input.get(), f_configs.getName()).getAbsolutePath())
+                .append("\n");
 
         try
         {
