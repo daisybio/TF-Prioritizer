@@ -101,9 +101,6 @@ public class Wrapper
         sb_compose.append("\t\tenvironment:\n");
         sb_compose.append("\t\t\t- _JAVA_OPTIONS=-Xmx").append(configs.general.memoryLimitMb.get()).append("m\n");
 
-        configs.tgene.pathToExecutable.setValue(new File("/srv/dependencies/meme"));
-        configs.igv.pathToIGV.setValue(new File("/srv/dependencies/igv"));
-
         sb_compose.append("\t\tvolumes:\n");
 
         File d_input = extend(argParser.getWorkingDirectory(), "input");
@@ -128,6 +125,9 @@ public class Wrapper
                 structure.setValue(f_docker);
             }
         }
+
+        configs.tgene.pathToExecutable.setValue(new File("/srv/dependencies/meme"));
+        configs.igv.pathToIGV.setValue(new File("/srv/dependencies/igv"));
 
         File f_compose = extend(argParser.getWorkingDirectory(), "docker-compose.yml");
         File f_configs = extend(d_input, "configs.json");
