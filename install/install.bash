@@ -87,7 +87,7 @@ sudo apt-get install -y bedtools unzip xvfb
 python3 -m pip install -r "$d_install/requirements.txt"
 
 # Install MEME Suite
-if [ ! -d "$HOME/.meme" ]; then
+if [ -d "$HOME/.meme" ]; then
     echo "MEME already installed."
 else
     echo "Installing MEME."
@@ -112,14 +112,16 @@ else
 fi
 
 # Install command line IGV and igvtools
-if [ ! -d "$HOME/.igv" ]; then
-    wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
-    if ! $docker ; then
-      unzip IGV_2.11.2.zip -d "$HOME/.igv"
-    else
-      unzip IGV_2.11.2.zip -d /srv/dependencies/igv
-    fi
-    rm IGV_2.11.2.zip
+if [ -d "$HOME/.igv" ]; then
+  echo "IGV already installed."
+else
+  wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
+  if ! $docker ; then
+    unzip IGV_2.11.2.zip -d "$HOME/.igv"
+  else
+    unzip IGV_2.11.2.zip -d /srv/dependencies/igv
+  fi
+  rm IGV_2.11.2.zip
 fi
 
 # Install GCC 9.3.0
