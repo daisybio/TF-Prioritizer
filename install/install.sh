@@ -109,6 +109,16 @@ if [ ! -d "IGV_2.11.2" ]; then
     rm IGV_2.11.2.zip
 fi
 
+# Compile tepic
+if [ ! $docker ]; then
+  PREFIX=ext
+else
+  PREFIX=/srv/dependencies/ext
+fi
+
+cmake $PREFIX/TEPIC/TEPIC/Code
+make -C $PREFIX/TEPIC/TEPIC/Code
+
 # Install GCC 9.3.0
 sudo apt-get install -y build-essential
 

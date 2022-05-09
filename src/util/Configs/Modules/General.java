@@ -26,8 +26,9 @@ public class General extends AbstractModule
 
     public final GeneratedFileStructure d_workflowHashes = extend(workingDirectory, ".hashes");
 
-    public final GeneratedFileStructure d_docker_wd = new GeneratedFileStructure(new File("/srv/wd"));
-    public final GeneratedFileStructure d_docker_wd_input = extend(d_docker_wd, "input");
+    public final GeneratedFileStructure d_docker = new GeneratedFileStructure(new File("/srv"));
+    public final GeneratedFileStructure d_docker_input = extend(d_docker, "input");
+    public final GeneratedFileStructure d_docker_wd = extend(d_docker, "wd");
 
     public General(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory, Logger logger)
             throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException

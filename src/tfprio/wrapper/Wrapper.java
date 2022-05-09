@@ -98,21 +98,11 @@ public class Wrapper
 
         sb_compose.append("\t\tvolumes:\n");
 
-        File d_input = extend(argParser.getWorkingDirectory(), "input");
-
-        try
-        {
-            deleteFileStructure(d_input);
-        } catch (IOException e)
-        {
-            logger.error(e.getMessage());
-        }
-
         for (InputFileStructure structure : configs.getInputFileStructure())
         {
             if (structure.isSet())
             {
-                File f_docker = extend(configs.general.d_docker_wd_input.get(), structure.get().getName());
+                File f_docker = extend(configs.general.d_docker_input.get(), structure.get().getName());
 
                 sb_compose.append("\t\t\t- ").append(structure.get().getAbsolutePath()).append(":")
                         .append(f_docker.getAbsolutePath()).append("\n");
@@ -125,12 +115,11 @@ public class Wrapper
         configs.igv.pathToIGV.setValue(new File("/srv/dependencies/igv"));
 
         File f_compose = extend(argParser.getWorkingDirectory(), "docker-compose.yml");
-        File f_configs = extend(d_input, "configs.json");
+        File f_configs = extend(argParser.getWorkingDirectory(), "dockerConfigs.json");
         configs.save(f_configs);
 
-        sb_compose.append("\t\t\t- ").append(f_configs.getAbsolutePath()).append(":")
-                .append(extend(configs.general.d_docker_wd_input.get(), f_configs.getName()).getAbsolutePath())
-                .append("\n");
+        sb_compose.append("\t\t\t- ").append(argParser.getWorkingDirectory()).append(":")
+                .append(configs.general.d_docker_wd.get().getAbsolutePath()).append("\n");
 
         try
         {

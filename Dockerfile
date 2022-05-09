@@ -9,6 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN groupadd --gid $GROUP_ID docker && useradd -lm --gid docker --uid $USER_ID docker
 
 RUN for i in \
+    /srv/input \
     /srv/dependencies/ext \
     /srv/dependencies/scripts \
     /srv/dependencies/config_templates \
