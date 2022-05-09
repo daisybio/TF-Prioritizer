@@ -19,7 +19,7 @@ RUN for i in \
     ; do mkdir -p $i && chown -R docker:docker $i; done
 
 COPY install/ /srv/install
-RUN bash -c "chmod +x /srv/install/install.sh && /srv/install/install.sh -d"
+RUN bash -c "chmod +x /srv/install/install.bash && /srv/install/install.bash -d"
 
 COPY ext/ /srv/dependencies/ext
 COPY scripts /srv/dependencies/scripts

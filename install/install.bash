@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 docker=false
 
@@ -12,6 +12,20 @@ while getopts ':d' OPTION; do
       ;;
   esac
 done
+
+# Compile tepic
+if ! $docker ; then
+  pushd ext/TEPIC/TEPIC/Code
+else
+  pushd /srv/dependencies/ext/TEPIC/TEPIC/Code
+fi
+
+cmake .
+make
+cd TRAP
+cmake .
+make
+popd
 
 sudo sudo apt-get install -y wget apt-utils curl
 
@@ -83,7 +97,7 @@ else
     rm meme-5.4.1.tar.gz
 
     cd meme-5.4.1
-    if [ ! $docker ]; then
+    if ! $docker ; then
       ./configure --prefix="$HOME/.meme" --enable-build-libxml2 --enable-build-libxslt
     else
       ./configure --prefix=/srv/dependencies/meme --enable-build-libxml2 --enable-build-libxslt
@@ -101,7 +115,7 @@ fi
 # Install command line IGV and igvtools
 if [ ! -d "IGV_2.11.2" ]; then
     wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
-    if [ ! $docker ]; then
+    if ! $docker ; then
       unzip IGV_2.11.2.zip -d "$HOME/.igv"
     else
       unzip IGV_2.11.2.zip -d /srv/dependencies/igv
@@ -109,23 +123,11 @@ if [ ! -d "IGV_2.11.2" ]; then
     rm IGV_2.11.2.zip
 fi
 
-# Compile tepic
-if [ ! $docker ]; then
-  PREFIX=ext
-else
-  PREFIX=/srv/dependencies/ext
-fi
-
-cmake $PREFIX/TEPIC/TEPIC/Code
-make -C $PREFIX/TEPIC/TEPIC/Code
-cmake $PREFIX/TEPIC/TEPIC/Code/TRAP
-make -C $PREFIX/TEPIC/TEPIC/Code/TRAP
-
 # Install GCC 9.3.0
 sudo apt-get install -y build-essential
 
 
-if [ ! $docker ]; then
+if ! $docker ; then
   # Install additional Java packages
   mkdir -p ../ext/lib
 
