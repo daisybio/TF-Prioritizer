@@ -36,18 +36,29 @@ public class Wrapper
 
         File f_compose = buildCompose(configs, argParser, logger);
 
-        File statsFile = extend(argParser.getWorkingDirectory(), "stats.tsv");
-        File statsExecutable = extend(argParser.getWorkingDirectory(), ".logDockerStats.sh");
-        String statLogCommand = readFile(configs.scriptTemplates.f_logDockerStats.get()).replace("{STATSFILE}",
-                statsFile.getAbsolutePath());
-        writeFile(statsExecutable, statLogCommand);
-
         ExecutionTimeMeasurement buildTimer = new ExecutionTimeMeasurement();
         executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " build", logger, true);
         logger.info("Finished building container. Process took " + buildTimer.stopAndGetDeltaFormatted());
+
+        Process container = execute("docker-compose -f " + f_compose.getAbsolutePath() + " up", logger, true);
+        String containerID = new String(Runtime.getRuntime().exec("docker-compose ps -q").getInputStream()
+                .readAllBytes()).replace("\n", "");
+        File statsFile = extend(argParser.getWorkingDirectory(), "stats.tsv");
+        File statsExecutable = extend(argParser.getWorkingDirectory(), ".logDockerStats.sh");
+        String statLogCommand = readFile(configs.scriptTemplates.f_logDockerStats.get()).replace("{STATSFILE}",
+                statsFile.getAbsolutePath()).replace("{CONTAINER_ID}", containerID);
+        writeFile(statsExecutable, statLogCommand);
         Process statLogging = execute(statsExecutable, logger);
-        executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " up", logger, true);
-        statLogging.destroy();
+
+        logger.info("Container ID: " + containerID);
+        logger.info("Stat logging PID: " + statLogging.pid());
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            statLogging.destroy();
+            container.destroy();
+        }));
+
+        container.waitFor();
     }
 
     private static File buildCompose(Configs configs, ArgParser argParser, Logger logger) throws IOException
