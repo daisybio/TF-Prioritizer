@@ -59,8 +59,35 @@ else
     echo "Finished Java installation."
 fi
 
+# Install GCC 9.3.0
+sudo apt-get install -y build-essential libssl-dev
+
+# Install cmake
+if cmake --version; then
+  echo "CMake already installed"
+else
+  wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz
+  tar -zxvf cmake-3.20.0.tar.gz
+  pushd cmake-3.20.0
+  ./bootstrap
+  make
+  sudo make install
+  popd
+  rm cmake-3.20.0.tar.gz
+  rm -rf cmake-3.20.0
+fi
+
+# Compile tepic
+pushd $d_ext/TEPIC/TEPIC/Code
+cmake .
+make
+cd TRAP
+cmake .
+make
+popd
+
 # Install dependencies for R packages
-sudo apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev
+sudo apt-get install -y libcurl4-openssl-dev libxml2-dev
 
 # Make libraries writeable for active user
 sudo chown -R "$USER" /usr/local/lib/R/site-library
@@ -114,32 +141,6 @@ else
   fi
   rm IGV_2.11.2.zip
 fi
-
-# Install GCC 9.3.0
-sudo apt-get install -y build-essential
-
-# Install cmake
-if cmake --version; then
-  echo "CMake already installed"
-else
-  wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0.tar.gz
-  tar -zxvf cmake-3.20.0.tar.gz
-  pushd cmake-3.20.0
-  ./bootstrap
-  make
-  sudo make install
-  popd
-  rm -rf cmake-3.20.0
-fi
-
-# Compile tepic
-pushd $d_ext/TEPIC/TEPIC/Code
-cmake .
-make
-cd TRAP
-cmake .
-make
-popd
 
 if ! $docker ; then
   # Install additional Java packages
