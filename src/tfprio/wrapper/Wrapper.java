@@ -42,9 +42,8 @@ public class Wrapper
 
         Process container = execute("docker-compose -f " + f_compose.getAbsolutePath() + " up", logger, true);
 
-        Thread.sleep(5000);
-
-        String containerID = new String(Runtime.getRuntime().exec("docker-compose ps -q").getInputStream()
+        String containerID =
+                new String(Runtime.getRuntime().exec("docker-compose -f " + f_compose.getAbsolutePath() + " ps -q").getInputStream()
                 .readAllBytes()).replace("\n", "");
         File statsFile = extend(argParser.getWorkingDirectory(), "stats.tsv");
         File statsExecutable = extend(argParser.getWorkingDirectory(), ".logDockerStats.sh");
