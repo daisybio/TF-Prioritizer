@@ -18,10 +18,11 @@ RUN for i in \
     /srv/wd \
     ; do mkdir -p $i && chown -R docker:docker $i; done
 
+COPY ext/ /srv/dependencies/ext
+
 COPY install/ /srv/install
 RUN bash -c "chmod +x /srv/install/install.bash && /srv/install/install.bash -d"
 
-COPY ext/ /srv/dependencies/ext
 COPY scripts /srv/dependencies/scripts
 COPY config_templates/defaultConfigs.json /srv/dependencies/config_templates/defaultConfigs.json
 COPY build/TFPRIO.jar /srv/app
