@@ -54,6 +54,7 @@ public class Wrapper
 
         logger.info("Container ID: " + containerID);
         logger.info("Stat logging PID: " + statLogging.pid());
+        logger.info("Wrapper finished");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             statLogging.destroy();
