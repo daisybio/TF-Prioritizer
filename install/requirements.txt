@@ -3,3 +3,4 @@ seaborn
 matplotlib
 pyliftover
 logomaker
+intervaltree
