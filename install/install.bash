@@ -21,9 +21,11 @@ else
   d_ext=/srv/dependencies/ext
 fi
 
+sudo apt-get update
+
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends tzdata
 
-sudo sudo apt-get install -y wget apt-utils curl python3 python3-pip software-properties-common
+sudo apt-get install -y wget apt-utils curl python3 python3-pip software-properties-common
 
 if R --version; then
     echo "R already installed."
@@ -92,11 +94,11 @@ sudo apt-get install -y libcurl4-openssl-dev libxml2-dev
 # Make libraries writeable for active user
 sudo chown -R "$USER" /usr/local/lib/R/site-library
 
-# Install DESeq2 R package
-Rscript "$d_install/r_dependencies.R"
-
 # Install R packages required for TEPIC
 Rscript $d_ext/TEPIC/TEPIC/Code/installRpackages.R
+
+# Install DESeq2 R package
+Rscript "$d_install/r_dependencies.R"
 
 # Install some more linux packages
 sudo apt-get install -y bedtools unzip xvfb
