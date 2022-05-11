@@ -50,6 +50,7 @@ public class Wrapper
         String statLogCommand = readFile(configs.scriptTemplates.f_logDockerStats.get()).replace("{STATSFILE}",
                 statsFile.getAbsolutePath()).replace("{CONTAINER_ID}", containerID);
         writeFile(statsExecutable, statLogCommand);
+        statsExecutable.setExecutable(true, true);
         Process statLogging = execute(statsExecutable, logger);
 
         logger.info("Container ID: " + containerID);
