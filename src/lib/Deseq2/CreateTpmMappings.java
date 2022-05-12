@@ -326,6 +326,8 @@ public class CreateTpmMappings extends ExecutableStep
             e.printStackTrace();
         }
 
+        finishAllQueuedThreads();
+
 
         try
         {
