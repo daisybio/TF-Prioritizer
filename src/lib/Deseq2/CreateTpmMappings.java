@@ -8,9 +8,7 @@ import util.FileFilters.Filters;
 import util.Hashing;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -87,7 +85,6 @@ public class CreateTpmMappings extends ExecutableStep
     }
 
     private List<String[]> query(String datasetName, List<String> geneIDs, List<String> attributes)
-            throws IOException, InterruptedException
     {
         String urlString = "http://www.ensembl.org/biomart/martservice";
 
@@ -98,8 +95,15 @@ public class CreateTpmMappings extends ExecutableStep
         }
         sb_geneID.deleteCharAt(sb_geneID.lastIndexOf(","));
         String xml = getBiomartXml(datasetName, sb_geneID.toString(), attributes);
-        URL url = new URL(urlString);
-
+        URL url = null;
+        try
+        {
+            url = new URL(urlString);
+        } catch (MalformedURLException e)
+        {
+            logger.error(e.getMessage());
+        }
+        assert url!= null;
 
         Map<String, String> parameters = new HashMap<>()
         {{
@@ -111,24 +115,28 @@ public class CreateTpmMappings extends ExecutableStep
 
         while (!successful)
         {
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("PUT");
-            connection.setDoOutput(true);
-            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream()))
+            try
             {
-                out.writeBytes(getParamsString(parameters));
-                out.flush();
-            }
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream())))
-            {
-                successful = true;
-                String inputLine;
-                while ((inputLine = reader.readLine()) != null)
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("PUT");
+                connection.setDoOutput(true);
+                try (DataOutputStream out = new DataOutputStream(connection.getOutputStream()))
                 {
-                    content.add(inputLine.split("\t"));
+                    out.writeBytes(getParamsString(parameters));
+                    out.flush();
+                }
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream())))
+                {
+                    successful = true;
+                    String inputLine;
+                    while ((inputLine = reader.readLine()) != null)
+                    {
+                        content.add(inputLine.split("\t"));
+                    }
                 }
             } catch (IOException e)
             {
+                logger.warn(e.getMessage());
                 logger.warn("Retrying: " + Hashing.hash(String.valueOf(geneIDs.hashCode())));
             }
         }
@@ -223,18 +231,8 @@ public class CreateTpmMappings extends ExecutableStep
                     int startIndex = finalSplitIndex * splitSize;
                     int endIndex = Math.min((finalSplitIndex + 1) * splitSize, geneIDs.size());
                     List<String> selectedIDs = geneIDs.subList(startIndex, endIndex);
-                    List<String[]> r_length = null;
-                    List<String[]> r_gc = null;
-                    try
-                    {
-                        r_length = query(species.get(), selectedIDs, lengthCols);
-                        r_gc = query(species.get(), selectedIDs, gcCols);
-                    } catch (IOException | InterruptedException e)
-                    {
-                        logger.error(e.getMessage());
-                    }
-                    assert r_length != null;
-                    assert r_gc != null;
+                    List<String[]> r_length = query(species.get(), selectedIDs, lengthCols);
+                    List<String[]> r_gc = query(species.get(), selectedIDs, gcCols);
 
                     Map<String, List<String[]>> m_length = mapIds(lengthCols, r_length);
                     Map<String, List<String[]>> m_gc = mapIds(gcCols, r_gc);
