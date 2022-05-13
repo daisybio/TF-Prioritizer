@@ -171,7 +171,12 @@ public class CreateGenePositions extends ExecutableStep
                 logger.info("equal genome versions. No uplifted needed. Skipping this step.");
             } else
             {
-                finishAllQueuedThreads();
+                try
+                {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignore)
+                {
+                }
                 executeAndWait(f_upliftScript.get(), logger);
             }
         } else

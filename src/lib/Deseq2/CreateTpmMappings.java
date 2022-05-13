@@ -327,7 +327,6 @@ public class CreateTpmMappings extends ExecutableStep
 
         finishAllQueuedThreads();
 
-
         try
         {
             String scriptTemplate = readFile(f_scriptTemplate.get());
@@ -352,7 +351,6 @@ public class CreateTpmMappings extends ExecutableStep
                     } catch (IOException e)
                     {
                         logger.error(e.getMessage());
-                        System.exit(1);
                     }
                 });
             }
