@@ -2,7 +2,7 @@ package lib.Logos;
 
 import lib.ExecutableStep;
 import org.apache.commons.compress.utils.IOUtils;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.TrustAllManager;

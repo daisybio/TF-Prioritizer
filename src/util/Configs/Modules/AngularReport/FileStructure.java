@@ -1,6 +1,6 @@
 package util.Configs.Modules.AngularReport;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Configs;

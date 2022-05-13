@@ -1,8 +1,8 @@
 package lib.Tgene;
 
 import lib.ExecutableStep;
-import tfprio.TFPRIO;
-import tfprio.Workflow;
+import tfprio.tfprio.TFPRIO;
+import tfprio.tfprio.Workflow;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;

@@ -1,6 +1,6 @@
 package util;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,57 +11,53 @@ public class ScriptExecution
 {
     public static void executeAndWait(File file, Logger logger)
     {
-        List<String> command = getExecutionCommand(file);
-
-        executeAndWait(command, logger);
+        Process process = execute(file, logger);
+        waitFor(process, logger, List.of(file.getAbsolutePath()));
     }
 
     public static void executeAndWait(List<String> command, Logger logger)
     {
-        logger.debug("Executing command: " + command);
-        ProcessBuilder pb = new ProcessBuilder(command);
-        if (TFPRIO.configs.general.redirectExternalScriptOutputStream.get())
+        Process process = execute(command, logger, false);
+        waitFor(process, logger, command);
+    }
+
+    private static Process executeProcessBuilder(ProcessBuilder builder, Logger logger, boolean redirectOutput)
+    {
+        logger.debug("Executing command: " + builder.command());
+        if (redirectOutput ||
+                (TFPRIO.configs != null && TFPRIO.configs.general.redirectExternalScriptOutputStream.get()))
         {
-            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         }
-        if (TFPRIO.configs.general.redirectExternalScriptErrorStream.get())
+        if (redirectOutput ||
+                (TFPRIO.configs != null && TFPRIO.configs.general.redirectExternalScriptErrorStream.get()))
         {
-            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         }
         try
         {
-            Process process = pb.start();
-            int returnCode = process.waitFor();
-
-            if (returnCode != 0)
-            {
-                String message = new String(process.getErrorStream().readAllBytes());
-                logger.error("Received return code " + returnCode + "\n\n Command was: " + command + "\n\n" + message);
-            }
-        } catch (IOException | InterruptedException e)
+            return builder.start();
+        } catch (IOException e)
         {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
-
-
+        // Will never be reached since logger.error exits the program.
+        return null;
     }
 
     public static void executeAndWait(String command, Logger logger)
     {
-        logger.debug("Executing command: " + command);
-        try
-        {
-            Process child = Runtime.getRuntime().exec(command);
+        executeAndWait(command, logger, false);
+    }
 
-            int code = child.waitFor();
-            if (code != 0)
-            {
-                String message = new String(child.getErrorStream().readAllBytes());
-                logger.error("Received return code " + code + "\n\n Command was: " + command + "\n\n" + message);
-            }
-        } catch (IOException | InterruptedException e)
+    public static void executeAndWait(String command, Logger logger, boolean redirectOutput)
+    {
+        Process process = execute(command, logger, redirectOutput);
+        int returnCode = waitFor(process, logger, new ArrayList<>(List.of(command)));
+
+        if (returnCode != 0)
         {
-            logger.error(e.getMessage());
+            logger.error("Received return code " + returnCode + "\n\n Command was: " + command);
         }
     }
 
@@ -72,25 +68,50 @@ public class ScriptExecution
         executeAndWait(command, logger);
     }
 
+    private static int waitFor(Process process, Logger logger, List<String> command)
+    {
+        try
+        {
+            int returnCode = process.waitFor();
+            if (returnCode != 0)
+            {
+                logger.warn("Received return code " + returnCode + " Command was: " + command);
+                logger.error(new String(process.getErrorStream().readAllBytes()));
+            }
+            return returnCode;
+        } catch (InterruptedException | IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+
+        // Will never be reached since logger.error exits the process
+        return 1;
+    }
+
     private static List<String> getExecutionPrefix(String fileExtension, boolean fileExecution)
     {
         List<String> command = new ArrayList<>();
         switch (fileExtension)
         {
-            case ".R" -> command.add("Rscript");
-            case ".py" ->
-            {
+            case ".R":
+                command.add("Rscript");
+                break;
+            case ".py":
+
                 command.add("python3");
                 if (!fileExecution)
                 {
                     command.add("-c");
                 }
-            }
-            case ".sh" ->
+                break;
+
+            case ".sh":
             {
                 command.add("sh");
             }
-            default -> throw new RuntimeException("This file type is not supported.");
+            break;
+            default:
+                throw new RuntimeException("This file type is not supported.");
         }
 
         return command;
@@ -109,5 +130,35 @@ public class ScriptExecution
         List<String> command = getExecutionPrefix(extension, true);
         command.add(file.getAbsolutePath());
         return command;
+    }
+
+    public static Process execute(String command, Logger logger)
+    {
+        return execute(command, logger, false);
+    }
+
+    public static Process execute(String command, Logger logger, boolean redirectOutput)
+    {
+        Process process = executeProcessBuilder(new ProcessBuilder(command.split(" ")), logger, redirectOutput);
+        assert process != null;
+        return process;
+    }
+
+    public static Process execute(List<String> command, Logger logger, boolean redirectOutput)
+    {
+        Process process = executeProcessBuilder(new ProcessBuilder(command), logger, redirectOutput);
+        assert process != null;
+        return process;
+    }
+
+    public static Process execute(List<String> command, Logger logger)
+    {
+        return execute(command, logger, false);
+    }
+
+    public static Process execute(File file, Logger logger)
+    {
+        List<String> command = getExecutionCommand(file);
+        return execute(command, logger);
     }
 }

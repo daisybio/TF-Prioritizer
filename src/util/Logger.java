@@ -1,12 +1,11 @@
 package util;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 
 import static util.FileManagement.appendToFile;
 
@@ -51,7 +50,7 @@ public class Logger
      */
     public Logger(String module)
     {
-        this(module, TFPRIO.configs.general.fileLogging.get(), TFPRIO.configs.general.logFile.get());
+        this(module, TFPRIO.configs.general.fileLogging.get(), TFPRIO.configs.getLogFile());
     }
 
     /**

@@ -74,6 +74,9 @@ public class InputConfig<T> extends AbstractConfig<T>
         } else if (configClass.equals(Double.class) && value.getClass().equals(BigDecimal.class))
         {
             setValue((T) Double.valueOf(((BigDecimal) value).doubleValue()));
+        } else if (configClass.equals(Double.class) && value.getClass().equals(Integer.class))
+        {
+            setValue((T) value);
         } else if (value == JSONObject.NULL)
         {
             setValue(null);

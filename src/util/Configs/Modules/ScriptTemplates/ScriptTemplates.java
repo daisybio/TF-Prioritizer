@@ -38,6 +38,8 @@ public class ScriptTemplates extends AbstractModule
     public final SourceDirectoryFileStructure f_logos_biophysicalModel = extend(d_root, "logos_biophysicalModel.py");
     public final SourceDirectoryFileStructure f_logos_tfBindingSequence = extend(d_root, "logos_bindingSequence.R");
 
+    public final SourceDirectoryFileStructure f_logDockerStats = extend(d_root, "logDockerStats.sh");
+
     public ScriptTemplates(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
                            Logger logger)
             throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException

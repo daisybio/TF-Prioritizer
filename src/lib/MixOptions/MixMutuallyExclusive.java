@@ -1,11 +1,11 @@
 package lib.MixOptions;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.RegionSearchTree.ChromosomePeakTrees;
 import lib.ExecutableStep;
 import util.Regions.PeakRegion;
 import util.Regions.Region;
-import tfprio.Workflow;
+import tfprio.tfprio.Workflow;
 import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;

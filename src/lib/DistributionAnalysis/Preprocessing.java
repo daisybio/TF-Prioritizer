@@ -1,7 +1,7 @@
 package lib.DistributionAnalysis;
 
 import lib.ExecutableStep;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 
@@ -60,7 +60,7 @@ public class Preprocessing extends ExecutableStep
                 {
                     continue;
                 }
-                
+
                 try (BufferedReader reader = new BufferedReader(new FileReader(f_input)))
                 {
                     String line_stages;

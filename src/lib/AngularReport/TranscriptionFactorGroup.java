@@ -1,7 +1,7 @@
 package lib.AngularReport;
 
 import org.json.JSONObject;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.FileFilters.Filters;
 import util.FileManagement;
 import util.Logger;

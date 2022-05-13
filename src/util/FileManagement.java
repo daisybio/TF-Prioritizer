@@ -1,6 +1,6 @@
 package util;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
@@ -342,6 +342,17 @@ public class FileManagement
         Files.createLink(newLink.toPath(), existingData.toPath());
     }
 
+    public static void hardLink(File newLink, File existingData, Logger logger)
+    {
+        try
+        {
+            hardLink(newLink, existingData);
+        } catch (IOException e)
+        {
+            logger.error("Error during hardLink creation: " + e.getMessage());
+        }
+    }
+
     public static void softLink(File newLink, File existingData) throws IOException
     {
         makeSureDirectoryExists(newLink.getParentFile());
@@ -360,29 +371,28 @@ public class FileManagement
             softLink(newLink, existingData);
         } catch (IOException e)
         {
-            logger.error(e.getMessage());
+            logger.error("Error during softLink creation: " + e.getMessage());
         }
     }
 
     public static void deleteFileStructure(File file) throws IOException
     {
+        if (Files.isSymbolicLink(file.toPath()))
+        {
+            Files.delete(file.toPath());
+            return;
+        }
+
         if (file.exists())
         {
-            if (file.isFile())
+            if (file.isDirectory() && Objects.requireNonNull(file.listFiles()).length > 0)
             {
-                if (!file.delete())
-                {
-                    throw new IOException("Could not delete file: " + file.getAbsolutePath());
-                }
-            } else
-            {
-                File[] subFiles = file.listFiles();
-                assert subFiles != null;
-                for (File subFile : subFiles)
+                for (File subFile : Objects.requireNonNull(file.listFiles()))
                 {
                     deleteFileStructure(subFile);
                 }
             }
+            Files.delete(file.toPath());
         }
     }
 

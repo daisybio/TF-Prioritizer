@@ -1,7 +1,7 @@
 package lib.Deseq2;
 
 import lib.ExecutableStep;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 
@@ -133,9 +133,8 @@ public class CreateGenePositions extends ExecutableStep
 
             StringBuilder sb_grc = new StringBuilder();
 
-            for (Object keyObject : synonymDict.get().keySet())
+            for (String key : synonymDict.get().keySet())
             {
-                String key = (String) keyObject;
                 sb_grc.append("'").append(key).append("':");
                 sb_grc.append("'").append(synonymDict.get().get(key)).append("',");
             }
@@ -145,8 +144,7 @@ public class CreateGenePositions extends ExecutableStep
             writeFile(f_upliftScript.get(), script);
         } catch (IOException e)
         {
-            e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
 
         String line_biomart_version = null;
@@ -155,8 +153,7 @@ public class CreateGenePositions extends ExecutableStep
             line_biomart_version = versionReader.readLine();
         } catch (IOException e)
         {
-            e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
 
 
@@ -174,16 +171,13 @@ public class CreateGenePositions extends ExecutableStep
                 logger.info("equal genome versions. No uplifted needed. Skipping this step.");
             } else
             {
+                finishAllQueuedThreads();
                 executeAndWait(f_upliftScript.get(), logger);
             }
         } else
         {
-            logger.info("Do not have " + biomartVersion + " in memory. Please add at igv_GRC_synonym_dict");
-            System.exit(1);
+            logger.error("Do not have " + biomartVersion + " in memory. Please add at igv_GRC_synonym_dict");
         }
-
-        // TODO: There is no data available for testing the following section. This is why i left it in the old style
-        //  for now.
 
         if (enhancerDBs.isSet())
         {

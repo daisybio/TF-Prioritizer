@@ -4,7 +4,7 @@ import lib.DistributionAnalysis.Classes.Stats;
 import lib.DistributionAnalysis.Classes.StatsCollection;
 import lib.DistributionAnalysis.Classes.StatsCummulativeGain;
 import lib.ExecutableStep;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;

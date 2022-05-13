@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import org.json.JSONObject;
 import util.FileManagement;
 import util.Comparators.IntegerStringComparator;

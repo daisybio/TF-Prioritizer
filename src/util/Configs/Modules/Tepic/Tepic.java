@@ -16,14 +16,14 @@ public class Tepic extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final InputFileStructure d_ext_tepic = extend(extDirectory, "TEPIC", "TEPIC");
-    public final InputFileStructure executable = extend(d_ext_tepic, "Code", "TEPIC.sh");
-    public final InputFileStructure d_dynamiteScripts =
+    public final SourceDirectoryFileStructure d_ext_tepic = extend(extDirectory, "TEPIC", "TEPIC");
+    public final SourceDirectoryFileStructure executable = extend(d_ext_tepic, "Code", "TEPIC.sh");
+    public final SourceDirectoryFileStructure d_dynamiteScripts =
             extend(d_ext_tepic, "MachineLearningPipelines", "DYNAMITE", "Scripts");
-    public final InputFileStructure f_dynamite_integrateDate = extend(d_dynamiteScripts, "integrateData.py");
-    public final InputFileStructure f_dynamite_prepareForClassification =
+    public final SourceDirectoryFileStructure f_dynamite_integrateDate = extend(d_dynamiteScripts, "integrateData.py");
+    public final SourceDirectoryFileStructure f_dynamite_prepareForClassification =
             extend(d_dynamiteScripts, "prepareForClassification.R");
-    public final InputFileStructure f_dynamite = extend(d_dynamiteScripts, "DYNAMITE.R");
+    public final SourceDirectoryFileStructure f_dynamite = extend(d_dynamiteScripts, "DYNAMITE.R");
 
     public final InputFileStructure inputDirectory = new InputFileStructure();
 

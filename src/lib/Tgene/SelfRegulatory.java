@@ -4,7 +4,7 @@ import util.RegionSearchTree.ChromosomeRegionTrees;
 import lib.ExecutableStep;
 import util.Regions.GeneRegion;
 import util.Regions.Region;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 

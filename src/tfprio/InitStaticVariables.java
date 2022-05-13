@@ -1,6 +1,7 @@
 package tfprio;
 
 import lib.ExecutableStep;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;

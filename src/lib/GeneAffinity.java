@@ -1,6 +1,6 @@
 package lib;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 
 public class GeneAffinity implements Comparable<GeneAffinity>
 {

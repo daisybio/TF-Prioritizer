@@ -1,6 +1,6 @@
 package util;
 
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 
 import java.io.*;
 import java.util.List;

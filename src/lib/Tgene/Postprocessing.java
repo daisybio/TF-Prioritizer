@@ -2,7 +2,7 @@ package lib.Tgene;
 
 import lib.ExecutableStep;
 import util.Regions.GeneRegion;
-import tfprio.TFPRIO;
+import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
