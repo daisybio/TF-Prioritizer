@@ -40,13 +40,18 @@ public class Wrapper
 
         ExecutionTimeMeasurement buildTimer = new ExecutionTimeMeasurement();
         executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " build", logger, true);
+        executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " up --no-start", logger, true);
         logger.info("Finished building container. Process took " + buildTimer.stopAndGetDeltaFormatted());
 
-        Process container = execute("docker-compose -f " + f_compose.getAbsolutePath() + " up", logger, true);
+        logger.info("Finished building container. Process took " + buildTimer.stopAndGetDeltaFormatted());
 
         String containerID = new String(
                 Runtime.getRuntime().exec("docker-compose -f " + f_compose.getAbsolutePath() + " ps -q")
                         .getInputStream().readAllBytes()).replace("\n", "");
+
+        Process container =
+                execute("docker-compose -f " + f_compose.getAbsolutePath() + " up --no-build", logger, true);
+
         File statsFile = extend(argParser.getWorkingDirectory(), "stats.tsv");
         File statsExecutable = extend(argParser.getWorkingDirectory(), ".logDockerStats.sh");
         String statLogCommand = readFile(configs.scriptTemplates.f_logDockerStats.get()).replace("{STATSFILE}",
