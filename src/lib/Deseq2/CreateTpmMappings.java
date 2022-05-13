@@ -231,7 +231,7 @@ public class CreateTpmMappings extends ExecutableStep
                         r_gc = query(species.get(), selectedIDs, gcCols);
                     } catch (IOException | InterruptedException e)
                     {
-                        e.printStackTrace();
+                        logger.error(e.getMessage());
                     }
                     assert r_length != null;
                     assert r_gc != null;
@@ -324,6 +324,7 @@ public class CreateTpmMappings extends ExecutableStep
         } catch (IOException e)
         {
             e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         finishAllQueuedThreads();
@@ -360,7 +361,7 @@ public class CreateTpmMappings extends ExecutableStep
         } catch (IOException e)
         {
             e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
     }
 }
