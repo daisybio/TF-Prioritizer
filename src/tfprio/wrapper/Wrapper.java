@@ -8,6 +8,8 @@ import util.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static util.FileManagement.*;
 import static util.ScriptExecution.execute;
@@ -42,9 +44,9 @@ public class Wrapper
 
         Process container = execute("docker-compose -f " + f_compose.getAbsolutePath() + " up", logger, true);
 
-        String containerID =
-                new String(Runtime.getRuntime().exec("docker-compose -f " + f_compose.getAbsolutePath() + " ps -q").getInputStream()
-                .readAllBytes()).replace("\n", "");
+        String containerID = new String(
+                Runtime.getRuntime().exec("docker-compose -f " + f_compose.getAbsolutePath() + " ps -q")
+                        .getInputStream().readAllBytes()).replace("\n", "");
         File statsFile = extend(argParser.getWorkingDirectory(), "stats.tsv");
         File statsExecutable = extend(argParser.getWorkingDirectory(), ".logDockerStats.sh");
         String statLogCommand = readFile(configs.scriptTemplates.f_logDockerStats.get()).replace("{STATSFILE}",
@@ -57,7 +59,8 @@ public class Wrapper
         logger.info("Stat logging PID: " + statLogging.pid());
         logger.info("Wrapper finished");
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        Runtime.getRuntime().addShutdownHook(new Thread(() ->
+        {
             statLogging.destroy();
             container.destroy();
         }));
@@ -118,14 +121,24 @@ public class Wrapper
 
         sb_compose.append("\t\tvolumes:\n");
 
+        Set<String> addedStructures = new HashSet<>();
+
         for (InputFileStructure structure : configs.getInputFileStructure())
         {
             if (structure.isSet())
             {
                 File f_docker = extend(configs.general.d_docker_input.get(), structure.get().getName());
 
-                sb_compose.append("\t\t\t- ").append(structure.get().getAbsolutePath()).append(":")
-                        .append(f_docker.getAbsolutePath()).append("\n");
+                if (addedStructures.contains(f_docker.getAbsolutePath()))
+                {
+                    logger.warn("Container already has file structure: " + f_docker.getAbsolutePath() + ". Skipping.");
+                } else
+                {
+                    addedStructures.add(f_docker.getAbsolutePath());
+
+                    sb_compose.append("\t\t\t- ").append(structure.get().getAbsolutePath()).append(":")
+                            .append(f_docker.getAbsolutePath()).append("\n");
+                }
 
                 structure.setValue(f_docker);
             }
