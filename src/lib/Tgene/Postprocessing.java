@@ -92,7 +92,6 @@ public class Postprocessing extends ExecutableStep
                         {
                             String inputLine;
                             br.readLine();
-                            int lineCount = 0;
 
                             while ((inputLine = br.readLine()) != null)
                             {
@@ -112,12 +111,11 @@ public class Postprocessing extends ExecutableStep
                                 GeneRegion region = new GeneRegion(chromosome, start, end, ensg);
 
                                 currentSampleRegions.add(region);
-                                lineCount++;
                             }
                         } catch (IOException e)
                         {
                             e.printStackTrace();
-                            System.exit(1);
+                            logger.error(e.getMessage());
                         }
                         List<GeneRegion> currentSampleRegionsNoDuplicates =
                                 removeGeneRegionDuplicates(currentSampleRegions, true);
@@ -265,30 +263,23 @@ public class Postprocessing extends ExecutableStep
 
     private void writeGeneRegionsToFile(List<GeneRegion> regions, File targetFile)
     {
-        try
-        {
-            makeSureFileExists(targetFile);
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
+
+        makeSureFileExists(targetFile, logger);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetFile)))
         {
-            writer.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG");
+            writer.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG\tSYMBOL");
             writer.newLine();
 
             for (GeneRegion region : regions)
             {
                 writer.write(region.toString());
                 writer.newLine();
-
             }
         } catch (IOException e)
         {
             e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
     }
 
