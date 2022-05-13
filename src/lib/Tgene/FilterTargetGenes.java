@@ -46,13 +46,13 @@ public class FilterTargetGenes extends ExecutableStep
             {
                 executorService.submit(() ->
                 {
-                    File input_data_TGENE = extend(d_input_tgene.get(), groupPairing, hm, s_tgene.get());
-                    File input_data_TEPIC = extend(d_input_tepic.get(), groupPairing, hm, s_tepicRatiosDir.get(),
+                    File f_input_tgene = extend(d_input_tgene.get(), groupPairing, hm, s_tgene.get());
+                    File f_input_tepic = extend(d_input_tepic.get(), groupPairing, hm, s_tepicRatiosDir.get(),
                             groupPairing + ".txt");
 
                     HashSet<String> available_target_genes = new HashSet<>();
 
-                    try (BufferedReader br_tgene = new BufferedReader(new FileReader(input_data_TGENE));)
+                    try (BufferedReader br_tgene = new BufferedReader(new FileReader(f_input_tgene));)
                     {
                         String line_tgene;
                         br_tgene.readLine();
@@ -75,24 +75,24 @@ public class FilterTargetGenes extends ExecutableStep
                         logger.error(e.getMessage());
                     }
 
-                    File targetFile = extend(d_output.get(), groupPairing, hm, input_data_TEPIC.getName());
+                    File targetFile = extend(d_output.get(), groupPairing, hm, f_input_tepic.getName());
                     makeSureFileExists(targetFile, logger);
 
-                    try (BufferedWriter bw_tepic = new BufferedWriter(new FileWriter(targetFile));
-                         BufferedReader br_tepic = new BufferedReader(new FileReader(input_data_TEPIC)))
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetFile));
+                         BufferedReader reader = new BufferedReader(new FileReader(f_input_tepic)))
                     {
-                        String line_tepic = br_tepic.readLine();
+                        String line_tepic = reader.readLine();
 
-                        bw_tepic.write(line_tepic);
-                        bw_tepic.newLine();
+                        writer.write(line_tepic);
+                        writer.newLine();
 
-                        while ((line_tepic = br_tepic.readLine()) != null)
+                        while ((line_tepic = reader.readLine()) != null)
                         {
                             String geneID = line_tepic.substring(0, line_tepic.indexOf("\t"));
                             if (available_target_genes.contains(geneID))
                             {
-                                bw_tepic.write(line_tepic);
-                                bw_tepic.newLine();
+                                writer.write(line_tepic);
+                                writer.newLine();
                             }
                         }
                     } catch (IOException e)

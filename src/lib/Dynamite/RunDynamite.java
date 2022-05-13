@@ -51,30 +51,27 @@ public class RunDynamite extends ExecutableStep
 
             for (String hm : pairingEntry.getValue())
             {
-                File d_in = extend(d_input.get(), pairing, hm);
-                int count_line_br = 0;
+                File d_input_pairingHm = extend(d_input.get(), pairing, hm);
 
-                for (File f_x : Objects.requireNonNull(d_in.listFiles(Filters.fileFilter)))
+                for (File f_input : Objects.requireNonNull(d_input_pairingHm.listFiles(Filters.fileFilter)))
                 {
                     try
                     {
-                        count_line_br += readLines(f_x).size();
+                        if (readLines(f_input).size() <= 2)
+                        {
+                            logger.error("File corrupted: "  + f_input.getAbsolutePath());
+                        }
                     } catch (IOException e)
                     {
                         logger.error(e.getMessage());
                     }
                 }
 
-                if (count_line_br < 2)
-                {
-                    continue;
-                }
-
                 File d_out = extend(d_output.get(), pairing, hm);
                 makeSureDirectoryExists(d_out, logger);
 
                 String command_edited = "Rscript " + f_dynamite_script.get().getAbsolutePath() + " --dataDir=" +
-                        d_in.getAbsolutePath() + " --outDir=" + d_out.getAbsolutePath() + " --out_var=" + outVar.get() +
+                        d_input_pairingHm.getAbsolutePath() + " --outDir=" + d_out.getAbsolutePath() + " --out_var=" + outVar.get() +
                         " --Ofolds=" + oFolds.get() + " --Ifolds=" + iFolds.get() + " --performance=" +
                         performance.get() + " --alpha=" + alpha.get() + " --cores=" + cores.get() + " --randomise=" +
                         randomize.get();
