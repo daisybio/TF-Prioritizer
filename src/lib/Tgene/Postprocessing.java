@@ -6,6 +6,7 @@ import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
+import util.Regions.MultiGeneRegion;
 
 import java.io.*;
 import java.util.*;
@@ -161,10 +162,13 @@ public class Postprocessing extends ExecutableStep
                             writeGeneRegionsToFile(regions, targetFile);
                         }
 
-                        //create tgen groups
+                        //create tgene groups
                         File targetFile = extend(d_outputGroups.get(), d_hm.getName(), d_group.getName(),
                                 s_groups_mergedGroups.get());
-                        writeGeneRegionsToFile(allRegionsFiltered, targetFile);
+
+                        List<MultiGeneRegion> combined = GeneRegion.mergeSameRegions(allRegionsFiltered);
+
+                        writeMultiGeneRegionsToFile(combined, targetFile);
                     }
                 });
             }
@@ -263,15 +267,35 @@ public class Postprocessing extends ExecutableStep
 
     private void writeGeneRegionsToFile(List<GeneRegion> regions, File targetFile)
     {
-
         makeSureFileExists(targetFile, logger);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetFile)))
         {
-            writer.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG\tSYMBOL");
+            writer.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSG");
             writer.newLine();
 
             for (GeneRegion region : regions)
+            {
+                writer.write(region.toString());
+                writer.newLine();
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void writeMultiGeneRegionsToFile(List<MultiGeneRegion> regions, File targetFile)
+    {
+        makeSureFileExists(targetFile, logger);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetFile)))
+        {
+            writer.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSGS");
+            writer.newLine();
+
+            for (MultiGeneRegion region : regions)
             {
                 writer.write(region.toString());
                 writer.newLine();
