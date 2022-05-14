@@ -354,12 +354,15 @@ public class DistributionAnalysis extends ExecutableStep
                                         double tgScoreCombined = tgScore1 + tgScore2;
 
                                         double tfTgScore = Math.abs(tgScoreCombined * tf_regression_coefficient);
-                                        String line =
-                                                geneID + "\t" + tfTgScore + "\t" + hm + "\t" + groupPairing + "\t" +
-                                                        tfSymbol + "\t" + tf_regression_coefficient;
+                                        if (!Double.isNaN(tfTgScore))
+                                        {
+                                            String line =
+                                                    geneID + "\t" + tfTgScore + "\t" + hm + "\t" + groupPairing + "\t" +
+                                                            tfSymbol + "\t" + tf_regression_coefficient;
 
-                                        writer.write(line);
-                                        writer.newLine();
+                                            writer.write(line);
+                                            writer.newLine();
+                                        }
                                     } catch (NullPointerException | AssertionError e)
                                     {
                                         logger.warn(groupPairing + ", " + hm + ", " + tfSymbol + ": " + e.getMessage());
