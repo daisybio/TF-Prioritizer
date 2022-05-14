@@ -21,8 +21,6 @@ public class SingleCombined extends ExecutableStep
     private final GeneratedFileStructure d_outputSingle = TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_single;
     private final GeneratedFileStructure d_outputMeanCounts =
             TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_meanCounts;
-    private final GeneratedFileStructure d_outputScripts = TFPRIO.configs.deSeq2.fileStructure.d_rScripts;
-
 
     private final AbstractConfig<File> f_scriptSingle = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingSingle;
     private final AbstractConfig<File> f_scriptCombined = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingCombined;
@@ -46,7 +44,7 @@ public class SingleCombined extends ExecutableStep
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
         return new HashSet<>(
-                Arrays.asList(d_outputSingle, d_outputCombined, d_outputMeanCounts, d_outputScripts));
+                Arrays.asList(d_outputSingle, d_outputCombined, d_outputMeanCounts));
     }
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()

@@ -33,7 +33,10 @@ public class Deseq2 extends ExecutableStep
 
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
-        return new HashSet<>(List.of(d_output_scripts));
+        return new HashSet<>(){{
+            add(d_output_scripts);
+            add(d_output);
+        }};
     }
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
