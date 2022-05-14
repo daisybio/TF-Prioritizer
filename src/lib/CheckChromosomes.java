@@ -62,7 +62,6 @@ public class CheckChromosomes extends ExecutableStep
                         } catch (IOException e)
                         {
                             logger.error("Could not read content from " + f_sample.getAbsolutePath());
-                            System.exit(1);
                         }
                         StringBuilder sb_output = new StringBuilder();
 
@@ -87,7 +86,6 @@ public class CheckChromosomes extends ExecutableStep
                         } catch (IOException e)
                         {
                             logger.error("Could not write content to " + f_outputGroupHmSample);
-                            System.exit(1);
                         }
                     });
 

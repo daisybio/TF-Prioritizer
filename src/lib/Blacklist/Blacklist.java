@@ -95,7 +95,6 @@ public class Blacklist extends ExecutableStep
                         } catch (IOException e)
                         {
                             logger.error(e.getMessage());
-                            System.exit(1);
                         }
                     });
                 }

@@ -66,8 +66,7 @@ public class RunTgene extends ExecutableStep
                         }
                     } catch (IOException e)
                     {
-                        e.printStackTrace();
-                        System.exit(1);
+                        logger.error(e.getMessage());
                     }
                     String[] name_split = f_sample.getName().split("\\.");
 
@@ -77,8 +76,7 @@ public class RunTgene extends ExecutableStep
                         makeSureDirectoryExists(d_output_sample);
                     } catch (IOException e)
                     {
-                        e.printStackTrace();
-                        System.exit(1);
+                        logger.error(e.getMessage());
                     }
 
                     File gtf = f_input_gtf.get();

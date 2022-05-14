@@ -44,8 +44,7 @@ public class Preprocess extends ExecutableStep
             makeSureFileExists(f_output);
         } catch (IOException e)
         {
-            e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
 
         List<GeneRegion> regions = new ArrayList<>();
@@ -104,8 +103,7 @@ public class Preprocess extends ExecutableStep
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
         List<Region> regionsMerged = merge(regions);
 

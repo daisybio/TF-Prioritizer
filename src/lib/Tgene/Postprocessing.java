@@ -225,8 +225,7 @@ public class Postprocessing extends ExecutableStep
                 }
             } catch (IOException e)
             {
-                e.printStackTrace();
-                System.exit(1);
+                logger.error(e.getMessage());
             }
         } else
         {
@@ -257,8 +256,7 @@ public class Postprocessing extends ExecutableStep
                 }
             } catch (IOException e)
             {
-                e.printStackTrace();
-                System.exit(1);
+                logger.error(e.getMessage());
             }
         }
 
@@ -354,8 +352,7 @@ public class Postprocessing extends ExecutableStep
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
 
         return geneID_lengths;

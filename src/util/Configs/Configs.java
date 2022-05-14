@@ -185,7 +185,6 @@ public class Configs
         } catch (JSONException e)
         {
             logger.error("The config JSON-File does not match the JSON formant: " + e.getMessage());
-            System.exit(1);
         }
 
         for (String moduleName : combined.keySet())
@@ -204,7 +203,6 @@ public class Configs
         if (!allModulesWorked)
         {
             logger.error("There were errors during config file merging. Aborting.");
-            System.exit(1);
         }
         logger.info("Merged configuration file: " + configFile.getAbsolutePath());
     }

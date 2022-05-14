@@ -112,7 +112,6 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
                         } catch (IOException e)
                         {
                             logger.error("Error during read process: " + e.getMessage());
-                            System.exit(1);
                         }
 
                         //sort region array lists per chromosome
@@ -281,7 +280,6 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep
                         } catch (IOException e)
                         {
                             logger.error("Error during write process: " + e.getMessage());
-                            System.exit(1);
                         }
                     });
                 }

@@ -74,8 +74,7 @@ public class SingleCombined extends ExecutableStep
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
 
         finishAllQueuedThreads();
@@ -105,8 +104,7 @@ public class SingleCombined extends ExecutableStep
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
     }
 }
