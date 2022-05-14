@@ -113,13 +113,23 @@ public class CreateGenePositions extends ExecutableStep
         }
         executeAndWait(f_script.get(), logger);
 
+        String line_biomart_version = null;
+        try (BufferedReader versionReader = new BufferedReader(new FileReader(f_data_version.get())))
+        {
+            line_biomart_version = versionReader.readLine();
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+        String biomartVersion = line_biomart_version.split("\\.")[0];
+
         try
         {
             makeSureFileExists(f_data.get());
 
             String script = readFile(f_upliftScriptTemplate.get());
             script = script.replace("{INPUTFILE}", f_data_prev.get().getAbsolutePath());
-            script = script.replace("{VERSIONFILE}", f_data_version.get().getAbsolutePath());
+            script = script.replace("{VERSION}", biomartVersion);
             script = script.replace("{OUTPUTFILE}", f_data.get().getAbsolutePath());
             script = script.replace("{REFERENCE_GENOME}", speciesReferenceGenome.get());
 
@@ -138,18 +148,6 @@ public class CreateGenePositions extends ExecutableStep
         {
             logger.error(e.getMessage());
         }
-
-        String line_biomart_version = null;
-        try (BufferedReader versionReader = new BufferedReader(new FileReader(f_data_version.get())))
-        {
-            line_biomart_version = versionReader.readLine();
-        } catch (IOException e)
-        {
-            logger.error(e.getMessage());
-        }
-
-
-        String biomartVersion = line_biomart_version.split("\\.")[0];
 
         logger.info("Uplift positions to correct genome version");
         logger.info("Our genome: " + speciesBiomart.get());

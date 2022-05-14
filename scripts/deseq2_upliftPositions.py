@@ -17,18 +17,13 @@ def convert(c, x, y, s, converter):
 
 def main():
     path_to_X = "{INPUTFILE}"
-    path_to_version = "{VERSIONFILE}"
+    version = "{VERSION}"
     path_to_newSave = "{OUTPUTFILE}"
 
     version_of_our_dat = "{REFERENCE_GENOME}"
 
     grc_dict = {{REFERENCE_GENOME_DICT}}
 
-    with open(path_to_version) as file:
-        version = file.readlines()
-
-    version = version.__getitem__(0).rstrip("\n")
-    version = version.split(".")[0]
     version_convert_from = grc_dict.get(version)
     please_convert = True
     if (version_of_our_dat == version_convert_from):
