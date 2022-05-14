@@ -3,8 +3,6 @@
     "threadLimit": 1,
     "memoryLimitMb": 20000,
     "fileLogging": true,
-    "calculateGenePositionsEnabled": true,
-    "calculateTpmLengthsEnabled": true,
     "redirectExternalScriptOutputStream": false,
     "redirectExternalScriptErrorStream": false
   },
