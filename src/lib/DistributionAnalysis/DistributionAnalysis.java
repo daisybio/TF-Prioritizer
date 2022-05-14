@@ -301,81 +301,68 @@ public class DistributionAnalysis extends ExecutableStep
                                 for (String geneID : geneID_score_1.keySet())
                                 {
                                     if (!geneID_score_2.containsKey(geneID) ||
-                                            (f_tgeneExecutable.isSet() && !available_ensgs.contains(geneID)))
+                                            (f_tgeneExecutable.isSet() && !available_ensgs.contains(geneID)) ||
+                                            !group_geneID_count.get(group1).containsKey(geneID) ||
+                                            !group_geneID_count.get(group2).containsKey(geneID) ||
+                                            !groupPairing_differentialExpression.containsKey(groupPairing))
                                     {
                                         continue;
                                     }
 
-                                    Double geneScore1 = geneID_score_1.get(geneID);
-                                    Double geneScore2 = geneID_score_2.get(geneID);
+                                    double geneScore1 = geneID_score_1.get(geneID);
+                                    double geneScore2 = geneID_score_2.get(geneID);
 
-                                    Double geneCount1 = null;
-                                    Double geneCount2 = null;
+                                    double geneCount1 = group_geneID_count.get(group1).get(geneID);
+                                    double geneCount2 = group_geneID_count.get(group2).get(geneID);
 
-                                    if (group_geneID_count.get(group1).containsKey(geneID))
+                                    double diffExpression;
+
+                                    if (randomizeTfGeneMatrix.get())
                                     {
-                                        geneCount1 = group_geneID_count.get(group1).get(geneID);
+                                        List<String> differentialExpressionList =
+                                                new ArrayList<>(groupPairing_differentialExpression.keySet());
+
+                                        int randomIndex = random.nextInt(differentialExpressionList.size());
+                                        String randomPairing = differentialExpressionList.get(randomIndex);
+                                        diffExpression = groupPairing_differentialExpression.get(randomPairing);
+                                    } else
+                                    {
+                                        diffExpression = groupPairing_differentialExpression.get(groupPairing);
                                     }
-                                    if (group_geneID_count.get(group2).containsKey(geneID))
+
+                                    try
                                     {
-                                        geneCount2 = group_geneID_count.get(group2).get(geneID);
-                                    }
+                                        double tgScore1;
+                                        double tgScore2;
 
-
-                                    if (groupPairing_differentialExpression.containsKey(groupPairing))
-                                    {
-                                        double diffExpression;
-
-                                        if (randomizeTfGeneMatrix.get())
+                                        if (scoreType.get().equals("EXCL_GENE_COUNTS"))
                                         {
-                                            List<String> differentialExpressionList =
-                                                    new ArrayList<>(groupPairing_differentialExpression.keySet());
-
-                                            int randomIndex = random.nextInt(differentialExpressionList.size());
-                                            String randomPairing = differentialExpressionList.get(randomIndex);
-                                            diffExpression = groupPairing_differentialExpression.get(randomPairing);
-                                        } else
+                                            tgScore1 = diffExpression * geneScore1;
+                                            tgScore2 = diffExpression * geneScore2;
+                                        } else if (scoreType.get().equals("GENE_COUNTS"))
                                         {
-                                            diffExpression = groupPairing_differentialExpression.get(groupPairing);
+                                            tgScore1 = geneCount1 * diffExpression * geneScore1;
+                                            tgScore2 = geneCount2 * diffExpression * geneScore2;
+                                        } else {
+                                            tgScore1 = 0;
+                                            tgScore2 = 0;
                                         }
 
-                                        try
-                                        {
-                                            double tgScore1;
-                                            double tgScore2;
+                                        tgScore1 = Math.abs(tgScore1);
+                                        tgScore2 = Math.abs(tgScore2);
 
-                                            assert geneCount1 != null;
-                                            assert geneCount2 != null;
+                                        double tgScoreCombined = tgScore1 + tgScore2;
 
-                                            if (scoreType.get().equals("EXCL_GENE_COUNTS"))
-                                            {
-                                                tgScore1 = diffExpression * geneScore1;
-                                                tgScore2 = diffExpression * geneScore2;
-                                            } else if (scoreType.get().equals("GENE_COUNTS"))
-                                            {
-                                                tgScore1 = geneCount1 * diffExpression * geneScore1;
-                                                tgScore2 = geneCount2 * diffExpression * geneScore2;
-                                            } else {
-                                                tgScore1 = 0;
-                                                tgScore2 = 0;
-                                            }
+                                        double tfTgScore = Math.abs(tgScoreCombined * tf_regression_coefficient);
+                                        String line =
+                                                geneID + "\t" + tfTgScore + "\t" + hm + "\t" + groupPairing + "\t" +
+                                                        tfSymbol + "\t" + tf_regression_coefficient;
 
-                                            tgScore1 = Math.abs(tgScore1);
-                                            tgScore2 = Math.abs(tgScore2);
-
-                                            double tgScoreCombined = tgScore1 + tgScore2;
-
-                                            double tfTgScore = Math.abs(tgScoreCombined * tf_regression_coefficient);
-                                            String line =
-                                                    geneID + "\t" + tfTgScore + "\t" + hm + "\t" + groupPairing + "\t" +
-                                                            tfSymbol + "\t" + tf_regression_coefficient;
-
-                                            writer.write(line);
-                                            writer.newLine();
-                                        } catch (NullPointerException | AssertionError e)
-                                        {
-                                            logger.warn(groupPairing + ", " + hm + ", " + tfSymbol + ": " + e.getMessage());
-                                        }
+                                        writer.write(line);
+                                        writer.newLine();
+                                    } catch (NullPointerException | AssertionError e)
+                                    {
+                                        logger.warn(groupPairing + ", " + hm + ", " + tfSymbol + ": " + e.getMessage());
                                     }
                                 }
                             } catch (IOException e)
