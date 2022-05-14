@@ -11,7 +11,7 @@ import java.util.*;
 
 import static util.FileManagement.*;
 
-public class RunDistributionAnalysis extends ExecutableStep
+public class DistributionAnalysis extends ExecutableStep
 {
     private final AbstractConfig<File> f_inputTfs = TFPRIO.configs.distributionAnalysis.fileStructure.f_analyzedTfs;
     private final AbstractConfig<File> d_inputGeneCounts =
