@@ -37,8 +37,6 @@ public class CreateGenePositions extends ExecutableStep
     private final AbstractConfig<File> f_dbScriptTemplate =
             TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingDbUplift;
 
-    private final AbstractConfig<Boolean> calculateGenePositionsEnabled =
-            TFPRIO.configs.general.calculateGenePositionsEnabled;
     private final AbstractConfig<String> speciesReferenceGenome = TFPRIO.configs.igv.speciesReferenceGenome;
     private final AbstractConfig<String> speciesBiomart = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
     private final AbstractConfig<Map<String, String>> synonymDict = TFPRIO.configs.igv.grcSynonymDict;
@@ -83,7 +81,7 @@ public class CreateGenePositions extends ExecutableStep
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
         return new HashSet<>(
-                Arrays.asList(calculateGenePositionsEnabled, speciesBiomart, speciesReferenceGenome, synonymDict))
+                Arrays.asList(speciesBiomart, speciesReferenceGenome, synonymDict))
         {{
             if (enhancerDBs.isSet())
             {
@@ -101,25 +99,19 @@ public class CreateGenePositions extends ExecutableStep
     @Override protected void execute()
     {
         //get biomart gene positions
-        if (calculateGenePositionsEnabled.get())
+        try
         {
-            try
-            {
-                String script = readFile(f_scriptTemplate.get());
-                script = script.replace("{INPUTFILE}", f_mapping.get().getAbsolutePath());
-                script = script.replace("{SPECIES}", speciesBiomart.get());
-                script = script.replace("{DATA_PREV_FILE}", f_data_prev.get().getAbsolutePath());
-                script = script.replace("{VERSIONFILE}", f_data_version.get().getAbsolutePath());
-                writeFile(f_script.get(), script);
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            executeAndWait(f_script.get(), logger);
-        } else
+            String script = readFile(f_scriptTemplate.get());
+            script = script.replace("{INPUTFILE}", f_mapping.get().getAbsolutePath());
+            script = script.replace("{SPECIES}", speciesBiomart.get());
+            script = script.replace("{DATA_PREV_FILE}", f_data_prev.get().getAbsolutePath());
+            script = script.replace("{VERSIONFILE}", f_data_version.get().getAbsolutePath());
+            writeFile(f_script.get(), script);
+        } catch (IOException e)
         {
-            logger.info("Gene positions were not fetched since command line parameter -b was set.");
+            logger.error(e.getMessage());
         }
+        executeAndWait(f_script.get(), logger);
 
         try
         {
@@ -173,9 +165,10 @@ public class CreateGenePositions extends ExecutableStep
             {
                 try
                 {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignore)
+                    logger.info(f_data_prev.get().getAbsolutePath() + " size: " + readLines(f_data_prev.get()).size());
+                } catch (IOException e)
                 {
+                    logger.error(e.getMessage());
                 }
                 executeAndWait(f_upliftScript.get(), logger);
             }

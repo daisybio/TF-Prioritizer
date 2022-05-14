@@ -28,8 +28,6 @@ public class CreateTpmMappings extends ExecutableStep
 
     private final AbstractConfig<File> f_scriptTemplate = TFPRIO.configs.scriptTemplates.f_deseq2PreprocessingTpm;
 
-    private final AbstractConfig<Boolean> calculateTpmLengthsEnabled =
-            TFPRIO.configs.general.calculateTpmLengthsEnabled;
     private final AbstractConfig<Integer> threadLimit = TFPRIO.configs.general.threadLimit;
     private final AbstractConfig<String> species = TFPRIO.configs.deSeq2.biomartDatasetSpecies;
 
@@ -45,7 +43,7 @@ public class CreateTpmMappings extends ExecutableStep
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
     {
-        return new HashSet<>(Arrays.asList(calculateTpmLengthsEnabled, threadLimit, species));
+        return new HashSet<>(Arrays.asList(threadLimit, species));
     }
 
 
