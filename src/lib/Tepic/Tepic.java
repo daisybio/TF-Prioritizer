@@ -334,7 +334,7 @@ public class Tepic extends ExecutableStep
         }
 
         stringConfigs.putAll(sampleConfigs);
-        stringConfigs.put("c", "1");
+        stringConfigs.put("c", String.valueOf(TFPRIO.configs.general.threadLimit.get()));
 
         for (Map.Entry<String, String> entry : stringConfigs.entrySet())
         {
@@ -342,6 +342,11 @@ public class Tepic extends ExecutableStep
         }
 
         return sb_command.toString();
+    }
+
+    @Override protected int getThreadNumber()
+    {
+        return 1;
     }
 
     @Override protected int getShutDownTimeOutMinutes()
