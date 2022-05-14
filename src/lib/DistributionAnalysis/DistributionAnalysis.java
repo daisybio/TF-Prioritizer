@@ -394,7 +394,7 @@ public class DistributionAnalysis extends ExecutableStep
 
     private void concatFiles(Iterable<String> tfSymbols)
     {
-        StringBuilder sb_all = new StringBuilder(getHeader("ALL", "ALL"));
+        StringBuilder sb_all = new StringBuilder();
 
         Map<String, StringBuilder> map_sbAllHms = new HashMap<>();
 
@@ -402,11 +402,13 @@ public class DistributionAnalysis extends ExecutableStep
         {
             for (String hm : TFPRIO.existingHms)
             {
-                StringBuilder sb_allTfs = new StringBuilder(getHeader(hm, "ALL"));
+                StringBuilder sb_allTfs = new StringBuilder();
 
                 for (String tfsymbol : tfSymbols)
                 {
-                    StringBuilder sb_tf = new StringBuilder(getHeader(hm, tfsymbol));
+                    StringBuilder sb_tf = new StringBuilder();
+
+                    boolean foundData = false;
 
                     for (String pairing : TFPRIO.groupCombinationsToHms.keySet())
                     {
@@ -414,6 +416,7 @@ public class DistributionAnalysis extends ExecutableStep
 
                         if (sourceFile.exists())
                         {
+                            foundData = true;
                             String content = readFile(sourceFile);
 
                             sb_tf.append(content);
@@ -425,35 +428,47 @@ public class DistributionAnalysis extends ExecutableStep
 
                                 if (!map_sbAllHms.containsKey(tfsymbol))
                                 {
-                                    map_sbAllHms.put(tfsymbol, new StringBuilder(getHeader("ALL", tfsymbol)));
+                                    map_sbAllHms.put(tfsymbol, new StringBuilder());
                                 }
                                 map_sbAllHms.get(tfsymbol).append(content);
                             }
                         }
                     }
 
-                    File f_tf = extend(d_outputTFScoresHm.get(), hm, tfsymbol + ".tsv");
-                    writeFile(f_tf, sb_tf.toString());
+                    if (foundData)
+                    {
+                        File f_tf = extend(d_outputTFScoresHm.get(), hm, tfsymbol + ".tsv");
+                        if (sb_tf.length() > 0)
+                        {
+                            writeFile(f_tf, getHeader(hm, tfsymbol) + sb_tf);
+                        }
+                    }
                 }
 
                 File f_allTfs = extend(d_outputBackgroundDistributionHm.get(), hm, s_output.get());
-                writeFile(f_allTfs, sb_allTfs.toString());
+                writeFile(f_allTfs, getHeader(hm, "ALL") + sb_allTfs);
             }
 
             if (performAllAnalysis.get())
             {
                 File f_all = extend(d_outputBackgroundDistributionAll.get(), s_output.get());
-                writeFile(f_all, sb_all.toString());
+                if (sb_all.length() > 0)
+                {
+                    writeFile(f_all, getHeader("ALL", "ALL") + sb_all);
+                }
 
                 for (Map.Entry<String, StringBuilder> allHmsEntry : map_sbAllHms.entrySet())
                 {
                     File f_allHms = extend(d_outputTFScoresAll.get(), allHmsEntry.getKey() + ".tsv");
-                    writeFile(f_allHms, allHmsEntry.getValue().toString());
+                    if (allHmsEntry.getValue().length() > 0)
+                    {
+                        writeFile(f_allHms, getHeader("ALL", allHmsEntry.getKey()) + allHmsEntry.getValue());
+                    }
                 }
             }
         } catch (IOException e)
         {
-            logger.error("X " + e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
