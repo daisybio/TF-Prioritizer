@@ -279,9 +279,6 @@ public class DistributionAnalysis extends ExecutableStep
                             logger.error("E " + e.getMessage());
                         }
 
-                        double current_tf_score = 1;//current_gene_counts;
-
-
                         if (tf_regression_coefficient != null)
                         {
                             List<File> inputFiles1 = getTepicInputFiles(groupPairing, hm, group1);
@@ -324,9 +321,11 @@ public class DistributionAnalysis extends ExecutableStep
                                         geneCount2 = group_geneID_count.get(group2).get(geneID);
                                     }
 
-                                    Double diffExpression = null;
+
                                     if (groupPairing_differentialExpression.containsKey(groupPairing))
                                     {
+                                        double diffExpression;
+
                                         if (randomizeTfGeneMatrix.get())
                                         {
                                             List<String> differentialExpressionList =
@@ -339,43 +338,44 @@ public class DistributionAnalysis extends ExecutableStep
                                         {
                                             diffExpression = groupPairing_differentialExpression.get(groupPairing);
                                         }
-                                    }
 
-                                    Double tgScore1 = null;
-                                    Double tgScore2 = null;
-
-                                    try
-                                    {
-                                        assert diffExpression != null;
-                                        assert geneCount1 != null;
-                                        assert geneCount2 != null;
-
-                                        if (scoreType.get().equals("EXCL_GENE_COUNTS"))
+                                        try
                                         {
-                                            tgScore1 = diffExpression * geneScore1;
-                                            tgScore2 = diffExpression * geneScore2;
-                                        } else if (scoreType.get().equals("GENE_COUNTS"))
+                                            double tgScore1;
+                                            double tgScore2;
+
+                                            assert geneCount1 != null;
+                                            assert geneCount2 != null;
+
+                                            if (scoreType.get().equals("EXCL_GENE_COUNTS"))
+                                            {
+                                                tgScore1 = diffExpression * geneScore1;
+                                                tgScore2 = diffExpression * geneScore2;
+                                            } else if (scoreType.get().equals("GENE_COUNTS"))
+                                            {
+                                                tgScore1 = geneCount1 * diffExpression * geneScore1;
+                                                tgScore2 = geneCount2 * diffExpression * geneScore2;
+                                            } else {
+                                                tgScore1 = 0;
+                                                tgScore2 = 0;
+                                            }
+
+                                            tgScore1 = Math.abs(tgScore1);
+                                            tgScore2 = Math.abs(tgScore2);
+
+                                            double tgScoreCombined = tgScore1 + tgScore2;
+
+                                            double tfTgScore = Math.abs(tgScoreCombined * tf_regression_coefficient);
+                                            String line =
+                                                    geneID + "\t" + tfTgScore + "\t" + hm + "\t" + groupPairing + "\t" +
+                                                            tfSymbol + "\t" + tf_regression_coefficient;
+
+                                            writer.write(line);
+                                            writer.newLine();
+                                        } catch (NullPointerException | AssertionError e)
                                         {
-                                            tgScore1 = geneCount1 * diffExpression * geneScore1;
-                                            tgScore2 = geneCount2 * diffExpression * geneScore2;
+                                            logger.warn(groupPairing + ", " + hm + ", " + tfSymbol + ": " + e.getMessage());
                                         }
-
-                                        tgScore1 = Math.abs(tgScore1);
-                                        tgScore2 = Math.abs(tgScore2);
-
-                                        double tgScoreCombined = tgScore1 + tgScore2;
-
-                                        double tfTgScore = Math.abs(
-                                                current_tf_score * tgScoreCombined * tf_regression_coefficient);
-                                        String line =
-                                                geneID + "\t" + tfTgScore + "\t" + hm + "\t" + groupPairing + "\t" +
-                                                        tfSymbol + "\t" + tf_regression_coefficient;
-
-                                        writer.write(line);
-                                        writer.newLine();
-                                    } catch (NullPointerException | AssertionError e)
-                                    {
-                                        logger.warn(groupPairing + ", " + hm + ", " + tfSymbol + ": " + e.getMessage());
                                     }
                                 }
                             } catch (IOException e)
