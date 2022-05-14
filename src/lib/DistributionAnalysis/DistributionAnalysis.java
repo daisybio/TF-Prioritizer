@@ -555,8 +555,8 @@ public class DistributionAnalysis extends ExecutableStep
         return "##HM\t" + hm + "\n" + "##TF\t" + tf + "\n" + "TARGET_GENE\tTF_TG_SCORE\tHM\tGROUPS\tTF\tTF_COEFF\n";
     }
 
-    @Override protected int getThreadNumber()
+    @Override protected int getMemoryEstimationMb()
     {
-        return 2;
+        return 5000;
     }
 }
