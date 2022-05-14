@@ -92,7 +92,7 @@ public class Workflow
         }
 
         {
-            steps.add(new lib.Deseq2.CreateDeseq2Scripts());
+            steps.add(new lib.Deseq2.SingleCombined());
             steps.add(new lib.Deseq2.CreateTpmMappings());
             steps.add(new lib.Deseq2.CreateGenePositions());
 

@@ -43,8 +43,6 @@ public class Wrapper
         executeAndWait("docker-compose -f " + f_compose.getAbsolutePath() + " up --no-start", logger, true);
         logger.info("Finished building container. Process took " + buildTimer.stopAndGetDeltaFormatted());
 
-        logger.info("Finished building container. Process took " + buildTimer.stopAndGetDeltaFormatted());
-
         String containerID = new String(
                 Runtime.getRuntime().exec("docker-compose -f " + f_compose.getAbsolutePath() + " ps -q")
                         .getInputStream().readAllBytes()).replace("\n", "");
