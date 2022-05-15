@@ -257,7 +257,7 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
                         //get json via curl
                         String command = jasparApi.get();
                         command = command.replace("{MATRIXID}", matrixId);
-                        File f_output = extend(d_tf, matrixId + s_jasparJson.get());
+                        File f_output = extend(d_tf, matrixId.replace(".", "_") + s_jasparJson.get());
                         makeSureFileExists(f_output, logger);
                         command = command.replace("{OUTPUTFILE}", f_output.getAbsolutePath());
 
