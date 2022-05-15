@@ -38,7 +38,8 @@ def main():
     for col in df.columns:
         column_names.append(col)
     if please_convert:
-        converter = LiftOver(version_convert_from, version_of_our_dat)
+        converter = LiftOver(version_convert_from, version_of_our_dat, search_dir=None, cache_dir=None,
+                             use_web=True)
     for _, row in df.iterrows():
         mgi_symbol = row[column_names.__getitem__(0)]
         chromosome_not_edited = str(row[column_names.__getitem__(1)])
