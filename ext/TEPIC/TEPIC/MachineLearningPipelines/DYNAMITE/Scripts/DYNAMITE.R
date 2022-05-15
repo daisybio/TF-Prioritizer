@@ -209,7 +209,9 @@ for(Sample in FileList){
       }
       
       #Determine best model and retrain it
-      index<-which(aError==min(aError))
+      index<-match(min(aError), aError)
+      print(paste0("Available alphas: ", alphas, " Errors: ", aError))
+      print(paste0("Selected alpha:   ", alphas[index]))
       if (length(unique(M[,Response_Variable_location]))==2){
         elasticnet<-cv.glmnet(x_train, y_train,alpha=alphas[index],family="binomial",type.measure="class",parallel=TRUE,nfolds=as.numeric(argsL$Ifolds))
       }else{
@@ -272,7 +274,9 @@ for(Sample in FileList){
   }else{
     aError<-sapply(alphas,elaMultinomial,x_com,y_com,as.numeric(argsL$Ifolds))
   }
-  index<-which(aError==min(aError))
+  index<-match(min(aError), aError)
+  print(paste0("Available alphas: ", alphas, " Errors: ", aError))
+  print(paste0("Selected alpha:   ", alphas[index]))
   if (length(unique(M[,Response_Variable_location]))==2){
     elasticnet<-cv.glmnet(x_com, y_com,alpha=alphas[index],family="binomial",type.measure="class",parallel=TRUE,nfolds=as.numeric(argsL$Ifolds))
   }else{
