@@ -264,11 +264,11 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
                         try
                         {
                             logger.debug("Excuting command: " + command);
-                            Process curl  = Runtime.getRuntime().exec(command);
-                            int returnCode = curl.waitFor();
+                            Process wget  = Runtime.getRuntime().exec(command);
+                            int returnCode = wget.waitFor();
                             if(returnCode != 0)
                             {
-                                System.out.println(new String(curl.getErrorStream().readAllBytes()));
+                                System.out.println(new String(wget.getErrorStream().readAllBytes()));
                                 throw new IOException("Received return code: " + returnCode);
                             }
                         } catch (IOException | InterruptedException e)
