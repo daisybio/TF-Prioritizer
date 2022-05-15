@@ -16,7 +16,7 @@ public class Jaspar extends AbstractModule
 
     public final InternalConfig<String> apiCall = new InternalConfig<>(
             "curl -X GET https://jaspar.genereg.net/api/v1/matrix/{MATRIXID}/ -H " +
-                    "'Accept:application/json' -o '{OUTPUTFILE}' --create-dirs");
+                    "'Accept:application/json' -o '{OUTPUTFILE}'");
     public final InternalConfig<String> logoDownloadUrl =
             new InternalConfig<>("https://jaspar.genereg.net/static/logos/all/svg/");
 
