@@ -261,20 +261,7 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
                         makeSureFileExists(f_output, logger);
                         command = command.replace("{OUTPUTFILE}", f_output.getAbsolutePath());
 
-                        try
-                        {
-                            logger.debug("Excuting command: " + command);
-                            Process wget  = Runtime.getRuntime().exec(command);
-                            int returnCode = wget.waitFor();
-                            if(returnCode != 0)
-                            {
-                                System.out.println(new String(wget.getErrorStream().readAllBytes()));
-                                throw new IOException("Received return code: " + returnCode);
-                            }
-                        } catch (IOException | InterruptedException e)
-                        {
-                            logger.error(e.getMessage());
-                        }
+                        executeAndWait(command, logger);
 
                         //get logos via static file download
                         // Create a new trust manager that trust all certificates
