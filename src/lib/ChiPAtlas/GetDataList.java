@@ -45,13 +45,47 @@ public class GetDataList extends ExecutableStep
 
     @Override protected void execute()
     {
+        int maxTries = 10;
+
         logger.info("Genome version: " + genomeVersion.get());
         logger.info("Tissue type: " + tissueType.get());
         logger.info("Downloading URL: " + urlToList.get());
 
         makeSureFileExists(f_zipped.get(), logger);
 
-        executeAndWait("wget " + urlToList.get() + " -O " + f_zipped.get().getAbsolutePath(), logger);
+        int i =0;
+        boolean worked = false;
+        String command = "wget " + urlToList.get() + " -O " + f_zipped.get().getAbsolutePath();
+        logger.debug("Executing command: " + command);
+
+        while(i < maxTries && !worked)
+        {
+            try
+            {
+                Process wget = Runtime.getRuntime().exec(command);
+                wget.waitFor();
+                worked = true;
+            } catch (IOException | InterruptedException e)
+            {
+                logger.warn("Failed try #" + i+1);
+            }
+            i++;
+            if (!worked)
+            {
+                try
+                {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e)
+                {
+                    logger.error(e.getMessage());
+                }
+            }
+        }
+
+        if (!worked)
+        {
+            logger.error("Could not get data.");
+        }
 
         String command_edited = "unzip " + f_zipped.get() + " -d " + f_list.get().getParentFile().getAbsolutePath();
         executeAndWait(command_edited, logger);
