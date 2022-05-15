@@ -49,28 +49,13 @@ public class GetDataList extends ExecutableStep
         logger.info("Tissue type: " + tissueType.get());
         logger.info("Downloading URL: " + urlToList.get());
 
-        TrustManager[] trustAllCerts = new TrustManager[]{new TrustAllManager()};
-        try
-        {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception e)
-        {
-            logger.error(e.getMessage());
-        }
-
         makeSureFileExists(f_zipped.get(), logger);
-        try (InputStream inputStream = new URL(urlToList.get()).openConnection().getInputStream();
-             OutputStream outputStream = new FileOutputStream(f_zipped.get()))
-        {
-            IOUtils.copy(inputStream, outputStream);
-        } catch (IOException e)
-        {
-            logger.error(e.getMessage());
-        }
+
+        executeAndWait("wget " + urlToList.get() + " -O " + f_zipped.get().getAbsolutePath(), logger);
 
         String command_edited = "unzip " + f_zipped.get() + " -d " + f_list.get().getParentFile().getAbsolutePath();
         executeAndWait(command_edited, logger);
+
+        f_zipped.get().delete();
     }
 }
