@@ -257,11 +257,20 @@ public class TfBindingLogoBiophysicalSequence extends ExecutableStep
                         //get json via curl
                         String command = jasparApi.get();
                         command = command.replace("{MATRIXID}", matrixId);
-                        File f_output = extend(d_tf, matrixId.replace(".", "_") + s_jasparJson.get());
+                        File f_output = extend(d_tf, matrixId + s_jasparJson.get());
                         makeSureFileExists(f_output, logger);
                         command = command.replace("{OUTPUTFILE}", f_output.getAbsolutePath());
 
-                        executeAndWait(command, logger);
+                        try
+                        {
+                            int returnCode = Runtime.getRuntime().exec(command).waitFor();
+                            if(returnCode != 0){
+                                throw new IOException("Received return code: " + returnCode);
+                            }
+                        } catch (IOException | InterruptedException e)
+                        {
+                            logger.error(e.getMessage());
+                        }
 
                         //get logos via static file download
                         // Create a new trust manager that trust all certificates
