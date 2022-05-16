@@ -65,10 +65,19 @@ public class GetDataList extends ExecutableStep
             {
                 logger.debug("Executing command: " + command_wget);
                 Process wget = Runtime.getRuntime().exec(command_wget);
-                wget.waitFor();
+
+                if (wget.waitFor() != 0)
+                {
+                    throw new IOException();
+                }
+
                 logger.debug("Executing command: " + command_unzip);
                 Process unzip = Runtime.getRuntime().exec(command_unzip);
-                unzip.waitFor();
+
+                if (unzip.waitFor() != 0)
+                {
+                    throw new IOException();
+                }
 
                 if (f_list.get().exists())
                 {
