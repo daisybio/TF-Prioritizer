@@ -66,18 +66,12 @@ public class GetDataList extends ExecutableStep
                 logger.debug("Executing command: " + command_wget);
                 Process wget = Runtime.getRuntime().exec(command_wget);
 
-                if (wget.waitFor() != 0)
-                {
-                    throw new IOException();
-                }
+                wget.waitFor();
 
                 logger.debug("Executing command: " + command_unzip);
                 Process unzip = Runtime.getRuntime().exec(command_unzip);
 
-                if (unzip.waitFor() != 0)
-                {
-                    throw new IOException();
-                }
+                unzip.waitFor();
 
                 if (f_list.get().exists())
                 {
@@ -87,6 +81,10 @@ public class GetDataList extends ExecutableStep
             } catch (IOException | InterruptedException e)
             {
                 logger.warn("Failed attempt #" + i+1);
+            }
+
+            if (!worked)
+            {
                 if (i >= maxTries)
                 {
                     logger.error("Reached maximum number of attempts.");
