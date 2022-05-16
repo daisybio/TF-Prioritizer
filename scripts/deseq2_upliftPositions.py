@@ -1,6 +1,8 @@
+from time import sleep
 import pandas as pd
 from pyliftover import LiftOver
 
+MAX_LIFTOVER_ATTEMPTS = 10
 
 def convert(c, x, y, s, converter):
     first = converter.convert_coordinate(c, int(x), s)
@@ -38,8 +40,21 @@ def main():
     for col in df.columns:
         column_names.append(col)
     if please_convert:
-        converter = LiftOver(version_convert_from, version_of_our_dat, search_dir=None, cache_dir=None,
-                             use_web=True)
+        attempt = 0
+        worked = False
+
+        while attempt < MAX_LIFTOVER_ATTEMPTS and not worked:
+            try:
+                converter = LiftOver(version_convert_from, version_of_our_dat, search_dir=None, cache_dir=None,
+                                     use_web=True)
+                worked = True
+            except AttributeError:
+                attempt += 1
+                sleep(5)
+
+        if not worked:
+            raise IOError("Could not get liftover file")
+
     for _, row in df.iterrows():
         mgi_symbol = row[column_names.__getitem__(0)]
         chromosome_not_edited = str(row[column_names.__getitem__(1)])
