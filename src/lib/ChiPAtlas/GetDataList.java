@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static util.FileManagement.deleteFileStructure;
 import static util.FileManagement.makeSureFileExists;
 import static util.ScriptExecution.executeAndWait;
 
@@ -53,48 +54,40 @@ public class GetDataList extends ExecutableStep
 
         makeSureFileExists(f_zipped.get(), logger);
 
-        int i =0;
+        int i = 0;
         boolean worked = false;
-        String command = "wget " + urlToList.get() + " -O " + f_zipped.get().getAbsolutePath();
-        logger.debug("Executing command: " + command);
+        String command_wget = "wget " + urlToList.get() + " -O " + f_zipped.get().getAbsolutePath();
+        String command_unzip = "unzip " + f_zipped.get() + " -d " + f_list.get().getParentFile().getAbsolutePath();
+        logger.debug("Executing command: " + command_wget);
 
-        while(i < maxTries && !worked)
+        while(!worked)
         {
             try
             {
-                Process wget = Runtime.getRuntime().exec(command);
+                Process wget = Runtime.getRuntime().exec(command_wget);
                 wget.waitFor();
+                Process unzip = Runtime.getRuntime().exec(command_unzip);
+                unzip.waitFor();
                 worked = true;
             } catch (IOException | InterruptedException e)
             {
-                logger.warn("Failed try #" + i+1);
-            }
-            i++;
-            if (!worked)
-            {
+                logger.warn("Failed attempt #" + i+1);
+                if (i >= maxTries)
+                {
+                    logger.error("Reached maximum number of attempts.");
+                }
+
                 try
                 {
+                    deleteFileStructure(f_zipped.get());
                     Thread.sleep(5000);
-                } catch (InterruptedException e)
+                } catch (InterruptedException | IOException ex)
                 {
-                    logger.error(e.getMessage());
+                    logger.error(ex.getMessage());
                 }
+
+                i++;
             }
         }
-
-        if (!worked)
-        {
-            logger.error("Could not get data.");
-        }
-
-        if (!f_zipped.get().exists())
-        {
-            logger.error("Something awkward happened.");
-        }
-
-        String command_edited = "unzip " + f_zipped.get() + " -d " + f_list.get().getParentFile().getAbsolutePath();
-        executeAndWait(command_edited, logger);
-
-        f_zipped.get().delete();
     }
 }
