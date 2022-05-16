@@ -549,7 +549,11 @@ public abstract class ExecutableStep
      */
     protected int getThreadNumber()
     {
-        return TFPRIO.configs.general.threadLimit.get();
+        return Math.min(TFPRIO.configs.general.threadLimit.get(), TFPRIO.configs.general.memoryLimitMb.get() / getMemoryEstimationMb());
+    }
+
+    protected int getMemoryEstimationMb() {
+        return 1;
     }
 
     /**

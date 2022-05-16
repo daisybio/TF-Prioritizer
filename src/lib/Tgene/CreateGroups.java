@@ -5,6 +5,7 @@ import util.Regions.GeneRegion;
 import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Regions.MultiGeneRegion;
 
 import java.io.*;
 import java.util.*;
@@ -77,9 +78,11 @@ public class CreateGroups extends ExecutableStep
                         getGeneRegions(input_group1, unmergedRegions);
                         getGeneRegions(input_group2, unmergedRegions);
 
-                        List<GeneRegion> noDuplicates = removeGeneRegionDuplicates(unmergedRegions, false);
+                        List<GeneRegion> noDuplicates = removeGeneRegionDuplicates(unmergedRegions, true);
 
-                        for (GeneRegion region : noDuplicates)
+                        List<MultiGeneRegion> combined = GeneRegion.mergeSameRegions(noDuplicates);
+
+                        for (MultiGeneRegion region : combined)
                         {
                             writer.write(region.toString());
                             writer.newLine();

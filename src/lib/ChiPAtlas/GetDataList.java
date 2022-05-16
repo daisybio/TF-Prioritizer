@@ -45,32 +45,56 @@ public class GetDataList extends ExecutableStep
 
     @Override protected void execute()
     {
+        int maxTries = 10;
+
         logger.info("Genome version: " + genomeVersion.get());
         logger.info("Tissue type: " + tissueType.get());
         logger.info("Downloading URL: " + urlToList.get());
 
-        TrustManager[] trustAllCerts = new TrustManager[]{new TrustAllManager()};
-        try
+        makeSureFileExists(f_zipped.get(), logger);
+
+        int i =0;
+        boolean worked = false;
+        String command = "wget " + urlToList.get() + " -O " + f_zipped.get().getAbsolutePath();
+        logger.debug("Executing command: " + command);
+
+        while(i < maxTries && !worked)
         {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception e)
-        {
-            logger.error(e.getMessage());
+            try
+            {
+                Process wget = Runtime.getRuntime().exec(command);
+                wget.waitFor();
+                worked = true;
+            } catch (IOException | InterruptedException e)
+            {
+                logger.warn("Failed try #" + i+1);
+            }
+            i++;
+            if (!worked)
+            {
+                try
+                {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e)
+                {
+                    logger.error(e.getMessage());
+                }
+            }
         }
 
-        makeSureFileExists(f_zipped.get(), logger);
-        try (InputStream inputStream = new URL(urlToList.get()).openConnection().getInputStream();
-             OutputStream outputStream = new FileOutputStream(f_zipped.get()))
+        if (!worked)
         {
-            IOUtils.copy(inputStream, outputStream);
-        } catch (IOException e)
+            logger.error("Could not get data.");
+        }
+
+        if (!f_zipped.get().exists())
         {
-            logger.error(e.getMessage());
+            logger.error("Something awkward happened.");
         }
 
         String command_edited = "unzip " + f_zipped.get() + " -d " + f_list.get().getParentFile().getAbsolutePath();
         executeAndWait(command_edited, logger);
+
+        f_zipped.get().delete();
     }
 }

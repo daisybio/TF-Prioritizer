@@ -21,7 +21,7 @@ public class Igv extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final InputFileStructure pathToIGV = extend(sourceDirectory, "IGV_2.11.2");
+    public final InputFileStructure pathToIGV = extend(sourceDirectory, "igv");
     public final InputConfig<Integer> topLog2fc = new InputConfig<>(Integer.class, new PositiveIntegerValidator());
     public final InputConfig<Boolean> topLog2fcIncludeLncRnaPseudogenes = new InputConfig<>(Boolean.class);
     public final InputConfig<List<String>> includePredictionData = new InputConfig<>(ClassGetter.getStringList());

@@ -132,7 +132,6 @@ public class PredictedBindingSites extends ExecutableStep
                             for (File f_sample : Objects.requireNonNull(
                                     d_sample.listFiles(Filters.getSuffixFilter(s_trapSequences.get()))))
                             {
-                                logger.debug(f_sample.getAbsolutePath());
                                 try (BufferedReader reader = new BufferedReader(new FileReader(f_sample)))
                                 {
                                     String inputLine;

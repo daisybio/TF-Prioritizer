@@ -72,7 +72,6 @@ public class StaticMethods
                             } catch (IOException e)
                             {
                                 logger.error(e.getMessage());
-                                System.exit(1);
                             }
                         }
 
@@ -135,7 +134,6 @@ public class StaticMethods
                         } catch (IOException e)
                         {
                             logger.error(e.getMessage());
-                            System.exit(1);
                         }
 
                         try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetFile)))
@@ -167,7 +165,6 @@ public class StaticMethods
                         } catch (IOException e)
                         {
                             logger.error("Could not write to file: " + targetFile.getAbsolutePath());
-                            System.exit(1);
                         }
                     }
                 });
@@ -256,8 +253,6 @@ public class StaticMethods
         } catch (IOException e)
         {
             logger.error(e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
         }
 
     }

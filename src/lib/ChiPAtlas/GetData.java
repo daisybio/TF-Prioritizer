@@ -201,6 +201,8 @@ public class GetData extends ExecutableStep
             {
                 executorService.submit(() ->
                 {
+                    // TODO: Use wget instead of streams
+
                     File f_output_tfSplit = extend(d_output_tf, tfSplit + ".bed");
 
                     TrustManager[] trustAllCerts = new TrustManager[]{new TrustAllManager()};

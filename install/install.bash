@@ -139,7 +139,8 @@ else
   if ! $docker ; then
     unzip IGV_2.11.2.zip -d "$HOME/.igv"
   else
-    unzip IGV_2.11.2.zip -d /srv/dependencies/igv
+    unzip IGV_2.11.2.zip -d /srv/dependencies
+    mv /srv/dependencies/IGV_2.11.2 /srv/dependencies/igv
   fi
   rm IGV_2.11.2.zip
 fi

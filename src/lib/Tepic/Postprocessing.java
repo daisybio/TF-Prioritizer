@@ -737,8 +737,8 @@ public class Postprocessing extends ExecutableStep
         }
     }
 
-    @Override protected int getThreadNumber()
+    @Override protected int getMemoryEstimationMb()
     {
-        return 1;
+        return 8000;
     }
 }

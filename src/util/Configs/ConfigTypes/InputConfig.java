@@ -31,7 +31,14 @@ public class InputConfig<T> extends AbstractConfig<T>
 
         for (Validator<T> validator : validators)
         {
-            boolean passed = validator.validate(this);
+            boolean passed = false;
+            try
+            {
+                passed = validator.validate(this);
+            } catch (ClassCastException e)
+            {
+                logger.warn("Object of type " + get().getClass() + " cannot by validated by " + validator);
+            }
             if (!passed)
             {
                 logger.warn(name + " does not match requirements: " + validator);
@@ -76,7 +83,8 @@ public class InputConfig<T> extends AbstractConfig<T>
             setValue((T) Double.valueOf(((BigDecimal) value).doubleValue()));
         } else if (configClass.equals(Double.class) && value.getClass().equals(Integer.class))
         {
-            setValue((T) value);
+            double doubleValue = ((Integer) value).intValue();
+            setValue((T) (Double) doubleValue);
         } else if (value == JSONObject.NULL)
         {
             setValue(null);

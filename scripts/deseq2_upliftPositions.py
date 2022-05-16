@@ -17,18 +17,13 @@ def convert(c, x, y, s, converter):
 
 def main():
     path_to_X = "{INPUTFILE}"
-    path_to_version = "{VERSIONFILE}"
+    version = "{VERSION}"
     path_to_newSave = "{OUTPUTFILE}"
 
     version_of_our_dat = "{REFERENCE_GENOME}"
 
     grc_dict = {{REFERENCE_GENOME_DICT}}
 
-    with open(path_to_version) as file:
-        version = file.readlines()
-
-    version = version.__getitem__(0).rstrip("\n")
-    version = version.split(".")[0]
     version_convert_from = grc_dict.get(version)
     please_convert = True
     if (version_of_our_dat == version_convert_from):
@@ -43,7 +38,8 @@ def main():
     for col in df.columns:
         column_names.append(col)
     if please_convert:
-        converter = LiftOver(version_convert_from, version_of_our_dat)
+        converter = LiftOver(version_convert_from, version_of_our_dat, search_dir=None, cache_dir=None,
+                             use_web=True)
     for _, row in df.iterrows():
         mgi_symbol = row[column_names.__getitem__(0)]
         chromosome_not_edited = str(row[column_names.__getitem__(1)])

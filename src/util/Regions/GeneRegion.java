@@ -118,4 +118,33 @@ public class GeneRegion extends Region
     {
         return getChromosome() + "\t" + getStart() + "\t" + getEnd() + "\t" + getId();
     }
+
+    public static List<MultiGeneRegion> mergeSameRegions(List<GeneRegion> input)
+    {
+        List<MultiGeneRegion> combined = new ArrayList<>();
+
+        for (int i = 0; i < input.size(); i++)
+        {
+            GeneRegion first = input.get(i);
+            MultiGeneRegion multiGeneRegion =
+                    new MultiGeneRegion(first.getChromosome(), first.getStart(), first.getEnd(), first.getId());
+
+            for (int j = i + 1; j < input.size(); j++)
+            {
+                GeneRegion current = input.get(j);
+
+                if (first.isIdentical(current, false))
+                {
+                    multiGeneRegion.addId(current.getId());
+                    i++;
+                } else
+                {
+                    break;
+                }
+            }
+
+            combined.add(multiGeneRegion);
+        }
+        return combined;
+    }
 }

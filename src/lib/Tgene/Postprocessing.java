@@ -6,6 +6,7 @@ import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
+import util.Regions.MultiGeneRegion;
 
 import java.io.*;
 import java.util.*;
@@ -92,7 +93,6 @@ public class Postprocessing extends ExecutableStep
                         {
                             String inputLine;
                             br.readLine();
-                            int lineCount = 0;
 
                             while ((inputLine = br.readLine()) != null)
                             {
@@ -112,12 +112,11 @@ public class Postprocessing extends ExecutableStep
                                 GeneRegion region = new GeneRegion(chromosome, start, end, ensg);
 
                                 currentSampleRegions.add(region);
-                                lineCount++;
                             }
                         } catch (IOException e)
                         {
                             e.printStackTrace();
-                            System.exit(1);
+                            logger.error(e.getMessage());
                         }
                         List<GeneRegion> currentSampleRegionsNoDuplicates =
                                 removeGeneRegionDuplicates(currentSampleRegions, true);
@@ -163,10 +162,13 @@ public class Postprocessing extends ExecutableStep
                             writeGeneRegionsToFile(regions, targetFile);
                         }
 
-                        //create tgen groups
+                        //create tgene groups
                         File targetFile = extend(d_outputGroups.get(), d_hm.getName(), d_group.getName(),
                                 s_groups_mergedGroups.get());
-                        writeGeneRegionsToFile(allRegionsFiltered, targetFile);
+
+                        List<MultiGeneRegion> combined = GeneRegion.mergeSameRegions(allRegionsFiltered);
+
+                        writeMultiGeneRegionsToFile(combined, targetFile);
                     }
                 });
             }
@@ -223,8 +225,7 @@ public class Postprocessing extends ExecutableStep
                 }
             } catch (IOException e)
             {
-                e.printStackTrace();
-                System.exit(1);
+                logger.error(e.getMessage());
             }
         } else
         {
@@ -255,8 +256,7 @@ public class Postprocessing extends ExecutableStep
                 }
             } catch (IOException e)
             {
-                e.printStackTrace();
-                System.exit(1);
+                logger.error(e.getMessage());
             }
         }
 
@@ -265,14 +265,7 @@ public class Postprocessing extends ExecutableStep
 
     private void writeGeneRegionsToFile(List<GeneRegion> regions, File targetFile)
     {
-        try
-        {
-            makeSureFileExists(targetFile);
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        makeSureFileExists(targetFile, logger);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetFile)))
         {
@@ -283,12 +276,32 @@ public class Postprocessing extends ExecutableStep
             {
                 writer.write(region.toString());
                 writer.newLine();
-
             }
         } catch (IOException e)
         {
             e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void writeMultiGeneRegionsToFile(List<MultiGeneRegion> regions, File targetFile)
+    {
+        makeSureFileExists(targetFile, logger);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetFile)))
+        {
+            writer.write("CHR\tLEFT_BORDER\tRIGHT_BORDER\tENSGS");
+            writer.newLine();
+
+            for (MultiGeneRegion region : regions)
+            {
+                writer.write(region.toString());
+                writer.newLine();
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -339,8 +352,7 @@ public class Postprocessing extends ExecutableStep
             }
         } catch (IOException e)
         {
-            e.printStackTrace();
-            System.exit(1);
+            logger.error(e.getMessage());
         }
 
         return geneID_lengths;

@@ -1,5 +1,6 @@
 package tfprio.tfprio;
 
+import lib.DistributionAnalysis.DistributionAnalysis;
 import lib.ExecutableStep;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
@@ -92,7 +93,7 @@ public class Workflow
         }
 
         {
-            steps.add(new lib.Deseq2.CreateDeseq2Scripts());
+            steps.add(new lib.Deseq2.SingleCombined());
             steps.add(new lib.Deseq2.CreateTpmMappings());
             steps.add(new lib.Deseq2.CreateGenePositions());
 
@@ -169,7 +170,7 @@ public class Workflow
         steps.add(new lib.Plots.TopKTargetGenes());
 
         steps.add(new lib.DistributionAnalysis.Preprocessing());
-        steps.add(new lib.DistributionAnalysis.RunDistributionAnalysis());
+        steps.add(new DistributionAnalysis());
         steps.add(new lib.DistributionAnalysis.CreatePlots());
         steps.add(new lib.DistributionAnalysis.CalculateDcgRank());
         steps.add(new lib.DistributionAnalysis.getTopKTargetGenes());

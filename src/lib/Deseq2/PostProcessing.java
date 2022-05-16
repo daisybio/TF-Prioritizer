@@ -45,8 +45,7 @@ public class PostProcessing extends ExecutableStep
                 makeSureFileExists(f_output);
             } catch (IOException e)
             {
-                e.printStackTrace();
-                System.exit(1);
+                logger.error(e.getMessage());
             }
 
             try (BufferedReader reader = new BufferedReader(new FileReader(f_input));
@@ -72,8 +71,7 @@ public class PostProcessing extends ExecutableStep
                 }
             } catch (IOException e)
             {
-                e.printStackTrace();
-                System.exit(1);
+                logger.error(e.getMessage());
             }
         }
     }

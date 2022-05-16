@@ -13,7 +13,6 @@ public class General extends AbstractModule
 {
     public final InputConfig<Boolean> fileLogging = new InputConfig<>(Boolean.class);
     public final InputConfig<Boolean> calculateTpmLengthsEnabled = new InputConfig<>(Boolean.class);
-    public final InputConfig<Boolean> calculateGenePositionsEnabled = new InputConfig<>(Boolean.class);
 
     public final InternalConfig<String> differentTps = new InternalConfig<>("DIFFERENT_TPS");
     public final InternalConfig<String> sameTps = new InternalConfig<>("SAME_TPS");
