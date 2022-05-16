@@ -87,6 +87,11 @@ public class GetDataList extends ExecutableStep
             logger.error("Could not get data.");
         }
 
+        if (!f_zipped.get().exists())
+        {
+            logger.error("Something awkward happened.");
+        }
+
         String command_edited = "unzip " + f_zipped.get() + " -d " + f_list.get().getParentFile().getAbsolutePath();
         executeAndWait(command_edited, logger);
 
