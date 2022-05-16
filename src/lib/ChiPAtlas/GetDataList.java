@@ -58,17 +58,23 @@ public class GetDataList extends ExecutableStep
         boolean worked = false;
         String command_wget = "wget " + urlToList.get() + " -O " + f_zipped.get().getAbsolutePath();
         String command_unzip = "unzip " + f_zipped.get() + " -d " + f_list.get().getParentFile().getAbsolutePath();
-        logger.debug("Executing command: " + command_wget);
 
         while(!worked)
         {
             try
             {
+                logger.debug("Executing command: " + command_wget);
                 Process wget = Runtime.getRuntime().exec(command_wget);
                 wget.waitFor();
+                logger.debug("Executing command: " + command_unzip);
                 Process unzip = Runtime.getRuntime().exec(command_unzip);
                 unzip.waitFor();
-                worked = true;
+
+                if (f_list.get().exists())
+                {
+                    logger.info("Successfully fetched data.");
+                    worked = true;
+                }
             } catch (IOException | InterruptedException e)
             {
                 logger.warn("Failed attempt #" + i+1);
