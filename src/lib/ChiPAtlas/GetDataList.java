@@ -77,6 +77,8 @@ public class GetDataList extends ExecutableStep
                 {
                     logger.info("Successfully fetched data.");
                     worked = true;
+                } else {
+                    throw new IOException();
                 }
             } catch (IOException | InterruptedException e)
             {
