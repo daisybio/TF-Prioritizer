@@ -98,16 +98,11 @@ public class ImportantLoci extends ExecutableStep
                 List<String> loadFiles =
                         getInputFiles(List.of(group), includePredictionData, d_input_tepic, pathToTfChipSeq, pathToTdf,
                                 d_input_peakFiles, tdfFiles);
-
-                String loadCommand = "load " + String.join("\nload ", loadFiles);
-
                 File f_save_session = extend(d_output_group, s_session.get());
-                IGV_Headless.createSession(f_save_session, loadCommand, tdfFiles, logger);
 
                 IGV_Headless igv = new IGV_Headless(group, logger);
+                igv.createSession(loadFiles, tdfFiles, f_save_session);
 
-                igv.addCommand("genome " + speciesReferenceGenome.get());
-                igv.addCommand("load " + f_save_session.getAbsolutePath());
                 igv.addCommand("snapshotDirectory " + d_output_group.getAbsolutePath());
 
                 for (Object locusObject : importantLoci.get())

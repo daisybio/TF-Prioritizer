@@ -129,17 +129,11 @@ public class DcgTargetGenes extends ExecutableStep
                                 getInputFiles(List.of(groupsSplit), includePredictionData, d_input_tepic,
                                         pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdf_files);
 
-                        String loadCommand = "load " + String.join("\nload ", loadFiles);
-
-                        //save session
                         File f_save_session = extend(d_output_groupPairing, s_session.get());
 
-                        IGV_Headless.createSession(f_save_session, loadCommand, tdf_files, logger);
-
                         IGV_Headless igv = new IGV_Headless(groupPairing, logger);
+                        igv.createSession(loadFiles, tdf_files, f_save_session);
 
-                        igv.addCommand("genome " + speciesReferenceGenome);
-                        igv.addCommand("load " + f_save_session.getAbsolutePath());
                         igv.addCommand("snapshotDirectory " + d_output_groupPairing.getAbsolutePath());
 
                         for (int i = 0; i < regulated_genes.size(); i++)

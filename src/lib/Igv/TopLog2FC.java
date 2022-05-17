@@ -107,9 +107,6 @@ public class TopLog2FC extends ExecutableStep
             }
         }
 
-        Map<String, List<GeneAffinity>> groupPairing_geneAffinities = new HashMap<>();
-        Map<String, File> groupPairing_sessionFile = new HashMap<>();
-
         for (File f_groupPairing : Objects.requireNonNull(d_input_deseq2.get().listFiles(Filters.fileFilter)))
         {
             executorService.submit(() ->
@@ -133,30 +130,12 @@ public class TopLog2FC extends ExecutableStep
                 }
                 Collections.sort(geneAffinities);
 
-                groupPairing_geneAffinities.put(groupPairing, geneAffinities);
-
-
                 File f_save_session = extend(d_output.get(), groupPairing, s_session.get());
                 ArrayList<File> tdfFiles = new ArrayList<>();
 
                 List<String> loadFiles =
                         getInputFiles(List.of(groupPairing.split("_")), includePredictionData, d_input_tepic,
                                 pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdfFiles);
-                String loadCommand = "load " + String.join("\nload ", loadFiles);
-                IGV_Headless.createSession(f_save_session, loadCommand, tdfFiles, logger);
-                groupPairing_sessionFile.put(groupPairing, f_save_session);
-            });
-        }
-
-        finishAllQueuedThreads();
-
-        for (String groupPairing : groupPairing_geneAffinities.keySet())
-        {
-            executorService.submit(() ->
-            {
-                List<GeneAffinity> geneAffinities = groupPairing_geneAffinities.get(groupPairing);
-
-                File f_save_session = groupPairing_sessionFile.get(groupPairing);
 
                 for (String suffix : Arrays.asList(s_downregulated.get(), s_upregulated.get()))
                 {
@@ -181,9 +160,8 @@ public class TopLog2FC extends ExecutableStep
                     }
 
                     IGV_Headless igv = new IGV_Headless(groupPairing + "-" + suffix, logger);
+                    igv.createSession(loadFiles, tdfFiles, f_save_session);
 
-                    igv.addCommand("genome " + speciesReferenceGenome.get());
-                    igv.addCommand("load " + f_save_session.getAbsolutePath());
                     igv.addCommand("snapshotDirectory " + d_output_mode.getAbsolutePath());
 
                     for (int i = 0; i < regulatedGenes.size(); i++)

@@ -67,7 +67,7 @@ public class IGV_Headless
         save(batchFile);
 
         String command =
-                "xvfb-run --auto-servernum --server-num=1 " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
+                "xvfb-run --auto-servernum --server-num=1 -s \"-terminate\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
                         "/igv.sh" + " -b " + batchFile.getAbsolutePath();
 
         executeAndWait(command, logger);
@@ -76,26 +76,22 @@ public class IGV_Headless
     /**
      * Create a new session xml file
      *
-     * @param f_output    the session save file
-     * @param loadCommand the string containing the load commands
+     * @param loadFiles   a list of absolute paths to load
      * @param tdfFiles    the tdf files
-     * @param logger      the {@link lib.ExecutableStep} logger
      */
-    public static void createSession(File f_output, String loadCommand, List<File> tdfFiles, Logger logger)
+    public void createSession(List<String> loadFiles, List<File> tdfFiles, File f_session)
     {
-        IGV_Headless igv = new IGV_Headless("create_session", logger);
+        addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
 
-        igv.addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
-
-        igv.addCommand(loadCommand);
+        addCommand(String.join("\nload ", loadFiles));
 
         //remodel tdf files if available
 
         for (File f_tdf : tdfFiles)
         {
-            igv.addCommand("setLogScale " + f_tdf.getName());
-            igv.addCommand("setDataRange auto " + f_tdf.getName());
-            igv.addCommand("setTrackHeight " + f_tdf.getName() + " 60");
+            addCommand("setLogScale " + f_tdf.getName());
+            addCommand("setDataRange auto " + f_tdf.getName());
+            addCommand("setTrackHeight " + f_tdf.getName() + " 60");
         }
 
         //include enhancer regions of interest if available
@@ -115,7 +111,7 @@ public class IGV_Headless
                     {
                         String[] split = line_mergedDB.split("\t");
 
-                        igv.addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
+                        addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
                     }
                 } catch (IOException e)
                 {
@@ -123,9 +119,6 @@ public class IGV_Headless
                 }
             }
         }
-
-        igv.addCommand("saveSession " + f_output);
-
-        igv.run(f_output.getParentFile());
+        addCommand("saveSession " + f_session.getAbsolutePath());
     }
 }
