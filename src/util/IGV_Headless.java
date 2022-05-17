@@ -5,8 +5,7 @@ import tfprio.tfprio.TFPRIO;
 import java.io.*;
 import java.util.List;
 
-import static util.FileManagement.extend;
-import static util.FileManagement.writeFile;
+import static util.FileManagement.*;
 import static util.ScriptExecution.executeAndWait;
 
 /**
@@ -14,6 +13,7 @@ import static util.ScriptExecution.executeAndWait;
  */
 public class IGV_Headless
 {
+    static int latestServerNum = 0;
     private final StringBuilder commandBuilder = new StringBuilder();
     private final String name;
     private final Logger logger;
@@ -67,7 +67,7 @@ public class IGV_Headless
         save(batchFile);
 
         String command =
-                "xvfb-run --auto-servernum --server-num=1 -s \"-terminate\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
+                "xvfb-run -n 1 -a " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
                         "/igv.sh" + " -b " + batchFile.getAbsolutePath();
 
         executeAndWait(command, logger);
@@ -119,6 +119,12 @@ public class IGV_Headless
                 }
             }
         }
+        makeSureFileExists(f_session, logger);
         addCommand("saveSession " + f_session.getAbsolutePath());
+    }
+
+    private static synchronized int getServerNum() {
+        latestServerNum = latestServerNum + 1;
+        return latestServerNum;
     }
 }
