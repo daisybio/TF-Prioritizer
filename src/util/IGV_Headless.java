@@ -67,7 +67,7 @@ public class IGV_Headless
         save(batchFile);
 
         String command =
-                "xvfb-run -n " + getServerNum() + " -s \"-terminate\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
+                "xvfb-run -n " + getServerNum() + " " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
                         "/igv.sh" + " -b " + batchFile.getAbsolutePath();
 
         executeAndWait(command, logger);
