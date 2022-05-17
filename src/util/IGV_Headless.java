@@ -5,8 +5,7 @@ import tfprio.tfprio.TFPRIO;
 import java.io.*;
 import java.util.List;
 
-import static util.FileManagement.extend;
-import static util.FileManagement.writeFile;
+import static util.FileManagement.*;
 import static util.ScriptExecution.executeAndWait;
 
 /**
@@ -119,6 +118,7 @@ public class IGV_Headless
                 }
             }
         }
+        makeSureFileExists(f_session, logger);
         addCommand("saveSession " + f_session.getAbsolutePath());
     }
 }
