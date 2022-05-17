@@ -13,6 +13,7 @@ import static util.ScriptExecution.executeAndWait;
  */
 public class IGV_Headless
 {
+    static int latestServerNum = 0;
     private final StringBuilder commandBuilder = new StringBuilder();
     private final String name;
     private final Logger logger;
@@ -66,7 +67,7 @@ public class IGV_Headless
         save(batchFile);
 
         String command =
-                "xvfb-run -s \"-terminate\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
+                "xvfb-run -n " + getServerNum() + " -s \"-terminate\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
                         "/igv.sh" + " -b " + batchFile.getAbsolutePath();
 
         executeAndWait(command, logger);
@@ -120,5 +121,10 @@ public class IGV_Headless
         }
         makeSureFileExists(f_session, logger);
         addCommand("saveSession " + f_session.getAbsolutePath());
+    }
+
+    private static synchronized int getServerNum() {
+        latestServerNum = latestServerNum + 1;
+        return latestServerNum;
     }
 }
