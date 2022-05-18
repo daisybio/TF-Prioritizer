@@ -4,6 +4,7 @@ import tfprio.tfprio.TFPRIO;
 
 import java.io.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 import static util.ScriptExecution.executeAndWait;
@@ -69,8 +70,15 @@ public class IGV_Headless
         String command =
                 "xvfb-run -n 1 -a " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
                         "/igv.sh" + " -b " + batchFile.getAbsolutePath();
-
-        executeAndWait(command, logger);
+        try
+        {
+            Process igv = Runtime.getRuntime().exec(command);
+            igv.waitFor(30, TimeUnit.SECONDS);
+            igv.destroy();
+        } catch (IOException | InterruptedException e)
+        {
+            logger.error(e.getMessage());
+        }
     }
 
     /**
