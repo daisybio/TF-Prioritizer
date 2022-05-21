@@ -17,3 +17,10 @@ echo \
 
 sudo apt-get update
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+if [ ! $(getent group docker) ]; then
+  sudo groupadd docker
+fi
+
+sudo usermod -aG docker $USER
+newgrp docker
