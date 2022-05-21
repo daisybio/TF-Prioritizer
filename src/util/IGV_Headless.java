@@ -2,9 +2,11 @@ package util;
 
 import tfprio.tfprio.TFPRIO;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 import static util.ScriptExecution.executeAndWait;
@@ -14,7 +16,6 @@ import static util.ScriptExecution.executeAndWait;
  */
 public class IGV_Headless
 {
-    static int latestServerNum = 0;
     private final StringBuilder commandBuilder = new StringBuilder();
     private final String name;
     private final Logger logger;
@@ -68,24 +69,17 @@ public class IGV_Headless
         save(batchFile);
 
         String command =
-                "xvfb-run -n 1 -a " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
-                        "/igv.sh" + " -b " + batchFile.getAbsolutePath();
-        try
-        {
-            Process igv = Runtime.getRuntime().exec(command);
-            igv.waitFor(30, TimeUnit.SECONDS);
-            igv.destroy();
-        } catch (IOException | InterruptedException e)
-        {
-            logger.error(e.getMessage());
-        }
+                "xvfb-run -n 1 -a " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh" + " -b " +
+                        batchFile.getAbsolutePath();
+
+        executeAndWait(command, logger);
     }
 
     /**
      * Create a new session xml file
      *
-     * @param loadFiles   a list of absolute paths to load
-     * @param tdfFiles    the tdf files
+     * @param loadFiles a list of absolute paths to load
+     * @param tdfFiles  the tdf files
      */
     public void createSession(List<String> loadFiles, List<File> tdfFiles, File f_session)
     {
@@ -129,10 +123,5 @@ public class IGV_Headless
         }
         makeSureFileExists(f_session, logger);
         addCommand("saveSession " + f_session.getAbsolutePath());
-    }
-
-    private static synchronized int getServerNum() {
-        latestServerNum = latestServerNum + 1;
-        return latestServerNum;
     }
 }
