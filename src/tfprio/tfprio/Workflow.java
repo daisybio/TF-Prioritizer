@@ -1,6 +1,5 @@
 package tfprio.tfprio;
 
-import lib.DistributionAnalysis.DistributionAnalysis;
 import lib.ExecutableStep;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
@@ -26,6 +25,7 @@ public class Workflow
         }
 
         steps.add(new tfprio.InitStaticVariables());
+        /*
         steps.add(new lib.CheckChromosomes());
 
         if (TFPRIO.configs.mixOptions.level.isSet())
@@ -170,7 +170,7 @@ public class Workflow
         steps.add(new lib.Plots.TopKTargetGenes());
 
         steps.add(new lib.DistributionAnalysis.Preprocessing());
-        steps.add(new DistributionAnalysis());
+        steps.add(new lib.DistributionAnalysis.DistributionAnalysis());
         steps.add(new lib.DistributionAnalysis.CreatePlots());
         steps.add(new lib.DistributionAnalysis.CalculateDcgRank());
         steps.add(new lib.DistributionAnalysis.getTopKTargetGenes());
@@ -219,6 +219,7 @@ public class Workflow
         steps.add(new lib.DistributionAnalysis.CoOccurrenceAnalysis());
 
         steps.add(new lib.Report.Report());
+         */
 
         steps.add(new lib.AngularReport.Generate());
         steps.add(new lib.AngularReport.PostProcessing());

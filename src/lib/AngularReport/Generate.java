@@ -21,8 +21,11 @@ import static util.ScriptExecution.executeAndWait;
 public class Generate extends ExecutableStep
 {
     AbstractConfig<File> f_input_transcriptionFactors = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
+    AbstractConfig<File> d_input_report = TFPRIO.configs.angularReport.d_angularSource;
     GeneratedFileStructure f_output_reportJson = TFPRIO.configs.angularReport.fileStructure.f_data;
     GeneratedFileStructure d_output_data = TFPRIO.configs.angularReport.fileStructure.d_data;
+    GeneratedFileStructure d_preprocessing = TFPRIO.configs.angularReport.fileStructure.d_preprocessing;
+    GeneratedFileStructure d_output = TFPRIO.configs.angularReport.fileStructure.d_output;
 
     JSONObject importantLoci;
 
@@ -48,9 +51,12 @@ public class Generate extends ExecutableStep
 
     @Override protected void execute()
     {
+        copyDirectory(d_input_report.get(), d_preprocessing.get(), false);
+
         collectImportantLoci();
         collectTopLog2fc();
         collectCoOccurrence();
+        logger.info("Finished collecting data.");
 
         List<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
 
@@ -80,14 +86,11 @@ public class Generate extends ExecutableStep
             logger.error(e.getMessage());
         }
         finishAllQueuedThreads();
+
         saveJson(transcriptionFactorGroups);
 
-        softLink(TFPRIO.configs.angularReport.d_dataLink.get(),
-                TFPRIO.configs.angularReport.fileStructure.d_preprocessing.get(), logger);
-
-        String script =
-                "cd " + TFPRIO.configs.angularReport.d_angularSource.get().getAbsolutePath() + "\n" + "ng build " +
-                        "--output-path=" + TFPRIO.configs.angularReport.fileStructure.d_output.get().getAbsolutePath();
+        String script = "cd " + d_preprocessing.get().getAbsolutePath() + "\nnpm install --include-dev \nng build " +
+                "--output-path=" + d_output.get().getAbsolutePath();
 
         try
         {

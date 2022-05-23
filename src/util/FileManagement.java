@@ -106,7 +106,8 @@ public class FileManagement
                 if (sourceFile.getName().matches(fileNameRegex))
                 {
                     String cleanName = sourceFile.getName();
-                    String fileExtension = cleanName.substring(cleanName.lastIndexOf("."));
+                    String fileExtension =
+                            cleanName.contains(".") ? cleanName.substring(cleanName.lastIndexOf(".")) : "";
 
                     cleanName = cleanName.replace(fileExtension, "");
 
