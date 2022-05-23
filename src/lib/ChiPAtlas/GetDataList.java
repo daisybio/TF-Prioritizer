@@ -1,24 +1,18 @@
 package lib.ChiPAtlas;
 
 import lib.ExecutableStep;
-import org.apache.commons.compress.utils.IOUtils;
 import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.TrustAllManager;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import static util.FileManagement.deleteFileStructure;
 import static util.FileManagement.makeSureFileExists;
-import static util.ScriptExecution.executeAndWait;
 
 public class GetDataList extends ExecutableStep
 {
@@ -59,7 +53,7 @@ public class GetDataList extends ExecutableStep
         String command_wget = "wget " + urlToList.get() + " -O " + f_zipped.get().getAbsolutePath();
         String command_unzip = "unzip " + f_zipped.get() + " -d " + f_list.get().getParentFile().getAbsolutePath();
 
-        while(!worked)
+        while (!worked)
         {
             try
             {
@@ -77,12 +71,13 @@ public class GetDataList extends ExecutableStep
                 {
                     logger.info("Successfully fetched data.");
                     worked = true;
-                } else {
+                } else
+                {
                     throw new IOException();
                 }
             } catch (IOException | InterruptedException e)
             {
-                logger.warn("Failed attempt #" + i+1);
+                logger.warn("Failed attempt #" + (i + 1));
             }
 
             if (!worked)
