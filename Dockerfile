@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 RUN apt-get update && apt-get -y install sudo
 
@@ -13,6 +13,7 @@ RUN for i in \
     /srv/dependencies/ext \
     /srv/dependencies/scripts \
     /srv/dependencies/config_templates \
+    /srv/dependencies/Report \
     /src/install \
     /srv/app \
     /srv/wd \
@@ -21,6 +22,7 @@ RUN for i in \
 COPY ext/ /srv/dependencies/ext
 
 COPY install/ /srv/install
+
 RUN bash -c "chmod +x /srv/install/install.bash && /srv/install/install.bash -d"
 
 COPY scripts /srv/dependencies/scripts
