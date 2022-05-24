@@ -56,11 +56,13 @@ public class TranscriptionFactorGroup
 
     public void collectData()
     {
-        logger.info("Collecting data for " + name);
+        logger.debug("Collecting data for group: " + name);
         transcriptionFactors.forEach(TranscriptionFactor::collectData);
+        logger.debug("Collecting general data for group: " + name);
         collectTargetGenes();
         collectValidationFiles();
         collectDistributionFiles();
+        logger.debug("Finished collecting data for group: " + name);
     }
 
     private void collectTargetGenes()
@@ -132,11 +134,8 @@ public class TranscriptionFactorGroup
                     File f_data = extend(d_input, hm, groupPairing + ".csv");
                     File f_plot = extend(d_input, hm, groupPairing + ".png");
 
-                    logger.warn("A");
-
                     if (f_data.exists() && f_plot.exists())
                     {
-                        logger.warn("B");
                         hm_groupPairing_filetype_file.get(hm).get(groupPairing).put("data", f_data);
                         hm_groupPairing_filetype_file.get(hm).get(groupPairing).put("plot", f_plot);
                     }

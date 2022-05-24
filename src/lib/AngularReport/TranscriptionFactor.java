@@ -58,10 +58,11 @@ public class TranscriptionFactor
 
     public void collectData()
     {
-        logger.info("Collecting data for " + name);
+        logger.debug("Collecting data for tf: " + name);
         collectLog2fc();
         collectTpm();
         collectNormalizedExpression();
+        logger.debug("Finished collecting data for tf: " + name);
     }
 
     private void collectNormalizedExpression()
