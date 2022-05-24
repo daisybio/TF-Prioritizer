@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static util.FileManagement.*;
-import static util.ScriptExecution.executeAndWait;
 
 /**
  * Allows generation and headless execution of igv batch files.
@@ -165,8 +164,6 @@ public class IGV_Headless
                 logger.info("Started XServer with ID: " + xServerNum);
             }
         }
-
-        executeAndWait("export DISPLAY=\":" + xServerNum + "\"", logger);
     }
 
     public static void stopXServer()
