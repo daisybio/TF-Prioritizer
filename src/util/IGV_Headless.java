@@ -93,7 +93,10 @@ public class IGV_Headless
     {
         addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
 
-        addCommand(String.join("\nload ", loadFiles));
+        for (String loadFile : loadFiles)
+        {
+            addCommand("load " + loadFile);
+        }
 
         //remodel tdf files if available
 
