@@ -122,13 +122,15 @@ public class TranscriptionFactorGroup
         {
             Map<String, Map<String, Map<String, File>>> hm_groupPairing_filetype_file = new HashMap<>();
             File d_input = extend(TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps.get(), name);
-
+            logger.debug("A");
             for (String hm : TFPRIO.existingHms)
             {
+                logger.debug("B");
                 hm_groupPairing_filetype_file.put(hm, new HashMap<>());
 
                 for (String groupPairing : TFPRIO.groupCombinationsToHms.keySet())
                 {
+                    logger.debug("C");
                     hm_groupPairing_filetype_file.get(hm).put(groupPairing, new HashMap<>());
 
                     File f_data = extend(d_input, hm, groupPairing + ".csv");
@@ -136,15 +138,19 @@ public class TranscriptionFactorGroup
 
                     if (f_data.exists() && f_plot.exists())
                     {
+                        logger.debug("D");
                         hm_groupPairing_filetype_file.get(hm).get(groupPairing).put("data", f_data);
                         hm_groupPairing_filetype_file.get(hm).get(groupPairing).put("plot", f_plot);
                     }
                 }
             }
+            logger.debug("E");
 
             validation_heatmap = new JSONObject(hm_groupPairing_filetype_file);
+            logger.debug("F");
 
             Generate.linkFiles(validation_heatmap, extend(d_validation, "heatmap"), executorService, logger);
+            logger.debug("G");
         } // Heatmaps
 
         {

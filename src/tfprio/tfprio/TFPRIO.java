@@ -4,6 +4,7 @@ import tfprio.ArgParser;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.Configs;
 import util.ExecutionTimeMeasurement;
+import util.IGV_Headless;
 import util.Logger;
 import util.MapSymbolAndEnsg;
 
@@ -102,6 +103,8 @@ public class TFPRIO
         {
             workflow.run();
         }
+
+        IGV_Headless.stopXServer();
 
         logger.info("Finished. Execution took " + timer.stopAndGetDeltaFormatted() + ".");
     }
