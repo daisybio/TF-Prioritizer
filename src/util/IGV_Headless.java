@@ -64,10 +64,7 @@ public class IGV_Headless
      */
     public void run(File workingDirectory)
     {
-        if (xServer == null)
-        {
-            startXServer(logger);
-        }
+        startXServer(logger);
 
         addCommand("exit");
 
@@ -75,10 +72,10 @@ public class IGV_Headless
 
         save(batchFile);
 
-        String command =
-                "/bin/bash 'DISPLAY=\":" + xServerNum + "\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
-                        "/igv.sh -b " + batchFile.getAbsolutePath() + "'";
-
+        String command = "/bin/bash '(export DISPLAY=\":" + xServerNum + "\"; " +
+                TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh -b " + batchFile.getAbsolutePath() +
+                "')";
+        logger.debug("Executing command: " + command);
         try
         {
             Process igv = Runtime.getRuntime().exec(command);
