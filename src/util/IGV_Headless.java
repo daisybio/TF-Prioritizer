@@ -6,9 +6,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import static util.FileManagement.*;
+import static util.ScriptExecution.execute;
+import static util.ScriptExecution.executeAndWait;
 
 /**
  * Allows generation and headless execution of igv batch files.
@@ -72,21 +75,12 @@ public class IGV_Headless
 
         save(batchFile);
 
-        String command = "/bin/bash '(export DISPLAY=\":" + xServerNum + "\"; " +
-                TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh -b " + batchFile.getAbsolutePath() +
-                "')";
-        logger.debug("Executing command: " + command);
-        try
-        {
-            Process igv = Runtime.getRuntime().exec(command);
-            if (!(igv.waitFor() == 0))
-            {
-                throw new IOException("Received non-zero return code");
-            }
-        } catch (IOException | InterruptedException e)
-        {
-            logger.error(e.getMessage());
-        }
+        String command =
+                TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh -b " + batchFile.getAbsolutePath();
+        executeAndWait(command, logger, new HashMap<>()
+        {{
+            put("DISPLAY", ":" + xServerNum);
+        }}, true);
     }
 
     /**
@@ -148,21 +142,9 @@ public class IGV_Headless
 
             while (!successful)
             {
-                try
-                {
-                    xServer = Runtime.getRuntime().exec("Xvfb :" + xServerNum + " - screen 1 1920x1080x16");
-                    successful = true;
-                } catch (IOException ignore)
-                {
-                    logger.info("Creating XServer failed for ID: " + xServerNum);
-                }
-                if (!successful)
-                {
-                    xServerNum++;
-                } else
-                {
-                    logger.info("Started XServer with ID: " + xServerNum);
-                }
+                xServer = execute("Xvfb :" + xServerNum + " -screen 1 1920x1080x16", logger);
+                successful = true;
+                logger.info("Started XServer with ID: " + xServerNum);
             }
         }
     }
