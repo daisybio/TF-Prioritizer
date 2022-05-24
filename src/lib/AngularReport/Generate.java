@@ -56,7 +56,7 @@ public class Generate extends ExecutableStep
         collectImportantLoci();
         collectTopLog2fc();
         collectCoOccurrence();
-        logger.info("Finished collecting data.");
+        logger.info("Finished collecting general data.");
 
         List<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
 
@@ -282,6 +282,8 @@ public class Generate extends ExecutableStep
 
     public static void linkFiles(JSONObject map, File d_target, ExecutorService executorService, Logger logger)
     {
+        logger.info("Linking files to " + d_target.getAbsolutePath());
+
         for (String key : map.keySet())
         {
             File newTarget = extend(d_target, key);

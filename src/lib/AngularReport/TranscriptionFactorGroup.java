@@ -132,7 +132,7 @@ public class TranscriptionFactorGroup
                     File f_data = extend(d_input, hm, groupPairing + ".csv");
                     File f_plot = extend(d_input, hm, groupPairing + ".png");
 
-                    if (f_data.exists() && f_plot.exists())
+                    if (f_data.canRead() && f_plot.canRead())
                     {
                         hm_groupPairing_filetype_file.get(hm).get(groupPairing).put("data", f_data);
                         hm_groupPairing_filetype_file.get(hm).get(groupPairing).put("plot", f_plot);
