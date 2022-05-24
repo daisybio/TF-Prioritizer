@@ -77,8 +77,8 @@ public class IGV_Headless
         save(batchFile);
 
         String command =
-                "DISPLAY=\":" + xServerNum + "\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh" +
-                        " -b " + batchFile.getAbsolutePath();
+                "(export DISPLAY=\":" + xServerNum + "\"; " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
+                        "/igv" + ".sh" + " -b " + batchFile.getAbsolutePath() + ")";
 
         executeAndWait(command, logger);
     }
@@ -151,8 +151,13 @@ public class IGV_Headless
             if (!successful)
             {
                 xServerNum++;
+            } else
+            {
+                logger.info("Started XServer with ID: " + xServerNum);
             }
         }
+
+        executeAndWait("export DISPLAY=\":" + xServerNum + "\"", logger);
     }
 
     public static void stopXServer()
