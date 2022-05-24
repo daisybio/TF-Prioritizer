@@ -75,8 +75,9 @@ public class IGV_Headless
 
         save(batchFile);
 
-        String command = "DISPLAY=\":" + xServerNum + "\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
-                "/igv.sh -b " + batchFile.getAbsolutePath();
+        String command =
+                "/bin/bash 'DISPLAY=\":" + xServerNum + "\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
+                        "/igv.sh -b " + batchFile.getAbsolutePath() + "'";
 
         try
         {
@@ -141,27 +142,30 @@ public class IGV_Headless
         addCommand("saveSession " + f_session.getAbsolutePath());
     }
 
-    private static void startXServer(Logger logger)
+    private static synchronized void startXServer(Logger logger)
     {
-        xServerNum = 20;
-        boolean successful = false;
-
-        while (!successful)
+        if (xServer == null)
         {
-            try
+            xServerNum = 20;
+            boolean successful = false;
+
+            while (!successful)
             {
-                xServer = Runtime.getRuntime().exec("Xvfb :" + xServerNum + " - screen 1 1920x1080x16");
-                successful = true;
-            } catch (IOException ignore)
-            {
-                logger.info("Creating XServer failed for ID: " + xServerNum);
-            }
-            if (!successful)
-            {
-                xServerNum++;
-            } else
-            {
-                logger.info("Started XServer with ID: " + xServerNum);
+                try
+                {
+                    xServer = Runtime.getRuntime().exec("Xvfb :" + xServerNum + " - screen 1 1920x1080x16");
+                    successful = true;
+                } catch (IOException ignore)
+                {
+                    logger.info("Creating XServer failed for ID: " + xServerNum);
+                }
+                if (!successful)
+                {
+                    xServerNum++;
+                } else
+                {
+                    logger.info("Started XServer with ID: " + xServerNum);
+                }
             }
         }
     }
