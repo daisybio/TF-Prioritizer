@@ -76,11 +76,20 @@ public class IGV_Headless
 
         save(batchFile);
 
-        String command =
-                "(export DISPLAY=\":" + xServerNum + "\"; " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
-                        "/igv" + ".sh" + " -b " + batchFile.getAbsolutePath() + ")";
+        String command = "DISPLAY=\":" + xServerNum + "\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() +
+                "/igv.sh -b " + batchFile.getAbsolutePath();
 
-        executeAndWait(command, logger);
+        try
+        {
+            Process igv = Runtime.getRuntime().exec(command);
+            if (!(igv.waitFor() == 0))
+            {
+                throw new IOException("Received non-zero return code");
+            }
+        } catch (IOException | InterruptedException e)
+        {
+            logger.error(e.getMessage());
+        }
     }
 
     /**
