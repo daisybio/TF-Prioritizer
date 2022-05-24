@@ -56,6 +56,7 @@ public class TranscriptionFactorGroup
 
     public void collectData()
     {
+        logger.info("Collecting data for " + name);
         transcriptionFactors.forEach(TranscriptionFactor::collectData);
         collectTargetGenes();
         collectValidationFiles();

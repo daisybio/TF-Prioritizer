@@ -58,6 +58,7 @@ public class TranscriptionFactor
 
     public void collectData()
     {
+        logger.info("Collecting data for " + name);
         collectLog2fc();
         collectTpm();
         collectNormalizedExpression();
