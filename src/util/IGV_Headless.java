@@ -20,6 +20,9 @@ public class IGV_Headless
     private final String name;
     private final Logger logger;
 
+    private static Integer xServerNum = null;
+    private static Process xServer = null;
+
     /**
      * Create a new class instance.
      *
@@ -62,6 +65,11 @@ public class IGV_Headless
      */
     public void run(File workingDirectory)
     {
+        if (xServer == null)
+        {
+            startXServer(logger);
+        }
+
         addCommand("exit");
 
         File batchFile = extend(workingDirectory, name + ".bat");
@@ -69,8 +77,8 @@ public class IGV_Headless
         save(batchFile);
 
         String command =
-                "xvfb-run -n 1 -a " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh" + " -b " +
-                        batchFile.getAbsolutePath();
+                "DISPLAY=\":" + xServerNum + "\" " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh" +
+                        " -b " + batchFile.getAbsolutePath();
 
         executeAndWait(command, logger);
     }
@@ -123,5 +131,35 @@ public class IGV_Headless
         }
         makeSureFileExists(f_session, logger);
         addCommand("saveSession " + f_session.getAbsolutePath());
+    }
+
+    private static void startXServer(Logger logger)
+    {
+        xServerNum = 20;
+        boolean successful = false;
+
+        while (!successful)
+        {
+            try
+            {
+                xServer = Runtime.getRuntime().exec("Xvfb :" + xServerNum + " - screen 1 1920x1080x16");
+                successful = true;
+            } catch (IOException ignore)
+            {
+                logger.info("Creating XServer failed for ID: " + xServerNum);
+            }
+            if (!successful)
+            {
+                xServerNum++;
+            }
+        }
+    }
+
+    public static void stopXServer()
+    {
+        if (xServer != null)
+        {
+            xServer.destroy();
+        }
     }
 }
