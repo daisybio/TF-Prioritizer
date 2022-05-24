@@ -67,6 +67,7 @@ public class TranscriptionFactorGroup
 
     private void collectTargetGenes()
     {
+        logger.debug("Collecting target genes for group: " + name);
         for (Map.Entry<String, Set<String>> entry : TFPRIO.groupCombinationsToHms.entrySet())
         {
             String groupCombination = entry.getKey();
@@ -117,6 +118,7 @@ public class TranscriptionFactorGroup
 
     private void collectValidationFiles()
     {
+        logger.debug("Collecting validation files for group: " + name);
         File d_validation = extend(d_tfData, "validation");
 
         {
@@ -264,6 +266,7 @@ public class TranscriptionFactorGroup
 
     private void collectDistributionFiles()
     {
+        logger.debug("Collecting distribution files for group: " + name);
         {
             File d_source = TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_hm.get();
 
