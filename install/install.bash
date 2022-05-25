@@ -142,6 +142,8 @@ else
     unzip IGV_2.13.0.zip -d /srv/dependencies
     mv /srv/dependencies/IGV_2.13.0 /srv/dependencies/igv
   fi
+  mkdir -p "$HOME"/igv/ && touch "$HOME"/igv/prefs.properties
+  echo "PORT_ENABLED=false" > "$HOME"/igv/prefs.properties
   rm IGV_2.13.0.zip
 fi
 
