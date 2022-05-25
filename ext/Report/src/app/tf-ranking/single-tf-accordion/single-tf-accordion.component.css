@@ -1,0 +1,6 @@
+.data {
+  background-color: var(--data-background);
+  padding: 10px;
+  border-radius: 8px;
+  margin: 2px;
+}
