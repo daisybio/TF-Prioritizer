@@ -138,12 +138,18 @@ else
   wget https://data.broadinstitute.org/igv/projects/downloads/2.13/IGV_2.13.0.zip
   if ! $docker ; then
     unzip IGV_2.13.0.zip -d "$HOME/.igv"
+    igv_dir=$HOME/igv
   else
     unzip IGV_2.13.0.zip -d /srv/dependencies
     mv /srv/dependencies/IGV_2.13.0 /srv/dependencies/igv
+    igv_dir=/home/docker/igv
   fi
-  mkdir -p "$HOME"/igv/ && touch "$HOME"/igv/prefs.properties
-  echo "PORT_ENABLED=false" > "$HOME"/igv/prefs.properties
+  mkdir -p $igv_dir && touch $igv_dir/prefs.properties && echo "PORT_ENABLED=false" > $igv_dir/prefs.properties
+
+  if $docker ; then
+    chown -R docker:docker $igv_dir
+  fi
+
   rm IGV_2.13.0.zip
 fi
 
