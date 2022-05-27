@@ -8,10 +8,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
 import static util.ScriptExecution.execute;
-import static util.ScriptExecution.executeAndWait;
 
 /**
  * Allows generation and headless execution of igv batch files.
@@ -77,10 +77,39 @@ public class IGV_Headless
 
         String command =
                 TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh -b " + batchFile.getAbsolutePath();
-        executeAndWait(command, logger, new HashMap<>()
-        {{
-            put("DISPLAY", ":" + xServerNum);
-        }}, true);
+
+        boolean worked = false;
+        int attempt = 0;
+
+        while (!worked)
+        {
+            try
+            {
+                Process igv = execute(command, logger, new HashMap<>()
+                {{
+                    put("DISPLAY", ":" + xServerNum);
+                }}, true);
+
+                boolean returnValue = igv.waitFor(5, TimeUnit.MINUTES);
+                if (returnValue)
+                {
+                    worked = true;
+                } else
+                {
+                    logger.warn("IGV did not work on attempt #" + (attempt + 1));
+                    attempt++;
+                    igv.destroy();
+                    logger.debug("Destroyed igv process.");
+                    if (attempt >= 10)
+                    {
+                        logger.error("Exiting since igv did not work.");
+                    }
+                }
+            } catch (InterruptedException e)
+            {
+                logger.error(e.getMessage());
+            }
+        }
     }
 
     /**
