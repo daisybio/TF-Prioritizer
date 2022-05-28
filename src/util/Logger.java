@@ -176,6 +176,6 @@ public class Logger
      */
     public void progress(String message)
     {
-        System.out.print(LogLevel.PROG.color + getLine(message, LogLevel.PROG) + TerminalColors.DEFAULT.code + "\r");
+        //System.out.print(LogLevel.PROG.color + getLine(message, LogLevel.PROG) + TerminalColors.DEFAULT.code + "\r");
     }
 }

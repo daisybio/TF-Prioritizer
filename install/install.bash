@@ -135,14 +135,22 @@ fi
 if [ -d "$HOME/.igv" ]; then
   echo "IGV already installed."
 else
-  wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.2.zip
+  wget https://data.broadinstitute.org/igv/projects/downloads/2.11/IGV_2.11.0.zip
   if ! $docker ; then
-    unzip IGV_2.11.2.zip -d "$HOME/.igv"
+    unzip IGV_2.11.0.zip -d "$HOME/.igv"
+    igv_dir=$HOME/igv
   else
-    unzip IGV_2.11.2.zip -d /srv/dependencies
-    mv /srv/dependencies/IGV_2.11.2 /srv/dependencies/igv
+    unzip IGV_2.11.0.zip -d /srv/dependencies
+    mv /srv/dependencies/IGV_2.11.0 /srv/dependencies/igv
+    igv_dir=/home/docker/igv
   fi
-  rm IGV_2.11.2.zip
+  mkdir -p $igv_dir && touch $igv_dir/prefs.properties && echo "PORT_ENABLED=false" > $igv_dir/prefs.properties
+
+  if $docker ; then
+    chown -R docker:docker $igv_dir
+  fi
+
+  rm IGV_2.11.0.zip
 fi
 
 if ! $docker ; then

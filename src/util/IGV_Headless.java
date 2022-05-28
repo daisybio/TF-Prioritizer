@@ -6,10 +6,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
-import static util.ScriptExecution.executeAndWait;
+import static util.ScriptExecution.execute;
 
 /**
  * Allows generation and headless execution of igv batch files.
@@ -19,6 +21,9 @@ public class IGV_Headless
     private final StringBuilder commandBuilder = new StringBuilder();
     private final String name;
     private final Logger logger;
+
+    private static Integer xServerNum = null;
+    private static Process xServer = null;
 
     /**
      * Create a new class instance.
@@ -62,6 +67,8 @@ public class IGV_Headless
      */
     public void run(File workingDirectory)
     {
+        startXServer(logger);
+
         addCommand("exit");
 
         File batchFile = extend(workingDirectory, name + ".bat");
@@ -69,10 +76,40 @@ public class IGV_Headless
         save(batchFile);
 
         String command =
-                "xvfb-run -n 1 -a " + TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh" + " -b " +
-                        batchFile.getAbsolutePath();
+                TFPRIO.configs.igv.pathToIGV.get().getAbsolutePath() + "/igv.sh -b " + batchFile.getAbsolutePath();
 
-        executeAndWait(command, logger);
+        boolean worked = false;
+        int attempt = 0;
+
+        while (!worked)
+        {
+            try
+            {
+                Process igv = execute(command, logger, new HashMap<>()
+                {{
+                    put("DISPLAY", ":" + xServerNum);
+                }}, true);
+
+                boolean returnValue = igv.waitFor(5, TimeUnit.MINUTES);
+                if (returnValue)
+                {
+                    worked = true;
+                } else
+                {
+                    logger.warn("IGV did not work on attempt #" + (attempt + 1));
+                    attempt++;
+                    igv.destroy();
+                    logger.debug("Destroyed igv process.");
+                    if (attempt >= 10)
+                    {
+                        logger.error("Exiting since igv did not work.");
+                    }
+                }
+            } catch (InterruptedException e)
+            {
+                logger.error(e.getMessage());
+            }
+        }
     }
 
     /**
@@ -85,7 +122,10 @@ public class IGV_Headless
     {
         addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
 
-        addCommand(String.join("\nload ", loadFiles));
+        for (String loadFile : loadFiles)
+        {
+            addCommand("load " + loadFile);
+        }
 
         //remodel tdf files if available
 
@@ -123,5 +163,29 @@ public class IGV_Headless
         }
         makeSureFileExists(f_session, logger);
         addCommand("saveSession " + f_session.getAbsolutePath());
+    }
+
+    private static synchronized void startXServer(Logger logger)
+    {
+        if (xServer == null)
+        {
+            xServerNum = 20;
+            boolean successful = false;
+
+            while (!successful)
+            {
+                xServer = execute("Xvfb :" + xServerNum + " -screen 1 1920x1080x16", logger);
+                successful = true;
+                logger.info("Started XServer with ID: " + xServerNum);
+            }
+        }
+    }
+
+    public static void stopXServer()
+    {
+        if (xServer != null)
+        {
+            xServer.destroy();
+        }
     }
 }

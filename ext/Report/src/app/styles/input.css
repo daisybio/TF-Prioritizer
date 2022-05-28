@@ -1,0 +1,15 @@
+::placeholder { /* Everything that is not from microsoft */
+  color: var(--standard-text);
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: var(--standard-text);
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: var(--standard-text);
+}
+
+input:focus {
+  outline: none;
+}

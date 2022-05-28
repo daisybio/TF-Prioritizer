@@ -5,6 +5,7 @@ import tfprio.tfprio.TFPRIO;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ScriptExecution
@@ -17,7 +18,7 @@ public class ScriptExecution
 
     public static void executeAndWait(List<String> command, Logger logger)
     {
-        Process process = execute(command, logger, false);
+        Process process = execute(command, logger, new HashMap<>(), false);
         waitFor(process, logger, command);
     }
 
@@ -47,12 +48,24 @@ public class ScriptExecution
 
     public static void executeAndWait(String command, Logger logger)
     {
-        executeAndWait(command, logger, false);
+        executeAndWait(command, logger, new HashMap<>(), false);
     }
+
+    public static void executeAndWait(String command, Logger logger, HashMap<String, String> environment)
+    {
+        executeAndWait(command, logger, environment, false);
+    }
+
 
     public static void executeAndWait(String command, Logger logger, boolean redirectOutput)
     {
-        Process process = execute(command, logger, redirectOutput);
+        executeAndWait(command, logger, new HashMap<>(), redirectOutput);
+    }
+
+    public static void executeAndWait(String command, Logger logger, HashMap<String, String> environment,
+                                      boolean redirectOutput)
+    {
+        Process process = execute(command, logger, environment, redirectOutput);
         int returnCode = waitFor(process, logger, new ArrayList<>(List.of(command)));
 
         if (returnCode != 0)
@@ -134,31 +147,47 @@ public class ScriptExecution
 
     public static Process execute(String command, Logger logger)
     {
-        return execute(command, logger, false);
+        return execute(command, logger, new HashMap<>(), false);
     }
 
     public static Process execute(String command, Logger logger, boolean redirectOutput)
     {
-        Process process = executeProcessBuilder(new ProcessBuilder(command.split(" ")), logger, redirectOutput);
+        return execute(command, logger, new HashMap<>(), redirectOutput);
+    }
+
+    public static Process execute(String command, Logger logger, HashMap<String, String> environment,
+                                  boolean redirectOutput)
+    {
+        ProcessBuilder builder = new ProcessBuilder(command.split(" "));
+        setEnvironment(builder, environment);
+        Process process = executeProcessBuilder(builder, logger, redirectOutput);
         assert process != null;
         return process;
     }
 
-    public static Process execute(List<String> command, Logger logger, boolean redirectOutput)
+    public static Process execute(List<String> command, Logger logger, HashMap<String, String> environment,
+                                  boolean redirectOutput)
     {
-        Process process = executeProcessBuilder(new ProcessBuilder(command), logger, redirectOutput);
+        ProcessBuilder builder = new ProcessBuilder(command);
+        setEnvironment(builder, environment);
+        Process process = executeProcessBuilder(builder, logger, redirectOutput);
         assert process != null;
         return process;
     }
 
     public static Process execute(List<String> command, Logger logger)
     {
-        return execute(command, logger, false);
+        return execute(command, logger, new HashMap<>(), false);
     }
 
     public static Process execute(File file, Logger logger)
     {
         List<String> command = getExecutionCommand(file);
         return execute(command, logger);
+    }
+
+    private static void setEnvironment(ProcessBuilder builder, HashMap<String, String> environment)
+    {
+        builder.environment().putAll(environment);
     }
 }

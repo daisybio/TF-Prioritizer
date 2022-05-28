@@ -56,14 +56,18 @@ public class TranscriptionFactorGroup
 
     public void collectData()
     {
+        logger.debug("Collecting data for group: " + name);
         transcriptionFactors.forEach(TranscriptionFactor::collectData);
+        logger.debug("Collecting general data for group: " + name);
         collectTargetGenes();
         collectValidationFiles();
         collectDistributionFiles();
+        logger.debug("Finished collecting data for group: " + name);
     }
 
     private void collectTargetGenes()
     {
+        logger.debug("Collecting target genes for group: " + name);
         for (Map.Entry<String, Set<String>> entry : TFPRIO.groupCombinationsToHms.entrySet())
         {
             String groupCombination = entry.getKey();
@@ -73,40 +77,44 @@ public class TranscriptionFactorGroup
                 File f_input = extend(TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps.get(), name, hm,
                         groupCombination + ".csv");
 
-                Integer c_geneID = null, c_geneSymbol = null;
-
-                try (BufferedReader reader = new BufferedReader(new FileReader(f_input)))
+                if (f_input.canRead())
                 {
-                    String[] headerSplit = reader.readLine().split(",");
+                    Integer c_geneID = null, c_geneSymbol = null;
 
-                    for (int i = 0; i < headerSplit.length; i++)
+                    try (BufferedReader reader = new BufferedReader(new FileReader(f_input)))
                     {
-                        if (headerSplit[i].equals("\"Geneid\""))
+                        String[] headerSplit = reader.readLine().split(",");
+
+                        for (int i = 0; i < headerSplit.length; i++)
                         {
-                            c_geneID = i;
-                        } else if (headerSplit[i].equals("\"geneSymbol\""))
-                        {
-                            c_geneSymbol = i;
+                            if (headerSplit[i].equals("\"Geneid\""))
+                            {
+                                c_geneID = i;
+                            } else if (headerSplit[i].equals("\"geneSymbol\""))
+                            {
+                                c_geneSymbol = i;
+                            }
                         }
-                    }
 
-                    if (c_geneID == null || c_geneSymbol == null)
-                    {
-                        logger.error("Could not find geneID or geneSymbol column in file " + f_input.getAbsolutePath());
-                    } else
-                    {
-                        String inputLine;
-
-                        while ((inputLine = reader.readLine()) != null)
+                        if (c_geneID == null || c_geneSymbol == null)
                         {
-                            String[] split = inputLine.split(",");
-                            targetGenes.add(new TargetGene(split[c_geneID].replace("\"", ""),
-                                    split[c_geneSymbol].replace("\"", "")));
+                            logger.error(
+                                    "Could not find geneID or geneSymbol column in file " + f_input.getAbsolutePath());
+                        } else
+                        {
+                            String inputLine;
+
+                            while ((inputLine = reader.readLine()) != null)
+                            {
+                                String[] split = inputLine.split(",");
+                                targetGenes.add(new TargetGene(split[c_geneID].replace("\"", ""),
+                                        split[c_geneSymbol].replace("\"", "")));
+                            }
                         }
+                    } catch (IOException e)
+                    {
+                        logger.error(e.getMessage());
                     }
-                } catch (IOException e)
-                {
-                    logger.error(e.getMessage());
                 }
             }
         }
@@ -114,12 +122,12 @@ public class TranscriptionFactorGroup
 
     private void collectValidationFiles()
     {
+        logger.debug("Collecting validation files for group: " + name);
         File d_validation = extend(d_tfData, "validation");
 
         {
             Map<String, Map<String, Map<String, File>>> hm_groupPairing_filetype_file = new HashMap<>();
             File d_input = extend(TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps.get(), name);
-
             for (String hm : TFPRIO.existingHms)
             {
                 hm_groupPairing_filetype_file.put(hm, new HashMap<>());
@@ -255,6 +263,7 @@ public class TranscriptionFactorGroup
 
     private void collectDistributionFiles()
     {
+        logger.debug("Collecting distribution files for group: " + name);
         {
             File d_source = TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_hm.get();
 

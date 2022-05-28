@@ -1,0 +1,10 @@
+<accordion-header [title]="title" [sub]="false"
+                  (click)="visible=!visible"></accordion-header>
+
+<div class="sub-panel" [ngClass]="{'visible': visible}">
+
+  <cross-links *ngIf="showAnalysisLinks" [tfGroup]="tfGroup" [exclude]="'geneCards'"></cross-links>
+
+  <single-tf-accordion *ngFor="let singleTf of tfGroup.transcriptionFactors" [transcriptionFactor]="singleTf"
+                       [hasSibling]="tfGroup.transcriptionFactors.length>1"></single-tf-accordion>
+</div>
