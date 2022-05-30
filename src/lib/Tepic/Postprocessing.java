@@ -25,7 +25,7 @@ public class Postprocessing extends ExecutableStep
     private final GeneratedFileStructure d_output = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
 
     private final GeneratedFileStructure d_postprocessing_trap_predicted_beds =
-            TFPRIO.configs.tepic.fileStructure.d_postprocessing_trap_predicted_beds;
+            TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
     private final GeneratedFileStructure f_output_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
 
     private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;

@@ -8,11 +8,13 @@ import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
 import util.IGV_Headless;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
-import static lib.Igv.Helpers.getGeneCoordinates;
-import static lib.Igv.Helpers.getInputFiles;
+import static lib.Igv.Helpers.*;
 import static util.FileManagement.extend;
 
 public class DcgTargetGenes extends ExecutableStep
@@ -22,6 +24,8 @@ public class DcgTargetGenes extends ExecutableStep
     private final AbstractConfig<File> d_input_heatmaps = TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps;
     private AbstractConfig<File> d_input_tepic;
     private final AbstractConfig<File> d_input_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
+    private final AbstractConfig<File> d_input_bedFiles =
+            TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
 
     private final GeneratedFileStructure d_output = TFPRIO.configs.igv.fileStructure.d_igvDcgTargetGenes;
 
@@ -38,7 +42,7 @@ public class DcgTargetGenes extends ExecutableStep
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
-        return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_heatmaps, d_input_tepic))
+        return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_heatmaps, d_input_tepic, d_input_peakFiles))
         {{
             if (TFPRIO.configs.igv.enhancerDatabases.isSet())
             {
@@ -128,6 +132,8 @@ public class DcgTargetGenes extends ExecutableStep
                         List<String> loadFiles =
                                 getInputFiles(List.of(groupsSplit), includePredictionData, d_input_tepic,
                                         pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdf_files);
+
+                        addBedFiles(loadFiles, List.of(groupsSplit), List.of(hm), d_input_bedFiles);
 
                         File f_save_session = extend(d_output_groupPairing, s_session.get());
 

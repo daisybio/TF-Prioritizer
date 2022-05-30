@@ -70,10 +70,8 @@ public class Helpers
             //include predictive HMs
             if (includePredictionData.isSet() && includePredictionData.get().size() > 0)
             {
-                for (Object includingHmObject : includePredictionData.get())
+                for (String includingHm : includePredictionData.get())
                 {
-                    String includingHm = (String) includingHmObject;
-
                     File d_input = extend(d_input_tepic.get(), group, includingHm);
 
                     if (d_input.exists())
@@ -139,5 +137,26 @@ public class Helpers
             }
         }
         return loadFiles;
+    }
+
+    static void addBedFiles(List<String> loadFiles, Iterable<String> groups, Iterable<String> hms,
+                            AbstractConfig<File> d_bedFiles)
+    {
+        for (String group : groups)
+        {
+            for (String hm : hms)
+            {
+                File d_groupHm = extend(d_bedFiles.get(), group, hm);
+                if (!d_groupHm.exists())
+                {
+                    continue;
+                }
+
+                for (File f_bedFile : Objects.requireNonNull(d_groupHm.listFiles(Filters.fileFilter)))
+                {
+                    loadFiles.add(f_bedFile.getAbsolutePath());
+                }
+            }
+        }
     }
 }
