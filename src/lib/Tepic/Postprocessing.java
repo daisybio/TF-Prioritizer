@@ -124,28 +124,8 @@ public class Postprocessing extends ExecutableStep
         //generate output structure for d_postprocessing_trap_predicted_beds and create bed files for predicted regions
         for (String group : TFPRIO.groupsToHms.keySet())
         {
-            File directory_group = extend(d_postprocessing_trap_predicted_beds.get(), group);
-
-            try
-            {
-                makeSureDirectoryExists(directory_group);
-            } catch (IOException e)
-            {
-                logger.error(e.getMessage());
-            }
-
             for (String hm : TFPRIO.groupsToHms.get(group))
             {
-                File directory_group_hm = extend(directory_group, hm);
-
-                try
-                {
-                    makeSureDirectoryExists(directory_group_hm);
-                } catch (IOException e)
-                {
-                    logger.error(e.getMessage());
-                }
-
                 //get important inputs
                 File d_input_groupHm = extend(d_input.get(), group, hm);
 
@@ -259,8 +239,10 @@ public class Postprocessing extends ExecutableStep
                         }
                     }
 
-                    try (BufferedWriter bw = new BufferedWriter(
-                            new FileWriter(extend(directory_group_hm, tf + ".csv"))))
+                    File f_target = extend(d_postprocessing_trap_predicted_beds.get(), group, hm, tf + ".csv");
+                    makeSureFileExists(f_target, logger);
+
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(f_target)))
                     {
                         bw.write(sb.toString());
                     } catch (IOException e)
