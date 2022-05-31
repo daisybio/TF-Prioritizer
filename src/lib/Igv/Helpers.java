@@ -63,7 +63,7 @@ public class Helpers
                                       AbstractConfig<File> pathToTdf, AbstractConfig<File> d_input_peakFiles,
                                       List<File> tdfFiles)
     {
-        List<String> loadFiles = new ArrayList<>();
+        Set<String> loadFiles = new HashSet<>();
 
         for (String group : groups)
         {
@@ -136,7 +136,7 @@ public class Helpers
                 }
             }
         }
-        return loadFiles;
+        return new ArrayList<>(loadFiles);
     }
 
     static void addBedFiles(List<String> loadFiles, Iterable<String> groups, Iterable<String> hms,
