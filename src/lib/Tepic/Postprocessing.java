@@ -239,7 +239,7 @@ public class Postprocessing extends ExecutableStep
                         }
                     }
 
-                    File f_target = extend(d_postprocessing_trap_predicted_beds.get(), group, hm, tf + ".csv");
+                    File f_target = extend(d_postprocessing_trap_predicted_beds.get(), group, hm, tf + ".bed");
                     makeSureFileExists(f_target, logger);
 
                     try (BufferedWriter bw = new BufferedWriter(new FileWriter(f_target)))
