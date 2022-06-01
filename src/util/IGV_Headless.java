@@ -225,7 +225,10 @@ public class IGV_Headless
                     {
                         String[] split = line_mergedDB.split("\t");
 
-                        addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
+                        if (split[4].equals(TFPRIO.configs.igv.speciesReferenceGenome.get()))
+                        {
+                            addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
+                        }
                     }
                 } catch (IOException e)
                 {

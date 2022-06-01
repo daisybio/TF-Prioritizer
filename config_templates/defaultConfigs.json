@@ -122,7 +122,9 @@
       "STAT5",
       "WAP"
     ],
-    "enhancerDatabases": null,
+    "enhancerDatabases": [
+      "ENdb"
+    ],
     "grcSynonymDict": {
       "GRCm39": "mm39",
       "GRCm38": "mm10",
