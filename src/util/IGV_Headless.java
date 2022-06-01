@@ -7,7 +7,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static util.FileManagement.*;
@@ -120,20 +122,28 @@ public class IGV_Headless
      */
     public void createSession(List<String> loadFiles, List<File> tdfFiles, File f_session)
     {
+        addCommand("maxPanelHeight 3000");
         addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
+        Set<String> nonTdfFiles = new HashSet<>();
 
         for (String loadFile : loadFiles)
         {
-            addCommand("load " + loadFile);
+            if (loadFile.endsWith(".tdf"))
+            {
+                addCommand("load " + loadFile);
+                File f_tdf = new File(loadFile);
+                addCommand("setLogScale true " + f_tdf.getName());
+                addCommand("setDataRange auto " + f_tdf.getName());
+                addCommand("setTrackHeight " + f_tdf.getName() + " 60");
+            } else
+            {
+                nonTdfFiles.add(loadFile);
+            }
         }
 
-        //remodel tdf files if available
-
-        for (File f_tdf : tdfFiles)
+        for (String entry : nonTdfFiles)
         {
-            addCommand("setLogScale true " + f_tdf.getName());
-            addCommand("setDataRange auto " + f_tdf.getName());
-            addCommand("setTrackHeight " + f_tdf.getName() + " 60");
+            addCommand("load " + entry);
         }
 
         //include enhancer regions of interest if available
@@ -174,7 +184,8 @@ public class IGV_Headless
 
             while (!successful)
             {
-                xServer = execute("Xvfb :" + xServerNum + " -screen 1 4000x2000x16", logger);
+                xServerNum++;
+                xServer = execute("Xvfb :" + xServerNum + " -screen 0 4000x4000x16", logger);
                 successful = true;
                 logger.info("Started XServer with ID: " + xServerNum);
             }
