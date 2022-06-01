@@ -121,18 +121,20 @@ public class Helpers
 
         if (d_input_peakFiles.get().exists())
         {
+            Set<String> addedFiles = new HashSet<>();
             for (File d_input_tf : Objects.requireNonNull(d_input_peakFiles.get().listFiles(Filters.directoryFilter)))
             {
                 for (File f_input : Objects.requireNonNull(d_input_tf.listFiles(Filters.fileFilter)))
                 {
                     String file_name = f_input.getName();
 
-                    if (file_name.endsWith("idx") || file_name.endsWith("bam"))
+                    if (file_name.endsWith("idx") || file_name.endsWith("bam") || addedFiles.contains(file_name))
                     {
                         continue;
                     }
 
                     loadFiles.add(f_input.getAbsolutePath());
+                    addedFiles.add(file_name);
                 }
             }
         }
