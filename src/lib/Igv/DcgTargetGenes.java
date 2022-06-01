@@ -133,7 +133,7 @@ public class DcgTargetGenes extends ExecutableStep
                                 getInputFiles(List.of(groupsSplit), includePredictionData, d_input_tepic,
                                         pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdf_files);
 
-                        addBedFiles(loadFiles, List.of(groupsSplit), List.of(hm), d_input_bedFiles);
+                        addBedFiles(loadFiles, List.of(groupsSplit), List.of(hm), List.of(tfSymbol), d_input_bedFiles);
 
                         File f_save_session = extend(d_output_groupPairing, s_session.get());
 

@@ -140,7 +140,7 @@ public class Helpers
     }
 
     static void addBedFiles(List<String> loadFiles, Iterable<String> groups, Iterable<String> hms,
-                            AbstractConfig<File> d_bedFiles)
+                            Iterable<String> tfSymbols, AbstractConfig<File> d_bedFiles)
     {
         for (String group : groups)
         {
@@ -154,7 +154,13 @@ public class Helpers
 
                 for (File f_bedFile : Objects.requireNonNull(d_groupHm.listFiles(Filters.fileFilter)))
                 {
-                    loadFiles.add(f_bedFile.getAbsolutePath());
+                    for (String tfSymbol : tfSymbols)
+                    {
+                        if (f_bedFile.getName().toUpperCase().contains(tfSymbol.toUpperCase()))
+                        {
+                            loadFiles.add(f_bedFile.getAbsolutePath());
+                        }
+                    }
                 }
             }
         }

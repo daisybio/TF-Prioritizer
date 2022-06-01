@@ -138,7 +138,8 @@ public class TopLog2FC extends ExecutableStep
                 List<String> loadFiles =
                         getInputFiles(List.of(groupPairing.split("_")), includePredictionData, d_input_tepic,
                                 pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdfFiles);
-                addBedFiles(loadFiles, List.of(groupPairing.split("_")), TFPRIO.existingHms, d_input_bedFiles);
+                addBedFiles(loadFiles, List.of(groupPairing.split("_")), TFPRIO.existingHms, new ArrayList<>(),
+                        d_input_bedFiles);
 
                 for (String suffix : Arrays.asList(s_downregulated.get(), s_upregulated.get()))
                 {

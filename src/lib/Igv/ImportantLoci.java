@@ -99,7 +99,7 @@ public class ImportantLoci extends ExecutableStep
                 List<String> loadFiles =
                         getInputFiles(List.of(group), includePredictionData, d_input_tepic, pathToTfChipSeq, pathToTdf,
                                 d_input_peakFiles, tdfFiles);
-                addBedFiles(loadFiles, List.of(group), TFPRIO.existingHms, d_input_bedFiles);
+                addBedFiles(loadFiles, List.of(group), TFPRIO.existingHms, importantLoci.get(), d_input_bedFiles);
 
                 File f_save_session = extend(d_output_group, s_session.get());
 
