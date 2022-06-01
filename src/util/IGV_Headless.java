@@ -146,14 +146,12 @@ public class IGV_Headless
                         .append(f_session.getParentFile().toPath().relativize(loadFile.toPath())).append("\" ")
                         .append("type=\"").append(extension.toLowerCase()).append("\"/>\n");
 
-                switch (extension)
+                if ("tdf".equals(extension))
                 {
-                    case "tdf":
-                        tdfFiles.add(loadFile);
-                        break;
-                    case "bed":
-                        otherFiles.add(loadFile);
-                        break;
+                    tdfFiles.add(loadFile);
+                } else
+                {
+                    otherFiles.add(loadFile);
                 }
             } else
             {
@@ -186,11 +184,23 @@ public class IGV_Headless
 
         for (File file : otherFiles)
         {
+            String name = file.getName();
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+            {
+                String firstLine = reader.readLine();
+                if (firstLine.startsWith("track name="))
+                {
+                    name = firstLine.substring(firstLine.indexOf("\"") + 1, firstLine.lastIndexOf("\""));
+                }
+            } catch (IOException ignore)
+            {
+            }
+
             sb_session.append("\t\t<Track attributeKey=\"").append(file.getName())
                     .append("\" autoScale=\"true\" clazz=\"org")
                     .append(".broad.igv.track.FeatureTrack\" fontSize=\"10\" height=\"40\" id=\"")
-                    .append(file.getAbsolutePath()).append("\" name=\"").append(file.getName())
-                    .append("\" visible=\"true\"/>\n");
+                    .append(file.getAbsolutePath()).append("\" name=\"").append(name).append("\" visible=\"true\"/>\n");
         }
         sb_session.append("\t</Panel>\n");
         sb_session.append("</Session>");
