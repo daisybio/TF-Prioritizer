@@ -194,16 +194,13 @@ public class Workflow
 
         steps.add(new lib.Igv.DcgTargetGenes());
 
-
-        if (TFPRIO.configs.igv.importantLociAllPrioTf.isSet() && TFPRIO.configs.igv.importantLociAllPrioTf.isSet())
+        if (TFPRIO.configs.igv.importantLociAllPrioTf.isSet())
         {
             steps.add(new lib.Igv.ImportantLoci());
         } else
         {
             ExecutableStep notExecutedStep = new lib.Igv.ImportantLoci();
-            notExecutedStep.setNoExecutionReason(
-                    TFPRIO.configs.igv.importantLociAllPrioTf.getName() + " is not set or " +
-                            TFPRIO.configs.igv.importantLociAllPrioTf.getName() + " is not set");
+            notExecutedStep.setNoExecutionReason(TFPRIO.configs.igv.importantLociAllPrioTf.getName() + " is not set.");
             notExecutedSteps.add(notExecutedStep);
         }
         if (TFPRIO.configs.igv.topLog2fc.isSet())

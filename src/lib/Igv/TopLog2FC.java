@@ -14,8 +14,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-import static lib.Igv.Helpers.getGeneCoordinates;
-import static lib.Igv.Helpers.getInputFiles;
+import static lib.Igv.Helpers.*;
 import static tfprio.tfprio.Workflow.getLatestInputDirectory;
 import static util.FileManagement.extend;
 
@@ -26,6 +25,8 @@ public class TopLog2FC extends ExecutableStep
     private final AbstractConfig<File> d_input_deseq2 = TFPRIO.configs.deSeq2.fileStructure.d_output;
     private AbstractConfig<File> d_input_tepic;
     private final AbstractConfig<File> d_input_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
+    private final AbstractConfig<File> d_input_bedFiles =
+            TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
 
     private final GeneratedFileStructure d_output = TFPRIO.configs.igv.fileStructure.d_igvTopLog2fc;
 
@@ -44,7 +45,8 @@ public class TopLog2FC extends ExecutableStep
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
-        return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_deseq2, d_input_tepic, d_input_peakFiles));
+        return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_deseq2, d_input_tepic, d_input_peakFiles,
+                d_input_peakFiles));
     }
 
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
@@ -133,9 +135,11 @@ public class TopLog2FC extends ExecutableStep
                 File f_save_session = extend(d_output.get(), groupPairing, s_session.get());
                 ArrayList<File> tdfFiles = new ArrayList<>();
 
-                List<String> loadFiles =
+                List<File> loadFiles =
                         getInputFiles(List.of(groupPairing.split("_")), includePredictionData, d_input_tepic,
-                                pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdfFiles);
+                                pathToTfChipSeq, pathToTdf, d_input_peakFiles);
+                addBedFiles(loadFiles, List.of(groupPairing.split("_")), TFPRIO.existingHms, new ArrayList<>(),
+                        d_input_bedFiles);
 
                 for (String suffix : Arrays.asList(s_downregulated.get(), s_upregulated.get()))
                 {
@@ -160,7 +164,7 @@ public class TopLog2FC extends ExecutableStep
                     }
 
                     IGV_Headless igv = new IGV_Headless(groupPairing + "-" + suffix, logger);
-                    igv.createSession(loadFiles, tdfFiles, f_save_session);
+                    igv.createSession(loadFiles, f_save_session);
 
                     igv.addCommand("snapshotDirectory " + d_output_mode.getAbsolutePath());
 

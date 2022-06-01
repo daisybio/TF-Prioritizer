@@ -10,8 +10,7 @@ import util.IGV_Headless;
 import java.io.File;
 import java.util.*;
 
-import static lib.Igv.Helpers.getGeneCoordinates;
-import static lib.Igv.Helpers.getInputFiles;
+import static lib.Igv.Helpers.*;
 import static tfprio.tfprio.Workflow.getLatestInputDirectory;
 import static util.FileManagement.extend;
 
@@ -23,6 +22,8 @@ public class ImportantLoci extends ExecutableStep
     private final AbstractConfig<File> d_input_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
     private final AbstractConfig<File> d_input_dcg =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_dcg_targetGenes;
+    private final AbstractConfig<File> d_input_bedFiles =
+            TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
 
     private final GeneratedFileStructure d_output = TFPRIO.configs.igv.fileStructure.d_importantLoci;
 
@@ -36,7 +37,8 @@ public class ImportantLoci extends ExecutableStep
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
-        return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_tepic, d_input_peakFiles, d_input_dcg));
+        return new HashSet<>(Arrays.asList(f_input_geneCoordinates, d_input_tepic, d_input_peakFiles, d_input_dcg,
+                d_input_peakFiles));
     }
 
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
@@ -67,9 +69,8 @@ public class ImportantLoci extends ExecutableStep
         ArrayList<String> remove_from_important_loci = new ArrayList<>();
 
         //check if symbol is available, if not check if similar one is there
-        for (Object locusObject : importantLoci.get())
+        for (String locus : importantLoci.get())
         {
-            String locus = (String) locusObject;
             if (!gene_coordinates.containsKey(locus))
             {
                 for (String loci : gene_coordinates.keySet())
@@ -92,23 +93,21 @@ public class ImportantLoci extends ExecutableStep
                 String group = d_group.getName();
 
                 File d_output_group = extend(d_output.get(), group);
-
-                List<File> tdfFiles = new ArrayList<>();
-
-                List<String> loadFiles =
+                
+                List<File> loadFiles =
                         getInputFiles(List.of(group), includePredictionData, d_input_tepic, pathToTfChipSeq, pathToTdf,
-                                d_input_peakFiles, tdfFiles);
+                                d_input_peakFiles);
+                addBedFiles(loadFiles, List.of(group), TFPRIO.existingHms, importantLoci.get(), d_input_bedFiles);
+
                 File f_save_session = extend(d_output_group, s_session.get());
 
                 IGV_Headless igv = new IGV_Headless(group, logger);
-                igv.createSession(loadFiles, tdfFiles, f_save_session);
+                igv.createSession(loadFiles, f_save_session);
 
                 igv.addCommand("snapshotDirectory " + d_output_group.getAbsolutePath());
 
-                for (Object locusObject : importantLoci.get())
+                for (String locus : importantLoci.get())
                 {
-                    String locus = (String) locusObject;
-
                     if (!gene_coordinates.containsKey(locus))
                     {
                         continue;

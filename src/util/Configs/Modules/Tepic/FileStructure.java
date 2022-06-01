@@ -1,6 +1,8 @@
 package util.Configs.Modules.Tepic;
 
-import util.Configs.ConfigTypes.*;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InternalConfig;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
@@ -22,8 +24,8 @@ public class FileStructure extends AbstractModule
     public final GeneratedFileStructure d_postprocessing_input = extend(d_postprocessing, "input");
     public final GeneratedFileStructure d_postprocessing_output = extend(d_postprocessing, "output");
 
-    public final GeneratedFileStructure d_postprocessing_trap_predicted_beds = extend(d_postprocessing,
-            "trap_predicted_tf_bindings");
+    public final GeneratedFileStructure d_postprocessing_trapPredictedBeds =
+            extend(d_postprocessing, "trap_predicted_tf_bindings");
 
     public final InternalConfig<String> s_postprocessing_output_meanAffinitiesDir =
             new InternalConfig<>("Mean_Affinities");

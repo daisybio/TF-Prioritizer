@@ -25,7 +25,7 @@ public class Postprocessing extends ExecutableStep
     private final GeneratedFileStructure d_output = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
 
     private final GeneratedFileStructure d_postprocessing_trap_predicted_beds =
-            TFPRIO.configs.tepic.fileStructure.d_postprocessing_trap_predicted_beds;
+            TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
     private final GeneratedFileStructure f_output_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
 
     private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
@@ -124,28 +124,8 @@ public class Postprocessing extends ExecutableStep
         //generate output structure for d_postprocessing_trap_predicted_beds and create bed files for predicted regions
         for (String group : TFPRIO.groupsToHms.keySet())
         {
-            File directory_group = extend(d_postprocessing_trap_predicted_beds.get(), group);
-
-            try
-            {
-                makeSureDirectoryExists(directory_group);
-            } catch (IOException e)
-            {
-                logger.error(e.getMessage());
-            }
-
             for (String hm : TFPRIO.groupsToHms.get(group))
             {
-                File directory_group_hm = extend(directory_group, hm);
-
-                try
-                {
-                    makeSureDirectoryExists(directory_group_hm);
-                } catch (IOException e)
-                {
-                    logger.error(e.getMessage());
-                }
-
                 //get important inputs
                 File d_input_groupHm = extend(d_input.get(), group, hm);
 
@@ -238,7 +218,7 @@ public class Postprocessing extends ExecutableStep
                     StringBuilder sb = new StringBuilder();
                     sb.append("track name=\"");
                     sb.append(tf);
-                    sb.append("(@PREDICTED)\"\n");
+                    sb.append("(@PRED_").append(group).append(")\"\n");
 
                     Map<String, List<Region>> regions = tf_chrRegion.get(tf).getAllRegionsSorted();
 
@@ -259,8 +239,10 @@ public class Postprocessing extends ExecutableStep
                         }
                     }
 
-                    try (BufferedWriter bw = new BufferedWriter(
-                            new FileWriter(extend(directory_group_hm, tf + ".csv"))))
+                    File f_target = extend(d_postprocessing_trap_predicted_beds.get(), group, hm, tf + ".bed");
+                    makeSureFileExists(f_target, logger);
+
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(f_target)))
                     {
                         bw.write(sb.toString());
                     } catch (IOException e)

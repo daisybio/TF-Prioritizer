@@ -1,7 +1,7 @@
 package lib.Report;
 
-import tfprio.tfprio.TFPRIO;
 import org.json.JSONObject;
+import tfprio.tfprio.TFPRIO;
 import util.FileManagement;
 
 import java.io.File;
@@ -248,8 +248,9 @@ public class PageGenerators
         for (TranscriptionFactorGroup tfGroup : transcriptionFactorGroups)
         {
             String prettyName = tfGroup.getName().replace("..", "_");
-            sb_tfs.append("<div class='tf' id='" + prettyName + "'>");
-            sb_tfs.append("<script>var targetGenes" + prettyName + " = " + tfGroup.getTargetGenes() + "</script>");
+            sb_tfs.append("<div class='tf' id='").append(prettyName).append("'>");
+            sb_tfs.append("<script>var targetGenes").append(prettyName).append(" = ").append(tfGroup.getTargetGenes())
+                    .append("</script>");
 
             if (!tfGroup.realGroup)
             {
@@ -361,8 +362,6 @@ public class PageGenerators
     {
         File templateFile = TFPRIO.configs.report.inputStructure.f_validation.get();
 
-        File d_igv_screenshots = TFPRIO.configs.igv.fileStructure.d_root.get();
-
         File d_out_validation = TFPRIO.configs.report.outputStructure.d_validation.get();
 
         File d_heatmaps = TFPRIO.configs.distributionAnalysis.fileStructure.d_heatmaps.get();
@@ -383,10 +382,10 @@ public class PageGenerators
             JSONObject data = new JSONObject();
 
             {
-                for (File d_hm : source.listFiles())
+                for (File d_hm : Objects.requireNonNull(source.listFiles()))
                 {
                     JSONObject hmObject = new JSONObject();
-                    for (File f_groupPairing : d_hm.listFiles())
+                    for (File f_groupPairing : Objects.requireNonNull(d_hm.listFiles()))
                     {
                         if (f_groupPairing.getName().endsWith(".csv"))
                         {
@@ -639,12 +638,12 @@ public class PageGenerators
             {
                 Map<String, Set<String>> csvSetData = new HashMap<>();
 
-                for (File d_hm : target.listFiles())
+                for (File d_hm : Objects.requireNonNull(target.listFiles()))
                 {
                     csvSetData.put(d_hm.getName(), new HashSet<>());
-                    for (File d_groupPairing : d_hm.listFiles())
+                    for (File d_groupPairing : Objects.requireNonNull(d_hm.listFiles()))
                     {
-                        for (File f_targetGene : d_groupPairing.listFiles())
+                        for (File f_targetGene : Objects.requireNonNull(d_groupPairing.listFiles()))
                         {
                             String name = f_targetGene.getName();
                             if (name.endsWith(".png"))

@@ -1,10 +1,11 @@
 package util.Configs.Modules.DeSeq2;
 
-import util.Configs.ConfigTypes.*;
+import util.Configs.ConfigTypes.GeneratedFileStructure;
+import util.Configs.ConfigTypes.InternalConfig;
+import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import static util.FileManagement.extend;
@@ -27,10 +28,8 @@ public class FileStructure extends AbstractModule
     public final GeneratedFileStructure f_preprocessing_tpm_geneLengths =
             extend(d_preprocessing_tpm, "gene_lengths.tsv");
     public final GeneratedFileStructure d_preprocessing_tpm_scripts = extend(d_preprocessing_tpm, "01_scripts");
-    public final InternalConfig<String> s_preprocessing_tpm_scripts = new InternalConfig<>("_get_tpms.R");
     public final GeneratedFileStructure d_preprocessing_tpm_tpmResults = extend(d_preprocessing_tpm, "02_tpm_mappings");
     public final GeneratedFileStructure d_preprocessing_tpm_updated = extend(d_preprocessing_tpm, "03_tpm_updated");
-    public final InternalConfig<String> s_preprocessing_tpm_mappings = new InternalConfig<>("_tpms.csv");
 
     public final GeneratedFileStructure d_preprocessing_genePositions = extend(d_preprocessing, "gene_positions");
     public final GeneratedFileStructure f_preprocessing_genePositions_script =
@@ -58,7 +57,6 @@ public class FileStructure extends AbstractModule
     public final GeneratedFileStructure d_outputRaw = extend(workingDirectory, "02_B_DESeq2_output_raw");
     public final GeneratedFileStructure d_rScripts = extend(workingDirectory, "02_C_DESeq2_R_scripts");
     public final GeneratedFileStructure d_output = extend(workingDirectory, "02_D_DESeq2_output");
-    public final InternalConfig<String> s_output_dynamite = new InternalConfig<>("_DYNAMITE.tsv");
 
     public FileStructure(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
                          Logger logger)

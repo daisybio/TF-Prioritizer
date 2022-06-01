@@ -1,11 +1,10 @@
 package util.Configs.Modules.Igv;
 
+import util.Configs.ClassGetter;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputConfig;
 import util.Configs.ConfigTypes.InputFileStructure;
-import util.Configs.ClassGetter;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
-import util.Configs.ConfigValidators.IntegerRangeValidator;
 import util.Configs.ConfigValidators.ListNotEmptyValidator;
 import util.Configs.ConfigValidators.PositiveIntegerValidator;
 import util.Configs.Modules.AbstractModule;
@@ -15,13 +14,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
-import static util.FileManagement.extend;
-
 public class Igv extends AbstractModule
 {
     public FileStructure fileStructure;
 
-    public final InputFileStructure pathToIGV = extend(sourceDirectory, "igv");
+    public final InputFileStructure pathToIGV = new InputFileStructure();
     public final InputConfig<Integer> topLog2fc = new InputConfig<>(Integer.class, new PositiveIntegerValidator());
     public final InputConfig<Boolean> topLog2fcIncludeLncRnaPseudogenes = new InputConfig<>(Boolean.class);
     public final InputConfig<List<String>> includePredictionData = new InputConfig<>(ClassGetter.getStringList());

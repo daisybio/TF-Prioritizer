@@ -58,30 +58,24 @@ public class Helpers
         return geneCoordinates;
     }
 
-    static List<String> getInputFiles(Iterable<String> groups, AbstractConfig<List<String>> includePredictionData,
-                                      AbstractConfig<File> d_input_tepic, AbstractConfig<File> pathToTfChipSeq,
-                                      AbstractConfig<File> pathToTdf, AbstractConfig<File> d_input_peakFiles,
-                                      List<File> tdfFiles)
+    static List<File> getInputFiles(Iterable<String> groups, AbstractConfig<List<String>> includePredictionData,
+                                    AbstractConfig<File> d_input_tepic, AbstractConfig<File> pathToTfChipSeq,
+                                    AbstractConfig<File> pathToTdf, AbstractConfig<File> d_input_peakFiles)
     {
-        List<String> loadFiles = new ArrayList<>();
+        Set<File> loadFiles = new HashSet<>();
 
         for (String group : groups)
         {
             //include predictive HMs
             if (includePredictionData.isSet() && includePredictionData.get().size() > 0)
             {
-                for (Object includingHmObject : includePredictionData.get())
+                for (String includingHm : includePredictionData.get())
                 {
-                    String includingHm = (String) includingHmObject;
-
                     File d_input = extend(d_input_tepic.get(), group, includingHm);
 
                     if (d_input.exists())
                     {
-                        for (File f_input : Objects.requireNonNull(d_input.listFiles(Filters.fileFilter)))
-                        {
-                            loadFiles.add(f_input.getAbsolutePath());
-                        }
+                        loadFiles.addAll(Arrays.asList(Objects.requireNonNull(d_input.listFiles(Filters.fileFilter))));
                     }
                 }
             }
@@ -94,10 +88,8 @@ public class Helpers
                 {
                     for (File d_input_tf : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
                     {
-                        for (File f_input : Objects.requireNonNull(d_input_tf.listFiles(Filters.fileFilter)))
-                        {
-                            loadFiles.add(f_input.getAbsolutePath());
-                        }
+                        loadFiles.addAll(
+                                Arrays.asList(Objects.requireNonNull(d_input_tf.listFiles(Filters.fileFilter))));
                     }
                 }
             }
@@ -113,8 +105,7 @@ public class Helpers
                     {
                         for (File f_input : Objects.requireNonNull(d_input_hm.listFiles(Filters.fileFilter)))
                         {
-                            loadFiles.add(f_input.getAbsolutePath());
-                            tdfFiles.add(f_input);
+                            loadFiles.add(f_input);
                         }
                     }
                 }
@@ -123,21 +114,50 @@ public class Helpers
 
         if (d_input_peakFiles.get().exists())
         {
+            Set<String> addedFiles = new HashSet<>();
             for (File d_input_tf : Objects.requireNonNull(d_input_peakFiles.get().listFiles(Filters.directoryFilter)))
             {
                 for (File f_input : Objects.requireNonNull(d_input_tf.listFiles(Filters.fileFilter)))
                 {
                     String file_name = f_input.getName();
 
-                    if (file_name.endsWith("idx") || file_name.endsWith("bam"))
+                    if (file_name.endsWith("idx") || file_name.endsWith("bam") || addedFiles.contains(file_name))
                     {
                         continue;
                     }
 
-                    loadFiles.add(f_input.getAbsolutePath());
+                    loadFiles.add(f_input);
+                    addedFiles.add(file_name);
                 }
             }
         }
-        return loadFiles;
+        return new ArrayList<>(loadFiles);
+    }
+
+    static void addBedFiles(List<File> loadFiles, Iterable<String> groups, Iterable<String> hms,
+                            Iterable<String> tfSymbols, AbstractConfig<File> d_bedFiles)
+    {
+        for (String group : groups)
+        {
+            for (String hm : hms)
+            {
+                File d_groupHm = extend(d_bedFiles.get(), group, hm);
+                if (!d_groupHm.exists())
+                {
+                    continue;
+                }
+
+                for (File f_bedFile : Objects.requireNonNull(d_groupHm.listFiles(Filters.fileFilter)))
+                {
+                    for (String tfSymbol : tfSymbols)
+                    {
+                        if (f_bedFile.getName().toUpperCase().contains(tfSymbol.toUpperCase()))
+                        {
+                            loadFiles.add(f_bedFile);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
