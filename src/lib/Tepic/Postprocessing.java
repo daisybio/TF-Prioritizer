@@ -218,7 +218,7 @@ public class Postprocessing extends ExecutableStep
                     StringBuilder sb = new StringBuilder();
                     sb.append("track name=\"");
                     sb.append(tf);
-                    sb.append("(@PREDICTED)\"\n");
+                    sb.append("(@PRED_").append(hm).append(")\"\n");
 
                     Map<String, List<Region>> regions = tf_chrRegion.get(tf).getAllRegionsSorted();
 
