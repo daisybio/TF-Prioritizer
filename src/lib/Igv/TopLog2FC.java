@@ -135,9 +135,9 @@ public class TopLog2FC extends ExecutableStep
                 File f_save_session = extend(d_output.get(), groupPairing, s_session.get());
                 ArrayList<File> tdfFiles = new ArrayList<>();
 
-                List<String> loadFiles =
+                List<File> loadFiles =
                         getInputFiles(List.of(groupPairing.split("_")), includePredictionData, d_input_tepic,
-                                pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdfFiles);
+                                pathToTfChipSeq, pathToTdf, d_input_peakFiles);
                 addBedFiles(loadFiles, List.of(groupPairing.split("_")), TFPRIO.existingHms, new ArrayList<>(),
                         d_input_bedFiles);
 
@@ -164,7 +164,7 @@ public class TopLog2FC extends ExecutableStep
                     }
 
                     IGV_Headless igv = new IGV_Headless(groupPairing + "-" + suffix, logger);
-                    igv.createSession(loadFiles, tdfFiles, f_save_session);
+                    igv.createSession(loadFiles, f_save_session);
 
                     igv.addCommand("snapshotDirectory " + d_output_mode.getAbsolutePath());
 

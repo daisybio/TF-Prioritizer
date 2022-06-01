@@ -164,6 +164,17 @@ public class FileManagement
         writeFile(file, content);
     }
 
+    public static void writeFile(File file, String content, Logger logger)
+    {
+        try
+        {
+            writeFile(file, content);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
     public static void writeFile(File file, String content) throws IOException
     {
         makeSureFileExists(file);

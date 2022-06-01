@@ -8,11 +8,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static util.FileManagement.*;
+import static util.FileManagement.extend;
+import static util.FileManagement.writeFile;
 import static util.ScriptExecution.execute;
 
 /**
@@ -117,34 +117,80 @@ public class IGV_Headless
     /**
      * Create a new session xml file
      *
-     * @param loadFiles a list of absolute paths to load
-     * @param tdfFiles  the tdf files
+     * @param loadFiles a list of files to load
      */
-    public void createSession(List<String> loadFiles, List<File> tdfFiles, File f_session)
+    public void createSession(Iterable<File> loadFiles, File f_session)
     {
-        addCommand("maxPanelHeight 3000");
-        addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
-        Set<String> nonTdfFiles = new HashSet<>();
+        Set<String> acceptedExtensions = new HashSet<>()
+        {{
+            add("tdf");
+            add("bed");
+            add("broadPeak");
+        }};
+        Set<File> tdfFiles = new HashSet<>();
+        Set<File> otherFiles = new HashSet<>();
 
-        for (String loadFile : loadFiles)
+        StringBuilder sb_session = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+        sb_session.append("<Session genome=\"").append(TFPRIO.configs.igv.speciesReferenceGenome.get())
+                .append("\" locus=\"All\" ").append("version=\"8\">\n");
+        sb_session.append("\t<Resources>\n");
+
+        for (File loadFile : loadFiles)
         {
-            if (loadFile.endsWith(".tdf"))
+            String extension = loadFile.getName().substring(loadFile.getName().lastIndexOf(".") + 1);
+
+            if (acceptedExtensions.contains(extension))
             {
-                addCommand("load " + loadFile);
-                File f_tdf = new File(loadFile);
-                addCommand("setLogScale true " + f_tdf.getName());
-                addCommand("setDataRange auto " + f_tdf.getName());
-                addCommand("setTrackHeight " + f_tdf.getName() + " 60");
+                sb_session.append("\t\t<Resource path=\"").append(loadFile.toPath().relativize(f_session.toPath()))
+                        .append("\" ").append("type=\"").append(extension).append("\"/>\n");
+
+                switch (extension)
+                {
+                    case "tdf":
+                        tdfFiles.add(loadFile);
+                        break;
+                    case "bed":
+                        otherFiles.add(loadFile);
+                        break;
+                }
             } else
             {
-                nonTdfFiles.add(loadFile);
+                logger.warn("Unknown file type to load for igv: " + loadFile.getAbsolutePath());
             }
         }
+        sb_session.append("\t</Resources>\n");
 
-        for (String entry : nonTdfFiles)
+        sb_session.append("\t<Panel height=\"").append((tdfFiles.size() + 2) * 60)
+                .append("\" name=\"tdf files\" width=\"900\">\n");
+        sb_session.append("\t\t<Track attributeKey=\"Reference sequence\" clazz=\"org.broad.igv.track.SequenceTrack\"" +
+                " fontSize=\"10\" id=\"Reference sequence\" name=\"Reference sequence\" sequenceTranslationStrandValue=\"POSITIVE\" shouldShowTranslation=\"false\" visible=\"true\"/>\n");
+
+        for (File file : tdfFiles)
         {
-            addCommand("load " + entry);
+            sb_session.append("\t\t<Track attributeKey=\"").append(file.getName())
+                    .append("\" autoScale=\"true\" clazz=\"org")
+                    .append(".broad.igv.track.DataSourceTrack\" fontSize=\"10\" height=\"60\" id=\"")
+                    .append(file.getAbsolutePath()).append("\" name=\"").append(file.getName())
+                    .append("\" renderer=\"BAR_CHART\" ").append("visible=\"true\" windowFunction=\"mean\"/>\n");
         }
+
+        sb_session.append("\t</Panel>\n");
+        sb_session.append("\t<Panel height=\"").append(otherFiles.size() * 40)
+                .append("\" name=\"bed files\" width=\"900\">\n");
+
+        for (File file : otherFiles)
+        {
+            sb_session.append("\t\t<Track attributeKey=\"").append(file.getName())
+                    .append("\" autoScale=\"true\" clazz=\"org")
+                    .append(".broad.igv.track.FeatureTrack\" fontSize=\"10\" height=\"40\" id=\"")
+                    .append(file.getAbsolutePath()).append("\" name=\"").append(file.getName())
+                    .append("\" visible=\"true\"/>\n");
+        }
+        sb_session.append("\t</Panel>\n");
+        sb_session.append("</Session>");
+
+        writeFile(f_session, sb_session.toString(), logger);
+        addCommand("load " + f_session.getAbsolutePath());
 
         //include enhancer regions of interest if available
         if (TFPRIO.configs.igv.enhancerDatabases.isSet())
@@ -171,8 +217,6 @@ public class IGV_Headless
                 }
             }
         }
-        makeSureFileExists(f_session, logger);
-        addCommand("saveSession " + f_session.getAbsolutePath());
     }
 
     private static synchronized void startXServer(Logger logger)

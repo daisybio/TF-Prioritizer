@@ -127,18 +127,16 @@ public class DcgTargetGenes extends ExecutableStep
 
                         //include all peak file etc in IGV
                         //create IGV load for both groups
-                        ArrayList<File> tdf_files = new ArrayList<>();
 
-                        List<String> loadFiles =
-                                getInputFiles(List.of(groupsSplit), includePredictionData, d_input_tepic,
-                                        pathToTfChipSeq, pathToTdf, d_input_peakFiles, tdf_files);
+                        List<File> loadFiles = getInputFiles(List.of(groupsSplit), includePredictionData, d_input_tepic,
+                                pathToTfChipSeq, pathToTdf, d_input_peakFiles);
 
                         addBedFiles(loadFiles, List.of(groupsSplit), List.of(hm), List.of(tfSymbol), d_input_bedFiles);
 
                         File f_save_session = extend(d_output_groupPairing, s_session.get());
 
                         IGV_Headless igv = new IGV_Headless(groupPairing, logger);
-                        igv.createSession(loadFiles, tdf_files, f_save_session);
+                        igv.createSession(loadFiles, f_save_session);
 
                         igv.addCommand("snapshotDirectory " + d_output_groupPairing.getAbsolutePath());
 

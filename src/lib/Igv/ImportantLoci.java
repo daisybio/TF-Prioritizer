@@ -93,18 +93,16 @@ public class ImportantLoci extends ExecutableStep
                 String group = d_group.getName();
 
                 File d_output_group = extend(d_output.get(), group);
-
-                List<File> tdfFiles = new ArrayList<>();
-
-                List<String> loadFiles =
+                
+                List<File> loadFiles =
                         getInputFiles(List.of(group), includePredictionData, d_input_tepic, pathToTfChipSeq, pathToTdf,
-                                d_input_peakFiles, tdfFiles);
+                                d_input_peakFiles);
                 addBedFiles(loadFiles, List.of(group), TFPRIO.existingHms, importantLoci.get(), d_input_bedFiles);
 
                 File f_save_session = extend(d_output_group, s_session.get());
 
                 IGV_Headless igv = new IGV_Headless(group, logger);
-                igv.createSession(loadFiles, tdfFiles, f_save_session);
+                igv.createSession(loadFiles, f_save_session);
 
                 igv.addCommand("snapshotDirectory " + d_output_group.getAbsolutePath());
 
