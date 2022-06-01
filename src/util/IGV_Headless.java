@@ -131,7 +131,7 @@ public class IGV_Headless
 
         for (File f_tdf : tdfFiles)
         {
-            addCommand("setLogScale " + f_tdf.getName());
+            addCommand("setLogScale true " + f_tdf.getName());
             addCommand("setDataRange auto " + f_tdf.getName());
             addCommand("setTrackHeight " + f_tdf.getName() + " 60");
         }
@@ -174,7 +174,7 @@ public class IGV_Headless
 
             while (!successful)
             {
-                xServer = execute("Xvfb :" + xServerNum + " -screen 1 1920x1080x16", logger);
+                xServer = execute("Xvfb :" + xServerNum + " -screen 1 4000x2000x16", logger);
                 successful = true;
                 logger.info("Started XServer with ID: " + xServerNum);
             }
