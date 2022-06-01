@@ -38,6 +38,7 @@ public class IGV_Headless
         this.logger = logger;
         this.name = name;
         addCommand("new");
+        addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
     }
 
     /**
@@ -141,8 +142,9 @@ public class IGV_Headless
 
             if (acceptedExtensions.contains(extension))
             {
-                sb_session.append("\t\t<Resource path=\"").append(loadFile.toPath().relativize(f_session.toPath()))
-                        .append("\" ").append("type=\"").append(extension).append("\"/>\n");
+                sb_session.append("\t\t<Resource path=\"")
+                        .append(f_session.getParentFile().toPath().relativize(loadFile.toPath())).append("\" ")
+                        .append("type=\"").append(extension.toLowerCase()).append("\"/>\n");
 
                 switch (extension)
                 {
@@ -160,10 +162,14 @@ public class IGV_Headless
         }
         sb_session.append("\t</Resources>\n");
 
-        sb_session.append("\t<Panel height=\"").append((tdfFiles.size() + 2) * 60)
-                .append("\" name=\"tdf files\" width=\"900\">\n");
+        sb_session.append("\t<Panel height=\"").append(tdfFiles.size() * 50)
+                .append("\" name=\"tdf files\" width=\"600\">\n");
         sb_session.append("\t\t<Track attributeKey=\"Reference sequence\" clazz=\"org.broad.igv.track.SequenceTrack\"" +
                 " fontSize=\"10\" id=\"Reference sequence\" name=\"Reference sequence\" sequenceTranslationStrandValue=\"POSITIVE\" shouldShowTranslation=\"false\" visible=\"true\"/>\n");
+        sb_session.append("\t\t<Track attributeKey=\"Refseq Genes\" clazz=\"org.broad.igv.track.FeatureTrack\" " +
+                        "fontSize=\"10\" height=\"60\" groupByStrand=\"false\" id=\"https://s3.amazonaws.com/igv.org.genomes/")
+                .append(TFPRIO.configs.igv.speciesReferenceGenome.get())
+                .append("/ncbiRefSeq.sorted.txt.gz\" name=\"Refseq Genes\" visible=\"true\"/>\n");
 
         for (File file : tdfFiles)
         {
@@ -176,7 +182,7 @@ public class IGV_Headless
 
         sb_session.append("\t</Panel>\n");
         sb_session.append("\t<Panel height=\"").append(otherFiles.size() * 40)
-                .append("\" name=\"bed files\" width=\"900\">\n");
+                .append("\" name=\"bed files\" width=\"600\">\n");
 
         for (File file : otherFiles)
         {
