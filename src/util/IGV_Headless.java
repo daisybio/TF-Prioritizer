@@ -211,29 +211,22 @@ public class IGV_Headless
         //include enhancer regions of interest if available
         if (TFPRIO.configs.igv.enhancerDatabases.isSet())
         {
-            for (String enhancerDB : TFPRIO.configs.igv.enhancerDatabases.get())
+            File f_database =
+                    extend(TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_mergedEnhancerDbs.get());
+
+            try (BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_database)))
             {
-                File f_database =
-                        extend(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_genePositions_enhancerDBs.get(),
-                                enhancerDB + ".bed");
-
-                try (BufferedReader br_mergedDB = new BufferedReader(new FileReader(f_database)))
+                String line_mergedDB;
+                br_mergedDB.readLine();
+                while ((line_mergedDB = br_mergedDB.readLine()) != null)
                 {
-                    String line_mergedDB;
-                    br_mergedDB.readLine();
-                    while ((line_mergedDB = br_mergedDB.readLine()) != null)
-                    {
-                        String[] split = line_mergedDB.split("\t");
+                    String[] split = line_mergedDB.split("\t");
 
-                        if (split[4].equals(TFPRIO.configs.igv.speciesReferenceGenome.get()))
-                        {
-                            addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
-                        }
-                    }
-                } catch (IOException e)
-                {
-                    logger.error(e.getMessage());
+                    addCommand("region " + split[0] + " " + split[1] + " " + split[2]);
                 }
+            } catch (IOException e)
+            {
+                logger.error(e.getMessage());
             }
         }
     }
