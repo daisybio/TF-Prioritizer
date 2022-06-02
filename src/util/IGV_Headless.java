@@ -160,8 +160,8 @@ public class IGV_Headless
         }
         sb_session.append("\t</Resources>\n");
 
-        sb_session.append("\t<Panel height=\"").append(tdfFiles.size() * 50)
-                .append("\" name=\"tdf files\" width=\"600\">\n");
+        sb_session.append("\t<Panel height=\"").append((tdfFiles.size() + 1) * 60)
+                .append("\" name=\"tdf files\" width=\"1131\">\n");
         sb_session.append("\t\t<Track attributeKey=\"Reference sequence\" clazz=\"org.broad.igv.track.SequenceTrack\"" +
                 " fontSize=\"10\" id=\"Reference sequence\" name=\"Reference sequence\" sequenceTranslationStrandValue=\"POSITIVE\" shouldShowTranslation=\"false\" visible=\"true\"/>\n");
         sb_session.append("\t\t<Track attributeKey=\"Refseq Genes\" clazz=\"org.broad.igv.track.FeatureTrack\" " +
@@ -175,12 +175,15 @@ public class IGV_Headless
                     .append("\" autoScale=\"true\" clazz=\"org")
                     .append(".broad.igv.track.DataSourceTrack\" fontSize=\"10\" height=\"60\" id=\"")
                     .append(file.getAbsolutePath()).append("\" name=\"").append(file.getName())
-                    .append("\" renderer=\"BAR_CHART\" ").append("visible=\"true\" windowFunction=\"mean\"/>\n");
+                    .append("\" renderer=\"BAR_CHART\" ").append("visible=\"true\" windowFunction=\"mean\">\n");
+            sb_session.append("\t\t\t<DataRange baseline=\"0.0\" drawBaseline=\"true\" flipAxis=\"false\" maximum=\"1" +
+                    ".0\" minimum=\"0.0\" type=\"LOG\"/>\n");
+            sb_session.append("\t\t</Track>\n");
         }
 
         sb_session.append("\t</Panel>\n");
         sb_session.append("\t<Panel height=\"").append(otherFiles.size() * 40)
-                .append("\" name=\"bed files\" width=\"600\">\n");
+                .append("\" name=\"bed files\" width=\"1131\">\n");
 
         for (File file : otherFiles)
         {
@@ -229,6 +232,8 @@ public class IGV_Headless
                 logger.error(e.getMessage());
             }
         }
+
+        addCommand("saveSession " + extend(f_session.getParentFile(), "processed.xml").getAbsolutePath());
     }
 
     private static synchronized void startXServer(Logger logger)
@@ -241,7 +246,7 @@ public class IGV_Headless
             while (!successful)
             {
                 xServerNum++;
-                xServer = execute("Xvfb :" + xServerNum + " -screen 0 4000x4000x16", logger);
+                xServer = execute("Xvfb :" + xServerNum + " -screen 0 1920x1080x16", logger);
                 successful = true;
                 logger.info("Started XServer with ID: " + xServerNum);
             }

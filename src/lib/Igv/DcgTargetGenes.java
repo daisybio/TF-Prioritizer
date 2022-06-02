@@ -46,7 +46,7 @@ public class DcgTargetGenes extends ExecutableStep
         {{
             if (TFPRIO.configs.igv.enhancerDatabases.isSet())
             {
-                add(TFPRIO.configs.deSeq2.fileStructure.d_preprocessing_genePositions_enhancerDBs);
+                add(TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_mergedEnhancerDbs);
             }
 
             if (chipAtlasEnabled.get())
