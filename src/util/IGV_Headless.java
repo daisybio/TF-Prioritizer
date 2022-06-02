@@ -175,10 +175,7 @@ public class IGV_Headless
                     .append("\" autoScale=\"true\" clazz=\"org")
                     .append(".broad.igv.track.DataSourceTrack\" fontSize=\"10\" height=\"60\" id=\"")
                     .append(file.getAbsolutePath()).append("\" name=\"").append(file.getName())
-                    .append("\" renderer=\"BAR_CHART\" ").append("visible=\"true\" windowFunction=\"mean\">\n");
-            sb_session.append("\t\t\t<DataRange baseline=\"0.0\" drawBaseline=\"true\" flipAxis=\"false\" maximum=\"1" +
-                    ".0\" minimum=\"0.0\" type=\"LOG\"/>\n");
-            sb_session.append("\t\t</Track>\n");
+                    .append("\" renderer=\"BAR_CHART\" ").append("visible=\"true\" windowFunction=\"mean\"/>\n");
         }
 
         sb_session.append("\t</Panel>\n");
@@ -210,6 +207,12 @@ public class IGV_Headless
 
         writeFile(f_session, sb_session.toString(), logger);
         addCommand("load " + f_session.getAbsolutePath());
+
+        for (File file : tdfFiles)
+        {
+            addCommand("setLogScale true " + file.getName());
+            addCommand("setDataRange auto " + file.getName());
+        }
 
         //include enhancer regions of interest if available
         if (TFPRIO.configs.igv.enhancerDatabases.isSet())
