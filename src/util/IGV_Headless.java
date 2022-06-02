@@ -249,7 +249,7 @@ public class IGV_Headless
             while (!successful)
             {
                 xServerNum++;
-                xServer = execute("Xvfb :" + xServerNum + " -screen 0 1920x1080x16", logger);
+                xServer = execute("Xvfb :" + xServerNum + " -screen 0 1131x500x16", logger);
                 successful = true;
                 logger.info("Started XServer with ID: " + xServerNum);
             }
