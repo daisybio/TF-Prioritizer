@@ -6,10 +6,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static util.FileManagement.extend;
 import static util.FileManagement.writeFile;
@@ -91,7 +91,7 @@ public class IGV_Headless
                 Process igv = execute(command, logger, new HashMap<>()
                 {{
                     put("DISPLAY", ":" + xServerNum);
-                }}, true);
+                }}, false);
 
                 boolean returnValue = igv.waitFor(5, TimeUnit.MINUTES);
                 if (returnValue)
@@ -182,26 +182,83 @@ public class IGV_Headless
         sb_session.append("\t<Panel height=\"").append(otherFiles.size() * 40)
                 .append("\" name=\"bed files\" width=\"1131\">\n");
 
+        Map<String, Set<File>> symbol_files = new HashMap<>();
+        Set<String> symbolsWithPrediction = new HashSet<>();
+
         for (File file : otherFiles)
         {
-            String name = file.getName();
+            String fileName = file.getName().toUpperCase().substring(0, file.getName().lastIndexOf("."));
+            ArrayList<String> nameParts = new ArrayList<>(List.of(fileName.split("_")));
+            nameParts.removeAll(TFPRIO.existingHms.stream().map(String::toUpperCase).collect(Collectors.toList()));
+            nameParts.removeAll(
+                    TFPRIO.groupsToHms.keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
+            nameParts.removeAll(TFPRIO.groupCombinationsToHms.keySet().stream().map(String::toUpperCase)
+                    .collect(Collectors.toList()));
 
-            try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+            if (nameParts.size() != 1)
             {
-                String firstLine = reader.readLine();
-                if (firstLine.startsWith("track name="))
-                {
-                    name = firstLine.substring(firstLine.indexOf("\"") + 1, firstLine.lastIndexOf("\""));
-                }
-            } catch (IOException ignore)
+                logger.warn(String.valueOf(nameParts));
+            }
+            String name = nameParts.get(0);
+            if (!symbol_files.containsKey(name))
             {
+                symbol_files.put(name, new HashSet<>());
+            }
+            if (file.getAbsolutePath().startsWith(
+                    TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds.get().getAbsolutePath()))
+            {
+                symbolsWithPrediction.add(name);
             }
 
-            sb_session.append("\t\t<Track attributeKey=\"").append(file.getName())
-                    .append("\" autoScale=\"true\" clazz=\"org")
-                    .append(".broad.igv.track.FeatureTrack\" fontSize=\"10\" height=\"40\" id=\"")
-                    .append(file.getAbsolutePath()).append("\" name=\"").append(name).append("\" visible=\"true\"/>\n");
+            symbol_files.get(name).add(file);
         }
+
+        Consumer<Set<File>> addFiles = (set) ->
+        {
+            Set<String> addedTrackNames = new HashSet<>();
+
+            for (File file : set)
+            {
+                String trackName = file.getName();
+
+                try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+                {
+                    String firstLine = reader.readLine();
+                    if (firstLine.startsWith("track name="))
+                    {
+                        trackName = firstLine.substring(firstLine.indexOf("\"") + 1, firstLine.lastIndexOf("\""));
+                    }
+                } catch (IOException ignore)
+                {
+                }
+
+                if (addedTrackNames.contains(trackName))
+                {
+                    continue;
+                }
+
+                sb_session.append("\t\t<Track attributeKey=\"").append(file.getName())
+                        .append("\" autoScale=\"true\" clazz=\"org")
+                        .append(".broad.igv.track.FeatureTrack\" fontSize=\"10\" height=\"40\" id=\"")
+                        .append(file.getAbsolutePath()).append("\" name=\"").append(trackName)
+                        .append("\" visible=\"true\"/>\n");
+
+                addedTrackNames.add(trackName);
+            }
+        };
+
+        for (String symbolWithPrediction : symbolsWithPrediction.stream().sorted().collect(Collectors.toList()))
+        {
+            addFiles.accept(symbol_files.get(symbolWithPrediction));
+        }
+
+        for (String symbolWithoutPrediction : symbol_files.keySet().stream()
+                .filter(entry -> !symbolsWithPrediction.contains(entry)).sorted().collect(Collectors.toList()))
+        {
+            addFiles.accept(symbol_files.get(symbolWithoutPrediction));
+        }
+
+
         sb_session.append("\t</Panel>\n");
         sb_session.append("</Session>");
 

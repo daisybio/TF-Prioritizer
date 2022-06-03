@@ -182,8 +182,8 @@ public class MapSymbolAndEnsg
         return symbolEnsg.containsKey(symbol.toUpperCase());
     }
 
-    public String getEnsgByIndex(int index)
+    public Set<String> getSymbols()
     {
-        return ensgList.get(index);
+        return symbolEnsg.keySet();
     }
 }
