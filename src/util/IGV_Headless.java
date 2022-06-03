@@ -91,7 +91,7 @@ public class IGV_Headless
                 Process igv = execute(command, logger, new HashMap<>()
                 {{
                     put("DISPLAY", ":" + xServerNum);
-                }}, false);
+                }}, true);
 
                 boolean returnValue = igv.waitFor(5, TimeUnit.MINUTES);
                 if (returnValue)
@@ -133,7 +133,7 @@ public class IGV_Headless
 
         StringBuilder sb_session = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
         sb_session.append("<Session genome=\"").append(TFPRIO.configs.igv.speciesReferenceGenome.get())
-                .append("\" locus=\"All\" ").append("version=\"8\">\n");
+                .append("\" hasGeneTrack=\"true\" hasSequenceTrack=\"true\" locus=\"All\" version=\"8\">\n");
         sb_session.append("\t<Resources>\n");
 
         for (File loadFile : loadFiles)
@@ -160,27 +160,28 @@ public class IGV_Headless
         }
         sb_session.append("\t</Resources>\n");
 
-        sb_session.append("\t<Panel height=\"").append((tdfFiles.size() + 1) * 60)
-                .append("\" name=\"tdf files\" width=\"1131\">\n");
+        int tdfTrackHeight = 60;
+        sb_session.append("\t<Panel height=\"").append((tdfFiles.size() + 1) * tdfTrackHeight)
+                .append("\" name=\"DataPanel\" width=\"1131\">\n");
         sb_session.append("\t\t<Track attributeKey=\"Reference sequence\" clazz=\"org.broad.igv.track.SequenceTrack\"" +
                 " fontSize=\"10\" id=\"Reference sequence\" name=\"Reference sequence\" sequenceTranslationStrandValue=\"POSITIVE\" shouldShowTranslation=\"false\" visible=\"true\"/>\n");
         sb_session.append("\t\t<Track attributeKey=\"Refseq Genes\" clazz=\"org.broad.igv.track.FeatureTrack\" " +
-                        "fontSize=\"10\" height=\"60\" groupByStrand=\"false\" id=\"https://s3.amazonaws.com/igv.org.genomes/")
-                .append(TFPRIO.configs.igv.speciesReferenceGenome.get())
+                        "fontSize=\"10\" height=\"" + tdfTrackHeight + "\" groupByStrand=\"false\" id=\"https://s3" +
+                        ".amazonaws" + ".com/igv" + ".org.genomes/").append(TFPRIO.configs.igv.speciesReferenceGenome.get())
                 .append("/ncbiRefSeq.sorted.txt.gz\" name=\"Refseq Genes\" visible=\"true\"/>\n");
 
         for (File file : tdfFiles)
         {
             sb_session.append("\t\t<Track attributeKey=\"").append(file.getName())
                     .append("\" autoScale=\"true\" clazz=\"org")
-                    .append(".broad.igv.track.DataSourceTrack\" fontSize=\"10\" height=\"60\" id=\"")
-                    .append(file.getAbsolutePath()).append("\" name=\"").append(file.getName())
+                    .append(".broad.igv.track.DataSourceTrack\" fontSize=\"10\" height=\"" + tdfTrackHeight + "\" " +
+                            "id=\"").append(file.getAbsolutePath()).append("\" name=\"").append(file.getName())
                     .append("\" renderer=\"BAR_CHART\" ").append("visible=\"true\" windowFunction=\"mean\"/>\n");
         }
 
         sb_session.append("\t</Panel>\n");
         sb_session.append("\t<Panel height=\"").append(otherFiles.size() * 40)
-                .append("\" name=\"bed files\" width=\"1131\">\n");
+                .append("\" name=\"FeaturePanel\" width=\"1131\">\n");
 
         Map<String, Set<File>> symbol_files = new HashMap<>();
         Set<String> symbolsWithPrediction = new HashSet<>();
@@ -267,7 +268,6 @@ public class IGV_Headless
 
         for (File file : tdfFiles)
         {
-            addCommand("setLogScale true " + file.getName());
             addCommand("setDataRange auto " + file.getName());
         }
 
