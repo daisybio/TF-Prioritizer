@@ -2,7 +2,6 @@ package lib.Tepic;
 
 import lib.ExecutableStep;
 import tfprio.tfprio.TFPRIO;
-import util.Comparators.ChromosomeComparator;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InternalConfig;
@@ -12,6 +11,7 @@ import util.Regions.Region;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static util.FileFilters.Filters.getSuffixFilter;
 import static util.FileManagement.*;
@@ -215,36 +215,30 @@ public class Postprocessing extends ExecutableStep
 
                 for (String tf : tf_chrRegion.keySet())
                 {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("track name=\"");
-                    sb.append(tf);
-                    sb.append("(@PRED_").append(group).append(")\"\n");
-
-                    Map<String, List<Region>> regions = tf_chrRegion.get(tf).getAllRegionsSorted();
-
-                    ArrayList<String> chrKeysSorted = new ArrayList<>(regions.keySet());
-                    Collections.sort(chrKeysSorted, new ChromosomeComparator());
-
-                    for (String chr : chrKeysSorted)
-                    {
-                        List<Region> chrRegion = regions.get(chr);
-                        for (Region region : chrRegion)
-                        {
-                            sb.append(region.getChromosome());
-                            sb.append("\t");
-                            sb.append(region.getStart());
-                            sb.append("\t");
-                            sb.append(region.getEnd());
-                            sb.append("\n");
-                        }
-                    }
-
                     File f_target = extend(d_postprocessing_trap_predicted_beds.get(), group, hm, tf + ".bed");
                     makeSureFileExists(f_target, logger);
 
                     try (BufferedWriter bw = new BufferedWriter(new FileWriter(f_target)))
                     {
-                        bw.write(sb.toString());
+                        bw.append("track name=\"");
+                        bw.append(tf);
+                        bw.append("(@PRED_").append(group).append(")\"\n");
+
+                        Map<String, List<Region>> regions = tf_chrRegion.get(tf).getAllRegionsSorted();
+
+                        for (String chr : regions.keySet().stream().sorted().collect(Collectors.toList()))
+                        {
+                            List<Region> chrRegion = regions.get(chr);
+                            for (Region region : chrRegion)
+                            {
+                                bw.append(region.getChromosome());
+                                bw.append("\t");
+                                bw.append(String.valueOf(region.getStart()));
+                                bw.append("\t");
+                                bw.append(String.valueOf(region.getEnd()));
+                                bw.newLine();
+                            }
+                        }
                     } catch (IOException e)
                     {
                         logger.error(e.getMessage());

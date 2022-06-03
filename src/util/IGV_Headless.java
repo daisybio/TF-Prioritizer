@@ -166,17 +166,19 @@ public class IGV_Headless
         sb_session.append("\t\t<Track attributeKey=\"Reference sequence\" clazz=\"org.broad.igv.track.SequenceTrack\"" +
                 " fontSize=\"10\" id=\"Reference sequence\" name=\"Reference sequence\" sequenceTranslationStrandValue=\"POSITIVE\" shouldShowTranslation=\"false\" visible=\"true\"/>\n");
         sb_session.append("\t\t<Track attributeKey=\"Refseq Genes\" clazz=\"org.broad.igv.track.FeatureTrack\" " +
-                        "fontSize=\"10\" height=\"" + tdfTrackHeight + "\" groupByStrand=\"false\" id=\"https://s3" +
-                        ".amazonaws" + ".com/igv" + ".org.genomes/").append(TFPRIO.configs.igv.speciesReferenceGenome.get())
+                        "fontSize=\"10\" height=\"").append(tdfTrackHeight).append("\" groupByStrand=\"false\" id=\"https://s3")
+                .append(".amazonaws").append(".com/igv").append(".org.genomes/")
+                .append(TFPRIO.configs.igv.speciesReferenceGenome.get())
                 .append("/ncbiRefSeq.sorted.txt.gz\" name=\"Refseq Genes\" visible=\"true\"/>\n");
 
         for (File file : tdfFiles)
         {
             sb_session.append("\t\t<Track attributeKey=\"").append(file.getName())
                     .append("\" autoScale=\"true\" clazz=\"org")
-                    .append(".broad.igv.track.DataSourceTrack\" fontSize=\"10\" height=\"" + tdfTrackHeight + "\" " +
-                            "id=\"").append(file.getAbsolutePath()).append("\" name=\"").append(file.getName())
-                    .append("\" renderer=\"BAR_CHART\" ").append("visible=\"true\" windowFunction=\"mean\"/>\n");
+                    .append(".broad.igv.track.DataSourceTrack\" fontSize=\"10\" height=\"").append(tdfTrackHeight)
+                    .append("\" ").append("id=\"").append(file.getAbsolutePath()).append("\" name=\"")
+                    .append(file.getName()).append("\" renderer=\"BAR_CHART\" ")
+                    .append("visible=\"true\" windowFunction=\"mean\"/>\n");
         }
 
         sb_session.append("\t</Panel>\n");
