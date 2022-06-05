@@ -137,6 +137,9 @@ public class Helpers
     static void addBedFiles(List<File> loadFiles, Iterable<String> groups, Iterable<String> hms,
                             Iterable<String> tfSymbols, AbstractConfig<File> d_bedFiles)
     {
+        Map<String, File> bedFiles = new HashMap<>();
+        Set<String> indicesToRemove = new HashSet<>();
+
         for (String group : groups)
         {
             for (String hm : hms)
@@ -153,11 +156,22 @@ public class Helpers
                     {
                         if (f_bedFile.getName().toUpperCase().contains(tfSymbol.toUpperCase()))
                         {
-                            loadFiles.add(f_bedFile);
+                            String fileName = f_bedFile.getName().substring(0, f_bedFile.getName().lastIndexOf("."));
+                            bedFiles.put(fileName, f_bedFile);
+
+                            if (fileName.endsWith("_merged"))
+                            {
+                                String tfGroup = fileName.replace("_merged", "");
+                                indicesToRemove.addAll(Arrays.asList(tfGroup.split("::")));
+                                indicesToRemove.add(tfGroup);
+                            }
                         }
                     }
                 }
             }
         }
+
+        indicesToRemove.forEach(bedFiles::remove);
+        loadFiles.addAll(bedFiles.values());
     }
 }

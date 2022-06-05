@@ -18,16 +18,12 @@ import static util.FileManagement.*;
 
 public class Postprocessing extends ExecutableStep
 {
-    private AbstractConfig<File> d_input;
-
     private final GeneratedFileStructure d_postprocessingInput =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_input;
     private final GeneratedFileStructure d_output = TFPRIO.configs.tepic.fileStructure.d_postprocessing_output;
-
     private final GeneratedFileStructure d_postprocessing_trap_predicted_beds =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
     private final GeneratedFileStructure f_output_tfs = TFPRIO.configs.tepic.fileStructure.f_postprocessing_tfs_csv;
-
     private final AbstractConfig<Boolean> mutuallyExclusive = TFPRIO.configs.mixOptions.mutuallyExclusive;
     private final AbstractConfig<Boolean> originalDecay = TFPRIO.configs.tepic.originalDecay;
     private final AbstractConfig<Double> tpmCutoff = TFPRIO.configs.tepic.tpmCutoff;
@@ -38,10 +34,9 @@ public class Postprocessing extends ExecutableStep
             TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_meanAffinitiesDir;
     private final AbstractConfig<String> s_ratios =
             TFPRIO.configs.tepic.fileStructure.s_postprocessing_output_ratiosDir;
-
     private final InternalConfig<String> s_outputRaw_trapSequences =
             TFPRIO.configs.tepic.fileStructure.s_outputRaw_trapSequences;
-
+    private AbstractConfig<File> d_input;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
@@ -130,7 +125,6 @@ public class Postprocessing extends ExecutableStep
                 File d_input_groupHm = extend(d_input.get(), group, hm);
 
                 HashMap<String, HashMap<String, HashSet<Region>>> sample_tf_regions = new HashMap<>();
-                HashSet<String> availableTfs = new HashSet<>();
 
                 for (File d_sample : Objects.requireNonNull(d_input_groupHm.listFiles(Filters.directoryFilter)))
                 {
@@ -153,7 +147,6 @@ public class Postprocessing extends ExecutableStep
 
                                 String[] split = line.split("\t");
                                 String tf = split[0];
-                                availableTfs.add(tf);
 
                                 //get chromosome region tree
                                 HashSet<Region> currentTfRegions;
@@ -213,8 +206,15 @@ public class Postprocessing extends ExecutableStep
                     }
                 }
 
+                Set<String> tfGroups = new HashSet<>();
+
                 for (String tf : tf_chrRegion.keySet())
                 {
+                    if (tf.contains("::"))
+                    {
+                        tfGroups.add(tf);
+                    }
+
                     File f_target = extend(d_postprocessing_trap_predicted_beds.get(), group, hm, tf + ".bed");
                     makeSureFileExists(f_target, logger);
 
@@ -244,10 +244,56 @@ public class Postprocessing extends ExecutableStep
                         logger.error(e.getMessage());
                     }
                 }
+
+                for (String tfGroup : tfGroups)
+                {
+                    String[] tfs = tfGroup.split("::");
+
+                    ChromosomeRegionTrees trees = tf_chrRegion.get(tfGroup);
+
+                    for (String tf : tfs)
+                    {
+                        if (tf_chrRegion.containsKey(tf))
+                        {
+                            trees.addAllOptimized(tf_chrRegion.get(tf).getAllRegionsSorted().values().stream()
+                                    .flatMap(Collection::stream).collect(Collectors.toSet()), true);
+                        }
+                    }
+
+                    File f_target =
+                            extend(d_postprocessing_trap_predicted_beds.get(), group, hm, tfGroup + "_merged" + ".bed");
+                    makeSureFileExists(f_target, logger);
+
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(f_target)))
+                    {
+                        bw.append("track name=\"");
+                        bw.append(tfGroup);
+                        bw.append("(@PRED_").append(group).append(")\"\n");
+
+                        Map<String, List<Region>> regions = trees.getAllRegionsSorted();
+
+                        for (String chr : regions.keySet().stream().sorted().collect(Collectors.toList()))
+                        {
+                            List<Region> chrRegion = regions.get(chr);
+                            for (Region region : chrRegion)
+                            {
+                                bw.append(region.getChromosome());
+                                bw.append("\t");
+                                bw.append(String.valueOf(region.getStart()));
+                                bw.append("\t");
+                                bw.append(String.valueOf(region.getEnd()));
+                                bw.newLine();
+                            }
+                        }
+                    } catch (IOException e)
+                    {
+                        logger.error(e.getMessage());
+                    }
+                }
             }
         }
 
-        //prepare command line for all (computeMeanRatioTFAffinities.py
+        //prepare command line for all (computeMeanRatioTFAffinities.py)
         HashSet<String> all_tfs = new HashSet<>();
 
         for (File d_pairing : Objects.requireNonNull(d_output.get().listFiles(Filters.directoryFilter)))

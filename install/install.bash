@@ -144,7 +144,7 @@ else
     mv /srv/dependencies/IGV_2.13.0 /srv/dependencies/igv
     igv_dir=/home/docker/igv
   fi
-  mkdir -p $igv_dir && touch $igv_dir/prefs.properties && echo "PORT_ENABLED=false" > $igv_dir/prefs.properties
+  mkdir -p $igv_dir && echo "PORT_ENABLED=false" > $igv_dir/prefs.properties
 
   if $docker ; then
     chown -R docker:docker $igv_dir

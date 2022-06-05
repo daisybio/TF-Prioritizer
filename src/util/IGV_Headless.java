@@ -20,12 +20,11 @@ import static util.ScriptExecution.execute;
  */
 public class IGV_Headless
 {
+    private static Integer xServerNum = null;
+    private static Process xServer = null;
     private final StringBuilder commandBuilder = new StringBuilder();
     private final String name;
     private final Logger logger;
-
-    private static Integer xServerNum = null;
-    private static Process xServer = null;
 
     /**
      * Create a new class instance.
@@ -39,6 +38,31 @@ public class IGV_Headless
         this.name = name;
         addCommand("new");
         addCommand("genome " + TFPRIO.configs.igv.speciesReferenceGenome.get());
+    }
+
+    private static synchronized void startXServer(Logger logger)
+    {
+        if (xServer == null)
+        {
+            xServerNum = 20;
+            boolean successful = false;
+
+            while (!successful)
+            {
+                xServerNum++;
+                xServer = execute("Xvfb :" + xServerNum + " -screen 0 1131x500x16", logger);
+                successful = true;
+                logger.info("Started XServer with ID: " + xServerNum);
+            }
+        }
+    }
+
+    public static void stopXServer()
+    {
+        if (xServer != null)
+        {
+            xServer.destroy();
+        }
     }
 
     /**
@@ -91,7 +115,7 @@ public class IGV_Headless
                 Process igv = execute(command, logger, new HashMap<>()
                 {{
                     put("DISPLAY", ":" + xServerNum);
-                }}, true);
+                }}, false);
 
                 boolean returnValue = igv.waitFor(5, TimeUnit.MINUTES);
                 if (returnValue)
@@ -210,6 +234,7 @@ public class IGV_Headless
             if (file.getAbsolutePath().startsWith(
                     TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds.get().getAbsolutePath()))
             {
+                symbolsWithPrediction.addAll(List.of(name.split("::")));
                 symbolsWithPrediction.add(name);
             }
 
@@ -252,6 +277,7 @@ public class IGV_Headless
 
         for (String symbolWithPrediction : symbolsWithPrediction.stream().sorted().collect(Collectors.toList()))
         {
+            System.out.println(symbolWithPrediction + " " + symbol_files.get(symbolWithPrediction));
             addFiles.accept(symbol_files.get(symbolWithPrediction));
         }
 
@@ -296,30 +322,5 @@ public class IGV_Headless
         }
 
         addCommand("saveSession " + extend(f_session.getParentFile(), "processed.xml").getAbsolutePath());
-    }
-
-    private static synchronized void startXServer(Logger logger)
-    {
-        if (xServer == null)
-        {
-            xServerNum = 20;
-            boolean successful = false;
-
-            while (!successful)
-            {
-                xServerNum++;
-                xServer = execute("Xvfb :" + xServerNum + " -screen 0 1131x500x16", logger);
-                successful = true;
-                logger.info("Started XServer with ID: " + xServerNum);
-            }
-        }
-    }
-
-    public static void stopXServer()
-    {
-        if (xServer != null)
-        {
-            xServer.destroy();
-        }
     }
 }
