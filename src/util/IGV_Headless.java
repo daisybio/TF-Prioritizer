@@ -226,6 +226,7 @@ public class IGV_Headless
             if (nameParts.size() > 1)
             {
                 logger.warn("Name not valid: " + file.getAbsolutePath());
+                logger.warn("Parts: " + nameParts);
                 continue;
             }
             String name;
