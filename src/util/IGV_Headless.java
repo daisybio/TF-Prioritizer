@@ -222,11 +222,20 @@ public class IGV_Headless
             nameParts.removeAll(TFPRIO.groupCombinationsToHms.keySet().stream().map(String::toUpperCase)
                     .collect(Collectors.toList()));
 
-            if (nameParts.size() != 1)
+            if (nameParts.size() > 1)
             {
                 logger.warn("Name not valid: " + file.getAbsolutePath());
+                continue;
             }
-            String name = nameParts.get(0);
+            String name;
+            if (nameParts.size() == 1)
+            {
+                name = nameParts.get(0);
+            } else
+            {
+                name = fileName;
+            }
+
             if (!symbol_files.containsKey(name))
             {
                 symbol_files.put(name, new HashSet<>());
