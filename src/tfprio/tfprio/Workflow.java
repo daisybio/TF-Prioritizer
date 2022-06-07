@@ -214,12 +214,26 @@ public class Workflow
         }
         steps.add(new lib.DistributionAnalysis.CoOccurrenceAnalysis());
 
-        steps.add(new lib.Report.Report());
+        //steps.add(new lib.Report.Report());
 
         steps.add(new lib.AngularReport.Generate());
         steps.add(new lib.AngularReport.PostProcessing());
 
         markNotGeneratedFileStructures();
+    }
+
+    public static AbstractConfig<File> getLatestInputDirectory()
+    {
+        List<AbstractConfig<File>> inputDirectories =
+                Arrays.asList(TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input,
+                        TFPRIO.configs.blacklist.fileStructure.d_newInput,
+                        TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks,
+                        TFPRIO.configs.mixOptions.fileStructure.d_hmMix,
+                        TFPRIO.configs.mixOptions.fileStructure.d_sampleMix,
+                        TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr,
+                        TFPRIO.configs.tepic.inputDirectory);
+
+        return getFirstExisting(inputDirectories);
     }
 
     public boolean simulationSuccessful()
@@ -273,19 +287,5 @@ public class Workflow
                 }
             }
         }
-    }
-
-    public static AbstractConfig<File> getLatestInputDirectory()
-    {
-        List<AbstractConfig<File>> inputDirectories =
-                Arrays.asList(TFPRIO.configs.mixOptions.fileStructure.d_mutuallyExclusive_input,
-                        TFPRIO.configs.blacklist.fileStructure.d_newInput,
-                        TFPRIO.configs.mixOptions.fileStructure.d_footprintsBetweenPeaks,
-                        TFPRIO.configs.mixOptions.fileStructure.d_hmMix,
-                        TFPRIO.configs.mixOptions.fileStructure.d_sampleMix,
-                        TFPRIO.configs.mixOptions.fileStructure.d_preprocessingCheckChr,
-                        TFPRIO.configs.tepic.inputDirectory);
-
-        return getFirstExisting(inputDirectories);
     }
 }
