@@ -221,6 +221,7 @@ public class IGV_Headless
                     TFPRIO.groupsToHms.keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
             nameParts.removeAll(TFPRIO.groupCombinationsToHms.keySet().stream().map(String::toUpperCase)
                     .collect(Collectors.toList()));
+            nameParts.remove("merged");
 
             if (nameParts.size() > 1)
             {
