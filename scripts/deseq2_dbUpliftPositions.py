@@ -1,5 +1,8 @@
-from pyliftover import LiftOver
+from time import sleep
 import pandas as pd
+from pyliftover import LiftOver
+
+MAX_LIFTOVER_ATTEMPTS = 10
 
 def convert(c, x, y, converter):
     first = converter.convert_coordinate(c, int(x))
@@ -34,18 +37,27 @@ def main():
     for col in df.columns:
         column_names.append(col)
 
-    converter = LiftOver(version_of_their_dat, version_of_our_dat)
+    attempt = 0
+    worked = False
 
-    for index, row in df.iterrows():
+    while attempt < MAX_LIFTOVER_ATTEMPTS and not worked:
+        try:
+            converter = LiftOver(version_of_their_dat, version_of_our_dat, search_dir=None, cache_dir=None,
+                                 use_web=True)
+            worked = True
+        except AttributeError:
+            attempt += 1
+            sleep(5)
+
+    if not worked:
+        raise IOError("Could not get liftover file")
+
+    for _, row in df.iterrows():
         mgi_symbol = row[column_names.__getitem__(3)]
         chromosome = str(row[column_names.__getitem__(0)])
         start_position = row[column_names.__getitem__(1)]
         end_position = row[column_names.__getitem__(2)]
 
-        ref_genome = row[column_names.__getitem__(4)]
-
-        search_string = chromosome+":" + \
-            str(start_position)+"-"+str(end_position)
         x_converted = start_position
         y_converted = end_position
 
