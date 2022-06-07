@@ -35,6 +35,7 @@ public class Wrapper
             logger.error("Exception during config merging: " + e.getMessage());
         }
         configs.validate();
+        configs.save(extend(argParser.getWorkingDirectory(), "wrapperConfigs.json"));
 
         File f_compose = buildCompose(configs, argParser, logger);
 
