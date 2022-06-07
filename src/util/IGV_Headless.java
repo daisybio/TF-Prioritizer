@@ -224,7 +224,7 @@ public class IGV_Headless
 
             if (nameParts.size() != 1)
             {
-                logger.warn(String.valueOf(nameParts));
+                logger.warn("Name not valid: " + file.getAbsolutePath());
             }
             String name = nameParts.get(0);
             if (!symbol_files.containsKey(name))
