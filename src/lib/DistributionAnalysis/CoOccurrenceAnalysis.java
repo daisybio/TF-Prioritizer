@@ -91,7 +91,7 @@ public class CoOccurrenceAnalysis extends ExecutableStep
                 "bedtools merge -i " + f_output_sorted.get().getAbsolutePath() + " -c 4 -o " + "collapse -delim " +
                         "'|' > " + f_output_merged.get().getAbsolutePath()), logger);
 
-        HashMap<String, Integer> tf_total_occurrences = new HashMap<>();
+        HashMap<String, Integer> tf_totalOccurrences = new HashMap<>();
         HashMap<String, HashMap<String, Integer>> tf_otherTf_cooccurrenceCount = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(f_output_merged.get())))
@@ -106,16 +106,16 @@ public class CoOccurrenceAnalysis extends ExecutableStep
                     continue;
                 }
 
-                List<String> tfSymbols = Arrays.asList(split[3].split("\\|"));
+                Set<String> tfSymbols = new HashSet<>(List.of(split[3].split("\\|")));
 
                 for (String tfSymbol : tfSymbols)
                 {
-                    if (tf_total_occurrences.containsKey(tfSymbol))
+                    if (tf_totalOccurrences.containsKey(tfSymbol))
                     {
-                        tf_total_occurrences.put(tfSymbol, tf_total_occurrences.get(tfSymbol) + 1);
+                        tf_totalOccurrences.put(tfSymbol, tf_totalOccurrences.get(tfSymbol) + 1);
                     } else
                     {
-                        tf_total_occurrences.put(tfSymbol, 1);
+                        tf_totalOccurrences.put(tfSymbol, 1);
                     }
                 }
 
@@ -157,7 +157,7 @@ public class CoOccurrenceAnalysis extends ExecutableStep
             HashMap<String, Integer> otherTf_counts = tf_otherTf_cooccurrenceCount.get(tfSymbol);
             for (String otherTfSymbol : otherTf_counts.keySet())
             {
-                int total_counts = tf_total_occurrences.get(tfSymbol) + tf_total_occurrences.get(otherTfSymbol);
+                int total_counts = tf_totalOccurrences.get(tfSymbol) + tf_totalOccurrences.get(otherTfSymbol);
                 int co_occurences = otherTf_counts.get(otherTfSymbol);
 
                 double freq = (co_occurences * 1.0) / total_counts;
