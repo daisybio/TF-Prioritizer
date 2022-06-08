@@ -4,7 +4,6 @@ import lib.ExecutableStep;
 import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.FileFilters.Filters;
 import util.IGV_Headless;
 
 import java.io.File;
@@ -18,22 +17,19 @@ public class ImportantLoci extends ExecutableStep
 {
     private final AbstractConfig<File> f_input_geneCoordinates =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_genePositions_data;
-    private AbstractConfig<File> d_input_tepic;
     private final AbstractConfig<File> d_input_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
     private final AbstractConfig<File> d_input_dcg =
             TFPRIO.configs.distributionAnalysis.fileStructure.d_dcg_targetGenes;
     private final AbstractConfig<File> d_input_bedFiles =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
-
     private final GeneratedFileStructure d_output = TFPRIO.configs.igv.fileStructure.d_importantLoci;
-
     private final AbstractConfig<List<String>> importantLoci = TFPRIO.configs.igv.importantLociAllPrioTf;
     private final AbstractConfig<String> s_session = TFPRIO.configs.igv.fileStructure.s_session;
     private final AbstractConfig<String> speciesReferenceGenome = TFPRIO.configs.igv.speciesReferenceGenome;
-
     private final AbstractConfig<List<String>> includePredictionData = TFPRIO.configs.igv.includePredictionData;
     private final AbstractConfig<File> pathToTfChipSeq = TFPRIO.configs.igv.pathToTfChipSeq;
     private final AbstractConfig<File> pathToTdf = TFPRIO.configs.igv.pathToTdf;
+    private AbstractConfig<File> d_input_tepic;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
@@ -86,14 +82,13 @@ public class ImportantLoci extends ExecutableStep
         importantLoci.get().addAll(add_to_important_loci);
         importantLoci.get().removeAll(remove_from_important_loci);
 
-        for (File d_group : Objects.requireNonNull(d_input_dcg.get().listFiles(Filters.directoryFilter)))
+        for (String group : TFPRIO.groupsToHms.keySet())
         {
+            logger.info("Creating IGV screenshots for group: " + group);
             executorService.submit(() ->
             {
-                String group = d_group.getName();
-
                 File d_output_group = extend(d_output.get(), group);
-                
+
                 List<File> loadFiles =
                         getInputFiles(List.of(group), includePredictionData, d_input_tepic, pathToTfChipSeq, pathToTdf,
                                 d_input_peakFiles);

@@ -115,7 +115,7 @@ public class IGV_Headless
                 Process igv = execute(command, logger, new HashMap<>()
                 {{
                     put("DISPLAY", ":" + xServerNum);
-                }}, false);
+                }}, true);
 
                 boolean returnValue = igv.waitFor(5, TimeUnit.MINUTES);
                 if (returnValue)
