@@ -146,7 +146,6 @@ public class IGV_Headless
      */
     public void createSession(Iterable<File> loadFiles, File f_session)
     {
-        logger.info("Load files: " + loadFiles);
         Set<String> acceptedExtensions = new HashSet<>()
         {{
             add("tdf");
@@ -289,8 +288,10 @@ public class IGV_Headless
 
         for (String symbolWithPrediction : symbolsWithPrediction.stream().sorted().collect(Collectors.toList()))
         {
-            System.out.println(symbolWithPrediction + " " + symbol_files.get(symbolWithPrediction));
-            addFiles.accept(symbol_files.get(symbolWithPrediction));
+            if (symbol_files.get(symbolWithPrediction) != null)
+            {
+                addFiles.accept(symbol_files.get(symbolWithPrediction));
+            }
         }
 
         for (String symbolWithoutPrediction : symbol_files.keySet().stream()
