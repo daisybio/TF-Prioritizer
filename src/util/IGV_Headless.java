@@ -146,6 +146,7 @@ public class IGV_Headless
      */
     public void createSession(Iterable<File> loadFiles, File f_session)
     {
+        logger.info("Load files: " + loadFiles);
         Set<String> acceptedExtensions = new HashSet<>()
         {{
             add("tdf");
