@@ -115,7 +115,7 @@ public class IGV_Headless
                 Process igv = execute(command, logger, new HashMap<>()
                 {{
                     put("DISPLAY", ":" + xServerNum);
-                }}, false);
+                }}, true);
 
                 boolean returnValue = igv.waitFor(5, TimeUnit.MINUTES);
                 if (returnValue)
@@ -221,12 +221,23 @@ public class IGV_Headless
                     TFPRIO.groupsToHms.keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
             nameParts.removeAll(TFPRIO.groupCombinationsToHms.keySet().stream().map(String::toUpperCase)
                     .collect(Collectors.toList()));
+            nameParts.remove("merged".toUpperCase());
 
-            if (nameParts.size() != 1)
+            if (nameParts.size() > 1)
             {
-                logger.warn(String.valueOf(nameParts));
+                logger.warn("Name not valid: " + file.getAbsolutePath());
+                logger.warn("Parts: " + nameParts);
+                continue;
             }
-            String name = nameParts.get(0);
+            String name;
+            if (nameParts.size() == 1)
+            {
+                name = nameParts.get(0);
+            } else
+            {
+                name = fileName;
+            }
+
             if (!symbol_files.containsKey(name))
             {
                 symbol_files.put(name, new HashSet<>());
@@ -277,8 +288,10 @@ public class IGV_Headless
 
         for (String symbolWithPrediction : symbolsWithPrediction.stream().sorted().collect(Collectors.toList()))
         {
-            System.out.println(symbolWithPrediction + " " + symbol_files.get(symbolWithPrediction));
-            addFiles.accept(symbol_files.get(symbolWithPrediction));
+            if (symbol_files.get(symbolWithPrediction) != null)
+            {
+                addFiles.accept(symbol_files.get(symbolWithPrediction));
+            }
         }
 
         for (String symbolWithoutPrediction : symbol_files.keySet().stream()
