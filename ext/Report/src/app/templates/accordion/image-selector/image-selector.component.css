@@ -1,0 +1,33 @@
+img {
+  max-width: 100%;
+}
+
+.dropdown {
+  position: absolute;
+  display: none;
+  left: -250px;
+  right: -250px;
+  z-index: 1;
+  top: 40px;
+  background-color: white;
+}
+
+.dropdown.visible {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-content: stretch;
+}
+
+.wrapper {
+  position: relative;
+  display: flex;
+}
+
+.symmetric {
+  width: 100%;
+  display: inline-grid;
+  justify-items: stretch;
+  grid-template-columns: 25% 5% 40% 5% 25%;
+}

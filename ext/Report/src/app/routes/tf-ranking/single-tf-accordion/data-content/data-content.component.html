@@ -1,0 +1,19 @@
+<table (mouseleave)="highLightAccessors([])">
+  <tr>
+    <th *ngIf="dimensions==2"></th>
+    <th *ngFor="let accessor of accessors"
+        [ngClass]="{'active': activeAccessors[0]==accessor}">{{accessor}}</th>
+  </tr>
+  <tr *ngIf="dimensions==1; else twoDimensions">
+    <td *ngFor="let columnAccessor of accessors"
+        (mouseenter)="highLightAccessors([columnAccessor])">{{getValue([columnAccessor])}}</td>
+  </tr>
+</table>
+
+<ng-template #twoDimensions>
+  <tr *ngFor="let rowAccessor of accessors">
+    <th [ngClass]="{'active': activeAccessors[1]==rowAccessor}">{{rowAccessor}}</th>
+    <td *ngFor="let columnAccessor of accessors"
+        (mouseenter)="highLightAccessors([columnAccessor, rowAccessor])">{{getValue([rowAccessor, columnAccessor])}}</td>
+  </tr>
+</ng-template>

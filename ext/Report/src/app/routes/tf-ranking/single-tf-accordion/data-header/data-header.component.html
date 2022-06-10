@@ -1,0 +1,12 @@
+<div class="right-flex">
+  <h2 class="flex-start">{{title}}</h2>
+  <button *ngIf="title=='GeneID'" class="icon"
+          (click)="urlOpener.openUrl(geneCardUrl + transcriptionFactor.name)"><img src="assets/icons/geneCards.png">
+  </button>
+  <button class="icon" (click)="toggleInformationVisibility()" *ngIf="information">
+    <img src="assets/icons/info_dark.svg">
+  </button>
+</div>
+<div class="sub-panel" [ngClass]="{'visible': informationVisible}" *ngIf="information">
+  <p>{{information}}</p>
+</div>

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {InputData, TranscriptionFactorGroup} from "../types/types";
 
-import data from '../../assets/input/data.json';
+import {tfData} from "../../assets/input/data";
 
 
 @Injectable({
@@ -13,7 +13,7 @@ export class TfDataGetterService {
 
   constructor() {
     // @ts-ignore
-    this.inputData = data;
+    this.inputData = tfData;
 
     for (let transcriptionFactorGroup of this.inputData.transcriptionFactorGroups) {
       this.tfMap[transcriptionFactorGroup.name] = transcriptionFactorGroup;

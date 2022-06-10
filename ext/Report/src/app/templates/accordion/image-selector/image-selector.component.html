@@ -1,0 +1,38 @@
+<accordion-header (togglePanel)="visible=$event" *ngIf="!hideHeader" [disabled]="!isEnabled" [information]="information" [sub]="sub"
+                  [title]="title"></accordion-header>
+<div [ngClass]="{'visible': visible || hideHeader}" class="sub-panel">
+  <div *ngFor="let levelOptions of availableOptions; let level = index" class="distribute-equally">
+    <ng-container *ngIf="!(level==availableOptions.length-1 && hasDropDown); else dropdown">
+      <button (click)="updateActiveOption(level, option)" *ngFor="let option of levelOptions" [disabled]="!isAllowed(level, option)"
+              [ngClass]="{'active': activeOptions[level]==option}"
+              class="lighter">{{option}}</button>
+    </ng-container>
+  </div>
+  <div *ngIf="!hasDropDown" class="distribute-equally">
+    <button class="lighter">Zoom in</button>
+    <button (click)="downloadData()" *ngIf="hasData" class="lighter">Download data</button>
+    <button class="lighter">Open in new tab</button>
+  </div>
+
+  <img [src]="imageSource">
+</div>
+
+<ng-template #dropdown>
+  <div class="symmetric">
+    <button (click)="downloadData()" *ngIf="hasData" class="lighter">Download data</button>
+    <button *ngIf="!hasData" class="lighter">Zoom in</button>
+    <button (click)="moveDropdown(-1)" class="lighter"><</button>
+    <div class="wrapper">
+      <button (click)="dropdownVisible=!dropdownVisible" [textContent]="activeOptions[activeOptions.length-1]" class="light"
+              style="min-width: 280px"></button>
+      <div [ngClass]="{'visible': dropdownVisible}" class="dropdown">
+        <button (click)="updateActiveOption(activeOptions.length-1, option)" *ngFor="let option of availableOptions[availableOptions.length-1]"
+                [disabled]="!isAllowed(activeOptions.length-1, option)"
+                [ngClass]="{'active': activeOptions[activeOptions.length-1]==option}"
+                class="lighter">{{option}}</button>
+      </div>
+    </div>
+    <button (click)="moveDropdown(1)" class="lighter">></button>
+    <button class="lighter">Open in new tab</button>
+  </div>
+</ng-template>

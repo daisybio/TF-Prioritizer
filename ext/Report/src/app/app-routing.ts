@@ -1,15 +1,15 @@
 import {Routes, RouterModule} from '@angular/router';
 
-import {TfRankingComponent} from "./tf-ranking/tf-ranking.component";
-import {ValidationComponent} from "./validation/validation.component";
+import {TfRankingComponent} from "./routes/tf-ranking/tf-ranking.component";
+import {ValidationComponent} from "./routes/validation/validation.component";
 import {NgModule} from "@angular/core";
-import {RegressionComponent} from "./regression/regression.component";
-import {DistributionComponent} from "./distribution/distribution.component";
-import {DocumentationComponent} from "./documentation/documentation.component";
-import {ParametersComponent} from "./parameters/parameters.component";
-import {ImportantLociComponent} from "./important-loci/important-loci.component";
-import {TopLog2fcComponent} from "./top-log2fc/top-log2fc.component";
-import {CoOccurrenceAnalysisComponent} from "./co-occurrence-analysis/co-occurrence-analysis.component";
+import {RegressionComponent} from "./routes/regression/regression.component";
+import {DistributionComponent} from "./routes/distribution/distribution.component";
+import {DocumentationComponent} from "./routes/documentation/documentation.component";
+import {ParametersComponent} from "./routes/parameters/parameters.component";
+import {ImportantLociComponent} from "./routes/important-loci/important-loci.component";
+import {TopLog2fcComponent} from "./routes/top-log2fc/top-log2fc.component";
+import {CoOccurrenceAnalysisComponent} from "./routes/co-occurrence-analysis/co-occurrence-analysis.component";
 
 const routes: Routes = [
   {path: '', component: TfRankingComponent},
