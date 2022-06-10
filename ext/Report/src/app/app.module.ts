@@ -46,7 +46,7 @@ import {CoOccurrenceAnalysisComponent} from './co-occurrence-analysis/co-occurre
     AppRoutingModule
   ],
   providers: [
-    {provide: LocationStrategy, useClass: HashLocationStrategy}
+    {provide: LocationStrategy, useClass: PathLocationStrategy}
   ],
   bootstrap: [AppComponent]
 })
