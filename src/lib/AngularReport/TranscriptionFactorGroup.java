@@ -21,16 +21,14 @@ public class TranscriptionFactorGroup
     final List<String> geneIDs = new ArrayList<>();
 
     final List<TranscriptionFactor> transcriptionFactors = new ArrayList<>();
+    final File d_tfData;
     Set<TargetGene> targetGenes = new HashSet<>();
     JSONObject validation_heatmap;
     JSONObject validation_igv;
     JSONObject validation_logos_biophysicalModel;
     JSONObject validation_logos_tfSequence;
-
     JSONObject distribution_plots;
     JSONObject distribution_ranks;
-
-    final File d_tfData;
 
     public TranscriptionFactorGroup(String name, Logger logger, ExecutorService executorService)
     {
@@ -267,30 +265,23 @@ public class TranscriptionFactorGroup
         {
             File d_source = TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_hm.get();
 
-            Map<String, Map<String, Map<String, File>>> hm_targetGene_filetype_file = new HashMap<>();
+            Map<String, Map<String, File>> hm_filetype_file = new HashMap<>();
 
             for (String hm : TFPRIO.existingHms)
             {
-                hm_targetGene_filetype_file.put(hm, new HashMap<>());
+                hm_filetype_file.put(hm, new HashMap<>());
 
                 File d_hm = extend(d_source, hm);
 
-                if (d_hm.exists())
-                {
-                    for (File f_targetGenePlot : Objects.requireNonNull(d_hm.listFiles(Filters.fileFilter)))
-                    {
-                        String targetGene =
-                                f_targetGenePlot.getName().substring(0, f_targetGenePlot.getName().lastIndexOf("."));
+                File f_plot = extend(d_source, hm, name + ".png");
 
-                        hm_targetGene_filetype_file.get(hm).put(targetGene, new HashMap<>()
-                        {{
-                            put("plot", f_targetGenePlot);
-                        }});
-                    }
+                if (f_plot.exists())
+                {
+                    hm_filetype_file.get(hm).put("plot", f_plot);
                 }
             }
 
-            distribution_plots = new JSONObject(hm_targetGene_filetype_file);
+            distribution_plots = new JSONObject(hm_filetype_file);
 
             Generate.linkFiles(distribution_plots, extend(d_tfData, "distribution", "plots"), executorService, logger);
         } // Plots
