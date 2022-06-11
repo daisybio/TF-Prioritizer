@@ -36,6 +36,7 @@ export class ImageSelectorComponent implements OnInit {
   isEnabled: boolean = true;
 
   dropdownVisible: boolean = false;
+  popupVisible: boolean = false;
 
   imageSource: string = "";
 
@@ -109,6 +110,10 @@ export class ImageSelectorComponent implements OnInit {
     document.body.appendChild(link);
     link.click();
     link.remove();
+  }
+
+  openNewTab(link: string) {
+    window.open(link, '_blank');
   }
 
   updateAllowedOptions(level: number) {
