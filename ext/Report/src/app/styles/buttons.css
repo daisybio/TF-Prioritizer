@@ -1,5 +1,5 @@
 
-button, input {
+button, input, a {
   border-radius: var(--border-radius);
   border: none;
   background-color: var(--standard-background);
@@ -12,7 +12,7 @@ button, input {
   text-decoration: none;
 }
 
-button:hover {
+button:hover, a:hover {
   cursor: pointer;
   opacity: 1;
 }

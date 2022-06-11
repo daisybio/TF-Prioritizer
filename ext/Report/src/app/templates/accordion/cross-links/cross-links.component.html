@@ -1,27 +1,27 @@
 <div class="distribute-equally">
-  <button *ngIf="exclude!='validation'" [routerLink]="'/validation'" [queryParams]="{'tf': tfGroup.name}">Validation
-  </button>
-  <button *ngIf="exclude!='distribution'" [routerLink]="'/distribution'" [queryParams]="{'tf': tfGroup.name}">
+  <a *ngIf="exclude!='validation'" [queryParams]="{'tf': tfGroup.name}" [routerLink]="'/validation'">Validation
+  </a>
+  <a *ngIf="exclude!='distribution'" [queryParams]="{'tf': tfGroup.name}" [routerLink]="'/distribution'">
     Distribution
-  </button>
-  <button *ngIf="exclude!='regression'" [routerLink]="'/regression'" [queryParams]="{'tf': tfGroup.name}">Regression
-  </button>
+  </a>
+  <a *ngIf="exclude!='regression'" [queryParams]="{'tf': tfGroup.name}" [routerLink]="'/regression'">Regression
+  </a>
   <ng-container *ngIf="exclude!='geneCards'">
-    <button
+    <a
       *ngIf="tfGroup.transcriptionFactors.length == 1; else multipleGeneCards"
-      (click)="openUrl(geneCardUrl+tfGroup.transcriptionFactors[0].name)">
+      href="{{geneCardUrl+tfGroup.transcriptionFactors[0].name}}" target="_blank">
       GeneCard
-    </button>
+    </a>
   </ng-container>
 </div>
 
 <ng-template #multipleGeneCards>
   <div class="dropdown-container">
     <button (click)="geneCardDropDownVisible=!geneCardDropDownVisible">GeneCard</button>
-    <div class="dropdown-content" [ngClass]="{'visible': geneCardDropDownVisible}">
-      <button *ngFor="let transcriptionFactor of tfGroup.transcriptionFactors"
-              (click)="openUrl(geneCardUrl + transcriptionFactor.name)">{{transcriptionFactor.name}}
-      </button>
+    <div [ngClass]="{'visible': geneCardDropDownVisible}" class="dropdown-content">
+      <a *ngFor="let transcriptionFactor of tfGroup.transcriptionFactors"
+         href="{{geneCardUrl + transcriptionFactor.name}}" target="_blank">{{transcriptionFactor.name}}
+      </a>
     </div>
   </div>
 </ng-template>
