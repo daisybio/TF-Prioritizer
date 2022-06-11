@@ -192,6 +192,11 @@ export class ImageSelectorComponent implements OnInit {
         this.collectLevels(sub, level + 1);
       }
     }
+    this.availableOptions[level].sort();
+
+    if (this.activeOptions.length <= level) {
+      this.activeOptions.push(this.availableOptions[level][0]);
+    }
   }
 
   moveDropdown(delta: number) {
