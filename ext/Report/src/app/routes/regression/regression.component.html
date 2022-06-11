@@ -3,6 +3,8 @@
   <cross-links [exclude]="'regression'" [tfGroup]="tfGroup"></cross-links>
   <tf-group-accordion [showAnalysisLinks]="false" [tfGroup]="tfGroup"></tf-group-accordion>
 
+  <image-selector [data]="tfGroup.regression.heatmaps" [information]="information['heatmaps']"
+                  [title]="'Overview regression heatmaps'"></image-selector>
   <image-selector [data]="tfGroup.regression.coefficients" [information]="information['coefficients']"
                   [title]="'Overview regression coefficients'"></image-selector>
 </div>

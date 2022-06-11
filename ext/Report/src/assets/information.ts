@@ -21,6 +21,7 @@ export const INFORMATION = {
     "ranks": loremIpsum
   },
   "regression": {
-    "coefficients": loremIpsum
+    "coefficients": loremIpsum,
+    "heatmaps": loremIpsum
   }
 }

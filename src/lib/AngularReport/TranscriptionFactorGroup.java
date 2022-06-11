@@ -30,6 +30,7 @@ public class TranscriptionFactorGroup
     JSONObject distribution_plots;
     JSONObject distribution_ranks;
     JSONObject regression_coefficients;
+    JSONObject regression_heatmaps;
 
     public TranscriptionFactorGroup(String name, Logger logger, ExecutorService executorService)
     {
@@ -333,35 +334,47 @@ public class TranscriptionFactorGroup
     {
         logger.debug("Collecting regression files for group: " + name);
 
-        Map<String, Map<String, Map<String, Map<String, File>>>> hm_cutOff_comparison_fileType_file = new HashMap<>();
+        Map<String, Map<String, Map<String, Map<String, File>>>> hm_cutOff_groupPairing_fileType_file = new HashMap<>();
+        Map<String, Map<String, Map<String, Map<String, File>>>> hm_cutOff_stages_fileType_file = new HashMap<>();
 
-        { // Plots
-            File d_input = TFPRIO.configs.plots.fileStructure.d_output.get();
+        File d_input = TFPRIO.configs.plots.fileStructure.d_output.get();
 
-            for (File d_hm : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
+        for (File d_hm : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
+        {
+            String hm = d_hm.getName();
+            hm_cutOff_groupPairing_fileType_file.put(hm, new HashMap<>());
+            hm_cutOff_stages_fileType_file.put(hm, new HashMap<>());
+            for (File d_cutOff : Objects.requireNonNull(d_hm.listFiles(Filters.directoryFilter)))
             {
-                String hm = d_hm.getName();
-                hm_cutOff_comparison_fileType_file.put(hm, new HashMap<>());
-                for (File d_cutOff : Objects.requireNonNull(d_hm.listFiles(Filters.directoryFilter)))
+                String cutOff = d_cutOff.getName();
+                hm_cutOff_groupPairing_fileType_file.get(hm).put(cutOff, new HashMap<>());
+                hm_cutOff_stages_fileType_file.get(hm).put(cutOff, new HashMap<>());
+                for (File f_plot : Objects.requireNonNull(d_cutOff.listFiles(Filters.getSuffixFilter(".png"))))
                 {
-                    String cutOff = d_cutOff.getName();
-                    hm_cutOff_comparison_fileType_file.get(hm).put(cutOff, new HashMap<>());
-                    for (File f_plot : Objects.requireNonNull(d_cutOff.listFiles(Filters.getSuffixFilter(".png"))))
+                    String comparison = f_plot.getName().replace(".png", "");
+                    if (TFPRIO.groupCombinationsToHms.containsKey(comparison))
                     {
-                        String comparison = f_plot.getName().replace(".png", "");
-                        hm_cutOff_comparison_fileType_file.get(hm).get(cutOff).put(comparison, new HashMap<>()
+                        hm_cutOff_groupPairing_fileType_file.get(hm).get(cutOff).put(comparison, new HashMap<>()
+                        {{
+                            put("plot", f_plot);
+                        }});
+                    } else
+                    {
+                        hm_cutOff_stages_fileType_file.get(hm).get(cutOff).put(comparison, new HashMap<>()
                         {{
                             put("plot", f_plot);
                         }});
                     }
                 }
             }
+        }
 
-            regression_coefficients = new JSONObject(hm_cutOff_comparison_fileType_file);
+        regression_coefficients = new JSONObject(hm_cutOff_groupPairing_fileType_file);
+        regression_heatmaps = new JSONObject(hm_cutOff_stages_fileType_file);
 
-            Generate.linkFiles(regression_coefficients, extend(d_tfData, "regression", "coefficients"), executorService,
-                    logger);
-        } // Plots
+        Generate.linkFiles(regression_coefficients, extend(d_tfData, "regression", "coefficients"), executorService,
+                logger);
+        Generate.linkFiles(regression_heatmaps, extend(d_tfData, "regression", "heatmaps"), executorService, logger);
     }
 
     public JSONObject toJSONObject()
@@ -403,6 +416,7 @@ public class TranscriptionFactorGroup
             put("regression", new JSONObject()
             {{
                 put("coefficients", regression_coefficients);
+                put("heatmaps", regression_heatmaps);
             }});
         }};
     }

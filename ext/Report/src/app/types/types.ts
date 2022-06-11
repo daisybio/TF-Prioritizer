@@ -31,7 +31,8 @@ export interface TranscriptionFactorGroup {
     }
   },
   "regression": {
-    "coefficients": {}
+    "coefficients": {},
+    "heatmaps": {}
   }
 }
 
