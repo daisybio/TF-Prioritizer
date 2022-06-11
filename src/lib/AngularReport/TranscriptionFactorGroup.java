@@ -29,6 +29,7 @@ public class TranscriptionFactorGroup
     JSONObject validation_logos_tfSequence;
     JSONObject distribution_plots;
     JSONObject distribution_ranks;
+    JSONObject regression_coefficients;
 
     public TranscriptionFactorGroup(String name, Logger logger, ExecutorService executorService)
     {
@@ -60,6 +61,7 @@ public class TranscriptionFactorGroup
         collectTargetGenes();
         collectValidationFiles();
         collectDistributionFiles();
+        collectRegressionFiles();
         logger.debug("Finished collecting data for group: " + name);
     }
 
@@ -271,8 +273,6 @@ public class TranscriptionFactorGroup
             {
                 hm_filetype_file.put(hm, new HashMap<>());
 
-                File d_hm = extend(d_source, hm);
-
                 File f_plot = extend(d_source, hm, name + ".png");
 
                 if (f_plot.exists())
@@ -329,6 +329,41 @@ public class TranscriptionFactorGroup
         } // Scores
     }
 
+    private void collectRegressionFiles()
+    {
+        logger.debug("Collecting regression files for group: " + name);
+
+        Map<String, Map<String, Map<String, Map<String, File>>>> hm_cutOff_comparison_fileType_file = new HashMap<>();
+
+        { // Plots
+            File d_input = TFPRIO.configs.plots.fileStructure.d_output.get();
+
+            for (File d_hm : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
+            {
+                String hm = d_hm.getName();
+                hm_cutOff_comparison_fileType_file.put(hm, new HashMap<>());
+                for (File d_cutOff : Objects.requireNonNull(d_hm.listFiles(Filters.directoryFilter)))
+                {
+                    String cutOff = d_cutOff.getName();
+                    hm_cutOff_comparison_fileType_file.get(hm).put(cutOff, new HashMap<>());
+                    for (File f_plot : Objects.requireNonNull(d_cutOff.listFiles(Filters.getSuffixFilter(".png"))))
+                    {
+                        String comparison = f_plot.getName().replace(".png", "");
+                        hm_cutOff_comparison_fileType_file.get(hm).get(cutOff).put(comparison, new HashMap<>()
+                        {{
+                            put("plot", f_plot);
+                        }});
+                    }
+                }
+            }
+
+            regression_coefficients = new JSONObject(hm_cutOff_comparison_fileType_file);
+
+            Generate.linkFiles(regression_coefficients, extend(d_tfData, "regression", "coefficients"), executorService,
+                    logger);
+        } // Plots
+    }
+
     public JSONObject toJSONObject()
     {
         return new JSONObject()
@@ -365,6 +400,10 @@ public class TranscriptionFactorGroup
                 put("ranks", distribution_ranks);
             }});
             put("targetGenes", targetGeneJsonObjects);
+            put("regression", new JSONObject()
+            {{
+                put("coefficients", regression_coefficients);
+            }});
         }};
     }
 }

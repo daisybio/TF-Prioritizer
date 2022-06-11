@@ -19,5 +19,8 @@ export const INFORMATION = {
   "distribution": {
     "plots": loremIpsum,
     "ranks": loremIpsum
+  },
+  "regression": {
+    "coefficients": loremIpsum
   }
 }

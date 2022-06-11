@@ -1,8 +1,13 @@
 <div *ngIf="tfGroup; else tfUndefined">
   <h2>{{tfGroup.name}}: Regression analysis</h2>
-  <cross-links [tfGroup]="tfGroup" [exclude]="'regression'"></cross-links>
+  <cross-links [exclude]="'regression'" [tfGroup]="tfGroup"></cross-links>
+  <tf-group-accordion [showAnalysisLinks]="false" [tfGroup]="tfGroup"></tf-group-accordion>
+
+  <image-selector [data]="tfGroup.regression.coefficients" [information]="information['coefficients']"
+                  [title]="'Overview regression coefficients'"></image-selector>
 </div>
 
 <ng-template #tfUndefined>
   <h2>Unknown transcription factor: {{routedName}}</h2>
 </ng-template>
+

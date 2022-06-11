@@ -29,6 +29,9 @@ export interface TranscriptionFactorGroup {
         [entryType: string]: number
       }
     }
+  },
+  "regression": {
+    "coefficients": {}
   }
 }
 
