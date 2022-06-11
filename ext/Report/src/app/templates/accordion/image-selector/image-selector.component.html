@@ -28,12 +28,15 @@
       <button (click)="dropdownVisible=!dropdownVisible" [textContent]="activeOptions[activeOptions.length-1]"
               class="light"
               style="min-width: 280px"></button>
-      <div [ngClass]="{'visible': dropdownVisible}" class="dropdown">
-        <button (click)="updateActiveOption(activeOptions.length-1, option)"
-                *ngFor="let option of availableOptions[availableOptions.length-1]"
-                [disabled]="!isAllowed(activeOptions.length-1, option)"
-                [ngClass]="{'active': activeOptions[activeOptions.length-1]==option}"
-                class="lighter">{{option}}</button>
+      <div [ngClass]="{'dropdown-visible': dropdownVisible}" class="dropdown">
+        <input [(ngModel)]="searchTerm" class="light" placeholder="Regex search" style="width: 100%">
+        <div class="dropdown-visible">
+          <button (click)="updateActiveOption(activeOptions.length-1, option)"
+                  *ngFor="let option of availableOptions[availableOptions.length-1]"
+                  [disabled]="!isAllowed(activeOptions.length-1, option)"
+                  [ngClass]="{'active': activeOptions[activeOptions.length-1]==option, 'hidden': !matchesFilter(option)}"
+                  class="lighter">{{option}}</button>
+        </div>
       </div>
     </div>
     <button (click)="moveDropdown(1)" class="lighter">></button>

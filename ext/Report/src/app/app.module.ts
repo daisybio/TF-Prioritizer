@@ -20,6 +20,7 @@ import {CrossLinksComponent} from './templates/accordion/cross-links/cross-links
 import {ImportantLociComponent} from './routes/important-loci/important-loci.component';
 import {TopLog2fcComponent} from './routes/top-log2fc/top-log2fc.component';
 import {CoOccurrenceAnalysisComponent} from './routes/co-occurrence-analysis/co-occurrence-analysis.component';
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import {CoOccurrenceAnalysisComponent} from './routes/co-occurrence-analysis/co-
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule
   ],
   providers: [
     {provide: LocationStrategy, useClass: HashLocationStrategy}

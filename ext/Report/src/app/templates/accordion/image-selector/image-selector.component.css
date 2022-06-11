@@ -16,7 +16,7 @@ img:hover {
   background-color: white;
 }
 
-.dropdown.visible {
+.dropdown-visible {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -27,6 +27,10 @@ img:hover {
 .wrapper {
   position: relative;
   display: flex;
+}
+
+.dropdown-visible button.hidden {
+  display: none;
 }
 
 .symmetric {

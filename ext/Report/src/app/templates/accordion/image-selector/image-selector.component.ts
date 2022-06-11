@@ -40,6 +40,8 @@ export class ImageSelectorComponent implements OnInit {
 
   imageSource: string = "";
 
+  searchTerm: string = "";
+
   constructor(private eRef: ElementRef) {
   }
 
@@ -217,5 +219,11 @@ export class ImageSelectorComponent implements OnInit {
     }
 
     this.updateActiveOption(dropDownLevel, this.allowedOptions[dropDownLevel][newIndex]);
+  }
+
+  matchesFilter(name: string) {
+    let regex = new RegExp(this.searchTerm.toUpperCase());
+
+    return regex.test(name);
   }
 }
