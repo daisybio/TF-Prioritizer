@@ -1,11 +1,11 @@
 <div *ngIf="tfGroup; else tfUndefined">
   <h2>{{tfGroup.name}}: Distribution analysis</h2>
-  <cross-links [tfGroup]="tfGroup" [exclude]="'distribution'"></cross-links>
-  <tf-group-accordion [tfGroup]="tfGroup" [showAnalysisLinks]="false"></tf-group-accordion>
+  <cross-links [exclude]="'distribution'" [tfGroup]="tfGroup"></cross-links>
+  <tf-group-accordion [showAnalysisLinks]="false" [tfGroup]="tfGroup"></tf-group-accordion>
 
-  <accordion-header [title]="'Discounted cumulative gain'" (togglePanel)="dcgVisible=!dcgVisible"
-                    [information]="information['ranks']"></accordion-header>
-  <div class="sub-panel" [ngClass]="{'visible': dcgVisible}">
+  <accordion-header (togglePanel)="dcgVisible=!dcgVisible" [information]="information['ranks']"
+                    [title]="'Discounted cumulative gain'"></accordion-header>
+  <div [ngClass]="{'visible': dcgVisible}" class="sub-panel">
     <table style="margin-left: auto; margin-right: auto; min-width: 50%">
       <tr>
         <th></th>
@@ -14,8 +14,8 @@
       </tr>
       <tr *ngFor="let histoneModification of histoneModifications">
         <th>{{histoneModification}}</th>
-        <td *ngIf="getRank(histoneModification)" class="icon"><img src="../../../assets/icons/is_available.png"></td>
-        <td *ngIf="!getRank(histoneModification)" class="icon"><img src="../../../assets/icons/not_available.png"></td>
+        <td *ngIf="getRank(histoneModification)" class="icon"><img src="assets/icons/is_available.png"></td>
+        <td *ngIf="!getRank(histoneModification)" class="icon"><img src="assets/icons/not_available.png"></td>
         <td *ngIf="getRank(histoneModification)">{{getRank(histoneModification)}}
           / {{getSize(histoneModification)}}</td>
         <td *ngIf="!getRank(histoneModification)">- / {{getSize(histoneModification)}}</td>
@@ -23,8 +23,8 @@
     </table>
   </div>
 
-  <image-selector [data]="tfGroup.distribution.plots" [title]="'Distribution plots'"
-                  [information]="information['plots']"></image-selector>
+  <image-selector [data]="tfGroup.distribution.plots" [information]="information['plots']"
+                  [title]="'Distribution plots'"></image-selector>
 </div>
 
 <ng-template #tfUndefined>

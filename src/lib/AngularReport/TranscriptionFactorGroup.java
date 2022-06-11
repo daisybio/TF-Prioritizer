@@ -14,12 +14,11 @@ import static util.FileManagement.*;
 
 public class TranscriptionFactorGroup
 {
+    private static Map<String, Map<String, Map<String, Double>>> allRegressionCoefficients = null;
     final String name;
     final Logger logger;
     final ExecutorService executorService;
-
     final List<String> geneIDs = new ArrayList<>();
-
     final List<TranscriptionFactor> transcriptionFactors = new ArrayList<>();
     final File d_tfData;
     Set<TargetGene> targetGenes = new HashSet<>();
@@ -31,12 +30,18 @@ public class TranscriptionFactorGroup
     JSONObject distribution_ranks;
     JSONObject regression_coefficients;
     JSONObject regression_heatmaps;
+    JSONObject regression_table;
 
     public TranscriptionFactorGroup(String name, Logger logger, ExecutorService executorService)
     {
         this.name = name;
         this.logger = logger;
         this.executorService = executorService;
+
+        if (allRegressionCoefficients == null)
+        {
+            loadRegressionCoefficients(logger);
+        }
 
         d_tfData = extend(TFPRIO.configs.angularReport.fileStructure.d_data.get(), name);
 
@@ -51,6 +56,60 @@ public class TranscriptionFactorGroup
         } catch (NoSuchFieldException e)
         {
             logger.warn("No geneIDs found for " + name);
+        }
+    }
+
+    private static void loadRegressionCoefficients(Logger logger)
+    {
+        allRegressionCoefficients = new HashMap<>();
+
+        File parentDir = TFPRIO.configs.dynamite.fileStructure.d_output.get();
+
+        for (File d_groupPairing : Objects.requireNonNull(parentDir.listFiles()))
+        {
+            for (File d_hm : Objects.requireNonNull(d_groupPairing.listFiles()))
+            {
+                File f_data = new File(
+                        d_hm + File.separator + TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted.get());
+
+                List<String> lines = null;
+                try
+                {
+                    lines = FileManagement.readLines(f_data);
+                } catch (IOException e)
+                {
+                    logger.error(e.getMessage());
+                }
+                assert lines != null;
+
+                boolean first = true;
+                for (String line : lines)
+                {
+                    if (first)
+                    {
+                        first = false;
+                        continue;
+                    }
+                    String tf = line.split("\t")[0].toUpperCase();
+                    double value = Double.parseDouble(line.split("\t")[1]);
+
+                    if (!allRegressionCoefficients.containsKey(tf))
+                    {
+                        allRegressionCoefficients.put(tf, new HashMap<>());
+                    }
+                    if (!allRegressionCoefficients.get(tf).containsKey(d_hm.getName()))
+                    {
+                        allRegressionCoefficients.get(tf).put(d_hm.getName(), new HashMap<>());
+                    }
+                    if (!allRegressionCoefficients.get(tf).get(d_hm.getName()).containsKey(d_groupPairing.getName()))
+                    {
+                        allRegressionCoefficients.get(tf).get(d_hm.getName()).put(d_groupPairing.getName(), value);
+                    } else
+                    {
+                        logger.warn("Duplicate regression coefficient detected!");
+                    }
+                }
+            }
         }
     }
 
@@ -371,6 +430,7 @@ public class TranscriptionFactorGroup
 
         regression_coefficients = new JSONObject(hm_cutOff_groupPairing_fileType_file);
         regression_heatmaps = new JSONObject(hm_cutOff_stages_fileType_file);
+        regression_table = new JSONObject(allRegressionCoefficients.get(name));
 
         Generate.linkFiles(regression_coefficients, extend(d_tfData, "regression", "coefficients"), executorService,
                 logger);
@@ -417,6 +477,7 @@ public class TranscriptionFactorGroup
             {{
                 put("coefficients", regression_coefficients);
                 put("heatmaps", regression_heatmaps);
+                put("table", regression_table);
             }});
         }};
     }

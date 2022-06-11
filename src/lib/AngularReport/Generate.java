@@ -122,8 +122,9 @@ public class Generate extends ExecutableStep
 
         saveJson(transcriptionFactorGroups);
 
-        String script = "cd " + d_preprocessing.get().getAbsolutePath() + "\nnpm install --include-dev \nng build " +
-                "--output-path=" + d_output.get().getAbsolutePath();
+        String script = "cd " + d_preprocessing.get().getAbsolutePath() +
+                "\nrm -rf node_modules ; rm -f package-lock.json ; npm install --include-dev\nng build --output-path=" +
+                d_output.get().getAbsolutePath();
 
         try
         {

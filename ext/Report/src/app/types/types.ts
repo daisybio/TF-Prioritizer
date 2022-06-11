@@ -32,7 +32,12 @@ export interface TranscriptionFactorGroup {
   },
   "regression": {
     "coefficients": {},
-    "heatmaps": {}
+    "heatmaps": {},
+    "table": {
+      [hm: string]: {
+        [groupPairing: string]: number
+      }
+    }
   }
 }
 

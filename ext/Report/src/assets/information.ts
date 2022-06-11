@@ -22,6 +22,7 @@ export const INFORMATION = {
   },
   "regression": {
     "coefficients": loremIpsum,
-    "heatmaps": loremIpsum
+    "heatmaps": loremIpsum,
+    "table": loremIpsum
   }
 }
