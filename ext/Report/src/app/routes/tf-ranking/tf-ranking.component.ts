@@ -1,7 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {TranscriptionFactorGroup} from "../../types/types";
 import {TfDataGetterService} from "../../services/tf-data-getter.service";
-import {resourceChangeTicket} from "@angular/compiler-cli/src/ngtsc/core";
 
 @Component({
   selector: 'tf-ranking',
@@ -9,14 +8,50 @@ import {resourceChangeTicket} from "@angular/compiler-cli/src/ngtsc/core";
   styleUrls: ['./tf-ranking.component.css']
 })
 export class TfRankingComponent implements OnInit {
-  @Input()
-  tfGroups: TranscriptionFactorGroup[];
+  tfGroup_rank: { [tfGroup: string]: number } = {};
+  existingHms = this.tfDataGetter.getData().existingValues.hm;
+  activeHms: Set<string> = new Set<string>();
 
-  constructor(tfDataGetter: TfDataGetterService) {
-    this.tfGroups = tfDataGetter.getData().transcriptionFactorGroups;
+  constructor(private tfDataGetter: TfDataGetterService) {
   }
 
   ngOnInit(): void {
+    this.existingHms.forEach(hm => this.activeHms.add(hm));
+    this.updateRanking();
+  }
+
+  getTfGroups() {
+    return Object.keys(this.tfGroup_rank);
+  }
+
+  updateRanking() {
+    let ranked = this.tfDataGetter.getRanked(Array.from(this.activeHms.values()));
+    for (let i = 0; i < ranked.length; i++) {
+      this.tfGroup_rank[ranked[i]] = i;
+    }
+  }
+
+  getRank(tfGroup: string) {
+    return this.tfGroup_rank[tfGroup];
+  }
+
+  getTfGroup(name: string) {
+    return this.tfDataGetter.getTfGroupByName(name);
+  }
+
+  toggleHm(hm: string) {
+    if (this.activeHms.has(hm)) {
+      if (!this.isOnlyActiveHm(hm))
+        this.activeHms.delete(hm);
+    } else {
+      this.activeHms.add(hm);
+    }
+    console.log(this.activeHms);
+    this.updateRanking();
+  }
+
+  isOnlyActiveHm(hm: string) {
+    return this.activeHms.size === 1 && this.activeHms.has(hm);
   }
 
   hasTargetGene(term: string, tfGroup: TranscriptionFactorGroup) {

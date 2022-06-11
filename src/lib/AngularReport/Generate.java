@@ -296,7 +296,13 @@ public class Generate extends ExecutableStep
             put("importantLoci", importantLoci);
             put("topLog2fc", topLog2fc);
             put("coOccurrenceAnalysis", coOccurrence);
-
+            put("backgroundStats", TranscriptionFactorGroup.getBackgroundStats());
+            put("existingValues", new JSONObject(new HashMap<>()
+            {{
+                put("hm", TFPRIO.existingHms);
+                put("group", TFPRIO.groupsToHms.keySet());
+                put("groupPairing", TFPRIO.groupCombinationsToHms.keySet());
+            }}));
             put("transcriptionFactorGroups", new ArrayList<>()
             {{
                 transcriptionFactorGroups.forEach(

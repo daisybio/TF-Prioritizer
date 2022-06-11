@@ -8,8 +8,8 @@ import {tfData} from "../../assets/input/data";
   providedIn: 'root'
 })
 export class TfDataGetterService {
-  private readonly inputData: InputData;
   tfMap: { [name: string]: TranscriptionFactorGroup } = {};
+  private readonly inputData: InputData;
 
   constructor() {
     // @ts-ignore
@@ -26,5 +26,59 @@ export class TfDataGetterService {
 
   getTfGroupByName(name: string) {
     return this.tfMap[name];
+  }
+
+  getRanked(hms: string[]) {
+    let name_score: {
+      [name: string]: number
+    } = {}
+
+    for (let hm of hms) {
+      let sorted = this.getRankedForHm(hm);
+
+      for (let i = 0; i < sorted.length; i++) {
+        let tf = sorted[i];
+        if (!Object.keys(name_score).includes(tf)) name_score[tf] = 0;
+
+        name_score[tf] = name_score[tf] + (sorted.length - i) / sorted.length;
+      }
+    }
+
+    let sortable: (string | number)[][] = [];
+    for (let tf in name_score) {
+      sortable.push([tf, name_score[tf]]);
+    }
+
+    sortable.sort((a, b) => {
+      // @ts-ignore
+      return a[1] - b[1];
+    });
+    // @ts-ignore
+    let sorted: string[] = sortable.map(x => x[0]);
+    return sorted.reverse();
+  }
+
+  getRankedForHm(hm: string) {
+    let allTfs = Object.keys(this.tfMap);
+    let withData: string[] = [];
+
+    for (let tf of allTfs) {
+      if (Object.keys(this.getTfGroupByName(tf).stats).includes(hm)) {
+        withData.push(tf);
+      }
+    }
+
+    return withData.sort((a: string, b: string) => {
+      let aStats = this.getTfGroupByName(a).stats[hm];
+      let bStats = this.getTfGroupByName(b).stats[hm];
+
+      let medianDifference = aStats.median - bStats.median;
+      if (medianDifference != 0) return medianDifference;
+
+      let quantile95Difference = aStats["95_quantile"] - bStats["95_quantile"];
+      if (quantile95Difference != 0) return quantile95Difference;
+
+      return aStats["99_quantile"] - bStats["99_quantile"];
+    }).reverse();
   }
 }

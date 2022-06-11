@@ -12,7 +12,15 @@
          placeholder="Search by target gene"
          type="text">
 </div>
-
-<tf-group-accordion *ngFor="let tfGroup of tfGroups; let i = index" [index]="i+1"
-                    [ngClass]="{'hidden': !tfGroup.name.toUpperCase().includes(nameSearch.value.toUpperCase()) || !hasTargetGene(targetGeneSearch.value, tfGroup)}"
-                    [tfGroup]="tfGroup"></tf-group-accordion>
+<div class="distribute-equally">
+  <button (click)="toggleHm(existingHm)"
+          *ngFor="let existingHm of existingHms"
+          [ngClass]="{'active': activeHms.has(existingHm), 'onlyActive': isOnlyActiveHm(existingHm)}"
+          class="lighter alwaysClickable">{{existingHm}}</button>
+</div>
+<div style="display: flex; flex-direction: column">
+  <tf-group-accordion *ngFor="let tfGroup of getTfGroups()" [index]="getRank(tfGroup)+1"
+                      [ngClass]="{'hidden': !tfGroup.toUpperCase().includes(nameSearch.value.toUpperCase()) || !hasTargetGene(targetGeneSearch.value, getTfGroup(tfGroup))}"
+                      [ngStyle]="{'order': getRank(tfGroup)}"
+                      [tfGroup]="getTfGroup(tfGroup)"></tf-group-accordion>
+</div>

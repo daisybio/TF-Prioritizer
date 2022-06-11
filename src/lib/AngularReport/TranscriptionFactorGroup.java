@@ -15,6 +15,7 @@ import static util.FileManagement.*;
 public class TranscriptionFactorGroup
 {
     private static Map<String, Map<String, Map<String, Double>>> allRegressionCoefficients = null;
+    private static Map<String, Map<String, Map<String, Double>>> allStats = null;
     final String name;
     final Logger logger;
     final ExecutorService executorService;
@@ -31,6 +32,7 @@ public class TranscriptionFactorGroup
     JSONObject regression_coefficients;
     JSONObject regression_heatmaps;
     JSONObject regression_table;
+    JSONObject stats;
 
     public TranscriptionFactorGroup(String name, Logger logger, ExecutorService executorService)
     {
@@ -41,6 +43,11 @@ public class TranscriptionFactorGroup
         if (allRegressionCoefficients == null)
         {
             loadRegressionCoefficients(logger);
+        }
+
+        if (allStats == null)
+        {
+            loadAllStats(logger);
         }
 
         d_tfData = extend(TFPRIO.configs.angularReport.fileStructure.d_data.get(), name);
@@ -113,6 +120,47 @@ public class TranscriptionFactorGroup
         }
     }
 
+    private static void loadAllStats(Logger logger)
+    {
+        File d_statsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_hm.get();
+        allStats = new HashMap<>();
+
+        for (File d_hm : Objects.requireNonNull(d_statsHm.listFiles(Filters.directoryFilter)))
+        {
+            String hm = d_hm.getName();
+            File f_stats = extend(d_hm, TFPRIO.configs.distributionAnalysis.fileStructure.s_stats_csv.get());
+
+            try
+            {
+                List<String> lines = readLines(f_stats);
+                String[] header = lines.get(0).split("\t");
+                lines.subList(1, lines.size()).stream().map(line -> line.split("\t")).forEach(splittedLine ->
+                {
+                    String tfGroup = splittedLine[1];
+                    if (!allStats.containsKey(tfGroup))
+                    {
+                        allStats.put(tfGroup, new HashMap<>());
+                    }
+                    allStats.get(tfGroup).put(hm, new HashMap<>()
+                    {{
+                        for (int i = 2; i < header.length; i++)
+                        {
+                            put(header[i], Double.parseDouble(splittedLine[i]));
+                        }
+                    }});
+                });
+            } catch (IOException e)
+            {
+                logger.error(e.getMessage());
+            }
+        }
+    }
+
+    public static JSONObject getBackgroundStats()
+    {
+        return new JSONObject(allStats.get("background"));
+    }
+
     public void collectData()
     {
         logger.debug("Collecting data for group: " + name);
@@ -122,6 +170,7 @@ public class TranscriptionFactorGroup
         collectValidationFiles();
         collectDistributionFiles();
         collectRegressionFiles();
+        collectStats();
         logger.debug("Finished collecting data for group: " + name);
     }
 
@@ -437,6 +486,11 @@ public class TranscriptionFactorGroup
         Generate.linkFiles(regression_heatmaps, extend(d_tfData, "regression", "heatmaps"), executorService, logger);
     }
 
+    private void collectStats()
+    {
+        stats = new JSONObject(allStats.get(name));
+    }
+
     public JSONObject toJSONObject()
     {
         return new JSONObject()
@@ -479,6 +533,8 @@ public class TranscriptionFactorGroup
                 put("heatmaps", regression_heatmaps);
                 put("table", regression_table);
             }});
+
+            put("stats", stats);
         }};
     }
 }

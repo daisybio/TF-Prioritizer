@@ -8,8 +8,7 @@ import {TranscriptionFactorGroup} from "../../../types/types";
 })
 export class TfGroupAccordionComponent implements OnInit {
   @Input()
-    // @ts-ignore
-  tfGroup: TranscriptionFactorGroup;
+  tfGroup!: TranscriptionFactorGroup;
 
   @Input()
   showAnalysisLinks: boolean = true;

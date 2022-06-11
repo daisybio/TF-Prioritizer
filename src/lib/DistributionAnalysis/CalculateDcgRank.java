@@ -77,17 +77,17 @@ public class CalculateDcgRank extends ExecutableStep
 
         for (String hm : hmStats.keySet())
         {
-            HashMap<String, Integer> tf_to_ranks = new HashMap<>();
+            HashMap<String, Integer> tf_rank = new HashMap<>();
             int rank = 1;
 
-            ArrayList<Stats> tf_rank = hmStats.get(hm).getTfs();
+            ArrayList<Stats> tfStats = hmStats.get(hm).getTfs();
 
-            for (Stats tf : tf_rank)
+            for (Stats tfStat : tfStats)
             {
-                tf_to_ranks.put(tf.getLabel(), rank);
+                tf_rank.put(tfStat.getLabel(), rank);
                 rank++;
             }
-            hm_tf_rank.put(hm, tf_to_ranks);
+            hm_tf_rank.put(hm, tf_rank);
         }
 
 

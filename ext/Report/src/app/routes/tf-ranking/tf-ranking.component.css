@@ -5,3 +5,11 @@ tf-group-accordion {
 tf-group-accordion.hidden {
   display: none;
 }
+
+.alwaysClickable {
+  cursor: pointer;
+}
+
+.onlyActive {
+  cursor: not-allowed;
+}
