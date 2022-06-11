@@ -1,21 +1,21 @@
-<accordion-header *ngIf="hasSibling" [title]="transcriptionFactor.name" [sub]="true"
-                  (click)="toggleVisibility()"></accordion-header>
-<div class="sub-panel" [ngClass]="{'visible': visible || !hasSibling}">
+<accordion-header (click)="toggleVisibility()" *ngIf="hasSibling" [sub]="true"
+                  [title]="transcriptionFactor.name"></accordion-header>
+<div [ngClass]="{'visible': visible || !hasSibling}" class="sub-panel">
   <div class="data">
-    <data-header [title]="'GeneID'" [information]="information['basicData']['geneID']"
+    <data-header [title]="'GeneID'"
                  [transcriptionFactor]="transcriptionFactor"></data-header>
     <p>{{transcriptionFactor.geneID}}</p>
   </div>
   <div class="data">
-    <data-header [title]="'Log2fc'" [information]="information['basicData']['Log2fc']"></data-header>
+    <data-header [information]="information['basicData']['Log2fc']" [title]="'Log2fc'"></data-header>
     <data-content [data]="transcriptionFactor.log2fc"></data-content>
   </div>
   <div class="data">
-    <data-header [title]="'Normalized expression'" [information]="information['basicData']['NormEx']"></data-header>
+    <data-header [information]="information['basicData']['NormEx']" [title]="'Normalized expression'"></data-header>
     <data-content [data]="transcriptionFactor.normalizedExpression"></data-content>
   </div>
   <div class="data">
-    <data-header [title]="'TPM'" [information]="information['basicData']['tpm']"></data-header>
+    <data-header [information]="information['basicData']['tpm']" [title]="'TPM'"></data-header>
     <data-content [data]="transcriptionFactor.tpm"></data-content>
   </div>
 </div>

@@ -2,7 +2,6 @@ export const loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing el
 
 export const INFORMATION = {
   "basicData": {
-    "geneID": loremIpsum,
     "Log2fc": loremIpsum,
     "NormEx": loremIpsum,
     "tpm": loremIpsum
