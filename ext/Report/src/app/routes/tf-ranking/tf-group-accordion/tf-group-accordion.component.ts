@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit} from '@angular/core';
 import {TranscriptionFactorGroup} from "../../../types/types";
 
 @Component({
@@ -15,6 +15,8 @@ export class TfGroupAccordionComponent implements OnInit {
 
   @Input()
   index: number | undefined;
+  @Input()
+  rankingChangeEmitter?: EventEmitter<{ [tfGroup: string]: number }>
 
   visible: boolean = false
   title: string = "Undefined";
@@ -23,10 +25,19 @@ export class TfGroupAccordionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.index) {
-      this.title = this.index + ". " + this.tfGroup.name;
-    } else {
+    this.updateTitle();
+
+    this.rankingChangeEmitter?.subscribe((map: { [tfGroup: string]: number }) => {
+      this.index = map[this.tfGroup.name];
+      this.updateTitle();
+    });
+  }
+
+  updateTitle() {
+    if (this.index === undefined) {
       this.title = "Basic data";
+    } else {
+      this.title = (this.index + 1) + ". " + this.tfGroup.name;
     }
   }
 }

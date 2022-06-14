@@ -19,8 +19,9 @@
           class="lighter alwaysClickable">{{existingHm}}</button>
 </div>
 <div style="display: flex; flex-direction: column">
-  <tf-group-accordion *ngFor="let tfGroup of getTfGroups()" [index]="getRank(tfGroup)+1"
+  <tf-group-accordion *ngFor="let tfGroup of getTfGroups()" [index]="getRank(tfGroup)"
                       [ngClass]="{'hidden': !tfGroup.toUpperCase().includes(nameSearch.value.toUpperCase()) || !hasTargetGene(targetGeneSearch.value, getTfGroup(tfGroup))}"
                       [ngStyle]="{'order': getRank(tfGroup)}"
+                      [rankingChangeEmitter]="rankingChangeEmitter"
                       [tfGroup]="getTfGroup(tfGroup)"></tf-group-accordion>
 </div>

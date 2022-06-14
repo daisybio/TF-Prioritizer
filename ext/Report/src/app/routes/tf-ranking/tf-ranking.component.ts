@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit} from '@angular/core';
 import {TranscriptionFactorGroup} from "../../types/types";
 import {TfDataGetterService} from "../../services/tf-data-getter.service";
 
@@ -11,6 +11,7 @@ export class TfRankingComponent implements OnInit {
   tfGroup_rank: { [tfGroup: string]: number } = {};
   existingHms = this.tfDataGetter.getData().existingValues.hm;
   activeHms: Set<string> = new Set<string>();
+  rankingChangeEmitter: EventEmitter<{ [tfGroup: string]: number }> = new EventEmitter();
 
   constructor(private tfDataGetter: TfDataGetterService) {
   }
@@ -29,6 +30,7 @@ export class TfRankingComponent implements OnInit {
     for (let i = 0; i < ranked.length; i++) {
       this.tfGroup_rank[ranked[i]] = i;
     }
+    this.rankingChangeEmitter.emit(this.tfGroup_rank);
   }
 
   getRank(tfGroup: string) {
@@ -46,7 +48,6 @@ export class TfRankingComponent implements OnInit {
     } else {
       this.activeHms.add(hm);
     }
-    console.log(this.activeHms);
     this.updateRanking();
   }
 
