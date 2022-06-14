@@ -27,10 +27,15 @@ export class TfRankingComponent implements OnInit {
 
   updateRanking() {
     let ranked = this.tfDataGetter.getRanked(Array.from(this.activeHms.values()));
+    this.tfGroup_rank = {};
     for (let i = 0; i < ranked.length; i++) {
       this.tfGroup_rank[ranked[i]] = i;
     }
     this.rankingChangeEmitter.emit(this.tfGroup_rank);
+  }
+
+  isRanked(tfGroup: string) {
+    return Object.keys(this.tfGroup_rank).includes(tfGroup);
   }
 
   getRank(tfGroup: string) {
