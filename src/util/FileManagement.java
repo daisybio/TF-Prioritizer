@@ -387,6 +387,17 @@ public class FileManagement
         }
     }
 
+    public static void deleteFileStructure(File file, Logger logger)
+    {
+        try
+        {
+            deleteFileStructure(file);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+    }
+
     public static void deleteFileStructure(File file) throws IOException
     {
         if (Files.isSymbolicLink(file.toPath()))
