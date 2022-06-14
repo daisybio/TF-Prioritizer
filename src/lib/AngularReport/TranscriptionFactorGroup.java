@@ -14,29 +14,41 @@ import static util.FileManagement.*;
 
 public class TranscriptionFactorGroup
 {
+    private static Map<String, Map<String, Map<String, Double>>> allRegressionCoefficients = null;
+    private static Map<String, Map<String, Map<String, Double>>> allStats = null;
     final String name;
     final Logger logger;
     final ExecutorService executorService;
-
     final List<String> geneIDs = new ArrayList<>();
-
     final List<TranscriptionFactor> transcriptionFactors = new ArrayList<>();
+    final File d_tfData;
     Set<TargetGene> targetGenes = new HashSet<>();
     JSONObject validation_heatmap;
     JSONObject validation_igv;
     JSONObject validation_logos_biophysicalModel;
     JSONObject validation_logos_tfSequence;
-
     JSONObject distribution_plots;
     JSONObject distribution_ranks;
-
-    final File d_tfData;
+    JSONObject regression_coefficients;
+    JSONObject regression_heatmaps;
+    JSONObject regression_table;
+    JSONObject stats;
 
     public TranscriptionFactorGroup(String name, Logger logger, ExecutorService executorService)
     {
         this.name = name;
         this.logger = logger;
         this.executorService = executorService;
+
+        if (allRegressionCoefficients == null)
+        {
+            loadRegressionCoefficients(logger);
+        }
+
+        if (allStats == null)
+        {
+            loadAllStats(logger);
+        }
 
         d_tfData = extend(TFPRIO.configs.angularReport.fileStructure.d_data.get(), name);
 
@@ -54,6 +66,101 @@ public class TranscriptionFactorGroup
         }
     }
 
+    private static void loadRegressionCoefficients(Logger logger)
+    {
+        allRegressionCoefficients = new HashMap<>();
+
+        File parentDir = TFPRIO.configs.dynamite.fileStructure.d_output.get();
+
+        for (File d_groupPairing : Objects.requireNonNull(parentDir.listFiles()))
+        {
+            for (File d_hm : Objects.requireNonNull(d_groupPairing.listFiles()))
+            {
+                File f_data = new File(
+                        d_hm + File.separator + TFPRIO.configs.dynamite.fileStructure.s_output_toBePlotted.get());
+
+                List<String> lines = null;
+                try
+                {
+                    lines = FileManagement.readLines(f_data);
+                } catch (IOException e)
+                {
+                    logger.error(e.getMessage());
+                }
+                assert lines != null;
+
+                boolean first = true;
+                for (String line : lines)
+                {
+                    if (first)
+                    {
+                        first = false;
+                        continue;
+                    }
+                    String tf = line.split("\t")[0].toUpperCase();
+                    double value = Double.parseDouble(line.split("\t")[1]);
+
+                    if (!allRegressionCoefficients.containsKey(tf))
+                    {
+                        allRegressionCoefficients.put(tf, new HashMap<>());
+                    }
+                    if (!allRegressionCoefficients.get(tf).containsKey(d_hm.getName()))
+                    {
+                        allRegressionCoefficients.get(tf).put(d_hm.getName(), new HashMap<>());
+                    }
+                    if (!allRegressionCoefficients.get(tf).get(d_hm.getName()).containsKey(d_groupPairing.getName()))
+                    {
+                        allRegressionCoefficients.get(tf).get(d_hm.getName()).put(d_groupPairing.getName(), value);
+                    } else
+                    {
+                        logger.warn("Duplicate regression coefficient detected!");
+                    }
+                }
+            }
+        }
+    }
+
+    private static void loadAllStats(Logger logger)
+    {
+        File d_statsHm = TFPRIO.configs.distributionAnalysis.fileStructure.d_stats_hm.get();
+        allStats = new HashMap<>();
+
+        for (File d_hm : Objects.requireNonNull(d_statsHm.listFiles(Filters.directoryFilter)))
+        {
+            String hm = d_hm.getName();
+            File f_stats = extend(d_hm, TFPRIO.configs.distributionAnalysis.fileStructure.s_stats_csv.get());
+
+            try
+            {
+                List<String> lines = readLines(f_stats);
+                String[] header = lines.get(0).split("\t");
+                lines.subList(1, lines.size()).stream().map(line -> line.split("\t")).forEach(splittedLine ->
+                {
+                    String tfGroup = splittedLine[1];
+                    if (!allStats.containsKey(tfGroup))
+                    {
+                        allStats.put(tfGroup, new HashMap<>());
+                    }
+                    allStats.get(tfGroup).put(hm, new HashMap<>()
+                    {{
+                        for (int i = 2; i < header.length; i++)
+                        {
+                            put(header[i], Double.parseDouble(splittedLine[i]));
+                        }
+                    }});
+                });
+            } catch (IOException e)
+            {
+                logger.error(e.getMessage());
+            }
+        }
+    }
+
+    public static JSONObject getBackgroundStats()
+    {
+        return new JSONObject(allStats.get("background"));
+    }
+
     public void collectData()
     {
         logger.debug("Collecting data for group: " + name);
@@ -62,6 +169,8 @@ public class TranscriptionFactorGroup
         collectTargetGenes();
         collectValidationFiles();
         collectDistributionFiles();
+        collectRegressionFiles();
+        collectStats();
         logger.debug("Finished collecting data for group: " + name);
     }
 
@@ -267,30 +376,21 @@ public class TranscriptionFactorGroup
         {
             File d_source = TFPRIO.configs.distributionAnalysis.fileStructure.d_plots_hm.get();
 
-            Map<String, Map<String, Map<String, File>>> hm_targetGene_filetype_file = new HashMap<>();
+            Map<String, Map<String, File>> hm_filetype_file = new HashMap<>();
 
             for (String hm : TFPRIO.existingHms)
             {
-                hm_targetGene_filetype_file.put(hm, new HashMap<>());
+                hm_filetype_file.put(hm, new HashMap<>());
 
-                File d_hm = extend(d_source, hm);
+                File f_plot = extend(d_source, hm, name + ".png");
 
-                if (d_hm.exists())
+                if (f_plot.exists())
                 {
-                    for (File f_targetGenePlot : Objects.requireNonNull(d_hm.listFiles(Filters.fileFilter)))
-                    {
-                        String targetGene =
-                                f_targetGenePlot.getName().substring(0, f_targetGenePlot.getName().lastIndexOf("."));
-
-                        hm_targetGene_filetype_file.get(hm).put(targetGene, new HashMap<>()
-                        {{
-                            put("plot", f_targetGenePlot);
-                        }});
-                    }
+                    hm_filetype_file.get(hm).put("plot", f_plot);
                 }
             }
 
-            distribution_plots = new JSONObject(hm_targetGene_filetype_file);
+            distribution_plots = new JSONObject(hm_filetype_file);
 
             Generate.linkFiles(distribution_plots, extend(d_tfData, "distribution", "plots"), executorService, logger);
         } // Plots
@@ -338,6 +438,59 @@ public class TranscriptionFactorGroup
         } // Scores
     }
 
+    private void collectRegressionFiles()
+    {
+        logger.debug("Collecting regression files for group: " + name);
+
+        Map<String, Map<String, Map<String, Map<String, File>>>> hm_cutOff_groupPairing_fileType_file = new HashMap<>();
+        Map<String, Map<String, Map<String, Map<String, File>>>> hm_cutOff_stages_fileType_file = new HashMap<>();
+
+        File d_input = TFPRIO.configs.plots.fileStructure.d_output.get();
+
+        for (File d_hm : Objects.requireNonNull(d_input.listFiles(Filters.directoryFilter)))
+        {
+            String hm = d_hm.getName();
+            hm_cutOff_groupPairing_fileType_file.put(hm, new HashMap<>());
+            hm_cutOff_stages_fileType_file.put(hm, new HashMap<>());
+            for (File d_cutOff : Objects.requireNonNull(d_hm.listFiles(Filters.directoryFilter)))
+            {
+                String cutOff = d_cutOff.getName();
+                hm_cutOff_groupPairing_fileType_file.get(hm).put(cutOff, new HashMap<>());
+                hm_cutOff_stages_fileType_file.get(hm).put(cutOff, new HashMap<>());
+                for (File f_plot : Objects.requireNonNull(d_cutOff.listFiles(Filters.getSuffixFilter(".png"))))
+                {
+                    String comparison = f_plot.getName().replace(".png", "");
+                    if (TFPRIO.groupCombinationsToHms.containsKey(comparison))
+                    {
+                        hm_cutOff_groupPairing_fileType_file.get(hm).get(cutOff).put(comparison, new HashMap<>()
+                        {{
+                            put("plot", f_plot);
+                        }});
+                    } else
+                    {
+                        hm_cutOff_stages_fileType_file.get(hm).get(cutOff).put(comparison, new HashMap<>()
+                        {{
+                            put("plot", f_plot);
+                        }});
+                    }
+                }
+            }
+        }
+
+        regression_coefficients = new JSONObject(hm_cutOff_groupPairing_fileType_file);
+        regression_heatmaps = new JSONObject(hm_cutOff_stages_fileType_file);
+        regression_table = new JSONObject(allRegressionCoefficients.get(name));
+
+        Generate.linkFiles(regression_coefficients, extend(d_tfData, "regression", "coefficients"), executorService,
+                logger);
+        Generate.linkFiles(regression_heatmaps, extend(d_tfData, "regression", "heatmaps"), executorService, logger);
+    }
+
+    private void collectStats()
+    {
+        stats = new JSONObject(allStats.get(name));
+    }
+
     public JSONObject toJSONObject()
     {
         return new JSONObject()
@@ -374,6 +527,14 @@ public class TranscriptionFactorGroup
                 put("ranks", distribution_ranks);
             }});
             put("targetGenes", targetGeneJsonObjects);
+            put("regression", new JSONObject()
+            {{
+                put("coefficients", regression_coefficients);
+                put("heatmaps", regression_heatmaps);
+                put("table", regression_table);
+            }});
+
+            put("stats", stats);
         }};
     }
 }

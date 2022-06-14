@@ -1,0 +1,30 @@
+<div *ngIf="tfGroup; else tfUndefined">
+  <h2>{{tfGroup.name}}: Regression analysis</h2>
+  <cross-links [exclude]="'regression'" [tfGroup]="tfGroup"></cross-links>
+  <tf-group-accordion [showAnalysisLinks]="false" [tfGroup]="tfGroup"></tf-group-accordion>
+  <accordion-header (togglePanel)="tableVisible=!tableVisible" [information]="information['table']"
+                    [title]="'Regression coefficients'"></accordion-header>
+  <div [ngClass]="{'visible': tableVisible}" class="sub-panel">
+    <table style="margin-left: auto; margin-right: auto; min-width: 50%">
+      <tr>
+        <th></th>
+        <th *ngFor="let histoneModification of histoneModifications">{{histoneModification}}</th>
+      </tr>
+      <tr *ngFor="let groupPairing of groupPairings">
+        <th>{{groupPairing}}</th>
+        <ng-container *ngFor="let histoneModification of histoneModifications">
+          <td *ngIf="getValue(histoneModification, groupPairing)">{{getValue(histoneModification, groupPairing)}}</td>
+          <td *ngIf="!getValue(histoneModification, groupPairing)">-</td>
+        </ng-container>
+      </tr>
+    </table>
+  </div>
+  <image-selector [data]="tfGroup.regression.heatmaps" [information]="information['heatmaps']"
+                  [title]="'Overview regression heatmaps'"></image-selector>
+  <image-selector [data]="tfGroup.regression.coefficients" [information]="information['coefficients']"
+                  [title]="'Overview regression coefficients'"></image-selector>
+</div>
+
+<ng-template #tfUndefined>
+  <h2>Unknown transcription factor: {{routedName}}</h2>
+</ng-template>

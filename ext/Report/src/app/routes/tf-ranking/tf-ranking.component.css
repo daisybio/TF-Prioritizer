@@ -1,0 +1,15 @@
+tf-group-accordion {
+  display: block;
+}
+
+tf-group-accordion.hidden {
+  display: none;
+}
+
+.alwaysClickable {
+  cursor: pointer;
+}
+
+.onlyActive {
+  cursor: not-allowed;
+}

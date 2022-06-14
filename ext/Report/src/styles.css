@@ -59,7 +59,7 @@ body {
   flex-wrap: wrap;
 }
 
-.distribute-equally button, .distribute-equally input {
+.distribute-equally button, .distribute-equally a, .distribute-equally input {
   flex-grow: 1;
 }
 

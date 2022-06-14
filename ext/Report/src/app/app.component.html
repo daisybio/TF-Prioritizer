@@ -1,7 +1,7 @@
 <div class="right-flex">
-  <img class="clickable flex-start" src="assets/logo/logo_wide.png" [routerLink]="'documentation'"
-       alt="TFPRIO logo">
-  <button *ngIf="router.url!='/'" [routerLink]="''">TF - Ranking</button>
-  <button *ngIf="router.url!='/parameters'" [routerLink]="'parameters'">Parameters</button>
+  <img [routerLink]="''" alt="TFPRIO logo" class="clickable flex-start"
+       src="assets/logo/logo_wide.png">
+  <a *ngIf="router.url!='/documentation'" [routerLink]="'documentation'">Documentation</a>
+  <a *ngIf="router.url!='/parameters'" [routerLink]="'parameters'">Parameters</a>
 </div>
 <router-outlet></router-outlet>

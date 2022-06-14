@@ -1,0 +1,83 @@
+img {
+  max-width: 100%;
+}
+
+img:hover {
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  display: none;
+  left: -250px;
+  right: -250px;
+  z-index: 1;
+  top: 40px;
+  background-color: white;
+}
+
+.dropdown-visible {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-content: stretch;
+}
+
+.wrapper {
+  position: relative;
+  display: flex;
+}
+
+.dropdown-visible button.hidden {
+  display: none;
+}
+
+.symmetric {
+  width: 100%;
+  display: inline-grid;
+  justify-items: stretch;
+  grid-template-columns: 25% 5% 40% 5% 25%;
+}
+
+.popup-background {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.popup-header, .popup-content {
+  display: flex;
+  flex-direction: row;
+  align-content: center
+}
+
+.popup-background.visible {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.popup button, .popup .caption {
+  font-size: 60px;
+  color: #ccc;
+  background-color: transparent;
+  border-radius: 0;
+  margin: 0;
+}
+
+.popup-content button {
+  flex-grow: 1;
+}
+
+.popup button:hover {
+  background-color: rgba(256, 256, 256, 0.2);
+}
+
+.popup-content img:hover {
+  cursor: default;
+}

@@ -1,0 +1,62 @@
+<accordion-header (togglePanel)="visible=$event" *ngIf="!hideHeader" [disabled]="!isEnabled" [information]="information"
+                  [sub]="sub"
+                  [title]="title"></accordion-header>
+<div [ngClass]="{'visible': visible || hideHeader}" class="sub-panel">
+  <div *ngFor="let levelOptions of availableOptions; let level = index" class="distribute-equally">
+    <ng-container *ngIf="!(level==availableOptions.length-1 && hasDropDown); else dropdown">
+      <button (click)="updateActiveOption(level, option)" *ngFor="let option of levelOptions"
+              [disabled]="!isAllowed(level, option)"
+              [ngClass]="{'active': activeOptions[level]==option}"
+              class="lighter">{{option}}</button>
+    </ng-container>
+  </div>
+  <div *ngIf="!hasDropDown" class="distribute-equally">
+    <button (click)="popupVisible=true" class="lighter">Zoom in</button>
+    <button (click)="downloadData()" *ngIf="hasData" class="lighter">Download data</button>
+    <button (click)="openNewTab(imageSource)" class="lighter">Open in new tab</button>
+  </div>
+
+  <img (click)="popupVisible=true" [src]="imageSource">
+</div>
+
+<ng-template #dropdown>
+  <div class="symmetric">
+    <button (click)="downloadData()" *ngIf="hasData" class="lighter">Download data</button>
+    <button (click)="popupVisible=true" *ngIf="!hasData" class="lighter">Zoom in</button>
+    <button (click)="moveDropdown(-1)" class="lighter"><</button>
+    <div class="wrapper">
+      <button (click)="dropdownVisible=!dropdownVisible" [textContent]="activeOptions[activeOptions.length-1]"
+              class="light"
+              style="min-width: 280px"></button>
+      <div [ngClass]="{'dropdown-visible': dropdownVisible}" class="dropdown">
+        <input [(ngModel)]="searchTerm" class="light" placeholder="Regex search" style="width: 100%">
+        <div class="dropdown-visible">
+          <button (click)="updateActiveOption(activeOptions.length-1, option)"
+                  *ngFor="let option of availableOptions[availableOptions.length-1]"
+                  [disabled]="!isAllowed(activeOptions.length-1, option)"
+                  [ngClass]="{'active': activeOptions[activeOptions.length-1]==option, 'hidden': !matchesFilter(option)}"
+                  class="lighter">{{option}}</button>
+        </div>
+      </div>
+    </div>
+    <button (click)="moveDropdown(1)" class="lighter">></button>
+    <button (click)="openNewTab(imageSource)" class="lighter">Open in new tab</button>
+  </div>
+</ng-template>
+
+<div [ngClass]="{'visible': popupVisible}" class="popup popup-background">
+  <div class="popup-header">
+    <div style="justify-self: left; width: 10%; margin-right: auto"></div>
+    <label class="caption" style="justify-self: center; display: flex; align-items: center; justify-content: center">
+      {{activeOptions[activeOptions.length - 1]}}
+    </label>
+    <button (click)="popupVisible=false"
+            style="justify-self: right; width: 10%; margin-left: auto">X
+    </button>
+  </div>
+  <div class="popup-content">
+    <button (click)="moveDropdown(-1)"><</button>
+    <img alt="Active plot" src="{{imageSource}}" style="max-width: 80vw; max-height: 90vh">
+    <button (click)="moveDropdown(1)">></button>
+  </div>
+</div>

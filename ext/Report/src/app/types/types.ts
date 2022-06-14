@@ -7,13 +7,20 @@ export interface InputData {
   },
   "importantLoci": {},
   "topLog2fc": {},
-  "coOccurrenceAnalysis": Data[]
+  "backgroundStats": Stats,
+  "coOccurrenceAnalysis": Data[],
+  "existingValues": {
+    "groupPairing": string[],
+    "hm": string[],
+    "group": string[]
+  }
 }
 
 export interface TranscriptionFactorGroup {
   "transcriptionFactors": TranscriptionFactor[],
   "name": string,
   "targetGenes": TargetGene[],
+  "stats": Stats,
   "validation": {
     "heatmap": {},
     "igv": {},
@@ -27,6 +34,15 @@ export interface TranscriptionFactorGroup {
     "ranks": {
       [hm: string]: {
         [entryType: string]: number
+      }
+    }
+  },
+  "regression": {
+    "coefficients": {},
+    "heatmaps": {},
+    "table": {
+      [hm: string]: {
+        [groupPairing: string]: number
       }
     }
   }
@@ -48,4 +64,15 @@ export interface TargetGene {
 export interface Data {
   "groups": string[],
   "value": number
+}
+
+export interface Stats {
+  [hm: string]: {
+    "sum_all_values": number,
+    "number_target_genes": number,
+    "median": number,
+    "99_quantile": number,
+    "mean": number,
+    "95_quantile": number
+  }
 }

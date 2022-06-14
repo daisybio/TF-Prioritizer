@@ -1,0 +1,27 @@
+<h2>Prioritized transcription factors</h2>
+<div class="distribute-equally">
+  <a [routerLink]="'/importantLoci'">Important loci</a>
+  <a [routerLink]="'/topLog2fc'">Top LOG2FC</a>
+  <a [routerLink]="'/coOccurrenceAnalysis'">Co-Occurrence Analysis</a>
+</div>
+<div class="distribute-equally">
+  <input #nameSearch (keyup)="targetGeneSearch.value=''"
+         placeholder="Search by name"
+         type="text">
+  <input #targetGeneSearch (keyup)="nameSearch.value=''"
+         placeholder="Search by target gene"
+         type="text">
+</div>
+<div class="distribute-equally">
+  <button (click)="toggleHm(existingHm)"
+          *ngFor="let existingHm of existingHms"
+          [ngClass]="{'active': activeHms.has(existingHm), 'onlyActive': isOnlyActiveHm(existingHm)}"
+          class="lighter alwaysClickable">{{existingHm}}</button>
+</div>
+<div style="display: flex; flex-direction: column">
+  <tf-group-accordion *ngFor="let tfGroup of getTfGroups()" [index]="getRank(tfGroup)"
+                      [ngClass]="{'hidden': !tfGroup.toUpperCase().includes(nameSearch.value.toUpperCase()) || !hasTargetGene(targetGeneSearch.value, getTfGroup(tfGroup))  || !isRanked(tfGroup)}"
+                      [ngStyle]="{'order': getRank(tfGroup)}"
+                      [rankingChangeEmitter]="rankingChangeEmitter"
+                      [tfGroup]="getTfGroup(tfGroup)"></tf-group-accordion>
+</div>

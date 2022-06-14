@@ -14,7 +14,7 @@ import static util.FileManagement.extend;
 public class FileStructure extends AbstractModule
 {
     public final GeneratedFileStructure d_preprocessing = extend(workingDirectory, "Report_Preprocessing");
-    public final GeneratedFileStructure f_data = extend(d_preprocessing, "src", "assets", "input", "data.json");
+    public final GeneratedFileStructure f_data = extend(d_preprocessing, "src", "assets", "input", "data.ts");
     public final GeneratedFileStructure d_data = extend(d_preprocessing, "src", "assets", "input", "data");
     public final GeneratedFileStructure f_script = extend(d_preprocessing, "generate.sh");
 

@@ -33,6 +33,39 @@ public class Generate extends ExecutableStep
 
     ArrayList<JSONObject> coOccurrence;
 
+    public static void linkFiles(JSONObject map, File d_target, ExecutorService executorService, Logger logger)
+    {
+        logger.info("Linking files to " + d_target.getAbsolutePath());
+
+        Set<String> keysToRemove = new HashSet<>();
+
+        for (String key : map.keySet())
+        {
+            File newTarget = extend(d_target, key);
+
+            Object value = map.get(key);
+
+            if (value.getClass().equals(String.class))
+            {
+                File sourceFile = new File((String) value);
+                String extension = sourceFile.getName().substring(sourceFile.getName().lastIndexOf("."));
+
+                File targetFile = new File(newTarget.getAbsolutePath() + extension);
+
+                executorService.submit(() -> softLink(targetFile, sourceFile, logger));
+
+                map.put(key, targetFile.getAbsolutePath()
+                        .replace(TFPRIO.configs.angularReport.fileStructure.d_data.get().getAbsolutePath(), ""));
+
+            } else if (value.getClass().equals(JSONObject.class))
+            {
+                linkFiles((JSONObject) value, newTarget, executorService, logger);
+            } else
+            {
+                logger.error("Illegal map structure detected");
+            }
+        }
+    }
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
@@ -89,8 +122,9 @@ public class Generate extends ExecutableStep
 
         saveJson(transcriptionFactorGroups);
 
-        String script = "cd " + d_preprocessing.get().getAbsolutePath() + "\nnpm install --include-dev \nng build " +
-                "--output-path=" + d_output.get().getAbsolutePath();
+        String script = "cd " + d_preprocessing.get().getAbsolutePath() +
+                "\nrm -rf node_modules ; rm -f package-lock.json ; npm install --include-dev\nng build --output-path=" +
+                d_output.get().getAbsolutePath();
 
         try
         {
@@ -262,7 +296,13 @@ public class Generate extends ExecutableStep
             put("importantLoci", importantLoci);
             put("topLog2fc", topLog2fc);
             put("coOccurrenceAnalysis", coOccurrence);
-
+            put("backgroundStats", TranscriptionFactorGroup.getBackgroundStats());
+            put("existingValues", new JSONObject(new HashMap<>()
+            {{
+                put("hm", TFPRIO.existingHms);
+                put("group", TFPRIO.groupsToHms.keySet());
+                put("groupPairing", TFPRIO.groupCombinationsToHms.keySet());
+            }}));
             put("transcriptionFactorGroups", new ArrayList<>()
             {{
                 transcriptionFactorGroups.forEach(
@@ -273,42 +313,10 @@ public class Generate extends ExecutableStep
 
         try
         {
-            writeFile(f_output_reportJson.get(), jsonObject.toString(4));
+            writeFile(f_output_reportJson.get(), "export const tfData=" + jsonObject.toString(4));
         } catch (IOException e)
         {
             logger.error(e.getMessage());
-        }
-    }
-
-    public static void linkFiles(JSONObject map, File d_target, ExecutorService executorService, Logger logger)
-    {
-        logger.info("Linking files to " + d_target.getAbsolutePath());
-
-        for (String key : map.keySet())
-        {
-            File newTarget = extend(d_target, key);
-
-            Object value = map.get(key);
-
-            if (value.getClass().equals(String.class))
-            {
-                File sourceFile = new File((String) value);
-                String extension = sourceFile.getName().substring(sourceFile.getName().lastIndexOf("."));
-
-                File targetFile = new File(newTarget.getAbsolutePath() + extension);
-
-                executorService.submit(() -> softLink(targetFile, sourceFile, logger));
-
-                map.put(key, targetFile.getAbsolutePath()
-                        .replace(TFPRIO.configs.angularReport.fileStructure.d_data.get().getAbsolutePath(), ""));
-
-            } else if (value.getClass().equals(JSONObject.class))
-            {
-                linkFiles((JSONObject) value, newTarget, executorService, logger);
-            } else
-            {
-                logger.error("Illegal map structure detected");
-            }
         }
     }
 }
