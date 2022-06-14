@@ -32,6 +32,8 @@ public class PostProcessing extends ExecutableStep
 
     @Override protected void execute()
     {
+        boolean compress = false;
+
         File f_index = extend(TFPRIO.configs.angularReport.fileStructure.d_output.get(), "index.html");
         try
         {
@@ -41,13 +43,16 @@ public class PostProcessing extends ExecutableStep
         {
             logger.error(e.getMessage());
         }
-        File d_assetsInputData =
-                extend(TFPRIO.configs.angularReport.fileStructure.d_output.get(), "assets", "input", "data");
-        for (File d_tf : Objects.requireNonNull(d_assetsInputData.listFiles(
-                file -> !Arrays.asList("importantLoci", "topLog2fc").contains(file.getName()))))
+        if (compress)
         {
-            File d_igv = extend(d_tf, "validation", "igv");
-            compressPngsInDirectory(d_igv);
+            File d_assetsInputData =
+                    extend(TFPRIO.configs.angularReport.fileStructure.d_output.get(), "assets", "input", "data");
+            for (File d_tf : Objects.requireNonNull(d_assetsInputData.listFiles(
+                    file -> !Arrays.asList("importantLoci", "topLog2fc").contains(file.getName()))))
+            {
+                File d_igv = extend(d_tf, "validation", "igv");
+                compressPngsInDirectory(d_igv);
+            }
         }
     }
 
