@@ -185,7 +185,7 @@ public class Randomization extends ExecutableStep
         Function<Region, Region> getRegionWithMargin =
                 region -> new Region(region.getChromosome(), region.getStart() - margin, region.getEnd() + margin);
 
-        int tp = 0, fp = 0, fn = 0;
+        int tp = 0, fp = 0, fn = 0, tn = 0;
 
         for (Region entry : comparison)
         {
@@ -252,25 +252,23 @@ public class Randomization extends ExecutableStep
 
         List<Region> randomWindows = getRandomEntries(notComparedWindows,
                 (int) StreamSupport.stream(comparison.spliterator(), false).count());
-        int tn_randomized = 0, fn_randomized = 0;
 
         for (Region randomWindow : randomWindows)
         {
             if (groundTruthTrees.hasOverlap(randomWindow))
             {
-                fn_randomized++;
+                fn++;
             } else
             {
-                tn_randomized++;
+                tn++;
             }
         }
 
         ConfusionMatrix matrix = new ConfusionMatrix();
-        matrix.setFn(fn);
         matrix.setTp(tp);
         matrix.setFp(fp);
-        matrix.setFnRandomized(fn_randomized);
-        matrix.setTnRandomized(tn_randomized);
+        matrix.setFn(fn);
+        matrix.setTn(tn);
 
         return matrix;
     }
