@@ -1,4 +1,4 @@
-package lib.Randomization;
+package lib.ConfusionMatrixes;
 
 import lib.ExecutableStep;
 import org.json.JSONObject;
@@ -18,7 +18,7 @@ import java.util.stream.StreamSupport;
 
 import static util.FileManagement.*;
 
-public class Randomization extends ExecutableStep
+public class Generate extends ExecutableStep
 {
     private final AbstractConfig<File> f_input_chromosomeLengths =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_chromosomeLengths;
@@ -26,6 +26,8 @@ public class Randomization extends ExecutableStep
     private final AbstractConfig<File> d_tepic_predictedPeaks =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
     private final AbstractConfig<File> d_input_experimentalPeaks = TFPRIO.configs.igv.pathToTfChipSeq;
+
+    private final GeneratedFileStructure d_output = TFPRIO.configs.confusionMatrixes.fileStructure.d_output;
     private final AbstractConfig<Integer> windowSize = TFPRIO.configs.tepic.windowSize;
 
     private final Map<String, Integer> chromosomeLengths = new HashMap<>();
@@ -64,7 +66,10 @@ public class Randomization extends ExecutableStep
 
     @Override public Set<GeneratedFileStructure> getCreatedFileStructure()
     {
-        return new HashSet<>();
+        return new HashSet<>()
+        {{
+            add(d_output);
+        }};
     }
 
     @Override protected Set<AbstractConfig<?>> getRequiredConfigs()
@@ -94,6 +99,8 @@ public class Randomization extends ExecutableStep
         for (File d_tfGroup : Objects.requireNonNull(d_chipAtlas_peakFiles.get().listFiles(Filters.directoryFilter)))
         {
             {
+                JSONObject confusionMatrices = new JSONObject();
+
                 String tfGroup = d_tfGroup.getName().replaceAll("\\d+_", "");
                 logger.info("Loading data for tf: " + tfGroup);
 
@@ -132,6 +139,7 @@ public class Randomization extends ExecutableStep
                 {
                     ConfusionMatrix chipVsPredicted = getConfusionMatrix(chipAtlasRegions, predictedRegions);
                     logger.info("ChipAtlas vs predicted: " + chipVsPredicted);
+                    confusionMatrices.put("chip", chipVsPredicted.toMap());
                 }
 
                 if (d_input_experimentalPeaks.isSet())
@@ -160,6 +168,7 @@ public class Randomization extends ExecutableStep
                         ConfusionMatrix experimentalVsPredicted =
                                 getConfusionMatrix(experimentalRegions, predictedRegions);
                         logger.info("Experimental vs predicted: " + experimentalVsPredicted);
+                        confusionMatrices.put("experimental", experimentalVsPredicted.toMap());
 
                         Set<Region> combined = new HashSet<>()
                         {{
@@ -168,8 +177,12 @@ public class Randomization extends ExecutableStep
                         }};
                         ConfusionMatrix combinedVsPredicted = getConfusionMatrix(combined, predictedRegions);
                         logger.info("Combined vs predicted: " + combinedVsPredicted);
+                        confusionMatrices.put("combined", combinedVsPredicted.toMap());
                     }
                 }
+
+                File f_output = extend(d_output.get(), tfGroup + ".json");
+                writeFile(f_output, confusionMatrices.toString(4), logger);
             }
         }
     }

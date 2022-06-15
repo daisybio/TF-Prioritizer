@@ -1,15 +1,19 @@
 package util.Configs;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
-import util.Configs.Modules.*;
+import util.Configs.Modules.AbstractModule;
 import util.Configs.Modules.AngularReport.AngularReport;
 import util.Configs.Modules.Blacklist.Blacklist;
 import util.Configs.Modules.ChipAtlas.ChipAtlas;
+import util.Configs.Modules.ConfusionMatrixes.ConfusionMatrixes;
 import util.Configs.Modules.DeSeq2.DeSeq2;
 import util.Configs.Modules.DistributionAnalysis.DistributionAnalysis;
 import util.Configs.Modules.Dynamite.Dynamite;
+import util.Configs.Modules.General;
 import util.Configs.Modules.Igv.Igv;
 import util.Configs.Modules.Jaspar.Jaspar;
 import util.Configs.Modules.MixOptions.MixOptions;
@@ -19,6 +23,7 @@ import util.Configs.Modules.ScriptTemplates.ScriptTemplates;
 import util.Configs.Modules.Tepic.Tepic;
 import util.Configs.Modules.Tgene.Tgene;
 import util.FileManagement;
+import util.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +34,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.json.*;
-import util.Logger;
-
 import static util.FileManagement.*;
 
 public class Configs
@@ -40,85 +42,69 @@ public class Configs
      * Maps the module names to their objects
      */
     private final Map<String, AbstractModule> configs = new HashMap<>();
-
+    private final Logger logger;
+    private final File logFile;
     /**
      * Configs that do not belong to a single module
      */
     public General general;
-
     /**
      * Configs for the Jaspar module
      */
     public Jaspar jaspar;
-
     /**
      * Configs for the Tgene module
      */
     public Tgene tgene;
-
     /**
      * Configs fot the Deseq2 module
      */
     public DeSeq2 deSeq2;
-
     /**
      * Configs for the Tepic module
      */
     public Tepic tepic;
-
     /**
      * Configs for the dynamite module
      */
     public Dynamite dynamite;
-
     /**
      * Configs for the IGV module
      */
     public Igv igv;
-
     /**
      * Configs for the Report module
      */
     public Report report;
-
     /**
      * Configs for the Blacklist module
      */
     public Blacklist blacklist;
-
     /**
      * Configs fot the MixOptions module
      */
     public MixOptions mixOptions;
-
     /**
      * Configs for the DistributionAnalysis module
      */
     public DistributionAnalysis distributionAnalysis;
-
     /**
      * Configs for the Plots module
      */
     public Plots plots;
-
     /**
      * Configs for the ScriptTemplates module
      */
     public ScriptTemplates scriptTemplates;
-
     /**
      * Configs for the ChipAtlas module
      */
     public ChipAtlas chipAtlas;
-
     /**
      * Configs for the AngularReport module
      */
     public AngularReport angularReport;
-
-    private final Logger logger;
-
-    private final File logFile;
+    public ConfusionMatrixes confusionMatrixes;
 
     /**
      * The default constructor.

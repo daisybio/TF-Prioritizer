@@ -1,4 +1,7 @@
-package lib.Randomization;
+package lib.ConfusionMatrixes;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConfusionMatrix
 {
@@ -50,5 +53,16 @@ public class ConfusionMatrix
     @Override public String toString()
     {
         return "ConfusionMatrix{" + "tn=" + tn + ", tp=" + tp + ", fp=" + fp + ", fn=" + fn + '}';
+    }
+
+    public Map<String, Integer> toMap()
+    {
+        return new HashMap<>()
+        {{
+            put("tn", tn);
+            put("tp", tp);
+            put("fp", fp);
+            put("fn", fn);
+        }};
     }
 }
