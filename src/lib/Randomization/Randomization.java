@@ -5,14 +5,12 @@ import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
 import util.FileFilters.Filters;
+import util.RegionSearchTree.ChromosomeRegionTrees;
 import util.Regions.Region;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static util.FileManagement.extend;
 import static util.FileManagement.readLines;
@@ -23,6 +21,7 @@ public class Randomization extends ExecutableStep
     private final AbstractConfig<File> d_tepic_predictedPeaks =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
     private final AbstractConfig<File> d_input_experimentalPeaks = TFPRIO.configs.igv.pathToTfChipSeq;
+    private final AbstractConfig<Integer> windowSize = TFPRIO.configs.tepic.windowSize;
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
@@ -88,6 +87,10 @@ public class Randomization extends ExecutableStep
             if (predictedRegions.size() == 0)
             {
                 logger.warn("No predicted data found for tf: " + tfGroup);
+            } else
+            {
+                Integer[] chipVsPredicted = getConfusionMatrix(chipAtlasRegions, predictedRegions);
+                logger.info("ChipAtlas vs predicted: " + Arrays.toString(chipVsPredicted));
             }
 
             if (d_input_experimentalPeaks.isSet())
@@ -111,6 +114,18 @@ public class Randomization extends ExecutableStep
                 if (experimentalRegions.size() == 0)
                 {
                     logger.warn("No experimental data found for tf: " + tfGroup);
+                } else
+                {
+                    Integer[] experimentalVsPredicted = getConfusionMatrix(experimentalRegions, predictedRegions);
+                    logger.info("Experimental vs predicted: " + Arrays.toString(experimentalVsPredicted));
+
+                    Set<Region> combined = new HashSet<>()
+                    {{
+                        addAll(experimentalRegions);
+                        addAll(chipAtlasRegions);
+                    }};
+                    Integer[] combinedVsPredicted = getConfusionMatrix(combined, predictedRegions);
+                    logger.info("Combined vs predicted: " + Arrays.toString(combinedVsPredicted));
                 }
             }
         }
@@ -130,5 +145,41 @@ public class Randomization extends ExecutableStep
         }
 
         return regions;
+    }
+
+    private Integer[] getConfusionMatrix(Set<Region> groundTruth, Set<Region> comparison)
+    {
+        ChromosomeRegionTrees groundTruthTrees = new ChromosomeRegionTrees();
+        groundTruthTrees.addAllOptimized(groundTruth, true);
+
+        int tp = 0, tn = 0, fp = 0, fn = 0;
+
+        for (Region entry : comparison)
+        {
+            Region searchRegion = new Region(entry.getChromosome(), entry.getStart() - windowSize.get() / 2,
+                    entry.getEnd() + windowSize.get() / 2);
+            if (groundTruthTrees.hasOverlap(searchRegion))
+            {
+                tp++;
+            } else
+            {
+                fp++;
+            }
+        }
+
+        ChromosomeRegionTrees comparisonTrees = new ChromosomeRegionTrees();
+        comparisonTrees.addAllOptimized(comparison, true);
+
+        for (Region entry : groundTruth)
+        {
+            Region searchRegion = new Region(entry.getChromosome(), entry.getStart() - windowSize.get() / 2,
+                    entry.getEnd() + windowSize.get() / 2);
+            if (!comparisonTrees.hasOverlap(searchRegion))
+            {
+                fn++;
+            }
+        }
+
+        return new Integer[]{tp, tn, fp, fn};
     }
 }
