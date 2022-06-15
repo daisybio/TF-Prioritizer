@@ -10,10 +10,9 @@ import util.Regions.Region;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static util.FileManagement.extend;
 import static util.FileManagement.readLines;
@@ -25,6 +24,28 @@ public class Randomization extends ExecutableStep
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
     private final AbstractConfig<File> d_input_experimentalPeaks = TFPRIO.configs.igv.pathToTfChipSeq;
     private final AbstractConfig<Integer> windowSize = TFPRIO.configs.tepic.windowSize;
+
+    private static List<Region> getRandomEntries(List<Region> regions, int numberOfEntries)
+    {
+        List<Region> selectedRegions;
+        int numberOfAvailableRegions = regions.size();
+        if (numberOfEntries < numberOfAvailableRegions)
+        {
+            Collections.shuffle(regions);
+            selectedRegions = new ArrayList<>(regions.subList(0, numberOfEntries - 1));
+        } else
+        {
+            selectedRegions = new ArrayList<>();
+            Random random = new Random();
+
+            for (int i = 0; i < numberOfEntries; i++)
+            {
+                selectedRegions.add(regions.get(random.nextInt(numberOfAvailableRegions)));
+            }
+        }
+
+        return selectedRegions;
+    }
 
     @Override protected Set<AbstractConfig<File>> getRequiredFileStructure()
     {
@@ -150,7 +171,7 @@ public class Randomization extends ExecutableStep
         return regions;
     }
 
-    private ConfusionMatrix getConfusionMatrix(Set<Region> groundTruth, Set<Region> comparison)
+    private ConfusionMatrix getConfusionMatrix(Iterable<Region> groundTruth, Iterable<Region> comparison)
     {
         ChromosomeRegionTrees groundTruthTrees = new ChromosomeRegionTrees();
         groundTruthTrees.addAllOptimized(groundTruth, true);
@@ -183,10 +204,67 @@ public class Randomization extends ExecutableStep
             }
         }
 
+        Set<Region> comparisonRegionsWithWindow = new HashSet<>()
+        {{
+            addAll(StreamSupport.stream(comparison.spliterator(), false)
+                    .map(region -> new Region(region.getChromosome(), region.getStart() - windowSize.get() / 2,
+                            region.getEnd() + windowSize.get() / 2)).collect(Collectors.toSet()));
+        }};
+
+        ChromosomeRegionTrees comparisonWithWindows = new ChromosomeRegionTrees();
+        comparisonWithWindows.addAllOptimized(comparisonRegionsWithWindow, true);
+        Map<String, List<Region>> sortedComparisonsWithWindow = comparisonWithWindows.getAllRegionsSorted();
+        List<Region> notComparedWindows = new ArrayList<>();
+
+        sortedComparisonsWithWindow.forEach((chromosome, regions) ->
+        {
+            List<Region> emptyRegions = new ArrayList<>();
+            int nextStart = 0;
+
+            for (Region region : regions)
+            {
+                emptyRegions.add(new Region(chromosome, nextStart, region.getStart() - 1));
+                nextStart = region.getEnd() + 1;
+            }
+
+            emptyRegions.forEach(region ->
+            {
+                int length = region.getEnd() - region.getStart();
+
+                for (int end = windowSize.get(); end < length + windowSize.get(); end += windowSize.get() + 1)
+                {
+                    if (end > length)
+                    {
+                        end = length;
+                    }
+
+                    int start = Math.max(end - windowSize.get(), 0);
+                    notComparedWindows.add(new Region(chromosome, start, end));
+                }
+            });
+        });
+
+        List<Region> randomWindows = getRandomEntries(notComparedWindows,
+                (int) StreamSupport.stream(comparison.spliterator(), false).count());
+        int tn_randomized = 0, fn_randomized = 0;
+
+        for (Region randomWindow : randomWindows)
+        {
+            if (groundTruthTrees.hasOverlap(randomWindow))
+            {
+                fn_randomized++;
+            } else
+            {
+                tn_randomized++;
+            }
+        }
+
         ConfusionMatrix matrix = new ConfusionMatrix();
         matrix.setFn(fn);
         matrix.setTp(tp);
         matrix.setFp(fp);
+        matrix.setFnRandomized(fn_randomized);
+        matrix.setTnRandomized(tn_randomized);
 
         return matrix;
     }

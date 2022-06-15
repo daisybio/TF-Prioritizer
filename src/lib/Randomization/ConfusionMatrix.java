@@ -2,7 +2,32 @@ package lib.Randomization;
 
 public class ConfusionMatrix
 {
-    private int tn, tp, fp, fn;
+    private int tn;
+    private int tp;
+    private int fp;
+    private int fn;
+    private int tnRandomized;
+    private int fnRandomized;
+
+    public int getTnRandomized()
+    {
+        return tnRandomized;
+    }
+
+    public void setTnRandomized(int tnRandomized)
+    {
+        this.tnRandomized = tnRandomized;
+    }
+
+    public int getFnRandomized()
+    {
+        return fnRandomized;
+    }
+
+    public void setFnRandomized(int fnRandomized)
+    {
+        this.fnRandomized = fnRandomized;
+    }
 
     public int getTn()
     {
@@ -46,6 +71,7 @@ public class ConfusionMatrix
 
     @Override public String toString()
     {
-        return "ConfusionMatrix{" + "tn=" + tn + ", tp=" + tp + ", fp=" + fp + ", fn=" + fn + '}';
+        return "ConfusionMatrix{" + "tn=" + tn + ", tp=" + tp + ", fp=" + fp + ", fn=" + fn + ", tnRandomized=" +
+                tnRandomized + ", fnRandomized=" + fnRandomized + '}';
     }
 }
