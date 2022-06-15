@@ -13,6 +13,8 @@ import static util.FileManagement.extend;
 public class FileStructure extends AbstractModule
 {
     public final GeneratedFileStructure d_preprocessing = extend(workingDirectory, "02_A_DESeq2_preprocessing");
+    public final GeneratedFileStructure f_preprocessing_chromosomeLengths =
+            extend(d_preprocessing, "chromosomeLengths.json");
 
     public final GeneratedFileStructure f_mapping = extend(d_preprocessing, "ENSG_SYMBOL_MAP.csv");
     public final GeneratedFileStructure f_mappingScript = extend(d_preprocessing, "ENSG_SYMBOL_MAP.R");
@@ -42,18 +44,14 @@ public class FileStructure extends AbstractModule
             extend(d_preprocessing_genePositions, "uplift_positions.py");
     public final GeneratedFileStructure f_preprocessing_genePositions_data =
             extend(d_preprocessing_genePositions, "gene_positions.csv");
+    public final GeneratedFileStructure f_preprocessing_genePositions_mergedEnhancerDbs =
+            extend(d_preprocessing_genePositions, "mergedEnhancerDBs.bed");
+    public final GeneratedFileStructure d_preprocessing_genePositions_enhancerDBs =
+            extend(d_preprocessing_genePositions, "enhancerDBs_prev");
     public final InternalConfig<String> s_preprocessing_genePositions_mergedEnhancerDbs_bedSuffix =
             new InternalConfig<>(".bed");
     public final InternalConfig<String> s_preprocessing_genePositions_mergedEnhancerDbs_bedFormat =
             new InternalConfig<>("chrom\tchromStart\tchromEnd\tname\treference_genome");
-    public final GeneratedFileStructure f_preprocessing_genePositions_mergedEnhancerDbs =
-            extend(d_preprocessing_genePositions,
-                    "mergedEnhancerDBs" + s_preprocessing_genePositions_mergedEnhancerDbs_bedSuffix.get());
-
-
-    public final GeneratedFileStructure d_preprocessing_genePositions_enhancerDBs =
-            extend(d_preprocessing_genePositions, "enhancerDBs_prev");
-
     public final GeneratedFileStructure d_outputRaw = extend(workingDirectory, "02_B_DESeq2_output_raw");
     public final GeneratedFileStructure d_rScripts = extend(workingDirectory, "02_C_DESeq2_R_scripts");
     public final GeneratedFileStructure d_output = extend(workingDirectory, "02_D_DESeq2_output");
