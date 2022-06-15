@@ -10,7 +10,10 @@ import util.Regions.Region;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static util.FileManagement.extend;
 import static util.FileManagement.readLines;
@@ -89,8 +92,8 @@ public class Randomization extends ExecutableStep
                 logger.warn("No predicted data found for tf: " + tfGroup);
             } else
             {
-                Integer[] chipVsPredicted = getConfusionMatrix(chipAtlasRegions, predictedRegions);
-                logger.info("ChipAtlas vs predicted: " + Arrays.toString(chipVsPredicted));
+                ConfusionMatrix chipVsPredicted = getConfusionMatrix(chipAtlasRegions, predictedRegions);
+                logger.info("ChipAtlas vs predicted: " + chipVsPredicted);
             }
 
             if (d_input_experimentalPeaks.isSet())
@@ -116,16 +119,16 @@ public class Randomization extends ExecutableStep
                     logger.warn("No experimental data found for tf: " + tfGroup);
                 } else
                 {
-                    Integer[] experimentalVsPredicted = getConfusionMatrix(experimentalRegions, predictedRegions);
-                    logger.info("Experimental vs predicted: " + Arrays.toString(experimentalVsPredicted));
+                    ConfusionMatrix experimentalVsPredicted = getConfusionMatrix(experimentalRegions, predictedRegions);
+                    logger.info("Experimental vs predicted: " + experimentalVsPredicted);
 
                     Set<Region> combined = new HashSet<>()
                     {{
                         addAll(experimentalRegions);
                         addAll(chipAtlasRegions);
                     }};
-                    Integer[] combinedVsPredicted = getConfusionMatrix(combined, predictedRegions);
-                    logger.info("Combined vs predicted: " + Arrays.toString(combinedVsPredicted));
+                    ConfusionMatrix combinedVsPredicted = getConfusionMatrix(combined, predictedRegions);
+                    logger.info("Combined vs predicted: " + combinedVsPredicted);
                 }
             }
         }
@@ -147,12 +150,12 @@ public class Randomization extends ExecutableStep
         return regions;
     }
 
-    private Integer[] getConfusionMatrix(Set<Region> groundTruth, Set<Region> comparison)
+    private ConfusionMatrix getConfusionMatrix(Set<Region> groundTruth, Set<Region> comparison)
     {
         ChromosomeRegionTrees groundTruthTrees = new ChromosomeRegionTrees();
         groundTruthTrees.addAllOptimized(groundTruth, true);
 
-        int tp = 0, tn = 0, fp = 0, fn = 0;
+        int tp = 0, fp = 0, fn = 0;
 
         for (Region entry : comparison)
         {
@@ -180,6 +183,11 @@ public class Randomization extends ExecutableStep
             }
         }
 
-        return new Integer[]{tp, tn, fp, fn};
+        ConfusionMatrix matrix = new ConfusionMatrix();
+        matrix.setFn(fn);
+        matrix.setTp(tp);
+        matrix.setFp(fp);
+
+        return matrix;
     }
 }
