@@ -91,8 +91,6 @@ public class Randomization extends ExecutableStep
             logger.error(e.getMessage());
         }
 
-        System.out.println(chromosomeLengths);
-
         for (File d_tfGroup : Objects.requireNonNull(d_chipAtlas_peakFiles.get().listFiles(Filters.directoryFilter)))
         {
             {
@@ -241,6 +239,7 @@ public class Randomization extends ExecutableStep
         sortedComparisonsWithWindow.forEach((chromosome, regions) ->
         {
             List<Region> emptyRegions = new ArrayList<>();
+            int chromosomeLength = chromosomeLengths.get(chromosome);
             int nextStart = 0;
 
             for (Region region : regions)
@@ -248,6 +247,7 @@ public class Randomization extends ExecutableStep
                 emptyRegions.add(new Region(chromosome, nextStart, region.getStart() - 1));
                 nextStart = region.getEnd() + 1;
             }
+            emptyRegions.add(new Region(chromosome, nextStart, chromosomeLength));
 
             emptyRegions.forEach(region ->
             {
