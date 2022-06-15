@@ -1,6 +1,7 @@
 package lib.Randomization;
 
 import lib.ExecutableStep;
+import org.json.JSONObject;
 import tfprio.tfprio.TFPRIO;
 import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
@@ -15,16 +16,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static util.FileManagement.extend;
-import static util.FileManagement.readLines;
+import static util.FileManagement.*;
 
 public class Randomization extends ExecutableStep
 {
+    private final AbstractConfig<File> f_input_chromosomeLengths =
+            TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_chromosomeLengths;
     private final AbstractConfig<File> d_chipAtlas_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
     private final AbstractConfig<File> d_tepic_predictedPeaks =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
     private final AbstractConfig<File> d_input_experimentalPeaks = TFPRIO.configs.igv.pathToTfChipSeq;
     private final AbstractConfig<Integer> windowSize = TFPRIO.configs.tepic.windowSize;
+
+    private final Map<String, Integer> chromosomeLengths = new HashMap<>();
 
     private static List<Region> getRandomEntries(List<Region> regions, int numberOfEntries)
     {
@@ -54,6 +58,7 @@ public class Randomization extends ExecutableStep
         {{
             add(d_chipAtlas_peakFiles);
             add(d_tepic_predictedPeaks);
+            add(f_input_chromosomeLengths);
         }};
     }
 
@@ -77,6 +82,17 @@ public class Randomization extends ExecutableStep
 
     @Override protected void execute()
     {
+        try
+        {
+            JSONObject json = new JSONObject(readFile(f_input_chromosomeLengths.get()));
+            json.keySet().forEach(key -> chromosomeLengths.put(key, json.getInt(key)));
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+
+        System.out.println(chromosomeLengths);
+
         for (File d_tfGroup : Objects.requireNonNull(d_chipAtlas_peakFiles.get().listFiles(Filters.directoryFilter)))
         {
             {
