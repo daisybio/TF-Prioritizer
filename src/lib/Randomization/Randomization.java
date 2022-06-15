@@ -11,6 +11,7 @@ import util.Regions.Region;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -32,7 +33,7 @@ public class Randomization extends ExecutableStep
         if (numberOfEntries < numberOfAvailableRegions)
         {
             Collections.shuffle(regions);
-            selectedRegions = new ArrayList<>(regions.subList(0, numberOfEntries - 1));
+            selectedRegions = new ArrayList<>(regions.subList(0, numberOfEntries));
         } else
         {
             selectedRegions = new ArrayList<>();
@@ -78,78 +79,82 @@ public class Randomization extends ExecutableStep
     {
         for (File d_tfGroup : Objects.requireNonNull(d_chipAtlas_peakFiles.get().listFiles(Filters.directoryFilter)))
         {
-            String tfGroup = d_tfGroup.getName().replaceAll("\\d+_", "");
-            logger.info("Loading data for tf: " + tfGroup);
-
-            Set<Region> chipAtlasRegions = new HashSet<>();
-            Set<Region> predictedRegions = new HashSet<>();
-
-            for (File f_bed : Objects.requireNonNull(d_tfGroup.listFiles(Filters.getSuffixFilter(".bed"))))
             {
-                chipAtlasRegions.addAll(getRegionsFromBed(f_bed));
-            }
+                String tfGroup = d_tfGroup.getName().replaceAll("\\d+_", "");
+                logger.info("Loading data for tf: " + tfGroup);
 
-            for (File d_group : Objects.requireNonNull(d_tepic_predictedPeaks.get().listFiles(Filters.directoryFilter)))
-            {
-                for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
+                Set<Region> chipAtlasRegions = new HashSet<>();
+                Set<Region> predictedRegions = new HashSet<>();
+
+                for (File f_bed : Objects.requireNonNull(d_tfGroup.listFiles(Filters.getSuffixFilter(".bed"))))
                 {
-                    File f_bed;
-                    if (tfGroup.contains(".."))
-                    {
-                        f_bed = extend(d_hm, tfGroup.replace("..", "::") + "_merged.bed");
-                    } else
-                    {
-                        f_bed = extend(d_hm, tfGroup + ".bed");
-                    }
-                    if (f_bed.exists())
-                    {
-                        predictedRegions.addAll(getRegionsFromBed(f_bed));
-                    }
+                    chipAtlasRegions.addAll(getRegionsFromBed(f_bed));
                 }
-            }
-
-            if (predictedRegions.size() == 0)
-            {
-                logger.warn("No predicted data found for tf: " + tfGroup);
-            } else
-            {
-                ConfusionMatrix chipVsPredicted = getConfusionMatrix(chipAtlasRegions, predictedRegions);
-                logger.info("ChipAtlas vs predicted: " + chipVsPredicted);
-            }
-
-            if (d_input_experimentalPeaks.isSet())
-            {
-                Set<Region> experimentalRegions = new HashSet<>();
 
                 for (File d_group : Objects.requireNonNull(
-                        d_input_experimentalPeaks.get().listFiles(Filters.directoryFilter)))
+                        d_tepic_predictedPeaks.get().listFiles(Filters.directoryFilter)))
                 {
-                    File d_tf = extend(d_group, tfGroup);
-                    if (!d_tf.exists())
+                    for (File d_hm : Objects.requireNonNull(d_group.listFiles(Filters.directoryFilter)))
                     {
-                        continue;
-                    }
-                    for (File f_peaks : Objects.requireNonNull(d_tf.listFiles(Filters.fileFilter)))
-                    {
-                        experimentalRegions.addAll(getRegionsFromBed(f_peaks));
+                        File f_bed;
+                        if (tfGroup.contains(".."))
+                        {
+                            f_bed = extend(d_hm, tfGroup.replace("..", "::") + "_merged.bed");
+                        } else
+                        {
+                            f_bed = extend(d_hm, tfGroup + ".bed");
+                        }
+                        if (f_bed.exists())
+                        {
+                            predictedRegions.addAll(getRegionsFromBed(f_bed));
+                        }
                     }
                 }
 
-                if (experimentalRegions.size() == 0)
+                if (predictedRegions.size() == 0)
                 {
-                    logger.warn("No experimental data found for tf: " + tfGroup);
+                    logger.warn("No predicted data found for tf: " + tfGroup);
                 } else
                 {
-                    ConfusionMatrix experimentalVsPredicted = getConfusionMatrix(experimentalRegions, predictedRegions);
-                    logger.info("Experimental vs predicted: " + experimentalVsPredicted);
+                    ConfusionMatrix chipVsPredicted = getConfusionMatrix(chipAtlasRegions, predictedRegions);
+                    logger.info("ChipAtlas vs predicted: " + chipVsPredicted);
+                }
 
-                    Set<Region> combined = new HashSet<>()
-                    {{
-                        addAll(experimentalRegions);
-                        addAll(chipAtlasRegions);
-                    }};
-                    ConfusionMatrix combinedVsPredicted = getConfusionMatrix(combined, predictedRegions);
-                    logger.info("Combined vs predicted: " + combinedVsPredicted);
+                if (d_input_experimentalPeaks.isSet())
+                {
+                    Set<Region> experimentalRegions = new HashSet<>();
+
+                    for (File d_group : Objects.requireNonNull(
+                            d_input_experimentalPeaks.get().listFiles(Filters.directoryFilter)))
+                    {
+                        File d_tf = extend(d_group, tfGroup);
+                        if (!d_tf.exists())
+                        {
+                            continue;
+                        }
+                        for (File f_peaks : Objects.requireNonNull(d_tf.listFiles(Filters.fileFilter)))
+                        {
+                            experimentalRegions.addAll(getRegionsFromBed(f_peaks));
+                        }
+                    }
+
+                    if (experimentalRegions.size() == 0)
+                    {
+                        logger.warn("No experimental data found for tf: " + tfGroup);
+                    } else
+                    {
+                        ConfusionMatrix experimentalVsPredicted =
+                                getConfusionMatrix(experimentalRegions, predictedRegions);
+                        logger.info("Experimental vs predicted: " + experimentalVsPredicted);
+
+                        Set<Region> combined = new HashSet<>()
+                        {{
+                            addAll(experimentalRegions);
+                            addAll(chipAtlasRegions);
+                        }};
+                        ConfusionMatrix combinedVsPredicted = getConfusionMatrix(combined, predictedRegions);
+                        logger.info("Combined vs predicted: " + combinedVsPredicted);
+                    }
                 }
             }
         }
@@ -175,13 +180,16 @@ public class Randomization extends ExecutableStep
     {
         ChromosomeRegionTrees groundTruthTrees = new ChromosomeRegionTrees();
         groundTruthTrees.addAllOptimized(groundTruth, true);
+        int margin = windowSize.get() / 2;
+
+        Function<Region, Region> getRegionWithMargin =
+                region -> new Region(region.getChromosome(), region.getStart() - margin, region.getEnd() + margin);
 
         int tp = 0, fp = 0, fn = 0;
 
         for (Region entry : comparison)
         {
-            Region searchRegion = new Region(entry.getChromosome(), entry.getStart() - windowSize.get() / 2,
-                    entry.getEnd() + windowSize.get() / 2);
+            Region searchRegion = getRegionWithMargin.apply(entry);
             if (groundTruthTrees.hasOverlap(searchRegion))
             {
                 tp++;
@@ -196,8 +204,7 @@ public class Randomization extends ExecutableStep
 
         for (Region entry : groundTruth)
         {
-            Region searchRegion = new Region(entry.getChromosome(), entry.getStart() - windowSize.get() / 2,
-                    entry.getEnd() + windowSize.get() / 2);
+            Region searchRegion = getRegionWithMargin.apply(entry);
             if (!comparisonTrees.hasOverlap(searchRegion))
             {
                 fn++;
@@ -206,9 +213,8 @@ public class Randomization extends ExecutableStep
 
         Set<Region> comparisonRegionsWithWindow = new HashSet<>()
         {{
-            addAll(StreamSupport.stream(comparison.spliterator(), false)
-                    .map(region -> new Region(region.getChromosome(), region.getStart() - windowSize.get() / 2,
-                            region.getEnd() + windowSize.get() / 2)).collect(Collectors.toSet()));
+            addAll(StreamSupport.stream(comparison.spliterator(), false).map(getRegionWithMargin)
+                    .collect(Collectors.toSet()));
         }};
 
         ChromosomeRegionTrees comparisonWithWindows = new ChromosomeRegionTrees();
