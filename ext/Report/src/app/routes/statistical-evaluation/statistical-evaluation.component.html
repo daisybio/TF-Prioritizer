@@ -3,9 +3,9 @@
   <accordion-header (togglePanel)="toggleVisibility(tfName)" [title]="tfName"></accordion-header>
   <div [ngClass]="{'visible': isVisible(tfName)}" class="sub-panel">
     <ng-container
-      *ngFor="let matrix of [statisticalEvaluation[tfName].chip, statisticalEvaluation[tfName].experimental, statisticalEvaluation[tfName].combined]">
-      <app-confusion-matrix *ngIf="matrix"
-                            [confusionMatrix]="matrix"></app-confusion-matrix>
+      *ngFor="let matrix of statisticalEvaluation[tfName] | keyvalue">
+      <app-confusion-matrix *ngIf="matrix.value"
+                            [confusionMatrix]="matrix.value" [title]="getTitle(matrix.key)"></app-confusion-matrix>
     </ng-container>
   </div>
 </ng-container>

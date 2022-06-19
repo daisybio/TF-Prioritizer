@@ -39,4 +39,16 @@ export class StatisticalEvaluationComponent implements OnInit {
   toggleVisibility(tfName: string) {
     this.visibilities[tfName] = !this.visibilities[tfName];
   }
+
+  getTitle(raw: string) {
+    switch (raw) {
+      case "chip":
+        return "ChIP vs predicted";
+      case "experimental":
+        return "Experimental vs predicted";
+      case "combined":
+        return "ChIP and experimental vs predicted";
+    }
+    return "Unknown title"
+  }
 }
