@@ -1,0 +1,11 @@
+<h1>Statistical evaluation</h1>
+<ng-container *ngFor="let tfName of getTfs()">
+  <accordion-header (togglePanel)="toggleVisibility(tfName)" [title]="tfName"></accordion-header>
+  <div [ngClass]="{'visible': isVisible(tfName)}" class="sub-panel">
+    <ng-container
+      *ngFor="let matrix of [statisticalEvaluation[tfName].chip, statisticalEvaluation[tfName].experimental, statisticalEvaluation[tfName].combined]">
+      <app-confusion-matrix *ngIf="matrix"
+                            [confusionMatrix]="matrix"></app-confusion-matrix>
+    </ng-container>
+  </div>
+</ng-container>
