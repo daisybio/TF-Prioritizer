@@ -2,6 +2,14 @@
                   [sub]="sub"
                   [title]="title"></accordion-header>
 <div [ngClass]="{'visible': visible || hideHeader}" class="sub-panel">
+  <ng-container *ngIf="geneTypeFilter">
+    <div class="distribute-equally">
+      <button (click)="toggleGeneCategoryActive(geneCategory)" *ngFor="let geneCategory of getGeneCategories()"
+              [ngClass]="{'active': isGeneCategoryActive(geneCategory)}"
+              class="lighter alwaysClickable">{{geneCategory}}</button>
+    </div>
+  </ng-container>
+
   <div *ngFor="let levelOptions of availableOptions; let level = index" class="distribute-equally">
     <ng-container *ngIf="!(level==availableOptions.length-1 && hasDropDown); else dropdown">
       <button (click)="updateActiveOption(level, option)" *ngFor="let option of levelOptions"

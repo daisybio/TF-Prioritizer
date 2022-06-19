@@ -25,6 +25,11 @@ export class ImageSelectorComponent implements OnInit {
   @Input()
   hideHeader: boolean = false;
 
+  @Input()
+  geneTypeFilter: boolean = false;
+
+  geneCategories: { [category: string]: boolean } = {};
+
   availableOptions: string[][] = [];
   activeOptions: string[] = [];
   allowedOptions: string[][] = [];
@@ -50,6 +55,10 @@ export class ImageSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    for (let geneCategory of ["mRNA", "Pseudogene", "Gene", "Symbols", "ENSG"]) {
+      this.geneCategories[geneCategory] = true;
+    }
+
     this.collectLevels(this.data, 0);
 
     this.hasData = this.availableOptions[this.availableOptions.length - 1].includes("data");
@@ -225,5 +234,17 @@ export class ImageSelectorComponent implements OnInit {
     let regex = new RegExp(this.searchTerm.toUpperCase());
 
     return regex.test(name);
+  }
+
+  getGeneCategories() {
+    return Object.keys(this.geneCategories);
+  }
+
+  isGeneCategoryActive(geneCategory: string) {
+    return this.geneCategories[geneCategory];
+  }
+
+  toggleGeneCategoryActive(geneCategory: string) {
+    this.geneCategories[geneCategory] = !this.geneCategories[geneCategory];
   }
 }
