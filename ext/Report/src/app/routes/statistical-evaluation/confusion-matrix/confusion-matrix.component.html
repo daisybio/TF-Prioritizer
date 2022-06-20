@@ -19,14 +19,14 @@
 <table>
   <tr>
     <th>Specificity</th>
-    <td>{{getSpecificity().toPrecision(2)}}%</td>
+    <td>{{getSpecificity() | percent : "0.2"}}</td>
   </tr>
   <tr>
     <th>Sensitivity</th>
-    <td>{{getSensitivity().toPrecision(2)}}%</td>
+    <td>{{getSensitivity() | percent : "0.2"}}</td>
   </tr>
   <tr>
     <th>Accuracy</th>
-    <td>{{getAccuracy().toPrecision(2)}}%</td>
+    <td>{{getAccuracy() | percent : "0.2"}}</td>
   </tr>
 </table>
