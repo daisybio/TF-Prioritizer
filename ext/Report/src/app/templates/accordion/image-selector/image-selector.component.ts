@@ -88,7 +88,7 @@ export class ImageSelectorComponent implements OnInit {
           this.existingFilters.add(this.getGeneType(entry));
         }
       }
-      
+
       this.updateImage();
     }
   }
@@ -244,6 +244,15 @@ export class ImageSelectorComponent implements OnInit {
     this.updateActiveOption(dropDownLevel, this.allowedOptions[dropDownLevel][newIndex]);
   }
 
+  isOnlyActiveGeneType(name: string) {
+    for (let geneType of Object.keys(this.geneCategories)) {
+      if (geneType != name && this.geneCategories[geneType] && this.existingFilters.has(geneType)) {
+        return false;
+      }
+    }
+    return this.geneCategories[name];
+  }
+
   getGeneType(name: string) {
     for (let geneType of Object.keys(this.geneCategories).filter(name => name != "Symbol")) {
       if (new RegExp(this.geneTypeFilterRegexes[geneType]).test(name)) {
@@ -272,6 +281,7 @@ export class ImageSelectorComponent implements OnInit {
   }
 
   toggleGeneCategoryActive(geneCategory: string) {
-    this.geneCategories[geneCategory] = !this.geneCategories[geneCategory];
+    if (!this.isOnlyActiveGeneType(geneCategory))
+      this.geneCategories[geneCategory] = !this.geneCategories[geneCategory];
   }
 }
