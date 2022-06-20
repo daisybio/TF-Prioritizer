@@ -5,6 +5,7 @@
   <ng-container *ngIf="geneTypeFilter">
     <div class="distribute-equally">
       <button (click)="toggleGeneCategoryActive(geneCategory)" *ngFor="let geneCategory of getGeneCategories()"
+              [disabled]="!existingFilters.has(geneCategory)"
               [ngClass]="{'active': isGeneCategoryActive(geneCategory)}"
               class="lighter alwaysClickable">{{geneCategory}}</button>
     </div>

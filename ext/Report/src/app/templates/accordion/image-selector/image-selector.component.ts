@@ -47,6 +47,16 @@ export class ImageSelectorComponent implements OnInit {
 
   searchTerm: string = "";
 
+  existingFilters = new Set<string>();
+
+  geneTypeFilterRegexes: { [name: string]: string } = {
+    "miRNA": "^MIR.+",
+    "ENSG": "^ENSG.+",
+    "RNA": "^RNA.+",
+    "Pseudogenes": "^PSEUDOGENE.+",
+    "Symbols": "^.+"
+  }
+
   constructor(private eRef: ElementRef) {
   }
 
@@ -55,7 +65,7 @@ export class ImageSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    for (let geneCategory of ["mRNA", "Pseudogene", "Gene", "Symbols", "ENSG"]) {
+    for (let geneCategory of Object.keys(this.geneTypeFilterRegexes)) {
       this.geneCategories[geneCategory] = true;
     }
 
@@ -74,7 +84,11 @@ export class ImageSelectorComponent implements OnInit {
       if (this.activeOptions.length > 0) {
         this.hasDropDown = this.availableOptions[this.activeOptions.length - 1].length > 7;
         this.updateAllowedOptions(0);
+        for (let entry of this.availableOptions[this.activeOptions.length - 1]) {
+          this.existingFilters.add(this.getGeneType(entry));
+        }
       }
+      
       this.updateImage();
     }
   }
@@ -230,10 +244,23 @@ export class ImageSelectorComponent implements OnInit {
     this.updateActiveOption(dropDownLevel, this.allowedOptions[dropDownLevel][newIndex]);
   }
 
-  matchesFilter(name: string) {
-    let regex = new RegExp(this.searchTerm.toUpperCase());
+  getGeneType(name: string) {
+    for (let geneType of Object.keys(this.geneCategories).filter(name => name != "Symbol")) {
+      if (new RegExp(this.geneTypeFilterRegexes[geneType]).test(name)) {
+        return geneType;
+      }
+    }
 
-    return regex.test(name);
+    return "Symbol";
+  }
+
+  matchesFilter(name: string) {
+    if (!new RegExp(this.searchTerm.toUpperCase()).test(name)) {
+      return false;
+    }
+
+    let geneType = this.getGeneType(name);
+    return this.geneCategories[geneType];
   }
 
   getGeneCategories() {
