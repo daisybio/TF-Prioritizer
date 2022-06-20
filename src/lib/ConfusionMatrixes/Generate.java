@@ -100,6 +100,7 @@ public class Generate extends ExecutableStep
         {
             executorService.submit(() ->
             {
+                boolean hasAnyData = false;
                 JSONObject confusionMatrices = new JSONObject();
 
                 String tfGroup = d_tfGroup.getName().replaceAll("\\d+_", "");
@@ -141,6 +142,7 @@ public class Generate extends ExecutableStep
                     ConfusionMatrix chipVsPredicted = getConfusionMatrix(chipAtlasRegions, predictedRegions);
                     logger.info("ChipAtlas vs predicted: " + chipVsPredicted);
                     confusionMatrices.put("chip", chipVsPredicted.toMap());
+                    hasAnyData = true;
                 }
 
                 if (d_input_experimentalPeaks.isSet())
@@ -179,11 +181,15 @@ public class Generate extends ExecutableStep
                         ConfusionMatrix combinedVsPredicted = getConfusionMatrix(combined, predictedRegions);
                         logger.info("Combined vs predicted: " + combinedVsPredicted);
                         confusionMatrices.put("combined", combinedVsPredicted.toMap());
+                        hasAnyData = true;
                     }
                 }
 
-                File f_output = extend(d_output.get(), tfGroup + ".json");
-                writeFile(f_output, confusionMatrices.toString(4), logger);
+                if (hasAnyData)
+                {
+                    File f_output = extend(d_output.get(), tfGroup + ".json");
+                    writeFile(f_output, confusionMatrices.toString(4), logger);
+                }
             });
         }
     }
