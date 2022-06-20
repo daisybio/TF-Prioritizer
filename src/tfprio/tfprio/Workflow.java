@@ -82,6 +82,7 @@ public class Workflow
 
         if (TFPRIO.configs.mixOptions.mutuallyExclusive.get())
         {
+            steps.add(new lib.Deseq2.GetChromosomeLengths());
             steps.add(new lib.MixOptions.MixMutuallyExclusive());
         } else
         {
@@ -192,6 +193,8 @@ public class Workflow
                 notExecutedSteps.add(notExecutedStep);
             }
         }
+
+        steps.add(new lib.ConfusionMatrixes.Generate());
 
         steps.add(new lib.Igv.DcgTargetGenes());
 
