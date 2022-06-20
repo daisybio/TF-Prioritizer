@@ -20,14 +20,18 @@ export class ConfusionMatrixComponent implements OnInit {
   }
 
   getSpecificity() {
-    return this.confusionMatrix.tp / (this.confusionMatrix.tp + this.confusionMatrix.fp);
+    return this.confusionMatrix.tn / (this.confusionMatrix.tn + this.confusionMatrix.fp);
   }
 
   getSensitivity() {
-    return this.confusionMatrix.tn / (this.confusionMatrix.tn + this.confusionMatrix.fn);
+    return this.confusionMatrix.tp / (this.confusionMatrix.tp + this.confusionMatrix.fn);
   }
 
   getAccuracy() {
     return (this.confusionMatrix.tn + this.confusionMatrix.tp) / (this.confusionMatrix.tn + this.confusionMatrix.fn + this.confusionMatrix.tp + this.confusionMatrix.fp);
+  }
+
+  getPrecision() {
+    return this.confusionMatrix.tp / (this.confusionMatrix.tp + this.confusionMatrix.fp);
   }
 }
