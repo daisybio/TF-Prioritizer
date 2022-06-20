@@ -24,6 +24,18 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class FileManagement
 {
+    public static String readFile(File file, Logger logger)
+    {
+        try
+        {
+            return readFile(file);
+        } catch (IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+        return null;
+    }
+
     public static String readFile(File file) throws IOException
     {
         return Files.readString(file.toPath());

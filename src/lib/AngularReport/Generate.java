@@ -20,16 +20,20 @@ import static util.ScriptExecution.executeAndWait;
 
 public class Generate extends ExecutableStep
 {
-    AbstractConfig<File> f_input_transcriptionFactors = TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
-    AbstractConfig<File> d_input_report = TFPRIO.configs.angularReport.d_angularSource;
-    GeneratedFileStructure f_output_reportJson = TFPRIO.configs.angularReport.fileStructure.f_data;
-    GeneratedFileStructure d_output_data = TFPRIO.configs.angularReport.fileStructure.d_data;
-    GeneratedFileStructure d_preprocessing = TFPRIO.configs.angularReport.fileStructure.d_preprocessing;
-    GeneratedFileStructure d_output = TFPRIO.configs.angularReport.fileStructure.d_output;
+    private final AbstractConfig<File> f_input_transcriptionFactors =
+            TFPRIO.configs.distributionAnalysis.fileStructure.f_dcg_stats;
+    private final AbstractConfig<File> d_input_confusionMatrixes =
+            TFPRIO.configs.confusionMatrixes.fileStructure.d_output;
+    private final AbstractConfig<File> d_input_report = TFPRIO.configs.angularReport.d_angularSource;
+    private final GeneratedFileStructure f_output_reportJson = TFPRIO.configs.angularReport.fileStructure.f_data;
+    private final GeneratedFileStructure d_output_data = TFPRIO.configs.angularReport.fileStructure.d_data;
+    private final GeneratedFileStructure d_preprocessing = TFPRIO.configs.angularReport.fileStructure.d_preprocessing;
+    private final GeneratedFileStructure d_output = TFPRIO.configs.angularReport.fileStructure.d_output;
 
     JSONObject importantLoci;
 
     JSONObject topLog2fc;
+    JSONObject statisticalEvaluation;
 
     ArrayList<JSONObject> coOccurrence;
 
@@ -89,6 +93,7 @@ public class Generate extends ExecutableStep
         collectImportantLoci();
         collectTopLog2fc();
         collectCoOccurrence();
+        collectStatisticalEvaluation();
         logger.info("Finished collecting general data.");
 
         List<TranscriptionFactorGroup> transcriptionFactorGroups = new ArrayList<>();
@@ -288,6 +293,21 @@ public class Generate extends ExecutableStep
         }};
     }
 
+    private void collectStatisticalEvaluation()
+    {
+        statisticalEvaluation = new JSONObject();
+
+        for (File f_tf : Objects.requireNonNull(
+                d_input_confusionMatrixes.get().listFiles(Filters.getSuffixFilter(".json"))))
+        {
+            String tfName = f_tf.getName().replace(".json", "");
+            String content = readFile(f_tf, logger);
+            assert content != null;
+            JSONObject tfJsonObject = new JSONObject(content);
+            statisticalEvaluation.put(tfName, tfJsonObject);
+        }
+    }
+
     private void saveJson(List<TranscriptionFactorGroup> transcriptionFactorGroups)
     {
         JSONObject jsonObject = new JSONObject()
@@ -297,6 +317,7 @@ public class Generate extends ExecutableStep
             put("topLog2fc", topLog2fc);
             put("coOccurrenceAnalysis", coOccurrence);
             put("backgroundStats", TranscriptionFactorGroup.getBackgroundStats());
+            put("statisticalEvaluation", statisticalEvaluation);
             put("existingValues", new JSONObject(new HashMap<>()
             {{
                 put("hm", TFPRIO.existingHms);

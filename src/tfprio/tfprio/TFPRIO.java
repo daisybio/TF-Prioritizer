@@ -22,24 +22,21 @@ import static util.FileManagement.extend;
 
 public class TFPRIO
 {
+    public static final boolean developmentMode = true;
     /**
      * The {@link Configs} object which is referenced by all the {@link lib.ExecutableStep} instances
      */
     public static Configs configs;
-
     /**
      * Mapping the existing groups to their associated histone modifications.
      */
     public static Map<String, Set<String>> groupsToHms = new HashMap<>();
-
     /**
      * Mapping the existing group combinations to their associated histone modifications.
      */
     public static Map<String, Set<String>> groupCombinationsToHms = new HashMap<>();
-
     public static Map<String, String> sample_group = new HashMap<>();
     public static Map<String, String> sample_batch = new HashMap<>();
-
     /**
      * Contains all the file configs whose allocated files or directories will be created during pipeline execution.
      * <p>
@@ -48,22 +45,17 @@ public class TFPRIO
      * commenting out executableSteps inside the {@link Workflow} would lead to a simulator error.
      */
     public static Set<AbstractConfig<File>> createdFileStructure = new HashSet<>();
-
     /**
      * Allows disk read efficient mapping of geneSymbols, geneIDs and their descriptions.
      */
     public static MapSymbolAndEnsg mapSymbolAndEnsg;
-
     /**
      * Contains all the histone modifications available in the input data.
      */
     public static Set<String> existingHms = new HashSet<>();
-
     public static File workingDirectory;
     public static File sourceDirectory;
     static File configFile;
-
-    public static final boolean developmentMode = false;
 
     public static void main(String[] args) throws Exception
     {

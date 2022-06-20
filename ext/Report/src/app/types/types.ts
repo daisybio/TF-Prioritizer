@@ -13,6 +13,13 @@ export interface InputData {
     "groupPairing": string[],
     "hm": string[],
     "group": string[]
+  },
+  "statisticalEvaluation": {
+    [tf: string]: {
+      "chip"?: ConfusionMatrix,
+      "experimental"?: ConfusionMatrix,
+      "combined"?: ConfusionMatrix
+    }
   }
 }
 
@@ -75,4 +82,11 @@ export interface Stats {
     "mean": number,
     "95_quantile": number
   }
+}
+
+export interface ConfusionMatrix {
+  "fn": number,
+  "tn": number,
+  "fp": number,
+  "tp": number
 }

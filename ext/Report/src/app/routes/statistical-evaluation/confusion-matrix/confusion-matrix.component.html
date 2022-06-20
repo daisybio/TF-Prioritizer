@@ -1,0 +1,32 @@
+<h2>{{title}}</h2>
+<table style="margin-bottom: 30px">
+  <tr>
+    <th></th>
+    <th>Actually positive</th>
+    <th>Actually negative</th>
+  </tr>
+  <tr>
+    <th>Predicted positive</th>
+    <td>{{confusionMatrix.tp}}</td>
+    <td>{{confusionMatrix.fp}}</td>
+  </tr>
+  <tr>
+    <th>Predicted negative</th>
+    <td>{{confusionMatrix.fn}}</td>
+    <td>{{confusionMatrix.tn}}</td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <th>Specificity</th>
+    <td>{{getSpecificity() | percent : "0.2"}}</td>
+  </tr>
+  <tr>
+    <th>Sensitivity</th>
+    <td>{{getSensitivity() | percent : "0.2"}}</td>
+  </tr>
+  <tr>
+    <th>Accuracy</th>
+    <td>{{getAccuracy() | percent : "0.2"}}</td>
+  </tr>
+</table>

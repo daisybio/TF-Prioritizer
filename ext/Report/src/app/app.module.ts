@@ -21,6 +21,8 @@ import {ImportantLociComponent} from './routes/important-loci/important-loci.com
 import {TopLog2fcComponent} from './routes/top-log2fc/top-log2fc.component';
 import {CoOccurrenceAnalysisComponent} from './routes/co-occurrence-analysis/co-occurrence-analysis.component';
 import {FormsModule} from "@angular/forms";
+import { StatisticalEvaluationComponent } from './routes/statistical-evaluation/statistical-evaluation.component';
+import { ConfusionMatrixComponent } from './routes/statistical-evaluation/confusion-matrix/confusion-matrix.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +43,8 @@ import {FormsModule} from "@angular/forms";
     ImportantLociComponent,
     TopLog2fcComponent,
     CoOccurrenceAnalysisComponent,
+    StatisticalEvaluationComponent,
+    ConfusionMatrixComponent,
   ],
   imports: [
     BrowserModule,

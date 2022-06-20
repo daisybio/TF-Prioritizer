@@ -52,3 +52,7 @@ button.icon {
   width: min-content;
   padding: 10px;
 }
+
+button.alwaysClickable {
+  cursor: pointer;
+}

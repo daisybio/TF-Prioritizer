@@ -1,4 +1,4 @@
-import {Routes, RouterModule} from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 
 import {TfRankingComponent} from "./routes/tf-ranking/tf-ranking.component";
 import {ValidationComponent} from "./routes/validation/validation.component";
@@ -10,6 +10,7 @@ import {ParametersComponent} from "./routes/parameters/parameters.component";
 import {ImportantLociComponent} from "./routes/important-loci/important-loci.component";
 import {TopLog2fcComponent} from "./routes/top-log2fc/top-log2fc.component";
 import {CoOccurrenceAnalysisComponent} from "./routes/co-occurrence-analysis/co-occurrence-analysis.component";
+import {StatisticalEvaluationComponent} from "./routes/statistical-evaluation/statistical-evaluation.component";
 
 const routes: Routes = [
   {path: '', component: TfRankingComponent},
@@ -21,6 +22,7 @@ const routes: Routes = [
   {path: 'importantLoci', component: ImportantLociComponent},
   {path: 'topLog2fc', component: TopLog2fcComponent},
   {path: 'coOccurrenceAnalysis', component: CoOccurrenceAnalysisComponent},
+  {path: 'statisticalEvaluation', component: StatisticalEvaluationComponent},
 
   // otherwise redirect to home
   {path: '**', redirectTo: ''}
