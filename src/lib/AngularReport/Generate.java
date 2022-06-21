@@ -39,8 +39,6 @@ public class Generate extends ExecutableStep
 
     public static void linkFiles(JSONObject map, File d_target, ExecutorService executorService, Logger logger)
     {
-        logger.info("Linking files to " + d_target.getAbsolutePath());
-
         Set<String> keysToRemove = new HashSet<>();
 
         for (String key : map.keySet())
