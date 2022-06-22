@@ -98,6 +98,7 @@ public class Generate extends ExecutableStep
 
         for (File d_tfGroup : Objects.requireNonNull(d_chipAtlas_peakFiles.get().listFiles(Filters.directoryFilter)))
         {
+            executorService.submit(() ->
             {
                 boolean hasAnyData = false;
                 JSONObject confusionMatrices = new JSONObject();
@@ -144,7 +145,7 @@ public class Generate extends ExecutableStep
                     hasAnyData = true;
                 }
 
-                if (d_input_experimentalPeaks.isSet())
+                if (d_input_experimentalPeaks.isSet() && false)
                 {
                     Set<Region> experimentalRegions = new HashSet<>();
 
@@ -189,7 +190,7 @@ public class Generate extends ExecutableStep
                     File f_output = extend(d_output.get(), tfGroup + ".json");
                     writeFile(f_output, confusionMatrices.toString(4), logger);
                 }
-            }
+            });
         }
     }
 
@@ -259,7 +260,7 @@ public class Generate extends ExecutableStep
             emptyRegions.forEach(region ->
             {
                 int length = region.getEnd() - region.getStart();
-                
+
                 if (length >= windowSize.get())
                 {
                     for (int end = region.getStart() + windowSize.get(); end < region.getEnd() + windowSize.get();
