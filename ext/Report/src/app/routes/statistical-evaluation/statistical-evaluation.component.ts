@@ -29,7 +29,7 @@ export class StatisticalEvaluationComponent implements OnInit {
   }
 
   getTfs() {
-    return Object.keys(this.statisticalEvaluation);
+    return Object.keys(this.statisticalEvaluation).sort();
   }
 
   isVisible(tfName: string) {
