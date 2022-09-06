@@ -9,7 +9,9 @@ import util.FileFilters.Filters;
 import util.RegionSearchTree.ChromosomeRegionTrees;
 import util.Regions.Region;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
@@ -17,11 +19,13 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static util.FileManagement.*;
+import static util.ScriptExecution.executeAndWait;
 
 public class Generate extends ExecutableStep
 {
     private final AbstractConfig<File> f_input_chromosomeLengths =
             TFPRIO.configs.deSeq2.fileStructure.f_preprocessing_chromosomeLengths;
+    private final AbstractConfig<File> f_metricsScript = TFPRIO.configs.scriptTemplates.f_metrics;
     private final AbstractConfig<File> d_chipAtlas_peakFiles = TFPRIO.configs.chipAtlas.fileStructure.d_peakFiles;
     private final AbstractConfig<File> d_tepic_predictedPeaks =
             TFPRIO.configs.tepic.fileStructure.d_postprocessing_trapPredictedBeds;
@@ -61,6 +65,7 @@ public class Generate extends ExecutableStep
             add(d_chipAtlas_peakFiles);
             add(d_tepic_predictedPeaks);
             add(f_input_chromosomeLengths);
+            add(f_metricsScript);
         }};
     }
 
@@ -96,9 +101,17 @@ public class Generate extends ExecutableStep
             logger.error(e.getMessage());
         }
 
-        for (File d_tfGroup : Objects.requireNonNull(d_chipAtlas_peakFiles.get().listFiles(Filters.directoryFilter)))
+        File f_combined = extend(d_output.get(), "combined.tsv");
+
+        makeSureFileExists(f_combined, logger);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(f_combined)))
         {
-            executorService.submit(() ->
+            writer.write("TF\t" + ConfusionMatrix.getTabularHeader("\t"));
+            writer.newLine();
+
+            for (File d_tfGroup : Objects.requireNonNull(
+                    d_chipAtlas_peakFiles.get().listFiles(Filters.directoryFilter)))
             {
                 boolean hasAnyData = false;
                 JSONObject confusionMatrices = new JSONObject();
@@ -142,10 +155,13 @@ public class Generate extends ExecutableStep
                     ConfusionMatrix chipVsPredicted = getConfusionMatrix(chipAtlasRegions, predictedRegions);
                     logger.info("ChipAtlas vs predicted: " + chipVsPredicted);
                     confusionMatrices.put("chip", chipVsPredicted.toMap());
+                    writer.write(String.join("\t", tfGroup, chipVsPredicted.getTabular("\t")));
+                    writer.newLine();
                     hasAnyData = true;
                 }
 
-                if (d_input_experimentalPeaks.isSet() && false)
+                // Line below: d_input_experimentalPeaks.isSet();
+                if (false)
                 {
                     Set<Region> experimentalRegions = new HashSet<>();
 
@@ -190,8 +206,19 @@ public class Generate extends ExecutableStep
                     File f_output = extend(d_output.get(), tfGroup + ".json");
                     writeFile(f_output, confusionMatrices.toString(4), logger);
                 }
-            });
+            }
+        } catch (IOException e)
+        {
+            logger.error("Could not write to combined file.");
         }
+
+        String script = Objects.requireNonNull(readFile(f_metricsScript.get(), logger))
+                .replace("{INPUTFILE}", f_combined.getAbsolutePath())
+                .replace("{OUTPUTFILE}", extend(d_output.get(), "metrics.png").getAbsolutePath());
+        File f_output_script = extend(d_output.get(), "metrics.R");
+        writeFile(f_output_script, script, logger);
+
+        executeAndWait(f_output_script, logger);
     }
 
     private Set<Region> getRegionsFromBed(File f_bed)

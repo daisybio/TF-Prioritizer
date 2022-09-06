@@ -1,4 +1,8 @@
 <h1>Statistical evaluation</h1>
+<accordion-header (togglePanel)="toggleOverview()" [title]="'Overview plot'"></accordion-header>
+<div [ngClass]="{'visible': overviewVisible}" class="sub-panel">
+  <img src="assets/input/data/metrics/metricsPlot.png">
+</div>
 <ng-container *ngFor="let tfName of getTfs()">
   <accordion-header (togglePanel)="toggleVisibility(tfName)" [title]="tfName"></accordion-header>
   <div [ngClass]="{'visible': isVisible(tfName)}" class="sub-panel">

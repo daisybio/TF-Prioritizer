@@ -1,13 +1,10 @@
 package util.Configs.Modules.ScriptTemplates;
 
-import util.Configs.ConfigTypes.AbstractConfig;
 import util.Configs.ConfigTypes.GeneratedFileStructure;
-import util.Configs.ConfigTypes.InputFileStructure;
 import util.Configs.ConfigTypes.SourceDirectoryFileStructure;
 import util.Configs.Modules.AbstractModule;
 import util.Logger;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import static util.FileManagement.extend;
@@ -39,6 +36,8 @@ public class ScriptTemplates extends AbstractModule
     public final SourceDirectoryFileStructure f_logos_tfBindingSequence = extend(d_root, "logos_bindingSequence.R");
 
     public final SourceDirectoryFileStructure f_logDockerStats = extend(d_root, "logDockerStats.sh");
+
+    public final SourceDirectoryFileStructure f_metrics = extend(d_root, "metrics.R");
 
     public ScriptTemplates(GeneratedFileStructure workingDirectory, SourceDirectoryFileStructure sourceDirectory,
                            Logger logger)

@@ -88,5 +88,10 @@ export interface ConfusionMatrix {
   "fn": number,
   "tn": number,
   "fp": number,
-  "tp": number
+  "tp": number,
+  "sensitivity": number,
+  "specificity": number,
+  "accuracy": number,
+  "precision": number,
+  "f1": number
 }

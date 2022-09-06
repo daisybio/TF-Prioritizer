@@ -62,9 +62,13 @@ public class Generate extends ExecutableStep
             } else if (value.getClass().equals(JSONObject.class))
             {
                 linkFiles((JSONObject) value, newTarget, executorService, logger);
+            } else if (value.getClass().equals(java.math.BigDecimal.class) ||
+                    value.getClass().equals(java.lang.Integer.class))
+            {
+                continue;
             } else
             {
-                logger.error("Illegal map structure detected");
+                logger.error("Illegal value type detected: " + value.getClass());
             }
         }
     }
@@ -304,6 +308,9 @@ public class Generate extends ExecutableStep
             JSONObject tfJsonObject = new JSONObject(content);
             statisticalEvaluation.put(tfName, tfJsonObject);
         }
+        statisticalEvaluation.put("metricsPlot",
+                extend(d_input_confusionMatrixes.get(), "metrics.png").getAbsolutePath());
+        linkFiles(statisticalEvaluation, extend(d_output_data.get(), "metrics"), executorService, logger);
     }
 
     private void saveJson(List<TranscriptionFactorGroup> transcriptionFactorGroups)

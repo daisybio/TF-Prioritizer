@@ -22,7 +22,7 @@ import static util.FileManagement.extend;
 
 public class TFPRIO
 {
-    public static final boolean developmentMode = false;
+    public static final boolean developmentMode = true;
     /**
      * The {@link Configs} object which is referenced by all the {@link lib.ExecutableStep} instances
      */

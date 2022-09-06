@@ -16,6 +16,8 @@ export class StatisticalEvaluationComponent implements OnInit {
     }
   }
 
+  overviewVisible = false;
+
   private visibilities: {
     [tfName: string]: boolean
   } = {}
@@ -34,6 +36,10 @@ export class StatisticalEvaluationComponent implements OnInit {
 
   isVisible(tfName: string) {
     return this.visibilities[tfName];
+  }
+
+  toggleOverview() {
+    this.overviewVisible = !this.overviewVisible;
   }
 
   toggleVisibility(tfName: string) {
