@@ -17,7 +17,10 @@ export class HeaderComponent implements OnInit {
   sub: boolean = false;
 
   @Input()
-  information: string | undefined;
+  information: {
+    ["content"]: string,
+    ["source"]: string
+  } | undefined;
 
   @Output()
   togglePanel = new EventEmitter<boolean>();

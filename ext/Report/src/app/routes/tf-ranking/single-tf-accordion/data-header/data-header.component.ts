@@ -10,11 +10,13 @@ import {OpenExternalUrlService} from "../../../../services/open-external-url.ser
 })
 export class DataHeaderComponent implements OnInit {
   @Input()
-    // @ts-ignore
-  title: string;
+  title!: string;
 
   @Input()
-  information: string | undefined;
+  information: {
+    ["content"]: string,
+    ["source"]: string
+  } | undefined;
 
   @Input()
     // @ts-ignore

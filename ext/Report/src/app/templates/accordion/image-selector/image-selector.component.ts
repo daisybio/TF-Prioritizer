@@ -20,7 +20,10 @@ export class ImageSelectorComponent implements OnInit {
   sub: boolean = false;
 
   @Input()
-  information: string | undefined;
+  information: {
+    ["content"]: string,
+    ["source"]: string
+  } | undefined;
 
   @Input()
   hideHeader: boolean = false;

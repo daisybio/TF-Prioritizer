@@ -1,10 +1,12 @@
 <div class="header">
-  <button class="text" [ngClass]="{'light': sub, 'hasInformation': information}" [disabled]="disabled"
-          (click)="onTogglePanel()">{{title}}</button>
-  <button *ngIf="information" class="icon" [ngClass]="{'light': sub}"><img src="assets/icons/info.svg"
-                                                                           (click)="informationVisible=!informationVisible">
+  <button (click)="onTogglePanel()" [disabled]="disabled" [ngClass]="{'light': sub, 'hasInformation': information}"
+          class="text">{{title}}</button>
+  <button *ngIf="information" [ngClass]="{'light': sub}" class="icon"><img
+    (click)="informationVisible=!informationVisible"
+    src="assets/icons/info.svg">
   </button>
 </div>
-<div class="sub-panel" *ngIf="information" [ngClass]="{'visible': informationVisible}">
-  <p>{{information}}</p>
+<div *ngIf="information" [ngClass]="{'visible': informationVisible}" class="sub-panel">
+  <p>{{information["content"]}}</p>
+  <p *ngIf="information['source']" style="font-style: italic">{{information["source"]}}</p>
 </div>
