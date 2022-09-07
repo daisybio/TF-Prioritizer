@@ -25,7 +25,6 @@ public class Workflow
         }
 
         steps.add(new tfprio.InitStaticVariables());
-        /*
         steps.add(new lib.CheckChromosomes());
 
         if (TFPRIO.configs.mixOptions.level.isSet())
@@ -194,11 +193,10 @@ public class Workflow
                 notExecutedSteps.add(notExecutedStep);
             }
         }
-         */
 
         steps.add(new lib.ConfusionMatrixes.Generate());
 
-        /*steps.add(new lib.Igv.DcgTargetGenes());
+        steps.add(new lib.Igv.DcgTargetGenes());
 
         if (TFPRIO.configs.igv.importantLociAllPrioTf.isSet())
         {
@@ -220,7 +218,7 @@ public class Workflow
         }
         steps.add(new lib.DistributionAnalysis.CoOccurrenceAnalysis());
 
-        //steps.add(new lib.Report.Report());*/
+        //steps.add(new lib.Report.Report());
 
         steps.add(new lib.AngularReport.Generate());
         steps.add(new lib.AngularReport.PostProcessing());
