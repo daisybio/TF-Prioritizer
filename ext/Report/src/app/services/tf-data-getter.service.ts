@@ -35,6 +35,8 @@ export class TfDataGetterService {
 
     for (let hm of hms) {
       let sorted = this.getRankedForHm(hm);
+      console.log(hm);
+      console.log(sorted);
 
       for (let i = 0; i < sorted.length; i++) {
         let tf = sorted[i];

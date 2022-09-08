@@ -406,11 +406,15 @@ public class TranscriptionFactorGroup
 
                 hm_entryType_value.put(hm, new HashMap<>());
 
-                Integer rank = null;
+                int rank = 0;
 
                 try
                 {
                     rank = Integer.parseInt(findValueInTable(name, 1, 0, f_stats, "\t", true));
+                    if (rank < Integer.parseInt(findValueInTable("background", 1, 0, f_stats, "\t", true)))
+                    {
+                        rank++;
+                    }
                 } catch (FileNotFoundException e)
                 {
                     logger.error(e.getMessage());

@@ -16,7 +16,7 @@ export class StatisticalEvaluationComponent implements OnInit {
     }
   }
 
-  overviewVisible = false;
+  overviewVisible = true;
 
   private visibilities: {
     [tfName: string]: boolean
@@ -31,7 +31,11 @@ export class StatisticalEvaluationComponent implements OnInit {
   }
 
   getTfs() {
-    return Object.keys(this.statisticalEvaluation).sort();
+    let tfs = Object.keys(this.statisticalEvaluation).sort();
+    tfs = tfs.filter(function (value, index, arr) {
+      return value != "metricsPlot";
+    })
+    return tfs;
   }
 
   isVisible(tfName: string) {

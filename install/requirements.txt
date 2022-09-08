@@ -4,3 +4,4 @@ matplotlib
 pyliftover
 logomaker
 intervaltree
+scipy

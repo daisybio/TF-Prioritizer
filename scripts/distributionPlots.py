@@ -1,9 +1,9 @@
-import scipy.stats as scp
-import statistics as sts
-import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import scipy.stats as scp
+import seaborn as sns
+import statistics as sts
 
 sns.set_context("notebook")
 color = "#A6CEE3"
@@ -74,7 +74,8 @@ df_interesting_stats.sort_values("median", ascending=False, inplace=True)
 
 df_interesting_stats.loc[0] = ['background', background_sum, background_length, background_mean, background_median,
                                background_quantile, background_quantile_99]
-df_interesting_stats.sort_index(inplace=True)
+df_interesting_stats.reset_index(inplace=True, drop=True)
+
 df_interesting_stats.to_csv(
     '{STATSFILE}',
     sep='\t')
