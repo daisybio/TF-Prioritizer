@@ -14,7 +14,7 @@ Graphical Abstract:
 
 Technical Workflow:
 
-![alt text](https://github.com/biomedbigdata/COM2POSE/blob/master/COM2POSE_framework.png)
+![alt text](https://github.com/biomedbigdata/COM2POSE/blob/master/technical_workflow.png)
 
 ## 2. License and Citing
 
