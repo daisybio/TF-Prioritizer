@@ -93,8 +93,8 @@ public class TFPRIO {
         CalculateTPM calculateTPM = new CalculateTPM(mergeCounts.getOutputs(), concatenateGeneInfo.outputFile);
         steps.add(calculateTPM);
 
-        FetchDatasetVersion fetchDatasetVersion = new FetchDatasetVersion();
-        steps.add(fetchDatasetVersion);
+        Uplift uplift = new Uplift(concatenateGeneInfo.outputFile);
+        steps.add(uplift);
 
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();

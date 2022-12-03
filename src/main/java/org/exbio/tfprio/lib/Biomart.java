@@ -178,11 +178,13 @@ public class Biomart {
     }
 
     public final List<String> getLines() {
-        return geneIds.stream().map(id -> String.join("\t", id, String.valueOf(geneLengths.getOrDefault(id, null)),
-                String.valueOf(geneGc.getOrDefault(id, null)), String.valueOf(geneChromosome.get(id)),
-                String.valueOf(genePositions.containsKey(id) ? genePositions.get(id).getLeft() : null),
-                String.valueOf(genePositions.containsKey(id) ? genePositions.get(id).getRight() : null),
-                String.valueOf(geneStrand.get(id)))).collect(Collectors.toList());
+        return geneIds.stream().filter(
+                id -> geneLengths.containsKey(id) && genePositions.containsKey(id) && geneGc.containsKey(id) &&
+                        geneChromosome.containsKey(id) && geneStrand.containsKey(id)).map(
+                id -> String.join("\t", id, String.valueOf(geneLengths.get(id)), String.valueOf(geneGc.get(id)),
+                        String.valueOf(geneChromosome.get(id)), String.valueOf(genePositions.get(id).getLeft()),
+                        String.valueOf(genePositions.get(id).getRight()), String.valueOf(geneStrand.get(id)))).collect(
+                Collectors.toList());
     }
 
     private Map<String, List<String[]>> mapIds(List<String> columns, List<String[]> matrix) {

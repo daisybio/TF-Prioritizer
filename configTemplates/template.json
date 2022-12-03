@@ -15,6 +15,7 @@
     "tfBindingSiteSearch": "BETWEEN"
   },
   "DeSeq2": {
-    "species": "mmusculus_gene_ensembl"
+    "species": "mmusculus_gene_ensembl",
+    "speciesRefGenome": "mm10"
   }
 }
