@@ -96,6 +96,12 @@ public class TFPRIO {
         Uplift uplift = new Uplift(concatenateGeneInfo.outputFile);
         steps.add(uplift);
 
+        FilterENdb filterENdb = new FilterENdb();
+        steps.add(filterENdb);
+
+        UpliftENdb upliftENdb = new UpliftENdb(filterENdb.outputFile);
+        steps.add(upliftENdb);
+
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();
     }

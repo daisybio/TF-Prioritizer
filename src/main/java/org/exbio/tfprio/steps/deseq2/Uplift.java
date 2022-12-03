@@ -6,11 +6,6 @@ import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,6 +14,7 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.copyFile;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
+import static org.exbio.tfprio.util.Helpers.getDatasetVersion;
 
 public class Uplift extends ExecutableStep {
     public final OutputFile outputFile;
@@ -67,29 +63,9 @@ public class Uplift extends ExecutableStep {
 
                 executeAndWait("python3 " + scriptPath + " " +
                         String.join(" ", genePositions.getAbsolutePath(), outputFile.getAbsolutePath(), originalVersion,
-                                refGenomeVersion), true);
+                                refGenomeVersion, "3", "4", "5", "6"), true);
                 return true;
             });
         }};
-    }
-
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
-    }
-
-    private String getDatasetVersion(String species) throws IOException {
-        URL url = new URL("http://www.ensembl.org/biomart/martservice?type=datasets&mart=ENSEMBL_MART_ENSEMBL");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-            for (String line; (line = reader.readLine()) != null; ) {
-                if (line.contains(species)) {
-                    String[] split = line.split("\t");
-                    return split[4];
-                }
-            }
-        }
-        return null;
     }
 }
