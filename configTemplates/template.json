@@ -1,0 +1,20 @@
+{
+  "InputConfigs": {
+    "chipSeq": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/03_broadPeaks_inc_Pol2",
+    "rnaSeq": "/home/nico/Data/TFPRIO/RawData/02_RNAseq_data",
+    "geneIDs": "/home/nico/Data/TFPRIO/RawData/02_RNAseq_data/Gene_id.txt"
+  },
+  "MixOptions": {
+    "biomartDatasetSpecies": "mmusculus_gene_ensembl",
+    "blackListPath": "/home/nico/Data/TFPRIO/RawData/05_black_listed_regions/mm10-blacklist.v2.txt",
+    "differentialPeakSignals": true,
+    "maxSpaceBetweenPeaks": 500,
+    "minOccurrence": 0,
+    "mixMutuallyExclusive": true,
+    "perform": true,
+    "tfBindingSiteSearch": "BETWEEN"
+  },
+  "DeSeq2": {
+    "species": "mmusculus_gene_ensembl"
+  }
+}
