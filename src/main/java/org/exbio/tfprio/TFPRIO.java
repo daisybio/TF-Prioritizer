@@ -102,6 +102,11 @@ public class TFPRIO {
         UpliftENdb upliftENdb = new UpliftENdb(filterENdb.outputFile);
         steps.add(upliftENdb);
 
+        if (Configs.deSeq2.tpmFilter.isSet()) {
+            FilterTPM filterTPM = new FilterTPM(calculateTPM.getOutputs());
+            steps.add(filterTPM);
+        }
+
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();
     }
