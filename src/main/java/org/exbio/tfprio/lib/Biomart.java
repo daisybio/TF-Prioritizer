@@ -18,65 +18,81 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Biomart {
-    private static final List<String> lengthCols =
-            Arrays.asList("ensembl_gene_id", "ensembl_exon_id", "chromosome_name", "exon_chrom_start",
-                    "exon_chrom_end");
-    private static final List<String> gcCols =
-            Arrays.asList("gene_exon_intron", "ensembl_gene_id", "start_position", "end_position");
+    private static final List<String> exonCols =
+            List.of("ensembl_gene_id", "ensembl_exon_id", "chromosome_name", "exon_chrom_start", "exon_chrom_end");
+    private static final List<String> geneCols =
+            List.of("gene_exon_intron", "ensembl_gene_id", "chromosome_name", "start_position", "end_position",
+                    "strand");
     private static final Logger logger = LogManager.getLogger("Biomart");
     private final List<String> geneIds;
     private final Map<String, Integer> geneLengths = new HashMap<>();
     private final Map<String, Double> geneGc = new HashMap<>();
+    private final Map<String, Pair<Integer, Integer>> genePositions = new HashMap<>();
+    private final Map<String, String> geneChromosome = new HashMap<>();
+    private final Map<String, Integer> geneStrand = new HashMap<>();
 
     public Biomart(String species, List<String> geneIds) {
         this.geneIds = geneIds;
 
-        List<String[]> r_length = query(species, geneIds, lengthCols);
-        List<String[]> r_gc = query(species, geneIds, gcCols);
+        List<String[]> exonResponse = query(species, geneIds, exonCols);
+        List<String[]> genesResponse = query(species, geneIds, geneCols);
 
-        Map<String, List<String[]>> m_length = mapIds(lengthCols, r_length);
-        Map<String, List<String[]>> m_gc = mapIds(gcCols, r_gc);
+        Map<String, List<String[]>> exonMap = mapIds(exonCols, exonResponse);
+        Map<String, List<String[]>> genesMap = mapIds(geneCols, genesResponse);
 
         geneIds.forEach(id -> {
-            List<String[]> exonLines = m_length.getOrDefault(id, new ArrayList<>());
-            List<String[]> gcLines = m_gc.getOrDefault(id, new ArrayList<>());
+            List<String[]> exonLines = exonMap.getOrDefault(id, new ArrayList<>());
+            List<String[]> geneLines = genesMap.getOrDefault(id, new ArrayList<>());
+
             int offset = Integer.MAX_VALUE;
             Set<Pair<Integer, Integer>> exonCoords = new HashSet<>();
 
-            if (exonLines.isEmpty()) {
-                geneLengths.put(id, null);
-                geneGc.put(id, null);
+            if (!exonLines.isEmpty()) {
+                int length = 0;
+
+                for (String[] exonLine : exonLines) {
+
+                    int start = Integer.parseInt(exonLine[exonCols.indexOf("exon_chrom_start")]);
+                    int end = Integer.parseInt(exonLine[exonCols.indexOf("exon_chrom_end")]);
+
+                    int smaller = Math.min(start, end);
+                    int larger = Math.max(start, end);
+
+                    length += larger - smaller;
+
+                    exonCoords.add(Pair.of(smaller, larger));
+
+                    offset = Math.min(offset, smaller);
+                }
+
+                geneLengths.put(id, length);
+            }
+
+            if (geneLines.isEmpty()) {
                 return;
             }
 
-            int length = 0;
-
-            for (String[] exonLine : exonLines) {
-                int start = Integer.parseInt(exonLine[lengthCols.indexOf("exon_chrom_start") + 1]);
-                int end = Integer.parseInt(exonLine[lengthCols.indexOf("exon_chrom_end") + 1]);
-
-                int smaller = Math.min(start, end);
-                int larger = Math.max(start, end);
-
-                length += larger - smaller;
-
-                exonCoords.add(Pair.of(smaller, larger));
-
-                offset = Math.min(offset, smaller);
+            if (geneLines.size() > 1) {
+                logger.warn("Gene {} has {} gc lines! Only processing the first one.", id, geneLines.size());
             }
 
-            geneLengths.put(id, length);
+            String[] geneLine = geneLines.get(0);
 
-            if (gcLines.isEmpty()) {
-                geneGc.put(id, null);
-                return;
+            if (geneLine.length != geneCols.size()) {
+                logger.warn("Gene {} has {} columns!", id, geneLine.length);
+                System.out.println(Arrays.toString(geneLine));
             }
 
-            if (gcLines.size() > 1) {
-                logger.warn("Gene {} has {} gc lines! Only processing the first one.", id, gcLines.size());
-            }
+            String sequence = geneLine[geneCols.indexOf("gene_exon_intron")];
 
-            String sequence = gcLines.get(0)[gcCols.indexOf("gene_exon_intron")];
+            int start = Integer.parseInt(geneLine[geneCols.indexOf("start_position")]);
+            int end = Integer.parseInt(geneLine[geneCols.indexOf("end_position")]);
+            String chromosome = geneLine[geneCols.indexOf("chromosome_name")];
+            int strand = Integer.parseInt(geneLine[geneCols.indexOf("strand")]);
+
+            genePositions.put(id, Pair.of(start, end));
+            geneChromosome.put(id, chromosome);
+            geneStrand.put(id, strand);
 
             final int finalOffset = offset;
 
@@ -110,7 +126,6 @@ public class Biomart {
                 "<Query  virtualSchemaName = \"default\" formatter = \"TSV\" header = \"0\" uniqueRows = \"0\" count = \"\" datasetConfigVersion = \"0.6\" >\n");
         builder.append("<Dataset name = \"").append(dataSetName).append("\" interface = \"default\" >\n");
         builder.append("<Filter name = \"ensembl_gene_id\" value = \"").append(geneIDs).append("\" />\n");
-        builder.append("<Attribute name = \"ensembl_gene_id\" />\n");
         for (String attribute : attributes) {
             builder.append("<Attribute name = \"").append(attribute).append("\" />\n");
         }
@@ -163,8 +178,11 @@ public class Biomart {
     }
 
     public final List<String> getLines() {
-        return geneIds.stream().map(id -> String.format("%s\t%d\t%f", id, geneLengths.get(id), geneGc.get(id))).collect(
-                Collectors.toList());
+        return geneIds.stream().map(id -> String.join("\t", id, String.valueOf(geneLengths.getOrDefault(id, null)),
+                String.valueOf(geneGc.getOrDefault(id, null)), String.valueOf(geneChromosome.get(id)),
+                String.valueOf(genePositions.containsKey(id) ? genePositions.get(id).getLeft() : null),
+                String.valueOf(genePositions.containsKey(id) ? genePositions.get(id).getRight() : null),
+                String.valueOf(geneStrand.get(id)))).collect(Collectors.toList());
     }
 
     private Map<String, List<String[]>> mapIds(List<String> columns, List<String[]> matrix) {
