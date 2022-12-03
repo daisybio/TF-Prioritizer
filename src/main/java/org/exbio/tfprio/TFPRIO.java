@@ -6,10 +6,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.steps.deseq2.CalculateTPM;
-import org.exbio.tfprio.steps.deseq2.CreatePairings;
-import org.exbio.tfprio.steps.deseq2.FetchGeneInfo;
-import org.exbio.tfprio.steps.deseq2.MergeCounts;
+import org.exbio.tfprio.steps.deseq2.*;
 import org.exbio.tfprio.steps.preprocessing.*;
 import org.exbio.tfprio.util.ArgParser;
 
@@ -95,6 +92,9 @@ public class TFPRIO {
 
         CalculateTPM calculateTPM = new CalculateTPM(mergeCounts.getOutputs(), concatenateGeneInfo.outputFile);
         steps.add(calculateTPM);
+
+        FetchDatasetVersion fetchDatasetVersion = new FetchDatasetVersion();
+        steps.add(fetchDatasetVersion);
 
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();
