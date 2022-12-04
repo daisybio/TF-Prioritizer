@@ -11,13 +11,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
-public class CheckAnnotationChromosomes extends ExecutableStep {
+public class TGeneFilter extends ExecutableStep {
     public final OutputFile outputFile;
     private final RequiredConfig<File> geneAnnotationFile =
             new RequiredConfig<>(Configs.inputConfigs.geneAnnotationFile);
     private final InputFile inputFile;
 
-    public CheckAnnotationChromosomes() {
+    public TGeneFilter() {
         super();
 
         inputFile = addInput(geneAnnotationFile);
@@ -32,7 +32,7 @@ public class CheckAnnotationChromosomes extends ExecutableStep {
                      BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
                     for (String line; (line = reader.readLine()) != null; ) {
                         // Remove initial "chr" from chromosome names
-                        if (line.startsWith("#")) {
+                        if (line.startsWith("#") || !line.split("\t")[2].equals("transcript")) {
                             continue;
                         }
 

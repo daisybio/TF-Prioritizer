@@ -6,7 +6,8 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.steps.CheckAnnotationChromosomes;
+import org.exbio.tfprio.steps.TGeneExtractRegions;
+import org.exbio.tfprio.steps.TGeneFilter;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.util.ArgParser;
@@ -121,8 +122,11 @@ public class TFPRIO {
         DeSeqPostprocessing deSeqPostprocessing = new DeSeqPostprocessing(deSeq2.outputFiles);
         steps.add(deSeqPostprocessing);
 
-        CheckAnnotationChromosomes checkAnnotationChromosomes = new CheckAnnotationChromosomes();
-        steps.add(checkAnnotationChromosomes);
+        TGeneFilter TGeneFilter = new TGeneFilter();
+        steps.add(TGeneFilter);
+
+        TGeneExtractRegions tGeneExtractRegions = new TGeneExtractRegions(TGeneFilter.outputFile);
+        steps.add(tGeneExtractRegions);
 
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();
