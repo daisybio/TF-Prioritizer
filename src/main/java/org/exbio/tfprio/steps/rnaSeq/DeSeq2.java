@@ -27,6 +27,7 @@ public class DeSeq2 extends ExecutableStep {
                 InputFile inputFile = addInput(input);
                 OutputFile outputFile = addOutput(inputFile.getName());
                 put(inputFile, outputFile);
+                outputFiles.add(outputFile);
                 filteredBatchFiles.put(inputFile, addOutput(
                         inputFile.getName().substring(0, inputFile.getName().lastIndexOf(".")) + "_meta.tsv"));
             });
@@ -50,9 +51,6 @@ public class DeSeq2 extends ExecutableStep {
 
                 bridge.forEach((input, output) -> add(() -> {
                     OutputFile filteredBatchFile = filteredBatchFiles.get(input);
-
-                    List<String> groups =
-                            Arrays.asList(input.getName().substring(0, input.getName().lastIndexOf(".")).split("_"));
 
                     final List<String> order;
                     try (BufferedReader reader = new BufferedReader(new FileReader(input))) {
@@ -82,10 +80,5 @@ public class DeSeq2 extends ExecutableStep {
                 throw new RuntimeException(e);
             }
         }};
-    }
-
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
     }
 }

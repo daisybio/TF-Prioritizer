@@ -114,7 +114,7 @@ public class TFPRIO {
             latestRnaSeq = filterTPM.getOutputs();
         }
 
-        DeSeq2 deSeq2 = new DeSeq2(createPairings.getOutputs(), createBatchFile.outputFile);
+        DeSeq2 deSeq2 = new DeSeq2(latestRnaSeq, createBatchFile.outputFile);
         steps.add(deSeq2);
 
         ExecutionManager manager = new ExecutionManager(steps);

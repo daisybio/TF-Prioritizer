@@ -2,6 +2,7 @@
 
 library("DESeq2")
 library("argparse")
+library("dplyr")
 
 parser <- ArgumentParser()
 parser$add_argument("--metadata", required = TRUE)
@@ -22,6 +23,9 @@ count_df <- read.csv(args$input, sep = "\t", header = T, row.names = NULL)
 count_df <- count_df[!duplicated(count_df$gene_id), ]
 row.names(count_df) <- count_df[, 1]
 count_df$gene_id <- NULL
+
+count_df <- round(count_df)
+
 if (include_batches) {
   dds <- DESeqDataSetFromMatrix(
     countData = count_df,

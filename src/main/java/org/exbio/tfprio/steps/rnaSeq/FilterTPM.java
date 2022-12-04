@@ -9,9 +9,7 @@ import org.exbio.tfprio.configs.Configs;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
@@ -33,10 +31,15 @@ public class FilterTPM extends ExecutableStep {
         return new HashSet<>() {{
             bridge.forEach((inputFile, outputFile) -> add(() -> {
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-                    readLines(inputFile).stream().map(line -> line.split("\t")).forEachOrdered(split -> {
+                    List<String> inputLines = readLines(inputFile);
+                    writer.write(inputLines.get(0));
+                    writer.newLine();
+                    inputLines.stream().skip(1).map(line -> line.split("\t")).forEachOrdered(split -> {
                         try {
-                            writer.write(String.join("\t", split[0],
-                                    Double.parseDouble(split[1]) >= tpmFilter.get() ? split[1] : "0"));
+                            writer.write(split[0] + "\t" + String.join("\t",
+                                    Arrays.stream(split).skip(1).mapToDouble(Double::parseDouble).map(
+                                            value -> value >= tpmFilter.get() ? value : 0).mapToObj(
+                                            String::valueOf).toArray(String[]::new)));
                             writer.newLine();
                         } catch (IOException e) {
                             throw new RuntimeException(e);
