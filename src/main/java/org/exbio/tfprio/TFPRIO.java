@@ -117,6 +117,9 @@ public class TFPRIO {
         DeSeq2 deSeq2 = new DeSeq2(latestRnaSeq, createBatchFile.outputFile);
         steps.add(deSeq2);
 
+        DeSeqPostprocessing deSeqPostprocessing = new DeSeqPostprocessing(deSeq2.outputFiles);
+        steps.add(deSeqPostprocessing);
+
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();
     }
