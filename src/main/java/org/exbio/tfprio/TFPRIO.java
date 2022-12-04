@@ -6,8 +6,8 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.steps.deseq2.*;
-import org.exbio.tfprio.steps.preprocessing.*;
+import org.exbio.tfprio.steps.chipSeq.*;
+import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.util.ArgParser;
 
 import java.io.File;
@@ -79,10 +79,15 @@ public class TFPRIO {
             latestChipSeq = mixMutuallyExclusive.outputFiles;
         }
 
+
         MergeCounts mergeCounts = new MergeCounts();
         steps.add(mergeCounts);
         CreatePairings createPairings = new CreatePairings(mergeCounts.outputFiles);
         steps.add(createPairings);
+
+        CreateBatchFile createBatchFile = new CreateBatchFile(mergeCounts.outputFiles);
+        steps.add(createBatchFile);
+
 
         FetchGeneInfo fetchGeneInfo = new FetchGeneInfo();
         steps.add(fetchGeneInfo);
@@ -90,8 +95,9 @@ public class TFPRIO {
         ConcatenateFiles concatenateGeneInfo = new ConcatenateFiles(fetchGeneInfo.getOutputs());
         steps.add(concatenateGeneInfo);
 
-        CalculateTPM calculateTPM = new CalculateTPM(mergeCounts.getOutputs(), concatenateGeneInfo.outputFile);
+        CalculateTPM calculateTPM = new CalculateTPM(createPairings.getOutputs(), concatenateGeneInfo.outputFile);
         steps.add(calculateTPM);
+        Collection<OutputFile> latestRnaSeq = calculateTPM.getOutputs();
 
         Uplift uplift = new Uplift(concatenateGeneInfo.outputFile);
         steps.add(uplift);
@@ -105,7 +111,11 @@ public class TFPRIO {
         if (Configs.deSeq2.tpmFilter.isSet()) {
             FilterTPM filterTPM = new FilterTPM(calculateTPM.getOutputs());
             steps.add(filterTPM);
+            latestRnaSeq = filterTPM.getOutputs();
         }
+
+        DeSeq2 deSeq2 = new DeSeq2(createPairings.getOutputs(), createBatchFile.outputFile);
+        steps.add(deSeq2);
 
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();

@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.deseq2;
+package org.exbio.tfprio.steps.rnaSeq;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
@@ -54,8 +54,7 @@ public class CreatePairings extends ExecutableStep {
                     IntStream.range(0, leftLines.size()).mapToObj(i -> {
                         String right = rightLines.get(i);
                         String left = leftLines.get(i);
-                        return left.substring(0, left.lastIndexOf("\t")) + "\t" +
-                                right.substring(right.indexOf('\t') + 1, right.lastIndexOf("\t"));
+                        return left + "\t" + right.substring(right.indexOf('\t') + 1);
                     }).forEach(line -> {
                         try {
                             writer.write(line);

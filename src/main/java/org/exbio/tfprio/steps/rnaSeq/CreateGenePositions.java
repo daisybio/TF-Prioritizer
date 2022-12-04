@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.deseq2;
+package org.exbio.tfprio.steps.rnaSeq;
 
 import org.exbio.pipejar.pipeline.ExecutableStep;
 

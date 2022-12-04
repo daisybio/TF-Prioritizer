@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.preprocessing;
+package org.exbio.tfprio.steps.chipSeq;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;

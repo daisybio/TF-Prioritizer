@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.deseq2;
+package org.exbio.tfprio.steps.rnaSeq;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;

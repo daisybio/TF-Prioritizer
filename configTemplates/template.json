@@ -17,6 +17,7 @@
   "DeSeq2": {
     "species": "mmusculus_gene_ensembl",
     "speciesRefGenome": "mm10",
-    "tpmFilter": 0.5
+    "tpmFilter": 0.5,
+    "batches": null
   }
 }

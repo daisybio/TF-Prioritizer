@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.deseq2;
+package org.exbio.tfprio.steps.rnaSeq;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
@@ -64,7 +64,7 @@ public class MergeCounts extends ExecutableStep {
                     // Write output file
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
                         // Write header
-                        writer.write("gene_id\tMean\t" + String.join("\t", counts.navigableKeySet()));
+                        writer.write("gene_id\t" + String.join("\t", counts.navigableKeySet()));
                         writer.newLine();
                         // For all the genes
                         IntStream.range(0, geneIDs.size())
@@ -72,10 +72,7 @@ public class MergeCounts extends ExecutableStep {
                                  .mapToObj(i -> {
                                      List<Integer> countsAtI = counts.values().stream().map(l -> l.get(i)).toList();
                                      return geneIDs.get(i) + "\t" +
-                                             // Also add the mean
-                                             countsAtI.stream().mapToDouble(Integer::doubleValue).average().orElse(0) +
-                                             String.join("\t", countsAtI.stream().map(Object::toString).toList()) +
-                                             "\t";
+                                             String.join("\t", countsAtI.stream().map(Object::toString).toList());
                                  }).sorted().forEachOrdered(line -> {
                                      try {
                                          writer.write(line);
