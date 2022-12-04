@@ -20,7 +20,7 @@ import static org.exbio.pipejar.util.FileManagement.readLines;
 public class FetchGeneInfo extends ExecutableStep {
     private static final int batchSize = 1000;
     private final RequiredConfig<File> geneIdsFile = new RequiredConfig<>(Configs.inputConfigs.geneIDs);
-    private final RequiredConfig<String> species = new RequiredConfig<>(Configs.deSeq2.species);
+    private final RequiredConfig<String> species = new RequiredConfig<>(Configs.deSeq2.speciesBiomart);
     private final Map<OutputFile, List<String>> bridge = new HashMap<>();
 
     public FetchGeneInfo() {

@@ -16,9 +16,16 @@
     "tfBindingSiteSearch": "BETWEEN"
   },
   "DeSeq2": {
-    "species": "mmusculus_gene_ensembl",
+    "speciesBiomart": "mmusculus_gene_ensembl",
     "speciesRefGenome": "mm10",
     "tpmFilter": 0.5,
     "batches": null
+  },
+  "TGene": {
+    "executable": "/home/nico/.meme/bin/tgene",
+    "noClosestLocus": false,
+    "noClosestTss": false,
+    "maxLinkDistance": 500000,
+    "pValue": 0.05
   }
 }

@@ -8,7 +8,7 @@ import org.exbio.pipejar.configs.ConfigValidators.PositiveDoubleValidator;
 import java.util.Map;
 
 public class DeSeq2 extends ConfigModule {
-    public final ExternalConfig<String> species = new ExternalConfig<>(String.class);
+    public final ExternalConfig<String> speciesBiomart = new ExternalConfig<>(String.class);
     public final ExternalConfig<String> speciesRefGenome = new ExternalConfig<>(String.class);
     public final ExternalConfig<Double> tpmFilter = new ExternalConfig<>(Double.class, new PositiveDoubleValidator());
 

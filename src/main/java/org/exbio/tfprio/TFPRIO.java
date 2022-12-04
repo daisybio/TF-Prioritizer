@@ -6,6 +6,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
+import org.exbio.tfprio.steps.TGene;
 import org.exbio.tfprio.steps.TGeneExtractRegions;
 import org.exbio.tfprio.steps.TGeneFilter;
 import org.exbio.tfprio.steps.chipSeq.*;
@@ -122,11 +123,14 @@ public class TFPRIO {
         DeSeqPostprocessing deSeqPostprocessing = new DeSeqPostprocessing(deSeq2.outputFiles);
         steps.add(deSeqPostprocessing);
 
-        TGeneFilter TGeneFilter = new TGeneFilter();
-        steps.add(TGeneFilter);
+        TGeneFilter tGeneFilter = new TGeneFilter();
+        steps.add(tGeneFilter);
 
-        TGeneExtractRegions tGeneExtractRegions = new TGeneExtractRegions(TGeneFilter.outputFile);
+        TGeneExtractRegions tGeneExtractRegions = new TGeneExtractRegions(tGeneFilter.outputFile);
         steps.add(tGeneExtractRegions);
+
+        TGene tGene = new TGene(latestChipSeq, tGeneFilter.outputFile);
+        steps.add(tGene);
 
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();
