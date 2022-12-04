@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps;
+package org.exbio.tfprio.steps.tGene;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;

@@ -6,11 +6,11 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.steps.TGene;
-import org.exbio.tfprio.steps.TGeneExtractRegions;
-import org.exbio.tfprio.steps.TGeneFilter;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
+import org.exbio.tfprio.steps.tGene.TGene;
+import org.exbio.tfprio.steps.tGene.TGeneExtractRegions;
+import org.exbio.tfprio.steps.tGene.TGeneFilter;
 import org.exbio.tfprio.util.ArgParser;
 
 import java.io.File;
