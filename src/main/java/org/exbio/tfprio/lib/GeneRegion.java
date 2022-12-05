@@ -1,7 +1,6 @@
 package org.exbio.tfprio.lib;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,7 +33,6 @@ public class GeneRegion extends Region {
      * @return the filtered list of geneRegions
      */
     public static List<GeneRegion> removeGeneRegionDuplicates(List<GeneRegion> input, boolean idMatters) {
-        Collections.sort(input);
         List<GeneRegion> output = new ArrayList<>();
         for (int i = 0; i < input.size(); i++) {
             GeneRegion region = input.get(i);

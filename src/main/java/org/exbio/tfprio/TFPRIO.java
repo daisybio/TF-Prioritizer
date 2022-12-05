@@ -10,7 +10,8 @@ import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.TGene;
 import org.exbio.tfprio.steps.tGene.TGeneExtractRegions;
-import org.exbio.tfprio.steps.tGene.TGeneFilter;
+import org.exbio.tfprio.steps.tGene.TGenePostprocessing;
+import org.exbio.tfprio.steps.tGene.TGenePreprocess;
 import org.exbio.tfprio.util.ArgParser;
 
 import java.io.File;
@@ -82,55 +83,62 @@ public class TFPRIO {
             latestChipSeq = mixMutuallyExclusive.outputFiles;
         }
 
-
-        MergeCounts mergeCounts = new MergeCounts();
-        steps.add(mergeCounts);
-        CreatePairings createPairings = new CreatePairings(mergeCounts.outputFiles);
-        steps.add(createPairings);
-
-        CreateBatchFile createBatchFile = new CreateBatchFile(mergeCounts.outputFiles);
-        steps.add(createBatchFile);
-
-
         FetchGeneInfo fetchGeneInfo = new FetchGeneInfo();
         steps.add(fetchGeneInfo);
 
         ConcatenateFiles concatenateGeneInfo = new ConcatenateFiles(fetchGeneInfo.getOutputs());
         steps.add(concatenateGeneInfo);
 
-        CalculateTPM calculateTPM = new CalculateTPM(createPairings.getOutputs(), concatenateGeneInfo.outputFile);
+        MergeCounts mergeCounts = new MergeCounts();
+        steps.add(mergeCounts);
+
+        CreateBatchFile createBatchFile = new CreateBatchFile(mergeCounts.outputFiles);
+        steps.add(createBatchFile);
+
+        CalculateTPM calculateTPM = new CalculateTPM(mergeCounts.outputFiles, concatenateGeneInfo.outputFile);
         steps.add(calculateTPM);
-        Collection<OutputFile> latestRnaSeq = calculateTPM.getOutputs();
 
-        Uplift uplift = new Uplift(concatenateGeneInfo.outputFile);
-        steps.add(uplift);
+        MeanTPMs meanTPMs = new MeanTPMs(calculateTPM.outputFiles);
+        steps.add(meanTPMs);
 
-        FilterENdb filterENdb = new FilterENdb();
-        steps.add(filterENdb);
+        CreatePairings createPairings = new CreatePairings(calculateTPM.outputFiles);
+        steps.add(createPairings);
 
-        UpliftENdb upliftENdb = new UpliftENdb(filterENdb.outputFile);
-        steps.add(upliftENdb);
+        {
+            Uplift uplift = new Uplift(concatenateGeneInfo.outputFile);
+            steps.add(uplift);
 
-        if (Configs.deSeq2.tpmFilter.isSet()) {
-            FilterTPM filterTPM = new FilterTPM(calculateTPM.getOutputs());
-            steps.add(filterTPM);
-            latestRnaSeq = filterTPM.getOutputs();
-        }
+            FilterENdb filterENdb = new FilterENdb();
+            steps.add(filterENdb);
 
-        DeSeq2 deSeq2 = new DeSeq2(latestRnaSeq, createBatchFile.outputFile);
+            UpliftENdb upliftENdb = new UpliftENdb(filterENdb.outputFile);
+            steps.add(upliftENdb);
+        } // Uplift
+
+        /**
+         * if (Configs.deSeq2.tpmFilter.isSet()) {
+         FilterTPM filterTPM = new FilterTPM(calculateTPM.getOutputs());
+         steps.add(filterTPM);
+         latestRnaSeq = filterTPM.getOutputs();
+         } */
+
+        DeSeq2 deSeq2 = new DeSeq2(createPairings.getOutputs(), createBatchFile.outputFile);
         steps.add(deSeq2);
 
         DeSeqPostprocessing deSeqPostprocessing = new DeSeqPostprocessing(deSeq2.outputFiles);
         steps.add(deSeqPostprocessing);
 
-        TGeneFilter tGeneFilter = new TGeneFilter();
-        steps.add(tGeneFilter);
+        TGenePreprocess tGenePreprocess = new TGenePreprocess();
+        steps.add(tGenePreprocess);
 
-        TGeneExtractRegions tGeneExtractRegions = new TGeneExtractRegions(tGeneFilter.outputFile);
+        TGeneExtractRegions tGeneExtractRegions = new TGeneExtractRegions(tGenePreprocess.outputFile);
         steps.add(tGeneExtractRegions);
 
-        TGene tGene = new TGene(latestChipSeq, tGeneFilter.outputFile);
+        TGene tGene = new TGene(latestChipSeq, tGenePreprocess.outputFile);
         steps.add(tGene);
+
+        TGenePostprocessing tGenePostprocessing = new TGenePostprocessing(meanTPMs.outputFiles, tGene.outputFiles);
+        steps.add(tGenePostprocessing);
 
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();

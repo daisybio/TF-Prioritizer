@@ -16,15 +16,20 @@ import static org.exbio.pipejar.util.FileManagement.readLines;
 
 
 public class CalculateTPM extends ExecutableStep {
+    public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final InputFile lengthsFile;
-    private final Map<InputFile, OutputFile> bridge;
+    private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public CalculateTPM(Collection<OutputFile> countFiles, OutputFile lengthsFile) {
-        super(false, countFiles, lengthsFile);
+    public CalculateTPM(Map<String, OutputFile> countFiles, OutputFile lengthsFile) {
+        super(false, countFiles.values(), lengthsFile);
         this.lengthsFile = addInput(lengthsFile);
 
-        bridge = countFiles.stream().collect(HashMap::new,
-                (map, dependency) -> map.put(addInput(dependency), addOutput(dependency.getName())), HashMap::putAll);
+        countFiles.forEach((group, input) -> {
+            InputFile inputFile = addInput(input);
+            OutputFile outputFile = addOutput(inputFile.getName());
+            outputFiles.put(group, outputFile);
+            bridge.put(inputFile, outputFile);
+        });
     }
 
     @Override

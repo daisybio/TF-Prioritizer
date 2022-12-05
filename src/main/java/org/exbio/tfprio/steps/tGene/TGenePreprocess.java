@@ -11,13 +11,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
-public class TGeneFilter extends ExecutableStep {
+public class TGenePreprocess extends ExecutableStep {
     public final OutputFile outputFile;
     private final RequiredConfig<File> geneAnnotationFile =
             new RequiredConfig<>(Configs.inputConfigs.geneAnnotationFile);
     private final InputFile inputFile;
 
-    public TGeneFilter() {
+    public TGenePreprocess() {
         super();
 
         inputFile = addInput(geneAnnotationFile);
@@ -38,6 +38,10 @@ public class TGeneFilter extends ExecutableStep {
 
                         if (line.startsWith("chr")) {
                             line = line.substring("chr".length());
+                        }
+
+                        if (line.startsWith("M\t")) {
+                            line = "MT\t" + line.substring("M\t".length());
                         }
 
                         writer.write(line);

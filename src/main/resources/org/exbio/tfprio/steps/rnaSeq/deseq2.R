@@ -17,7 +17,7 @@ metadata_df$sample <- NULL
 metadata_df$group <- as.factor(metadata_df$group)
 metadata_df$batch <- as.factor(metadata_df$batch)
 
-include_batches <- unique(metadata_df$batch) != 1
+include_batches <- (n_distinct(metadata_df$batch) > 1)
 
 count_df <- read.csv(args$input, sep = "\t", header = T, row.names = NULL)
 count_df <- count_df[!duplicated(count_df$gene_id), ]
