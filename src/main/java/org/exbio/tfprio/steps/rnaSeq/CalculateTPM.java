@@ -89,9 +89,4 @@ public class CalculateTPM extends ExecutableStep {
             }
         }};
     }
-
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
-    }
 }

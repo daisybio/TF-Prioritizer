@@ -1,5 +1,6 @@
 package org.exbio.tfprio.steps.rnaSeq;
 
+import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
@@ -26,8 +27,10 @@ public class FetchGeneInfo extends ExecutableStep {
     public FetchGeneInfo() {
         super();
 
+        InputFile inputFile = addInput(geneIdsFile);
+
         try {
-            List<String> geneIds = readLines(geneIdsFile.get()).stream().skip(1).toList();
+            List<String> geneIds = readLines(inputFile).stream().skip(1).toList();
 
             IntStream.range(0, geneIds.size()).boxed().collect(Collectors.groupingBy(i -> i / batchSize)).forEach(
                     (batchId, indices) -> {

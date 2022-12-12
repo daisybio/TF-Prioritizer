@@ -11,11 +11,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class MeanTPMs extends ExecutableStep {
+public class MeanExpression extends ExecutableStep {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public MeanTPMs(Map<String, OutputFile> inputFiles) {
+    public MeanExpression(Map<String, OutputFile> inputFiles) {
         super(false, inputFiles.values());
 
         inputFiles.forEach((group, input) -> {

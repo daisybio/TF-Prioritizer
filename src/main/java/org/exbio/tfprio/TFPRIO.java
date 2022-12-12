@@ -6,6 +6,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
+import org.exbio.tfprio.steps.TEPIC.TEPIC;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.TGene;
@@ -15,14 +16,13 @@ import org.exbio.tfprio.steps.tGene.TGenePreprocess;
 import org.exbio.tfprio.util.ArgParser;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 import static org.exbio.pipejar.util.FileManagement.extend;
 
 public class TFPRIO {
+    private static final Collection<ExecutableStep> steps = new HashSet<>();
     /**
      * The {@link ConfigModuleCollection} object which is referenced by all the {@link ExecutableStep} instances
      */
@@ -32,10 +32,12 @@ public class TFPRIO {
 
     public static void main(String[] args) throws Exception {
         ArgParser argParser = new ArgParser(args);
-        execute(argParser);
+        init(argParser);
+        buildFlow();
+        execute();
     }
 
-    protected static void execute(ArgParser argParser) throws Exception {
+    private static void init(ArgParser argParser) throws IOException {
         File configFile = argParser.getConfigFile();
         workingDirectory = argParser.getWorkingDirectory();
         sourceDirectory = argParser.getSourceDirectory();
@@ -48,99 +50,77 @@ public class TFPRIO {
             System.exit(1);
         }
         configs.save(extend(workingDirectory, "configs.json"));
+    }
 
-        Collection<ExecutableStep> steps = new HashSet<>();
-
-        CheckChromosomes checkChromosomes = new CheckChromosomes();
-        steps.add(checkChromosomes);
+    protected static void buildFlow() {
+        CheckChromosomes checkChromosomes = add(new CheckChromosomes());
 
         Map<String, Map<String, Collection<OutputFile>>> latestChipSeq = checkChromosomes.outputFiles;
 
         if (Configs.mixOptions.perform.get()) {
-            MixSamples mixSamples = new MixSamples(checkChromosomes.outputFiles);
-            steps.add(mixSamples);
+            MixSamples mixSamples = add(new MixSamples(checkChromosomes.outputFiles));
             latestChipSeq = mixSamples.outputFiles;
         }
 
         if (List.of("BETWEEN", "EXCL_BETWEEN").contains(Configs.mixOptions.tfBindingSiteSearch.get())) {
-            CreateFootprintsBetweenPeaks createFootprintsBetweenPeaks = new CreateFootprintsBetweenPeaks(latestChipSeq);
-            steps.add(createFootprintsBetweenPeaks);
+            CreateFootprintsBetweenPeaks createFootprintsBetweenPeaks =
+                    add(new CreateFootprintsBetweenPeaks(latestChipSeq));
             latestChipSeq = createFootprintsBetweenPeaks.outputFiles;
         }
 
         if (Configs.mixOptions.blackListPath.isSet()) {
-            Blacklist blacklist = new Blacklist(latestChipSeq);
-            steps.add(blacklist);
+            Blacklist blacklist = add(new Blacklist(latestChipSeq));
             latestChipSeq = blacklist.outputFiles;
         }
 
-        GetChromosomeLengths getChromosomeLengths = new GetChromosomeLengths();
-        steps.add(getChromosomeLengths);
+        GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths());
 
         if (Configs.mixOptions.mixMutuallyExclusive.get()) {
-            MixMutuallyExclusive mixMutuallyExclusive = new MixMutuallyExclusive(latestChipSeq);
-            steps.add(mixMutuallyExclusive);
+            MixMutuallyExclusive mixMutuallyExclusive = add(new MixMutuallyExclusive(latestChipSeq));
             latestChipSeq = mixMutuallyExclusive.outputFiles;
         }
 
-        FetchGeneInfo fetchGeneInfo = new FetchGeneInfo();
-        steps.add(fetchGeneInfo);
+        FetchGeneInfo fetchGeneInfo = add(new FetchGeneInfo());
+        ConcatenateFiles concatenateGeneInfo = add(new ConcatenateFiles(fetchGeneInfo.getOutputs()));
+        MergeCounts mergeCounts = add(new MergeCounts());
 
-        ConcatenateFiles concatenateGeneInfo = new ConcatenateFiles(fetchGeneInfo.getOutputs());
-        steps.add(concatenateGeneInfo);
+        CreateBatchFile createBatchFile = add(new CreateBatchFile(mergeCounts.outputFiles));
+        CalculateTPM calculateTPM = add(new CalculateTPM(mergeCounts.outputFiles, concatenateGeneInfo.outputFile));
+        MeanExpression meanCounts = add(new MeanExpression(mergeCounts.outputFiles));
+        CreatePairings createPairings = add(new CreatePairings(mergeCounts.outputFiles));
 
-        MergeCounts mergeCounts = new MergeCounts();
-        steps.add(mergeCounts);
+        Uplift uplift = add(new Uplift(concatenateGeneInfo.outputFile));
+        FilterENdb filterENdb = add(new FilterENdb());
+        UpliftENdb upliftENdb = add(new UpliftENdb(filterENdb.outputFile));
 
-        CreateBatchFile createBatchFile = new CreateBatchFile(mergeCounts.outputFiles);
-        steps.add(createBatchFile);
+        if (Configs.deSeq2.tpmFilter.isSet()) {
+            FilterExpression filterExpression = add(new FilterExpression(calculateTPM.outputFiles));
+        }
 
-        CalculateTPM calculateTPM = new CalculateTPM(mergeCounts.outputFiles, concatenateGeneInfo.outputFile);
-        steps.add(calculateTPM);
+        DeSeq2 deSeq2 = add(new DeSeq2(createPairings.getOutputs(), createBatchFile.outputFile));
+        DeSeqPostprocessing deSeqPostprocessing = add(new DeSeqPostprocessing(deSeq2.outputFiles));
 
-        MeanTPMs meanTPMs = new MeanTPMs(calculateTPM.outputFiles);
-        steps.add(meanTPMs);
+        Map<String, Map<String, OutputFile>> tgeneFiles = new HashMap<>();
 
-        CreatePairings createPairings = new CreatePairings(calculateTPM.outputFiles);
-        steps.add(createPairings);
+        if (Configs.tGene.executable.isSet()) {
+            TGenePreprocess tGenePreprocess = add(new TGenePreprocess());
+            TGeneExtractRegions tGeneExtractRegions = add(new TGeneExtractRegions(tGenePreprocess.outputFile));
+            TGene tGene = add(new TGene(latestChipSeq, tGenePreprocess.outputFile));
+            TGenePostprocessing tGenePostprocessing =
+                    add(new TGenePostprocessing(meanCounts.outputFiles, tGene.outputFiles));
+            tgeneFiles = tGenePostprocessing.outputFiles;
+        }
 
-        {
-            Uplift uplift = new Uplift(concatenateGeneInfo.outputFile);
-            steps.add(uplift);
+        TEPIC tepic = add(new TEPIC(latestChipSeq));
+    }
 
-            FilterENdb filterENdb = new FilterENdb();
-            steps.add(filterENdb);
-
-            UpliftENdb upliftENdb = new UpliftENdb(filterENdb.outputFile);
-            steps.add(upliftENdb);
-        } // Uplift
-
-        /**
-         * if (Configs.deSeq2.tpmFilter.isSet()) {
-         FilterTPM filterTPM = new FilterTPM(calculateTPM.getOutputs());
-         steps.add(filterTPM);
-         latestRnaSeq = filterTPM.getOutputs();
-         } */
-
-        DeSeq2 deSeq2 = new DeSeq2(createPairings.getOutputs(), createBatchFile.outputFile);
-        steps.add(deSeq2);
-
-        DeSeqPostprocessing deSeqPostprocessing = new DeSeqPostprocessing(deSeq2.outputFiles);
-        steps.add(deSeqPostprocessing);
-
-        TGenePreprocess tGenePreprocess = new TGenePreprocess();
-        steps.add(tGenePreprocess);
-
-        TGeneExtractRegions tGeneExtractRegions = new TGeneExtractRegions(tGenePreprocess.outputFile);
-        steps.add(tGeneExtractRegions);
-
-        TGene tGene = new TGene(latestChipSeq, tGenePreprocess.outputFile);
-        steps.add(tGene);
-
-        TGenePostprocessing tGenePostprocessing = new TGenePostprocessing(meanTPMs.outputFiles, tGene.outputFiles);
-        steps.add(tGenePostprocessing);
-
+    private static void execute() {
         ExecutionManager manager = new ExecutionManager(steps);
         manager.run();
+    }
+
+    private static <T extends ExecutableStep> T add(T step) {
+        steps.add(step);
+        return step;
     }
 }

@@ -12,20 +12,47 @@
     "maxSpaceBetweenPeaks": 500,
     "minOccurrence": 0,
     "mixMutuallyExclusive": false,
-    "perform": false,
+    "perform": true,
     "tfBindingSiteSearch": "BETWEEN"
   },
   "DeSeq2": {
     "speciesBiomart": "mmusculus_gene_ensembl",
     "speciesRefGenome": "mm10",
     "tpmFilter": 0.5,
-    "batches": null
+    "batches": null,
+    "countFilter": 50
   },
   "TGene": {
-    "executable": "/home/nico/.meme/bin/tgene",
+    "executable": null,
     "noClosestLocus": false,
     "noClosestTss": false,
     "maxLinkDistance": 500000,
     "pValue": 0.05
+  },
+  "TEPIC": {
+    "randomize": true,
+    "executable": "/home/nico/Software/TEPIC/Code/TEPIC.sh",
+    "PWMs": "/home/nico/Software/TEPIC/PWMs/3.0/combined_Jaspar_Hocomoco_mouse_PSEM.PSEM",
+    "transcriptBased": false,
+    "columnBedfile": null,
+    "windowSize": 50000,
+    "loopListFile": null,
+    "loopWindows": 5000,
+    "geneAnnotationFile": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
+    "exponentialDecay": true,
+    "doNotNormalizePeakLength": false,
+    "doNotGenerate": false,
+    "maxMinutesPerChromosome": 3,
+    "doZip": false,
+    "originalDecay": false,
+    "psemsLengthFile": null,
+    "pValue": 0.05,
+    "chromosomePrefix": false,
+    "onlyPeakFeatures": false,
+    "entireGeneBody": false,
+    "twoBitFile": null,
+    "onlyDNasePeaks": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
+    "inputReferenceGenome": "/home/nico/Data/TFPRIO/RawData/04_requiredData/genome.fa",
+    "bedChromatinSignal": null
   }
 }
