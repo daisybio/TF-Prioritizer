@@ -2,7 +2,9 @@ package org.exbio.tfprio.steps.rnaSeq;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
+import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.*;
@@ -18,6 +20,7 @@ public class DeSeq2 extends ExecutableStep {
     private final InputFile batchFile;
     private final Map<InputFile, OutputFile> bridge;
     private final Map<InputFile, OutputFile> filteredBatchFiles = new HashMap<>();
+    private final RequiredConfig<Integer> countFilter = new RequiredConfig<>(Configs.deSeq2.countFilter);
 
     public DeSeq2(Collection<OutputFile> dependencies, OutputFile batchFile) {
         super(false, dependencies, batchFile);
@@ -73,7 +76,8 @@ public class DeSeq2 extends ExecutableStep {
                     }
 
                     executeAndWait("Rscript " + scriptPath + " --metadata " + filteredBatchFile.getAbsolutePath() +
-                            " --input " + input.getAbsolutePath() + " --output " + output.getAbsolutePath(), true);
+                            " --input " + input.getAbsolutePath() + " --output " + output.getAbsolutePath() +
+                            " --minCount " + countFilter.get(), true);
                     return true;
                 }));
             } catch (IOException e) {

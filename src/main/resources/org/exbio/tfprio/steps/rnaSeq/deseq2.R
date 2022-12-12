@@ -8,6 +8,7 @@ parser <- ArgumentParser()
 parser$add_argument("--metadata", required = TRUE)
 parser$add_argument("--input", required = TRUE)
 parser$add_argument("--output", required = TRUE)
+parser$add_argument("--minCount", required = TRUE, type = "integer", default = 10)
 
 args <- parser$parse_args()
 
@@ -39,8 +40,7 @@ if (include_batches) {
     design = ~group
   )
 }
-threshold <- 50
-keep <- rowSums(counts(dds)) >= threshold
+keep <- rowSums(counts(dds)) >= args$minCount
 dds <- dds[keep, ]
 output_path <- args$output
 dds <- DESeq(dds)

@@ -14,16 +14,20 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class FilterTPM extends ExecutableStep {
-    private final HashMap<InputFile, OutputFile> bridge;
-
+public class FilterExpression extends ExecutableStep {
+    public final Map<String, OutputFile> outputFiles = new HashMap<>();
+    private final HashMap<InputFile, OutputFile> bridge = new HashMap<>();
     private final RequiredConfig<Double> tpmFilter = new RequiredConfig<>(Configs.deSeq2.tpmFilter);
 
-    public FilterTPM(Collection<OutputFile> dependencies) {
-        super(false, dependencies);
+    public FilterExpression(Map<String, OutputFile> dependencies) {
+        super(false, dependencies.values());
 
-        bridge = dependencies.stream().collect(HashMap::new,
-                (map, dependency) -> map.put(addInput(dependency), addOutput(dependency.getName())), HashMap::putAll);
+        dependencies.forEach((name, file) -> {
+            OutputFile outputFile = addOutput(file.getName());
+            InputFile inputFile = addInput(file);
+            bridge.put(inputFile, outputFile);
+            outputFiles.put(name, outputFile);
+        });
     }
 
     @Override
