@@ -21,7 +21,7 @@ import java.util.*;
 
 import static org.exbio.pipejar.util.FileManagement.extend;
 
-public class TFPRIO {
+public class TF_Prioritizer {
     private static final Collection<ExecutableStep> steps = new HashSet<>();
     /**
      * The {@link ConfigModuleCollection} object which is referenced by all the {@link ExecutableStep} instances

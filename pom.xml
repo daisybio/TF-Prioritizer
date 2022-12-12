@@ -36,6 +36,14 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.4.0</version>
+                    <configuration>
+                        <mainClass>org.exbio.tfprio.TF_Prioritizer</mainClass>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
@@ -47,7 +55,7 @@
                         <archive>
                             <manifest>
                                 <addClasspath>true</addClasspath>
-                                <mainClass>org.exbio.tfprio.TFPRIO</mainClass>
+                                <mainClass>org.exbio.tfprio.TF_Prioritizer</mainClass>
                             </manifest>
                         </archive>
                     </configuration>
@@ -57,7 +65,7 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <mainClass>org.exbio.tfprio.TFPRIO</mainClass>
+                                <mainClass>org.exbio.tfprio.TF_Prioritizer</mainClass>
                             </manifest>
                         </archive>
                         <descriptorRefs>
