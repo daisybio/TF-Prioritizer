@@ -83,58 +83,56 @@ public class TEPIC extends ExecutableStep {
         String order = "gbocpdnawfmervkiqhs";
         return new HashSet<>() {{
             chipSeqFiles.forEach((group, hmMap) -> hmMap.forEach((hm, samples) -> {
-                samples.forEach(sample -> {
-                    add(() -> {
-                        Map<Character, String> stringConfigs = new HashMap<>() {{
-                            put('b', sample.getAbsolutePath());
-                            put('o', bridge.get(sample).getAbsolutePath());
-                            put('S', new File(bridge.get(sample), "trap_sequences.csv").getAbsolutePath());
-                        }};
+                samples.forEach(sample -> add(() -> {
+                    Map<Character, String> stringConfigs = new HashMap<>() {{
+                        put('b', sample.getAbsolutePath());
+                        put('o', bridge.get(sample).getAbsolutePath());
+                        put('S', new File(bridge.get(sample), "trap_sequences.csv").getAbsolutePath());
+                    }};
 
-                        Map<Character, UsageConfig<?>> otherConfigs = new HashMap<>() {{
-                            put('g', f_referenceGenome);
-                            put('p', f_pwms);
-                            put('d', bedChromatinSignal);
-                            put('n', columnBedfile);
-                            put('a', geneAnnotationFile);
-                            put('w', windowSize);
-                            put('f', onlyDNasePeaks);
-                            put('e', exponentialDecay);
-                            put('l', doNotNormalizePeakLength);
-                            put('u', doNotGenerate);
-                            put('x', originalDecay);
-                            put('m', psemsLengthFile);
-                            put('y', entireGeneBody);
-                            put('z', doZip);
-                            put('r', twoBitFile);
-                            put('v', pValue);
-                            put('i', maxMinutesPerChromosome);
-                            put('j', chromosomePrefix);
-                            put('t', transcriptBased);
-                            put('h', loopListFile);
-                            put('s', loopWindows);
-                            put('q', onlyPeakFeatures);
-                        }};
+                    Map<Character, UsageConfig<?>> otherConfigs = new HashMap<>() {{
+                        put('g', f_referenceGenome);
+                        put('p', f_pwms);
+                        put('d', bedChromatinSignal);
+                        put('n', columnBedfile);
+                        put('a', geneAnnotationFile);
+                        put('w', windowSize);
+                        put('f', onlyDNasePeaks);
+                        put('e', exponentialDecay);
+                        put('l', doNotNormalizePeakLength);
+                        put('u', doNotGenerate);
+                        put('x', originalDecay);
+                        put('m', psemsLengthFile);
+                        put('y', entireGeneBody);
+                        put('z', doZip);
+                        put('r', twoBitFile);
+                        put('v', pValue);
+                        put('i', maxMinutesPerChromosome);
+                        put('j', chromosomePrefix);
+                        put('t', transcriptBased);
+                        put('h', loopListFile);
+                        put('s', loopWindows);
+                        put('q', onlyPeakFeatures);
+                    }};
 
-                        otherConfigs.forEach((key, config) -> {
-                            if (config.isSet()) {
-                                stringConfigs.put(key, config.get().toString());
-                            }
-                        });
-                        String command = executable.get() + " " +
-                                order.chars().mapToObj(c -> (char) c).filter(stringConfigs::containsKey).map(c -> {
-                                    if (stringConfigs.containsKey(c)) {
-                                        return "-" + c + " " + stringConfigs.get(c);
-                                    } else {
-                                        return "";
-                                    }
-                                }).collect(Collectors.joining(" "));
-
-                        executeAndWait(command, true);
-
-                        return true;
+                    otherConfigs.forEach((key, config) -> {
+                        if (config.isSet()) {
+                            stringConfigs.put(key, config.get().toString());
+                        }
                     });
-                });
+                    String command = executable.get() + " " +
+                            order.chars().mapToObj(c -> (char) c).filter(stringConfigs::containsKey).map(c -> {
+                                if (stringConfigs.containsKey(c)) {
+                                    return "-" + c + " " + stringConfigs.get(c);
+                                } else {
+                                    return "";
+                                }
+                            }).collect(Collectors.joining(" "));
+
+                    executeAndWait(command, true);
+
+                    return true;
+                }));
             }));
         }};
     }
