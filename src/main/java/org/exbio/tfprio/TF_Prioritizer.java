@@ -41,7 +41,7 @@ public class TF_Prioritizer {
         File configFile = argParser.getConfigFile();
         workingDirectory = argParser.getWorkingDirectory();
         ExecutionManager.workingDirectory = new OutputFile(extend(workingDirectory, "output").getAbsolutePath());
-        ExecutionManager.setThreadNumber(5);
+        ExecutionManager.setThreadNumber(argParser.getThreadNumber());
 
         configs = new Configs();
 
