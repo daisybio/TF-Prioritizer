@@ -9,7 +9,6 @@ import org.exbio.tfprio.configs.Configs;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.copyFile;
@@ -22,7 +21,7 @@ public class Uplift extends ExecutableStep {
     private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(Configs.deSeq2.speciesRefGenome);
     private final InputFile genePositions;
 
-    private final String scriptPath;
+    private final InputFile script;
 
     private final RequiredConfig<Map<String, String>> grcSynonymDict =
             new RequiredConfig<>(Configs.internalConfigs.grcSynonymDict);
@@ -33,7 +32,7 @@ public class Uplift extends ExecutableStep {
         this.genePositions = addInput(genePositions);
         outputFile = addOutput("uplifted.tsv");
 
-        scriptPath = Objects.requireNonNull(getClass().getResource("uplift.py")).getPath();
+        script = addInput(getClass().getResourceAsStream("uplift.py"), "uplift.py");
     }
 
     @Override
@@ -61,7 +60,7 @@ public class Uplift extends ExecutableStep {
                     return true;
                 }
 
-                executeAndWait("python3 " + scriptPath + " " +
+                executeAndWait("python3 " + script + " " +
                         String.join(" ", genePositions.getAbsolutePath(), outputFile.getAbsolutePath(), originalVersion,
                                 refGenomeVersion, "3", "4", "5", "6"), true);
                 return true;

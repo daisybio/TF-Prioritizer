@@ -1,29 +1,28 @@
 package org.exbio.tfprio.steps.rnaSeq;
 
+import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
 public class FilterENdb extends ExecutableStep {
     public final OutputFile outputFile;
-    private final File enDBfile;
+    private final InputFile enDBfile;
     private final RequiredConfig<String> species = new RequiredConfig<>(Configs.deSeq2.speciesRefGenome);
 
     public FilterENdb() {
         super();
-        enDBfile = new File(Objects.requireNonNull(getClass().getResource("ENdb.bed")).getPath());
+        enDBfile = addInput(getClass().getResourceAsStream("ENdb.bed"), "ENdb.bed");
         outputFile = addOutput("out.bed");
     }
 

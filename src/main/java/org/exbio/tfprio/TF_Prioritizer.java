@@ -6,7 +6,6 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.steps.TEPIC.TEPIC;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.TGene;
@@ -109,7 +108,7 @@ public class TF_Prioritizer {
             tgeneFiles = tGenePostprocessing.outputFiles;
         }
 
-        TEPIC tepic = add(new TEPIC(latestChipSeq));
+        //TEPIC tepic = add(new TEPIC(latestChipSeq));
     }
 
     private static void execute() {

@@ -58,7 +58,7 @@ loopList=""
 trap_sequences=""
 
 #Parsing command line
-while getopts "g:b:o:c:p:S:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjt" o;
+while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjt:S:" o;
 do
 case $o in
 	g)	genome=$OPTARG;;
@@ -87,7 +87,8 @@ case $o in
 	q)	onlyPeakFeatures=$OPTARG;;
 	h)	loopList=$OPTARG;;
 	s)	loopWindow=$OPTARG;;
-  S) trap_sequences=$OPTARG;;
+  S)  trap_sequences=$OPTARG;;
+  *)	echo -e $help
 esac
 done
 

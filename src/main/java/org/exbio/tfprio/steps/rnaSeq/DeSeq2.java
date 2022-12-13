@@ -16,7 +16,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class DeSeq2 extends ExecutableStep {
     public final Collection<OutputFile> outputFiles = new HashSet<>();
-    private final String scriptPath;
+    private final InputFile script;
     private final InputFile batchFile;
     private final Map<InputFile, OutputFile> bridge;
     private final Map<InputFile, OutputFile> filteredBatchFiles = new HashMap<>();
@@ -38,7 +38,7 @@ public class DeSeq2 extends ExecutableStep {
 
         this.batchFile = addInput(batchFile);
 
-        this.scriptPath = Objects.requireNonNull(getClass().getResource("deseq2.R")).getPath();
+        this.script = addInput(getClass().getResourceAsStream("deseq2.R"), "deseq2.R");
     }
 
     @Override
@@ -75,9 +75,9 @@ public class DeSeq2 extends ExecutableStep {
                         });
                     }
 
-                    executeAndWait("Rscript " + scriptPath + " --metadata " + filteredBatchFile.getAbsolutePath() +
-                            " --input " + input.getAbsolutePath() + " --output " + output.getAbsolutePath() +
-                            " --minCount " + countFilter.get(), true);
+                    executeAndWait("Rscript " + script.getAbsolutePath() + " --metadata " +
+                            filteredBatchFile.getAbsolutePath() + " --input " + input.getAbsolutePath() + " --output " +
+                            output.getAbsolutePath() + " --minCount " + countFilter.get(), true);
                     return true;
                 }));
             } catch (IOException e) {

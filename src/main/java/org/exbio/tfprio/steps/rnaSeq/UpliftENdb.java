@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.softLink;
@@ -20,7 +19,7 @@ public class UpliftENdb extends ExecutableStep {
 
     public final OutputFile outputFile;
     private final InputFile inputFile;
-    private final String scriptPath;
+    private final InputFile script;
 
     private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(Configs.deSeq2.speciesRefGenome);
 
@@ -29,7 +28,7 @@ public class UpliftENdb extends ExecutableStep {
 
         inputFile = addInput(enDBfile);
         outputFile = addOutput("upliftedENdb.tsv");
-        scriptPath = Objects.requireNonNull(getClass().getResource("uplift.py")).getPath();
+        script = addInput(getClass().getResourceAsStream("uplift.py"), "uplift.py");
     }
 
     @Override
@@ -48,7 +47,7 @@ public class UpliftENdb extends ExecutableStep {
                     return true;
                 }
 
-                executeAndWait("python3 " + scriptPath + " " +
+                executeAndWait("python3 " + script.getAbsolutePath() + " " +
                         String.join(" ", inputFile.getPath(), outputFile.getPath(), genome, speciesRefGenome.get(), "0",
                                 "1", "2"), true);
 

@@ -86,7 +86,7 @@ public class TEPIC extends ExecutableStep {
                 samples.forEach(sample -> add(() -> {
                     Map<Character, String> stringConfigs = new HashMap<>() {{
                         put('b', sample.getAbsolutePath());
-                        put('o', bridge.get(sample).getAbsolutePath());
+                        put('o', bridge.get(sample).getAbsolutePath() + "/");
                         put('S', new File(bridge.get(sample), "trap_sequences.csv").getAbsolutePath());
                     }};
 
