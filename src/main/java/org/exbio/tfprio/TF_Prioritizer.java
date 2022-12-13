@@ -28,7 +28,6 @@ public class TF_Prioritizer {
      */
     public static Configs configs;
     public static File workingDirectory;
-    public static File sourceDirectory;
 
     public static void main(String[] args) throws Exception {
         ArgParser argParser = new ArgParser(args);
@@ -40,7 +39,6 @@ public class TF_Prioritizer {
     private static void init(ArgParser argParser) throws IOException {
         File configFile = argParser.getConfigFile();
         workingDirectory = argParser.getWorkingDirectory();
-        sourceDirectory = argParser.getSourceDirectory();
         ExecutionManager.workingDirectory = new OutputFile(extend(workingDirectory, "output").getAbsolutePath());
         ExecutionManager.setThreadNumber(5);
 

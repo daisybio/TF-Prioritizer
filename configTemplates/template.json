@@ -31,7 +31,6 @@
   },
   "TEPIC": {
     "randomize": true,
-    "executable": "/home/nico/Software/TEPIC/Code/TEPIC.sh",
     "PWMs": "/home/nico/Software/TEPIC/PWMs/3.0/combined_Jaspar_Hocomoco_mouse_PSEM.PSEM",
     "transcriptBased": false,
     "columnBedfile": null,

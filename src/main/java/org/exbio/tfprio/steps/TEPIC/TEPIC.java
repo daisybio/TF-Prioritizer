@@ -9,10 +9,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -23,7 +20,6 @@ public class TEPIC extends ExecutableStep {
 
     private final Map<String, Map<String, Collection<InputFile>>> chipSeqFiles = new HashMap<>();
 
-    private final RequiredConfig<File> executable = new RequiredConfig<>(Configs.tepic.executable);
     private final RequiredConfig<File> f_referenceGenome = new RequiredConfig<>(Configs.tepic.inputReferenceGenome);
     private final RequiredConfig<File> f_pwms = new RequiredConfig<>(Configs.tepic.PWMs);
     private final OptionalConfig<File> bedChromatinSignal =
@@ -54,10 +50,14 @@ public class TEPIC extends ExecutableStep {
     private final OptionalConfig<Boolean> onlyPeakFeatures =
             new OptionalConfig<>(Configs.tepic.onlyPeakFeatures, false);
 
+    private final File executable;
+
     public TEPIC(Map<String, Map<String, Collection<OutputFile>>> latestChipSeq) {
         super(false,
                 latestChipSeq.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
                         Collectors.toSet()));
+
+        executable = new File(Objects.requireNonNull(getClass().getResource("Code/TEPIC.sh")).getFile());
 
         latestChipSeq.forEach((group, hmMap) -> {
             OutputFile dGroupOut = new OutputFile(outputDirectory, group);
@@ -80,7 +80,7 @@ public class TEPIC extends ExecutableStep {
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
-        String order = "gbocpdnawfmervkiqhs";
+        String order = "gbopScdnawfmervkiqhs";
         return new HashSet<>() {{
             chipSeqFiles.forEach((group, hmMap) -> hmMap.forEach((hm, samples) -> {
                 samples.forEach(sample -> add(() -> {
@@ -120,7 +120,7 @@ public class TEPIC extends ExecutableStep {
                             stringConfigs.put(key, config.get().toString());
                         }
                     });
-                    String command = executable.get() + " " +
+                    String command = executable.getAbsolutePath() + " " +
                             order.chars().mapToObj(c -> (char) c).filter(stringConfigs::containsKey).map(c -> {
                                 if (stringConfigs.containsKey(c)) {
                                     return "-" + c + " " + stringConfigs.get(c);

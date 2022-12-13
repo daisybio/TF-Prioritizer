@@ -24,7 +24,8 @@ Optional parameters:\n
 [-t flag indicating that the annotation should be transcript and not gene based]\n
 [-h a loop list file containing chromatin contacts]\n
 [-s size of the loop window used around a genes promoter to link chromatin loops to genes (default 5000)]\n
-[-q parameter to be set if only peak features should be computed (default FALSE)]\n"
+[-q parameter to be set if only peak features should be computed (default FALSE)]\n
+[-S trap predicted sequences output]\n"
 
 #Initialising parameters
 genome=""
@@ -54,8 +55,10 @@ onlyPeakFeatures="FALSE"
 transcripts="FALSE"
 loopWindow=5000
 loopList=""
+trap_sequences=""
+
 #Parsing command line
-while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjt" o;
+while getopts "g:b:o:c:p:S:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjt" o;
 do
 case $o in
 	g)	genome=$OPTARG;;
@@ -84,6 +87,7 @@ case $o in
 	q)	onlyPeakFeatures=$OPTARG;;
 	h)	loopList=$OPTARG;;
 	s)	loopWindow=$OPTARG;;
+  S) trap_sequences=$OPTARG;;
 esac
 done
 
@@ -346,11 +350,11 @@ fi
 affinity=${prefix}_Affinity.txt
 
 echo "Starting TRAP"
-${working_dir}/TRAPmulti $pwms ${prefix}-FilteredSequences.fa $cores > ${affinity}_temp 
+${working_dir}/TRAPmulti $pwms ${prefix}-FilteredSequences.fa $cores $trap_sequences > ${affinity}_temp
 rm ${prefix}-FilteredSequences.fa
 if [ -n "$randomGenome" ] || [ -n "$backgroundRegions" ];
 then
-${working_dir}/TRAPmulti $pwms ${prefix}-Random-FilteredSequences.fa $cores > ${affinity}_Random 
+${working_dir}/TRAPmulti $pwms ${prefix}-Random-FilteredSequences.fa $cores $trap_sequences > ${affinity}_Random
 rm ${prefix}-Random-FilteredSequences.fa
 fi
 

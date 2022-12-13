@@ -5,11 +5,10 @@ import org.apache.commons.cli.*;
 import java.io.File;
 
 public class ArgParser {
-    private File configFile;
-    private File workingDirectory;
-    private File sourceDirectory;
+    private final File configFile;
+    private final File workingDirectory;
 
-    public ArgParser(String[] args) {
+    public ArgParser(String[] args) throws ParseException {
         Options options = new Options();
 
         Option opt_configFile = new Option("c", "com2pose-config", true,
@@ -22,13 +21,7 @@ public class ArgParser {
         opt_workingDirectory.setRequired(true);
         options.addOption(opt_workingDirectory);
 
-        Option opt_tfprioDirectory = new Option("p", "path-tfprio", true, "[REQ]: filepath to TFPRIO folder");
-        opt_tfprioDirectory.setRequired(true);
-        options.addOption(opt_tfprioDirectory);
-
-
         CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd;
 
         try {
@@ -36,11 +29,8 @@ public class ArgParser {
 
             configFile = new File(cmd.getOptionValue("com2pose-config"));
             workingDirectory = new File(cmd.getOptionValue("working-directory"));
-            sourceDirectory = new File(cmd.getOptionValue("path-tfprio"));
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
-            formatter.printHelp("-c <com2pose-config> -w <working-directory> -p <path-com2pose>", options);
-            System.exit(1);
+            throw new ParseException("Failed to parse command line properties\n" + e.getMessage() + "\n" + options);
         }
     }
 
@@ -50,9 +40,5 @@ public class ArgParser {
 
     public File getWorkingDirectory() {
         return workingDirectory;
-    }
-
-    public File getSourceDirectory() {
-        return sourceDirectory;
     }
 }
