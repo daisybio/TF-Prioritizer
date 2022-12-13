@@ -9,10 +9,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -37,7 +34,6 @@ public class TEPIC extends ExecutableStep {
             new OptionalConfig<>(Configs.tepic.exponentialDecay, false);
     private final OptionalConfig<Boolean> doNotNormalizePeakLength =
             new OptionalConfig<>(Configs.tepic.doNotNormalizePeakLength, false);
-    private final OptionalConfig<Boolean> doNotGenerate = new OptionalConfig<>(Configs.tepic.doNotGenerate, false);
     private final OptionalConfig<Boolean> originalDecay = new OptionalConfig<>(Configs.tepic.originalDecay, false);
     private final OptionalConfig<File> psemsLengthFile = new OptionalConfig<>(Configs.tepic.psemsLengthFile, false);
     private final OptionalConfig<Boolean> entireGeneBody = new OptionalConfig<>(Configs.tepic.entireGeneBody, false);
@@ -105,7 +101,6 @@ public class TEPIC extends ExecutableStep {
                         put('f', onlyDNasePeaks);
                         put('e', exponentialDecay);
                         put('l', doNotNormalizePeakLength);
-                        put('u', doNotGenerate);
                         put('x', originalDecay);
                         put('m', psemsLengthFile);
                         put('y', entireGeneBody);
@@ -122,7 +117,19 @@ public class TEPIC extends ExecutableStep {
 
                     otherConfigs.forEach((key, config) -> {
                         if (config.isSet()) {
-                            stringConfigs.put(key, config.get().toString());
+                            if (config.get().getClass().equals(Boolean.class)) {
+                                if (List.of('e', 'q').contains(key)) {
+                                    // Boolean parameters
+                                    stringConfigs.put(key, config.toString().toUpperCase());
+                                } else {
+                                    // Flags
+                                    if ((boolean) config.get()) {
+                                        stringConfigs.put(key, "");
+                                    }
+                                }
+                            } else {
+                                stringConfigs.put(key, config.get().toString());
+                            }
                         }
                     });
                     String command = executable.getAbsolutePath() + " " +

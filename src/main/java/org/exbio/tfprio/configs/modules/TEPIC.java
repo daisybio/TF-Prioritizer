@@ -16,7 +16,6 @@ public class TEPIC extends ConfigModule {
     public final ExternalConfig<File> onlyDNasePeaks = new ExternalConfig<>(File.class);
     public final ExternalConfig<Boolean> exponentialDecay = new ExternalConfig<>(Boolean.class);
     public final ExternalConfig<Boolean> doNotNormalizePeakLength = new ExternalConfig<>(Boolean.class);
-    public final ExternalConfig<Boolean> doNotGenerate = new ExternalConfig<>(Boolean.class);
     public final ExternalConfig<Boolean> originalDecay = new ExternalConfig<>(Boolean.class);
     public final ExternalConfig<File> psemsLengthFile = new ExternalConfig<>(File.class);
     public final ExternalConfig<Boolean> entireGeneBody = new ExternalConfig<>(Boolean.class);
