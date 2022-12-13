@@ -9,10 +9,14 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import static org.exbio.pipejar.util.FileManagement.extend;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class TEPIC extends ExecutableStep {
@@ -52,12 +56,13 @@ public class TEPIC extends ExecutableStep {
 
     private final File executable;
 
-    public TEPIC(Map<String, Map<String, Collection<OutputFile>>> latestChipSeq) {
+    public TEPIC(Map<String, Map<String, Collection<OutputFile>>> latestChipSeq, OutputFile tepicDirectory) {
         super(false,
                 latestChipSeq.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
-                        Collectors.toSet()));
+                        Collectors.toSet()), tepicDirectory);
 
-        executable = new File(Objects.requireNonNull(getClass().getResource("Code/TEPIC.sh")).getFile());
+        addInput(tepicDirectory);
+        executable = extend(tepicDirectory, "Code", "TEPIC.sh");
 
         latestChipSeq.forEach((group, hmMap) -> {
             OutputFile dGroupOut = new OutputFile(outputDirectory, group);
