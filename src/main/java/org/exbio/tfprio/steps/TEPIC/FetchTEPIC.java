@@ -19,10 +19,15 @@ public class FetchTEPIC extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {
-                URL resource = (getClass().getResource("/org/exbio/tfprio/steps/TEPIC"));
-                if (resource == null) {
-                    copyResources("/org/exbio/tfprio/steps/TEPIC", outputFile.toPath());
+                String path = "/org/exbio/tfprio/steps/TEPIC";
+                URL resource = getClass().getResource(path);
+                if (resource == null || !new File(resource.getFile()).exists()) {
+                    // Usually entered when running via Jar
+                    logger.info("Jar mode");
+                    copyResources(path, outputFile.toPath());
                 } else {
+                    // Usually entered when running via IDE
+                    logger.info("IDE mode");
                     copyDirectory(new File(resource.getFile()), outputFile, false);
                 }
                 makeAllChildrenExecutable(outputFile);
