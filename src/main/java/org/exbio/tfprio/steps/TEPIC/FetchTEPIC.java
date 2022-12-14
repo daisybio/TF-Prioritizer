@@ -9,16 +9,20 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
-import static org.exbio.pipejar.util.FileManagement.copyDirectory;
-import static org.exbio.pipejar.util.FileManagement.makeAllChildrenExecutable;
+import static org.exbio.pipejar.util.FileManagement.*;
 
 public class FetchTEPIC extends ExecutableStep {
     public final OutputFile outputFile = addOutput("TEPIC");
+
+    public FetchTEPIC() {
+        super();
+    }
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {
+                deleteFileStructure(outputFile);
                 String path = "/org/exbio/tfprio/steps/TEPIC";
                 URL resource = getClass().getResource(path);
                 if (resource == null || !new File(resource.getFile()).exists()) {
@@ -34,5 +38,10 @@ public class FetchTEPIC extends ExecutableStep {
                 return true;
             });
         }};
+    }
+
+    @Override
+    protected boolean mayBeSkipped() {
+        return false;
     }
 }

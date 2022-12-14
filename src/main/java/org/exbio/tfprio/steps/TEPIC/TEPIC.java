@@ -148,9 +148,4 @@ public class TEPIC extends ExecutableStep {
             }));
         }};
     }
-
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
-    }
 }
