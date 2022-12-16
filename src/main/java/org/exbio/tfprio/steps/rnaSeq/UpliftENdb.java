@@ -55,9 +55,4 @@ public class UpliftENdb extends ExecutableStep {
             });
         }};
     }
-
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
-    }
 }

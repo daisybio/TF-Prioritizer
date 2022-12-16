@@ -9,11 +9,14 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import static org.exbio.pipejar.util.FileManagement.extend;
+import static org.exbio.pipejar.util.FileManagement.*;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class TEPIC extends ExecutableStep {
@@ -52,13 +55,36 @@ public class TEPIC extends ExecutableStep {
 
     private final File executable;
 
-    public TEPIC(Map<String, Map<String, Collection<OutputFile>>> latestChipSeq, OutputFile tepicDirectory) {
+    public TEPIC(Map<String, Map<String, Collection<OutputFile>>> latestChipSeq) {
         super(false,
                 latestChipSeq.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
-                        Collectors.toSet()), tepicDirectory);
+                        Collectors.toSet()));
 
-        addInput(tepicDirectory);
-        executable = extend(tepicDirectory, "Code", "TEPIC.sh");
+        InputFile tepicDirectory = new InputFile(inputDirectory, "TEPIC");
+
+        String path = "/org/exbio/tfprio/steps/TEPIC/Code";
+        URL resource = getClass().getResource(path);
+        if (resource == null || !new File(resource.getFile()).exists()) {
+            // Usually entered when running via Jar
+            logger.info("Jar mode");
+            try {
+                copyResources(path, tepicDirectory.toPath());
+            } catch (URISyntaxException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Usually entered when running via IDE
+            logger.info("IDE mode");
+            try {
+                copyDirectory(new File(resource.getFile()), tepicDirectory,
+                        pathname -> !pathname.getName().endsWith(".class"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        makeAllChildrenExecutable(tepicDirectory);
+
+        executable = extend(tepicDirectory, "TEPIC.sh");
 
         latestChipSeq.forEach((group, hmMap) -> {
             OutputFile dGroupOut = new OutputFile(outputDirectory, group);
@@ -142,7 +168,6 @@ public class TEPIC extends ExecutableStep {
                             }).collect(Collectors.joining(" "));
 
                     executeAndWait(command, true);
-
                     return true;
                 }));
             }));
