@@ -30,7 +30,7 @@
     "pValue": 0.05
   },
   "TEPIC": {
-    "randomize": true,
+    "randomize": false,
     "PWMs": "/home/nico/Software/TEPIC/PWMs/3.0/combined_Jaspar_Hocomoco_mouse_PSEM.PSEM",
     "transcriptBased": false,
     "columnBedfile": null,
@@ -51,6 +51,7 @@
     "twoBitFile": null,
     "onlyDNasePeaks": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
     "inputReferenceGenome": "/home/nico/Data/TFPRIO/RawData/04_requiredData/genome.fa",
-    "bedChromatinSignal": null
+    "bedChromatinSignal": null,
+    "affinityCutoff": 0.05
   }
 }

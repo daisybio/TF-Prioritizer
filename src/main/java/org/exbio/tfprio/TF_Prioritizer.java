@@ -110,9 +110,14 @@ public class TF_Prioritizer {
             tgeneFiles = tGenePostprocessing.outputFiles;
         }
         TEPIC tepic = add(new TEPIC(latestChipSeq));
+        Map<String, Map<String, Collection<OutputFile>>> tepicFiles = tepic.outputFiles;
+
         if (Configs.tepic.randomize.isSet() && Configs.tepic.randomize.get()) {
             TEPICRandomize tepicRandomize = add(new TEPICRandomize(tepic.outputFiles));
+            tepicFiles = tepicRandomize.outputFiles;
         }
+
+        // TEPICPostprocessing tepicPostprocessing = new TEPICPostprocessing(tepicFiles);
     }
 
     private static void execute() {
