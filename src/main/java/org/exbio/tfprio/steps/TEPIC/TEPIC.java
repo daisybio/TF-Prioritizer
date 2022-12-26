@@ -20,8 +20,8 @@ import static org.exbio.pipejar.util.FileManagement.*;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class TEPIC extends ExecutableStep {
+    public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
-
     private final Map<String, Map<String, Collection<InputFile>>> chipSeqFiles = new HashMap<>();
 
     private final RequiredConfig<File> f_referenceGenome = new RequiredConfig<>(Configs.tepic.inputReferenceGenome);
@@ -89,14 +89,17 @@ public class TEPIC extends ExecutableStep {
         latestChipSeq.forEach((group, hmMap) -> {
             OutputFile dGroupOut = new OutputFile(outputDirectory, group);
             chipSeqFiles.put(group, new HashMap<>());
+            outputFiles.put(group, new HashMap<>());
             OutputFile dGroupIn = new OutputFile(inputDirectory, group);
             hmMap.forEach((hm, samples) -> {
                 OutputFile dHmOut = new OutputFile(dGroupOut, hm);
                 chipSeqFiles.get(group).put(hm, new HashSet<>());
+                outputFiles.get(group).put(hm, new HashSet<>());
                 OutputFile dHmIn = new OutputFile(dGroupIn, hm);
                 samples.forEach(sample -> {
                     OutputFile sampleDir =
                             addOutput(dHmOut, sample.getName().substring(0, sample.getName().lastIndexOf('.')));
+                    outputFiles.get(group).get(hm).add(sampleDir);
                     InputFile inputFile = addInput(dHmIn, sample);
                     bridge.put(inputFile, sampleDir);
                     chipSeqFiles.get(group).get(hm).add(inputFile);
