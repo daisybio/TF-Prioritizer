@@ -2,7 +2,10 @@ package org.exbio.tfprio.steps.TEPIC;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
+import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.OptionalConfig;
+import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.*;
@@ -15,6 +18,8 @@ import static org.exbio.pipejar.util.FileManagement.copyFile;
 public class TEPICRandomize extends ExecutableStep {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
+    private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(Configs.tepic.sequenceFileName);
+    private final OptionalConfig<Double> tpmFilter = new OptionalConfig<>(Configs.deSeq2.tpmFilter, false);
 
     public TEPICRandomize(Map<String, Map<String, Collection<OutputFile>>> tepicResults) {
         super(false,
@@ -41,22 +46,26 @@ public class TEPICRandomize extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             bridge.forEach((inputDirectory, outputDirectory) -> add(() -> {
+                String suffix = tpmFilter.isSet() ? "_Gene_View_Filtered_TPM.txt" : "_Gene_View_Filtered.txt";
 
-
-                File[] consideredFiles = inputDirectory.listFiles(
-                        file -> file.isFile() && file.getName().matches(".*_Affinity_Gene_View_Filtered.*"));
+                File[] consideredFiles =
+                        inputDirectory.listFiles(file -> file.isFile() && file.getName().endsWith(suffix));
 
                 if (consideredFiles == null || consideredFiles.length == 0) {
-                    logger.warn("No files found in " + inputDirectory);
+                    logger.warn(
+                            "No affinity file found in " + inputDirectory.getAbsolutePath() + "for suffix " + suffix);
+                    return false;
+                } else if (consideredFiles.length > 1) {
+                    logger.warn("Multiple affinity files found in " + inputDirectory.getAbsolutePath() + "for suffix " +
+                            suffix + ". Using first file.");
                     return false;
                 }
 
-                File affinities = Arrays.stream(consideredFiles).filter(
-                        file -> file.getName().endsWith("TPM.txt")).findFirst().orElse(consideredFiles[0]);
-                File sequences = new File(inputDirectory, "trap_sequences.csv");
+                File affinities = consideredFiles[0];
+                File sequences = new File(inputDirectory, sequenceFileName.get());
 
                 if (!sequences.exists()) {
-                    logger.warn("No trap_sequences.csv found in " + inputDirectory);
+                    logger.warn("No " + sequenceFileName.get() + " found in " + inputDirectory);
                     return false;
                 }
 
@@ -99,6 +108,9 @@ public class TEPICRandomize extends ExecutableStep {
                 try (BufferedReader reader = new BufferedReader(new FileReader(sequences))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("#")) {
+                            continue;
+                        }
                         tfNames.add(line.split("\t")[0]);
                     }
                 }
@@ -108,7 +120,7 @@ public class TEPICRandomize extends ExecutableStep {
                      BufferedWriter writer = new BufferedWriter(new FileWriter(shuffledSequences))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        if (line.startsWith("#")) {
+                        if (line.startsWith("#") || line.startsWith("TF\t")) {
                             writer.write(line);
                             writer.newLine();
                             continue;

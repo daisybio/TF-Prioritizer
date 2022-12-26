@@ -2,6 +2,7 @@ package org.exbio.tfprio.configs.modules;
 
 import org.exbio.pipejar.configs.ConfigModule;
 import org.exbio.pipejar.configs.ConfigTypes.InputTypes.ExternalConfig;
+import org.exbio.pipejar.configs.ConfigTypes.InputTypes.InternalConfig;
 
 import java.io.File;
 
@@ -28,4 +29,6 @@ public class TEPIC extends ConfigModule {
     public final ExternalConfig<File> loopListFile = new ExternalConfig<>(File.class);
     public final ExternalConfig<Integer> loopWindows = new ExternalConfig<>(Integer.class);
     public final ExternalConfig<Boolean> onlyPeakFeatures = new ExternalConfig<>(Boolean.class);
+    public final ExternalConfig<Double> affinityCutoff = new ExternalConfig<>(Double.class);
+    public final InternalConfig<String> sequenceFileName = new InternalConfig<>("trap_sequences.tsv");
 }
