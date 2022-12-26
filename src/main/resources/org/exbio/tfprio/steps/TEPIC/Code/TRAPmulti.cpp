@@ -209,10 +209,13 @@ int main(int argc, char *argv[]){
     file_output_sequences << "#LINE - 1-based index in filtered_sequences.fa\n";
     file_output_sequences << "#START_POS - 0-based start position in sequence\n";
     file_output_sequences << "#LENGTH - length of sequence (END_POS = START_POS + LENGTH)\n";
-    file_output_sequences << "TF\tAFFINITY_VALUE\tLINE\tSTART_POS\tLENGTH\tSEQUENCE\n";
+    file_output_sequences << "#CURRENT_AREA - current area on the actual chromosome\n";
+    file_output_sequences << "TF\tAFFINITY_VALUE\tLINE\tSTART_POS\tLENGTH\tSEQUENCE\tCURRENT_AREA\n";
 
+    //TODO: uncomment!!
     omp_set_num_threads(num_workers);
     int line_fasta = -1;
+    std::string current_area ="";
     while(!fasta.eof())
     { //GO THROUGH FASTA FILE
         line_fasta++;
@@ -221,6 +224,7 @@ int main(int argc, char *argv[]){
             continue;
         }
         if(newbases.substr(0,1) == ">"){ //NEW SEQUENCE HEADER
+            current_area=newbases;
             string delimiters = " \t"; //word seperators in each line
             int i = 0;
             start = newbases.find_first_not_of(delimiters);
@@ -261,6 +265,7 @@ int main(int argc, char *argv[]){
         double bestStartTF_affinityValueTF[factors+1];
         //LOOP OVER FACTORS
 
+        //TODO: UNCOMMENT!!
 #pragma omp parallel for
         for(int f = 0; f <= factors; f++){
             affinityValuesTF[f] = 0;
@@ -350,8 +355,8 @@ int main(int argc, char *argv[]){
         for(int f = 0; f <= factors; f++){
             cout << "\t" << setprecision(10) << affinityValuesTF[f];
 
-            //file_output_sequences << "TF\tAFFINITY_VALUE\tSEQUENCE_NUMB\tSTART_POS\tLENGTH\tSEQUENCE\n";
-            file_output_sequences << bestSequenceTF_name[f] << "\t" << affinityValuesTF[f] << "\t" << line_fasta << "\t" << bestStartTF[f] << "\t" << bestLengthTF[f] << "\t" << bestSequenceTF.at(f) <<"\n";
+            //file_output_sequences << "TF\tAFFINITY_VALUE\tSEQUENCE_NUMB\tSTART_POS\tLENGTH\tSEQUENCE\tCURRENT_AREA\n";
+            file_output_sequences << bestSequenceTF_name[f] << "\t" << affinityValuesTF[f] << "\t" << line_fasta << "\t" << bestStartTF[f] << "\t" << bestLengthTF[f] << "\t" << bestSequenceTF.at(f) << "\t" << current_area <<"\n";
 
         }
         cout << "\n";

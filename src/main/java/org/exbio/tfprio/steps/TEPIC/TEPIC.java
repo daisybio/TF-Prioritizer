@@ -23,6 +23,7 @@ public class TEPIC extends ExecutableStep {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
     private final Map<String, Map<String, Collection<InputFile>>> chipSeqFiles = new HashMap<>();
+    private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(Configs.tepic.sequenceFileName);
 
     private final RequiredConfig<File> f_referenceGenome = new RequiredConfig<>(Configs.tepic.inputReferenceGenome);
     private final RequiredConfig<File> f_pwms = new RequiredConfig<>(Configs.tepic.PWMs);
@@ -117,7 +118,7 @@ public class TEPIC extends ExecutableStep {
                     Map<Character, String> stringConfigs = new HashMap<>() {{
                         put('b', sample.getAbsolutePath());
                         put('o', bridge.get(sample).getAbsolutePath() + "/");
-                        put('S', new File(bridge.get(sample), "trap_sequences.csv").getAbsolutePath());
+                        put('S', new File(bridge.get(sample), sequenceFileName.get()).getAbsolutePath());
                     }};
 
                     Map<Character, UsageConfig<?>> otherConfigs = new HashMap<>() {{
