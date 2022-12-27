@@ -6,6 +6,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
+import org.exbio.tfprio.steps.TEPIC.CreateBindingRegionsBedFiles;
 import org.exbio.tfprio.steps.TEPIC.TEPIC;
 import org.exbio.tfprio.steps.TEPIC.TEPICRandomize;
 import org.exbio.tfprio.steps.chipSeq.*;
@@ -117,7 +118,7 @@ public class TF_Prioritizer {
             tepicFiles = tepicRandomize.outputFiles;
         }
 
-        // TEPICPostprocessing tepicPostprocessing = new TEPICPostprocessing(tepicFiles);
+        CreateBindingRegionsBedFiles createBindingRegionsBedFiles = add(new CreateBindingRegionsBedFiles(tepicFiles));
     }
 
     private static void execute() {
