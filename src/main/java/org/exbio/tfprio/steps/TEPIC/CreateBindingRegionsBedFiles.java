@@ -182,9 +182,4 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
-    }
 }
