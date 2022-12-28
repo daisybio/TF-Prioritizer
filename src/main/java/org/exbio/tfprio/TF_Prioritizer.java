@@ -10,6 +10,7 @@ import org.exbio.tfprio.steps.TEPIC.CreateBindingRegionsBedFiles;
 import org.exbio.tfprio.steps.TEPIC.TEPIC;
 import org.exbio.tfprio.steps.TEPIC.TEPICRandomize;
 import org.exbio.tfprio.steps.chipSeq.*;
+import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.TGene;
 import org.exbio.tfprio.steps.tGene.TGeneExtractRegions;

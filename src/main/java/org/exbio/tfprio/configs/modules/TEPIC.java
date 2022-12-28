@@ -31,4 +31,5 @@ public class TEPIC extends ConfigModule {
     public final ExternalConfig<Boolean> onlyPeakFeatures = new ExternalConfig<>(Boolean.class);
     public final ExternalConfig<Double> affinityCutoff = new ExternalConfig<>(Double.class);
     public final InternalConfig<String> sequenceFileName = new InternalConfig<>("trap_sequences.tsv");
+    public final InternalConfig<String> geneRegionFileName = new InternalConfig<>("regions_to_target_genes.tsv");
 }
