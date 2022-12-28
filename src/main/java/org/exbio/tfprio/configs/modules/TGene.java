@@ -11,5 +11,6 @@ public class TGene extends ConfigModule {
     public final ExternalConfig<Boolean> noClosestTss = new ExternalConfig<>(Boolean.class);
     public final ExternalConfig<Integer> maxLinkDistance = new ExternalConfig<>(Integer.class);
     public final ExternalConfig<Double> pValue = new ExternalConfig<>(Double.class);
+    public final ExternalConfig<Boolean> selfRegulatory = new ExternalConfig<>(Boolean.class);
 }
 

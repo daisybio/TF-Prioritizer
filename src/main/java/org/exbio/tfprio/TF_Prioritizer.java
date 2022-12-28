@@ -12,10 +12,7 @@ import org.exbio.tfprio.steps.TEPIC.TEPICRandomize;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
 import org.exbio.tfprio.steps.rnaSeq.*;
-import org.exbio.tfprio.steps.tGene.TGene;
-import org.exbio.tfprio.steps.tGene.TGeneExtractRegions;
-import org.exbio.tfprio.steps.tGene.TGenePostprocessing;
-import org.exbio.tfprio.steps.tGene.TGenePreprocess;
+import org.exbio.tfprio.steps.tGene.*;
 import org.exbio.tfprio.util.ArgParser;
 
 import java.io.File;
@@ -120,6 +117,17 @@ public class TF_Prioritizer {
         }
 
         CreateBindingRegionsBedFiles createBindingRegionsBedFiles = add(new CreateBindingRegionsBedFiles(tepicFiles));
+        OpenRegionsViolinPlots openRegionsViolinPlots = add(new OpenRegionsViolinPlots(tepicFiles));
+
+        if (Configs.tGene.executable.isSet()) {
+            if (!Configs.mixOptions.mixMutuallyExclusive.get()) {
+                add(new TGeneCreateGroups());
+            }
+
+            if (Configs.tGene.selfRegulatory.isSet() && Configs.tGene.selfRegulatory.get()) {
+                add(new TGeneSelfRegulatory());
+            }
+        }
     }
 
     private static void execute() {
