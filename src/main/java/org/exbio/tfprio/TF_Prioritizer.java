@@ -6,10 +6,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.ExecutionManager;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.steps.TEPIC.CalculateRatios;
-import org.exbio.tfprio.steps.TEPIC.CreateBindingRegionsBedFiles;
-import org.exbio.tfprio.steps.TEPIC.TEPIC;
-import org.exbio.tfprio.steps.TEPIC.TEPICRandomize;
+import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
 import org.exbio.tfprio.steps.rnaSeq.*;
@@ -118,7 +115,9 @@ public class TF_Prioritizer {
         }
 
         CreateBindingRegionsBedFiles createBindingRegionsBedFiles = add(new CreateBindingRegionsBedFiles(tepicFiles));
-        CalculateRatios calculateRatios = add(new CalculateRatios(tepicFiles));
+        CalculateMeanAffinities calculateMeanAffinities = add(new CalculateMeanAffinities(tepicFiles));
+        CalculateAffinityRatios calculateAffinityRatios =
+                add(new CalculateAffinityRatios(calculateMeanAffinities.outputFiles));
         OpenRegionsViolinPlots openRegionsViolinPlots = add(new OpenRegionsViolinPlots(tepicFiles));
 
         if (Configs.tGene.executable.isSet()) {
