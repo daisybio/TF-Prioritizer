@@ -1,9 +1,8 @@
 package org.exbio.tfprio;
 
-import org.exbio.pipejar.configs.ConfigModuleCollection;
+import org.apache.commons.cli.ParseException;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
-import org.exbio.pipejar.pipeline.ExecutableStep;
-import org.exbio.pipejar.pipeline.ExecutionManager;
+import org.exbio.pipejar.pipeline.Workflow;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
 import org.exbio.tfprio.steps.TEPIC.*;
@@ -11,44 +10,28 @@ import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
-import org.exbio.tfprio.util.ArgParser;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.exbio.pipejar.util.FileManagement.extend;
-
-public class TF_Prioritizer {
-    private static final Collection<ExecutableStep> steps = new HashSet<>();
-    /**
-     * The {@link ConfigModuleCollection} object which is referenced by all the {@link ExecutableStep} instances
-     */
-    public static Configs configs;
-    public static File workingDirectory;
+public class TF_Prioritizer extends Workflow<Configs> {
+    public TF_Prioritizer(String[] args) throws IOException, ParseException {
+        super(args);
+    }
 
     public static void main(String[] args) throws Exception {
-        ArgParser argParser = new ArgParser(args);
-        init(argParser);
-        buildFlow();
-        execute();
+        new TF_Prioritizer(args);
     }
 
-    private static void init(ArgParser argParser) throws IOException {
-        File configFile = argParser.getConfigFile();
-        workingDirectory = argParser.getWorkingDirectory();
-        ExecutionManager.workingDirectory = new OutputFile(extend(workingDirectory, "output").getAbsolutePath());
-        ExecutionManager.setThreadNumber(argParser.getThreadNumber());
-
-        configs = new Configs();
-
-        if (!configs.merge(configFile) || !configs.validate()) {
-            System.exit(1);
-        }
-        configs.save(extend(workingDirectory, "configs.json"));
+    @Override
+    protected Configs createConfigs() {
+        return new Configs();
     }
 
-    protected static void buildFlow() {
+    protected void buildFlow() {
         CheckChromosomes checkChromosomes = add(new CheckChromosomes());
 
         Map<String, Map<String, Collection<OutputFile>>> latestChipSeq = checkChromosomes.outputFiles;
@@ -129,15 +112,5 @@ public class TF_Prioritizer {
                 add(new TGeneSelfRegulatory());
             }
         }
-    }
-
-    private static void execute() {
-        ExecutionManager manager = new ExecutionManager(steps);
-        manager.run();
-    }
-
-    private static <T extends ExecutableStep> T add(T step) {
-        steps.add(step);
-        return step;
     }
 }

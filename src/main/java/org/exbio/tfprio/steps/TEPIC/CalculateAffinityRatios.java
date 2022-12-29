@@ -46,13 +46,7 @@ public class CalculateAffinityRatios extends ExecutableStep {
             });
         }));
     }
-
-
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
-    }
-
+    
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
