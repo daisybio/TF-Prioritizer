@@ -35,6 +35,8 @@ public class CalculateAffinityRatios extends ExecutableStep {
             OutputFile outPairing = new OutputFile(outputDirectory, pairing);
             OutputFile inPairing = new OutputFile(inputDirectory, pairing);
 
+            outputFiles.computeIfAbsent(pairing, s -> new HashMap<>());
+
             hmMap1.forEach((hm, file1) -> {
                 if (!hmMap2.containsKey(hm)) {
                     return;
@@ -43,10 +45,11 @@ public class CalculateAffinityRatios extends ExecutableStep {
                 OutputFile outHm = addOutput(outPairing, hm + ".tsv");
 
                 bridge.put(outHm, Pair.of(addInput(inPairing, file1), addInput(inPairing, file2)));
+                outputFiles.get(pairing).put(hm, outHm);
             });
         }));
     }
-    
+
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{

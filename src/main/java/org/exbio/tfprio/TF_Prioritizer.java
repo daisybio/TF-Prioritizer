@@ -5,6 +5,7 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.Workflow;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
+import org.exbio.tfprio.steps.Dynamite.IntegrateData;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
@@ -112,5 +113,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
                 add(new TGeneSelfRegulatory());
             }
         }
+
+        IntegrateData integrateData =
+                add(new IntegrateData(calculateAffinityRatios.outputFiles, deSeqPostprocessing.getOutputs()));
     }
 }
