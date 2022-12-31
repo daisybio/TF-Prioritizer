@@ -26,9 +26,11 @@ public class PrepareForClassification extends ExecutableStep {
 
             hmMap.forEach((hm, input) -> {
                 InputFile inputFile = addInput(inputPairing, input);
-                OutputFile outputFile = addOutput(outputPairing, hm + ".tsv");
+
+                OutputFile outputDir = addOutput(outputPairing, hm);
+                OutputFile outputFile = new OutputFile(outputDir, hm + ".tsv");
                 bridge.put(inputFile, outputFile);
-                outputFiles.computeIfAbsent(pairing, s -> new HashMap<>()).put(hm, outputFile);
+                outputFiles.computeIfAbsent(pairing, s -> new HashMap<>()).put(hm, outputDir);
             });
         });
     }
