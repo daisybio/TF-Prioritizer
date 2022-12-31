@@ -5,7 +5,6 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -13,7 +12,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class IntegrateData extends ExecutableStep {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
-    private final File script;
+    private final InputFile script;
     private final Map<OutputFile, Pair<InputFile, InputFile>> bridge = new HashMap<>();
 
     public IntegrateData(Map<String, Map<String, OutputFile>> affinityRatios, Collection<OutputFile> diffExpression) {
@@ -60,7 +59,6 @@ public class IntegrateData extends ExecutableStep {
                                 "--expressionC", "1");
 
                 String command = String.join(" ", commandElements);
-                logger.debug("Executing command: " + command);
 
                 executeAndWait(command, true);
 
