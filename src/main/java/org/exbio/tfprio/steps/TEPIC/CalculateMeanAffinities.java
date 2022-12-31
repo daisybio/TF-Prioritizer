@@ -35,13 +35,22 @@ public class CalculateMeanAffinities extends ExecutableStep {
 
     static void writeFile(Map<String, Map<String, Double>> geneTfAffinity, File outFile) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile))) {
-            writer.write("Gene\t" + geneTfAffinity.values().stream().flatMap(
-                    tfAffinity -> tfAffinity.keySet().stream()).distinct().sorted().collect(Collectors.joining("\t")));
+            List<String> tfOrder = geneTfAffinity.values().stream().flatMap(
+                    tfAffinity -> tfAffinity.keySet().stream()).distinct().sorted().toList();
+
+            writer.write("Gene\t" + String.join("\t", tfOrder));
             writer.newLine();
             geneTfAffinity.forEach((gene, tfAffinity) -> {
+                List<Double> affinityOrder =
+                        tfOrder.stream().map(tf -> tfAffinity.getOrDefault(tf, Double.NaN)).toList();
+
+                if (affinityOrder.stream().anyMatch(affinity -> affinity.isNaN())) {
+                    return;
+                }
+
                 try {
                     writer.write(gene + "\t" +
-                            tfAffinity.values().stream().map(Object::toString).collect(Collectors.joining("\t")));
+                            affinityOrder.stream().map(Object::toString).collect(Collectors.joining("\t")));
                     writer.newLine();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
