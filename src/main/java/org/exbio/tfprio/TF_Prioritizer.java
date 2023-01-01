@@ -5,12 +5,14 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.Workflow;
 import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
+import org.exbio.tfprio.steps.Dynamite.FilterRegressionCoefficients;
 import org.exbio.tfprio.steps.Dynamite.IntegrateData;
 import org.exbio.tfprio.steps.Dynamite.PrepareForClassification;
 import org.exbio.tfprio.steps.Dynamite.RunDynamite;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
+import org.exbio.tfprio.steps.plots.ThresholdPlots;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
 
@@ -122,5 +124,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
                 add(new PrepareForClassification(integrateData.outputFiles));
 
         RunDynamite runDynamite = add(new RunDynamite(prepareForClassification.outputFiles));
+        FilterRegressionCoefficients filterRegressionCoefficients =
+                add(new FilterRegressionCoefficients(runDynamite.outputFiles));
+        ThresholdPlots thresholdPlots = add(new ThresholdPlots(filterRegressionCoefficients.outputFiles));
     }
 }

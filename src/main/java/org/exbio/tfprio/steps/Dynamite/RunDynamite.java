@@ -38,7 +38,7 @@ public class RunDynamite extends ExecutableStep {
 
             hmMap.forEach((hm, inDir) -> {
                 InputFile inputDir = addInput(inputPairing, inDir);
-                OutputFile outputDir = new OutputFile(outputPairing, hm);
+                OutputFile outputDir = addOutput(outputPairing, hm);
 
                 bridge.put(inputDir, outputDir);
                 outputFiles.computeIfAbsent(pairing, s -> new HashMap<>()).put(hm, outputDir);

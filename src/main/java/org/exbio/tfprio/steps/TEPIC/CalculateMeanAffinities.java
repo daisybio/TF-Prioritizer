@@ -103,7 +103,9 @@ public class CalculateMeanAffinities extends ExecutableStep {
                                      String gene = split[0];
                                      Map<String, Double> tfAffinity = IntStream.range(1, split.length).mapToObj(
                                              index -> Pair.of(tfLocations[index],
-                                                     Double.parseDouble(split[index]))).collect(HashMap::new,
+                                                     Double.parseDouble(split[index]))).filter(
+                                             pair -> !List.of("Peak_Counts", "Peak_Length").contains(
+                                                     pair.getKey())).collect(HashMap::new,
                                              (map, p) -> map.put(p.getLeft(), p.getRight()), HashMap::putAll);
                                      return Pair.of(gene, tfAffinity);
                                  }).collect(HashMap::new, (map, p) -> map.put(p.getLeft(), p.getRight()),
