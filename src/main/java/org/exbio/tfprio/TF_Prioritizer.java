@@ -11,7 +11,9 @@ import org.exbio.tfprio.steps.Dynamite.PrepareForClassification;
 import org.exbio.tfprio.steps.Dynamite.RunDynamite;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
+import org.exbio.tfprio.steps.plots.GroupStages;
 import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
+import org.exbio.tfprio.steps.plots.PlotGroupedStages;
 import org.exbio.tfprio.steps.plots.ThresholdPlots;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
@@ -69,9 +71,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
         MergeCounts mergeCounts = add(new MergeCounts());
 
         CreateBatchFile createBatchFile = add(new CreateBatchFile(mergeCounts.outputFiles));
-        CalculateTPM calculateTPM = add(new CalculateTPM(mergeCounts.outputFiles, concatenateGeneInfo.outputFile));
         MeanExpression meanCounts = add(new MeanExpression(mergeCounts.outputFiles));
         CreatePairings createPairings = add(new CreatePairings(mergeCounts.outputFiles));
+
+        CalculateTPM calculateTPM = add(new CalculateTPM(meanCounts.outputFiles, concatenateGeneInfo.outputFile));
 
         Uplift uplift = add(new Uplift(concatenateGeneInfo.outputFile));
         FilterENdb filterENdb = add(new FilterENdb());
@@ -122,10 +125,12 @@ public class TF_Prioritizer extends Workflow<Configs> {
                 add(new IntegrateData(calculateAffinityRatios.outputFiles, deSeqPostprocessing.getOutputs()));
         PrepareForClassification prepareForClassification =
                 add(new PrepareForClassification(integrateData.outputFiles));
-
         RunDynamite runDynamite = add(new RunDynamite(prepareForClassification.outputFiles));
+
         FilterRegressionCoefficients filterRegressionCoefficients =
                 add(new FilterRegressionCoefficients(runDynamite.outputFiles));
         ThresholdPlots thresholdPlots = add(new ThresholdPlots(filterRegressionCoefficients.outputFiles));
+        GroupStages groupStages = add(new GroupStages(filterRegressionCoefficients.outputFiles));
+        PlotGroupedStages plotGroupedStages = add(new PlotGroupedStages(groupStages.outputFiles));
     }
 }

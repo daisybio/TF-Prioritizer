@@ -3,7 +3,13 @@
     "chipSeq": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/03_broadPeaks_inc_Pol2",
     "rnaSeq": "/home/nico/Data/TFPRIO/RawData/02_RNAseq_data",
     "geneIDs": "/home/nico/Data/TFPRIO/RawData/02_RNAseq_data/Gene_id.txt",
-    "geneAnnotationFile": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf"
+    "geneAnnotationFile": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
+    "sameStages": {
+      "L1": "L",
+      "L10": "L",
+      "p6": "p",
+      "p13": "p"
+    }
   },
   "MixOptions": {
     "biomartDatasetSpecies": "mmusculus_gene_ensembl",

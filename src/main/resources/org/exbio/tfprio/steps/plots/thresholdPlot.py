@@ -4,8 +4,7 @@ import pandas as pd
 import seaborn as sns
 
 parser = argparse.ArgumentParser()
-parser.add_argument("input", type=argparse.FileType(
-    "r"))
+parser.add_argument("input", type=argparse.FileType("r"))
 parser.add_argument("output", type=str)
 parser.add_argument("hm", type=str)
 parser.add_argument("group1", type=str)
