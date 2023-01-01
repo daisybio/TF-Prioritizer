@@ -112,6 +112,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         CalculateAffinityRatios calculateAffinityRatios =
                 add(new CalculateAffinityRatios(calculateMeanAffinities.outputFiles));
         OpenRegionsViolinPlots openRegionsViolinPlots = add(new OpenRegionsViolinPlots(tepicFiles));
+        FindAnalyzableTFs findAnalyzableTFs = add(new FindAnalyzableTFs(calculateMeanAffinities.outputFiles));
 
         if (Configs.tGene.executable.isSet()) {
             if (!Configs.mixOptions.mixMutuallyExclusive.get()) {
