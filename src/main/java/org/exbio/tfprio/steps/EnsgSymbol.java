@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.rnaSeq;
+package org.exbio.tfprio.steps;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
@@ -10,47 +10,36 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
+import static org.exbio.tfprio.lib.Biomart.query;
 
-public class FetchGeneInfo extends ExecutableStep {
+public class EnsgSymbol extends ExecutableStep {
     private static final int batchSize = 1000;
+    public final OutputFile outputFile = addOutput("ensgSymbol.tsv");
     private final RequiredConfig<File> geneIdsFile = new RequiredConfig<>(Configs.inputConfigs.geneIDs);
     private final RequiredConfig<String> species = new RequiredConfig<>(Configs.deSeq2.speciesBiomart);
-    private final Map<OutputFile, List<String>> bridge = new HashMap<>();
+    private final InputFile inputFile = addInput(geneIdsFile);
 
-    public FetchGeneInfo() {
+
+    public EnsgSymbol() {
         super();
-
-        InputFile inputFile = addInput(geneIdsFile);
-
-        try {
-            List<String> geneIds = readLines(inputFile).stream().skip(1).toList();
-
-            IntStream.range(0, geneIds.size()).boxed().collect(Collectors.groupingBy(i -> i / batchSize)).forEach(
-                    (batchId, indices) -> {
-                        OutputFile f_out = addOutput("geneInfo_" + batchId + ".tsv");
-                        bridge.put(f_out, indices.stream().map(geneIds::get).toList());
-                    });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            bridge.forEach((outputFile, geneIds) -> add(() -> {
-                org.exbio.tfprio.lib.FetchGeneInfo mart =
-                        new org.exbio.tfprio.lib.FetchGeneInfo(species.get(), geneIds);
+            add(() -> {
+                List<String[]> result = query(species.get(), readLines(inputFile).stream().skip(1).toList(),
+                        List.of("ensembl_gene_id", "external_gene_name"));
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-                    mart.getLines().forEach(line -> {
+                    result.forEach(line -> {
                         try {
-                            writer.write(line);
+                            writer.write(String.join("\t", line));
                             writer.newLine();
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -59,7 +48,7 @@ public class FetchGeneInfo extends ExecutableStep {
                     });
                 }
                 return true;
-            }));
+            });
         }};
     }
 }

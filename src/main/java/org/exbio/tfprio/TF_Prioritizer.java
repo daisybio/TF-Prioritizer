@@ -9,6 +9,7 @@ import org.exbio.tfprio.steps.Dynamite.FilterRegressionCoefficients;
 import org.exbio.tfprio.steps.Dynamite.IntegrateData;
 import org.exbio.tfprio.steps.Dynamite.PrepareForClassification;
 import org.exbio.tfprio.steps.Dynamite.RunDynamite;
+import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.plots.GroupStages;
@@ -40,7 +41,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
     protected void buildFlow() {
         CheckChromosomes checkChromosomes = add(new CheckChromosomes());
-
         Map<String, Map<String, Collection<OutputFile>>> latestChipSeq = checkChromosomes.outputFiles;
 
         if (Configs.mixOptions.perform.get()) {
@@ -58,6 +58,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
             Blacklist blacklist = add(new Blacklist(latestChipSeq));
             latestChipSeq = blacklist.outputFiles;
         }
+
+        EnsgSymbol ensgSymbol = add(new EnsgSymbol());
 
         GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths());
 
