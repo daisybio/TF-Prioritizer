@@ -69,6 +69,7 @@
     "randomize": false
   },
   "Plots": {
+    "topKTargetGenes": 30,
     "thresholds": [
       0.1,
       0.2,
