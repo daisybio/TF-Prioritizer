@@ -130,10 +130,12 @@ public class TF_Prioritizer extends Workflow<Configs> {
         FilterRegressionCoefficients filterRegressionCoefficients =
                 add(new FilterRegressionCoefficients(runDynamite.outputFiles));
         ThresholdPlots thresholdPlots = add(new ThresholdPlots(filterRegressionCoefficients.outputFiles));
+        
         GroupStages groupStages = add(new GroupStages(filterRegressionCoefficients.outputFiles));
         PlotGroupedStages plotGroupedStages = add(new PlotGroupedStages(groupStages.outputFiles));
         AnalyzeGroupLevel analyzeGroupLevels =
                 add(new AnalyzeGroupLevel(calculateTPM.outputFiles, meanCounts.outputFiles, groupStages.outputFiles,
                         ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
+        AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(analyzeGroupLevels.outputFiles));
     }
 }

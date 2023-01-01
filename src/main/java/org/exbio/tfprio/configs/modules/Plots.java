@@ -11,4 +11,5 @@ public class Plots extends ConfigModule {
     public final ExternalConfig<Integer> cutoffGroups = new ExternalConfig<>(Integer.class);
     public final ExternalConfig<Double> cutoffGroupCounts = new ExternalConfig<>(Double.class);
     public final ExternalConfig<Double> cutoffTPM = new ExternalConfig<>(Double.class);
+    public final ExternalConfig<Integer> cutoffHms = new ExternalConfig<>(Integer.class);
 }

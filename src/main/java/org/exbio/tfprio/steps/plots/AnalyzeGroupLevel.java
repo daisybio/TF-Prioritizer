@@ -18,11 +18,11 @@ import static java.util.stream.Collectors.toMap;
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
 public class AnalyzeGroupLevel extends ExecutableStep {
+    public final Map<String, Map<Double, Pair<OutputFile, OutputFile>>> outputFiles = new HashMap<>();
     private final InputFile ensgSymbolFile;
     private final InputFile analyzableTfs;
     private final Map<String, InputFile> groupTPMFiles;
     private final Map<String, InputFile> groupMeanCountFiles;
-
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
     private final OptionalConfig<Integer> cutoffGroups = new OptionalConfig<>(Configs.plots.cutoffGroups, false);
     private final OptionalConfig<Double> cutoffGroupCounts =
@@ -65,6 +65,9 @@ public class AnalyzeGroupLevel extends ExecutableStep {
 
                 bridge.put(inputSame, outputSame);
                 bridge.put(inputDifferent, outputDifferent);
+
+                outputFiles.computeIfAbsent(hm, k -> new HashMap<>()).put(threshold,
+                        Pair.of(outputSame, outputDifferent));
             });
         });
     }
