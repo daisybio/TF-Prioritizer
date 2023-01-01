@@ -8,4 +8,7 @@ import java.util.List;
 
 public class Plots extends ConfigModule {
     public final ExternalConfig<List<Double>> thresholds = new ExternalConfig<>(ClassGetter.getList());
+    public final ExternalConfig<Integer> cutoffGroups = new ExternalConfig<>(Integer.class);
+    public final ExternalConfig<Double> cutoffGroupCounts = new ExternalConfig<>(Double.class);
+    public final ExternalConfig<Double> cutoffTPM = new ExternalConfig<>(Double.class);
 }

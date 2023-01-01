@@ -87,7 +87,8 @@ public class GroupStages extends ExecutableStep {
                         try {
                             writer.write(tf + "\t" + pairings.stream().map(
                                     pairing -> pairingValues.getOrDefault(pairing, Double.NaN)).map(
-                                    Object::toString).collect(java.util.stream.Collectors.joining("\t")));
+                                    Object::toString).map(s -> s.equals("NaN") ? "" : s).collect(
+                                    java.util.stream.Collectors.joining("\t")));
                             writer.newLine();
                         } catch (IOException e) {
                             logger.error("Error writing file", e);
