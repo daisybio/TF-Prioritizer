@@ -10,10 +10,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 import static org.exbio.tfprio.lib.Biomart.query;
@@ -39,7 +41,8 @@ public class EnsgSymbol extends ExecutableStep {
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
                     result.forEach(line -> {
                         try {
-                            writer.write(String.join("\t", line));
+                            writer.write(
+                                    Arrays.stream(line).map(String::toUpperCase).collect(Collectors.joining("\t")));
                             writer.newLine();
                         } catch (IOException e) {
                             e.printStackTrace();
