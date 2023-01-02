@@ -71,11 +71,7 @@ public class RunDistributionAnalysis extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             Map<String, Collection<String>> tfHms;
-            Map<String, Collection<String>> symbolEnsgs;
             try {
-                symbolEnsgs = readLines(ensgSymbol).stream().skip(1).map(line -> line.split("\t")).filter(
-                        split -> split.length > 1).collect(Collectors.groupingBy(split -> split[1],
-                        Collectors.mapping(split -> split[0], Collectors.toCollection(HashSet::new))));
                 tfHms = readLines(preprocessed).stream().skip(1).map(line -> line.split("\t")).map(
                         split -> Pair.of(split[0], split[1])).collect(Collectors.groupingBy(Pair::getKey,
                         Collectors.mapping(Pair::getValue, Collectors.toCollection(HashSet::new))));
@@ -162,7 +158,7 @@ public class RunDistributionAnalysis extends ExecutableStep {
 
                         double regressionCoefficient =
                                 pairingHmTfRegressionCoefficients.getOrDefault(pairing, new HashMap<>()).getOrDefault(
-                                        hm, new HashMap<>()).getOrDefault(tf, 0.0);
+                                        hm, new HashMap<>()).getOrDefault(tf, -1.);
 
                         if (regressionCoefficient <= 0.0) {
                             return;

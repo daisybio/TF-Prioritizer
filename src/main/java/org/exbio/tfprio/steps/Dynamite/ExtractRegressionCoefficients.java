@@ -4,14 +4,12 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 
-import java.io.File;
+import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
-import static org.exbio.pipejar.util.FileManagement.softLink;
 
 public class ExtractRegressionCoefficients extends ExecutableStep {
 
@@ -37,11 +35,6 @@ public class ExtractRegressionCoefficients extends ExecutableStep {
     }
 
     @Override
-    protected boolean doCreateFiles() {
-        return false;
-    }
-
-    @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             bridge.forEach((input, output) -> add(() -> {
@@ -54,7 +47,17 @@ public class ExtractRegressionCoefficients extends ExecutableStep {
 
                 File regressionCoefficients = considered[0];
 
-                softLink(output, regressionCoefficients);
+                try (BufferedReader reader = new BufferedReader(new FileReader(regressionCoefficients));
+                     BufferedWriter writer = new BufferedWriter(new FileWriter(output))) {
+                    reader.lines().map(line -> line.replace("..", "::")).forEachOrdered(line -> {
+                        try {
+                            writer.write(line);
+                            writer.newLine();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
 
                 return true;
             }));
