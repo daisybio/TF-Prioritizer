@@ -17,11 +17,11 @@ public class FilterRegressionCoefficients extends ExecutableStep {
 
     private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(Configs.plots.thresholds);
 
-    public FilterRegressionCoefficients(Map<String, Map<String, OutputFile>> dynamiteOutput) {
-        super(false, dynamiteOutput.values().stream().flatMap(
+    public FilterRegressionCoefficients(Map<String, Map<String, OutputFile>> regressionCoefficients) {
+        super(false, regressionCoefficients.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).toList());
 
-        dynamiteOutput.forEach((pairing, hmMap) -> {
+        regressionCoefficients.forEach((pairing, hmMap) -> {
             OutputFile inputPairing = new OutputFile(inputDirectory, pairing);
             OutputFile outputPairing = new OutputFile(outputDirectory, pairing);
 
@@ -42,12 +42,8 @@ public class FilterRegressionCoefficients extends ExecutableStep {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            bridge.forEach((inputDir, hmMap) -> hmMap.forEach((threshold, outputThreshold) -> add(() -> {
-                File inputFile = Arrays.stream(Objects.requireNonNull(inputDir.listFiles(file -> file.getName().equals(
-                        "Regression_Coefficients_Entire_Data_Set_" + inputDir.getName() +
-                                ".txt")))).findFirst().orElseThrow();
-
-                try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+            bridge.forEach((extractedCoefficients, hmMap) -> hmMap.forEach((threshold, outputThreshold) -> add(() -> {
+                try (BufferedReader reader = new BufferedReader(new FileReader(extractedCoefficients));
                      BufferedWriter writer = new BufferedWriter(new FileWriter(outputThreshold))) {
 
                     writer.write(reader.readLine());
@@ -62,7 +58,7 @@ public class FilterRegressionCoefficients extends ExecutableStep {
                             writer.write(pair.getKey() + "\t" + pair.getValue());
                             writer.newLine();
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            throw new RuntimeException(e);
                         }
                     });
                 }
