@@ -15,16 +15,18 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class DeSeqPostprocessing extends ExecutableStep {
+    public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge;
 
-    public DeSeqPostprocessing(Collection<OutputFile> dependencies) {
-        super(false, dependencies);
+    public DeSeqPostprocessing(Map<String, OutputFile> dependencies) {
+        super(false, dependencies.values());
 
         bridge = new HashMap<>() {{
-            dependencies.forEach(dependency -> {
+            dependencies.forEach((pairing, dependency) -> {
                 InputFile inputFile = addInput(dependency);
                 OutputFile outputFile = addOutput(inputFile.getName());
                 put(inputFile, outputFile);
+                outputFiles.put(pairing, outputFile);
             });
         }};
     }

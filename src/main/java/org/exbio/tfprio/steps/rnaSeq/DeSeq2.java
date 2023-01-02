@@ -15,22 +15,22 @@ import static org.exbio.pipejar.util.FileManagement.readLines;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class DeSeq2 extends ExecutableStep {
-    public final Collection<OutputFile> outputFiles = new HashSet<>();
+    public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final InputFile script;
     private final InputFile batchFile;
     private final Map<InputFile, OutputFile> bridge;
     private final Map<InputFile, OutputFile> filteredBatchFiles = new HashMap<>();
     private final RequiredConfig<Integer> countFilter = new RequiredConfig<>(Configs.deSeq2.countFilter);
 
-    public DeSeq2(Collection<OutputFile> dependencies, OutputFile batchFile) {
-        super(false, dependencies, batchFile);
+    public DeSeq2(Map<String, OutputFile> pairingCounts, OutputFile batchFile) {
+        super(false, pairingCounts.values(), batchFile);
 
         bridge = new HashMap<>() {{
-            dependencies.forEach(input -> {
+            pairingCounts.forEach((pairing, input) -> {
                 InputFile inputFile = addInput(input);
                 OutputFile outputFile = addOutput(inputFile.getName());
                 put(inputFile, outputFile);
-                outputFiles.add(outputFile);
+                outputFiles.put(pairing, outputFile);
                 filteredBatchFiles.put(inputFile, addOutput(
                         inputFile.getName().substring(0, inputFile.getName().lastIndexOf(".")) + "_meta.tsv"));
             });

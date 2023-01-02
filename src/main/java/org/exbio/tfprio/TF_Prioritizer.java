@@ -84,7 +84,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
             FilterExpression filterExpression = add(new FilterExpression(calculateTPM.outputFiles));
         }
 
-        DeSeq2 deSeq2 = add(new DeSeq2(createPairings.getOutputs(), createBatchFile.outputFile));
+        DeSeq2 deSeq2 = add(new DeSeq2(createPairings.outputFiles, createBatchFile.outputFile));
         DeSeqPostprocessing deSeqPostprocessing = add(new DeSeqPostprocessing(deSeq2.outputFiles));
 
         Map<String, Map<String, OutputFile>> tgeneFiles = new HashMap<>();
