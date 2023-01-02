@@ -12,4 +12,5 @@ public class Configs extends ConfigModuleCollection {
     public static final DYNAMITE dynamite = new DYNAMITE();
     public static final InternalConfigs internalConfigs = new InternalConfigs();
     public static final Plots plots = new Plots();
+    public static final DistributionAnalysis distributionAnalysis = new DistributionAnalysis();
 }

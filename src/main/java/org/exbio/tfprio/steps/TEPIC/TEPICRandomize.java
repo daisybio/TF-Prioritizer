@@ -21,6 +21,8 @@ public class TEPICRandomize extends ExecutableStep {
     private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(Configs.tepic.sequenceFileName);
     private final OptionalConfig<Double> tpmFilter = new OptionalConfig<>(Configs.deSeq2.tpmFilter, false);
 
+    // TODO put this behind after extraction of affinity files
+
     public TEPICRandomize(Map<String, Map<String, Collection<OutputFile>>> tepicResults) {
         super(false,
                 tepicResults.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
