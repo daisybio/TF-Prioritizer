@@ -37,8 +37,6 @@ public class TopKTargetGenes extends ExecutableStep {
             OutputFile inAffinitiesHm = new OutputFile(inAffinities, hm);
             OutputFile outHm = new OutputFile(outputDirectory, hm);
 
-            System.out.println(groupHmMeanAffinities);
-
             Map<String, InputFile> groupMeanAffinities = groupHmMeanAffinities.entrySet().stream().map(
                     entry -> Pair.of(entry.getKey(), entry.getValue().get(hm))).filter(
                     pair -> !Objects.isNull(pair.getValue())).map(

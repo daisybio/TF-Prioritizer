@@ -76,66 +76,59 @@ public class CalculateMeanAffinities extends ExecutableStep {
         }};
     }
 
-    private Map<String, Map<String, Double>> getMeanAffinity(Collection<InputFile> sampleDirs) {
-        return sampleDirs.stream()
-                         // Get affinity files
-                         .map(sampleDir -> {
-                             File[] consideredFiles = sampleDir.listFiles(
-                                     file -> file.isFile() && file.getName().contains("Affinity_Gene_View_Filtered"));
+    private Map<String, Map<String, Double>> getMeanAffinity(Collection<InputFile> sampleAffinityFiles) {
+        return sampleAffinityFiles.stream()
+                                  // Get affinities
+                                  .map(affinityFile -> {
+                                      Map<String, Map<String, Double>> geneTfAffinity;
 
-                             if (consideredFiles == null || consideredFiles.length != 1) {
-                                 throw new RuntimeException(
-                                         "Expected exactly one file in " + sampleDir + " but found " +
-                                                 (consideredFiles == null ? 0 : consideredFiles.length));
-                             }
+                                      try (BufferedReader reader = new BufferedReader(new FileReader(affinityFile))) {
+                                          String[] tfLocations = reader.readLine().split("\t");
 
-                             return consideredFiles[0];
-                         })
-                         // Get affinities
-                         .map(affinityFile -> {
-                             Map<String, Map<String, Double>> geneTfAffinity;
+                                          geneTfAffinity = reader.lines().map(line -> {
+                                              String[] split = line.split("\t");
+                                              String gene = split[0];
+                                              Map<String, Double> tfAffinity =
+                                                      IntStream.range(1, split.length).mapToObj(
+                                                              index -> Pair.of(tfLocations[index],
+                                                                      Double.parseDouble(split[index]))).filter(
+                                                              pair -> !List.of("Peak_Counts", "Peak_Length").contains(
+                                                                      pair.getKey())).collect(HashMap::new,
+                                                              (map, p) -> map.put(p.getLeft(), p.getRight()),
+                                                              HashMap::putAll);
+                                              return Pair.of(gene, tfAffinity);
+                                          }).collect(HashMap::new, (map, p) -> map.put(p.getLeft(), p.getRight()),
+                                                  HashMap::putAll);
+                                      } catch (IOException e) {
+                                          throw new RuntimeException(e);
+                                      }
 
-                             try (BufferedReader reader = new BufferedReader(new FileReader(affinityFile))) {
-                                 String[] tfLocations = reader.readLine().split("\t");
-
-                                 geneTfAffinity = reader.lines().map(line -> {
-                                     String[] split = line.split("\t");
-                                     String gene = split[0];
-                                     Map<String, Double> tfAffinity = IntStream.range(1, split.length).mapToObj(
-                                             index -> Pair.of(tfLocations[index],
-                                                     Double.parseDouble(split[index]))).filter(
-                                             pair -> !List.of("Peak_Counts", "Peak_Length").contains(
-                                                     pair.getKey())).collect(HashMap::new,
-                                             (map, p) -> map.put(p.getLeft(), p.getRight()), HashMap::putAll);
-                                     return Pair.of(gene, tfAffinity);
-                                 }).collect(HashMap::new, (map, p) -> map.put(p.getLeft(), p.getRight()),
-                                         HashMap::putAll);
-                             } catch (IOException e) {
-                                 throw new RuntimeException(e);
-                             }
-
-                             return geneTfAffinity;
-                         })
-                         // Concatenate affinities
-                         .reduce(new HashMap<String, Map<String, List<Double>>>(), (map, geneTfAffinity) -> {
-                             geneTfAffinity.forEach((gene, tfAffinity) -> tfAffinity.forEach(
-                                     (tf, affinity) -> map.computeIfAbsent(gene, s -> new HashMap<>()).computeIfAbsent(
-                                             tf, s -> new ArrayList<>()).add(affinity)));
-                             return map;
-                         }, (map1, map2) -> {
-                             map2.forEach((gene, tfAffinity) -> tfAffinity.forEach(
-                                     (tf, newAffinities) -> map1.computeIfAbsent(gene,
-                                             s -> new HashMap<>()).computeIfAbsent(tf, s -> new ArrayList<>()).addAll(
-                                             newAffinities)));
-                             return map1;
-                         }).entrySet().stream()
-                         // Average affinities
-                         .map(entry -> {
-                             Map<String, Double> tfAffinity = entry.getValue().entrySet().stream().map(
-                                     tfEntry -> Pair.of(tfEntry.getKey(), tfEntry.getValue().stream().mapToDouble(
-                                             Double::doubleValue).average().orElseThrow())).collect(HashMap::new,
-                                     (map, p) -> map.put(p.getLeft(), p.getRight()), HashMap::putAll);
-                             return Pair.of(entry.getKey(), tfAffinity);
-                         }).collect(HashMap::new, (map, p) -> map.put(p.getLeft(), p.getRight()), HashMap::putAll);
+                                      return geneTfAffinity;
+                                  })
+                                  // Concatenate affinities
+                                  .reduce(new HashMap<String, Map<String, List<Double>>>(), (map, geneTfAffinity) -> {
+                                      geneTfAffinity.forEach((gene, tfAffinity) -> tfAffinity.forEach(
+                                              (tf, affinity) -> map.computeIfAbsent(gene,
+                                                      s -> new HashMap<>()).computeIfAbsent(tf,
+                                                      s -> new ArrayList<>()).add(affinity)));
+                                      return map;
+                                  }, (map1, map2) -> {
+                                      map2.forEach((gene, tfAffinity) -> tfAffinity.forEach(
+                                              (tf, newAffinities) -> map1.computeIfAbsent(gene,
+                                                      s -> new HashMap<>()).computeIfAbsent(tf,
+                                                      s -> new ArrayList<>()).addAll(newAffinities)));
+                                      return map1;
+                                  }).entrySet().stream()
+                                  // Average affinities
+                                  .map(entry -> {
+                                      Map<String, Double> tfAffinity = entry.getValue().entrySet().stream().map(
+                                              tfEntry -> Pair.of(tfEntry.getKey(),
+                                                      tfEntry.getValue().stream().mapToDouble(
+                                                              Double::doubleValue).average().orElseThrow())).collect(
+                                              HashMap::new, (map, p) -> map.put(p.getLeft(), p.getRight()),
+                                              HashMap::putAll);
+                                      return Pair.of(entry.getKey(), tfAffinity);
+                                  }).collect(HashMap::new, (map, p) -> map.put(p.getLeft(), p.getRight()),
+                        HashMap::putAll);
     }
 }

@@ -102,8 +102,11 @@ public class TF_Prioritizer extends Workflow<Configs> {
             tepicFiles = tepicRandomize.outputFiles;
         }
 
+        ExtractAffinities extractAffinities = add(new ExtractAffinities(tepicFiles));
+
         CreateBindingRegionsBedFiles createBindingRegionsBedFiles = add(new CreateBindingRegionsBedFiles(tepicFiles));
-        CalculateMeanAffinities calculateMeanAffinities = add(new CalculateMeanAffinities(tepicFiles));
+        CalculateMeanAffinities calculateMeanAffinities =
+                add(new CalculateMeanAffinities(extractAffinities.outputFiles));
         CalculateAffinityRatios calculateAffinityRatios =
                 add(new CalculateAffinityRatios(calculateMeanAffinities.outputFiles));
         OpenRegionsViolinPlots openRegionsViolinPlots = add(new OpenRegionsViolinPlots(tepicFiles));
