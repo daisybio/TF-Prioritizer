@@ -12,6 +12,7 @@ import org.exbio.tfprio.steps.Dynamite.RunDynamite;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
+import org.exbio.tfprio.steps.distributionAnalyisis.Preprocessing;
 import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
@@ -140,5 +141,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
         TopKTargetGenes topKTargetGenes =
                 add(new TopKTargetGenes(groupStages.outputFiles, calculateMeanAffinities.outputFiles));
+
+        Preprocessing daPreprocessing = add(new Preprocessing(groupStages.outputFiles));
     }
 }
