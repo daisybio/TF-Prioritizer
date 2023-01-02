@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.distributionAnalyisis;
+package org.exbio.tfprio.steps.distributionAnalysis;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
