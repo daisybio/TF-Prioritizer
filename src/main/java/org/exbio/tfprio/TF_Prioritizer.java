@@ -9,6 +9,7 @@ import org.exbio.tfprio.steps.Dynamite.*;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
+import org.exbio.tfprio.steps.distributionAnalyisis.CreateBackground;
 import org.exbio.tfprio.steps.distributionAnalyisis.Preprocessing;
 import org.exbio.tfprio.steps.distributionAnalyisis.RunDistributionAnalysis;
 import org.exbio.tfprio.steps.plots.*;
@@ -150,5 +151,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
                 add(new RunDistributionAnalysis(daPreprocessing.outputFile, ensgSymbol.outputFile,
                         meanCounts.outputFiles, deSeqPostprocessing.outputFiles,
                         extractRegressionCoefficients.outputFiles, calculateMeanAffinities.outputFiles));
+        CreateBackground createBackground = add(new CreateBackground(runDistributionAnalysis.outputFiles));
     }
 }

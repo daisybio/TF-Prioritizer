@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
 public class RunDistributionAnalysis extends ExecutableStep {
-    public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
+    public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final InputFile preprocessed;
     private final InputFile ensgSymbol;
     private final Map<String, InputFile> groupMeanCounts = new HashMap<>();
@@ -39,6 +39,15 @@ public class RunDistributionAnalysis extends ExecutableStep {
         this.preprocessed = addInput(preprocessed);
         this.ensgSymbol = addInput(ensgSymbol);
 
+        Set<String> hms =
+                pairingHmRegressionCoefficients.values().stream().flatMap(entry -> entry.keySet().stream()).collect(
+                        Collectors.toSet());
+
+        hms.forEach(hm -> {
+            OutputFile output = addOutput(hm);
+            outputFiles.put(hm, output);
+        });
+
         OutputFile meanCountsDir = new OutputFile(inputDirectory, "counts");
         groupMeanCounts.forEach(
                 (group, meanCounts) -> this.groupMeanCounts.put(group, addInput(meanCountsDir, meanCounts)));
@@ -49,11 +58,9 @@ public class RunDistributionAnalysis extends ExecutableStep {
         OutputFile regressionCoefficients = new OutputFile(inputDirectory, "regressionCoefficients");
         pairingHmRegressionCoefficients.forEach((pairing, hmMap) -> {
             OutputFile pairingDir = new OutputFile(regressionCoefficients, pairing);
-            OutputFile outPairing = new OutputFile(outputDirectory, pairing);
             hmMap.forEach((hm, regressionCoefficientFile) -> {
                 this.pairingHmRegressionCoefficients.computeIfAbsent(pairing, s -> new HashMap<>()).put(hm,
                         addInput(pairingDir, regressionCoefficientFile));
-                this.outputFiles.computeIfAbsent(pairing, s -> new HashMap<>()).put(hm, addOutput(outPairing, hm));
             });
         });
 
@@ -145,13 +152,18 @@ public class RunDistributionAnalysis extends ExecutableStep {
                         return Pair.of(group, hmTfGeneAffinity);
                     }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
-            tfHms.forEach((tf, hms) -> add(() -> {
-                pairingAverageLog2fc.forEach((pairing, averageLog2fc) -> {
-                    String[] split = pairing.split("_");
-                    String group1 = split[0];
-                    String group2 = split[1];
+            tfHms.forEach((tf, hms) -> hms.forEach(hm -> add(() -> {
+                File outDir = outputFiles.get(hm);
+                File outFile = new File(outDir, tf + ".tsv");
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile))) {
+                    writer.write("Gene\tTfTgScore\tHM\tPairing\tTF\tRegressionCoefficient");
+                    writer.newLine();
 
-                    hms.forEach(hm -> {
+                    pairingAverageLog2fc.forEach((pairing, averageLog2fc) -> {
+                        String[] split = pairing.split("_");
+                        String group1 = split[0];
+                        String group2 = split[1];
+
                         // Here the available genes were extracted from tgene files (line 231-250)
                         // Not implemented, because Tgene files are not available
                         // TODO implement
@@ -174,56 +186,46 @@ public class RunDistributionAnalysis extends ExecutableStep {
                         Set<String> targetGenes = new HashSet<>(targetGeneAffinity1.keySet());
                         targetGenes.retainAll(targetGeneAffinity2.keySet());
 
-                        OutputFile outDir = outputFiles.get(pairing).get(hm);
-                        File outFile = new File(outDir, tf + ".tsv");
-
                         if (targetGenes.isEmpty()) {
                             return;
                         }
 
-                        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outFile))) {
-                            writer.write("Gene\tTfTgScore\tHM\tPairing\tTF\tRegressionCoefficient");
-                            writer.newLine();
+                        targetGenes.forEach(targetGene -> {
+                            double affinity1 = targetGeneAffinity1.get(targetGene);
+                            double affinity2 = targetGeneAffinity2.get(targetGene);
 
-                            targetGenes.forEach(targetGene -> {
-                                double affinity1 = targetGeneAffinity1.get(targetGene);
-                                double affinity2 = targetGeneAffinity2.get(targetGene);
-
-                                double geneCount1 =
-                                        groupGeneCount.getOrDefault(group1, new HashMap<>()).getOrDefault(targetGene,
-                                                0.0);
-                                double geneCount2 =
-                                        groupGeneCount.getOrDefault(group2, new HashMap<>()).getOrDefault(targetGene,
-                                                0.0);
+                            double geneCount1 =
+                                    groupGeneCount.getOrDefault(group1, new HashMap<>()).getOrDefault(targetGene, 0.0);
+                            double geneCount2 =
+                                    groupGeneCount.getOrDefault(group2, new HashMap<>()).getOrDefault(targetGene, 0.0);
 
 
-                                double tgScore1 = averageLog2fc * affinity1;
-                                double tgScore2 = averageLog2fc * affinity2;
+                            double tgScore1 = averageLog2fc * affinity1;
+                            double tgScore2 = averageLog2fc * affinity2;
 
-                                if (scoreIncludeCounts.isSet() && scoreIncludeCounts.get()) {
-                                    tgScore1 *= geneCount1;
-                                    tgScore2 *= geneCount2;
-                                }
+                            if (scoreIncludeCounts.isSet() && scoreIncludeCounts.get()) {
+                                tgScore1 *= geneCount1;
+                                tgScore2 *= geneCount2;
+                            }
 
-                                double tgScore = Math.abs(tgScore1) + Math.abs(tgScore2);
-                                double tfTgScore = Math.abs(tgScore * regressionCoefficient);
+                            double tgScore = Math.abs(tgScore1) + Math.abs(tgScore2);
+                            double tfTgScore = Math.abs(tgScore * regressionCoefficient);
 
-                                try {
-                                    writer.write(
-                                            targetGene + "\t" + tfTgScore + "\t" + hm + "\t" + pairing + "\t" + tf +
-                                                    "\t" + regressionCoefficient);
-                                    writer.newLine();
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                            try {
+                                writer.write(
+                                        targetGene + "\t" + tfTgScore + "\t" + hm + "\t" + pairing + "\t" + tf + "\t" +
+                                                regressionCoefficient);
+                                writer.newLine();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
                     });
-                });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 return true;
-            }));
+            })));
         }};
     }
 
