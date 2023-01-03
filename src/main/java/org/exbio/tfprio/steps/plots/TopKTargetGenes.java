@@ -27,8 +27,6 @@ public class TopKTargetGenes extends ExecutableStep {
                         pair -> Stream.of(pair.getLeft(), pair.getRight())).toList(),
                 groupHmMeanAffinities.values().stream().flatMap(sub -> sub.values().stream()).toList());
 
-        Set<String> groups = hmThresholdGrouped.keySet();
-
         OutputFile inCoefficients = new OutputFile(inputDirectory, "coefficients");
         OutputFile inAffinities = new OutputFile(inputDirectory, "meanAffinities");
 
@@ -58,6 +56,51 @@ public class TopKTargetGenes extends ExecutableStep {
                 bridge.put(outDifferent, Pair.of(inDifferent, groupMeanAffinities));
             });
         });
+    }
+
+    public static Map<String, List<Pair<String, Double>>> getTfTopGeneAffinities(File affinityFile,
+                                                                                 Collection<String> tfs, int topK)
+            throws IOException {
+        try (var reader = new BufferedReader(new FileReader(affinityFile))) {
+            String[] header = reader.readLine().split("\t");
+
+            Map<String, Integer> tfIndices =
+                    IntStream.range(1, header.length).mapToObj(i -> Pair.of(header[i].toUpperCase(), i)).filter(
+                            p -> tfs.contains(p.getKey())).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+
+            Map<String, Map<String, Double>> tfGeneAffinity =
+                    reader.lines().map(line -> line.split("\t")).flatMap(split -> {
+                        String gene = split[0];
+                        return tfIndices.entrySet().stream().map(
+                                entry -> Pair.of(entry.getKey(), Pair.of(gene, split[entry.getValue()])));
+                    }).collect(Collectors.groupingBy(Pair::getKey, Collectors.toMap(p -> p.getRight().getLeft(),
+                            p -> Double.parseDouble(p.getRight().getRight()))));
+
+            return tfGeneAffinity.entrySet().stream().map(entry -> Pair.of(entry.getKey(),
+                    entry.getValue().entrySet().stream().sorted((a, b) -> b.getValue().compareTo(a.getValue())).limit(
+                            topK).map(Pair::of).toList())).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+        }
+    }
+
+    public static void writeAffinities(File outputFile, List<Pair<String, Double>> geneAffinities) {
+        try {
+            makeSureFileExists(outputFile);
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+                writer.write("Gene\tAffinity");
+                writer.newLine();
+
+                geneAffinities.forEach(p -> {
+                    try {
+                        writer.write(p.getKey() + "\t" + p.getValue());
+                        writer.newLine();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -96,53 +139,18 @@ public class TopKTargetGenes extends ExecutableStep {
                     File outputGroup = new File(output, group);
                     InputFile inputAffinities = groupMeanAffinities.get(group);
 
-                    try (var reader = new BufferedReader(new FileReader(inputAffinities))) {
-                        String[] header = reader.readLine().split("\t");
-                        Map<String, Integer> tfIndices = IntStream.range(1, header.length).mapToObj(
-                                i -> Pair.of(header[i].toUpperCase(), i)).filter(p -> tfs.contains(p.getKey())).collect(
-                                Collectors.toMap(Pair::getKey, Pair::getValue));
 
-                        Map<String, Collection<Pair<String, Double>>> tfGeneAffinity =
-                                reader.lines().map(line -> line.split("\t")).flatMap(split -> {
-                                    String gene = split[0];
-                                    return tfIndices.entrySet().stream().map(entry -> {
-                                        double affinity = Double.parseDouble(split[entry.getValue()]);
-                                        return Pair.of(entry.getKey(), Pair.of(gene, affinity));
-                                    });
-                                }).collect(Collectors.groupingBy(Pair::getKey,
-                                        Collectors.mapping(Pair::getValue, Collectors.toCollection(HashSet::new))));
-
-                        Map<String, List<Pair<String, Double>>> tfTopGeneAffinity =
-                                tfGeneAffinity.entrySet().stream().map(entry -> Pair.of(entry.getKey(),
-                                        entry.getValue().stream().sorted(
-                                                (a, b) -> b.getValue().compareTo(a.getValue())).limit(
-                                                topKTargetGenes.get()).toList())).collect(
-                                        Collectors.toMap(Pair::getKey, Pair::getValue));
-
-                        tfTopGeneAffinity.forEach((tf, topGeneAffinity) -> {
-                            File outputTf = new File(outputGroup, tf + ".tsv");
-                            try {
-                                makeSureFileExists(outputTf);
-                                try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputTf))) {
-                                    writer.write("Gene\tAffinity");
-                                    writer.newLine();
-
-                                    topGeneAffinity.forEach(p -> {
-                                        try {
-                                            writer.write(p.getKey() + "\t" + p.getValue());
-                                            writer.newLine();
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    });
-                                }
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+                    Map<String, List<Pair<String, Double>>> tfTopGeneAffinity;
+                    try {
+                        tfTopGeneAffinity = getTfTopGeneAffinities(inputAffinities, tfs, topKTargetGenes.get());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+
+                    tfTopGeneAffinity.forEach((tf, topGeneAffinity) -> {
+                        File outputTf = new File(outputGroup, tf + ".tsv");
+                        writeAffinities(outputTf, topGeneAffinity);
+                    });
                 });
 
                 return true;

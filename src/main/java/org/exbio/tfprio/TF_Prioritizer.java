@@ -141,8 +141,9 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
         AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(analyzeGroupLevel.outputFiles));
 
-        TopKTargetGenes topKTargetGenes =
-                add(new TopKTargetGenes(groupStages.outputFiles, calculateMeanAffinities.outputFiles));
+        org.exbio.tfprio.steps.plots.TopKTargetGenes topKTargetGenes =
+                add(new org.exbio.tfprio.steps.plots.TopKTargetGenes(groupStages.outputFiles,
+                        calculateMeanAffinities.outputFiles));
 
         Preprocessing daPreprocessing = add(new Preprocessing(groupStages.outputFiles));
         RunDistributionAnalysis runDistributionAnalysis =
@@ -155,5 +156,9 @@ public class TF_Prioritizer extends Workflow<Configs> {
         ExtractStats extractStats = add(new ExtractStats(createPlots.outputFiles));
         ExtractStatRank extractStatRank = add(new ExtractStatRank(extractStats.outputFiles));
         CalculateDcgRank calculateDcgRank = add(new CalculateDcgRank(extractStatRank.outputFiles));
+
+        org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes daTopKTargetGenes =
+                add(new org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes(calculateDcgRank.outputFile,
+                        calculateMeanAffinities.outputFiles));
     }
 }
