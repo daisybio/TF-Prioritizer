@@ -10,9 +10,7 @@ import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
-import org.exbio.tfprio.steps.logos.BiophysicalLogo;
-import org.exbio.tfprio.steps.logos.BiophysicalModel;
-import org.exbio.tfprio.steps.logos.Jaspar;
+import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
@@ -106,6 +104,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         }
 
         ExtractAffinities extractAffinities = add(new ExtractAffinities(tepicFiles));
+        ExtractSequences extractSequences = add(new ExtractSequences(tepicFiles));
 
         CreateBindingRegionsBedFiles createBindingRegionsBedFiles = add(new CreateBindingRegionsBedFiles(tepicFiles));
         CalculateMeanAffinities calculateMeanAffinities =
@@ -168,5 +167,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
         BiophysicalLogo biophysicalLogo = add(new BiophysicalLogo(biophysicalModel.outputFile));
 
         Jaspar jaspar = add(new Jaspar(calculateDcgRank.outputFile));
+        ExtractBindingSites extractBindingSites =
+                add(new ExtractBindingSites(calculateDcgRank.outputFile, extractSequences.outputFiles));
+        PredictedLogo predictedLogo = add(new PredictedLogo(extractBindingSites.outputFiles));
     }
 }
