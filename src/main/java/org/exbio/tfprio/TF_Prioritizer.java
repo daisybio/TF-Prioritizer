@@ -160,5 +160,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
         org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes daTopKTargetGenes =
                 add(new org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes(calculateDcgRank.outputFile,
                         calculateMeanAffinities.outputFiles));
+        CreateHeatmaps createHeatmaps = add(new CreateHeatmaps());
     }
 }
