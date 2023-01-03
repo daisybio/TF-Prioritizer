@@ -10,6 +10,8 @@ import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
+import org.exbio.tfprio.steps.logos.BiophysicalLogo;
+import org.exbio.tfprio.steps.logos.BiophysicalModel;
 import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
@@ -161,5 +163,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
                 add(new org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes(calculateDcgRank.outputFile,
                         calculateMeanAffinities.outputFiles));
         CreateHeatmaps createHeatmaps = add(new CreateHeatmaps());
+        BiophysicalModel biophysicalModel = add(new BiophysicalModel(calculateDcgRank.outputFile));
+        BiophysicalLogo biophysicalLogo = add(new BiophysicalLogo(biophysicalModel.outputFile));
     }
 }
