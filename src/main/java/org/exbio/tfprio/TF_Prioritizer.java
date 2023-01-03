@@ -153,5 +153,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         CreatePlots createPlots =
                 add(new CreatePlots(runDistributionAnalysis.outputFiles, createBackground.outputFiles));
         ExtractStats extractStats = add(new ExtractStats(createPlots.outputFiles));
+        ExtractStatRank extractStatRank = add(new ExtractStatRank(extractStats.outputFiles));
+        CalculateDcgRank calculateDcgRank = add(new CalculateDcgRank(extractStatRank.outputFiles));
     }
 }
