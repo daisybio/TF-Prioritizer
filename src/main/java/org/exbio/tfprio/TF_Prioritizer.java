@@ -12,6 +12,7 @@ import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.logos.BiophysicalLogo;
 import org.exbio.tfprio.steps.logos.BiophysicalModel;
+import org.exbio.tfprio.steps.logos.Jaspar;
 import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
@@ -165,5 +166,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         CreateHeatmaps createHeatmaps = add(new CreateHeatmaps());
         BiophysicalModel biophysicalModel = add(new BiophysicalModel(calculateDcgRank.outputFile));
         BiophysicalLogo biophysicalLogo = add(new BiophysicalLogo(biophysicalModel.outputFile));
+
+        Jaspar jaspar = add(new Jaspar(calculateDcgRank.outputFile));
     }
 }

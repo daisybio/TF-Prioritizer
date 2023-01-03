@@ -14,4 +14,10 @@ public class InternalConfigs extends ConfigModule {
         put("GRCh38", "hg38");
         put("GRCh37", "hg19");
     }});
+
+    public final InternalConfig<String> jasparURL = new InternalConfig<>(
+            "https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_redundant_pfms_jaspar.txt");
+
+    public final InternalConfig<String> jasparLogoUrl =
+            new InternalConfig<>("https://jaspar.genereg.net/static/logos/all/svg/");
 }
