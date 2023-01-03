@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class CreatePlots extends ExecutableStep {
+    // TODO: remove index from being stored
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<Pair<InputFile, InputFile>, Pair<OutputFile, OutputFile>> bridge = new HashMap<>();
 
@@ -27,14 +28,16 @@ public class CreatePlots extends ExecutableStep {
         OutputFile inTf = new OutputFile(inputDirectory, "tf");
         OutputFile inBackground = new OutputFile(inputDirectory, "background");
 
-        OutputFile outStats = new OutputFile(outputDirectory, "stats");
+        OutputFile outStats = addOutput("stats");
+        outputFiles.put("stats", outStats);
 
         hmTfDirectory.forEach((hm, directory) -> {
             InputFile inputTf = addInput(inTf, directory);
             InputFile inputBackground = addInput(inBackground, hmBackground.get(hm));
 
             OutputFile outputHm = addOutput(hm);
-            OutputFile outputStats = addOutput(outStats, hm + ".tsv");
+            OutputFile outputStats = new OutputFile(outStats, hm + ".tsv");
+            outputFiles.put(hm, outputHm);
 
             bridge.put(Pair.of(inputTf, inputBackground), Pair.of(outputHm, outputStats));
         });
@@ -52,7 +55,7 @@ public class CreatePlots extends ExecutableStep {
                 String command = "python3 " + script + " --backgroundFile " + inputBackground.getAbsolutePath() +
                         " --statsFile " + outputStats.getAbsolutePath() + " --inputDirectory " +
                         inputTf.getAbsolutePath() + " --outputDirectory " + outputHm.getAbsolutePath();
-                
+
                 executeAndWait(command, true);
 
                 return true;

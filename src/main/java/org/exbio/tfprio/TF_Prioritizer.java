@@ -9,10 +9,7 @@ import org.exbio.tfprio.steps.Dynamite.*;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipSeq.*;
-import org.exbio.tfprio.steps.distributionAnalysis.CreateBackground;
-import org.exbio.tfprio.steps.distributionAnalysis.CreatePlots;
-import org.exbio.tfprio.steps.distributionAnalysis.Preprocessing;
-import org.exbio.tfprio.steps.distributionAnalysis.RunDistributionAnalysis;
+import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
@@ -155,5 +152,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
         CreateBackground createBackground = add(new CreateBackground(runDistributionAnalysis.outputFiles));
         CreatePlots createPlots =
                 add(new CreatePlots(runDistributionAnalysis.outputFiles, createBackground.outputFiles));
+        ExtractStats extractStats = add(new ExtractStats(createPlots.outputFiles));
     }
 }
