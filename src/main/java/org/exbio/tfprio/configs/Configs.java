@@ -13,4 +13,6 @@ public class Configs extends ConfigModuleCollection {
     public static final InternalConfigs internalConfigs = new InternalConfigs();
     public static final Plots plots = new Plots();
     public static final DistributionAnalysis distributionAnalysis = new DistributionAnalysis();
+    public static final ChipAtlas chipAtlas = new ChipAtlas();
+    public static final IGV igv = new IGV();
 }

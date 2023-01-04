@@ -78,5 +78,15 @@
       0.5,
       0.6
     ]
+  },
+  "ChipAtlas": {
+    "enabled": true,
+    "genomeVersion": "mm10",
+    "tissueTypes": [
+      "breast"
+    ]
+  },
+  "IGV": {
+    "igvTools": "/home/nico/.igv/IGV_2.13.0/igvtools"
   }
 }

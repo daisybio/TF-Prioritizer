@@ -8,6 +8,8 @@ import org.exbio.tfprio.configs.Configs;
 import org.exbio.tfprio.steps.Dynamite.*;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
+import org.exbio.tfprio.steps.chipAtlas.GetData;
+import org.exbio.tfprio.steps.chipAtlas.GetList;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.logos.*;
@@ -170,5 +172,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
         ExtractBindingSites extractBindingSites =
                 add(new ExtractBindingSites(calculateDcgRank.outputFile, extractSequences.outputFiles));
         PredictedLogo predictedLogo = add(new PredictedLogo(extractBindingSites.outputFiles));
+
+        if (Configs.chipAtlas.enabled.isSet() && Configs.chipAtlas.enabled.get()) {
+            GetList getList = add(new GetList());
+            GetData getData = add(new GetData(getList.outputFile, calculateDcgRank.outputFile));
+        }
     }
 }
