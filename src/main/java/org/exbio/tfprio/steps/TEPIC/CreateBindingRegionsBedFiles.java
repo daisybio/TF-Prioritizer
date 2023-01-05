@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class CreateBindingRegionsBedFiles extends ExecutableStep {
-    public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
+    public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
     private final RequiredConfig<Double> affinityCutoff = new RequiredConfig<>(Configs.tepic.affinityCutoff);
     private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(Configs.tepic.sequenceFileName);
@@ -28,8 +28,8 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
             outputFiles.put(group, new HashMap<>());
             OutputFile outputGroup = new OutputFile(outputDirectory, group);
             hmMap.forEach((hm, sampleDirectories) -> {
-                outputFiles.get(group).put(hm, new HashSet<>(sampleDirectories.size()));
                 OutputFile outputDirectory = addOutput(outputGroup, hm);
+                outputFiles.get(group).put(hm, outputDirectory);
                 outputDirectoryGroup.put(outputDirectory, group);
                 bridge.put(outputDirectory, sampleDirectories.stream().map(this::addInput).collect(Collectors.toSet()));
             });
@@ -66,11 +66,12 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
 
                                                                                       String[] split = line.split("\t");
 
-                                                                                      String tf = split[0];
+                                                                                      // Regex to remove version numbers (e.g. ATF3(MA0605.1))
+                                                                                      String tf = split[0].replaceAll("\\(.*?\\)", "");
+
                                                                                       double affinity = Double.parseDouble(split[1]);
                                                                                       int start = Integer.parseInt(split[3]);
                                                                                       int length = Integer.parseInt(split[4]);
-                                                                                      String sequence = split[5];
 
                                                                                       if (affinity < affinityCutoff.get()) {
                                                                                           continue;
@@ -102,8 +103,6 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
                                                                               return a;
                                                                           });
 
-                // TODO: There are some TFs which differ only by versions (e.g. ATF3(MA0605.1) and ATF3(MA1988.1)).
-                //  Should they be merged?
                 Map<String, Collection<Region>> filteredRegions = allRegions.entrySet().stream()
                                                                             // Merge overlapping regions
                                                                             .map(entry -> {
@@ -124,11 +123,9 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
                                                                                                     return a;
                                                                                                 }, (a, b) -> {
                                                                                                     b.forEach(
-                                                                                                            region -> {
-                                                                                                                addRegion(
-                                                                                                                        a,
-                                                                                                                        region);
-                                                                                                            });
+                                                                                                            region -> addRegion(
+                                                                                                                    a,
+                                                                                                                    region));
                                                                                                     return a;
                                                                                                 });
 

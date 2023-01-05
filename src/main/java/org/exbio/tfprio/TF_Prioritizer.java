@@ -12,6 +12,7 @@ import org.exbio.tfprio.steps.chipAtlas.GetData;
 import org.exbio.tfprio.steps.chipAtlas.GetList;
 import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
+import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
@@ -173,9 +174,16 @@ public class TF_Prioritizer extends Workflow<Configs> {
                 add(new ExtractBindingSites(calculateDcgRank.outputFile, extractSequences.outputFiles));
         PredictedLogo predictedLogo = add(new PredictedLogo(extractBindingSites.outputFiles));
 
+        OutputFile chipAtlasDirectory = null;
         if (Configs.chipAtlas.enabled.isSet() && Configs.chipAtlas.enabled.get()) {
             GetList getList = add(new GetList());
             GetData getData = add(new GetData(getList.outputFile, calculateDcgRank.outputFile));
+            chipAtlasDirectory = getData.outputFile;
         }
+
+        DistributionTargetGenes distributionTargetGenes =
+                add(new DistributionTargetGenes(ensgSymbol.outputFile, concatenateGeneInfo.outputFile,
+                        calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
+                        createBindingRegionsBedFiles.outputFiles));
     }
 }
