@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.*;
-import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class GetData extends ExecutableStep {
     public final OutputFile outputFile = addOutput("chipAtlas");
@@ -110,45 +109,36 @@ public class GetData extends ExecutableStep {
 
             logger.debug("Found {} TFs which are available from both ChipAtlas and DCG file", tfSplits.size());
 
-            tfSplits.forEach((tf, splits) -> {
-                File tfDirectory = new File(outputFile, tf);
+            Set<String> urls =
+                    tfSplits.values().stream().flatMap(Collection::stream).map(tfUrl::get).collect(Collectors.toSet());
 
-                splits.forEach(tfSplit -> add(() -> {
-                    String url = tfUrl.get(tfSplit);
-                    File bedFile = new File(tfDirectory, url.substring(url.lastIndexOf('/') + 1));
+            urls.forEach(url -> add(() -> {
+                File bedFile = new File(outputFile, url.substring(url.lastIndexOf('/') + 1));
+                int attempt = 1;
 
-                    int attempt = 1;
+                while (!bedFile.exists()) {
+                    logger.debug("Attempt " + attempt + " to download chip atlas bed file");
+                    try {
+                        makeSureFileExists(bedFile);
+                        IOUtils.copy(new URL(url), bedFile);
 
-                    while (!bedFile.exists()) {
-                        logger.debug("Attempt " + attempt + " to download chip atlas bed file");
-                        try {
-                            makeSureFileExists(bedFile);
-                            IOUtils.copy(new URL(url), bedFile);
+                        long size = Files.size(bedFile.toPath());
 
-                            long size = Files.size(bedFile.toPath());
-
-                            if (size < 300) {
-                                logger.warn("File {} is too small ({} bytes)", bedFile, size);
-                                deleteFileStructure(bedFile);
-                            }
-                        } catch (Exception e) {
-                            attempt++;
-                            if (attempt > 3) {
-                                throw e;
-                            }
+                        if (size < 300) {
+                            logger.warn("File {} is too small ({} bytes)", bedFile, size);
+                            throw new IOException("File too small");
+                        }
+                    } catch (IOException e) {
+                        deleteFileStructure(bedFile);
+                        attempt++;
+                        if (attempt > 3) {
+                            throw new RuntimeException("Could not download file " + url);
                         }
                     }
+                }
 
-
-                    logger.trace("Start igv indexing for {}", bedFile);
-
-                    String command = String.format("%s index %s", igvTools.get().getAbsolutePath(), bedFile);
-
-                    executeAndWait(command, true);
-
-                    return true;
-                }));
-            });
+                return true;
+            }));
         }};
     }
 }

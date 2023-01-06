@@ -180,10 +180,8 @@ public class DistributionTargetGenes extends ExecutableStep {
                                         (Integer.parseInt(line[5]) + windowExtend.get())));
                 tfNames = readLines(dcgFile).stream().skip(1).map(line -> line.split("\t")[0]).collect(
                         Collectors.toSet());
-                chipAtlasFiles = chipAtlas != null ?
-                        Arrays.stream(Objects.requireNonNull(chipAtlas.listFiles(File::isDirectory))).flatMap(
-                                directory -> Arrays.stream(Objects.requireNonNull(
-                                        directory.listFiles(file -> file.getName().endsWith(".bed"))))).toList() :
+                chipAtlasFiles = chipAtlas != null ? Arrays.stream(
+                        Objects.requireNonNull(chipAtlas.listFiles(file -> file.getName().endsWith(".bed")))).toList() :
                         new ArrayList<>();
                 groupHmTfPredictedBindingSites = groupHmPredictedBindingSitesDirectories.entrySet().stream().collect(
                         Collectors.toMap(Map.Entry::getKey,
