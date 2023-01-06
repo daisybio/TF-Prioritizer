@@ -14,7 +14,7 @@
   "MixOptions": {
     "biomartDatasetSpecies": "mmusculus_gene_ensembl",
     "blackListPath": "/home/nico/Data/TFPRIO/RawData/05_black_listed_regions/mm10-blacklist.v2.txt",
-    "differentialPeakSignals": false,
+    "differentialPeakSignals": true,
     "maxSpaceBetweenPeaks": 500,
     "minOccurrence": 0,
     "mixMutuallyExclusive": false,
@@ -25,7 +25,7 @@
   "DeSeq2": {
     "speciesBiomart": "mmusculus_gene_ensembl",
     "speciesRefGenome": "mm10",
-    "tpmFilter": 0.5,
+    "tpmFilter": null,
     "batches": null,
     "countFilter": 50
   },
