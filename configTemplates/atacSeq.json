@@ -3,7 +3,11 @@
     "peaks": "/nfs/data/COM2POSE/ATAC-seq/atac-seq/",
     "rnaSeq": "/nfs/data/COM2POSE/ATAC-seq/rna/",
     "geneIDs": "/nfs/data/COM2POSE/ATAC-seq/rna/Gene_id.txt",
-    "geneAnnotationFile": "/nfs/data3/circRNA_pipeline/covid_SAECs/data/hg38.ensGene.gtf"
+    "geneAnnotationFile": "/nfs/data3/circRNA_pipeline/covid_SAECs/data/hg38.ensGene.gtf",
+    "sameStages": {
+      "MCF-7": "MCF7",
+      "K562": "K562"
+    }
   },
   "HINT": {
     "bam_directory": "/nfs/data/COM2POSE/ATAC-seq/bams",
@@ -24,8 +28,9 @@
   "DeSeq2": {
     "speciesBiomart": "hsapiens_gene_ensembl",
     "speciesRefGenome": "hg38",
-    "tpmFilter": 0.5,
-    "batches": null
+    "tpmFilter": null,
+    "batches": null,
+    "countFilter": 50
   },
   "TGene": {
     "executable": null,
