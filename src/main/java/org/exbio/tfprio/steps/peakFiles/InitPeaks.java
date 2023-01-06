@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.chipSeq;
+package org.exbio.tfprio.steps.peakFiles;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;

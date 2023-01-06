@@ -261,8 +261,8 @@ public class DistributionTargetGenes extends ExecutableStep {
                                 Pair.of(groupHmTfPredictedBindingSites.get(group1).get(hm).get(query),
                                         groupHmTfPredictedBindingSites.get(group2).get(hm).get(query));
 
-                        Function<File, String> removeExtension =
-                                file -> file.getName().substring(0, file.getName().lastIndexOf('.'));
+                        Function<File, String> removeExtension = file -> file == null ? "" :
+                                file.getName().substring(0, file.getName().lastIndexOf('.'));
                         Map<File, String> descriptions = new HashMap<>(chipAtlasDescriptions) {{
                             experimentalFiles.getLeft().forEach(
                                     file -> put(file, removeExtension.apply(file) + " experimental"));
@@ -298,20 +298,19 @@ public class DistributionTargetGenes extends ExecutableStep {
 
                         igv.addCommand("snapshotDirectory " + tfOutputDir.getAbsolutePath());
 
-                        Stream.of(targetGenes.getLeft(), targetGenes.getRight()).forEach(targetGenesList -> {
-                            IntStream.range(0, targetGenesList.size()).forEach(i -> {
-                                String targetGene = targetGenesList.get(i);
+                        Stream.of(targetGenes.getLeft(), targetGenes.getRight()).forEach(
+                                targetGenesList -> IntStream.range(0, targetGenesList.size()).forEach(i -> {
+                                    String targetGene = targetGenesList.get(i);
 
-                                if (!geneLocation.containsKey(targetGene)) {
-                                    return;
-                                }
+                                    if (!geneLocation.containsKey(targetGene)) {
+                                        return;
+                                    }
 
-                                String location = geneLocation.get(targetGene);
+                                    String location = geneLocation.get(targetGene);
 
-                                igv.addCommand("goto " + location);
-                                igv.addCommand("snapshot " + (i + 1) + "_" + ensgSymbol.get(targetGene) + ".png");
-                            });
-                        });
+                                    igv.addCommand("goto " + location);
+                                    igv.addCommand("snapshot " + (i + 1) + "_" + ensgSymbol.get(targetGene) + ".png");
+                                }));
 
                         igv.run(tfOutputDir);
 
@@ -320,10 +319,5 @@ public class DistributionTargetGenes extends ExecutableStep {
                 });
             });
         }};
-    }
-
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
     }
 }

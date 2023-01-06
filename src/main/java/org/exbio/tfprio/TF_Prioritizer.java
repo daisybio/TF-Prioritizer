@@ -10,10 +10,10 @@ import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipAtlas.GetData;
 import org.exbio.tfprio.steps.chipAtlas.GetList;
-import org.exbio.tfprio.steps.chipSeq.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
+import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
@@ -41,30 +41,30 @@ public class TF_Prioritizer extends Workflow<Configs> {
     protected void buildFlow() {
         // read peaks input
         InitPeaks initPeaks = add(new InitPeaks());
-        Map<String, Map<String, Collection<OutputFile>>> peaks = initPeaks.outputFiles;
+        Map<String, Map<String, Collection<OutputFile>>> latestPeakFiles = initPeaks.outputFiles;
 
         // perform HINT preprocessing for ATAC-/DNASE-seq input data
         if (List.of("atac-seq", "dnase-seq").contains(Configs.mixOptions.seqType.get())) {
-            HINT hint = add(new HINT(peaks));
-            peaks = hint.outputFiles;
+            HINT hint = add(new HINT(latestPeakFiles));
+            latestPeakFiles = hint.outputFiles;
         }
 
-        CheckChromosomes checkChromosomes = add(new CheckChromosomes(peaks));
+        CheckChromosomes checkChromosomes = add(new CheckChromosomes(latestPeakFiles));
 
         if (Configs.mixOptions.perform.get()) {
             MixSamples mixSamples = add(new MixSamples(checkChromosomes.outputFiles));
-            peaks = mixSamples.outputFiles;
+            latestPeakFiles = mixSamples.outputFiles;
         }
 
         if (List.of("BETWEEN", "EXCL_BETWEEN").contains(Configs.mixOptions.tfBindingSiteSearch.get())) {
             CreateFootprintsBetweenPeaks createFootprintsBetweenPeaks =
-                    add(new CreateFootprintsBetweenPeaks(peaks));
-            peaks = createFootprintsBetweenPeaks.outputFiles;
+                    add(new CreateFootprintsBetweenPeaks(latestPeakFiles));
+            latestPeakFiles = createFootprintsBetweenPeaks.outputFiles;
         }
 
         if (Configs.mixOptions.blackListPath.isSet()) {
-            Blacklist blacklist = add(new Blacklist(peaks));
-            peaks = blacklist.outputFiles;
+            Blacklist blacklist = add(new Blacklist(latestPeakFiles));
+            latestPeakFiles = blacklist.outputFiles;
         }
 
         EnsgSymbol ensgSymbol = add(new EnsgSymbol());
@@ -72,8 +72,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
         GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths());
 
         if (Configs.mixOptions.mixMutuallyExclusive.get()) {
-            MixMutuallyExclusive mixMutuallyExclusive = add(new MixMutuallyExclusive(peaks));
-            peaks = mixMutuallyExclusive.outputFiles;
+            MixMutuallyExclusive mixMutuallyExclusive = add(new MixMutuallyExclusive(latestPeakFiles));
+            latestPeakFiles = mixMutuallyExclusive.outputFiles;
         }
 
         FetchGeneInfo fetchGeneInfo = add(new FetchGeneInfo());
@@ -102,12 +102,12 @@ public class TF_Prioritizer extends Workflow<Configs> {
         if (Configs.tGene.executable.isSet()) {
             TGenePreprocess tGenePreprocess = add(new TGenePreprocess());
             TGeneExtractRegions tGeneExtractRegions = add(new TGeneExtractRegions(tGenePreprocess.outputFile));
-            TGene tGene = add(new TGene(peaks, tGenePreprocess.outputFile));
+            TGene tGene = add(new TGene(latestPeakFiles, tGenePreprocess.outputFile));
             TGenePostprocessing tGenePostprocessing =
                     add(new TGenePostprocessing(meanCounts.outputFiles, tGene.outputFiles));
             tgeneFiles = tGenePostprocessing.outputFiles;
         }
-        TEPIC tepic = add(new TEPIC(peaks));
+        TEPIC tepic = add(new TEPIC(latestPeakFiles));
         Map<String, Map<String, Collection<OutputFile>>> tepicFiles = tepic.outputFiles;
 
         if (Configs.tepic.randomize.isSet() && Configs.tepic.randomize.get()) {
