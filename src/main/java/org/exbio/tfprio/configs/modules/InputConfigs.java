@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.Map;
 
 public class InputConfigs extends ConfigModule {
-    public final ExternalConfig<File> chipSeq = new ExternalConfig<>(File.class);
+    public final ExternalConfig<File> peaks = new ExternalConfig<>(File.class);
     public final ExternalConfig<File> rnaSeq = new ExternalConfig<>(File.class);
     public final ExternalConfig<File> geneIDs = new ExternalConfig<>(File.class);
     public final ExternalConfig<File> geneAnnotationFile = new ExternalConfig<>(File.class);

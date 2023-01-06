@@ -14,6 +14,8 @@ public class MixOptions extends ConfigModule {
     public final ExternalConfig<String> biomartDatasetSpecies = new ExternalConfig<>(String.class);
     public final ExternalConfig<String> tfBindingSiteSearch =
             new ExternalConfig<>(String.class, new StringValidator("BETWEEN", "EXCL_BETWEEN", "INSIDE"));
+    public final ExternalConfig<String> seqType =
+            new ExternalConfig<>(String.class, new StringValidator("chip-seq", "atac-seq", "dnase-seq"));
     public final ExternalConfig<Integer> maxSpaceBetweenPeaks = new ExternalConfig<>(Integer.class);
     public final ExternalConfig<Boolean> mixMutuallyExclusive =
             new ExternalConfig<>(Boolean.class, new RequiresOtherToBeTrueValidator(perform));

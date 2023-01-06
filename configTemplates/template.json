@@ -19,7 +19,8 @@
     "minOccurrence": 0,
     "mixMutuallyExclusive": false,
     "perform": true,
-    "tfBindingSiteSearch": "BETWEEN"
+    "tfBindingSiteSearch": "BETWEEN",
+    "seqType": "chip-seq"
   },
   "DeSeq2": {
     "speciesBiomart": "mmusculus_gene_ensembl",
@@ -92,5 +93,10 @@
     "signalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/06_evaluation_tdf",
     "genome": "mm10",
     "igvExecutable": "/home/nico/.igv/IGV_2.13.0/igv.sh"
+  },
+  "HINT": {
+    "bam_directory": "/nfs/data/COM2POSE/ATAC-seq/bams",
+    "paired": true,
+    "genome": "hg38"
   }
 }

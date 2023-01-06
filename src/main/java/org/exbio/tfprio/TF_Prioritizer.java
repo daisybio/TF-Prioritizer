@@ -39,8 +39,17 @@ public class TF_Prioritizer extends Workflow<Configs> {
     }
 
     protected void buildFlow() {
-        CheckChromosomes checkChromosomes = add(new CheckChromosomes());
-        Map<String, Map<String, Collection<OutputFile>>> latestChipSeq = checkChromosomes.outputFiles;
+        // read peaks input
+        InitPeaks initPeaks = add(new InitPeaks());
+        Map<String, Map<String, Collection<OutputFile>>> latestChipSeq = initPeaks.outputFiles;
+
+        // perform HINT preprocessing for ATAC-/DNASE-seq input data
+        if (List.of("atac-seq", "dnase-seq").contains(Configs.mixOptions.seqType.get())) {
+            HINT hint = add(new HINT(latestChipSeq));
+            latestChipSeq = hint.outputFiles;
+        }
+
+        CheckChromosomes checkChromosomes = add(new CheckChromosomes(latestChipSeq));
 
         if (Configs.mixOptions.perform.get()) {
             MixSamples mixSamples = add(new MixSamples(checkChromosomes.outputFiles));
