@@ -45,15 +45,28 @@ public class FetchGeneInfo extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             bridge.forEach((outputFile, geneIds) -> add(() -> {
-                org.exbio.tfprio.lib.FetchGeneInfo mart =
-                        new org.exbio.tfprio.lib.FetchGeneInfo(species.get(), geneIds);
+                org.exbio.tfprio.lib.FetchGeneInfo fetchGeneInfo = null;
+
+                for (int i = 0; i < 5; i++) {
+                    try {
+                        fetchGeneInfo = new org.exbio.tfprio.lib.FetchGeneInfo(species.get(), geneIds);
+                        break;
+                    } catch (Exception e) {
+                        logger.warn("Failed to fetch gene info, retrying...");
+                        Thread.sleep(1000);
+                    }
+                }
+
+                if (fetchGeneInfo == null) {
+                    throw new RuntimeException("Failed to fetch gene info");
+                }
+
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-                    mart.getLines().forEach(line -> {
+                    fetchGeneInfo.getLines().forEach(line -> {
                         try {
                             writer.write(line);
                             writer.newLine();
                         } catch (IOException e) {
-                            e.printStackTrace();
                             throw new RuntimeException(e);
                         }
                     });

@@ -14,7 +14,7 @@
   "MixOptions": {
     "biomartDatasetSpecies": "mmusculus_gene_ensembl",
     "blackListPath": "/home/nico/Data/TFPRIO/RawData/05_black_listed_regions/mm10-blacklist.v2.txt",
-    "differentialPeakSignals": true,
+    "differentialPeakSignals": false,
     "maxSpaceBetweenPeaks": 500,
     "minOccurrence": 0,
     "mixMutuallyExclusive": false,

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import static org.exbio.tfprio.lib.Biomart.query;
 
 public class FetchGeneInfo {
+    // TODO: Remove retching of sequences and GC content, not used
     private static final List<String> exonCols =
             List.of("ensembl_gene_id", "ensembl_exon_id", "chromosome_name", "exon_chrom_start", "exon_chrom_end");
     private static final List<String> geneCols =
