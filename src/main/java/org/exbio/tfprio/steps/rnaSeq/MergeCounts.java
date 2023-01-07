@@ -49,8 +49,8 @@ public class MergeCounts extends ExecutableStep {
                     TreeMap<String, List<Integer>> counts = inputFiles.stream().collect(TreeMap::new, (map, file) -> {
                         try {
                             List<String> content = readLines(file);
-                            map.put(content.get(0),
-                                    content.stream().skip(1).map(Integer::parseInt).collect(Collectors.toList()));
+                            map.put(content.get(0), content.stream().skip(1).map(Double::parseDouble).map(
+                                    d -> (int) Math.round(d)).collect(Collectors.toList()));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
