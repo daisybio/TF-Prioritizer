@@ -1,6 +1,6 @@
 {
   "InputConfigs": {
-    "chipSeq": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/03_broadPeaks_inc_Pol2",
+    "peaks": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/03_broadPeaks_inc_Pol2",
     "rnaSeq": "/home/nico/Data/TFPRIO/RawData/02_RNAseq_data",
     "geneIDs": "/home/nico/Data/TFPRIO/RawData/02_RNAseq_data/Gene_id.txt",
     "geneAnnotationFile": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
@@ -14,7 +14,7 @@
   "MixOptions": {
     "biomartDatasetSpecies": "mmusculus_gene_ensembl",
     "blackListPath": "/home/nico/Data/TFPRIO/RawData/05_black_listed_regions/mm10-blacklist.v2.txt",
-    "differentialPeakSignals": true,
+    "differentialPeakSignals": false,
     "maxSpaceBetweenPeaks": 500,
     "minOccurrence": 0,
     "mixMutuallyExclusive": false,
@@ -81,22 +81,16 @@
     ]
   },
   "ChipAtlas": {
-    "enabled": true,
+    "enabled": false,
     "genomeVersion": "mm10",
     "tissueTypes": [
       "breast"
     ]
   },
   "IGV": {
-    "igvTools": "/home/nico/.igv/IGV_2.13.0/igvtools",
     "experimentalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/04_evaluation/merged/working_dir/00_MIX_OPTION/01_SAMPLE_MIX",
     "signalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/06_evaluation_tdf",
     "genome": "mm10",
     "igvExecutable": "/home/nico/.igv/IGV_2.13.0/igv.sh"
-  },
-  "HINT": {
-    "bam_directory": "/nfs/data/COM2POSE/ATAC-seq/bams",
-    "paired": true,
-    "genome": "hg38"
   }
 }

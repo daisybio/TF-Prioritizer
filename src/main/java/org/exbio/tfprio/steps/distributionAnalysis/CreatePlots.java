@@ -15,7 +15,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class CreatePlots extends ExecutableStep {
     // TODO: remove index from being stored
-    public final Map<String, OutputFile> outputFiles = new HashMap<>();
+    public final Map<String, Pair<OutputFile, OutputFile>> outputFiles = new HashMap<>();
     private final Map<Pair<InputFile, InputFile>, Pair<OutputFile, OutputFile>> bridge = new HashMap<>();
 
     private final InputFile script;
@@ -29,15 +29,14 @@ public class CreatePlots extends ExecutableStep {
         OutputFile inBackground = new OutputFile(inputDirectory, "background");
 
         OutputFile outStats = addOutput("stats");
-        outputFiles.put("stats", outStats);
 
         hmTfDirectory.forEach((hm, directory) -> {
             InputFile inputTf = addInput(inTf, directory);
             InputFile inputBackground = addInput(inBackground, hmBackground.get(hm));
 
             OutputFile outputHm = addOutput(hm);
-            OutputFile outputStats = new OutputFile(outStats, hm + ".tsv");
-            outputFiles.put(hm, outputHm);
+            OutputFile outputStats = addOutput(outStats, hm + ".tsv");
+            outputFiles.put(hm, Pair.of(outputHm, outputStats));
 
             bridge.put(Pair.of(inputTf, inputBackground), Pair.of(outputHm, outputStats));
         });

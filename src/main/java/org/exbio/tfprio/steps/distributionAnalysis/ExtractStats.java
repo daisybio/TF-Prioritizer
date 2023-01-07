@@ -4,10 +4,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
-import org.exbio.pipejar.util.FileFilters.Filters;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.softLink;
@@ -17,14 +19,15 @@ public class ExtractStats extends ExecutableStep {
 
     private final Map<File, OutputFile> bridge = new HashMap<>();
 
-    public ExtractStats(Map<String, OutputFile> plotOutputFiles) {
-        super(false, plotOutputFiles.get("stats"));
+    public ExtractStats(Map<String, Pair<OutputFile, OutputFile>> plotOutputFiles) {
+        super(false, plotOutputFiles.values().stream().map(Pair::getRight).toList());
 
-        InputFile statsDirectory = addInput(plotOutputFiles.get("stats"));
-        Arrays.stream(Objects.requireNonNull(statsDirectory.listFiles(Filters.fileFilter))).map(
-                file -> Pair.of(file, addOutput(file.getName()))).forEach(pair -> {
-            bridge.put(pair.getLeft(), pair.getRight());
-            outputFiles.put(pair.getLeft().getName(), pair.getRight());
+        plotOutputFiles.forEach((hm, output) -> {
+            OutputFile outputStats = output.getRight();
+            OutputFile outputHm = addOutput(hm);
+            InputFile inputHm = addInput(outputStats);
+            outputFiles.put(hm, outputHm);
+            bridge.put(inputHm, outputHm);
         });
     }
 

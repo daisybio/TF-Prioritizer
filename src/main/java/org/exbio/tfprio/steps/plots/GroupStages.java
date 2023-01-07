@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 
 public class GroupStages extends ExecutableStep {
     public final Map<String, Map<Double, Pair<OutputFile, OutputFile>>> outputFiles = new HashMap<>();
+    // TODO: make this optional
     private final RequiredConfig<Map<String, String>> sameStages =
             new RequiredConfig<>(Configs.inputConfigs.sameStages);
     private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(Configs.plots.thresholds);

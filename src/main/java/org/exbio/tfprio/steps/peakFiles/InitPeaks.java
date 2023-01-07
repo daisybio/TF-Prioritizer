@@ -1,4 +1,4 @@
-package org.exbio.tfprio.steps.chipSeq;
+package org.exbio.tfprio.steps.peakFiles;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+import static org.exbio.pipejar.util.FileManagement.softLink;
+
 public class InitPeaks extends ExecutableStep {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final RequiredConfig<File> inputDirectory = new RequiredConfig<>(Configs.inputConfigs.peaks);
@@ -20,18 +22,20 @@ public class InitPeaks extends ExecutableStep {
 
         // Register all input files and their corresponding output files
         InputFile input = addInput(inputDirectory);
+
         Arrays.stream(Objects.requireNonNull(input.listFiles())).forEach(d_group -> {
-            OutputFile d_groupOut = addOutput(d_group.getName());
-            d_groupOut.mkdir();
-            outputFiles.put(d_group.getName(), new HashMap<>());
+            String group = d_group.getName();
+            OutputFile d_groupOut = new OutputFile(outputDirectory, d_group.getName());
+
             Arrays.stream(Objects.requireNonNull(d_group.listFiles())).forEach(d_hm -> {
-                OutputFile d_hmOut = addOutput(d_groupOut, d_hm.getName());
-                d_hmOut.mkdir();
-                outputFiles.get(d_group.getName()).put(d_hm.getName(), new HashSet<>());
+                String hm = d_hm.getName();
+                OutputFile d_hmOut = new OutputFile(d_groupOut, d_hm.getName());
+
                 Arrays.stream(Objects.requireNonNull(d_hm.listFiles())).forEach(f_sample -> {
                     OutputFile f_sampleOut = addOutput(d_hmOut, f_sample.getName());
                     bridge.put(f_sample, f_sampleOut);
-                    outputFiles.get(d_group.getName()).get(d_hm.getName()).add(f_sampleOut);
+                    outputFiles.computeIfAbsent(group, k -> new HashMap<>()).computeIfAbsent(hm,
+                            k -> new HashSet<>()).add(f_sampleOut);
                 });
             });
         });
@@ -41,7 +45,10 @@ public class InitPeaks extends ExecutableStep {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            bridge.forEach((inputFile, outputFile) -> add(() -> true));
+            bridge.forEach((inputFile, outputFile) -> add(() -> {
+                softLink(outputFile, inputFile);
+                return true;
+            }));
         }};
     }
 }

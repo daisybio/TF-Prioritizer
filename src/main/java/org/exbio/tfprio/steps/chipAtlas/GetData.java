@@ -25,7 +25,6 @@ public class GetData extends ExecutableStep {
     public final OutputFile outputFile = addOutput("chipAtlas");
     private final InputFile dataList;
     private final InputFile dcgFile;
-    private final RequiredConfig<File> igvTools = new RequiredConfig<>(Configs.igv.igvTools);
     private final RequiredConfig<List<String>> tissueTypes = new RequiredConfig<>(Configs.chipAtlas.tissueTypes);
     private final RequiredConfig<String> genomeVersionColName =
             new RequiredConfig<>(Configs.chipAtlas.genomeVersionColName);
