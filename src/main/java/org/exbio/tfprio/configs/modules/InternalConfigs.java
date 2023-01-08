@@ -13,6 +13,7 @@ public class InternalConfigs extends ConfigModule {
         put("GRCm37", "mm9");
         put("GRCh38", "hg38");
         put("GRCh37", "hg19");
+        put("GRCh38.p13", "hg38");
     }});
 
     public final InternalConfig<String> jasparURL = new InternalConfig<>(
