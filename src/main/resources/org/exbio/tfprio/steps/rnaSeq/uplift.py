@@ -1,7 +1,6 @@
-from time import sleep
+import argparse
 import pandas as pd
 from pyliftover import LiftOver
-import argparse
 
 
 def convert(converter, chromosome, start, end, strand=None):
@@ -12,7 +11,7 @@ def convert(converter, chromosome, start, end, strand=None):
         first = converter.convert_coordinate(chromosome, int(start), strand)
         second = converter.convert_coordinate(chromosome, int(end), strand)
 
-    if (first is None or second is None):
+    if first is None or second is None:
         return None, None
 
     if len(first) == 0 or len(second) == 0:
@@ -31,7 +30,6 @@ parser.add_argument("target_version", type=str)
 parser.add_argument("col_chromosome", type=int)
 parser.add_argument("col_start", type=int)
 parser.add_argument("col_end", type=int)
-parser.add_argument("col_strand", type=int, default=None)
 
 args = parser.parse_args()
 
@@ -40,7 +38,6 @@ df = pd.read_csv(args.original, sep="\t", header=None)
 col_chromosome = args.col_chromosome
 col_start = args.col_start
 col_end = args.col_end
-col_strand = args.col_strand
 
 converter = LiftOver(args.original_version, args.target_version, search_dir=None, cache_dir=None,
                      use_web=True)
@@ -51,12 +48,10 @@ for i, row in df.iterrows():
     start_position = row[col_start]
     end_position = row[col_end]
 
-    strand = row[col_strand] if col_strand is not None else None
-
     chromosome = "chrM" if chromosome == "chrMT" else chromosome
 
     start_converted, end_converted = convert(converter,
-                                             chromosome, start_position, end_position, strand)
+                                             chromosome, start_position, end_position)
 
     if (start_converted is None or end_converted is None):
         continue
