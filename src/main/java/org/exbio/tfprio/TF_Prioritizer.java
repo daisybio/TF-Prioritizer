@@ -3,7 +3,6 @@ package org.exbio.tfprio;
 import org.apache.commons.cli.ParseException;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.Workflow;
-import org.exbio.pipejar.steps.ConcatenateFiles;
 import org.exbio.tfprio.configs.Configs;
 import org.exbio.tfprio.steps.Dynamite.*;
 import org.exbio.tfprio.steps.EnsgSymbol;
@@ -14,7 +13,10 @@ import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
-import org.exbio.tfprio.steps.plots.*;
+import org.exbio.tfprio.steps.plots.GroupStages;
+import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
+import org.exbio.tfprio.steps.plots.PlotGroupedStages;
+import org.exbio.tfprio.steps.plots.ThresholdPlots;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
 
@@ -67,7 +69,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
             latestPeakFiles = blacklist.outputFiles;
         }
 
-        EnsgSymbol ensgSymbol = add(new EnsgSymbol());
 
         GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths());
 
@@ -76,17 +77,21 @@ public class TF_Prioritizer extends Workflow<Configs> {
             latestPeakFiles = mixMutuallyExclusive.outputFiles;
         }
 
-        FetchGeneInfo fetchGeneInfo = add(new FetchGeneInfo());
-        ConcatenateFiles concatenateGeneInfo = add(new ConcatenateFiles(fetchGeneInfo.getOutputs()));
-        MergeCounts mergeCounts = add(new MergeCounts());
+        FilterEnsgs filterEnsgs = add(new FilterEnsgs());
+
+        MergeCounts mergeCounts = add(new MergeCounts(filterEnsgs.outputFile));
+
+        FetchGeneInfo fetchGeneInfo = add(new FetchGeneInfo(filterEnsgs.cleanFile));
+
+        EnsgSymbol ensgSymbol = add(new EnsgSymbol(filterEnsgs.cleanFile));
 
         CreateBatchFile createBatchFile = add(new CreateBatchFile(mergeCounts.outputFiles));
         MeanExpression meanCounts = add(new MeanExpression(mergeCounts.outputFiles));
         CreatePairings createPairings = add(new CreatePairings(mergeCounts.outputFiles));
 
-        CalculateTPM calculateTPM = add(new CalculateTPM(meanCounts.outputFiles, concatenateGeneInfo.outputFile));
+        CalculateTPM calculateTPM = add(new CalculateTPM(meanCounts.outputFiles, fetchGeneInfo.outputFile));
 
-        Uplift uplift = add(new Uplift(concatenateGeneInfo.outputFile));
+        Uplift uplift = add(new Uplift(fetchGeneInfo.outputFile));
         FilterENdb filterENdb = add(new FilterENdb());
         UpliftENdb upliftENdb = add(new UpliftENdb(filterENdb.outputFile));
 
@@ -96,6 +101,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
         DeSeq2 deSeq2 = add(new DeSeq2(createPairings.outputFiles, createBatchFile.outputFile));
         DeSeqPostprocessing deSeqPostprocessing = add(new DeSeqPostprocessing(deSeq2.outputFiles));
+
 
         Map<String, Map<String, OutputFile>> tgeneFiles = new HashMap<>();
 
@@ -150,10 +156,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
         GroupStages groupStages = add(new GroupStages(filterRegressionCoefficients.outputFiles));
         PlotGroupedStages plotGroupedStages = add(new PlotGroupedStages(groupStages.outputFiles));
-        AnalyzeGroupLevel analyzeGroupLevel =
-                add(new AnalyzeGroupLevel(calculateTPM.outputFiles, meanCounts.outputFiles, groupStages.outputFiles,
-                        ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
-        AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(analyzeGroupLevel.outputFiles));
+        //  AnalyzeGroupLevel analyzeGroupLevel =
+        //        add(new AnalyzeGroupLevel(calculateTPM.outputFiles, meanCounts.outputFiles, groupStages.outputFiles,
+        //              ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
+        //AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(analyzeGroupLevel.outputFiles));
 
         org.exbio.tfprio.steps.plots.TopKTargetGenes topKTargetGenes =
                 add(new org.exbio.tfprio.steps.plots.TopKTargetGenes(groupStages.outputFiles,
@@ -191,7 +197,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         }
 
         DistributionTargetGenes distributionTargetGenes =
-                add(new DistributionTargetGenes(ensgSymbol.outputFile, concatenateGeneInfo.outputFile,
+                add(new DistributionTargetGenes(ensgSymbol.outputFile, fetchGeneInfo.outputFile,
                         calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
                         createBindingRegionsBedFiles.outputFiles));
     }

@@ -28,7 +28,8 @@ public class CreateBatchFile extends ExecutableStep {
                 Map<String, Set<String>> samples = new HashMap<>() {{
                     files.forEach((group, inputFile) -> {
                         Set<String> currentSamples = new HashSet<>();
-                        put(group, currentSamples);
+                        String cleanGroup = group.replace("-", "_");
+                        put(cleanGroup, currentSamples);
                         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
                             Arrays.stream(reader.readLine().split("\t")).filter(
                                     s -> !s.equals("gene_id") && !s.equals("Mean")).distinct().sorted().forEachOrdered(

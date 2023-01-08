@@ -35,58 +35,60 @@ public class CalculateTPM extends ExecutableStep {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
+            Map<String, Integer> lengths;
             try {
-                Map<String, Integer> lengths = readLines(lengthsFile).stream().collect(HashMap::new, (map, line) -> {
+                lengths = readLines(lengthsFile).stream().collect(HashMap::new, (map, line) -> {
                     String[] split = line.split("\t");
                     if (!split[1].equals("null")) {
                         map.put(split[0], Integer.parseInt(split[1]));
                     }
                 }, HashMap::putAll);
-
-                bridge.forEach((inputFile, outputFile) -> add(() -> {
-                    List<String> inputLines = readLines(inputFile);
-                    Map<String, List<Double>> counts =
-                            inputLines.stream().skip(1).collect(HashMap::new, (map, line) -> {
-                                String[] split = line.split("\t");
-                                map.put(split[0],
-                                        Arrays.stream(split).skip(1).map(Double::parseDouble).collect(ArrayList::new,
-                                                List::add, List::addAll));
-                            }, HashMap::putAll);
-
-
-                    Map<String, List<Double>> intermediate =
-                            counts.entrySet().stream().filter(entry -> lengths.containsKey(entry.getKey())).collect(
-                                    Collectors.toMap(Map.Entry::getKey,
-                                            entry -> entry.getValue().stream().mapToDouble(Double::doubleValue).map(
-                                                    value -> 1E3 * value / lengths.get(entry.getKey())).boxed().collect(
-                                                    Collectors.toList())));
-
-                    List<Double> sumIntermediate =
-                            IntStream.range(0, intermediate.values().iterator().next().size()).mapToObj(
-                                    i -> intermediate.values().stream().mapToDouble(
-                                            list -> list.get(i)).sum()).toList();
-
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-                        writer.write(inputLines.get(0));
-                        writer.newLine();
-                        intermediate.entrySet().stream().map(entry -> entry.getKey() + "\t" +
-                                IntStream.range(0, entry.getValue().size()).mapToObj(
-                                        i -> (entry.getValue().get(i) / sumIntermediate.get(i) * 1E6)).map(
-                                        String::valueOf).collect(Collectors.joining("\t"))).sorted().forEachOrdered(
-                                line -> {
-                                    try {
-                                        writer.write(line);
-                                        writer.newLine();
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                });
-                    }
-                    return true;
-                }));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
+
+            bridge.forEach((inputFile, outputFile) -> add(() -> {
+                List<String> inputLines = readLines(inputFile);
+                Map<String, List<Double>> counts = inputLines.stream().skip(1).collect(HashMap::new, (map, line) -> {
+                    String[] split = line.split("\t");
+                    map.put(split[0], Arrays.stream(split).skip(1).map(Double::parseDouble).toList());
+                }, HashMap::putAll);
+
+                logger.trace("Found " + counts.size() + " lines.");
+
+                Map<String, List<Double>> intermediate =
+                        counts.entrySet().stream().filter(entry -> lengths.containsKey(entry.getKey())).collect(
+                                Collectors.toMap(Map.Entry::getKey,
+                                        entry -> entry.getValue().stream().mapToDouble(Double::doubleValue).map(
+                                                value -> 1E3 * value / lengths.get(entry.getKey())).boxed().collect(
+                                                Collectors.toList())));
+
+                logger.trace("Found " + intermediate.size() + " lines with known lengths.");
+
+                List<Double> sumIntermediate =
+                        IntStream.range(0, intermediate.values().iterator().next().size()).mapToObj(
+                                i -> intermediate.values().stream().mapToDouble(list -> list.get(i)).sum()).toList();
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+                    writer.write(inputLines.get(0));
+                    writer.newLine();
+                    intermediate.entrySet().stream().map(entry -> entry.getKey() + "\t" +
+                            IntStream.range(0, entry.getValue().size()).mapToObj(
+                                    i -> (entry.getValue().get(i) / sumIntermediate.get(i) * 1E6)).map(
+                                    String::valueOf).collect(Collectors.joining("\t"))).sorted().forEachOrdered(
+                            line -> {
+                                try {
+                                    writer.write(line);
+                                    writer.newLine();
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                }
+
+                return true;
+            }));
         }};
     }
 }
