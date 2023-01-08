@@ -28,10 +28,10 @@ public class HINT extends ExecutableStep {
     private final String exec = "rgt-hint";
     private final String mode = "footprinting";
     private final RequiredConfig<String> seqType = new RequiredConfig<>(Configs.mixOptions.seqType);
-    private final RequiredConfig<File> inputDirectory = new RequiredConfig<>(Configs.hint.bam_directory);
+    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(Configs.hint.bam_directory);
     private final RequiredConfig<Boolean> paired = new RequiredConfig<>(Configs.hint.paired);
     private final RequiredConfig<String> genome = new RequiredConfig<>(Configs.hint.genome);
-    private final Map<String, File> bamFiles = new HashMap<>();
+    private final Map<String, InputFile> bamFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
     /**
@@ -44,60 +44,54 @@ public class HINT extends ExecutableStep {
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
 
+        OutputFile inBam = new OutputFile(inputDirectory, "bam");
+
         // manage bam files as input
-        setBamFiles();
+        Arrays.stream(Objects.requireNonNull(bamDirectory.get().listFiles())).forEach(d_group -> {
+            OutputFile bamGroupDir = new OutputFile(inBam, d_group.getName());
+            // separation folder (atac-seq)
+            Arrays.stream(Objects.requireNonNull(d_group.listFiles())).forEach(d_hm -> {
+                OutputFile bamHmDir = new OutputFile(bamGroupDir, d_hm.getName());
+                // add bam files
+                Arrays.stream(Objects.requireNonNull(d_hm.listFiles())).forEach(bam -> {
+                    OutputFile bamFile = new OutputFile(bam.getAbsolutePath());
+                    String sampleName = trimFile(bamFile.getName());
+                    // TODO: Creating a map based on the file names only might be a weak connection
+                    bamFiles.put(sampleName, addInput(bamHmDir, bamFile));
+                });
+            });
+        });
+
         // manage output files
         peakFiles.forEach((group, hmMap) -> {
-            outputFiles.put(group, new HashMap<>());
-            OutputFile d_groupOut = addOutput(group);
+            OutputFile d_groupIn = new OutputFile(inputDirectory, group);
+            OutputFile d_groupOut = new OutputFile(outputDirectory, group);
             hmMap.forEach((hm, sampleFiles) -> {
-                outputFiles.get(group).put(hm, new HashSet<>());
-                OutputFile d_hmOut = addOutput(d_groupOut, hm);
+                OutputFile d_hmIn = new OutputFile(d_groupIn, hm);
+                OutputFile d_hmOut = new OutputFile(d_groupOut, hm);
 
                 sampleFiles.forEach(sampleFile -> {
-                    InputFile inputFile = addInput(sampleFile);
-
+                    InputFile inputFile = addInput(d_hmIn, sampleFile);
                     OutputFile outputFile = addOutput(d_hmOut, inputFile.getName());
-                    outputFiles.get(group).get(hm).add(outputFile);
+
+                    outputFiles.computeIfAbsent(group, k -> new HashMap<>()).computeIfAbsent(hm,
+                            k -> new HashSet<>()).add(outputFile);
                     bridge.put(inputFile, outputFile);
                 });
             });
         });
     }
 
-    @Override
-    protected boolean mayBeSkipped() {
-        return false;
-    }
-
     private String trimFile(String file) {
-        return file.substring(0, file.indexOf('.'));
-    }
-
-    /**
-     * Add bam files as input
-     */
-    private void setBamFiles() {
-        InputFile input = addInput(inputDirectory);
-        // create different groups
-        Arrays.stream(Objects.requireNonNull(input.listFiles())).forEach(d_group -> {
-            // separation folder (atac-seq)
-            Arrays.stream(Objects.requireNonNull(d_group.listFiles())).forEach(d_hm -> {
-                // add bam files
-                Arrays.stream(Objects.requireNonNull(d_hm.listFiles())).forEach(bam -> {
-                    File bam_file = new File(bam.getAbsolutePath());
-                    String sample = trimFile(bam_file.getName());
-                    bamFiles.put(sample, bam_file);
-                });
-            });
-        });
+        return file.substring(0, file.lastIndexOf('.'));
     }
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             bridge.forEach((inputFile, out) -> add(() -> {
-                File bam = bamFiles.get(trimFile(inputFile.getName()));
+                String inputName = trimFile(inputFile.getName());
+                File bam = bamFiles.get(inputName);
                 // set sequencing type (one of: atac-seq; dnase-seq)
                 String type = "--" + seqType.get();
                 // basic hint call for given sequencing type
