@@ -1,5 +1,6 @@
 package org.exbio.tfprio.steps.peakFiles;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
@@ -11,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import static org.exbio.pipejar.util.FileManagement.extend;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 /**
@@ -31,8 +33,7 @@ public class HINT extends ExecutableStep {
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(Configs.hint.bam_directory);
     private final RequiredConfig<Boolean> paired = new RequiredConfig<>(Configs.hint.paired);
     private final RequiredConfig<String> genome = new RequiredConfig<>(Configs.hint.genome);
-    private final Map<String, InputFile> bamFiles = new HashMap<>();
-    private final Map<InputFile, OutputFile> bridge = new HashMap<>();
+    private final Map<OutputFile, Pair<InputFile, InputFile>> bridge = new HashMap<>();
 
     /**
      * Init HINT with peak files
@@ -44,25 +45,6 @@ public class HINT extends ExecutableStep {
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
 
-        OutputFile inBam = new OutputFile(inputDirectory, "bam");
-
-        // manage bam files as input
-        Arrays.stream(Objects.requireNonNull(bamDirectory.get().listFiles())).forEach(d_group -> {
-            OutputFile bamGroupDir = new OutputFile(inBam, d_group.getName());
-            // separation folder (atac-seq)
-            Arrays.stream(Objects.requireNonNull(d_group.listFiles())).forEach(d_hm -> {
-                OutputFile bamHmDir = new OutputFile(bamGroupDir, d_hm.getName());
-                // add bam files
-                Arrays.stream(Objects.requireNonNull(d_hm.listFiles())).forEach(bam -> {
-                    OutputFile bamFile = new OutputFile(bam.getAbsolutePath());
-                    String sampleName = trimFile(bamFile.getName());
-                    // TODO: Creating a map based on the file names only might be a weak connection
-                    bamFiles.put(sampleName, addInput(bamHmDir, bamFile));
-                });
-            });
-        });
-
-        // manage output files
         peakFiles.forEach((group, hmMap) -> {
             OutputFile d_groupIn = new OutputFile(inputDirectory, group);
             OutputFile d_groupOut = new OutputFile(outputDirectory, group);
@@ -70,13 +52,25 @@ public class HINT extends ExecutableStep {
                 OutputFile d_hmIn = new OutputFile(d_groupIn, hm);
                 OutputFile d_hmOut = new OutputFile(d_groupOut, hm);
 
-                sampleFiles.forEach(sampleFile -> {
-                    InputFile inputFile = addInput(d_hmIn, sampleFile);
-                    OutputFile outputFile = addOutput(d_hmOut, inputFile.getName());
+                sampleFiles.forEach(bedFile -> {
+                    String sampleName = trimFile(bedFile.getName());
+
+                    OutputFile bamFile = new OutputFile(
+                            extend(bamDirectory.get(), group, hm, sampleName + ".bam").getAbsolutePath());
+                    OutputFile bamIndex = new OutputFile(
+                            extend(bamDirectory.get(), group, hm, sampleName + ".bam.bai").getAbsolutePath());
+
+                    InputFile inputBed = addInput(d_hmIn, bedFile);
+                    InputFile inputBam = addInput(d_hmIn, bamFile);
+                    if (bamIndex.exists()) {
+                        addInput(d_hmIn, bamIndex);
+                    }
+
+                    OutputFile outputFile = addOutput(d_hmOut, inputBed.getName());
 
                     outputFiles.computeIfAbsent(group, k -> new HashMap<>()).computeIfAbsent(hm,
                             k -> new HashSet<>()).add(outputFile);
-                    bridge.put(inputFile, outputFile);
+                    bridge.put(outputFile, Pair.of(inputBed, inputBam));
                 });
             });
         });
@@ -89,9 +83,10 @@ public class HINT extends ExecutableStep {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            bridge.forEach((inputFile, out) -> add(() -> {
-                String inputName = trimFile(inputFile.getName());
-                File bam = bamFiles.get(inputName);
+            bridge.forEach((out, inputs) -> add(() -> {
+                InputFile bed = inputs.getLeft();
+                InputFile bam = inputs.getRight();
+
                 // set sequencing type (one of: atac-seq; dnase-seq)
                 String type = "--" + seqType.get();
                 // basic hint call for given sequencing type
@@ -109,7 +104,7 @@ public class HINT extends ExecutableStep {
                 // add bam file
                 command_args.add(bam.getAbsolutePath());
                 // add peaks file
-                command_args.add(inputFile.getAbsolutePath());
+                command_args.add(bed.getAbsolutePath());
                 executeAndWait(command_args, true);
                 return true;
             }));
