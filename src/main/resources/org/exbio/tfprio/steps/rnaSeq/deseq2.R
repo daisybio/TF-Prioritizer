@@ -8,6 +8,7 @@ parser <- ArgumentParser()
 parser$add_argument("--metadata", required = TRUE)
 parser$add_argument("--input", required = TRUE)
 parser$add_argument("--output", required = TRUE)
+parser$add_argument("--out_normalized", required = TRUE)
 parser$add_argument("--minCount", required = TRUE, type = "integer", default = 10)
 
 args <- parser$parse_args()
@@ -42,8 +43,11 @@ if (include_batches) {
 }
 keep <- rowSums(counts(dds)) >= args$minCount
 dds <- dds[keep, ]
-output_path <- args$output
 dds <- DESeq(dds)
+
+counts_normalized <- counts(dds)
+write.table(counts_normalized, file = args$out_normalized, sep = "\t")
+
 res <- results(dds)
 summary(res)
-write.table(res, file = output_path, sep = "\t")
+write.table(res, file = args$output, sep = "\t")

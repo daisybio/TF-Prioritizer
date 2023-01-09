@@ -16,25 +16,34 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class DeSeq2 extends ExecutableStep {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
+    public final Map<String, OutputFile> normalizedCounts = new HashMap<>();
     private final InputFile script;
     private final InputFile batchFile;
-    private final Map<InputFile, OutputFile> bridge;
+    private final Set<String> pairings;
     private final Map<InputFile, OutputFile> filteredBatchFiles = new HashMap<>();
     private final RequiredConfig<Integer> countFilter = new RequiredConfig<>(Configs.deSeq2.countFilter);
+    private final Map<String, InputFile> inputFiles = new HashMap<>();
 
     public DeSeq2(Map<String, OutputFile> pairingCounts, OutputFile batchFile) {
         super(false, pairingCounts.values(), batchFile);
 
-        bridge = new HashMap<>() {{
-            pairingCounts.forEach((pairing, input) -> {
-                InputFile inputFile = addInput(input);
-                OutputFile outputFile = addOutput(inputFile.getName());
-                put(inputFile, outputFile);
-                outputFiles.put(pairing, outputFile);
-                filteredBatchFiles.put(inputFile, addOutput(
-                        inputFile.getName().substring(0, inputFile.getName().lastIndexOf(".")) + "_meta.tsv"));
-            });
-        }};
+
+        pairings = pairingCounts.keySet();
+
+        pairings.forEach(pairing -> {
+            OutputFile input = pairingCounts.get(pairing);
+            InputFile inputFile = addInput(input);
+            inputFiles.put(pairing, inputFile);
+
+            OutputFile outputFile = addOutput(inputFile.getName());
+            outputFiles.put(pairing, outputFile);
+
+            OutputFile normalizedCount = addOutput(pairing + "_normalized.tsv");
+            normalizedCounts.put(pairing, normalizedCount);
+
+            filteredBatchFiles.put(inputFile,
+                    addOutput(inputFile.getName().substring(0, inputFile.getName().lastIndexOf(".")) + "_meta.tsv"));
+        });
 
         this.batchFile = addInput(batchFile);
 
@@ -52,7 +61,11 @@ public class DeSeq2 extends ExecutableStep {
                 Map<String, String> sampleBatch = batchLines.stream().skip(1).map(line -> line.split("\t")).collect(
                         Collectors.toMap(line -> line[0], line -> line[2]));
 
-                bridge.forEach((input, output) -> add(() -> {
+                pairings.forEach(pairing -> add(() -> {
+                    InputFile input = inputFiles.get(pairing);
+                    OutputFile output = outputFiles.get(pairing);
+                    OutputFile normalizedCount = normalizedCounts.get(pairing);
+
                     OutputFile filteredBatchFile = filteredBatchFiles.get(input);
 
                     final List<String> order;
@@ -77,7 +90,8 @@ public class DeSeq2 extends ExecutableStep {
 
                     executeAndWait("Rscript " + script.getAbsolutePath() + " --metadata " +
                             filteredBatchFile.getAbsolutePath() + " --input " + input.getAbsolutePath() + " --output " +
-                            output.getAbsolutePath() + " --minCount " + countFilter.get(), true);
+                            output.getAbsolutePath() + " --out_normalized " + normalizedCount.getAbsolutePath() +
+                            " --minCount " + countFilter.get(), true);
                     return true;
                 }));
             } catch (IOException e) {
