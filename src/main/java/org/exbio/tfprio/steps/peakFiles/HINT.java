@@ -10,6 +10,7 @@ import org.exbio.tfprio.configs.Configs;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.extend;
@@ -34,6 +35,10 @@ public class HINT extends ExecutableStep {
     private final RequiredConfig<Boolean> paired = new RequiredConfig<>(Configs.hint.paired);
     private final RequiredConfig<String> genome = new RequiredConfig<>(Configs.hint.genome);
     private final Map<OutputFile, Pair<InputFile, InputFile>> bridge = new HashMap<>();
+    private final Function<File, String> trimFile = (file) -> {
+        String name = file.getName();
+        return name.substring(0, name.lastIndexOf('.'));
+    };
 
     /**
      * Init HINT with peak files
@@ -53,7 +58,7 @@ public class HINT extends ExecutableStep {
                 OutputFile d_hmOut = new OutputFile(d_groupOut, hm);
 
                 sampleFiles.forEach(bedFile -> {
-                    String sampleName = trimFile(bedFile.getName());
+                    String sampleName = trimFile.apply(bedFile);
 
                     OutputFile bamFile =
                             new OutputFile(extend(bamDirectory.get(), group, sampleName + ".bam").getAbsolutePath());
@@ -75,10 +80,6 @@ public class HINT extends ExecutableStep {
         });
     }
 
-    private String trimFile(String file) {
-        return file.substring(0, file.lastIndexOf('.'));
-    }
-
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
@@ -90,6 +91,10 @@ public class HINT extends ExecutableStep {
                 String type = "--" + seqType.get();
                 // basic hint call for given sequencing type
                 ArrayList<String> command_args = new ArrayList<>(List.of(exec, mode, type));
+                if (seqType.get().equals("dnase-seq")) {
+                    // set genome
+                    command_args.add("--bias-correction");
+                }
                 // paired or not
                 if (paired.get()) {
                     command_args.add("--paired-end");
@@ -99,7 +104,7 @@ public class HINT extends ExecutableStep {
                 // output location
                 command_args.add("--output-location" + "=" + out.getParentFile().getAbsolutePath());
                 // output prefix -> final name will be: ${prefix}.bed
-                command_args.add("--output-prefix" + "=" + trimFile(out.getName()));
+                command_args.add("--output-prefix" + "=" + trimFile.apply(out));
                 // add bam file
                 command_args.add(bam.getAbsolutePath());
                 // add peaks file
