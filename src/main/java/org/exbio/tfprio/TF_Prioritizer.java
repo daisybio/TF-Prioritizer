@@ -52,9 +52,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
         }
 
         CheckChromosomes checkChromosomes = add(new CheckChromosomes(latestPeakFiles));
+        latestPeakFiles = checkChromosomes.outputFiles;
 
         if (Configs.mixOptions.perform.get()) {
-            MixSamples mixSamples = add(new MixSamples(checkChromosomes.outputFiles));
+            MixSamples mixSamples = add(new MixSamples(latestPeakFiles));
             latestPeakFiles = mixSamples.outputFiles;
         }
 

@@ -21,6 +21,15 @@ public class Region implements Comparable<Region> {
      */
     protected int end;
 
+    public Region(String line) {
+        this(line.split("\t"));
+    }
+
+
+    public Region(String[] split) {
+        this(split[0], Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+    }
+
     /**
      * Creates a new Region based on the given input data
      *

@@ -55,10 +55,9 @@ public class HINT extends ExecutableStep {
                 sampleFiles.forEach(bedFile -> {
                     String sampleName = trimFile(bedFile.getName());
 
-                    OutputFile bamFile = new OutputFile(
-                            extend(bamDirectory.get(), group, hm, sampleName + ".bam").getAbsolutePath());
-                    OutputFile bamIndex = new OutputFile(
-                            extend(bamDirectory.get(), group, hm, sampleName + ".bam.bai").getAbsolutePath());
+                    OutputFile bamFile =
+                            new OutputFile(extend(bamDirectory.get(), group, sampleName + ".bam").getAbsolutePath());
+                    OutputFile bamIndex = new OutputFile(bamFile.getAbsolutePath() + ".bai");
 
                     InputFile inputBed = addInput(d_hmIn, bedFile);
                     InputFile inputBam = addInput(d_hmIn, bamFile);

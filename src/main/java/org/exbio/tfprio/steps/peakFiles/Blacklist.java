@@ -5,8 +5,7 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.lib.BedRegion;
-import org.exbio.tfprio.lib.BroadPeakRegion;
+import org.exbio.tfprio.lib.Region;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,12 +23,15 @@ import static org.exbio.pipejar.util.FileManagement.readLines;
 public class Blacklist extends ExecutableStep {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
-    private final RequiredConfig<File> blacklist = new RequiredConfig<>(Configs.mixOptions.blackListPath);
+    private final RequiredConfig<File> blacklistConfig = new RequiredConfig<>(Configs.mixOptions.blackListPath);
+    private final InputFile blacklist;
 
     public Blacklist(Map<String, Map<String, Collection<OutputFile>>> dependencies) {
         super(false, dependencies.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
+        blacklist = addInput(blacklistConfig);
+
         dependencies.forEach((group, hmMap) -> {
             outputFiles.put(group, new HashMap<>());
             OutputFile d_groupOut = addOutput(group);
@@ -51,28 +53,29 @@ public class Blacklist extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             try {
-                // Load all blacklisted regions
-                Collection<BedRegion> blacklistRegions =
-                        readLines(blacklist.get()).stream().map(BedRegion::new).toList();
+                logger.trace("Reading blacklist file");
+                Collection<Region> blacklistRegions = readLines(blacklist).stream().map(Region::new).toList();
+                logger.trace("Found " + blacklistRegions.size() + " blacklisted regions");
 
                 bridge.forEach((inputFile, outputFile) -> add(() -> {
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
                         // Read all regions from the input file
-                        readLines(inputFile).stream().map(BroadPeakRegion::new)
-                                            // Filter out all blacklisted regions
-                                            .filter(broadPeakRegion -> blacklistRegions.stream().noneMatch(
-                                                    broadPeakRegion::overlaps))
-                                            // Get string representations of remaining regions
-                                            .map(BroadPeakRegion::toString)
-                                            // Write them to the output file
-                                            .forEach(line -> {
-                                                try {
-                                                    writer.write(line);
-                                                    writer.newLine();
-                                                } catch (IOException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                            });
+                        long count = readLines(inputFile).stream().map(Region::new)
+                                                         // Filter out all blacklisted regions
+                                                         .filter(region -> blacklistRegions.stream().noneMatch(
+                                                                 region::overlaps))
+                                                         // Get string representations of remaining regions
+                                                         .map(Region::toString)
+                                                         // Write them to the output file
+                                                         .peek(line -> {
+                                                             try {
+                                                                 writer.write(line);
+                                                                 writer.newLine();
+                                                             } catch (IOException e) {
+                                                                 throw new RuntimeException(e);
+                                                             }
+                                                         }).count();
+                        logger.trace("Wrote " + count + " regions to " + outputFile);
                     }
                     return true;
                 }));
