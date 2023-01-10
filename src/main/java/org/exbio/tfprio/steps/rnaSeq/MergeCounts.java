@@ -47,20 +47,19 @@ public class MergeCounts extends ExecutableStep {
 
                 bridge.forEach((outputFile, inputFiles) -> add(() -> {
                     // Read counts from all input files
-                    TreeMap<String, List<Integer>> counts =
-                            inputFiles.stream().filter(file -> !file.getName().equals("ENCSR000BZV_1.tsv")).collect(
-                                    TreeMap::new, (map, file) -> {
-                                        try {
-                                            List<String> content = readLines(file);
-                                            String fileName = file.getName();
-                                            String colName = fileName.substring(0, fileName.lastIndexOf('.'));
-                                            colName = colName.replace("-", "_");
-                                            map.put(colName, content.stream().map(Double::parseDouble).map(
-                                                    d -> (int) Math.round(d)).collect(Collectors.toList()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }, TreeMap::putAll);
+                    TreeMap<String, List<Integer>> counts = inputFiles.stream().collect(TreeMap::new, (map, file) -> {
+                        try {
+                            List<String> content = readLines(file);
+                            String fileName = file.getName();
+                            String colName = fileName.substring(0, fileName.lastIndexOf('.'));
+                            colName = colName.replace("-", "_");
+                            map.put(colName,
+                                    content.stream().map(Double::parseDouble).map(d -> (int) Math.round(d)).collect(
+                                            Collectors.toList()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }, TreeMap::putAll);
 
                     // Check if sizes match
                     if (!counts.values().stream().allMatch(l -> l.size() == geneIDs.size())) {
