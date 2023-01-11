@@ -121,4 +121,9 @@ public class Region implements Comparable<Region> {
         this.start = Math.min(getStart(), other.getStart());
         this.end = Math.max(getEnd(), other.getEnd());
     }
+
+    @Override
+    public String toString() {
+        return getChromosome() + "\t" + getStart() + "\t" + getEnd();
+    }
 }
