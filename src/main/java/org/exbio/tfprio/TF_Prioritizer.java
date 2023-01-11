@@ -114,7 +114,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
                     add(new TGenePostprocessing(meanCounts.outputFiles, tGene.outputFiles));
             tgeneFiles = tGenePostprocessing.outputFiles;
         }
-        TEPIC tepic = add(new TEPIC(latestPeakFiles));
+        PreprocessReferenceGenome preprocessReferenceGenome = add(new PreprocessReferenceGenome());
+        TEPIC tepic = add(new TEPIC(latestPeakFiles, preprocessReferenceGenome.outputFile));
         Map<String, Map<String, Collection<OutputFile>>> tepicFiles = tepic.outputFiles;
 
         if (Configs.tepic.randomize.isSet() && Configs.tepic.randomize.get()) {

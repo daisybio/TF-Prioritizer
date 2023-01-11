@@ -25,7 +25,6 @@ public class TEPIC extends ExecutableStep {
     private final Map<String, Map<String, Collection<InputFile>>> chipSeqFiles = new HashMap<>();
     private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(Configs.tepic.sequenceFileName);
 
-    private final RequiredConfig<File> f_referenceGenome = new RequiredConfig<>(Configs.tepic.inputReferenceGenome);
     private final RequiredConfig<File> f_pwms = new RequiredConfig<>(Configs.tepic.PWMs);
     private final OptionalConfig<File> bedChromatinSignal =
             new OptionalConfig<>(Configs.tepic.bedChromatinSignal, false);
@@ -53,15 +52,17 @@ public class TEPIC extends ExecutableStep {
     private final OptionalConfig<Integer> loopWindows = new OptionalConfig<>(Configs.tepic.loopWindows, false);
     private final OptionalConfig<Boolean> onlyPeakFeatures =
             new OptionalConfig<>(Configs.tepic.onlyPeakFeatures, false);
+    private final InputFile referenceGenome;
 
     private final File executable;
 
-    public TEPIC(Map<String, Map<String, Collection<OutputFile>>> latestChipSeq) {
+    public TEPIC(Map<String, Map<String, Collection<OutputFile>>> latestChipSeq, OutputFile referenceGenome) {
         super(false,
                 latestChipSeq.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
-                        Collectors.toSet()));
+                        Collectors.toSet()), referenceGenome);
 
         InputFile tepicDirectory = new InputFile(inputDirectory, "TEPIC");
+        this.referenceGenome = addInput(referenceGenome);
 
         String path = "/org/exbio/tfprio/steps/TEPIC/Code";
         URL resource = getClass().getResource(path);
@@ -119,10 +120,10 @@ public class TEPIC extends ExecutableStep {
                         put('b', sample.getAbsolutePath());
                         put('o', bridge.get(sample).getAbsolutePath() + "/");
                         put('S', new File(bridge.get(sample), sequenceFileName.get()).getAbsolutePath());
+                        put('g', referenceGenome.getAbsolutePath());
                     }};
 
                     Map<Character, UsageConfig<?>> otherConfigs = new HashMap<>() {{
-                        put('g', f_referenceGenome);
                         put('p', f_pwms);
                         put('d', bedChromatinSignal);
                         put('n', columnBedfile);
