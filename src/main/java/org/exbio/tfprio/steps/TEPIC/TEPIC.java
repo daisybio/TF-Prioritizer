@@ -114,13 +114,20 @@ public class TEPIC extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         String order = "gbopScdnawfmervkiqhs";
         return new HashSet<>() {{
+            File linkedReferenceGenome = new File(outputDirectory, referenceGenome.getName());
+            try {
+                softLink(linkedReferenceGenome, referenceGenome);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
             chipSeqFiles.forEach((group, hmMap) -> hmMap.forEach((hm, samples) -> {
                 samples.forEach(sample -> add(() -> {
                     Map<Character, String> stringConfigs = new HashMap<>() {{
                         put('b', sample.getAbsolutePath());
                         put('o', bridge.get(sample).getAbsolutePath() + "/");
                         put('S', new File(bridge.get(sample), sequenceFileName.get()).getAbsolutePath());
-                        put('g', referenceGenome.getAbsolutePath());
+                        put('g', linkedReferenceGenome.getAbsolutePath());
                     }};
 
                     Map<Character, UsageConfig<?>> otherConfigs = new HashMap<>() {{
