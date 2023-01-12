@@ -30,7 +30,7 @@ public class TEPIC extends ExecutableStep {
             new OptionalConfig<>(Configs.tepic.bedChromatinSignal, false);
     private final OptionalConfig<Integer> columnBedfile = new OptionalConfig<>(Configs.tepic.columnBedfile, false);
     private final OptionalConfig<File> geneAnnotationFile =
-            new OptionalConfig<>(Configs.tepic.geneAnnotationFile, false);
+            new OptionalConfig<>(Configs.inputConfigs.geneAnnotationFile, false);
     private final OptionalConfig<Integer> windowSize = new OptionalConfig<>(Configs.tepic.windowSize, false);
     private final OptionalConfig<File> onlyDNasePeaks = new OptionalConfig<>(Configs.tepic.onlyDNasePeaks, false);
     private final OptionalConfig<Boolean> exponentialDecay =
@@ -99,8 +99,8 @@ public class TEPIC extends ExecutableStep {
                 outputFiles.get(group).put(hm, new HashSet<>());
                 OutputFile dHmIn = new OutputFile(dGroupIn, hm);
                 samples.forEach(sample -> {
-                    OutputFile sampleDir =
-                            addOutput(dHmOut, sample.getName().substring(0, sample.getName().lastIndexOf('.')));
+                    OutputFile sampleDir = addOutput(dHmOut,
+                            sample.getName().substring(0, sample.getName().lastIndexOf('.')).replace(".", "_"));
                     outputFiles.get(group).get(hm).add(sampleDir);
                     InputFile inputFile = addInput(dHmIn, sample);
                     bridge.put(inputFile, sampleDir);

@@ -12,7 +12,6 @@ public class TEPIC extends ConfigModule {
     public final ExternalConfig<File> PWMs = new ExternalConfig<>(File.class);
     public final ExternalConfig<File> bedChromatinSignal = new ExternalConfig<>(File.class);
     public final ExternalConfig<Integer> columnBedfile = new ExternalConfig<>(Integer.class);
-    public final ExternalConfig<File> geneAnnotationFile = new ExternalConfig<>(File.class);
     public final ExternalConfig<Integer> windowSize = new ExternalConfig<>(Integer.class);
     public final ExternalConfig<File> onlyDNasePeaks = new ExternalConfig<>(File.class);
     public final ExternalConfig<Boolean> exponentialDecay = new ExternalConfig<>(Boolean.class);
