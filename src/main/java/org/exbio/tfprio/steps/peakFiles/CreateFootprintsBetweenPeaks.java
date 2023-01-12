@@ -50,6 +50,12 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep {
         return new HashSet<>() {{
             bridge.forEach((inputFile, outputFile) -> add(() -> {
                 final List<BroadPeakRegion> regions = readLines(inputFile).stream().map(BroadPeakRegion::new).toList();
+
+                if (regions.isEmpty()) {
+                    logger.warn("No regions found in file " + inputFile);
+                    return true;
+                }
+
                 final List<BroadPeakRegion> processedRegions;
 
                 if (tfBindingSiteSearch.get().equals("BETWEEN")) {
@@ -79,7 +85,8 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep {
                     processedRegions = new ArrayList<>();
 
                     for (BroadPeakRegion region : regions.subList(1, regions.size())) {
-                        if (region.getStart() - previousRegion.getEnd() <= maxDistance.get()) {
+                        if ((region.getChromosome().equals(previousRegion.getChromosome())) &&
+                                (region.getStart() - previousRegion.getEnd() <= maxDistance.get())) {
                             processedRegions.add(BroadPeakRegion.between(previousRegion, region));
                         }
                         previousRegion = region;
@@ -93,7 +100,7 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep {
                             writer.write(region.toString());
                             writer.newLine();
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            throw new RuntimeException(e);
                         }
                     });
                 }
