@@ -4,14 +4,9 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.Callable;
-
-import static org.exbio.pipejar.util.FileManagement.softLink;
 
 public class ExtractSequences extends ExecutableStep {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
@@ -57,7 +52,24 @@ public class ExtractSequences extends ExecutableStep {
                     return false;
                 }
 
-                softLink(output, allFiles[0]);
+                File sequenceFile = allFiles[0];
+
+                try (var reader = new BufferedReader(new FileReader(sequenceFile));
+                     var writer = new BufferedWriter(new FileWriter(output))) {
+                    reader.lines().filter(line -> !line.startsWith("#")).map(line -> line.split("\t")).forEachOrdered(
+                            split -> {
+                                String tfWithVersion = split[0];
+                                String tf = tfWithVersion.replaceAll("\\(.*?\\)", "");
+
+                                try {
+                                    writer.write(
+                                            tf + "\t" + String.join("\t", Arrays.copyOfRange(split, 1, split.length)));
+                                    writer.newLine();
+                                } catch (IOException e) {
+                                    throw new UncheckedIOException(e);
+                                }
+                            });
+                }
                 return true;
             }));
         }};

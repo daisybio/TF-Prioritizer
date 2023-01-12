@@ -16,22 +16,21 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
     private final RequiredConfig<Double> affinityCutoff = new RequiredConfig<>(Configs.tepic.affinityCutoff);
-    private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(Configs.tepic.sequenceFileName);
 
-    private final Map<OutputFile, String> outputDirectoryGroup = new HashMap<>();
+    private final Map<OutputFile, String> outputFileGroup = new HashMap<>();
 
-    public CreateBindingRegionsBedFiles(Map<String, Map<String, Collection<OutputFile>>> tepicResults) {
+    public CreateBindingRegionsBedFiles(Map<String, Map<String, Collection<OutputFile>>> sequenceFiles) {
         super(false,
-                tepicResults.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
+                sequenceFiles.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
                         Collectors.toList()));
-        tepicResults.forEach((group, hmMap) -> {
+        sequenceFiles.forEach((group, hmMap) -> {
             outputFiles.put(group, new HashMap<>());
             OutputFile outputGroup = new OutputFile(outputDirectory, group);
             hmMap.forEach((hm, sampleDirectories) -> {
-                OutputFile outputDirectory = addOutput(outputGroup, hm);
-                outputFiles.get(group).put(hm, outputDirectory);
-                outputDirectoryGroup.put(outputDirectory, group);
-                bridge.put(outputDirectory, sampleDirectories.stream().map(this::addInput).collect(Collectors.toSet()));
+                OutputFile output = addOutput(outputGroup, hm);
+                outputFiles.get(group).put(hm, output);
+                outputFileGroup.put(output, group);
+                bridge.put(output, sampleDirectories.stream().map(this::addInput).collect(Collectors.toSet()));
             });
         });
     }
@@ -52,56 +51,52 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            bridge.forEach((outputDirectory, inputDirectories) -> add(() -> {
-                Map<String, TreeSet<Region>> allRegions = inputDirectories.stream().map(
-                                                                                  inputDirectory -> new File(inputDirectory, sequenceFileName.get())).map(sequenceFile -> {
-                                                                              Map<String, TreeSet<Region>> sampleRegions = new HashMap<>();
+            bridge.forEach((outputDirectory, inputFiles) -> add(() -> {
+                Map<String, TreeSet<Region>> allRegions = inputFiles.stream().map(sequenceFile -> {
+                                                                        Map<String, TreeSet<Region>> sampleRegions = new HashMap<>();
 
-                                                                              // Read sequence file
-                                                                              try (BufferedReader reader = new BufferedReader(new FileReader(sequenceFile))) {
-                                                                                  for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                                                                                      if (line.startsWith("#") || line.startsWith("TF\t")) {
-                                                                                          continue;
-                                                                                      }
+                                                                        // Read sequence file
+                                                                        try (BufferedReader reader = new BufferedReader(new FileReader(sequenceFile))) {
+                                                                            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                                                                                if (line.startsWith("#") || line.startsWith("TF\t")) {
+                                                                                    continue;
+                                                                                }
 
-                                                                                      String[] split = line.split("\t");
+                                                                                String[] split = line.split("\t");
 
-                                                                                      // Regex to remove version numbers (e.g. ATF3(MA0605.1))
-                                                                                      String tf = split[0].replaceAll("\\(.*?\\)", "");
+                                                                                // Regex to remove version numbers (e.g. ATF3(MA0605.1))
+                                                                                String tf = split[0];
 
-                                                                                      double affinity = Double.parseDouble(split[1]);
-                                                                                      int start = Integer.parseInt(split[3]);
-                                                                                      int length = Integer.parseInt(split[4]);
+                                                                                double affinity = Double.parseDouble(split[1]);
+                                                                                int start = Integer.parseInt(split[3]);
+                                                                                int length = Integer.parseInt(split[4]);
 
-                                                                                      if (affinity < affinityCutoff.get()) {
-                                                                                          continue;
-                                                                                      }
+                                                                                if (affinity < affinityCutoff.get()) {
+                                                                                    continue;
+                                                                                }
 
-                                                                                      String area = split[6];
-                                                                                      String chromosome = area.substring(1, area.indexOf(':'));
-                                                                                      int areaStart = Integer.parseInt(area.substring(area.indexOf(':') + 1, area.indexOf('-')));
-                                                                                      int areaEnd = Integer.parseInt(area.substring(area.indexOf('-') + 1));
+                                                                                String area = split[6];
+                                                                                String chromosome = area.substring(1, area.indexOf(':'));
+                                                                                int areaStart = Integer.parseInt(area.substring(area.indexOf(':') + 1, area.indexOf('-')));
+                                                                                int areaEnd = Integer.parseInt(area.substring(area.indexOf('-') + 1));
 
-                                                                                      int predictedStart = areaStart + start;
-                                                                                      int predictedEnd = predictedStart + length;
+                                                                                int predictedStart = areaStart + start;
+                                                                                int predictedEnd = predictedStart + length;
 
-                                                                                      sampleRegions.computeIfAbsent(tf, x -> new TreeSet<>()).add(
-                                                                                              new Region(chromosome, predictedStart, predictedEnd));
-                                                                                  }
-                                                                              } catch (IOException e) {
-                                                                                  throw new RuntimeException(e);
-                                                                              }
-                                                                              return sampleRegions;
-                                                                          })
-                                                                          // Collect regions from all samples to single map
-                                                                          .reduce(new HashMap<>(), (a, b) -> {
-                                                                              b.forEach(
-                                                                                      (tf, regions) -> a.computeIfAbsent(
-                                                                                              tf,
-                                                                                              x -> new TreeSet<>()).addAll(
-                                                                                              regions));
-                                                                              return a;
-                                                                          });
+                                                                                sampleRegions.computeIfAbsent(tf, x -> new TreeSet<>()).add(
+                                                                                        new Region(chromosome, predictedStart, predictedEnd));
+                                                                            }
+                                                                        } catch (IOException e) {
+                                                                            throw new RuntimeException(e);
+                                                                        }
+                                                                        return sampleRegions;
+                                                                    })
+                                                                    // Collect regions from all samples to single map
+                                                                    .reduce(new HashMap<>(), (a, b) -> {
+                                                                        b.forEach((tf, regions) -> a.computeIfAbsent(tf,
+                                                                                x -> new TreeSet<>()).addAll(regions));
+                                                                        return a;
+                                                                    });
 
                 Map<String, Collection<Region>> filteredRegions = allRegions.entrySet().stream()
                                                                             // Merge overlapping regions
@@ -137,7 +132,7 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
                 filteredRegions.forEach((tf, regions) -> {
                     File outputFile = new File(outputDirectory, tf + ".bed");
 
-                    writeRegionsToFile(tf, outputDirectoryGroup.get(outputDirectory), regions, outputFile);
+                    writeRegionsToFile(tf, outputFileGroup.get(outputDirectory), regions, outputFile);
 
                     if (tf.contains("::")) {
                         String[] tfParts = tf.split("::");
@@ -156,7 +151,7 @@ public class CreateBindingRegionsBedFiles extends ExecutableStep {
                                     b.forEach(region -> addRegion(a, region));
                                     return a;
                                 });
-                        writeRegionsToFile(tf, outputDirectoryGroup.get(outputDirectory), merged,
+                        writeRegionsToFile(tf, outputFileGroup.get(outputDirectory), merged,
                                 new File(outputDirectory, tf + "_merged.bed"));
                     }
                 });

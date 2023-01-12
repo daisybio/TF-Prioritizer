@@ -1,15 +1,15 @@
 package org.exbio.tfprio.steps.TEPIC;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 
-import java.io.File;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
-
-import static org.exbio.pipejar.util.FileManagement.makeSureFileExists;
-import static org.exbio.pipejar.util.FileManagement.softLink;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ExtractAffinities extends ExecutableStep {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
@@ -37,11 +37,6 @@ public class ExtractAffinities extends ExecutableStep {
                 });
             });
         });
-    }
-
-    @Override
-    protected boolean doCreateFiles() {
-        return false;
     }
 
     @Override
@@ -73,9 +68,42 @@ public class ExtractAffinities extends ExecutableStep {
 
                         File affinityFile = matching.get(0);
 
-                        makeSureFileExists(output);
-                        softLink(output, affinityFile);
+                        try (var reader = new BufferedReader(new FileReader(affinityFile));
+                             var writer = new BufferedWriter(new FileWriter(output))) {
+                            String header = reader.readLine().replaceAll("\\(.*?\\)", "");
+                            String[] headerSplit = header.split("\t");
 
+                            String first = headerSplit[0];
+                            String[] tfs = Arrays.copyOfRange(headerSplit, 1, headerSplit.length);
+
+                            List<String> tfOrder = Arrays.stream(tfs).distinct().sorted().toList();
+
+                            writer.write(first + "\t" + String.join("\t", tfOrder));
+                            writer.newLine();
+
+                            reader.lines().map(line -> line.split("\t")).map(split -> {
+                                String gene = split[0];
+                                List<Double> affinities =
+                                        Arrays.stream(split).skip(1).map(Double::parseDouble).toList();
+
+                                Map<String, Double> tfAffinities = IntStream.range(0, affinities.size()).mapToObj(
+                                        i -> Pair.of(tfs[i], affinities.get(i))).collect(
+                                        Collectors.groupingBy(Pair::getKey,
+                                                Collectors.averagingDouble(Pair::getValue)));
+
+                                return Pair.of(gene, tfAffinities);
+                            }).map(pair -> pair.getKey() + "\t" +
+                                    tfOrder.stream().map(tf -> pair.getValue().getOrDefault(tf, 0.)).map(
+                                            Object::toString).collect(Collectors.joining("\t"))).forEach(line -> {
+                                try {
+                                    writer.write(line);
+                                    writer.newLine();
+                                } catch (IOException e) {
+                                    throw new UncheckedIOException(e);
+                                }
+                            });
+                        }
+                        
                         return true;
                     }
                     logger.warn("Could not find affinity file for {}", input);

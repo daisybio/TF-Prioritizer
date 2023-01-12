@@ -126,7 +126,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
         ExtractAffinities extractAffinities = add(new ExtractAffinities(tepicFiles));
         ExtractSequences extractSequences = add(new ExtractSequences(tepicFiles));
 
-        CreateBindingRegionsBedFiles createBindingRegionsBedFiles = add(new CreateBindingRegionsBedFiles(tepicFiles));
+        CreateBindingRegionsBedFiles createBindingRegionsBedFiles =
+                add(new CreateBindingRegionsBedFiles(extractSequences.outputFiles));
         CalculateMeanAffinities calculateMeanAffinities =
                 add(new CalculateMeanAffinities(extractAffinities.outputFiles));
         CalculateAffinityRatios calculateAffinityRatios =
