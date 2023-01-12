@@ -79,7 +79,7 @@ public class CalculateAffinityRatios extends ExecutableStep {
                                         if (affinity1 == 0) {
                                             return Pair.of(tf, 1.0);
                                         } else {
-                                            return Pair.of(tf, Double.POSITIVE_INFINITY);
+                                            return Pair.of(tf, Double.NaN);
                                         }
                                     }
 
