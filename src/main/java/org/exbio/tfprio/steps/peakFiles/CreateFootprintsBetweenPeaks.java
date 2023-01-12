@@ -5,7 +5,7 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.lib.BroadPeakRegion;
+import org.exbio.tfprio.lib.Region;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -49,25 +49,25 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             bridge.forEach((inputFile, outputFile) -> add(() -> {
-                final List<BroadPeakRegion> regions = readLines(inputFile).stream().map(BroadPeakRegion::new).toList();
+                final List<Region> regions = readLines(inputFile).stream().map(Region::new).toList();
 
                 if (regions.isEmpty()) {
                     logger.warn("No regions found in file " + inputFile);
                     return true;
                 }
 
-                final List<BroadPeakRegion> processedRegions;
+                final List<Region> processedRegions;
 
                 if (tfBindingSiteSearch.get().equals("BETWEEN")) {
-                    List<Set<BroadPeakRegion>> groupedRegions = new ArrayList<>();
+                    List<Set<Region>> groupedRegions = new ArrayList<>();
 
                     groupedRegions.add(new HashSet<>() {{
                         add(regions.get(0));
                     }});
 
-                    BroadPeakRegion previousRegion = regions.get(0);
+                    Region previousRegion = regions.get(0);
 
-                    for (BroadPeakRegion region : regions.subList(1, regions.size())) {
+                    for (Region region : regions.subList(1, regions.size())) {
                         if (region.getStart() - previousRegion.getEnd() <= maxDistance.get()) {
                             groupedRegions.get(groupedRegions.size() - 1).add(region);
                         } else {
@@ -77,17 +77,17 @@ public class CreateFootprintsBetweenPeaks extends ExecutableStep {
                         }
                         previousRegion = region;
                     }
-                    processedRegions = groupedRegions.stream().map(BroadPeakRegion::merge).toList();
+                    processedRegions = groupedRegions.stream().map(Region::mergeMulti).toList();
                 } else {
                     // EXCL_BETWEEN
-                    BroadPeakRegion previousRegion = regions.get(0);
+                    Region previousRegion = regions.get(0);
 
                     processedRegions = new ArrayList<>();
 
-                    for (BroadPeakRegion region : regions.subList(1, regions.size())) {
+                    for (Region region : regions.subList(1, regions.size())) {
                         if ((region.getChromosome().equals(previousRegion.getChromosome())) &&
                                 (region.getStart() - previousRegion.getEnd() <= maxDistance.get())) {
-                            processedRegions.add(BroadPeakRegion.between(previousRegion, region));
+                            processedRegions.add(Region.between(previousRegion, region));
                         }
                         previousRegion = region;
                     }

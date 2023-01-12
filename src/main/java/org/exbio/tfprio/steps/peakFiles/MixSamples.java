@@ -120,7 +120,7 @@ public class MixSamples extends ExecutableStep {
                                                                // Keep only groups with at least minCount regions
                                                                .filter(group -> group.size() >= minCount)
                                                                // Merge remaining into one region per overlapping group
-                                                               .map(Region::mergeSimple)
+                                                               .map(Region::mergeMulti)
                                                                // Get sorted list
                                                                .sorted().toList();
 

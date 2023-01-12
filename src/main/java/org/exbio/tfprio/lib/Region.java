@@ -47,7 +47,7 @@ public class Region implements Comparable<Region> {
         this.end = Math.max(start, end);
     }
 
-    public static Region mergeSimple(Collection<Region> overlapping) {
+    public static Region mergeMulti(Collection<Region> overlapping) {
         if (overlapping.isEmpty()) {
             throw new IllegalArgumentException("Cannot merge empty collection");
         }
@@ -55,6 +55,17 @@ public class Region implements Comparable<Region> {
         int start = overlapping.stream().map(Region::getStart).min(Integer::compareTo).get();
         int end = overlapping.stream().map(Region::getEnd).max(Integer::compareTo).get();
         return new Region(overlapping.iterator().next().getChromosome(), start, end);
+    }
+
+    public static Region between(Region a, Region b) {
+        if (!a.getChromosome().equals(b.getChromosome())) {
+            throw new IllegalArgumentException("Cannot merge regions on different chromosomes");
+        }
+
+        int start = a.getEnd();
+        int end = b.getStart();
+
+        return new Region(a.getChromosome(), start, end);
     }
 
     /**
