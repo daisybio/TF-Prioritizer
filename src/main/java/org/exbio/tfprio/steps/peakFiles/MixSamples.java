@@ -6,7 +6,6 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.lib.BroadPeakRegion;
 import org.exbio.tfprio.lib.Region;
 
 import java.io.BufferedWriter;
@@ -55,11 +54,10 @@ public class MixSamples extends ExecutableStep {
         return new HashSet<>() {{
             bridge.forEach((outputFile, inputFiles) -> add(() -> {
                 // Collect all regions from all input files
-                Map<InputFile, List<BroadPeakRegion>> sortedRegions = new HashMap<>();
+                Map<InputFile, List<Region>> sortedRegions = new HashMap<>();
                 inputFiles.forEach(inputFile -> {
                     try {
-                        sortedRegions.put(inputFile,
-                                readLines(inputFile).stream().map(BroadPeakRegion::new).sorted().toList());
+                        sortedRegions.put(inputFile, readLines(inputFile).stream().map(Region::new).sorted().toList());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -69,9 +67,9 @@ public class MixSamples extends ExecutableStep {
                     inputFiles.forEach(inputFile -> put(inputFile, 0));
                 }};
 
-                SortedMap<Region, Collection<BroadPeakRegion>> overlappingRegions = new TreeMap<>();
+                SortedMap<Region, Collection<Region>> overlappingRegions = new TreeMap<>();
 
-                Optional<BroadPeakRegion> optionalRegion;
+                Optional<Region> optionalRegion;
 
                 while (
                     // Find next region to process
@@ -92,7 +90,7 @@ public class MixSamples extends ExecutableStep {
                                                            return pair.right;
                                                        })).isPresent()) {
 
-                    BroadPeakRegion region = optionalRegion.get();
+                    Region region = optionalRegion.get();
 
                     // Only entered in first iteration
                     if (overlappingRegions.isEmpty()) {
@@ -118,17 +116,17 @@ public class MixSamples extends ExecutableStep {
                 final int minCount =
                         minOccurrence.isSet() ? Math.min(minOccurrence.get(), inputFiles.size()) : inputFiles.size();
 
-                List<BroadPeakRegion> mergedRegions = overlappingRegions.values().stream()
-                                                                        // Keep only groups with at least minCount regions
-                                                                        .filter(group -> group.size() >= minCount)
-                                                                        // Merge remaining into one region per overlapping group
-                                                                        .map(BroadPeakRegion::merge)
-                                                                        // Get sorted list
-                                                                        .sorted().toList();
+                List<Region> mergedRegions = overlappingRegions.values().stream()
+                                                               // Keep only groups with at least minCount regions
+                                                               .filter(group -> group.size() >= minCount)
+                                                               // Merge remaining into one region per overlapping group
+                                                               .map(Region::mergeSimple)
+                                                               // Get sorted list
+                                                               .sorted().toList();
 
                 // Write the output file
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
-                    for (BroadPeakRegion region : mergedRegions) {
+                    for (Region region : mergedRegions) {
                         writer.write(region.toString());
                         writer.newLine();
                     }

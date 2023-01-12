@@ -3,6 +3,8 @@ package org.exbio.tfprio.lib;
 
 import org.exbio.tfprio.util.ChromosomeComparator;
 
+import java.util.Collection;
+
 /**
  * Represents a certain region on a certain chromosome.
  */
@@ -43,6 +45,16 @@ public class Region implements Comparable<Region> {
         // Make sure start position is smaller than end position
         this.start = Math.min(start, end);
         this.end = Math.max(start, end);
+    }
+
+    public static Region mergeSimple(Collection<Region> overlapping) {
+        if (overlapping.isEmpty()) {
+            throw new IllegalArgumentException("Cannot merge empty collection");
+        }
+
+        int start = overlapping.stream().map(Region::getStart).min(Integer::compareTo).get();
+        int end = overlapping.stream().map(Region::getEnd).max(Integer::compareTo).get();
+        return new Region(overlapping.iterator().next().getChromosome(), start, end);
     }
 
     /**
