@@ -176,8 +176,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         CreateBackground createBackground = add(new CreateBackground(runDistributionAnalysis.outputFiles));
         CreatePlots createPlots =
                 add(new CreatePlots(runDistributionAnalysis.outputFiles, createBackground.outputFiles));
-        ExtractStats extractStats = add(new ExtractStats(createPlots.outputFiles));
-        ExtractStatRank extractStatRank = add(new ExtractStatRank(extractStats.outputFiles));
+        ExtractStatRank extractStatRank = add(new ExtractStatRank(createPlots.statFiles));
         CalculateDcgRank calculateDcgRank = add(new CalculateDcgRank(extractStatRank.outputFiles));
 
         org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes daTopKTargetGenes =
