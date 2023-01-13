@@ -1,5 +1,6 @@
 package org.exbio.tfprio.steps.rnaSeq;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
@@ -47,48 +48,53 @@ public class MergeCounts extends ExecutableStep {
 
                 bridge.forEach((outputFile, inputFiles) -> add(() -> {
                     // Read counts from all input files
-                    TreeMap<String, List<Integer>> counts = inputFiles.stream().collect(TreeMap::new, (map, file) -> {
-                        try {
-                            List<String> content = readLines(file);
-                            String fileName = file.getName();
-                            String colName = fileName.substring(0, fileName.lastIndexOf('.'));
-                            colName = colName.replace("-", "_");
-                            map.put(colName,
-                                    content.stream().map(Double::parseDouble).map(d -> (int) Math.round(d)).collect(
-                                            Collectors.toList()));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }, TreeMap::putAll);
+                    TreeMap<String, List<Integer>> fileCounts =
+                            inputFiles.stream().collect(TreeMap::new, (map, file) -> {
+                                try {
+                                    List<String> content = readLines(file);
+                                    String fileName = file.getName();
+                                    String colName = fileName.substring(0, fileName.lastIndexOf('.'));
+                                    colName = colName.replace("-", "_");
+                                    map.put(colName, content.stream().map(Double::parseDouble).map(
+                                            d -> (int) Math.round(d)).collect(Collectors.toList()));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }, TreeMap::putAll);
 
                     // Check if sizes match
-                    if (!counts.values().stream().allMatch(l -> l.size() == geneIDs.size())) {
-                        throw new RuntimeException("The number of gene IDS is " + geneIDs.size() +
+                    if (!fileCounts.values().stream().allMatch(l -> l.size() == geneIDs.size())) {
+                        throw new RuntimeException("The number of gene IDs is " + geneIDs.size() +
                                 ". The sizes of the following files differ: " +
-                                counts.entrySet().stream().filter(e -> e.getValue().size() != geneIDs.size()).map(
+                                fileCounts.entrySet().stream().filter(e -> e.getValue().size() != geneIDs.size()).map(
                                         Map.Entry::getKey).collect(Collectors.joining(", ")));
                     }
+
+                    Map<String, List<Integer>> geneIdCounts = IntStream.range(0, geneIDs.size()).mapToObj(i -> {
+                        String geneID = geneIDs.get(i);
+                        return Pair.of(geneID, fileCounts.navigableKeySet().stream().map(
+                                colName -> fileCounts.get(colName).get(i)).collect(Collectors.toList()));
+                    }).collect(Collectors.toMap(Pair::getKey, Pair::getValue,
+                            (old, next) -> IntStream.range(0, old.size()).mapToObj(
+                                    i -> old.get(i) + next.get(i)).collect(Collectors.toList())));
 
                     // Write output file
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
                         // Write header
-                        writer.write("gene_id\t" + String.join("\t", counts.navigableKeySet()));
+                        writer.write("gene_id\t" + String.join("\t", fileCounts.navigableKeySet()));
                         writer.newLine();
                         // For all the genes
-                        IntStream.range(0, geneIDs.size()).filter(i -> !geneIDs.get(i).equals("-"))
-                                 // Map gene index to an output line
-                                 .mapToObj(i -> {
-                                     List<Integer> countsAtI = counts.values().stream().map(l -> l.get(i)).toList();
-                                     return geneIDs.get(i) + "\t" +
-                                             String.join("\t", countsAtI.stream().map(Object::toString).toList());
-                                 }).sorted().forEachOrdered(line -> {
-                                     try {
-                                         writer.write(line);
-                                         writer.newLine();
-                                     } catch (IOException e) {
-                                         throw new RuntimeException(e);
-                                     }
-                                 });
+                        geneIdCounts.entrySet().stream().filter(geneIdEntry -> !geneIdEntry.getKey().equals("-"))
+                                    // Map gene index to an output line
+                                    .map(i -> i.getKey() + "\t" + String.join("\t", i.getValue().stream().map(
+                                            Object::toString).toList())).sorted().forEachOrdered(line -> {
+                                        try {
+                                            writer.write(line);
+                                            writer.newLine();
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    });
                     }
                     return true;
                 }));
