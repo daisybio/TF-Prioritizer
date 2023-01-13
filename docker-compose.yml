@@ -1,6 +1,9 @@
-version: '3.6'
+version: '3.8'
 
 services:
   tfprio:
     build: .
     image: tfprio
+    volumes:
+      - ./configTemplates/template.json:/srv/input/configs.json
+    command: java -jar /srv/TF-Prioritizer.jar -t 5 -o /srv/wd -c /srv/input/configs.json

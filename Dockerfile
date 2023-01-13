@@ -9,7 +9,7 @@ RUN for i in \
     /srv/dependencies \
     /srv/environment \
     /srv/wd \
-    ; do mkdir -p $i && chown -R docker:docker $i; done;
+    ; do mkdir -p $i && chmod -R 777 $i; done;
 
 COPY environment /srv/environment
 RUN chmod u+x /srv/environment/setup.sh && ./srv/environment/setup.sh
@@ -17,3 +17,4 @@ RUN chmod u+x /srv/environment/setup.sh && ./srv/environment/setup.sh
 COPY bin/TF-Prioritizer.jar /srv/TF-Prioritizer.jar
 
 USER docker
+

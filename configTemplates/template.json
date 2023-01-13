@@ -44,7 +44,6 @@
     "windowSize": 50000,
     "loopListFile": null,
     "loopWindows": 5000,
-    "geneAnnotationFile": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
     "exponentialDecay": true,
     "doNotNormalizePeakLength": false,
     "maxMinutesPerChromosome": 3,
