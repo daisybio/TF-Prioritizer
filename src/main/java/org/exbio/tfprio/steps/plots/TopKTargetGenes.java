@@ -113,7 +113,13 @@ public class TopKTargetGenes extends ExecutableStep {
                 Map<String, Collection<String>> groupTfs;
 
                 try (var reader = new BufferedReader(new FileReader(inputCoefficients))) {
-                    List<String> pairings = Arrays.stream(reader.readLine().split("\t")).skip(1).toList();
+                    String header = reader.readLine();
+
+                    if (header == null) {
+                        return true;
+                    }
+
+                    List<String> pairings = Arrays.stream(header.split("\t")).skip(1).toList();
 
                     Map<String, Collection<String>> tfPairings = reader.lines().map(line -> line.split("\t")).map(
                             split -> Pair.of(split[0], List.of(split).subList(1, split.length))).map(
