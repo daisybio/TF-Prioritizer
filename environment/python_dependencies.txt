@@ -1,0 +1,7 @@
+pandas
+seaborn
+matplotlib
+pyliftover
+logomaker
+intervaltree
+scipy
