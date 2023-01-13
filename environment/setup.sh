@@ -12,7 +12,8 @@ apt-get install -y \
   cmake \
   bedtools \
   unzip \
-  xvfb
+  xvfb \
+  libcurl4-openssl-dev libxml2-dev r-cran-httr
 
 Rscript "$DIRECTORY"/setup.R
 python3 -m pip install -r "$DIRECTORY"/python_dependencies.txt
