@@ -91,10 +91,6 @@ public class HINT extends ExecutableStep {
                 String type = "--" + seqType.get();
                 // basic hint call for given sequencing type
                 ArrayList<String> command_args = new ArrayList<>(List.of(exec, mode, type));
-                if (seqType.get().equals("dnase-seq")) {
-                    // set genome
-                    command_args.add("--bias-correction");
-                }
                 // paired or not
                 if (paired.get()) {
                     command_args.add("--paired-end");
