@@ -26,12 +26,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
+
 public class TF_Prioritizer extends Workflow<Configs> {
     public TF_Prioritizer(String[] args) throws IOException, ParseException {
         super(args);
     }
 
     public static void main(String[] args) throws Exception {
+        executeAndWait("id -u", true);
+
         new TF_Prioritizer(args);
     }
 

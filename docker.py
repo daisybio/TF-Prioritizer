@@ -30,6 +30,8 @@ config_path = os.path.abspath(args.c)
 threads = args.t
 output = os.path.abspath(args.o)
 
+os.makedirs(output, exist_ok=True)
+
 with open(config_path, 'r') as f:
     configs = json.load(f)
 
@@ -40,14 +42,13 @@ docker_config_file = os.path.join(os.path.dirname(output), 'docker_config.json')
 with open(docker_config_file, 'w') as f:
     json.dump(configs, f)
 
-mounts["/srv/wd"] = output
-
-volume_string = ' '.join([f'-v {v}:{k}' for k, v in mounts.items()])
+volume_string = ' '.join([f'-v {v}:{k}:ro' for k, v in mounts.items()])
 
 internal_command = f"java -jar /srv/TF-Prioritizer.jar -t {threads} -o /srv/wd -c /srv/input/configs.json"
 
 external_command = f"docker run --user='{os.getuid()}':'{os.getgid()}'" \
-                   f" -v '{docker_config_file}:/srv/input/configs.json' {volume_string} tfprio {internal_command}"
+                   f" -v '{docker_config_file}:/srv/input/configs.json:ro' {volume_string} -v '{output}:/srv/wd:rw,Z' " \
+                   f"tfprio {internal_command}"
 
 os.system("docker build . -t tfprio")
 os.system(external_command)
