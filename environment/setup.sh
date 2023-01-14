@@ -4,7 +4,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 DIRECTORY=$(dirname "$0")
 
-apt-get install -y \
+apt-get update && apt-get install -y \
   openjdk-17-jre-headless \
   r-base \
   python3 \
