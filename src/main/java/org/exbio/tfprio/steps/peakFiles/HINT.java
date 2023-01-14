@@ -8,6 +8,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -82,6 +83,13 @@ public class HINT extends ExecutableStep {
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
+        String rgtDataDirectory = System.getenv("RGTDATA");
+        String fetchGenomeCommand = "python3 " + rgtDataDirectory + "/setupGenomicData.py --" + genome.get();
+        try {
+            executeAndWait(fetchGenomeCommand, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return new HashSet<>() {{
             bridge.forEach((out, inputs) -> add(() -> {
                 InputFile bed = inputs.getLeft();

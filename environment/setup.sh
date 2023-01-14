@@ -13,7 +13,11 @@ apt-get update && apt-get install -y \
   bedtools \
   unzip \
   xvfb \
+  wget \
   libcurl4-openssl-dev libxml2-dev r-cran-httr
 
-Rscript "$DIRECTORY"/setup.R
+mkdir -p "$RGTDATA"
 python3 -m pip install -r "$DIRECTORY"/python_dependencies.txt
+chmod -R 777 "$RGTDATA"
+
+Rscript "$DIRECTORY"/setup.R
