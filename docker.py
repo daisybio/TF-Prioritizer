@@ -10,6 +10,8 @@ parser.add_argument('-o', type=str)
 
 args = parser.parse_args()
 
+PACKAGE_URL = "ghcr.io/biomedbigdata/tfprio"
+
 
 def process_configs(configs: dict) -> dict:
     mounts = {}
@@ -48,6 +50,7 @@ internal_command = f"java -jar /srv/TF-Prioritizer.jar -t {threads} -o /srv/wd -
 
 external_command = f"docker run --user='{os.getuid()}':'{os.getgid()}'" \
                    f" -v '{docker_config_file}:/srv/input/configs.json:ro' {volume_string} -v '{output}:/srv/wd:rw,Z' " \
-                   f"ghcr.io/biomedbigdata/tfprio {internal_command}"
+                   f"{PACKAGE_URL} {internal_command}"
 
+os.system("docker image pull " + PACKAGE_URL)
 os.system(external_command)
