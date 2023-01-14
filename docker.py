@@ -48,7 +48,6 @@ internal_command = f"java -jar /srv/TF-Prioritizer.jar -t {threads} -o /srv/wd -
 
 external_command = f"docker run --user='{os.getuid()}':'{os.getgid()}'" \
                    f" -v '{docker_config_file}:/srv/input/configs.json:ro' {volume_string} -v '{output}:/srv/wd:rw,Z' " \
-                   f"tfprio {internal_command}"
+                   f"ghcr.io/biomedbigdata/tfprio {internal_command}"
 
-os.system("docker build . -t tfprio")
 os.system(external_command)
