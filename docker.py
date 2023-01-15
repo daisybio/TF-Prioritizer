@@ -42,7 +42,7 @@ mounts = process_configs(configs)
 docker_config_file = os.path.join(os.path.dirname(output), 'docker_config.json')
 
 with open(docker_config_file, 'w') as f:
-    json.dump(configs, f)
+    json.dump(configs, f, indent=4)
 
 volume_string = ' '.join([f'-v {v}:{k}:ro' for k, v in mounts.items()])
 

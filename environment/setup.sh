@@ -31,3 +31,10 @@ chmod -R 777 "$RGTDATA"
 
 # Install R packages
 Rscript "$DIRECTORY"/setup.R
+
+# Install IGV
+mkdir -p "$IGV"
+wget https://data.broadinstitute.org/igv/projects/downloads/2.13/IGV_2.13.0.zip -O "$IGV"/IGV.zip
+unzip "$IGV"/IGV.zip -d "$IGV"
+mv "$IGV"/IGV_2.13.0/* "$IGV"
+rm -rf "$IGV"/IGV_2.13.0 "$IGV"/IGV.zip

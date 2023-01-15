@@ -40,10 +40,10 @@ public class DistributionTargetGenes extends ExecutableStep {
     private final Map<String, Map<String, InputFile>> groupHmPredictedBindingSitesDirectories = new HashMap<>();
     private final Map<String, Set<InputFile>> groupExperimentalFiles = new HashMap<>();
     private final Map<String, Map<String, InputFile>> groupHmSignalFile = new HashMap<>();
+    private final RequiredConfig<File> igvExecutable = new RequiredConfig<>(Configs.igv.igvExecutable);
     private final InputFile chipAtlas;
     private final InputFile ensgSymbolFile;
     private final RequiredConfig<String> genome = new RequiredConfig<>(Configs.igv.genome);
-    private final RequiredConfig<File> igvExecutable = new RequiredConfig<>(Configs.igv.igvExecutable);
     private final Map<String, Map<String, InputFile>> groupHmTfTargetGenes = new HashMap<>();
     private final Map<Pair<String, String>, Collection<String>> groupPairingHms;
 
