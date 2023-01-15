@@ -39,8 +39,8 @@ public class EnsgSymbol extends ExecutableStep {
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
                     result.forEach(line -> {
                         try {
-                            writer.write(
-                                    Arrays.stream(line).map(String::toUpperCase).collect(Collectors.joining("\t")));
+                            writer.write(Arrays.stream(line).skip(1).map(String::toUpperCase).collect(
+                                    Collectors.joining("\t")));
                             writer.newLine();
                         } catch (IOException e) {
                             e.printStackTrace();

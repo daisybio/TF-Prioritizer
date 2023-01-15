@@ -17,14 +17,16 @@ public class CreateHeatmaps extends ExecutableStep {
     private final InputFile script;
     private final Map<OutputFile, Pair<InputFile, Pair<InputFile, InputFile>>> bridge = new HashMap<>();
     private final InputFile batchFile;
+    private final InputFile ensgSymbol;
 
     public CreateHeatmaps(Map<String, OutputFile> normalizedCounts, Map<String, Map<String, OutputFile>> targetGenes,
-                          OutputFile batchFile) {
+                          OutputFile batchFile, OutputFile ensgSymbol) {
         super(false, normalizedCounts.values(),
                 targetGenes.values().stream().flatMap(map -> map.values().stream()).toList(), List.of(batchFile));
 
         script = addInput(getClass().getResourceAsStream("heatmaps.R"), "heatmaps.R");
         this.batchFile = addInput(batchFile);
+        this.ensgSymbol = addInput(ensgSymbol);
 
         Collection<String> hms =
                 targetGenes.values().stream().map(Map::keySet).flatMap(Collection::stream).collect(Collectors.toSet());
@@ -89,9 +91,9 @@ public class CreateHeatmaps extends ExecutableStep {
                     String command =
                             "Rscript " + script + " --counts " + counts + " --tg1 " + targetGenes1 + " --tg2 " +
                                     targetGenes2 + " --heatmap " + output + " --outCounts " + outCounts + " --groups " +
-                                    batchFile;
+                                    batchFile + " --ensgSymbol " + ensgSymbol;
 
-                    executeAndWait(command, true);
+                    executeAndWait(command, false);
 
                     return true;
                 }));

@@ -182,7 +182,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
                 add(new org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes(calculateDcgRank.outputFile,
                         calculateMeanAffinities.outputFiles));
         CreateHeatmaps createHeatmaps = add(new CreateHeatmaps(deSeq2.normalizedCounts, daTopKTargetGenes.outputFiles,
-                createBatchFile.outputFile));
+                createBatchFile.outputFile, ensgSymbol.outputFile));
         BiophysicalModel biophysicalModel = add(new BiophysicalModel(calculateDcgRank.outputFile));
         BiophysicalLogo biophysicalLogo = add(new BiophysicalLogo(biophysicalModel.outputFile));
 
