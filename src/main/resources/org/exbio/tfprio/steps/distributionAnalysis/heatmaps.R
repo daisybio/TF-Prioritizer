@@ -6,36 +6,27 @@ library(dplyr)
 library(argparse)
 
 parser <- ArgumentParser()
-parser$add_argument("--affinity_file1", required = TRUE)
-parser$add_argument("--affinity_file2", required = TRUE)
-parser$add_argument("--expression_file", required = TRUE)
-parser$add_argument("--heatmap_file", required = TRUE)
-parser$add_argument("--metadata", required = TRUE)
+parser$add_argument("--counts", required = TRUE)
+parser$add_argument("--tg1", required = TRUE)
+parser$add_argument("--tg2", required = TRUE)
+parser$add_argument("--heatmap", required = TRUE)
+parser$add_argument("--outCounts", required = TRUE)
+parser$add_argument("--groups", required = TRUE)
 args <- parser$parse_args()
 
-tf <- tools::file_path_sans_ext(basename(args$target_genes_file))
-pairing <- tools::file_path_sans_ext(group_pairing)
+counts <- read.csv(args$counts, sep = "\t", header = TRUE, row.names = 1)
+tg1 <- read.csv(args$tg1, sep = "\t", header = TRUE, row.names = 1)
+tg2 <- read.csv(args$tg2, sep = "\t", header = TRUE, row.names = 1)
+groups <- read.csv(args$groups, sep = "\t", header = TRUE, row.names = 1)
 
-metaData <- read.csv(args$metadata, sep = "\t")
+# Concatenate row names of tg1 and tg2
+genes <- c(rownames(tg1), rownames(tg2))
+genes <- intersect(genes, rownames(counts))
+counts <- counts[genes,]
 
-target_genes1 <- read.csv(args$affinity_file1, sep = "\t")
-target_genes2 <- read.csv(args$affinity_file2, sep = "\t")
-target_genes <- rbind(target_genes1, target_genes2)
+groups <- groups[, "group", drop = FALSE]
 
-expression <- read.csv(args$expression_file, sep = "\t")
-target_gene_expression <- expression[expression$gene_id %in% target_genes$gene_id, ]
-
-read_counts <- subset(chosen, select = -c(Geneid))
-metaData_groupPairing <- metaData[colnames(read_counts), ]
-metaData_groupPairing$sample_id <- NULL
-
-dds <- DESeqDataSetFromMatrix(countData = read_counts,
-                              colData = metaData_groupPairing,
-                              design = ~{ DESIGN })
-dds <- DESeq(dds, quiet = TRUE)
-
-geneCounts_normalized <- counts(dds)
-
-pheatmap(geneCounts_normalized, scale = "row", filename = plot_file, labels_row = chosen$geneSymbol, legend =
- TRUE, annotation_legend = TRUE, angle_col = 45, show_row_dend = FALSE, show_col_dend = FALSE, show_rownames
- = TRUE, show_colnames = FALSE, treeheight_row = 0, treeheight_col = 0, annotation_col = metaData_groupPairing)
+write.table(counts, file = args$outCounts, row.names = TRUE, col.names = TRUE, sep = "\t")
+pheatmap(counts, scale = "row", filename = args$heatmap, legend = TRUE, annotation_legend = TRUE,
+         annotation_col = groups, show_colnames = FALSE, show_col_dend = FALSE, show_row_dend = FALSE,
+         treeheight_row = 0, treeheight_col = 0)

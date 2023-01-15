@@ -10,7 +10,6 @@ import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipAtlas.GetData;
 import org.exbio.tfprio.steps.chipAtlas.GetList;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
-import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.*;
@@ -104,7 +103,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
         DeSeq2 deSeq2 = add(new DeSeq2(createPairings.outputFiles, createBatchFile.outputFile));
         DeSeqPostprocessing deSeqPostprocessing = add(new DeSeqPostprocessing(deSeq2.outputFiles));
 
-
         Map<String, Map<String, OutputFile>> tgeneFiles = new HashMap<>();
 
         if (Configs.tGene.executable.isSet()) {
@@ -183,7 +181,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
         org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes daTopKTargetGenes =
                 add(new org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes(calculateDcgRank.outputFile,
                         calculateMeanAffinities.outputFiles));
-        CreateHeatmaps createHeatmaps = add(new CreateHeatmaps());
+        CreateHeatmaps createHeatmaps = add(new CreateHeatmaps(deSeq2.normalizedCounts, daTopKTargetGenes.outputFiles,
+                createBatchFile.outputFile));
         BiophysicalModel biophysicalModel = add(new BiophysicalModel(calculateDcgRank.outputFile));
         BiophysicalLogo biophysicalLogo = add(new BiophysicalLogo(biophysicalModel.outputFile));
 
@@ -200,9 +199,9 @@ public class TF_Prioritizer extends Workflow<Configs> {
             chipAtlasDirectory = getData.outputFile;
         }
 
-        DistributionTargetGenes distributionTargetGenes =
-                add(new DistributionTargetGenes(ensgSymbol.outputFile, fetchGeneInfo.outputFile,
-                        calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
-                        createBindingRegionsBedFiles.outputFiles));
+        //DistributionTargetGenes distributionTargetGenes =
+        //        add(new DistributionTargetGenes(ensgSymbol.outputFile, fetchGeneInfo.outputFile,
+        //                calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
+        //                createBindingRegionsBedFiles.outputFiles));
     }
 }
