@@ -62,7 +62,7 @@ public class Uplift extends ExecutableStep {
 
                 executeAndWait("python3 " + script + " " +
                         String.join(" ", genePositions.getAbsolutePath(), outputFile.getAbsolutePath(), originalVersion,
-                                refGenomeVersion, "3", "4", "5", "6"), true);
+                                refGenomeVersion, "2", "3", "4"), true);
                 return true;
             });
         }};

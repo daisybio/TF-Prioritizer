@@ -43,8 +43,8 @@ converter = LiftOver(args.original_version, args.target_version, search_dir=None
                      use_web=True)
 
 for i, row in df.iterrows():
-    chr = row[col_chromosome]
-    chromosome = f"chr{chr}" if not chr.startswith("chr") else chr
+    chromosome = str(row[col_chromosome])
+    chromosome = f"chr{chromosome}" if not chromosome.startswith("chr") else chromosome
     start_position = row[col_start]
     end_position = row[col_end]
 
@@ -53,7 +53,7 @@ for i, row in df.iterrows():
     start_converted, end_converted = convert(converter,
                                              chromosome, start_position, end_position)
 
-    if (start_converted is None or end_converted is None):
+    if start_converted is None or end_converted is None:
         continue
 
     df.loc[i, col_start] = start_converted
