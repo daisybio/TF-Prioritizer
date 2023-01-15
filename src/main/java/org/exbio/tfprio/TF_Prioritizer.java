@@ -13,10 +13,7 @@ import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
-import org.exbio.tfprio.steps.plots.GroupStages;
-import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
-import org.exbio.tfprio.steps.plots.PlotGroupedStages;
-import org.exbio.tfprio.steps.plots.ThresholdPlots;
+import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
 
@@ -163,10 +160,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
         GroupStages groupStages = add(new GroupStages(filterRegressionCoefficients.outputFiles));
         PlotGroupedStages plotGroupedStages = add(new PlotGroupedStages(groupStages.outputFiles));
-        //  AnalyzeGroupLevel analyzeGroupLevel =
-        //        add(new AnalyzeGroupLevel(calculateTPM.outputFiles, meanCounts.outputFiles, groupStages.outputFiles,
-        //              ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
-        //AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(analyzeGroupLevel.outputFiles));
+        AnalyzeGroupLevel analyzeGroupLevel =
+                add(new AnalyzeGroupLevel(calculateTPM.outputFiles, meanCounts.outputFiles, groupStages.outputFiles,
+                        ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
+        AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(analyzeGroupLevel.outputFiles));
 
         org.exbio.tfprio.steps.plots.TopKTargetGenes topKTargetGenes =
                 add(new org.exbio.tfprio.steps.plots.TopKTargetGenes(groupStages.outputFiles,
@@ -193,7 +190,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
         Jaspar jaspar = add(new Jaspar(calculateDcgRank.outputFile));
         ExtractBindingSites extractBindingSites =
                 add(new ExtractBindingSites(calculateDcgRank.outputFile, extractSequences.outputFiles));
-        PredictedLogo predictedLogo = add(new PredictedLogo(extractBindingSites.outputFiles));
+        FilterBindingSites filterBindingSites = add(new FilterBindingSites(extractBindingSites.outputFiles));
+        PredictedLogo predictedLogo = add(new PredictedLogo(filterBindingSites.outputFiles));
 
         OutputFile chipAtlasDirectory = null;
         if (Configs.chipAtlas.enabled.isSet() && Configs.chipAtlas.enabled.get()) {
