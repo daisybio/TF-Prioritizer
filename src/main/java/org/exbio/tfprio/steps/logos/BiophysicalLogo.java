@@ -33,7 +33,7 @@ public class BiophysicalLogo extends ExecutableStep {
                         String inputName = inputFile.getName();
                         File output = new File(outputFile, inputName.substring(0, inputName.lastIndexOf(".")) + ".png");
 
-                        String command = String.format("python %s %s %s", script, inputFile, output);
+                        String command = String.format("python3 %s %s %s", script, inputFile, output);
                         executeAndWait(command, true);
 
                         return true;
