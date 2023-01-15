@@ -166,7 +166,7 @@ public class DistributionTargetGenes extends ExecutableStep {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            final Map<String, String> geneLocation;
+            final Map<String, List<String>> geneLocations;
             final Set<String> tfNames;
             final List<File> chipAtlasFiles;
             final Map<String, Map<String, Map<String, File>>> groupHmTfPredictedBindingSites;
@@ -174,10 +174,13 @@ public class DistributionTargetGenes extends ExecutableStep {
             final Map<File, String> chipAtlasDescriptions;
 
             try {
-                geneLocation = readLines(geneInfo).stream().map(line -> line.split("\t")).collect(
-                        Collectors.toMap(line -> line[0],
-                                line -> "chr" + line[2] + ":" + (Integer.parseInt(line[3]) - windowExtend.get()) + "-" +
-                                        (Integer.parseInt(line[4]) + windowExtend.get())));
+                geneLocations = readLines(geneInfo).stream().map(line -> line.split("\t")).map(
+                        split -> Pair.of(split[0],
+                                "chr" + split[2] + ":" + (Integer.parseInt(split[3]) - windowExtend.get()) + "-" +
+                                        (Integer.parseInt(split[4]) + windowExtend.get()))).distinct().collect(
+                        Collectors.groupingBy(Pair::getKey, Collectors.mapping(Pair::getValue, Collectors.toList())));
+
+
                 tfNames = readLines(dcgFile).stream().skip(1).map(line -> line.split("\t")[0]).collect(
                         Collectors.toSet());
                 chipAtlasFiles = chipAtlas != null ? Arrays.stream(
@@ -302,14 +305,17 @@ public class DistributionTargetGenes extends ExecutableStep {
                                 targetGenesList -> IntStream.range(0, targetGenesList.size()).forEach(i -> {
                                     String targetGene = targetGenesList.get(i);
 
-                                    if (!geneLocation.containsKey(targetGene)) {
+                                    if (!geneLocations.containsKey(targetGene)) {
                                         return;
                                     }
 
-                                    String location = geneLocation.get(targetGene);
+                                    List<String> locations = geneLocations.get(targetGene);
 
-                                    igv.addCommand("goto " + location);
-                                    igv.addCommand("snapshot " + (i + 1) + "_" + ensgSymbol.get(targetGene) + ".png");
+                                    IntStream.range(0, locations.size()).forEach(j -> {
+                                        igv.addCommand("goto " + locations.get(j));
+                                        igv.addCommand("snapshot " + (i + 1) + "_" + ensgSymbol.get(targetGene) +
+                                                (locations.size() > 1 ? "[" + j + "]" : "") + ".png");
+                                    });
                                 }));
 
                         igv.run(tfOutputDir);
