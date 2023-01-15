@@ -176,8 +176,8 @@ public class DistributionTargetGenes extends ExecutableStep {
             try {
                 geneLocation = readLines(geneInfo).stream().map(line -> line.split("\t")).collect(
                         Collectors.toMap(line -> line[0],
-                                line -> "chr" + line[3] + ":" + (Integer.parseInt(line[4]) - windowExtend.get()) + "-" +
-                                        (Integer.parseInt(line[5]) + windowExtend.get())));
+                                line -> "chr" + line[2] + ":" + (Integer.parseInt(line[3]) - windowExtend.get()) + "-" +
+                                        (Integer.parseInt(line[4]) + windowExtend.get())));
                 tfNames = readLines(dcgFile).stream().skip(1).map(line -> line.split("\t")[0]).collect(
                         Collectors.toSet());
                 chipAtlasFiles = chipAtlas != null ? Arrays.stream(
