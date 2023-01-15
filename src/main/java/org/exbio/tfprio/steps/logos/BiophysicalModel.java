@@ -66,31 +66,28 @@ public class BiophysicalModel extends ExecutableStep {
                 }
             }
 
-            tfNames.forEach(tf -> {
-                add(() -> {
-                    List<String> bindingEnergies = Stream.of(tfBindingProfile.getOrDefault(tf, new HashSet<>()),
-                            tf.contains("::") ?
-                                    Arrays.stream(tf.split("::")).filter(tfBindingProfile::containsKey).flatMap(
-                                            singleTf -> tfBindingProfile.get(singleTf).stream()).toList() :
-                                    new HashSet<String>()).flatMap(Collection::stream).toList();
+            tfNames.forEach(tf -> add(() -> {
+                List<String> bindingEnergies = Stream.of(tfBindingProfile.getOrDefault(tf, new HashSet<>()),
+                        tf.contains("::") ? Arrays.stream(tf.split("::")).filter(tfBindingProfile::containsKey).flatMap(
+                                singleTf -> tfBindingProfile.get(singleTf).stream()).toList() :
+                                new HashSet<String>()).flatMap(Collection::stream).toList();
 
-                    File outputFile = new File(BiophysicalModel.this.outputFile, tf + ".tsv");
+                File outputFile = new File(BiophysicalModel.this.outputFile, tf + ".tsv");
 
-                    try (var writer = new BufferedWriter(new FileWriter(outputFile))) {
-                        bindingEnergies.forEach(line -> {
-                            try {
-                                writer.write(line);
-                                writer.newLine();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-                    }
+                try (var writer = new BufferedWriter(new FileWriter(outputFile))) {
+                    bindingEnergies.forEach(line -> {
+                        try {
+                            writer.write(line);
+                            writer.newLine();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
 
 
-                    return true;
-                });
-            });
+                return true;
+            }));
         }};
     }
 }
