@@ -10,6 +10,7 @@ import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipAtlas.GetData;
 import org.exbio.tfprio.steps.chipAtlas.GetList;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
+import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.*;
@@ -199,9 +200,9 @@ public class TF_Prioritizer extends Workflow<Configs> {
             chipAtlasDirectory = getData.outputFile;
         }
 
-        //DistributionTargetGenes distributionTargetGenes =
-        //        add(new DistributionTargetGenes(ensgSymbol.outputFile, fetchGeneInfo.outputFile,
-        //                calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
-        //                createBindingRegionsBedFiles.outputFiles));
+        DistributionTargetGenes distributionTargetGenes =
+                add(new DistributionTargetGenes(ensgSymbol.outputFile, fetchGeneInfo.outputFile,
+                        calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
+                        createBindingRegionsBedFiles.outputFiles));
     }
 }

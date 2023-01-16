@@ -26,6 +26,7 @@ public class IGV_Headless {
     private final StringBuilder commandBuilder = new StringBuilder();
     private final Logger logger;
     private final File igvExecutable;
+    private final File igvCacheDirectory;
     private final String genome;
     private final File workingDirectory;
     private final File sessionFile;
@@ -35,12 +36,14 @@ public class IGV_Headless {
      *
      * @param logger the {@link org.exbio.pipejar.pipeline.ExecutableStep} logger
      */
-    public IGV_Headless(Logger logger, String genome, File igvExecutable, File workingDirectory) {
+    public IGV_Headless(Logger logger, String genome, File igvExecutable, File igvCacheDirectory,
+                        File workingDirectory) {
         this.logger = logger;
         this.genome = genome;
         this.igvExecutable = igvExecutable;
         this.workingDirectory = workingDirectory;
         this.sessionFile = new File(workingDirectory, "session.xml");
+        this.igvCacheDirectory = igvCacheDirectory;
         addCommand("new");
         addCommand("genome " + genome);
         addCommand("load " + sessionFile.getAbsolutePath());
@@ -98,7 +101,8 @@ public class IGV_Headless {
 
         save(batchFile);
 
-        String command = igvExecutable.getAbsolutePath() + " -b " + batchFile.getAbsolutePath();
+        String command = igvExecutable.getAbsolutePath() + " -b " + batchFile.getAbsolutePath() + " --igvDirectory " +
+                igvCacheDirectory.getAbsolutePath();
 
         boolean worked = false;
         int attempt = 0;
