@@ -48,11 +48,13 @@ with open(docker_config_file, 'w') as f:
 
 volume_string = ' '.join([f'-v {v}:{k}:ro' for k, v in mounts.items()])
 
-internal_command = f"java -Xmx {memory}g -jar /srv/TF-Prioritizer.jar -t {threads} -o /srv/wd -c /srv/input/configs.json"
+internal_command = f"java -Xmx{memory}g -jar /srv/TF-Prioritizer.jar -t {threads} -o /srv/wd -c /srv/input/configs.json"
 
 external_command = f"docker run --cpus='{threads}' --user='{os.getuid()}':'{os.getgid()}'" \
                    f" -v '{docker_config_file}:/srv/input/configs.json:ro' {volume_string} -v '{output}:/srv/wd:rw,Z' " \
                    f"{PACKAGE_URL} {internal_command}"
+
+print(external_command)
 
 os.system("docker image pull " + PACKAGE_URL)
 os.system(external_command)
