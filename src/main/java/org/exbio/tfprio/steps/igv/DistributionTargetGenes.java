@@ -268,10 +268,18 @@ public class DistributionTargetGenes extends ExecutableStep {
                         Function<File, String> removeExtension = file -> file == null ? "" :
                                 file.getName().substring(0, file.getName().lastIndexOf('.'));
                         Map<File, String> descriptions = new HashMap<>(chipAtlasDescriptions) {{
-                            experimentalFiles.getLeft().forEach(
-                                    file -> put(file, removeExtension.apply(file) + " experimental"));
-                            experimentalFiles.getRight().forEach(
-                                    file -> put(file, removeExtension.apply(file) + " experimental"));
+                            Collection<InputFile> group1ExperimentalFiles = experimentalFiles.getLeft();
+                            Collection<InputFile> group2ExperimentalFiles = experimentalFiles.getRight();
+
+                            if (group1ExperimentalFiles != null) {
+                                experimentalFiles.getLeft().forEach(
+                                        file -> put(file, removeExtension.apply(file) + " experimental"));
+                            }
+
+                            if (group2ExperimentalFiles != null) {
+                                experimentalFiles.getRight().forEach(
+                                        file -> put(file, removeExtension.apply(file) + " experimental"));
+                            }
 
                             tepicBedFiles.getLeft().forEach(
                                     file -> put(file, group1 + ", " + hm + " all predicted peaks"));
