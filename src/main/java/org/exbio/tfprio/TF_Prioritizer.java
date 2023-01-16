@@ -2,11 +2,13 @@ package org.exbio.tfprio;
 
 import org.apache.commons.cli.ParseException;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
+import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.Workflow;
 import org.exbio.tfprio.configs.Configs;
 import org.exbio.tfprio.steps.Dynamite.*;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
+import org.exbio.tfprio.steps.chipAtlas.CoOccurrenceAnalysis;
 import org.exbio.tfprio.steps.chipAtlas.GetData;
 import org.exbio.tfprio.steps.chipAtlas.GetList;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
@@ -23,15 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
-
 public class TF_Prioritizer extends Workflow<Configs> {
     public TF_Prioritizer(String[] args) throws IOException, ParseException {
         super(args);
     }
 
     public static void main(String[] args) throws Exception {
-        executeAndWait("id -u", true);
+        ExecutableStep.setAcceptAllInputs();
 
         new TF_Prioritizer(args);
     }
@@ -198,11 +198,14 @@ public class TF_Prioritizer extends Workflow<Configs> {
             GetList getList = add(new GetList());
             GetData getData = add(new GetData(getList.outputFile, calculateDcgRank.outputFile));
             chipAtlasDirectory = getData.outputFile;
+
+            CoOccurrenceAnalysis coOccurrenceAnalysis = add(new CoOccurrenceAnalysis(chipAtlasDirectory));
         }
 
         DistributionTargetGenes distributionTargetGenes =
                 add(new DistributionTargetGenes(ensgSymbol.outputFile, fetchGeneInfo.outputFile,
                         calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
                         createBindingRegionsBedFiles.outputFiles));
+        distributionTargetGenes.setUnderDevelopment();
     }
 }

@@ -293,14 +293,17 @@ public class DistributionTargetGenes extends ExecutableStep {
                             put(predictedBindingSites.getRight(), group2 + ", " + hm + ", " + tf + " predicted");
                         }};
 
+                        Function<Collection<? extends File>, Collection<? extends File>> emptyIfNull =
+                                files -> files == null ? new HashSet<>() : files;
+
                         List<File> includedFiles = new ArrayList<File>() {{
-                            addAll(experimentalFiles.getLeft());
-                            addAll(tepicBedFiles.getLeft());
+                            addAll(emptyIfNull.apply(experimentalFiles.getLeft()));
+                            addAll(emptyIfNull.apply(tepicBedFiles.getLeft()));
                             add(signalFiles.getLeft());
                             add(predictedBindingSites.getLeft());
 
-                            addAll(experimentalFiles.getRight());
-                            addAll(tepicBedFiles.getRight());
+                            addAll(emptyIfNull.apply(experimentalFiles.getRight()));
+                            addAll(emptyIfNull.apply(tepicBedFiles.getRight()));
                             add(signalFiles.getRight());
                             add(predictedBindingSites.getRight());
                         }}.stream().filter(Objects::nonNull).filter(File::exists).toList();
@@ -329,7 +332,7 @@ public class DistributionTargetGenes extends ExecutableStep {
                                     });
                                 }));
 
-                        igv.run(tfOutputDir);
+                        igv.run();
 
                         return true;
                     }));

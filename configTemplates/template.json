@@ -89,7 +89,6 @@
   "IGV": {
     "experimentalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/04_evaluation/merged/working_dir/00_MIX_OPTION/01_SAMPLE_MIX",
     "signalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/06_evaluation_tdf",
-    "genome": "mm10",
-    "igvExecutable": "/home/nico/.igv/IGV_2.13.0/igv.sh"
+    "genome": "mm10"
   }
 }

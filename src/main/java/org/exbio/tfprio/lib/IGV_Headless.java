@@ -10,11 +10,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.exbio.pipejar.util.FileManagement.*;
 import static org.exbio.pipejar.util.ScriptExecution.execute;
+import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 
 /**
@@ -28,8 +28,8 @@ public class IGV_Headless {
     private final File igvExecutable;
     private final File igvCacheDirectory;
     private final String genome;
-    private final File workingDirectory;
     private final File sessionFile;
+    private final File batchFile;
 
     /**
      * Create a new class instance.
@@ -41,8 +41,8 @@ public class IGV_Headless {
         this.logger = logger;
         this.genome = genome;
         this.igvExecutable = igvExecutable;
-        this.workingDirectory = workingDirectory;
         this.sessionFile = new File(workingDirectory, "session.xml");
+        this.batchFile = new File(workingDirectory, "run.bat");
         this.igvCacheDirectory = igvCacheDirectory;
         addCommand("new");
         addCommand("genome " + genome);
@@ -63,7 +63,7 @@ public class IGV_Headless {
         }
     }
 
-    public static void stopXServer() {
+    public static synchronized void stopXServer() {
         if (xServer != null) {
             xServer.destroy();
         }
@@ -78,9 +78,9 @@ public class IGV_Headless {
         commandBuilder.append(command).append("\n");
     }
 
-    private void save(File file) {
+    private void save() {
         try {
-            writeFile(file, commandBuilder.toString());
+            writeFile(batchFile, commandBuilder.toString());
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -88,53 +88,24 @@ public class IGV_Headless {
 
     /**
      * Save and execute the created command sequence.
-     *
-     * @param workingDirectory the directory to save the batch file in. The generated screenshots will also be saved
-     *                         to this directory, if not referenced by absolute paths.
      */
-    public void run(File workingDirectory) throws IOException {
+    public void run() throws IOException {
         startXServer(logger);
 
         addCommand("exit");
 
-        File batchFile = extend(workingDirectory, "run.bat");
-
-        save(batchFile);
+        save();
 
         String command = igvExecutable.getAbsolutePath() + " -b " + batchFile.getAbsolutePath() + " --igvDirectory " +
                 igvCacheDirectory.getAbsolutePath();
-
-        boolean worked = false;
-        int attempt = 0;
-
-        while (!worked) {
-            try {
-                Process igv = execute(command, new HashMap<>() {{
-                    put("DISPLAY", ":" + xServerNum);
-                }}, false);
-
-                boolean returnValue = igv.waitFor(5, TimeUnit.MINUTES);
-                if (returnValue) {
-                    worked = true;
-                } else {
-                    logger.warn("IGV did not work on attempt #" + (attempt + 1));
-                    attempt++;
-                    igv.destroy();
-                    logger.debug("Destroyed igv process.");
-                    if (attempt >= 10) {
-                        logger.error("Exiting since igv did not work.");
-                    }
-                }
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage());
-            }
-        }
+        
+        executeAndWait(command, new HashMap<>() {{
+            put("DISPLAY", ":" + xServerNum);
+        }}, false);
     }
 
     /**
      * Create a new session xml file
-     *
-     * @param loadFiles a list of files to load
      */
     public void createSession(List<File> firstPanel, List<File> secondPanel, Map<File, String> descriptions)
             throws IOException {

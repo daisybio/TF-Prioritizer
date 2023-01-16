@@ -7,6 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-c', type=str)
 parser.add_argument('-t', type=str)
 parser.add_argument('-o', type=str)
+parser.add_argument('-m', type=int, default=10)
 
 args = parser.parse_args()
 
@@ -31,6 +32,7 @@ def process_configs(configs: dict) -> dict:
 config_path = os.path.abspath(args.c)
 threads = args.t
 output = os.path.abspath(args.o)
+memory = args.m
 
 os.makedirs(output, exist_ok=True)
 
@@ -46,7 +48,7 @@ with open(docker_config_file, 'w') as f:
 
 volume_string = ' '.join([f'-v {v}:{k}:ro' for k, v in mounts.items()])
 
-internal_command = f"java -jar /srv/TF-Prioritizer.jar -t {threads} -o /srv/wd -c /srv/input/configs.json"
+internal_command = f"java -Xmx {memory}g -jar /srv/TF-Prioritizer.jar -t {threads} -o /srv/wd -c /srv/input/configs.json"
 
 external_command = f"docker run --cpus='{threads}' --user='{os.getuid()}':'{os.getgid()}'" \
                    f" -v '{docker_config_file}:/srv/input/configs.json:ro' {volume_string} -v '{output}:/srv/wd:rw,Z' " \
