@@ -10,6 +10,7 @@ DIRECTORY=$(dirname "$0")
 
 apt-get update && apt-get install -y \
   openjdk-17-jre-headless \
+  openjdk-17-jdk \
   r-base \
   python3 \
   python3-pip \
@@ -38,3 +39,6 @@ wget https://data.broadinstitute.org/igv/projects/downloads/2.13/IGV_2.13.0.zip 
 unzip "$IGV"/IGV.zip -d "$IGV"
 mv "$IGV"/IGV_2.13.0/* "$IGV"
 rm -rf "$IGV"/IGV_2.13.0 "$IGV"/IGV.zip
+
+mkdir -p "$IGV_CACHE"
+chmod -R 777 "$IGV_CACHE"
