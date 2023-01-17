@@ -16,6 +16,7 @@ import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.*;
+import org.exbio.tfprio.steps.report.Report;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
 
@@ -206,6 +207,9 @@ public class TF_Prioritizer extends Workflow<Configs> {
                 add(new DistributionTargetGenes(ensgSymbol.outputFile, fetchGeneInfo.outputFile,
                         calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
                         createBindingRegionsBedFiles.outputFiles));
-        distributionTargetGenes.setUnderDevelopment();
+
+        Report report = add(new Report(ensgSymbol.outputFile, extractStatRank.outputFiles, deSeq2.outputFiles,
+                meanCounts.outputFiles, calculateTPM.outputFiles));
+        report.setUnderDevelopment();
     }
 }
