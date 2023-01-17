@@ -6,6 +6,7 @@ DIRECTORY=$(dirname "$0")
 # unzip: Required for ChipAtlas download extraction
 # xvfb: Required for headless IGV
 # wget: Required for HINT genome download
+# curl: Required for angular installation
 # libcurl4-openssl-dev, libxml2-dev, r-cran-httr: Required by R packages
 
 apt-get update && apt-get install -y \
@@ -19,8 +20,15 @@ apt-get update && apt-get install -y \
   unzip \
   xvfb \
   wget \
+  curl \
   pngquant \
   libcurl4-openssl-dev libxml2-dev r-cran-httr
+
+# Setup angular and nodejs
+curl -fsSL https://deb.nodesource.com/setup_19.x | bash -
+apt-get install -y nodejs
+npm install npm@latest -g
+npm install -g @angular/cli
 
 # Setup matplotlib cache directory
 mkdir -p "$MPLCONFIGDIR"

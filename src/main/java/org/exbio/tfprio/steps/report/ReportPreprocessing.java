@@ -10,23 +10,27 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
-import static org.exbio.pipejar.util.FileManagement.readLines;
+import static org.exbio.pipejar.util.FileManagement.*;
 
-public class Report extends ExecutableStep {
+public class ReportPreprocessing extends ExecutableStep {
     public final OutputFile outputFile = addOutput("report");
     private final InputFile ensgSymbol;
+    private final InputFile angularInput;
     private final Map<String, InputFile> hmRanks = new HashMap<>();
     private final Map<String, InputFile> pairingDeseq = new HashMap<>();
     private final Map<String, InputFile> groupMeanExpression = new HashMap<>();
     private final Map<String, InputFile> groupTpm = new HashMap<>();
 
-    public Report(OutputFile ensgSymbol, Map<String, OutputFile> hmRanks, Map<String, OutputFile> deseqResults,
-                  Map<String, OutputFile> groupMeanExpression, Map<String, OutputFile> groupTpm) {
+    public ReportPreprocessing(OutputFile ensgSymbol, Map<String, OutputFile> hmRanks,
+                               Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
+                               Map<String, OutputFile> groupTpm) {
         super(false, hmRanks.values(), deseqResults.values(), groupMeanExpression.values(), groupTpm.values(),
                 List.of(ensgSymbol));
 
@@ -43,12 +47,40 @@ public class Report extends ExecutableStep {
 
         OutputFile tpmDir = new OutputFile(inputDirectory, "tpm");
         groupTpm.forEach((group, tpmFile) -> this.groupTpm.put(group, addInput(tpmDir, tpmFile)));
+
+        angularInput = new InputFile(inputDirectory, "report");
+
+        String path = "/org/exbio/tfprio/steps/report";
+        URL resource = getClass().getResource(path);
+        if (resource == null || !new File(resource.getFile()).exists()) {
+            // Usually entered when running via Jar
+            logger.info("Jar mode");
+            try {
+                copyResources(path, angularInput.toPath());
+            } catch (URISyntaxException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Usually entered when running via IDE
+            logger.info("IDE mode");
+            try {
+                copyDirectory(new File(resource.getFile()), angularInput,
+                        pathname -> !pathname.getName().endsWith(".class"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {
+                copyDirectory(angularInput, outputFile);
+
+                File data = extend(outputFile, "src", "assets", "data.json");
+
+
                 Map<String, List<String>> symbolEnsgMap =
                         readLines(ensgSymbol).stream().map(line -> line.split("\t")).filter(
                                 split -> split.length > 1).collect(Collectors.groupingBy(split -> split[1],
@@ -145,8 +177,6 @@ public class Report extends ExecutableStep {
                 JSONObject json = new JSONObject() {{
                     put("groups", groups.stream().map(TfGroup::toJSON).toList());
                 }};
-
-                File data = new File(outputFile, "data.json");
 
                 try (FileWriter writer = new FileWriter(data)) {
                     json.write(writer, 4, 0);
