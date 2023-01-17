@@ -17,7 +17,6 @@ import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.*;
 import org.exbio.tfprio.steps.report.ReportCreation;
-import org.exbio.tfprio.steps.report.ReportPostprocessing;
 import org.exbio.tfprio.steps.report.ReportPreprocessing;
 import org.exbio.tfprio.steps.rnaSeq.*;
 import org.exbio.tfprio.steps.tGene.*;
@@ -216,8 +215,5 @@ public class TF_Prioritizer extends Workflow<Configs> {
         reportPreprocessing.setUnderDevelopment();
         ReportCreation reportCreation = add(new ReportCreation(reportPreprocessing.outputFile));
         reportCreation.setUnderDevelopment();
-
-        ReportPostprocessing reportPostprocessing = add(new ReportPostprocessing(reportCreation.outputFile));
-        reportPostprocessing.setUnderDevelopment();
     }
 }

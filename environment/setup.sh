@@ -25,10 +25,14 @@ apt-get update && apt-get install -y \
   libcurl4-openssl-dev libxml2-dev r-cran-httr
 
 # Setup angular and nodejs
+NPM_CACHE=/srv/dependencies/npm
+mkdir -p $NPM_CACHE
 curl -fsSL https://deb.nodesource.com/setup_19.x | bash -
 apt-get install -y nodejs
 npm install npm@latest -g
 npm install -g @angular/cli
+npm config set cache $NPM_CACHE --global
+chmod -R 777 $NPM_CACHE
 
 # Setup matplotlib cache directory
 mkdir -p "$MPLCONFIGDIR"
