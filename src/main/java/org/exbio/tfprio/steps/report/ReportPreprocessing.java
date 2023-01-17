@@ -50,7 +50,7 @@ public class ReportPreprocessing extends ExecutableStep {
 
         angularInput = new InputFile(inputDirectory, "report");
 
-        String path = "/org/exbio/tfprio/steps/report";
+        String path = "/org/exbio/tfprio/steps/report/angular";
         URL resource = getClass().getResource(path);
         if (resource == null || !new File(resource.getFile()).exists()) {
             // Usually entered when running via Jar
@@ -70,6 +70,8 @@ public class ReportPreprocessing extends ExecutableStep {
                 throw new RuntimeException(e);
             }
         }
+
+        logger.trace("Finished copying angular files");
     }
 
     @Override

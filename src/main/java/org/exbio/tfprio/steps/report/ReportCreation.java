@@ -24,7 +24,8 @@ public class ReportCreation extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {
-                String command = "ng build --prod --output-path " + reportDirectory.getAbsolutePath();
+                String command = "pushd " + reportDirectory + " & npm install & ng build --prod --output-path " +
+                        outputFile.getAbsolutePath() + " & popd";
 
                 executeAndWait(command, true);
 
