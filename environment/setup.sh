@@ -19,6 +19,7 @@ apt-get update && apt-get install -y \
   unzip \
   xvfb \
   wget \
+  pngquant \
   libcurl4-openssl-dev libxml2-dev r-cran-httr
 
 # Setup matplotlib cache directory

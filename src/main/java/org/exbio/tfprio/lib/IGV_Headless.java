@@ -6,10 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.exbio.pipejar.util.FileManagement.*;
@@ -30,6 +27,7 @@ public class IGV_Headless {
     private final String genome;
     private final File sessionFile;
     private final File batchFile;
+    private final File workingDirectory;
 
     /**
      * Create a new class instance.
@@ -43,6 +41,7 @@ public class IGV_Headless {
         this.igvExecutable = igvExecutable;
         this.sessionFile = new File(workingDirectory, "session.xml");
         this.batchFile = new File(workingDirectory, "run.bat");
+        this.workingDirectory = workingDirectory;
         this.igvCacheDirectory = igvCacheDirectory;
         addCommand("new");
         addCommand("genome " + genome);
@@ -98,10 +97,23 @@ public class IGV_Headless {
 
         String command = igvExecutable.getAbsolutePath() + " -b " + batchFile.getAbsolutePath() + " --igvDirectory " +
                 igvCacheDirectory.getAbsolutePath();
-        
+
         executeAndWait(command, new HashMap<>() {{
             put("DISPLAY", ":" + xServerNum);
         }}, false);
+
+        logger.debug("Compressing images");
+
+        Arrays.stream(
+                Objects.requireNonNull(workingDirectory.listFiles(file -> file.getName().endsWith(".png")))).forEach(
+
+                file -> {
+                    try {
+                        executeAndWait("pngquant --ext .png --force " + file.getAbsolutePath(), false);
+                    } catch (IOException e) {
+                        logger.error(e.getMessage());
+                    }
+                });
     }
 
     /**
