@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import {DataManagerService} from "./services/data-manager.service";
+import {tfGroup} from "../interfaces";
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent {
-  title = 'angular';
+  groups: tfGroup[] = this.dataService.groups;
+
+  constructor(private dataService: DataManagerService) {
+  }
 }

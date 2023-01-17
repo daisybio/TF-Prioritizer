@@ -1,8 +1,8 @@
 <mat-accordion>
-  <mat-expansion-panel hideToggle>
+  <mat-expansion-panel hideToggle *ngFor="let group of groups">
     <mat-expansion-panel-header>
       <mat-panel-title>
-        This is the expansion title
+        This is the expansion title: {{group.symbol}}
       </mat-panel-title>
       <mat-panel-description>
         This is a summary of the content
