@@ -32,6 +32,7 @@
                 <exclude>org/exbio/tfprio/steps/report/angular/.angular/**</exclude>
                 <exclude>org/exbio/tfprio/steps/report/angular/node_modules/**</exclude>
                 <exclude>org/exbio/tfprio/steps/report/angular/package-lock.json</exclude>
+                <exclude>org/exbio/tfprio/steps/report/angular/src/assets/**</exclude>
             </excludes>
         </fileSet>
     </fileSets>

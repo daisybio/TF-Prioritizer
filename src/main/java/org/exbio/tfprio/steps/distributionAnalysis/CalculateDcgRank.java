@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
 public class CalculateDcgRank extends ExecutableStep {
+    // ToDo: Use output of calculateDcgPerHm
     public final OutputFile outputFile = addOutput("dcg.tsv");
     private final Map<String, InputFile> hmRankFiles = new HashMap<>();
 

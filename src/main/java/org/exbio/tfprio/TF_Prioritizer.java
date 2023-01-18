@@ -179,6 +179,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         CreatePlots createPlots =
                 add(new CreatePlots(runDistributionAnalysis.outputFiles, createBackground.outputFiles));
         ExtractStatRank extractStatRank = add(new ExtractStatRank(createPlots.statFiles));
+        CalculateDcgPerHm calculateDcgPerHm = add(new CalculateDcgPerHm(extractStatRank.outputFiles));
         CalculateDcgRank calculateDcgRank = add(new CalculateDcgRank(extractStatRank.outputFiles));
 
         org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes daTopKTargetGenes =
@@ -210,7 +211,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         createBindingRegionsBedFiles.outputFiles));
 
         ReportPreprocessing reportPreprocessing =
-                add(new ReportPreprocessing(ensgSymbol.outputFile, extractStatRank.outputFiles, deSeq2.outputFiles,
+                add(new ReportPreprocessing(ensgSymbol.outputFile, calculateDcgPerHm.outputFiles, deSeq2.outputFiles,
                         meanCounts.outputFiles, calculateTPM.outputFiles));
         reportPreprocessing.setUnderDevelopment();
         ReportCreation reportCreation = add(new ReportCreation(reportPreprocessing.outputFile));

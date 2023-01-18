@@ -9,15 +9,15 @@ import java.util.Map;
 public class TfGroup {
     private final String symbol;
     private final Collection<TranscriptionFactor> transcriptionFactors;
-    private final Map<String, Integer> hmRanks = new HashMap<>();
+    private final Map<String, Double> hmDcg = new HashMap<>();
 
     public TfGroup(String symbol, Collection<TranscriptionFactor> transcriptionFactors) {
         this.symbol = symbol;
         this.transcriptionFactors = transcriptionFactors;
     }
 
-    public void setRank(String hm, int rank) {
-        hmRanks.put(hm, rank);
+    public void setRank(String hm, Double rank) {
+        hmDcg.put(hm, rank);
     }
 
     public Collection<TranscriptionFactor> getTranscriptionFactors() {
@@ -31,7 +31,7 @@ public class TfGroup {
     public JSONObject toJSON() {
         return new JSONObject() {{
             put("symbol", symbol);
-            put("hmRanks", hmRanks);
+            put("hmDcg", hmDcg);
             put("transcriptionFactors", transcriptionFactors.stream().map(TranscriptionFactor::toJSON).toList());
         }};
     }

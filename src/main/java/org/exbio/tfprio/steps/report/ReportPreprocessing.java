@@ -23,20 +23,20 @@ public class ReportPreprocessing extends ExecutableStep {
     public final OutputFile outputFile = addOutput("report");
     private final InputFile ensgSymbol;
     private final InputFile angularInput;
-    private final Map<String, InputFile> hmRanks = new HashMap<>();
+    private final Map<String, InputFile> hmDcgFiles = new HashMap<>();
     private final Map<String, InputFile> pairingDeseq = new HashMap<>();
     private final Map<String, InputFile> groupMeanExpression = new HashMap<>();
     private final Map<String, InputFile> groupTpm = new HashMap<>();
 
-    public ReportPreprocessing(OutputFile ensgSymbol, Map<String, OutputFile> hmRanks,
+    public ReportPreprocessing(OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
                                Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
                                Map<String, OutputFile> groupTpm) {
-        super(false, hmRanks.values(), deseqResults.values(), groupMeanExpression.values(), groupTpm.values(),
+        super(false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(), groupTpm.values(),
                 List.of(ensgSymbol));
 
         this.ensgSymbol = addInput(ensgSymbol);
         OutputFile rankDir = new OutputFile(inputDirectory, "ranks");
-        hmRanks.forEach((hm, rankFile) -> this.hmRanks.put(hm, addInput(rankDir, rankFile)));
+        hmDcgFiles.forEach((hm, rankFile) -> this.hmDcgFiles.put(hm, addInput(rankDir, rankFile)));
 
         OutputFile deseqDir = new OutputFile(inputDirectory, "deseq");
         deseqResults.forEach((pairing, deseqFile) -> this.pairingDeseq.put(pairing, addInput(deseqDir, deseqFile)));
@@ -90,7 +90,7 @@ public class ReportPreprocessing extends ExecutableStep {
 
                 logger.trace("Fetching tf symbols");
 
-                Set<String> tfSymbols = hmRanks.values().stream().flatMap(rankFile -> {
+                Set<String> tfSymbols = hmDcgFiles.values().stream().flatMap(rankFile -> {
                     try {
                         return readLines(rankFile).stream().skip(1);
                     } catch (IOException e) {
@@ -160,18 +160,18 @@ public class ReportPreprocessing extends ExecutableStep {
                                     ensgTpm::get).average().orElse(0.0))));
                 });
 
-                logger.trace("Reading ranks");
+                logger.trace("Reading dcg files");
 
-                hmRanks.forEach((hm, rankFile) -> {
-                    Map<String, Integer> symbolRank;
+                hmDcgFiles.forEach((hm, dcgFile) -> {
+                    Map<String, Double> symbolDcg;
                     try {
-                        symbolRank = readLines(rankFile).stream().skip(1).map(line -> line.split("\t")).map(
-                                split -> Pair.of(split[0], Integer.parseInt(split[1]))).collect(
+                        symbolDcg = readLines(dcgFile).stream().skip(1).map(line -> line.split("\t")).map(
+                                split -> Pair.of(split[0], Double.parseDouble(split[1]))).collect(
                                 toMap(Pair::getKey, Pair::getValue));
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }
-                    groups.forEach(group -> group.setRank(hm, symbolRank.getOrDefault(group.getSymbol(), -1)));
+                    groups.forEach(group -> group.setRank(hm, symbolDcg.getOrDefault(group.getSymbol(), -1.)));
                 });
 
                 logger.trace("Writing output");
@@ -179,6 +179,8 @@ public class ReportPreprocessing extends ExecutableStep {
                 JSONObject json = new JSONObject() {{
                     put("groups", groups.stream().map(TfGroup::toJSON).toList());
                 }};
+
+                makeSureFileExists(data);
 
                 try (FileWriter writer = new FileWriter(data)) {
                     json.write(writer, 4, 0);
