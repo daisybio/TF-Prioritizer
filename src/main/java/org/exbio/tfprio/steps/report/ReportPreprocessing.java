@@ -27,14 +27,21 @@ public class ReportPreprocessing extends ExecutableStep {
     private final Map<String, InputFile> pairingDeseq = new HashMap<>();
     private final Map<String, InputFile> groupMeanExpression = new HashMap<>();
     private final Map<String, InputFile> groupTpm = new HashMap<>();
+    private final Map<String, Map<String, InputFile>> pairingHmHeatmapDir = new HashMap<>();
+    private final InputFile biophysicalLogo;
+    private final InputFile tfSequence;
 
     public ReportPreprocessing(OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
                                Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
-                               Map<String, OutputFile> groupTpm) {
+                               Map<String, OutputFile> groupTpm, OutputFile biophysicalLogo, OutputFile tfSequence,
+                               Map<String, Map<String, OutputFile>> pairingHmHeatmapDir) {
         super(false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(), groupTpm.values(),
-                List.of(ensgSymbol));
+                List.of(ensgSymbol),
+                pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()));
 
         this.ensgSymbol = addInput(ensgSymbol);
+        this.biophysicalLogo = addInput(biophysicalLogo);
+        this.tfSequence = addInput(tfSequence);
         OutputFile rankDir = new OutputFile(inputDirectory, "ranks");
         hmDcgFiles.forEach((hm, rankFile) -> this.hmDcgFiles.put(hm, addInput(rankDir, rankFile)));
 
@@ -47,6 +54,15 @@ public class ReportPreprocessing extends ExecutableStep {
 
         OutputFile tpmDir = new OutputFile(inputDirectory, "tpm");
         groupTpm.forEach((group, tpmFile) -> this.groupTpm.put(group, addInput(tpmDir, tpmFile)));
+
+        OutputFile heatmapDir = new OutputFile(inputDirectory, "heatmaps");
+        pairingHmHeatmapDir.forEach((pairing, hmDirectories) -> {
+            OutputFile pairingDir = new OutputFile(heatmapDir, pairing);
+            hmDirectories.forEach((hm, hmDir) -> {
+                InputFile input = addInput(pairingDir, hmDir);
+                this.pairingHmHeatmapDir.computeIfAbsent(pairing, k -> new HashMap<>()).put(hm, input);
+            });
+        });
 
         angularInput = new InputFile(inputDirectory, "report");
 
@@ -80,8 +96,7 @@ public class ReportPreprocessing extends ExecutableStep {
             add(() -> {
                 copyDirectory(angularInput, outputFile);
 
-                File data = extend(outputFile, "src", "assets", "data.json");
-
+                File srcDir = new File(outputFile, "src");
 
                 Map<String, List<String>> symbolEnsgMap =
                         readLines(ensgSymbol).stream().map(line -> line.split("\t")).filter(
@@ -108,8 +123,10 @@ public class ReportPreprocessing extends ExecutableStep {
                         return new TranscriptionFactor(tfPart, ensgs);
                     }).toList();
 
-                    return new TfGroup(tfSymbol, transcriptionFactors);
+                    return new TfGroup(tfSymbol, transcriptionFactors, srcDir);
                 }).collect(Collectors.toSet());
+
+                Map<String, TfGroup> tfGroupMap = groups.stream().collect(toMap(TfGroup::getSymbol, g -> g));
 
                 logger.trace("Reading log2 fold changes");
 
@@ -174,11 +191,53 @@ public class ReportPreprocessing extends ExecutableStep {
                     groups.forEach(group -> group.setRank(hm, symbolDcg.getOrDefault(group.getSymbol(), -1.)));
                 });
 
+                File assets = new File(srcDir, "assets");
+
+
+                Map<String, File> tfBiophysical = Arrays.stream(
+                        Objects.requireNonNull(biophysicalLogo.listFiles(file -> file.getName().endsWith(".png")))).map(
+                        file -> {
+                            String symbol = file.getName().replace(".png", "");
+                            return Pair.of(symbol, file);
+                        }).collect(toMap(Pair::getKey, Pair::getValue));
+                groups.stream().filter(group -> tfBiophysical.containsKey(group.getSymbol())).forEach(group -> {
+                    try {
+                        group.setBiophysicalLogo(tfBiophysical.get(group.getSymbol()));
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+
+                Map<String, Collection<File>> tfJaspar =
+                        Arrays.stream(Objects.requireNonNull(tfSequence.listFiles(File::isDirectory))).map(
+                                directory -> {
+                                    String symbol = directory.getName();
+                                    return Pair.of(symbol,
+                                            Arrays.stream(Objects.requireNonNull(directory.listFiles())).filter(
+                                                    file -> file.getName().endsWith(".svg")).collect(
+                                                    Collectors.toList()));
+                                }).collect(toMap(Pair::getKey, Pair::getValue));
+
+                groups.stream().filter(group -> tfJaspar.containsKey(group.getSymbol())).forEach(
+                        group -> group.setTfSequence(tfJaspar.get(group.getSymbol())));
+
+                pairingHmHeatmapDir.forEach((pairing, hmHeatmapDir) -> hmHeatmapDir.forEach(
+                        (hm, heatmapDir) -> Arrays.stream(Objects.requireNonNull(
+                                heatmapDir.listFiles(file -> file.getName().endsWith(".png")))).forEach(file -> {
+                            String symbol = file.getName().replace(".png", "");
+                            if (tfGroupMap.containsKey(symbol)) {
+                                tfGroupMap.get(symbol).setHeatmap(pairing, hm, file);
+                            }
+                        })));
+
+
                 logger.trace("Writing output");
 
                 JSONObject json = new JSONObject() {{
                     put("groups", groups.stream().map(TfGroup::toJSON).toList());
                 }};
+
+                File data = new File(assets, "data.json");
 
                 makeSureFileExists(data);
 

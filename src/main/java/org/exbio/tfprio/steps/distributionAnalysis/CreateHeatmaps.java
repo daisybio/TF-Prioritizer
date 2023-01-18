@@ -58,6 +58,7 @@ public class CreateHeatmaps extends ExecutableStep {
                 OutputFile output = addOutput(outPairing, hm);
 
                 bridge.put(output, Pair.of(inputCounts, Pair.of(targetGenes1, targetGenes2)));
+                outputFiles.computeIfAbsent(pairing, k -> new HashMap<>()).put(hm, output);
             });
         });
     }
