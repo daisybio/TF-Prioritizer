@@ -1,0 +1,56 @@
+<form class="example-form">
+  <div class="flex-row stretched">
+    <button mat-flat-button color="primary" class="full-width">Important loci</button>
+    <button mat-flat-button color="primary" class="full-width">Top log2fc</button>
+    <button mat-flat-button color="primary" class="full-width">Co-Occurrence</button>
+    <button mat-flat-button color="primary" class="full-width">Statistical evaluation</button>
+  </div>
+  <div class="flex-row stretched">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>TF Name</mat-label>
+      <input type="text"
+             placeholder="Pick one"
+             aria-label="Number"
+             matInput
+             [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let option of groups " [value]="option.symbol">
+          {{option.symbol}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Target gene</mat-label>
+      <input type="text"
+             placeholder="Pick one"
+             aria-label="Number"
+             matInput
+             [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option *ngFor="let option of groups " [value]="option.symbol">
+          {{option.symbol}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+</form>
+<mat-chip-list aria-label="Fish selection">
+  <mat-chip>One fish</mat-chip>
+  <mat-chip>Two fish</mat-chip>
+  <mat-chip color="primary" selected>Primary fish</mat-chip>
+  <mat-chip color="accent" selected>Accent fish</mat-chip>
+</mat-chip-list>
+
+<mat-accordion>
+  <mat-expansion-panel hideToggle *ngFor="let group of groups">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{group.symbol}}
+      </mat-panel-title>
+      <mat-panel-description>
+        This is a summary of the content
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <p>This is the primary content of the panel.</p>
+  </mat-expansion-panel>
+</mat-accordion>
