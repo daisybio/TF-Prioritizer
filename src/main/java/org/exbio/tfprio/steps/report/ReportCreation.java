@@ -28,7 +28,7 @@ public class ReportCreation extends ExecutableStep {
         return new HashSet<>() {{
             add(() -> {
                 String command = "pushd " + reportDirectory + " && npm install && ng build --output-path " +
-                        outputFile.getAbsolutePath() + " && popd";
+                        outputFile.getAbsolutePath() + " --delete-output-path && popd";
 
                 File scriptFile = new File(outputFile, "create.sh");
 

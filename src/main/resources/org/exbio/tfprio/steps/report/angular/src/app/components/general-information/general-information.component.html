@@ -1,0 +1,41 @@
+<ng-container *ngIf="tfGroup.transcriptionFactors.length==1">
+  <ng-container
+    *ngTemplateOutlet="tfDetails; context: {'tf': tfGroup.transcriptionFactors[0], 'group': tfGroup}"></ng-container>
+</ng-container>
+
+<mat-accordion *ngIf="tfGroup.transcriptionFactors.length>1">
+  <mat-expansion-panel *ngFor="let tf of tfGroup.transcriptionFactors">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{tf.symbol}}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <ng-container *ngTemplateOutlet="tfDetails; context: {'tf': tf, 'group': tfGroup}"></ng-container>
+  </mat-expansion-panel>
+</mat-accordion>
+
+
+<ng-template #tfDetails let-tf='tf' let-thisGroup='group'>
+  <h2>GeneID</h2>
+  <p *ngFor="let geneID of tf.ensgs">{{geneID}}</p>
+  <mat-divider></mat-divider>
+  <h2>Log2fc</h2>
+  <div *ngIf="!activeGroup || thisGroup==(activeGroup | async)" class="chart-container">
+    <ngx-charts-bar-horizontal
+      [results]="dataService.formatPlotData(tf.pairingLog2fc)" xAxis="true" yAxis="true"
+    ></ngx-charts-bar-horizontal>
+  </div>
+  <mat-divider></mat-divider>
+  <h2>TPM</h2>
+  <div *ngIf="!activeGroup || thisGroup==(activeGroup | async)" class="chart-container">
+    <ngx-charts-bar-horizontal
+      [results]="dataService.formatPlotData(tf.groupTpm)" xAxis="true" yAxis="true"
+    ></ngx-charts-bar-horizontal>
+  </div>
+  <h2>Mean expression</h2>
+  <div *ngIf="!activeGroup || thisGroup==(activeGroup | async)" class="chart-container">
+    <ngx-charts-bar-horizontal
+      [results]="dataService.formatPlotData(tf.groupMeanExpression)" xAxis="true" yAxis="true"
+    ></ngx-charts-bar-horizontal>
+  </div>
+</ng-template>

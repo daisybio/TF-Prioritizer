@@ -1,56 +1,59 @@
-<form class="example-form">
-  <div class="flex-row stretched">
-    <button mat-flat-button color="primary" class="full-width">Important loci</button>
-    <button mat-flat-button color="primary" class="full-width">Top log2fc</button>
-    <button mat-flat-button color="primary" class="full-width">Co-Occurrence</button>
-    <button mat-flat-button color="primary" class="full-width">Statistical evaluation</button>
-  </div>
-  <div class="flex-row stretched">
+<form>
+  <h2>Ranking</h2>
+  <div class="flex-row stretched" style="flex-wrap: nowrap">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>TF Name</mat-label>
-      <input type="text"
-             placeholder="Pick one"
+      <input [formControl]="filterControl"
              aria-label="Number"
              matInput
-             [matAutocomplete]="auto">
-      <mat-autocomplete #auto="matAutocomplete">
-        <mat-option *ngFor="let option of groups " [value]="option.symbol">
-          {{option.symbol}}
-        </mat-option>
-      </mat-autocomplete>
+             type="text">
     </mat-form-field>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Target gene</mat-label>
-      <input type="text"
-             placeholder="Pick one"
+      <input [formControl]="filterControl"
              aria-label="Number"
              matInput
-             [matAutocomplete]="auto">
-      <mat-autocomplete #auto="matAutocomplete">
-        <mat-option *ngFor="let option of groups " [value]="option.symbol">
-          {{option.symbol}}
-        </mat-option>
-      </mat-autocomplete>
+             type="text">
     </mat-form-field>
   </div>
 </form>
-<mat-chip-list aria-label="Fish selection">
-  <mat-chip>One fish</mat-chip>
-  <mat-chip>Two fish</mat-chip>
-  <mat-chip color="primary" selected>Primary fish</mat-chip>
-  <mat-chip color="accent" selected>Accent fish</mat-chip>
-</mat-chip-list>
+<mat-chip-listbox multiple>
+  <div class="flex-row full-width stretch">
+    <mat-chip-option (click)="recalculateScores()" (selectionChange)="hmActive.set(hm, !hmActive.get(hm))"
+                     *ngFor="let hm of hmList"
+                     selected>{{hm}}</mat-chip-option>
+  </div>
+</mat-chip-listbox>
 
 <mat-accordion>
-  <mat-expansion-panel hideToggle *ngFor="let group of groups">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        {{group.symbol}}
-      </mat-panel-title>
-      <mat-panel-description>
-        This is a summary of the content
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-    <p>This is the primary content of the panel.</p>
-  </mat-expansion-panel>
+  <ng-container *ngFor="let tfGroup of tfGroupRanking | async">
+    <mat-expansion-panel (click)="openGroup.next(tfGroup)" *ngIf="(filteredTfGroups | async)?.get(tfGroup)">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <h2>{{tfGroup.symbol}}</h2>
+        </mat-panel-title>
+        <mat-panel-description>
+          <div class="flex-row" style="margin-left: auto">
+            <a [queryParams]="{'tf': tfGroup.symbol}" color="primary" mat-flat-button routerLink="/details">Details</a>
+
+            <ng-container *ngFor="let hm of hmList">
+              <button [ngClass]="
+          {
+          'highest': tfGroup.hmDcg[hm]>.8,
+          'high': tfGroup.hmDcg[hm]>.6 && tfGroup.hmDcg[hm]<=.8,
+          'medium': tfGroup.hmDcg[hm]>.4 && tfGroup.hmDcg[hm]<=.6,
+          'low': tfGroup.hmDcg[hm]>.2 && tfGroup.hmDcg[hm]<=.4,
+          'lowest': tfGroup.hmDcg[hm]<=.2 && tfGroup.hmDcg[hm]>=0,
+          'unavailable': tfGroup.hmDcg[hm] < 0
+          }"
+                      mat-flat-button>{{hm}}</button>
+            </ng-container>
+          </div>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <app-general-information [activeGroup]="openGroup" [tfGroup]="tfGroup"></app-general-information>
+    </mat-expansion-panel>
+  </ng-container>
 </mat-accordion>
+
+

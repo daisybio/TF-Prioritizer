@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 import static org.exbio.pipejar.util.FileManagement.*;
 
 public class ReportPreprocessing extends ExecutableStep {
@@ -28,16 +28,25 @@ public class ReportPreprocessing extends ExecutableStep {
     private final Map<String, InputFile> groupMeanExpression = new HashMap<>();
     private final Map<String, InputFile> groupTpm = new HashMap<>();
     private final Map<String, Map<String, InputFile>> pairingHmHeatmapDir = new HashMap<>();
+    private final Map<String, Map<String, InputFile>> pairingHmIgvDir = new HashMap<>();
+    private final Map<String, InputFile> hmDistributionPlots = new HashMap<>();
+    private final Map<String, Map<String, InputFile>> pairingHmRegressionCoefficients = new HashMap<>();
     private final InputFile biophysicalLogo;
     private final InputFile tfSequence;
 
     public ReportPreprocessing(OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
                                Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
                                Map<String, OutputFile> groupTpm, OutputFile biophysicalLogo, OutputFile tfSequence,
-                               Map<String, Map<String, OutputFile>> pairingHmHeatmapDir) {
+                               Map<String, Map<String, OutputFile>> pairingHmHeatmapDir,
+                               Map<String, Map<String, OutputFile>> pairingHmIgvDir,
+                               Map<String, OutputFile> hmDistributionPlots,
+                               Map<String, Map<String, OutputFile>> pairingHmRegressionCoefficients) {
         super(false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(), groupTpm.values(),
-                List.of(ensgSymbol),
-                pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()));
+                List.of(ensgSymbol), hmDistributionPlots.values(),
+                pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
+                pairingHmIgvDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
+                pairingHmRegressionCoefficients.values().stream().flatMap(m -> m.values().stream()).collect(
+                        Collectors.toList()));
 
         this.ensgSymbol = addInput(ensgSymbol);
         this.biophysicalLogo = addInput(biophysicalLogo);
@@ -61,6 +70,28 @@ public class ReportPreprocessing extends ExecutableStep {
             hmDirectories.forEach((hm, hmDir) -> {
                 InputFile input = addInput(pairingDir, hmDir);
                 this.pairingHmHeatmapDir.computeIfAbsent(pairing, k -> new HashMap<>()).put(hm, input);
+            });
+        });
+
+        OutputFile igvDir = new OutputFile(inputDirectory, "igv");
+        pairingHmIgvDir.forEach((pairing, hmDirectories) -> {
+            OutputFile pairingDir = new OutputFile(igvDir, pairing);
+            hmDirectories.forEach((hm, hmDir) -> {
+                InputFile input = addInput(pairingDir, hmDir);
+                this.pairingHmIgvDir.computeIfAbsent(pairing, k -> new HashMap<>()).put(hm, input);
+            });
+        });
+
+        OutputFile distributionDir = new OutputFile(inputDirectory, "distributionPlots");
+        hmDistributionPlots.forEach((hm, distributionPlot) -> this.hmDistributionPlots.put(hm,
+                addInput(distributionDir, distributionPlot)));
+
+        OutputFile thresholdDir = new OutputFile(inputDirectory, "thresholdPlots");
+        pairingHmRegressionCoefficients.forEach((pairing, hmFiles) -> {
+            OutputFile pairingDir = new OutputFile(thresholdDir, pairing);
+            hmFiles.forEach((hm, file) -> {
+                InputFile input = addInput(pairingDir, file);
+                this.pairingHmRegressionCoefficients.computeIfAbsent(pairing, k -> new HashMap<>()).put(hm, input);
             });
         });
 
@@ -100,8 +131,8 @@ public class ReportPreprocessing extends ExecutableStep {
 
                 Map<String, List<String>> symbolEnsgMap =
                         readLines(ensgSymbol).stream().map(line -> line.split("\t")).filter(
-                                split -> split.length > 1).collect(Collectors.groupingBy(split -> split[1],
-                                Collectors.mapping(split -> split[0], Collectors.toList())));
+                                split -> split.length > 1).collect(
+                                groupingBy(split -> split[1], mapping(split -> split[0], Collectors.toList())));
 
                 logger.trace("Fetching tf symbols");
 
@@ -230,11 +261,50 @@ public class ReportPreprocessing extends ExecutableStep {
                             }
                         })));
 
+                pairingHmIgvDir.forEach((pairing, hmIgvDir) -> hmIgvDir.forEach((hm, igvDir) -> Arrays.stream(
+                        Objects.requireNonNull(igvDir.listFiles(File::isDirectory))).forEach(directory -> {
+                    String symbol = directory.getName();
+                    if (tfGroupMap.containsKey(symbol)) {
+                        tfGroupMap.get(symbol).setIgv(pairing, hm, directory);
+                    }
+                })));
+
+                hmDistributionPlots.forEach((hm, distributionPlotDirectory) -> Arrays.stream(Objects.requireNonNull(
+                        distributionPlotDirectory.listFiles(f -> f.getName().endsWith(".png")))).forEach(plotFile -> {
+                    String symbol = plotFile.getName().replace(".png", "");
+                    if (tfGroupMap.containsKey(symbol)) {
+                        tfGroupMap.get(symbol).setDistributionPlot(hm, plotFile);
+                    }
+                }));
+
+                Map<String, Map<String, Map<String, Double>>> hmPairingTfRegressionCoefficient =
+                        pairingHmRegressionCoefficients.entrySet().stream().flatMap(pairingHmRegressionCoefficient -> {
+                            String pairing = pairingHmRegressionCoefficient.getKey();
+                            Map<String, InputFile> hmRegressionCoefficients = pairingHmRegressionCoefficient.getValue();
+
+                            return hmRegressionCoefficients.entrySet().stream().map(hmRegressionCoefficient -> {
+                                String hm = hmRegressionCoefficient.getKey();
+                                InputFile regressionCoefficient = hmRegressionCoefficient.getValue();
+                                Map<String, Double> tfRegressionCoefficient = null;
+                                try {
+                                    tfRegressionCoefficient = readLines(regressionCoefficient).stream().skip(1).map(
+                                            line -> line.split("\t")).collect(
+                                            toMap(split -> split[0], split -> Double.parseDouble(split[1])));
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                                return Pair.of(hm, Pair.of(pairing, tfRegressionCoefficient));
+                            });
+                        }).collect(
+                                groupingBy(Pair::getKey, mapping(Pair::getValue, toMap(Pair::getKey, Pair::getValue))));
+
 
                 logger.trace("Writing output");
 
                 JSONObject json = new JSONObject() {{
                     put("groups", groups.stream().map(TfGroup::toJSON).toList());
+                    put("regressionCoefficients", hmPairingTfRegressionCoefficient);
                 }};
 
                 File data = new File(assets, "data.json");

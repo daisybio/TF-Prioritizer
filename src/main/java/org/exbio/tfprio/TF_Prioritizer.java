@@ -213,7 +213,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
         ReportPreprocessing reportPreprocessing =
                 add(new ReportPreprocessing(ensgSymbol.outputFile, calculateDcgPerHm.outputFiles, deSeq2.outputFiles,
                         meanCounts.outputFiles, calculateTPM.outputFiles, biophysicalLogo.outputFile, jaspar.outputFile,
-                        createHeatmaps.outputFiles));
+                        createHeatmaps.outputFiles, distributionTargetGenes.outputFiles, createPlots.plotFiles,
+                        extractRegressionCoefficients.outputFiles));
         reportPreprocessing.setUnderDevelopment();
         ReportCreation reportCreation = add(new ReportCreation(reportPreprocessing.outputFile));
         reportCreation.setUnderDevelopment();

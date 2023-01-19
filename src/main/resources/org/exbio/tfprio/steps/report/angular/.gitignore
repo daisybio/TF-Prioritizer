@@ -1,4 +1,7 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
+
+package-lock.json
+src/assets/*
 *.css
 *.css.map
 
@@ -42,4 +45,3 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
-/src/assets/data.json
