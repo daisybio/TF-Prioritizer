@@ -24,6 +24,11 @@ public class ReportCreation extends ExecutableStep {
     }
 
     @Override
+    protected boolean doCreateFiles() {
+        return false;
+    }
+
+    @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {

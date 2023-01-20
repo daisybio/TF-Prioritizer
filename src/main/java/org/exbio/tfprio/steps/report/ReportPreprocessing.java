@@ -285,7 +285,7 @@ public class ReportPreprocessing extends ExecutableStep {
                             return hmRegressionCoefficients.entrySet().stream().map(hmRegressionCoefficient -> {
                                 String hm = hmRegressionCoefficient.getKey();
                                 InputFile regressionCoefficient = hmRegressionCoefficient.getValue();
-                                Map<String, Double> tfRegressionCoefficient = null;
+                                Map<String, Double> tfRegressionCoefficient;
                                 try {
                                     tfRegressionCoefficient = readLines(regressionCoefficient).stream().skip(1).map(
                                             line -> line.split("\t")).collect(

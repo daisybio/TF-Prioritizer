@@ -108,11 +108,13 @@ public class GetData extends ExecutableStep {
 
             logger.debug("Found {} TFs which are available from both ChipAtlas and DCG file", tfSplits.size());
 
-            Set<String> urls =
-                    tfSplits.values().stream().flatMap(Collection::stream).map(tfUrl::get).collect(Collectors.toSet());
+            Set<Pair<String, String>> splitUrls = tfSplits.values().stream().flatMap(Collection::stream).distinct().map(
+                    tf -> Pair.of(tf, tfUrl.get(tf))).collect(Collectors.toSet());
 
-            urls.forEach(url -> add(() -> {
-                File bedFile = new File(outputFile, url.substring(url.lastIndexOf('/') + 1));
+            splitUrls.forEach(splitUrl -> add(() -> {
+                String tf = splitUrl.getKey();
+                String url = splitUrl.getValue();
+                File bedFile = new File(outputFile, tf + "_" + url.substring(url.lastIndexOf('/') + 1));
                 int attempt = 1;
 
                 while (!bedFile.exists()) {
