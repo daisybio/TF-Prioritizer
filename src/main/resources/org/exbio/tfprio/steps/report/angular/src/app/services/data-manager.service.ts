@@ -30,6 +30,10 @@ export class DataManagerService {
     return this._inputData.regressionCoefficients;
   }
 
+  get coOccurrence() {
+    return this._inputData.coOccurrence;
+  }
+
   public getTfGroupByName(name: string): tfGroup | undefined {
     return this.groupMap.get(name);
   }

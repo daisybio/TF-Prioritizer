@@ -5,17 +5,16 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 import static org.exbio.pipejar.util.FileManagement.*;
@@ -34,6 +33,7 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
     private final Map<String, Map<String, InputFile>> pairingHmRegressionCoefficients = new HashMap<>();
     private final InputFile biophysicalLogo;
     private final InputFile tfSequence;
+    private final InputFile coOccurrence;
 
     public ReportPreprocessing(Configs configs, OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
                                Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
@@ -41,7 +41,8 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                                Map<String, Map<String, OutputFile>> pairingHmHeatmapDir,
                                Map<String, Map<String, OutputFile>> pairingHmIgvDir,
                                Map<String, OutputFile> hmDistributionPlots,
-                               Map<String, Map<String, OutputFile>> pairingHmRegressionCoefficients) {
+                               Map<String, Map<String, OutputFile>> pairingHmRegressionCoefficients,
+                               OutputFile coOccurrence) {
         super(configs, false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(),
                 groupTpm.values(), List.of(ensgSymbol), hmDistributionPlots.values(),
                 pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
@@ -52,6 +53,7 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
         this.ensgSymbol = addInput(ensgSymbol);
         this.biophysicalLogo = addInput(biophysicalLogo);
         this.tfSequence = addInput(tfSequence);
+        this.coOccurrence = addInput(coOccurrence);
         OutputFile rankDir = new OutputFile(inputDirectory, "ranks");
         hmDcgFiles.forEach((hm, rankFile) -> this.hmDcgFiles.put(hm, addInput(rankDir, rankFile)));
 
@@ -300,6 +302,29 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                         }).collect(
                                 groupingBy(Pair::getKey, mapping(Pair::getValue, toMap(Pair::getKey, Pair::getValue))));
 
+                final JSONArray coOccurrenceJson;
+                try (var reader = new BufferedReader(new FileReader(coOccurrence))) {
+                    String[] header = reader.readLine().split("\t");
+                    List<JSONObject> objects = reader.lines().map(line -> {
+                        String[] split = line.split("\t");
+                        String tf = split[0];
+                        return Pair.of(tf, Arrays.stream(split).skip(1).mapToDouble(Double::parseDouble).toArray());
+                    }).map(pair -> {
+                        double[] values = pair.getValue();
+                        JSONArray series =
+                                new JSONArray(IntStream.range(0, values.length).mapToObj(i -> new JSONObject() {{
+                                    put("name", header[i + 1]);
+                                    put("value", values[i]);
+                                }}).collect(toList()));
+
+                        return new JSONObject() {{
+                            put("name", pair.getKey());
+                            put("series", series);
+                        }};
+                    }).collect(toList());
+
+                    coOccurrenceJson = new JSONArray(objects);
+                }
 
                 logger.trace("Writing output");
 
@@ -307,6 +332,7 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                     put("groups", groups.stream().map(TfGroup::toJSON).toList());
                     put("regressionCoefficients", hmPairingTfRegressionCoefficient);
                     put("configs", configs.getConfigsJSONObject(true, true));
+                    put("coOccurrence", coOccurrenceJson);
                 }};
 
                 File data = new File(assets, "data.json");

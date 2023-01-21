@@ -200,12 +200,14 @@ public class TF_Prioritizer extends Workflow<Configs> {
         PredictedLogo predictedLogo = add(new PredictedLogo(configs, filterBindingSites.outputFiles));
 
         OutputFile chipAtlasDirectory = null;
+        OutputFile coOccurrence = null;
         if (configs.chipAtlas.enabled.isSet() && configs.chipAtlas.enabled.get()) {
             GetList getList = add(new GetList(configs));
             GetData getData = add(new GetData(configs, getList.outputFile, calculateDcgRank.outputFile));
             chipAtlasDirectory = getData.outputFile;
 
             CoOccurrenceAnalysis coOccurrenceAnalysis = add(new CoOccurrenceAnalysis(configs, chipAtlasDirectory));
+            coOccurrence = coOccurrenceAnalysis.outputFile;
         }
 
         DistributionTargetGenes distributionTargetGenes =
@@ -218,7 +220,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         deSeq2.outputFiles, meanCounts.outputFiles, calculateTPM.outputFiles,
                         biophysicalLogo.outputFile, jaspar.outputFile, createHeatmaps.outputFiles,
                         distributionTargetGenes.outputFiles, createPlots.plotFiles,
-                        extractRegressionCoefficients.outputFiles));
+                        extractRegressionCoefficients.outputFiles, coOccurrence));
+        reportPreprocessing.setUnderDevelopment();
         ReportCreation reportCreation = add(new ReportCreation(configs, reportPreprocessing.outputFile));
         ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
     }

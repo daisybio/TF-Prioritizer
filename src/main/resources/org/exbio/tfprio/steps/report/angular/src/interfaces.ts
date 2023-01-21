@@ -28,6 +28,13 @@ export interface tfGroup {
 
 export interface dataInterface {
   "groups": tfGroup[];
+  coOccurrence: {
+    "name": string;
+    "series": {
+      "name": string;
+      "value": number;
+    }[];
+  }[];
   "configs": {
     [mod: string]: {
       [config: string]: string | number | boolean;

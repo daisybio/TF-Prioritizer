@@ -14,7 +14,7 @@ import {MatChipsModule} from "@angular/material/chips";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatTableModule} from "@angular/material/table";
-import {BarChartModule} from "@swimlane/ngx-charts";
+import {BarChartModule, HeatMapModule} from "@swimlane/ngx-charts";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HashLocationStrategy, LocationStrategy} from "@angular/common";
 import {ImportantLociComponent} from './pages/generalAnalysis/important-loci/important-loci.component';
@@ -41,6 +41,7 @@ import {
 import {DataSelectorComponent} from './components/data-selector/data-selector.component';
 import {MatSliderModule} from "@angular/material/slider";
 import {MatListModule} from "@angular/material/list";
+import {MatButtonToggleModule} from "@angular/material/button-toggle";
 
 @NgModule({
   declarations: [
@@ -83,6 +84,8 @@ import {MatListModule} from "@angular/material/list";
     MatSliderModule,
     FormsModule,
     MatListModule,
+    HeatMapModule,
+    MatButtonToggleModule,
   ],
   providers: [
     {
