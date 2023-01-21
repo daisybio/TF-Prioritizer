@@ -306,6 +306,7 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                 JSONObject json = new JSONObject() {{
                     put("groups", groups.stream().map(TfGroup::toJSON).toList());
                     put("regressionCoefficients", hmPairingTfRegressionCoefficient);
+                    put("configs", configs.getConfigsJSONObject(true, true));
                 }};
 
                 File data = new File(assets, "data.json");

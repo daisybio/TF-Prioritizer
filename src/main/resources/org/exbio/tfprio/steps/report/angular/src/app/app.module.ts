@@ -40,6 +40,7 @@ import {
 } from './pages/generalAnalysis/regression-coefficients/regression-coefficients.component';
 import {DataSelectorComponent} from './components/data-selector/data-selector.component';
 import {MatSliderModule} from "@angular/material/slider";
+import {MatListModule} from "@angular/material/list";
 
 @NgModule({
   declarations: [
@@ -81,6 +82,7 @@ import {MatSliderModule} from "@angular/material/slider";
     MatTabsModule,
     MatSliderModule,
     FormsModule,
+    MatListModule,
   ],
   providers: [
     {

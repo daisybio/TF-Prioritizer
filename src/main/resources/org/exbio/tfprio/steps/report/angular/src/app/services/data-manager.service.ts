@@ -39,4 +39,8 @@ export class DataManagerService {
       return {"name": entry[0], "value": entry[1]}
     });
   }
+
+  public getConfigs() {
+    return this._inputData.configs;
+  }
 }

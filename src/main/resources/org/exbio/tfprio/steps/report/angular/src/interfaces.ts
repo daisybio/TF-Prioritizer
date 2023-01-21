@@ -28,6 +28,11 @@ export interface tfGroup {
 
 export interface dataInterface {
   "groups": tfGroup[];
+  "configs": {
+    [mod: string]: {
+      [config: string]: string | number | boolean;
+    }
+  }
   "regressionCoefficients": {
     [hm: string]: {
       [pairing: string]: {
