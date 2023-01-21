@@ -10,5 +10,6 @@ ENV MPLCONFIGDIR=/srv/dependencies/matplotlib
 
 COPY environment /srv/environment
 RUN chmod u+x /srv/environment/setup.sh && ./srv/environment/setup.sh
+RUN mkdir -p "/srv/temp" && chmod -R 777 "/srv/temp"
 
 COPY bin/TF-Prioritizer.jar /srv/TF-Prioritizer.jar

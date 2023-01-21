@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
+import static org.exbio.pipejar.util.FileManagement.copyDirectory;
 import static org.exbio.pipejar.util.FileManagement.writeFile;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
@@ -32,8 +33,18 @@ public class ReportCreation extends ExecutableStep {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {
-                String command = "pushd " + reportDirectory + " && npm install && ng build --output-path " +
-                        outputFile.getAbsolutePath() + " --delete-output-path && popd";
+                // The temp directories are a workaround for the problems that occurred when running the
+                // report generation on the server. The exact problem was that somehow the generation of the report
+                // tried to make sure that the output directory is empty, but it failed to do so. A possible reason
+                // for this are permissions, since everything else should be the same due to docker.
+                // TODO: Find a better solution for this problem.
+                File tempAngular = new File("/srv/temp/angular");
+                File tempOutput = new File("/srv/temp/output");
+
+                copyDirectory(reportDirectory, tempAngular);
+
+                String command = "pushd " + tempAngular + " && npm install && ng build --output-path " +
+                        tempOutput.getAbsolutePath() + " && popd";
 
                 File scriptFile = new File(outputFile, "create.sh");
 
@@ -41,8 +52,8 @@ public class ReportCreation extends ExecutableStep {
 
                 executeAndWait("bash " + scriptFile.getAbsolutePath(), true);
 
-                File index = new File(outputFile, "index.html");
-                File processed = new File(outputFile, "processed_index.html");
+                File index = new File(tempOutput, "index.html");
+                File processed = new File(tempOutput, "processed_index.html");
 
                 try (var reader = new BufferedReader(new FileReader(index));
                      var writer = new BufferedWriter(new FileWriter(processed))) {
@@ -58,6 +69,8 @@ public class ReportCreation extends ExecutableStep {
 
                 Files.delete(index.toPath());
                 Files.move(processed.toPath(), index.toPath());
+
+                copyDirectory(tempOutput, outputFile);
 
                 return true;
             });

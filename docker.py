@@ -54,7 +54,5 @@ external_command = f"docker run --cpus='{threads}' --user='{os.getuid()}':'{os.g
                    f" -v '{docker_config_file}:/srv/input/configs.json:ro' {volume_string} -v '{output}:/srv/wd:rw,Z' " \
                    f"{PACKAGE_URL} {internal_command}"
 
-print(external_command)
-
 os.system("docker image pull " + PACKAGE_URL)
 os.system(external_command)

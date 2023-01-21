@@ -2,14 +2,20 @@
 
 DIRECTORY=$(dirname "$0")
 
+# Prepare node installation
+NPM_CACHE=/srv/dependencies/npm
+mkdir -p $NPM_CACHE
+apt-get update && apt-get install -y curl
+curl -sL https://deb.nodesource.com/setup_18.x | bash -
+
 # bedtools: Required by TEPIC
 # unzip: Required for ChipAtlas download extraction
 # xvfb: Required for headless IGV
 # wget: Required for HINT genome download
 # curl: Required for angular installation
 # libcurl4-openssl-dev, libxml2-dev, r-cran-httr: Required by R packages
-
 apt-get update && apt-get install -y \
+  nodejs \
   openjdk-17-jre-headless \
   openjdk-17-jdk \
   r-base \
@@ -24,11 +30,6 @@ apt-get update && apt-get install -y \
   pngquant \
   libcurl4-openssl-dev libxml2-dev r-cran-httr
 
-# Setup angular and nodejs
-NPM_CACHE=/srv/dependencies/npm
-mkdir -p $NPM_CACHE
-curl -fsSL https://deb.nodesource.com/setup_19.x | bash -
-apt-get install -y nodejs
 npm install npm@latest -g
 npm install -g @angular/cli
 npm config set cache $NPM_CACHE --global

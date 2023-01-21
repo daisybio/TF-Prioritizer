@@ -203,7 +203,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
             chipAtlasDirectory = getData.outputFile;
 
             CoOccurrenceAnalysis coOccurrenceAnalysis = add(new CoOccurrenceAnalysis(chipAtlasDirectory));
-            coOccurrenceAnalysis.setUnderDevelopment();
         }
 
         DistributionTargetGenes distributionTargetGenes =
@@ -216,6 +215,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         meanCounts.outputFiles, calculateTPM.outputFiles, biophysicalLogo.outputFile, jaspar.outputFile,
                         createHeatmaps.outputFiles, distributionTargetGenes.outputFiles, createPlots.plotFiles,
                         extractRegressionCoefficients.outputFiles));
+        reportPreprocessing.setUnderDevelopment();
         ReportCreation reportCreation = add(new ReportCreation(reportPreprocessing.outputFile));
+        reportCreation.setUnderDevelopment();
     }
 }
