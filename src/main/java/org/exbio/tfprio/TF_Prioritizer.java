@@ -16,6 +16,7 @@ import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.*;
+import org.exbio.tfprio.steps.report.ReportCompression;
 import org.exbio.tfprio.steps.report.ReportCreation;
 import org.exbio.tfprio.steps.report.ReportPreprocessing;
 import org.exbio.tfprio.steps.rnaSeq.*;
@@ -215,8 +216,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         meanCounts.outputFiles, calculateTPM.outputFiles, biophysicalLogo.outputFile, jaspar.outputFile,
                         createHeatmaps.outputFiles, distributionTargetGenes.outputFiles, createPlots.plotFiles,
                         extractRegressionCoefficients.outputFiles));
-        reportPreprocessing.setUnderDevelopment();
         ReportCreation reportCreation = add(new ReportCreation(reportPreprocessing.outputFile));
-        reportCreation.setUnderDevelopment();
+        ReportCompression reportCompression = add(new ReportCompression(reportCreation.outputFile));
     }
 }

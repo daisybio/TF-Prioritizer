@@ -46,7 +46,7 @@ public class ReportCreation extends ExecutableStep {
                 String command = "pushd " + tempAngular + " && npm install && ng build --output-path " +
                         tempOutput.getAbsolutePath() + " && popd";
 
-                File scriptFile = new File(outputFile, "create.sh");
+                File scriptFile = new File(outputDirectory, "create.sh");
 
                 writeFile(scriptFile, command);
 
