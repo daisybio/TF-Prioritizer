@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.rnaSeq;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,12 +15,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class DeSeqPostprocessing extends ExecutableStep {
+public class DeSeqPostprocessing extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge;
 
-    public DeSeqPostprocessing(Map<String, OutputFile> dependencies) {
-        super(false, dependencies.values());
+    public DeSeqPostprocessing(Configs configs, Map<String, OutputFile> dependencies) {
+        super(configs, false, dependencies.values());
 
         bridge = new HashMap<>() {{
             dependencies.forEach((pairing, dependency) -> {

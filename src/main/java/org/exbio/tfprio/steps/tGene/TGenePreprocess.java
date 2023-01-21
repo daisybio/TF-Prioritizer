@@ -11,14 +11,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
-public class TGenePreprocess extends ExecutableStep {
+public class TGenePreprocess extends ExecutableStep<Configs> {
     public final OutputFile outputFile;
     private final RequiredConfig<File> geneAnnotationFile =
-            new RequiredConfig<>(Configs.inputConfigs.geneAnnotationFile);
+            new RequiredConfig<>(configs.inputConfigs.geneAnnotationFile);
     private final InputFile inputFile;
 
-    public TGenePreprocess() {
-        super();
+    public TGenePreprocess(Configs configs) {
+        super(configs);
 
         inputFile = addInput(geneAnnotationFile);
         outputFile = addOutput("annotations.tsv");

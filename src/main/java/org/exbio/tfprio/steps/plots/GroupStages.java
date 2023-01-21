@@ -11,17 +11,17 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public class GroupStages extends ExecutableStep {
+public class GroupStages extends ExecutableStep<Configs> {
     public final Map<String, Map<Double, Pair<OutputFile, OutputFile>>> outputFiles = new HashMap<>();
     // TODO: make this optional
     private final RequiredConfig<Map<String, String>> sameStages =
-            new RequiredConfig<>(Configs.inputConfigs.sameStages);
-    private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(Configs.plots.thresholds);
+            new RequiredConfig<>(configs.inputConfigs.sameStages);
+    private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(configs.plots.thresholds);
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
     private final Map<InputFile, String> inputFilePairing = new HashMap<>();
 
-    public GroupStages(Map<String, Map<String, Map<Double, OutputFile>>> coefficientFiles) {
-        super(false, coefficientFiles.values().stream().flatMap(x -> x.values().stream()).flatMap(
+    public GroupStages(Configs configs, Map<String, Map<String, Map<Double, OutputFile>>> coefficientFiles) {
+        super(configs, false, coefficientFiles.values().stream().flatMap(x -> x.values().stream()).flatMap(
                 col -> col.values().stream()).toList());
 
         coefficientFiles.values().stream().map(Map::keySet).flatMap(Collection::stream).distinct().forEach(hm -> {

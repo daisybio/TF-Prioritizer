@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,13 +15,13 @@ import java.util.stream.Stream;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class PlotGroupedStages extends ExecutableStep {
+public class PlotGroupedStages extends ExecutableStep<Configs> {
     public final Map<String, Map<Double, Pair<OutputFile, OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
     private final InputFile script;
 
-    public PlotGroupedStages(Map<String, Map<Double, Pair<OutputFile, OutputFile>>> groupedStages) {
-        super(false, groupedStages.values().stream().flatMap(x -> x.values().stream()).flatMap(
+    public PlotGroupedStages(Configs configs, Map<String, Map<Double, Pair<OutputFile, OutputFile>>> groupedStages) {
+        super(configs, false, groupedStages.values().stream().flatMap(x -> x.values().stream()).flatMap(
                 pair -> Stream.of(pair.getLeft(), pair.getRight())).toList());
 
         script = addInput(getClass().getResourceAsStream("groupedStagePlot.py"), "groupedStagePlot.py");

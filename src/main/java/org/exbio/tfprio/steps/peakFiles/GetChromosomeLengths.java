@@ -20,9 +20,13 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.IntStream;
 
-public class GetChromosomeLengths extends ExecutableStep {
+public class GetChromosomeLengths extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("chromosomeLengths.json");
-    private final RequiredConfig<String> species = new RequiredConfig<>(Configs.mixOptions.biomartDatasetSpecies);
+    private final RequiredConfig<String> species = new RequiredConfig<>(configs.mixOptions.biomartDatasetSpecies);
+
+    public GetChromosomeLengths(Configs configs) {
+        super(configs);
+    }
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {

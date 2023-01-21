@@ -10,13 +10,13 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public class CreateBatchFile extends ExecutableStep {
+public class CreateBatchFile extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("batches.tsv");
-    private final OptionalConfig<Map<String, Integer>> batches = new OptionalConfig<>(Configs.deSeq2.batches, false);
+    private final OptionalConfig<Map<String, Integer>> batches = new OptionalConfig<>(configs.deSeq2.batches, false);
     private final Map<String, InputFile> files = new HashMap<>();
 
-    public CreateBatchFile(Map<String, OutputFile> dependencies) {
-        super(false, dependencies.values());
+    public CreateBatchFile(Configs configs, Map<String, OutputFile> dependencies) {
+        super(configs, false, dependencies.values());
 
         dependencies.forEach((group, file) -> files.put(group, addInput(file)));
     }

@@ -14,15 +14,16 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AnalyzeHmLevel extends ExecutableStep {
+public class AnalyzeHmLevel extends ExecutableStep<Configs> {
     public final Map<Double, Pair<OutputFile, OutputFile>> outputFiles = new HashMap<>();
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
-    private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(Configs.plots.thresholds);
+    private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(configs.plots.thresholds);
 
-    private final OptionalConfig<Integer> cutoffHms = new OptionalConfig<>(Configs.plots.cutoffHms, false);
+    private final OptionalConfig<Integer> cutoffHms = new OptionalConfig<>(configs.plots.cutoffHms, false);
 
-    public AnalyzeHmLevel(Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGroupLevel) {
-        super(false, hmThresholdGroupLevel.values().stream().flatMap(x -> x.values().stream()).flatMap(
+    public AnalyzeHmLevel(Configs configs,
+                          Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGroupLevel) {
+        super(configs, false, hmThresholdGroupLevel.values().stream().flatMap(x -> x.values().stream()).flatMap(
                 pair -> Stream.of(pair.getLeft(), pair.getRight())).toList());
 
         thresholds.get().forEach(threshold -> {

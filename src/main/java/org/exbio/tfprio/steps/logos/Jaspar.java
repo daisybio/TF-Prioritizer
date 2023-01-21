@@ -21,14 +21,14 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class Jaspar extends ExecutableStep {
+public class Jaspar extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("jaspar");
-    private final RequiredConfig<String> jasparURL = new RequiredConfig<>(Configs.internalConfigs.jasparURL);
-    private final RequiredConfig<String> jasparLogoUrl = new RequiredConfig<>(Configs.internalConfigs.jasparLogoUrl);
+    private final RequiredConfig<String> jasparURL = new RequiredConfig<>(configs.internalConfigs.jasparURL);
+    private final RequiredConfig<String> jasparLogoUrl = new RequiredConfig<>(configs.internalConfigs.jasparLogoUrl);
     private final InputFile dcgFile;
 
-    public Jaspar(OutputFile dcgFile) {
-        super(false, dcgFile);
+    public Jaspar(Configs configs, OutputFile dcgFile) {
+        super(configs, false, dcgFile);
         this.dcgFile = addInput(dcgFile);
     }
 

@@ -15,13 +15,13 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class FilterENdb extends ExecutableStep {
+public class FilterENdb extends ExecutableStep<Configs> {
     public final OutputFile outputFile;
     private final InputFile enDBfile;
-    private final RequiredConfig<String> species = new RequiredConfig<>(Configs.deSeq2.speciesRefGenome);
+    private final RequiredConfig<String> species = new RequiredConfig<>(configs.deSeq2.speciesRefGenome);
 
-    public FilterENdb() {
-        super();
+    public FilterENdb(Configs configs) {
+        super(configs);
         enDBfile = addInput(getClass().getResourceAsStream("ENdb.bed"), "ENdb.bed");
         outputFile = addOutput("out.bed");
     }

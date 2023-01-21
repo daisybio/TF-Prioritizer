@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -18,12 +19,12 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class CalculateDcgPerHm extends ExecutableStep {
+public class CalculateDcgPerHm extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public CalculateDcgPerHm(Map<String, OutputFile> hmRanks) {
-        super(false, hmRanks.values());
+    public CalculateDcgPerHm(Configs configs, Map<String, OutputFile> hmRanks) {
+        super(configs, false, hmRanks.values());
 
         hmRanks.forEach((hm, hmRankFile) -> {
             OutputFile outputFile = addOutput(hm + ".tsv");

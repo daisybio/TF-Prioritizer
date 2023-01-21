@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -14,12 +15,12 @@ import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class CreatePairings extends ExecutableStep {
+public class CreatePairings extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<OutputFile, Pair<InputFile, InputFile>> bridge = new HashMap<>();
 
-    public CreatePairings(Map<String, OutputFile> groupFiles) {
-        super(false, groupFiles.values());
+    public CreatePairings(Configs configs, Map<String, OutputFile> groupFiles) {
+        super(configs, false, groupFiles.values());
 
         Map<String, InputFile> inputFiles = groupFiles.entrySet().stream().collect(HashMap::new,
                 (m, e) -> m.put(e.getKey(), addInput(e.getValue())), HashMap::putAll);

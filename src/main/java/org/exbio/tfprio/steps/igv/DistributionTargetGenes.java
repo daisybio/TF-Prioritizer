@@ -25,34 +25,33 @@ import java.util.stream.Stream;
 import static org.exbio.pipejar.util.FileManagement.extend;
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class DistributionTargetGenes extends ExecutableStep {
+public class DistributionTargetGenes extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final InputFile geneInfo;
     private final InputFile dcgFile;
-    private final RequiredConfig<Integer> windowExtend =
-            new RequiredConfig<>(org.exbio.tfprio.configs.Configs.igv.windowExtend);
+    private final RequiredConfig<Integer> windowExtend = new RequiredConfig<>(configs.igv.windowExtend);
     private final Map<InputFile, String> inputHm = new HashMap<>();
     private final Map<InputFile, String> inputGroup = new HashMap<>();
     private final OptionalConfig<File> experimentalDirectory =
-            new OptionalConfig<>(Configs.igv.experimentalFiles, false);
-    private final OptionalConfig<File> signalFiles = new OptionalConfig<>(Configs.igv.signalFiles, false);
+            new OptionalConfig<>(configs.igv.experimentalFiles, false);
+    private final OptionalConfig<File> signalFiles = new OptionalConfig<>(configs.igv.signalFiles, false);
     private final Map<String, Map<String, Collection<InputFile>>> groupHmTepicSampleDirectories = new HashMap<>();
     private final Map<String, Map<String, InputFile>> groupHmPredictedBindingSitesDirectories = new HashMap<>();
     private final Map<String, Set<InputFile>> groupExperimentalFiles = new HashMap<>();
     private final Map<String, Map<String, InputFile>> groupHmSignalFile = new HashMap<>();
-    private final RequiredConfig<File> igvExecutable = new RequiredConfig<>(Configs.igv.igvExecutable);
-    private final RequiredConfig<File> igvCacheDirectory = new RequiredConfig<>(Configs.igv.igvCacheDirectory);
+    private final RequiredConfig<File> igvExecutable = new RequiredConfig<>(configs.igv.igvExecutable);
+    private final RequiredConfig<File> igvCacheDirectory = new RequiredConfig<>(configs.igv.igvCacheDirectory);
     private final InputFile chipAtlas;
     private final InputFile ensgSymbolFile;
-    private final RequiredConfig<String> genome = new RequiredConfig<>(Configs.igv.genome);
+    private final RequiredConfig<String> genome = new RequiredConfig<>(configs.igv.genome);
     private final Map<String, Map<String, InputFile>> groupHmTfTargetGenes = new HashMap<>();
     private final Map<Pair<String, String>, Collection<String>> groupPairingHms;
 
-    public DistributionTargetGenes(OutputFile ensgSymbolFile, OutputFile geneInfo, OutputFile dcgFile,
+    public DistributionTargetGenes(Configs configs, OutputFile ensgSymbolFile, OutputFile geneInfo, OutputFile dcgFile,
                                    OutputFile chipAtlas, Map<String, Map<String, OutputFile>> groupHmTfTargetGenes,
                                    Map<String, Map<String, Collection<OutputFile>>> groupHmTepicSampleDirectories,
                                    Map<String, Map<String, OutputFile>> groupHmTepicBindingRegions) {
-        super(false, groupHmTfTargetGenes.values().stream().flatMap(sub -> sub.values().stream()).toList(),
+        super(configs, false, groupHmTfTargetGenes.values().stream().flatMap(sub -> sub.values().stream()).toList(),
                 groupHmTepicSampleDirectories.values().stream().flatMap(sub -> sub.values().stream()).flatMap(
                         Collection::stream).toList(),
                 groupHmTepicBindingRegions.values().stream().flatMap(sub -> sub.values().stream()).toList(),

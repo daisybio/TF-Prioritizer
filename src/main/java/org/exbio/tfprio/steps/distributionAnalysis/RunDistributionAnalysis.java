@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class RunDistributionAnalysis extends ExecutableStep {
+public class RunDistributionAnalysis extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final InputFile preprocessed;
     private final InputFile ensgSymbol;
@@ -25,13 +25,13 @@ public class RunDistributionAnalysis extends ExecutableStep {
     private final Map<String, Map<String, InputFile>> pairingHmRegressionCoefficients = new HashMap<>();
     private final Map<String, Map<String, InputFile>> groupHmAffinityFiles = new HashMap<>();
     private final OptionalConfig<Boolean> scoreIncludeCounts =
-            new OptionalConfig<>(Configs.distributionAnalysis.scoreIncludeCounts, false);
+            new OptionalConfig<>(configs.distributionAnalysis.scoreIncludeCounts, false);
 
-    public RunDistributionAnalysis(OutputFile preprocessed, OutputFile ensgSymbol,
+    public RunDistributionAnalysis(Configs configs, OutputFile preprocessed, OutputFile ensgSymbol,
                                    Map<String, OutputFile> groupMeanCounts, Map<String, OutputFile> pairingLog2fc,
                                    Map<String, Map<String, OutputFile>> pairingHmRegressionCoefficients,
                                    Map<String, Map<String, OutputFile>> groupHmAffinityFiles) {
-        super(false, pairingLog2fc.values(), groupMeanCounts.values(),
+        super(configs, false, pairingLog2fc.values(), groupMeanCounts.values(),
                 pairingHmRegressionCoefficients.values().stream().flatMap(entry -> entry.values().stream()).toList(),
                 groupHmAffinityFiles.values().stream().flatMap(entry -> entry.values().stream()).toList(),
                 List.of(preprocessed, ensgSymbol));

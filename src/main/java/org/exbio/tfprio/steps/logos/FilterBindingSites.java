@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.logos;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.*;
@@ -11,12 +12,12 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class FilterBindingSites extends ExecutableStep {
+public class FilterBindingSites extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public FilterBindingSites(Map<String, OutputFile> bindingSites) {
-        super(false, bindingSites.values());
+    public FilterBindingSites(Configs configs, Map<String, OutputFile> bindingSites) {
+        super(configs, false, bindingSites.values());
 
         bindingSites.forEach((hm, hmDirectory) -> {
             OutputFile outputHm = addOutput(hm);

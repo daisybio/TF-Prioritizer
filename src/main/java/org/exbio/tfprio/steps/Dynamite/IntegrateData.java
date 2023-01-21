@@ -4,19 +4,21 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.util.*;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class IntegrateData extends ExecutableStep {
+public class IntegrateData extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final InputFile script;
     private final Map<OutputFile, Pair<InputFile, InputFile>> bridge = new HashMap<>();
 
-    public IntegrateData(Map<String, Map<String, OutputFile>> affinityRatios, Collection<OutputFile> diffExpression) {
-        super(false, affinityRatios.values().stream().flatMap(
+    public IntegrateData(Configs configs, Map<String, Map<String, OutputFile>> affinityRatios,
+                         Collection<OutputFile> diffExpression) {
+        super(configs, false, affinityRatios.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).toList(), diffExpression);
         script = addInput(
                 getClass().getResourceAsStream("/org/exbio/tfprio/steps/TEPIC/DYNAMITE/Scripts/integrateData.py"),

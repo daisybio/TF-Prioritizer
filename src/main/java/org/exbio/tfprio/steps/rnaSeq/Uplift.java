@@ -15,19 +15,19 @@ import static org.exbio.pipejar.util.FileManagement.copyFile;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 import static org.exbio.tfprio.util.Helpers.getDatasetVersion;
 
-public class Uplift extends ExecutableStep {
+public class Uplift extends ExecutableStep<Configs> {
     public final OutputFile outputFile;
-    private final RequiredConfig<String> species = new RequiredConfig<>(Configs.deSeq2.speciesBiomart);
-    private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(Configs.deSeq2.speciesRefGenome);
+    private final RequiredConfig<String> species = new RequiredConfig<>(configs.deSeq2.speciesBiomart);
+    private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(configs.deSeq2.speciesRefGenome);
     private final InputFile genePositions;
 
     private final InputFile script;
 
     private final RequiredConfig<Map<String, String>> grcSynonymDict =
-            new RequiredConfig<>(Configs.internalConfigs.grcSynonymDict);
+            new RequiredConfig<>(configs.internalConfigs.grcSynonymDict);
 
-    public Uplift(OutputFile genePositions) {
-        super(false, genePositions);
+    public Uplift(Configs configs, OutputFile genePositions) {
+        super(configs, false, genePositions);
 
         this.genePositions = addInput(genePositions);
         outputFile = addOutput("uplifted.tsv");

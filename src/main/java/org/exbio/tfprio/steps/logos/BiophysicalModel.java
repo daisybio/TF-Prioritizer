@@ -17,14 +17,14 @@ import java.util.stream.Stream;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class BiophysicalModel extends ExecutableStep {
+public class BiophysicalModel extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("models");
     private final InputFile dcgFile;
     private final InputFile pwmFile;
-    private final RequiredConfig<File> pwmFileLocation = new RequiredConfig<>(Configs.tepic.PWMs);
+    private final RequiredConfig<File> pwmFileLocation = new RequiredConfig<>(configs.tepic.PWMs);
 
-    public BiophysicalModel(OutputFile dcgFile) {
-        super(false, dcgFile);
+    public BiophysicalModel(Configs configs, OutputFile dcgFile) {
+        super(configs, false, dcgFile);
 
         this.dcgFile = addInput(dcgFile);
         pwmFile = addInput(pwmFileLocation);

@@ -15,16 +15,16 @@ import java.util.concurrent.Callable;
 import static org.exbio.pipejar.util.FileManagement.softLink;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class UpliftENdb extends ExecutableStep {
+public class UpliftENdb extends ExecutableStep<Configs> {
 
     public final OutputFile outputFile;
     private final InputFile inputFile;
     private final InputFile script;
 
-    private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(Configs.deSeq2.speciesRefGenome);
+    private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(configs.deSeq2.speciesRefGenome);
 
-    public UpliftENdb(OutputFile enDBfile) {
-        super(false, enDBfile);
+    public UpliftENdb(Configs configs, OutputFile enDBfile) {
+        super(configs, false, enDBfile);
 
         inputFile = addInput(enDBfile);
         outputFile = addOutput("upliftedENdb.tsv");

@@ -11,11 +11,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
-public class FilterEnsgs extends ExecutableStep {
+public class FilterEnsgs extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("ensgs.tsv");
     public final OutputFile cleanFile = addOutput("clean.tsv");
-    private final RequiredConfig<File> geneIdsFile = new RequiredConfig<>(Configs.inputConfigs.geneIDs);
+    private final RequiredConfig<File> geneIdsFile = new RequiredConfig<>(configs.inputConfigs.geneIDs);
     private final InputFile inputFile = addInput(geneIdsFile);
+
+    public FilterEnsgs(Configs configs) {
+        super(configs);
+    }
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {

@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.Dynamite;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.Collection;
@@ -11,13 +12,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class ExtractRegressionCoefficients extends ExecutableStep {
+public class ExtractRegressionCoefficients extends ExecutableStep<Configs> {
 
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public ExtractRegressionCoefficients(Map<String, Map<String, OutputFile>> rawDynamiteOutput) {
-        super(false, rawDynamiteOutput.values().stream().flatMap(
+    public ExtractRegressionCoefficients(Configs configs, Map<String, Map<String, OutputFile>> rawDynamiteOutput) {
+        super(configs, false, rawDynamiteOutput.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).toList());
 
         rawDynamiteOutput.forEach((pairing, hmMap) -> {

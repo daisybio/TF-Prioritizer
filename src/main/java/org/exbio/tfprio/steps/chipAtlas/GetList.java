@@ -12,9 +12,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
-public class GetList extends ExecutableStep {
+public class GetList extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("chip_atlas_file_list.csv");
-    private final RequiredConfig<String> listUrl = new RequiredConfig<>(Configs.chipAtlas.listUrl);
+    private final RequiredConfig<String> listUrl = new RequiredConfig<>(configs.chipAtlas.listUrl);
+
+    public GetList(Configs configs) {
+        super(configs);
+    }
 
     @Override
     protected boolean doCreateFiles() {

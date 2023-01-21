@@ -14,18 +14,18 @@ import java.util.stream.Collectors;
 import static org.exbio.pipejar.util.FileManagement.readLines;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class DeSeq2 extends ExecutableStep {
+public class DeSeq2 extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     public final Map<String, OutputFile> normalizedCounts = new HashMap<>();
     private final InputFile script;
     private final InputFile batchFile;
     private final Set<String> pairings;
     private final Map<InputFile, OutputFile> filteredBatchFiles = new HashMap<>();
-    private final RequiredConfig<Integer> countFilter = new RequiredConfig<>(Configs.deSeq2.countFilter);
+    private final RequiredConfig<Integer> countFilter = new RequiredConfig<>(configs.deSeq2.countFilter);
     private final Map<String, InputFile> inputFiles = new HashMap<>();
 
-    public DeSeq2(Map<String, OutputFile> pairingCounts, OutputFile batchFile) {
-        super(false, pairingCounts.values(), batchFile);
+    public DeSeq2(Configs configs, Map<String, OutputFile> pairingCounts, OutputFile batchFile) {
+        super(configs, false, pairingCounts.values(), batchFile);
 
 
         pairings = pairingCounts.keySet();

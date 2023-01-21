@@ -1,12 +1,12 @@
 package org.exbio.tfprio.steps.tGene;
 
-import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.pipejar.pipeline.ExecutableStepWithoutConfigs;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
-public class TGeneCreateGroups extends ExecutableStep {
+public class TGeneCreateGroups extends ExecutableStepWithoutConfigs {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{

@@ -20,14 +20,14 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class Blacklist extends ExecutableStep {
+public class Blacklist extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
-    private final RequiredConfig<File> blacklistConfig = new RequiredConfig<>(Configs.mixOptions.blackListPath);
+    private final RequiredConfig<File> blacklistConfig = new RequiredConfig<>(configs.mixOptions.blackListPath);
     private final InputFile blacklist;
 
-    public Blacklist(Map<String, Map<String, Collection<OutputFile>>> dependencies) {
-        super(false, dependencies.values().stream().flatMap(
+    public Blacklist(Configs configs, Map<String, Map<String, Collection<OutputFile>>> dependencies) {
+        super(configs, false, dependencies.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
         blacklist = addInput(blacklistConfig);

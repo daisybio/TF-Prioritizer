@@ -19,14 +19,14 @@ import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class MergeCounts extends ExecutableStep {
+public class MergeCounts extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
-    private final RequiredConfig<File> rnaSeqDirectory = new RequiredConfig<>(Configs.inputConfigs.rnaSeq);
+    private final RequiredConfig<File> rnaSeqDirectory = new RequiredConfig<>(configs.inputConfigs.rnaSeq);
     private final InputFile geneIDFile;
     private final Map<OutputFile, Collection<File>> bridge = new HashMap<>();
 
-    public MergeCounts(OutputFile ensgFile) {
-        super(false, ensgFile);
+    public MergeCounts(Configs configs, OutputFile ensgFile) {
+        super(configs, false, ensgFile);
         geneIDFile = addInput(ensgFile);
         // Register all input files and their corresponding output files
         InputFile input = addInput(rnaSeqDirectory);

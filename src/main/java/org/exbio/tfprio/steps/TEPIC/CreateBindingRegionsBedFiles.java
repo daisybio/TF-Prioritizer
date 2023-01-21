@@ -12,15 +12,16 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class CreateBindingRegionsBedFiles extends ExecutableStep {
+public class CreateBindingRegionsBedFiles extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
-    private final RequiredConfig<Double> affinityCutoff = new RequiredConfig<>(Configs.tepic.affinityCutoff);
+    private final RequiredConfig<Double> affinityCutoff = new RequiredConfig<>(configs.tepic.affinityCutoff);
 
     private final Map<OutputFile, String> outputFileGroup = new HashMap<>();
 
-    public CreateBindingRegionsBedFiles(Map<String, Map<String, Collection<OutputFile>>> sequenceFiles) {
-        super(false,
+    public CreateBindingRegionsBedFiles(Configs configs,
+                                        Map<String, Map<String, Collection<OutputFile>>> sequenceFiles) {
+        super(configs, false,
                 sequenceFiles.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
                         Collectors.toList()));
         sequenceFiles.forEach((group, hmMap) -> {

@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.chipAtlas;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
 import java.util.Collection;
@@ -11,14 +12,14 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class CoOccurrenceAnalysis extends ExecutableStep {
+public class CoOccurrenceAnalysis extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("coOccurrence.tsv");
     private final InputFile inputDirectory;
     private final InputFile mergeScript;
     private final InputFile coOccurrenceScript;
 
-    public CoOccurrenceAnalysis(OutputFile chipAtlasDirectory) {
-        super(false, chipAtlasDirectory);
+    public CoOccurrenceAnalysis(Configs configs, OutputFile chipAtlasDirectory) {
+        super(configs, false, chipAtlasDirectory);
 
         inputDirectory = addInput(chipAtlasDirectory);
         mergeScript = addInput(getClass().getResourceAsStream("merge.sh"), "merge.sh");

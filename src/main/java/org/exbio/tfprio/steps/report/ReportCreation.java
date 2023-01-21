@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.report;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,12 +15,12 @@ import static org.exbio.pipejar.util.FileManagement.copyDirectory;
 import static org.exbio.pipejar.util.FileManagement.writeFile;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class ReportCreation extends ExecutableStep {
+public class ReportCreation extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("report");
     private final InputFile reportDirectory;
 
-    public ReportCreation(OutputFile reportDirectory) {
-        super(false, reportDirectory);
+    public ReportCreation(Configs configs, OutputFile reportDirectory) {
+        super(configs, false, reportDirectory);
 
         this.reportDirectory = addInput(reportDirectory);
     }

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
 import java.util.*;
@@ -12,16 +13,17 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class CreateHeatmaps extends ExecutableStep {
+public class CreateHeatmaps extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final InputFile script;
     private final Map<OutputFile, Pair<InputFile, Pair<InputFile, InputFile>>> bridge = new HashMap<>();
     private final InputFile batchFile;
     private final InputFile ensgSymbol;
 
-    public CreateHeatmaps(Map<String, OutputFile> normalizedCounts, Map<String, Map<String, OutputFile>> targetGenes,
-                          OutputFile batchFile, OutputFile ensgSymbol) {
-        super(false, normalizedCounts.values(),
+    public CreateHeatmaps(Configs configs, Map<String, OutputFile> normalizedCounts,
+                          Map<String, Map<String, OutputFile>> targetGenes, OutputFile batchFile,
+                          OutputFile ensgSymbol) {
+        super(configs, false, normalizedCounts.values(),
                 targetGenes.values().stream().flatMap(map -> map.values().stream()).toList(), List.of(batchFile));
 
         script = addInput(getClass().getResourceAsStream("heatmaps.R"), "heatmaps.R");

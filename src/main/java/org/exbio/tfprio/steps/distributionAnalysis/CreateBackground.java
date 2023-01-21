@@ -4,17 +4,18 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.util.FileFilters.Filters;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public class CreateBackground extends ExecutableStep {
+public class CreateBackground extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public CreateBackground(Map<String, OutputFile> inputFiles) {
-        super(false, inputFiles.values());
+    public CreateBackground(Configs configs, Map<String, OutputFile> inputFiles) {
+        super(configs, false, inputFiles.values());
 
         inputFiles.forEach((hm, inDir) -> {
             OutputFile output = addOutput(hm + ".tsv");

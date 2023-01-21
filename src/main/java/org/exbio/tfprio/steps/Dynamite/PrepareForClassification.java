@@ -3,19 +3,20 @@ package org.exbio.tfprio.steps.Dynamite;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.util.*;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class PrepareForClassification extends ExecutableStep {
+public class PrepareForClassification extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final InputFile script;
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public PrepareForClassification(Map<String, Map<String, OutputFile>> integratedData) {
-        super(false, integratedData.values().stream().flatMap(
+    public PrepareForClassification(Configs configs, Map<String, Map<String, OutputFile>> integratedData) {
+        super(configs, false, integratedData.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).toList());
         script = addInput(getClass().getResourceAsStream(
                         "/org/exbio/tfprio/steps/TEPIC/DYNAMITE/Scripts/prepareForClassification.R"),

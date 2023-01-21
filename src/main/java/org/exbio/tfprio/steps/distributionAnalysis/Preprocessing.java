@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -15,13 +16,13 @@ import java.util.stream.Stream;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class Preprocessing extends ExecutableStep {
+public class Preprocessing extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("preprocessed.tsv");
 
     private final Map<String, Pair<InputFile, InputFile>> inputFiles = new HashMap<>();
 
-    public Preprocessing(Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGrouped) {
-        super(false, hmThresholdGrouped.values().stream().map(
+    public Preprocessing(Configs configs, Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGrouped) {
+        super(configs, false, hmThresholdGrouped.values().stream().map(
                 map -> map.get(map.keySet().stream().min(Double::compareTo).orElseThrow())).flatMap(
                 maps -> Stream.of(maps.getLeft(), maps.getRight())).toList());
 

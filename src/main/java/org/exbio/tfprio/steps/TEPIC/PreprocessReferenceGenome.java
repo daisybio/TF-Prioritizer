@@ -11,10 +11,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 
-public class PreprocessReferenceGenome extends ExecutableStep {
+public class PreprocessReferenceGenome extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("referenceGenome.fa");
-    private final RequiredConfig<File> referenceGenomeConfig = new RequiredConfig<>(Configs.tepic.inputReferenceGenome);
+    private final RequiredConfig<File> referenceGenomeConfig = new RequiredConfig<>(configs.tepic.inputReferenceGenome);
     private final InputFile referenceGenome = addInput(referenceGenomeConfig);
+
+    public PreprocessReferenceGenome(Configs configs) {
+        super(configs);
+    }
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {

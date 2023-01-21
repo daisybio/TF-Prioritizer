@@ -3,17 +3,18 @@ package org.exbio.tfprio.steps.TEPIC;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public class ExtractSequences extends ExecutableStep {
+public class ExtractSequences extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public ExtractSequences(Map<String, Map<String, Collection<OutputFile>>> tepicFiles) {
-        super(false, tepicFiles.values().stream().flatMap(
+    public ExtractSequences(Configs configs, Map<String, Map<String, Collection<OutputFile>>> tepicFiles) {
+        super(configs, false, tepicFiles.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream().flatMap(Collection::stream)).toList());
 
         tepicFiles.forEach((group, hmMap) -> {

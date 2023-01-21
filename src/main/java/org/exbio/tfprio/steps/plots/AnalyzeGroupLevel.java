@@ -17,23 +17,24 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toMap;
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class AnalyzeGroupLevel extends ExecutableStep {
+public class AnalyzeGroupLevel extends ExecutableStep<Configs> {
     public final Map<String, Map<Double, Pair<OutputFile, OutputFile>>> outputFiles = new HashMap<>();
     private final InputFile ensgSymbolFile;
     private final InputFile analyzableTfs;
     private final Map<String, InputFile> groupTPMFiles;
     private final Map<String, InputFile> groupMeanCountFiles;
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
-    private final OptionalConfig<Integer> cutoffGroups = new OptionalConfig<>(Configs.plots.cutoffGroups, false);
+    private final OptionalConfig<Integer> cutoffGroups = new OptionalConfig<>(configs.plots.cutoffGroups, false);
     private final OptionalConfig<Double> cutoffGroupCounts =
-            new OptionalConfig<>(Configs.plots.cutoffGroupCounts, false);
-    private final OptionalConfig<Double> cutoffTPM = new OptionalConfig<>(Configs.plots.cutoffTPM, false);
+            new OptionalConfig<>(configs.plots.cutoffGroupCounts, false);
+    private final OptionalConfig<Double> cutoffTPM = new OptionalConfig<>(configs.plots.cutoffTPM, false);
 
 
-    public AnalyzeGroupLevel(Map<String, OutputFile> groupMeanTPM, Map<String, OutputFile> groupMeanCount,
+    public AnalyzeGroupLevel(Configs configs, Map<String, OutputFile> groupMeanTPM,
+                             Map<String, OutputFile> groupMeanCount,
                              Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGroupedStages,
                              OutputFile ensgSymbolFile, OutputFile analyzableTfs) {
-        super(false, groupMeanTPM.values(), groupMeanCount.values(),
+        super(configs, false, groupMeanTPM.values(), groupMeanCount.values(),
                 hmThresholdGroupedStages.values().stream().flatMap(x -> x.values().stream()).flatMap(
                         pair -> Stream.of(pair.getLeft(), pair.getRight())).toList(),
                 List.of(ensgSymbolFile, analyzableTfs));

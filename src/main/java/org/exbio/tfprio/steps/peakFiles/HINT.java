@@ -27,14 +27,14 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
  * Output:
  * - .bed footprint files
  */
-public class HINT extends ExecutableStep {
+public class HINT extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final String exec = "rgt-hint";
     private final String mode = "footprinting";
-    private final RequiredConfig<String> seqType = new RequiredConfig<>(Configs.mixOptions.seqType);
-    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(Configs.hint.bam_directory);
-    private final RequiredConfig<Boolean> paired = new RequiredConfig<>(Configs.hint.paired);
-    private final RequiredConfig<String> genome = new RequiredConfig<>(Configs.hint.genome);
+    private final RequiredConfig<String> seqType = new RequiredConfig<>(configs.mixOptions.seqType);
+    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.hint.bam_directory);
+    private final RequiredConfig<Boolean> paired = new RequiredConfig<>(configs.hint.paired);
+    private final RequiredConfig<String> genome = new RequiredConfig<>(configs.hint.genome);
     private final Map<OutputFile, Pair<InputFile, InputFile>> bridge = new HashMap<>();
     private final Function<File, String> trimFile = (file) -> {
         String name = file.getName();
@@ -46,8 +46,8 @@ public class HINT extends ExecutableStep {
      *
      * @param peakFiles: Output of preprocessing steps for peakFiles
      */
-    public HINT(Map<String, Map<String, Collection<OutputFile>>> peakFiles) {
-        super(false, peakFiles.values().stream().flatMap(
+    public HINT(Configs configs, Map<String, Map<String, Collection<OutputFile>>> peakFiles) {
+        super(configs, false, peakFiles.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
 

@@ -2,16 +2,17 @@ package org.exbio.tfprio.steps.TEPIC;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public class FindAnalyzableTFs extends ExecutableStep {
+public class FindAnalyzableTFs extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("analyzableTFs.tsv");
 
-    public FindAnalyzableTFs(Map<String, Map<String, OutputFile>> affinityFiles) {
-        super(true, affinityFiles.values().stream().flatMap(m -> m.values().stream()).toList());
+    public FindAnalyzableTFs(Configs configs, Map<String, Map<String, OutputFile>> affinityFiles) {
+        super(configs, true, affinityFiles.values().stream().flatMap(m -> m.values().stream()).toList());
     }
 
     @Override

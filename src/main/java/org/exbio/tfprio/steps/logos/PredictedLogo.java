@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
 import java.util.*;
@@ -11,13 +12,13 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class PredictedLogo extends ExecutableStep {
+public class PredictedLogo extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
     private final InputFile script;
 
-    public PredictedLogo(Map<String, OutputFile> hmDirectories) {
-        super(false, hmDirectories.values());
+    public PredictedLogo(Configs configs, Map<String, OutputFile> hmDirectories) {
+        super(configs, false, hmDirectories.values());
 
         script = addInput(getClass().getResourceAsStream("predicted.R"), "predicted.R");
 

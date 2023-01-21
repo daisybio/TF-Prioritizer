@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class CreatePlots extends ExecutableStep {
+public class CreatePlots extends ExecutableStep<Configs> {
     // TODO: remove index from being stored
     public final Map<String, OutputFile> statFiles = new HashMap<>();
     public final Map<String, OutputFile> plotFiles = new HashMap<>();
@@ -21,8 +22,8 @@ public class CreatePlots extends ExecutableStep {
 
     private final InputFile script;
 
-    public CreatePlots(Map<String, OutputFile> hmTfDirectory, Map<String, OutputFile> hmBackground) {
-        super(false, hmTfDirectory.values(), hmBackground.values());
+    public CreatePlots(Configs configs, Map<String, OutputFile> hmTfDirectory, Map<String, OutputFile> hmBackground) {
+        super(configs, false, hmTfDirectory.values(), hmBackground.values());
 
         script = addInput(getClass().getResourceAsStream("plots.py"), "plots.py");
 

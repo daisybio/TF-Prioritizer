@@ -16,14 +16,14 @@ import java.util.stream.Stream;
 
 import static org.exbio.pipejar.util.FileManagement.makeSureFileExists;
 
-public class TopKTargetGenes extends ExecutableStep {
+public class TopKTargetGenes extends ExecutableStep<Configs> {
     public final Map<String, Map<Double, Pair<OutputFile, OutputFile>>> outputFiles = new HashMap<>();
     private final Map<OutputFile, Pair<InputFile, Map<String, InputFile>>> bridge = new HashMap<>();
-    private final RequiredConfig<Integer> topKTargetGenes = new RequiredConfig<>(Configs.plots.topKTargetGenes);
+    private final RequiredConfig<Integer> topKTargetGenes = new RequiredConfig<>(configs.plots.topKTargetGenes);
 
-    public TopKTargetGenes(Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGrouped,
+    public TopKTargetGenes(Configs configs, Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGrouped,
                            Map<String, Map<String, OutputFile>> groupHmMeanAffinities) {
-        super(false, hmThresholdGrouped.values().stream().flatMap(x -> x.values().stream()).flatMap(
+        super(configs, false, hmThresholdGrouped.values().stream().flatMap(x -> x.values().stream()).flatMap(
                         pair -> Stream.of(pair.getLeft(), pair.getRight())).toList(),
                 groupHmMeanAffinities.values().stream().flatMap(sub -> sub.values().stream()).toList());
 

@@ -23,13 +23,13 @@ import static org.exbio.pipejar.util.FileManagement.readLines;
  * either all overlapping peaks are merged or only the ones that occur more than
  * {@link org.exbio.tfprio.configs.Configs#mixOptions#minOccurrence} times.
  */
-public class MixSamples extends ExecutableStep {
+public class MixSamples extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
-    private final RequiredConfig<Integer> minOccurrence = new RequiredConfig<>(Configs.mixOptions.minOccurrence);
+    private final RequiredConfig<Integer> minOccurrence = new RequiredConfig<>(configs.mixOptions.minOccurrence);
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
 
-    public MixSamples(Map<String, Map<String, Collection<OutputFile>>> dependencies) {
-        super(false, dependencies.values().stream().flatMap(
+    public MixSamples(Configs configs, Map<String, Map<String, Collection<OutputFile>>> dependencies) {
+        super(configs, false, dependencies.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
         dependencies.forEach((group, hmMap) -> {

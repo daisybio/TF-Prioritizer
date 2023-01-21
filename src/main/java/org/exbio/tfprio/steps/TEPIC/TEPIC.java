@@ -19,45 +19,46 @@ import java.util.stream.Collectors;
 import static org.exbio.pipejar.util.FileManagement.*;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class TEPIC extends ExecutableStep {
+public class TEPIC extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
     private final Map<String, Map<String, Collection<InputFile>>> chipSeqFiles = new HashMap<>();
-    private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(Configs.tepic.sequenceFileName);
+    private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(configs.tepic.sequenceFileName);
 
-    private final RequiredConfig<File> f_pwms = new RequiredConfig<>(Configs.tepic.PWMs);
+    private final RequiredConfig<File> f_pwms = new RequiredConfig<>(configs.tepic.PWMs);
     private final OptionalConfig<File> bedChromatinSignal =
-            new OptionalConfig<>(Configs.tepic.bedChromatinSignal, false);
-    private final OptionalConfig<Integer> columnBedfile = new OptionalConfig<>(Configs.tepic.columnBedfile, false);
+            new OptionalConfig<>(configs.tepic.bedChromatinSignal, false);
+    private final OptionalConfig<Integer> columnBedfile = new OptionalConfig<>(configs.tepic.columnBedfile, false);
     private final OptionalConfig<File> geneAnnotationFile =
-            new OptionalConfig<>(Configs.inputConfigs.geneAnnotationFile, false);
-    private final OptionalConfig<Integer> windowSize = new OptionalConfig<>(Configs.tepic.windowSize, false);
-    private final OptionalConfig<File> onlyDNasePeaks = new OptionalConfig<>(Configs.tepic.onlyDNasePeaks, false);
+            new OptionalConfig<>(configs.inputConfigs.geneAnnotationFile, false);
+    private final OptionalConfig<Integer> windowSize = new OptionalConfig<>(configs.tepic.windowSize, false);
+    private final OptionalConfig<File> onlyDNasePeaks = new OptionalConfig<>(configs.tepic.onlyDNasePeaks, false);
     private final OptionalConfig<Boolean> exponentialDecay =
-            new OptionalConfig<>(Configs.tepic.exponentialDecay, false);
+            new OptionalConfig<>(configs.tepic.exponentialDecay, false);
     private final OptionalConfig<Boolean> doNotNormalizePeakLength =
-            new OptionalConfig<>(Configs.tepic.doNotNormalizePeakLength, false);
-    private final OptionalConfig<Boolean> originalDecay = new OptionalConfig<>(Configs.tepic.originalDecay, false);
-    private final OptionalConfig<File> psemsLengthFile = new OptionalConfig<>(Configs.tepic.psemsLengthFile, false);
-    private final OptionalConfig<Boolean> entireGeneBody = new OptionalConfig<>(Configs.tepic.entireGeneBody, false);
-    private final OptionalConfig<Boolean> doZip = new OptionalConfig<>(Configs.tepic.doZip, false);
-    private final OptionalConfig<File> twoBitFile = new OptionalConfig<>(Configs.tepic.twoBitFile, false);
-    private final OptionalConfig<Double> pValue = new OptionalConfig<>(Configs.tepic.pValue, false);
+            new OptionalConfig<>(configs.tepic.doNotNormalizePeakLength, false);
+    private final OptionalConfig<Boolean> originalDecay = new OptionalConfig<>(configs.tepic.originalDecay, false);
+    private final OptionalConfig<File> psemsLengthFile = new OptionalConfig<>(configs.tepic.psemsLengthFile, false);
+    private final OptionalConfig<Boolean> entireGeneBody = new OptionalConfig<>(configs.tepic.entireGeneBody, false);
+    private final OptionalConfig<Boolean> doZip = new OptionalConfig<>(configs.tepic.doZip, false);
+    private final OptionalConfig<File> twoBitFile = new OptionalConfig<>(configs.tepic.twoBitFile, false);
+    private final OptionalConfig<Double> pValue = new OptionalConfig<>(configs.tepic.pValue, false);
     private final OptionalConfig<Integer> maxMinutesPerChromosome =
-            new OptionalConfig<>(Configs.tepic.maxMinutesPerChromosome, false);
+            new OptionalConfig<>(configs.tepic.maxMinutesPerChromosome, false);
     private final OptionalConfig<Boolean> chromosomePrefix =
-            new OptionalConfig<>(Configs.tepic.chromosomePrefix, false);
-    private final OptionalConfig<Boolean> transcriptBased = new OptionalConfig<>(Configs.tepic.transcriptBased, false);
-    private final OptionalConfig<File> loopListFile = new OptionalConfig<>(Configs.tepic.loopListFile, false);
-    private final OptionalConfig<Integer> loopWindows = new OptionalConfig<>(Configs.tepic.loopWindows, false);
+            new OptionalConfig<>(configs.tepic.chromosomePrefix, false);
+    private final OptionalConfig<Boolean> transcriptBased = new OptionalConfig<>(configs.tepic.transcriptBased, false);
+    private final OptionalConfig<File> loopListFile = new OptionalConfig<>(configs.tepic.loopListFile, false);
+    private final OptionalConfig<Integer> loopWindows = new OptionalConfig<>(configs.tepic.loopWindows, false);
     private final OptionalConfig<Boolean> onlyPeakFeatures =
-            new OptionalConfig<>(Configs.tepic.onlyPeakFeatures, false);
+            new OptionalConfig<>(configs.tepic.onlyPeakFeatures, false);
     private final InputFile referenceGenome;
 
     private final File executable;
 
-    public TEPIC(Map<String, Map<String, Collection<OutputFile>>> latestChipSeq, OutputFile referenceGenome) {
-        super(false,
+    public TEPIC(Configs configs, Map<String, Map<String, Collection<OutputFile>>> latestChipSeq,
+                 OutputFile referenceGenome) {
+        super(configs, false,
                 latestChipSeq.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
                         Collectors.toSet()), referenceGenome);
 

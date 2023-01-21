@@ -17,15 +17,16 @@ import static org.exbio.pipejar.util.FileManagement.readLines;
 import static org.exbio.tfprio.steps.plots.TopKTargetGenes.getTfTopGeneAffinities;
 import static org.exbio.tfprio.steps.plots.TopKTargetGenes.writeAffinities;
 
-public class TopKTargetGenes extends ExecutableStep {
+public class TopKTargetGenes extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final InputFile dcgScoreFile;
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
-    private final RequiredConfig<Integer> topKTargetGenes = new RequiredConfig<>(Configs.plots.topKTargetGenes);
+    private final RequiredConfig<Integer> topKTargetGenes = new RequiredConfig<>(configs.plots.topKTargetGenes);
 
 
-    public TopKTargetGenes(OutputFile dcgScoreFile, Map<String, Map<String, OutputFile>> groupHmMeanAffinities) {
-        super(false, groupHmMeanAffinities.values().stream().flatMap(sub -> sub.values().stream()).toList(),
+    public TopKTargetGenes(Configs configs, OutputFile dcgScoreFile,
+                           Map<String, Map<String, OutputFile>> groupHmMeanAffinities) {
+        super(configs, false, groupHmMeanAffinities.values().stream().flatMap(sub -> sub.values().stream()).toList(),
                 dcgScoreFile);
 
         this.dcgScoreFile = addInput(dcgScoreFile);

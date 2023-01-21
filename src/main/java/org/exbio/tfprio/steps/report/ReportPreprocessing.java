@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.*;
 import static org.exbio.pipejar.util.FileManagement.*;
 
-public class ReportPreprocessing extends ExecutableStep {
+public class ReportPreprocessing extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("report");
     private final InputFile ensgSymbol;
     private final InputFile angularInput;
@@ -34,15 +35,15 @@ public class ReportPreprocessing extends ExecutableStep {
     private final InputFile biophysicalLogo;
     private final InputFile tfSequence;
 
-    public ReportPreprocessing(OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
+    public ReportPreprocessing(Configs configs, OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
                                Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
                                Map<String, OutputFile> groupTpm, OutputFile biophysicalLogo, OutputFile tfSequence,
                                Map<String, Map<String, OutputFile>> pairingHmHeatmapDir,
                                Map<String, Map<String, OutputFile>> pairingHmIgvDir,
                                Map<String, OutputFile> hmDistributionPlots,
                                Map<String, Map<String, OutputFile>> pairingHmRegressionCoefficients) {
-        super(false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(), groupTpm.values(),
-                List.of(ensgSymbol), hmDistributionPlots.values(),
+        super(configs, false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(),
+                groupTpm.values(), List.of(ensgSymbol), hmDistributionPlots.values(),
                 pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
                 pairingHmIgvDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
                 pairingHmRegressionCoefficients.values().stream().flatMap(m -> m.values().stream()).collect(

@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.plots;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class ThresholdPlots extends ExecutableStep {
+public class ThresholdPlots extends ExecutableStep<Configs> {
     // Originally, there wer also plots for same stages and different stages here
     // Removed them, because it is not trivial to define what is a same stage and what is a different stage
     // First letter works just for the demo mouse data
@@ -24,8 +25,8 @@ public class ThresholdPlots extends ExecutableStep {
     private final Map<InputFile, String> inputFileHm = new HashMap<>();
     private final Map<InputFile, String> inputFilePairing = new HashMap<>();
 
-    public ThresholdPlots(Map<String, Map<String, Map<Double, OutputFile>>> coefficientFiles) {
-        super(false, coefficientFiles.values().stream().flatMap(x -> x.values().stream()).flatMap(
+    public ThresholdPlots(Configs configs, Map<String, Map<String, Map<Double, OutputFile>>> coefficientFiles) {
+        super(configs, false, coefficientFiles.values().stream().flatMap(x -> x.values().stream()).flatMap(
                 col -> col.values().stream()).toList());
 
         script = addInput(getClass().getResourceAsStream("thresholdPlot.py"), "thresholdPlot.py");

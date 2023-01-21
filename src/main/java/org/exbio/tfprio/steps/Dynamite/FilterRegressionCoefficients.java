@@ -11,14 +11,14 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public class FilterRegressionCoefficients extends ExecutableStep {
+public class FilterRegressionCoefficients extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Map<Double, OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, Map<Double, OutputFile>> bridge = new HashMap<>();
 
-    private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(Configs.plots.thresholds);
+    private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(configs.plots.thresholds);
 
-    public FilterRegressionCoefficients(Map<String, Map<String, OutputFile>> regressionCoefficients) {
-        super(false, regressionCoefficients.values().stream().flatMap(
+    public FilterRegressionCoefficients(Configs configs, Map<String, Map<String, OutputFile>> regressionCoefficients) {
+        super(configs, false, regressionCoefficients.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).toList());
 
         regressionCoefficients.forEach((pairing, hmMap) -> {

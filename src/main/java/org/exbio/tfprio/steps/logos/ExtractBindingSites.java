@@ -14,16 +14,17 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class ExtractBindingSites extends ExecutableStep {
+public class ExtractBindingSites extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final InputFile dcgFile;
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
-    private final OptionalConfig<Double> affinityCutoff = new OptionalConfig<>(Configs.tepic.affinityCutoff, false);
+    private final OptionalConfig<Double> affinityCutoff = new OptionalConfig<>(configs.tepic.affinityCutoff, false);
 
-    public ExtractBindingSites(OutputFile dcgFile,
+    public ExtractBindingSites(Configs configs, OutputFile dcgFile,
                                Map<String, Map<String, Collection<OutputFile>>> groupHmSampleSequenceFiles) {
-        super(false, groupHmSampleSequenceFiles.values().stream().flatMap(sub -> sub.values().stream()).flatMap(
-                Collection::stream).toList(), dcgFile);
+        super(configs, false,
+                groupHmSampleSequenceFiles.values().stream().flatMap(sub -> sub.values().stream()).flatMap(
+                        Collection::stream).toList(), dcgFile);
         this.dcgFile = addInput(dcgFile);
 
         Set<String> hms = groupHmSampleSequenceFiles.values().stream().flatMap(sub -> sub.keySet().stream()).collect(

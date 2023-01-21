@@ -15,16 +15,16 @@ import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.copyFile;
 
-public class TEPICRandomize extends ExecutableStep {
+public class TEPICRandomize extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
-    private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(Configs.tepic.sequenceFileName);
-    private final OptionalConfig<Double> tpmFilter = new OptionalConfig<>(Configs.deSeq2.tpmFilter, false);
+    private final RequiredConfig<String> sequenceFileName = new RequiredConfig<>(configs.tepic.sequenceFileName);
+    private final OptionalConfig<Double> tpmFilter = new OptionalConfig<>(configs.deSeq2.tpmFilter, false);
 
     // TODO put this behind after extraction of affinity files
 
-    public TEPICRandomize(Map<String, Map<String, Collection<OutputFile>>> tepicResults) {
-        super(false,
+    public TEPICRandomize(Configs configs, Map<String, Map<String, Collection<OutputFile>>> tepicResults) {
+        super(configs, false,
                 tepicResults.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
                         Collectors.toList()));
         tepicResults.forEach((group, hmMap) -> {

@@ -12,13 +12,13 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.softLink;
 
-public class InitPeaks extends ExecutableStep {
+public class InitPeaks extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
-    private final RequiredConfig<File> inputDirectory = new RequiredConfig<>(Configs.inputConfigs.peaks);
+    private final RequiredConfig<File> inputDirectory = new RequiredConfig<>(configs.inputConfigs.peaks);
     private final Map<File, OutputFile> bridge = new HashMap<>();
 
-    public InitPeaks() {
-        super();
+    public InitPeaks(Configs configs) {
+        super(configs);
 
         // Register all input files and their corresponding output files
         InputFile input = addInput(inputDirectory);

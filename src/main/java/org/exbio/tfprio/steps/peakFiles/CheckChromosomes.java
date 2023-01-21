@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.peakFiles;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,12 +16,12 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class CheckChromosomes extends ExecutableStep {
+public class CheckChromosomes extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public CheckChromosomes(Map<String, Map<String, Collection<OutputFile>>> peakFiles) {
-        super(false, peakFiles.values().stream().flatMap(
+    public CheckChromosomes(Configs configs, Map<String, Map<String, Collection<OutputFile>>> peakFiles) {
+        super(configs, false, peakFiles.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
 

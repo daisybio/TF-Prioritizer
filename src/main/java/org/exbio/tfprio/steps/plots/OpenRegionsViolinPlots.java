@@ -13,15 +13,15 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class OpenRegionsViolinPlots extends ExecutableStep {
+public class OpenRegionsViolinPlots extends ExecutableStep<Configs> {
     public final OutputFile dataFile = addOutput("data.tsv");
     public final OutputFile plotFile = addOutput("plot.png");
     private final InputFile script;
-    private final RequiredConfig<String> geneRegionFileName = new RequiredConfig<>(Configs.tepic.geneRegionFileName);
+    private final RequiredConfig<String> geneRegionFileName = new RequiredConfig<>(configs.tepic.geneRegionFileName);
     private final Map<String, Collection<InputFile>> hmDirectories = new HashMap<>();
 
-    public OpenRegionsViolinPlots(Map<String, Map<String, Collection<OutputFile>>> tepicResults) {
-        super(false,
+    public OpenRegionsViolinPlots(Configs configs, Map<String, Map<String, Collection<OutputFile>>> tepicResults) {
+        super(configs, false,
                 tepicResults.values().stream().flatMap(x -> x.values().stream()).flatMap(Collection::stream).collect(
                         Collectors.toList()));
 

@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 import static org.exbio.pipejar.util.FileManagement.readLines;
 import static org.exbio.tfprio.lib.Biomart.query;
 
-public class EnsgSymbol extends ExecutableStep {
+public class EnsgSymbol extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("ensgSymbol.tsv");
     private final InputFile geneIdsFile;
-    private final RequiredConfig<String> species = new RequiredConfig<>(Configs.deSeq2.speciesBiomart);
+    private final RequiredConfig<String> species = new RequiredConfig<>(configs.deSeq2.speciesBiomart);
 
 
-    public EnsgSymbol(OutputFile ensgFile) {
-        super(false, ensgFile);
+    public EnsgSymbol(Configs configs, OutputFile ensgFile) {
+        super(configs, false, ensgFile);
         geneIdsFile = addInput(ensgFile);
     }
 

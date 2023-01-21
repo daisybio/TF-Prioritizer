@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.distributionAnalysis;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,13 +15,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class ExtractStatRank extends ExecutableStep {
+public class ExtractStatRank extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
 
-    public ExtractStatRank(Map<String, OutputFile> hmStats) {
-        super(false, hmStats.values());
+    public ExtractStatRank(Configs configs, Map<String, OutputFile> hmStats) {
+        super(configs, false, hmStats.values());
 
         hmStats.forEach((hm, statsFile) -> {
             OutputFile output = addOutput(statsFile.getName());

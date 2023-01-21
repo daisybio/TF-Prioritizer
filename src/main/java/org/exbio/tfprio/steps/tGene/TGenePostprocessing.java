@@ -17,15 +17,15 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class TGenePostprocessing extends ExecutableStep {
+public class TGenePostprocessing extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final Map<String, InputFile> tpmFiles = new HashMap<>();
     private final Map<String, Map<String, Collection<InputFile>>> linkFiles = new HashMap<>();
-    private final OptionalConfig<Double> tpmFilter = new OptionalConfig<>(Configs.deSeq2.tpmFilter, false);
+    private final OptionalConfig<Double> tpmFilter = new OptionalConfig<>(configs.deSeq2.tpmFilter, false);
 
-    public TGenePostprocessing(Map<String, OutputFile> tpmFiles,
+    public TGenePostprocessing(Configs configs, Map<String, OutputFile> tpmFiles,
                                Map<String, Map<String, Collection<OutputFile>>> linkFiles) {
-        super(false, tpmFiles.values(),
+        super(configs, false, tpmFiles.values(),
                 linkFiles.values().stream().flatMap(map -> map.values().stream()).flatMap(Collection::stream).toArray(
                         OutputFile[]::new));
 

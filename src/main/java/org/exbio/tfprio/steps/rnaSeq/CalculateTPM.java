@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.rnaSeq;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -15,13 +16,13 @@ import java.util.stream.IntStream;
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
 
-public class CalculateTPM extends ExecutableStep {
+public class CalculateTPM extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final InputFile lengthsFile;
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public CalculateTPM(Map<String, OutputFile> countFiles, OutputFile lengthsFile) {
-        super(false, countFiles.values(), lengthsFile);
+    public CalculateTPM(Configs configs, Map<String, OutputFile> countFiles, OutputFile lengthsFile) {
+        super(configs, false, countFiles.values(), lengthsFile);
         this.lengthsFile = addInput(lengthsFile);
 
         countFiles.forEach((group, input) -> {

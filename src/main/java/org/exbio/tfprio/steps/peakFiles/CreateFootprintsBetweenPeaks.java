@@ -16,15 +16,16 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class CreateFootprintsBetweenPeaks extends ExecutableStep {
+public class CreateFootprintsBetweenPeaks extends ExecutableStep<Configs> {
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
     private final RequiredConfig<String> tfBindingSiteSearch =
-            new RequiredConfig<>(Configs.mixOptions.tfBindingSiteSearch);
-    private final RequiredConfig<Integer> maxDistance = new RequiredConfig<>(Configs.mixOptions.maxSpaceBetweenPeaks);
+            new RequiredConfig<>(configs.mixOptions.tfBindingSiteSearch);
+    private final RequiredConfig<Integer> maxDistance = new RequiredConfig<>(configs.mixOptions.maxSpaceBetweenPeaks);
     public Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
 
-    public CreateFootprintsBetweenPeaks(Map<String, Map<String, Collection<OutputFile>>> dependencies) {
-        super(false, dependencies.values().stream().flatMap(
+    public CreateFootprintsBetweenPeaks(Configs configs,
+                                        Map<String, Map<String, Collection<OutputFile>>> dependencies) {
+        super(configs, false, dependencies.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
 

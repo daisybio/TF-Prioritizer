@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.tGene;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 import org.exbio.tfprio.lib.GeneRegion;
 
 import java.io.*;
@@ -12,12 +13,12 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class TGeneExtractRegions extends ExecutableStep {
+public class TGeneExtractRegions extends ExecutableStep<Configs> {
     public final OutputFile outputFile;
     private final InputFile inputFile;
 
-    public TGeneExtractRegions(OutputFile input) {
-        super(false, input);
+    public TGeneExtractRegions(Configs configs, OutputFile input) {
+        super(configs, false, input);
         this.inputFile = addInput(input);
         this.outputFile = addOutput("regions.tsv");
     }

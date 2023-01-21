@@ -20,14 +20,14 @@ import static org.exbio.pipejar.util.FileManagement.readLines;
 /**
  *
  */
-public class MixMutuallyExclusive extends ExecutableStep {
+public class MixMutuallyExclusive extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<String, Map<String, Collection<InputFile>>> inputFiles = new HashMap<>();
     private final RequiredConfig<Boolean> differentialPeakSignals =
-            new RequiredConfig<>(Configs.mixOptions.differentialPeakSignals);
+            new RequiredConfig<>(configs.mixOptions.differentialPeakSignals);
 
-    public MixMutuallyExclusive(Map<String, Map<String, Collection<OutputFile>>> dependencies) {
-        super(false, dependencies.values().stream().flatMap(
+    public MixMutuallyExclusive(Configs configs, Map<String, Map<String, Collection<OutputFile>>> dependencies) {
+        super(configs, false, dependencies.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
         dependencies.forEach((group, hmMap) -> {

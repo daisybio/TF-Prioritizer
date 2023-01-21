@@ -3,6 +3,7 @@ package org.exbio.tfprio.steps.rnaSeq;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.Collection;
@@ -11,12 +12,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class MeanExpression extends ExecutableStep {
+public class MeanExpression extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public MeanExpression(Map<String, OutputFile> inputFiles) {
-        super(false, inputFiles.values());
+    public MeanExpression(Configs configs, Map<String, OutputFile> inputFiles) {
+        super(configs, false, inputFiles.values());
 
         inputFiles.forEach((group, input) -> {
             InputFile inputFile = addInput(input);

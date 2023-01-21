@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.*;
@@ -11,12 +12,12 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class ExtractAffinities extends ExecutableStep {
+public class ExtractAffinities extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    public ExtractAffinities(Map<String, Map<String, Collection<OutputFile>>> tepicFiles) {
-        super(false, tepicFiles.values().stream().flatMap(
+    public ExtractAffinities(Configs configs, Map<String, Map<String, Collection<OutputFile>>> tepicFiles) {
+        super(configs, false, tepicFiles.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream().flatMap(Collection::stream)).toList());
 
         tepicFiles.forEach((group, hmMap) -> {
@@ -103,7 +104,7 @@ public class ExtractAffinities extends ExecutableStep {
                                 }
                             });
                         }
-                        
+
                         return true;
                     }
                     logger.warn("Could not find affinity file for {}", input);

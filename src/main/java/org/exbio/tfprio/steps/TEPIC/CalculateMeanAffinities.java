@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
+import org.exbio.tfprio.configs.Configs;
 
 import java.io.*;
 import java.util.*;
@@ -11,12 +12,12 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class CalculateMeanAffinities extends ExecutableStep {
+public class CalculateMeanAffinities extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
 
-    public CalculateMeanAffinities(Map<String, Map<String, Collection<OutputFile>>> tepicFiles) {
-        super(false, tepicFiles.values().stream().flatMap(
+    public CalculateMeanAffinities(Configs configs, Map<String, Map<String, Collection<OutputFile>>> tepicFiles) {
+        super(configs, false, tepicFiles.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).toList());
 
         tepicFiles.forEach((group, hmMap) -> {

@@ -19,19 +19,19 @@ import java.util.stream.Collectors;
 import static org.exbio.pipejar.util.FileManagement.deleteFileStructure;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class TGene extends ExecutableStep {
+public class TGene extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
     private final InputFile gtfFile;
-    private final RequiredConfig<Boolean> noClosestLocus = new RequiredConfig<>(Configs.tGene.noClosestLocus);
-    private final RequiredConfig<Boolean> noClosestTss = new RequiredConfig<>(Configs.tGene.noClosestTss);
-    private final RequiredConfig<Integer> maxLinkDistance = new RequiredConfig<>(Configs.tGene.maxLinkDistance);
-    private final RequiredConfig<Double> pValue = new RequiredConfig<>(Configs.tGene.pValue);
+    private final RequiredConfig<Boolean> noClosestLocus = new RequiredConfig<>(configs.tGene.noClosestLocus);
+    private final RequiredConfig<Boolean> noClosestTss = new RequiredConfig<>(configs.tGene.noClosestTss);
+    private final RequiredConfig<Integer> maxLinkDistance = new RequiredConfig<>(configs.tGene.maxLinkDistance);
+    private final RequiredConfig<Double> pValue = new RequiredConfig<>(configs.tGene.pValue);
 
-    private final RequiredConfig<File> executable = new RequiredConfig<>(Configs.tGene.executable);
+    private final RequiredConfig<File> executable = new RequiredConfig<>(configs.tGene.executable);
 
-    public TGene(Map<String, Map<String, Collection<OutputFile>>> peakFiles, OutputFile gtfFile) {
-        super(false, peakFiles.values().stream().flatMap(
+    public TGene(Configs configs, Map<String, Map<String, Collection<OutputFile>>> peakFiles, OutputFile gtfFile) {
+        super(configs, false, peakFiles.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()), gtfFile);
 

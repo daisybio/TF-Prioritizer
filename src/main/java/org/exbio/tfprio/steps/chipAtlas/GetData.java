@@ -21,24 +21,24 @@ import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.*;
 
-public class GetData extends ExecutableStep {
+public class GetData extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("chipAtlas");
     private final InputFile dataList;
     private final InputFile dcgFile;
-    private final RequiredConfig<List<String>> tissueTypes = new RequiredConfig<>(Configs.chipAtlas.tissueTypes);
+    private final RequiredConfig<List<String>> tissueTypes = new RequiredConfig<>(configs.chipAtlas.tissueTypes);
     private final RequiredConfig<String> genomeVersionColName =
-            new RequiredConfig<>(Configs.chipAtlas.genomeVersionColName);
+            new RequiredConfig<>(configs.chipAtlas.genomeVersionColName);
     private final RequiredConfig<String> antigenClassColName =
-            new RequiredConfig<>(Configs.chipAtlas.antigenClassColName);
-    private final RequiredConfig<String> antigenColName = new RequiredConfig<>(Configs.chipAtlas.antigenRegexColName);
+            new RequiredConfig<>(configs.chipAtlas.antigenClassColName);
+    private final RequiredConfig<String> antigenColName = new RequiredConfig<>(configs.chipAtlas.antigenRegexColName);
     private final RequiredConfig<String> cellTypeClassColName =
-            new RequiredConfig<>(Configs.chipAtlas.cellTypeClassColName);
-    private final RequiredConfig<String> urlColName = new RequiredConfig<>(Configs.chipAtlas.urlColName);
-    private final RequiredConfig<String> thresholdColName = new RequiredConfig<>(Configs.chipAtlas.thresholdColName);
-    private final RequiredConfig<String> genomeVersion = new RequiredConfig<>(Configs.chipAtlas.genomeVersion);
+            new RequiredConfig<>(configs.chipAtlas.cellTypeClassColName);
+    private final RequiredConfig<String> urlColName = new RequiredConfig<>(configs.chipAtlas.urlColName);
+    private final RequiredConfig<String> thresholdColName = new RequiredConfig<>(configs.chipAtlas.thresholdColName);
+    private final RequiredConfig<String> genomeVersion = new RequiredConfig<>(configs.chipAtlas.genomeVersion);
 
-    public GetData(OutputFile dataList, OutputFile dcgFile) {
-        super(false, dataList);
+    public GetData(Configs configs, OutputFile dataList, OutputFile dcgFile) {
+        super(configs, false, dataList);
 
         this.dataList = addInput(dataList);
         this.dcgFile = addInput(dcgFile);

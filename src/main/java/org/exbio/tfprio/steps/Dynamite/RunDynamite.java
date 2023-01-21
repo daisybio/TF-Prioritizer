@@ -14,20 +14,20 @@ import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
-public class RunDynamite extends ExecutableStep {
+public class RunDynamite extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final InputFile script;
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
 
-    private final RequiredConfig<String> outVar = new RequiredConfig<>(Configs.dynamite.outVar);
-    private final OptionalConfig<Integer> oFolds = new OptionalConfig<>(Configs.dynamite.oFolds, false);
-    private final OptionalConfig<Integer> iFolds = new OptionalConfig<>(Configs.dynamite.iFolds, false);
-    private final OptionalConfig<Boolean> performance = new OptionalConfig<>(Configs.dynamite.performance, false);
-    private final OptionalConfig<Double> alpha = new OptionalConfig<>(Configs.dynamite.alpha, false);
-    private final OptionalConfig<Boolean> randomize = new OptionalConfig<>(Configs.dynamite.randomize, false);
+    private final RequiredConfig<String> outVar = new RequiredConfig<>(configs.dynamite.outVar);
+    private final OptionalConfig<Integer> oFolds = new OptionalConfig<>(configs.dynamite.oFolds, false);
+    private final OptionalConfig<Integer> iFolds = new OptionalConfig<>(configs.dynamite.iFolds, false);
+    private final OptionalConfig<Boolean> performance = new OptionalConfig<>(configs.dynamite.performance, false);
+    private final OptionalConfig<Double> alpha = new OptionalConfig<>(configs.dynamite.alpha, false);
+    private final OptionalConfig<Boolean> randomize = new OptionalConfig<>(configs.dynamite.randomize, false);
 
-    public RunDynamite(Map<String, Map<String, OutputFile>> preparedData) {
-        super(false, preparedData.values().stream().flatMap(
+    public RunDynamite(Configs configs, Map<String, Map<String, OutputFile>> preparedData) {
+        super(configs, false, preparedData.values().stream().flatMap(
                 stringCollectionMap -> stringCollectionMap.values().stream()).toList());
         script = addInput(getClass().getResourceAsStream("/org/exbio/tfprio/steps/TEPIC/DYNAMITE/Scripts/DYNAMITE.R"),
                 "DYNAMITE.R");

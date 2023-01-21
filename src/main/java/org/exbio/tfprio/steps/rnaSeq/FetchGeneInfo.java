@@ -16,13 +16,13 @@ import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class FetchGeneInfo extends ExecutableStep {
+public class FetchGeneInfo extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("geneInfo.tsv");
     private final InputFile geneIdsFile;
-    private final RequiredConfig<String> species = new RequiredConfig<>(Configs.deSeq2.speciesBiomart);
+    private final RequiredConfig<String> species = new RequiredConfig<>(configs.deSeq2.speciesBiomart);
 
-    public FetchGeneInfo(OutputFile ensgFile) {
-        super(false, ensgFile);
+    public FetchGeneInfo(Configs configs, OutputFile ensgFile) {
+        super(configs, false, ensgFile);
 
         geneIdsFile = addInput(ensgFile);
     }

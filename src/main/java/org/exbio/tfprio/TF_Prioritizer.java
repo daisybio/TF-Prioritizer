@@ -46,177 +46,180 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
     protected void buildFlow() {
         // read peaks input
-        InitPeaks initPeaks = add(new InitPeaks());
+        InitPeaks initPeaks = add(new InitPeaks(configs));
         Map<String, Map<String, Collection<OutputFile>>> latestPeakFiles = initPeaks.outputFiles;
 
         // perform HINT preprocessing for ATAC-/DNASE-seq input data
-        if (List.of("atac-seq", "dnase-seq").contains(Configs.mixOptions.seqType.get())) {
-            HINT hint = add(new HINT(latestPeakFiles));
+        if (List.of("atac-seq", "dnase-seq").contains(configs.mixOptions.seqType.get())) {
+            HINT hint = add(new HINT(configs, latestPeakFiles));
             latestPeakFiles = hint.outputFiles;
         }
 
-        CheckChromosomes checkChromosomes = add(new CheckChromosomes(latestPeakFiles));
+
+        CheckChromosomes checkChromosomes = add(new CheckChromosomes(configs, latestPeakFiles));
         latestPeakFiles = checkChromosomes.outputFiles;
 
-        if (Configs.mixOptions.perform.get()) {
-            MixSamples mixSamples = add(new MixSamples(latestPeakFiles));
+        if (configs.mixOptions.perform.get()) {
+            MixSamples mixSamples = add(new MixSamples(configs, latestPeakFiles));
             latestPeakFiles = mixSamples.outputFiles;
         }
 
-        if (List.of("BETWEEN", "EXCL_BETWEEN").contains(Configs.mixOptions.tfBindingSiteSearch.get())) {
+        if (List.of("BETWEEN", "EXCL_BETWEEN").contains(configs.mixOptions.tfBindingSiteSearch.get())) {
             CreateFootprintsBetweenPeaks createFootprintsBetweenPeaks =
-                    add(new CreateFootprintsBetweenPeaks(latestPeakFiles));
+                    add(new CreateFootprintsBetweenPeaks(configs, latestPeakFiles));
             latestPeakFiles = createFootprintsBetweenPeaks.outputFiles;
         }
 
-        if (Configs.mixOptions.blackListPath.isSet()) {
-            Blacklist blacklist = add(new Blacklist(latestPeakFiles));
+        if (configs.mixOptions.blackListPath.isSet()) {
+            Blacklist blacklist = add(new Blacklist(configs, latestPeakFiles));
             latestPeakFiles = blacklist.outputFiles;
         }
 
 
-        GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths());
+        GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths(configs));
 
-        if (Configs.mixOptions.mixMutuallyExclusive.get()) {
-            MixMutuallyExclusive mixMutuallyExclusive = add(new MixMutuallyExclusive(latestPeakFiles));
+        if (configs.mixOptions.mixMutuallyExclusive.get()) {
+            MixMutuallyExclusive mixMutuallyExclusive = add(new MixMutuallyExclusive(configs, latestPeakFiles));
             latestPeakFiles = mixMutuallyExclusive.outputFiles;
         }
 
-        FilterEnsgs filterEnsgs = add(new FilterEnsgs());
+        FilterEnsgs filterEnsgs = add(new FilterEnsgs(configs));
 
-        MergeCounts mergeCounts = add(new MergeCounts(filterEnsgs.outputFile));
+        MergeCounts mergeCounts = add(new MergeCounts(configs, filterEnsgs.outputFile));
 
-        FetchGeneInfo fetchGeneInfo = add(new FetchGeneInfo(filterEnsgs.cleanFile));
+        FetchGeneInfo fetchGeneInfo = add(new FetchGeneInfo(configs, filterEnsgs.cleanFile));
 
-        EnsgSymbol ensgSymbol = add(new EnsgSymbol(filterEnsgs.cleanFile));
+        EnsgSymbol ensgSymbol = add(new EnsgSymbol(configs, filterEnsgs.cleanFile));
 
-        CreateBatchFile createBatchFile = add(new CreateBatchFile(mergeCounts.outputFiles));
-        MeanExpression meanCounts = add(new MeanExpression(mergeCounts.outputFiles));
-        CreatePairings createPairings = add(new CreatePairings(mergeCounts.outputFiles));
+        CreateBatchFile createBatchFile = add(new CreateBatchFile(configs, mergeCounts.outputFiles));
+        MeanExpression meanCounts = add(new MeanExpression(configs, mergeCounts.outputFiles));
+        CreatePairings createPairings = add(new CreatePairings(configs, mergeCounts.outputFiles));
 
-        CalculateTPM calculateTPM = add(new CalculateTPM(meanCounts.outputFiles, fetchGeneInfo.outputFile));
+        CalculateTPM calculateTPM = add(new CalculateTPM(configs, meanCounts.outputFiles, fetchGeneInfo.outputFile));
 
-        Uplift uplift = add(new Uplift(fetchGeneInfo.outputFile));
-        FilterENdb filterENdb = add(new FilterENdb());
-        UpliftENdb upliftENdb = add(new UpliftENdb(filterENdb.outputFile));
+        Uplift uplift = add(new Uplift(configs, fetchGeneInfo.outputFile));
+        FilterENdb filterENdb = add(new FilterENdb(configs));
+        UpliftENdb upliftENdb = add(new UpliftENdb(configs, filterENdb.outputFile));
 
-        if (Configs.deSeq2.tpmFilter.isSet()) {
-            FilterExpression filterExpression = add(new FilterExpression(calculateTPM.outputFiles));
+        if (configs.deSeq2.tpmFilter.isSet()) {
+            FilterExpression filterExpression = add(new FilterExpression(configs, calculateTPM.outputFiles));
         }
 
-        DeSeq2 deSeq2 = add(new DeSeq2(createPairings.outputFiles, createBatchFile.outputFile));
-        DeSeqPostprocessing deSeqPostprocessing = add(new DeSeqPostprocessing(deSeq2.outputFiles));
+        DeSeq2 deSeq2 = add(new DeSeq2(configs, createPairings.outputFiles, createBatchFile.outputFile));
+        DeSeqPostprocessing deSeqPostprocessing = add(new DeSeqPostprocessing(configs, deSeq2.outputFiles));
 
         Map<String, Map<String, OutputFile>> tgeneFiles = new HashMap<>();
 
-        if (Configs.tGene.executable.isSet()) {
-            TGenePreprocess tGenePreprocess = add(new TGenePreprocess());
-            TGeneExtractRegions tGeneExtractRegions = add(new TGeneExtractRegions(tGenePreprocess.outputFile));
-            TGene tGene = add(new TGene(latestPeakFiles, tGenePreprocess.outputFile));
+        if (configs.tGene.executable.isSet()) {
+            TGenePreprocess tGenePreprocess = add(new TGenePreprocess(configs));
+            TGeneExtractRegions tGeneExtractRegions = add(new TGeneExtractRegions(configs, tGenePreprocess.outputFile));
+            TGene tGene = add(new TGene(configs, latestPeakFiles, tGenePreprocess.outputFile));
             TGenePostprocessing tGenePostprocessing =
-                    add(new TGenePostprocessing(meanCounts.outputFiles, tGene.outputFiles));
+                    add(new TGenePostprocessing(configs, meanCounts.outputFiles, tGene.outputFiles));
             tgeneFiles = tGenePostprocessing.outputFiles;
         }
-        PreprocessReferenceGenome preprocessReferenceGenome = add(new PreprocessReferenceGenome());
-        TEPIC tepic = add(new TEPIC(latestPeakFiles, preprocessReferenceGenome.outputFile));
+        PreprocessReferenceGenome preprocessReferenceGenome = add(new PreprocessReferenceGenome(configs));
+        TEPIC tepic = add(new TEPIC(configs, latestPeakFiles, preprocessReferenceGenome.outputFile));
         Map<String, Map<String, Collection<OutputFile>>> tepicFiles = tepic.outputFiles;
 
-        if (Configs.tepic.randomize.isSet() && Configs.tepic.randomize.get()) {
-            TEPICRandomize tepicRandomize = add(new TEPICRandomize(tepic.outputFiles));
+        if (configs.tepic.randomize.isSet() && configs.tepic.randomize.get()) {
+            TEPICRandomize tepicRandomize = add(new TEPICRandomize(configs, tepic.outputFiles));
             tepicFiles = tepicRandomize.outputFiles;
         }
 
-        ExtractAffinities extractAffinities = add(new ExtractAffinities(tepicFiles));
-        ExtractSequences extractSequences = add(new ExtractSequences(tepicFiles));
+        ExtractAffinities extractAffinities = add(new ExtractAffinities(configs, tepicFiles));
+        ExtractSequences extractSequences = add(new ExtractSequences(configs, tepicFiles));
 
         CreateBindingRegionsBedFiles createBindingRegionsBedFiles =
-                add(new CreateBindingRegionsBedFiles(extractSequences.outputFiles));
+                add(new CreateBindingRegionsBedFiles(configs, extractSequences.outputFiles));
         CalculateMeanAffinities calculateMeanAffinities =
-                add(new CalculateMeanAffinities(extractAffinities.outputFiles));
+                add(new CalculateMeanAffinities(configs, extractAffinities.outputFiles));
         CalculateAffinityRatios calculateAffinityRatios =
-                add(new CalculateAffinityRatios(calculateMeanAffinities.outputFiles));
-        OpenRegionsViolinPlots openRegionsViolinPlots = add(new OpenRegionsViolinPlots(tepicFiles));
-        FindAnalyzableTFs findAnalyzableTFs = add(new FindAnalyzableTFs(calculateMeanAffinities.outputFiles));
+                add(new CalculateAffinityRatios(configs, calculateMeanAffinities.outputFiles));
+        OpenRegionsViolinPlots openRegionsViolinPlots = add(new OpenRegionsViolinPlots(configs, tepicFiles));
+        FindAnalyzableTFs findAnalyzableTFs = add(new FindAnalyzableTFs(configs, calculateMeanAffinities.outputFiles));
 
-        if (Configs.tGene.executable.isSet()) {
-            if (!Configs.mixOptions.mixMutuallyExclusive.get()) {
+        if (configs.tGene.executable.isSet()) {
+            if (!configs.mixOptions.mixMutuallyExclusive.get()) {
                 add(new TGeneCreateGroups());
             }
 
-            if (Configs.tGene.selfRegulatory.isSet() && Configs.tGene.selfRegulatory.get()) {
+            if (configs.tGene.selfRegulatory.isSet() && configs.tGene.selfRegulatory.get()) {
                 add(new TGeneSelfRegulatory());
             }
         }
 
         IntegrateData integrateData =
-                add(new IntegrateData(calculateAffinityRatios.outputFiles, deSeqPostprocessing.getOutputs()));
+                add(new IntegrateData(configs, calculateAffinityRatios.outputFiles, deSeqPostprocessing.getOutputs()));
         PrepareForClassification prepareForClassification =
-                add(new PrepareForClassification(integrateData.outputFiles));
-        RunDynamite runDynamite = add(new RunDynamite(prepareForClassification.outputFiles));
+                add(new PrepareForClassification(configs, integrateData.outputFiles));
+        RunDynamite runDynamite = add(new RunDynamite(configs, prepareForClassification.outputFiles));
         ExtractRegressionCoefficients extractRegressionCoefficients =
-                add(new ExtractRegressionCoefficients(runDynamite.outputFiles));
+                add(new ExtractRegressionCoefficients(configs, runDynamite.outputFiles));
 
         FilterRegressionCoefficients filterRegressionCoefficients =
-                add(new FilterRegressionCoefficients(extractRegressionCoefficients.outputFiles));
-        ThresholdPlots thresholdPlots = add(new ThresholdPlots(filterRegressionCoefficients.outputFiles));
+                add(new FilterRegressionCoefficients(configs, extractRegressionCoefficients.outputFiles));
+        ThresholdPlots thresholdPlots = add(new ThresholdPlots(configs, filterRegressionCoefficients.outputFiles));
 
-        GroupStages groupStages = add(new GroupStages(filterRegressionCoefficients.outputFiles));
-        PlotGroupedStages plotGroupedStages = add(new PlotGroupedStages(groupStages.outputFiles));
+        GroupStages groupStages = add(new GroupStages(configs, filterRegressionCoefficients.outputFiles));
+        PlotGroupedStages plotGroupedStages = add(new PlotGroupedStages(configs, groupStages.outputFiles));
         AnalyzeGroupLevel analyzeGroupLevel =
-                add(new AnalyzeGroupLevel(calculateTPM.outputFiles, meanCounts.outputFiles, groupStages.outputFiles,
-                        ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
-        AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(analyzeGroupLevel.outputFiles));
+                add(new AnalyzeGroupLevel(configs, calculateTPM.outputFiles, meanCounts.outputFiles,
+                        groupStages.outputFiles, ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
+        AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(configs, analyzeGroupLevel.outputFiles));
 
         org.exbio.tfprio.steps.plots.TopKTargetGenes topKTargetGenes =
-                add(new org.exbio.tfprio.steps.plots.TopKTargetGenes(groupStages.outputFiles,
+                add(new org.exbio.tfprio.steps.plots.TopKTargetGenes(configs, groupStages.outputFiles,
                         calculateMeanAffinities.outputFiles));
 
-        Preprocessing daPreprocessing = add(new Preprocessing(groupStages.outputFiles));
+        Preprocessing daPreprocessing = add(new Preprocessing(configs, groupStages.outputFiles));
         RunDistributionAnalysis runDistributionAnalysis =
-                add(new RunDistributionAnalysis(daPreprocessing.outputFile, ensgSymbol.outputFile,
+                add(new RunDistributionAnalysis(configs, daPreprocessing.outputFile, ensgSymbol.outputFile,
                         meanCounts.outputFiles, deSeqPostprocessing.outputFiles,
                         extractRegressionCoefficients.outputFiles, calculateMeanAffinities.outputFiles));
-        CreateBackground createBackground = add(new CreateBackground(runDistributionAnalysis.outputFiles));
+        CreateBackground createBackground = add(new CreateBackground(configs, runDistributionAnalysis.outputFiles));
         CreatePlots createPlots =
-                add(new CreatePlots(runDistributionAnalysis.outputFiles, createBackground.outputFiles));
-        ExtractStatRank extractStatRank = add(new ExtractStatRank(createPlots.statFiles));
-        CalculateDcgPerHm calculateDcgPerHm = add(new CalculateDcgPerHm(extractStatRank.outputFiles));
-        CalculateDcgRank calculateDcgRank = add(new CalculateDcgRank(extractStatRank.outputFiles));
+                add(new CreatePlots(configs, runDistributionAnalysis.outputFiles, createBackground.outputFiles));
+        ExtractStatRank extractStatRank = add(new ExtractStatRank(configs, createPlots.statFiles));
+        CalculateDcgPerHm calculateDcgPerHm = add(new CalculateDcgPerHm(configs, extractStatRank.outputFiles));
+        CalculateDcgRank calculateDcgRank = add(new CalculateDcgRank(configs, extractStatRank.outputFiles));
 
         org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes daTopKTargetGenes =
-                add(new org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes(calculateDcgRank.outputFile,
-                        calculateMeanAffinities.outputFiles));
-        CreateHeatmaps createHeatmaps = add(new CreateHeatmaps(deSeq2.normalizedCounts, daTopKTargetGenes.outputFiles,
-                createBatchFile.outputFile, ensgSymbol.outputFile));
-        BiophysicalModel biophysicalModel = add(new BiophysicalModel(calculateDcgRank.outputFile));
-        BiophysicalLogo biophysicalLogo = add(new BiophysicalLogo(biophysicalModel.outputFile));
+                add(new org.exbio.tfprio.steps.distributionAnalysis.TopKTargetGenes(configs,
+                        calculateDcgRank.outputFile, calculateMeanAffinities.outputFiles));
+        CreateHeatmaps createHeatmaps =
+                add(new CreateHeatmaps(configs, deSeq2.normalizedCounts, daTopKTargetGenes.outputFiles,
+                        createBatchFile.outputFile, ensgSymbol.outputFile));
+        BiophysicalModel biophysicalModel = add(new BiophysicalModel(configs, calculateDcgRank.outputFile));
+        BiophysicalLogo biophysicalLogo = add(new BiophysicalLogo(configs, biophysicalModel.outputFile));
 
-        Jaspar jaspar = add(new Jaspar(calculateDcgRank.outputFile));
+        Jaspar jaspar = add(new Jaspar(configs, calculateDcgRank.outputFile));
         ExtractBindingSites extractBindingSites =
-                add(new ExtractBindingSites(calculateDcgRank.outputFile, extractSequences.outputFiles));
-        FilterBindingSites filterBindingSites = add(new FilterBindingSites(extractBindingSites.outputFiles));
-        PredictedLogo predictedLogo = add(new PredictedLogo(filterBindingSites.outputFiles));
+                add(new ExtractBindingSites(configs, calculateDcgRank.outputFile, extractSequences.outputFiles));
+        FilterBindingSites filterBindingSites = add(new FilterBindingSites(configs, extractBindingSites.outputFiles));
+        PredictedLogo predictedLogo = add(new PredictedLogo(configs, filterBindingSites.outputFiles));
 
         OutputFile chipAtlasDirectory = null;
-        if (Configs.chipAtlas.enabled.isSet() && Configs.chipAtlas.enabled.get()) {
-            GetList getList = add(new GetList());
-            GetData getData = add(new GetData(getList.outputFile, calculateDcgRank.outputFile));
+        if (configs.chipAtlas.enabled.isSet() && configs.chipAtlas.enabled.get()) {
+            GetList getList = add(new GetList(configs));
+            GetData getData = add(new GetData(configs, getList.outputFile, calculateDcgRank.outputFile));
             chipAtlasDirectory = getData.outputFile;
 
-            CoOccurrenceAnalysis coOccurrenceAnalysis = add(new CoOccurrenceAnalysis(chipAtlasDirectory));
+            CoOccurrenceAnalysis coOccurrenceAnalysis = add(new CoOccurrenceAnalysis(configs, chipAtlasDirectory));
         }
 
         DistributionTargetGenes distributionTargetGenes =
-                add(new DistributionTargetGenes(ensgSymbol.outputFile, fetchGeneInfo.outputFile,
+                add(new DistributionTargetGenes(configs, ensgSymbol.outputFile, fetchGeneInfo.outputFile,
                         calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
                         createBindingRegionsBedFiles.outputFiles));
 
         ReportPreprocessing reportPreprocessing =
-                add(new ReportPreprocessing(ensgSymbol.outputFile, calculateDcgPerHm.outputFiles, deSeq2.outputFiles,
-                        meanCounts.outputFiles, calculateTPM.outputFiles, biophysicalLogo.outputFile, jaspar.outputFile,
-                        createHeatmaps.outputFiles, distributionTargetGenes.outputFiles, createPlots.plotFiles,
+                add(new ReportPreprocessing(configs, ensgSymbol.outputFile, calculateDcgPerHm.outputFiles,
+                        deSeq2.outputFiles, meanCounts.outputFiles, calculateTPM.outputFiles,
+                        biophysicalLogo.outputFile, jaspar.outputFile, createHeatmaps.outputFiles,
+                        distributionTargetGenes.outputFiles, createPlots.plotFiles,
                         extractRegressionCoefficients.outputFiles));
-        ReportCreation reportCreation = add(new ReportCreation(reportPreprocessing.outputFile));
-        ReportCompression reportCompression = add(new ReportCompression(reportCreation.outputFile));
+        ReportCreation reportCreation = add(new ReportCreation(configs, reportPreprocessing.outputFile));
+        ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
     }
 }
