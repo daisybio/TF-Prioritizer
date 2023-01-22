@@ -1,2 +1,5 @@
-out
-Rplots.pdf
+/target/
+/.idea/
+/TFPRIO.iml
+/runRemote.sh
+/bin/

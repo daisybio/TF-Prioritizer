@@ -1,0 +1,20 @@
+<h1>Regression coefficients</h1>
+<mat-accordion>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title><h2>Configs</h2></mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="flex-row full-width stretch">
+      <mat-label>Threshold: {{threshold}}</mat-label>
+      <mat-slider [step]="0.05" discrete
+                  max="1" min="0">
+        <input (ngModelChange)="$threshold.next($event)" [ngModel]="threshold" [value]="threshold" matSliderThumb>
+      </mat-slider>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
+<app-data-selector [activeData]="$selectedData" [data]="allData" [maxDepth]="2"></app-data-selector>
+<div class="chart-container">
+  <ngx-charts-bar-horizontal [results]="plotData | async"
+                             xAxis="true" yAxis="true"></ngx-charts-bar-horizontal>
+</div>

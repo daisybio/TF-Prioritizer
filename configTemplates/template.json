@@ -1,0 +1,94 @@
+{
+  "InputConfigs": {
+    "peaks": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/03_broadPeaks_inc_Pol2",
+    "rnaSeq": "/home/nico/Data/TFPRIO/RawData/02_RNAseq_data",
+    "geneIDs": "/home/nico/Data/TFPRIO/RawData/02_RNAseq_data/Gene_id.txt",
+    "geneAnnotationFile": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
+    "sameStages": {
+      "L1": "L",
+      "L10": "L",
+      "p6": "p",
+      "p13": "p"
+    }
+  },
+  "MixOptions": {
+    "biomartDatasetSpecies": "mmusculus_gene_ensembl",
+    "blackListPath": "/home/nico/Data/TFPRIO/RawData/05_black_listed_regions/mm10-blacklist.v2.txt",
+    "differentialPeakSignals": false,
+    "maxSpaceBetweenPeaks": 500,
+    "minOccurrence": 0,
+    "mixMutuallyExclusive": false,
+    "perform": true,
+    "tfBindingSiteSearch": "BETWEEN",
+    "seqType": "chip-seq"
+  },
+  "DeSeq2": {
+    "speciesBiomart": "mmusculus_gene_ensembl",
+    "speciesRefGenome": "mm10",
+    "tpmFilter": null,
+    "batches": null,
+    "countFilter": 50
+  },
+  "TGene": {
+    "executable": null,
+    "noClosestLocus": false,
+    "noClosestTss": false,
+    "maxLinkDistance": 500000,
+    "pValue": 0.05
+  },
+  "TEPIC": {
+    "randomize": false,
+    "PWMs": "/home/nico/Software/TEPIC/PWMs/3.0/combined_Jaspar_Hocomoco_mouse_PSEM.PSEM",
+    "transcriptBased": false,
+    "columnBedfile": null,
+    "windowSize": 50000,
+    "loopListFile": null,
+    "loopWindows": 5000,
+    "exponentialDecay": true,
+    "doNotNormalizePeakLength": false,
+    "maxMinutesPerChromosome": 3,
+    "doZip": false,
+    "originalDecay": false,
+    "psemsLengthFile": null,
+    "pValue": 0.05,
+    "chromosomePrefix": false,
+    "onlyPeakFeatures": false,
+    "entireGeneBody": false,
+    "twoBitFile": null,
+    "onlyDNasePeaks": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
+    "inputReferenceGenome": "/home/nico/Data/TFPRIO/RawData/04_requiredData/genome.fa",
+    "bedChromatinSignal": null,
+    "affinityCutoff": 0.05
+  },
+  "DYNAMITE": {
+    "outVar": "Expression",
+    "iFolds": 6,
+    "oFolds": 3,
+    "performance": true,
+    "alpha": 0.1,
+    "randomize": false
+  },
+  "Plots": {
+    "topKTargetGenes": 30,
+    "thresholds": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6
+    ]
+  },
+  "ChipAtlas": {
+    "enabled": true,
+    "genomeVersion": "mm10",
+    "tissueTypes": [
+      "breast"
+    ]
+  },
+  "IGV": {
+    "experimentalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/04_evaluation/merged/working_dir/00_MIX_OPTION/01_SAMPLE_MIX",
+    "signalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/06_evaluation_tdf",
+    "genome": "mm10"
+  }
+}

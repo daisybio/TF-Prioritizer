@@ -1,0 +1,94 @@
+{
+  "InputConfigs": {
+    "peaks": "/nfs/data/COM2POSE/ATAC-seq/atac-seq/",
+    "rnaSeq": "/nfs/data/COM2POSE/ATAC-seq/rna/",
+    "geneIDs": "/nfs/data/COM2POSE/ATAC-seq/rna/Gene_id.txt",
+    "geneAnnotationFile": "/nfs/data3/circRNA_pipeline/covid_SAECs/data/hg38.ensGene.gtf",
+    "sameStages": {
+      "MCF-7": "MCF7",
+      "K562": "K562"
+    }
+  },
+  "HINT": {
+    "bam_directory": "/nfs/data/COM2POSE/ATAC-seq/bams",
+    "paired": true,
+    "genome": "hg38"
+  },
+  "MixOptions": {
+    "biomartDatasetSpecies": "hsapiens_gene_ensembl",
+    "blackListPath": "/nfs/data/COM2POSE/TFPRIO_data/05_black_listed_regions/hg38-blacklist.v2.bed",
+    "differentialPeakSignals": false,
+    "maxSpaceBetweenPeaks": 500,
+    "minOccurrence": 0,
+    "mixMutuallyExclusive": false,
+    "perform": false,
+    "tfBindingSiteSearch": "INSIDE",
+    "seqType": "atac-seq"
+  },
+  "DeSeq2": {
+    "speciesBiomart": "hsapiens_gene_ensembl",
+    "speciesRefGenome": "hg38",
+    "tpmFilter": null,
+    "batches": null,
+    "countFilter": 50
+  },
+  "TGene": {
+    "executable": null,
+    "noClosestLocus": false,
+    "noClosestTss": false,
+    "maxLinkDistance": 500000,
+    "pValue": 0.05
+  },
+  "TEPIC": {
+    "randomize": false,
+    "PWMs": "/nfs/data/COM2POSE/TEPIC/PWMs/3.0/combined_Jaspar_Hocomoco_Kellis_human_PSEM.PSEM",
+    "transcriptBased": false,
+    "columnBedfile": null,
+    "windowSize": 50000,
+    "loopListFile": null,
+    "loopWindows": 5000,
+    "geneAnnotationFile": "/nfs/data3/circRNA_pipeline/covid_SAECs/data/hg38.ensGene.gtf",
+    "exponentialDecay": true,
+    "doNotNormalizePeakLength": false,
+    "maxMinutesPerChromosome": 3,
+    "doZip": false,
+    "originalDecay": false,
+    "psemsLengthFile": null,
+    "pValue": 0.05,
+    "chromosomePrefix": false,
+    "onlyPeakFeatures": false,
+    "entireGeneBody": false,
+    "twoBitFile": null,
+    "onlyDNasePeaks": "/nfs/data3/circRNA_pipeline/covid_SAECs/data/hg38.ensGene.gtf",
+    "inputReferenceGenome": "/nfs/data/TCGA_TGCT/circrna_sponging_pipeline/input/references/hg38.fa",
+    "bedChromatinSignal": null,
+    "affinityCutoff": 0.05
+  },
+  "DYNAMITE": {
+    "outVar": "Expression",
+    "iFolds": 6,
+    "oFolds": 3,
+    "performance": true,
+    "alpha": 0.1,
+    "randomize": false
+  },
+  "Plots": {
+    "topKTargetGenes": 30,
+    "thresholds": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6
+    ]
+  },
+  "ChipAtlas": {
+    "enabled": true,
+    "genomeVersion": "hg38",
+    "tissueTypes": [
+      "lymphoblast",
+      "breast"
+    ]
+  }
+}

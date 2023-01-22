@@ -1,35 +1,15 @@
 FROM ubuntu:22.04
 
-RUN apt-get update && apt-get -y install sudo
+LABEL org.opencontainers.image.source=https://github.com/biomedbigdata/TF-Prioritizer
 
-ARG USER_ID
-ARG GROUP_ID
-ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
+ENV IGV=/srv/dependencies/igv
+ENV IGV_CACHE=/srv/dependencies/igv_cache
+ENV RGTDATA=/srv/dependencies/rgtdata
+ENV MPLCONFIGDIR=/srv/dependencies/matplotlib
 
-RUN groupadd --gid $GROUP_ID docker && useradd -lm --gid docker --uid $USER_ID docker
+COPY environment /srv/environment
+RUN chmod u+x /srv/environment/setup.sh && ./srv/environment/setup.sh
+RUN mkdir -p "/srv/temp" && chmod -R 777 "/srv/temp"
 
-RUN for i in \
-    /srv/input \
-    /srv/dependencies/ext \
-    /srv/dependencies/scripts \
-    /srv/dependencies/config_templates \
-    /srv/dependencies/Report \
-    /src/install \
-    /srv/app \
-    /srv/wd \
-    ; do mkdir -p $i && chown -R docker:docker $i; done
-
-COPY ext/ /srv/dependencies/ext
-
-COPY install/ /srv/install
-
-RUN bash -c "chmod +x /srv/install/install.bash && /srv/install/install.bash -d"
-
-COPY scripts /srv/dependencies/scripts
-COPY config_templates/defaultConfigs.json /srv/dependencies/config_templates/defaultConfigs.json
-COPY build/TFPRIO.jar /srv/app
-
-USER docker
-
-CMD ["java", "-jar", "/srv/app/TFPRIO.jar", "-c", "/srv/wd/dockerConfigs.json", "-w", "/srv/wd", "-p", \
-"/srv/dependencies"]
+COPY bin/TF-Prioritizer.jar /srv/TF-Prioritizer.jar

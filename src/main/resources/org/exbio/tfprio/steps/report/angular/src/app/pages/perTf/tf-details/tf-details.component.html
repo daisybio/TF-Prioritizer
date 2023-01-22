@@ -1,0 +1,26 @@
+<ng-container *ngIf="tfGroup; else noGroup">
+  <h1>Details for: {{tfGroup.symbol}}</h1>
+  <mat-accordion>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title><h2>General information</h2></mat-panel-title>
+      </mat-expansion-panel-header>
+      <app-general-information [tfGroup]="tfGroup"></app-general-information>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <mat-tab-group>
+    <mat-tab label="Validation">
+      <app-validation [tfGroup]="tfGroup"></app-validation>
+    </mat-tab>
+    <mat-tab label="Distribution">
+      <app-distribution [tfGroup]="tfGroup"></app-distribution>
+    </mat-tab>
+    <mat-tab label="Regression">
+      <app-regression [tfGroup]="tfGroup"></app-regression>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>
+
+<ng-template #noGroup>
+  <h1>Unknown tf</h1>
+</ng-template>

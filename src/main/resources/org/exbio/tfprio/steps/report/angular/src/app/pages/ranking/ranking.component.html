@@ -1,0 +1,59 @@
+<form>
+  <h2>Ranking</h2>
+  <div class="flex-row stretched" style="flex-wrap: nowrap">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>TF Name</mat-label>
+      <input [formControl]="filterControl"
+             aria-label="Number"
+             matInput
+             type="text">
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Target gene</mat-label>
+      <input [formControl]="filterControl"
+             aria-label="Number"
+             matInput
+             type="text">
+    </mat-form-field>
+  </div>
+</form>
+<mat-chip-listbox multiple>
+  <div class="flex-row full-width stretch">
+    <mat-chip-option (click)="recalculateScores()" (selectionChange)="hmActive.set(hm, !hmActive.get(hm))"
+                     *ngFor="let hm of hmList"
+                     selected>{{hm}}</mat-chip-option>
+  </div>
+</mat-chip-listbox>
+
+<mat-accordion>
+  <ng-container *ngFor="let tfGroup of tfGroupRanking | async">
+    <mat-expansion-panel (click)="openGroup.next(tfGroup)" *ngIf="(filteredTfGroups | async)?.get(tfGroup)">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <h2>{{tfGroup.symbol}}</h2>
+        </mat-panel-title>
+        <mat-panel-description>
+          <div class="flex-row" style="margin-left: auto">
+            <a [queryParams]="{'tf': tfGroup.symbol}" color="primary" mat-flat-button routerLink="/details">Details</a>
+
+            <ng-container *ngFor="let hm of hmList">
+              <button [ngClass]="
+          {
+          'highest': tfGroup.hmDcg[hm]>.8,
+          'high': tfGroup.hmDcg[hm]>.6 && tfGroup.hmDcg[hm]<=.8,
+          'medium': tfGroup.hmDcg[hm]>.4 && tfGroup.hmDcg[hm]<=.6,
+          'low': tfGroup.hmDcg[hm]>.2 && tfGroup.hmDcg[hm]<=.4,
+          'lowest': tfGroup.hmDcg[hm]<=.2 && tfGroup.hmDcg[hm]>=0,
+          'unavailable': tfGroup.hmDcg[hm] < 0
+          }"
+                      mat-flat-button>{{hm}}</button>
+            </ng-container>
+          </div>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <app-general-information [activeGroup]="openGroup" [tfGroup]="tfGroup"></app-general-information>
+    </mat-expansion-panel>
+  </ng-container>
+</mat-accordion>
+
+
