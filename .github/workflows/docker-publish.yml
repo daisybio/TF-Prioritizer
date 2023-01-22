@@ -34,6 +34,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        
+      - name: Build jar
+        run: ./mvnw clean compile assembly:single && mkdir -p bin && cp target/TFPRIO-1.0-bin.jar bin/TF-Prioritizer.jar
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
