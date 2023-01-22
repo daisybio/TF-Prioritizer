@@ -16,8 +16,8 @@
 
     <repositories>
         <repository>
-            <id>my</id>
-            <url>file://${project.basedir}/../lib/pipeJar.jar</url>
+            <id>pipeJar</id>
+            <url>https://github.com/nictru/pipeJar/raw/main/bin/pipeJar.jar</url>
         </repository>
     </repositories>
 
