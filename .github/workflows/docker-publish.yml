@@ -34,9 +34,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
+      - name: Install pipeJar
+        run: ./mvnw org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/pipeJar.jar
+
       - name: Build jar
-        run: tree && ./mvnw clean compile assembly:single && mkdir -p bin && cp target/TFPRIO-1.0-bin.jar bin/TF-Prioritizer.jar
+        run: ./mvnw install:install-file && ./mvnw clean compile assembly:single && mkdir -p bin && cp target/TFPRIO-1.0-bin.jar bin/TF-Prioritizer.jar
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
