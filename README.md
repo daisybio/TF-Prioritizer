@@ -1,4 +1,26 @@
-# Execution
+This repository is under development.
+
+# 1. About TF-Prioritizer
+
+This java wrapper gives you a full analysis of nfcore ChIP-seq peak data and nfcore RNA-seq count data. It performs
+DESeq2, TEPIC and DYNAMITE including all preprocessing and postprocessing steps necessary to transform the data. It also
+gives you plots for deep analysis of the data. The general workflow is sketched in the images below:
+
+## Graphical abstract:
+
+![Graphical abstrat](media/graphicalAbstract.png)
+
+## Technical workflow:
+
+![Technical workflow](media/technicalWorkflow.png)
+
+# 2. License and Citing
+
+TF-Prioritizer is distributed under the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html). The
+Graphical Abstract and the Technical Workflow
+was created using [biorender.com](https://biorender.com/).
+
+# 3. Usage
 
 The software can be executed using docker. For the following command, only [python3](https://www.python.org/downloads/),
 [curl](https://curl.se/download.html) and [docker](https://docs.docker.com/get-docker/) are required.
