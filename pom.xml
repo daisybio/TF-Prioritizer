@@ -14,13 +14,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>pipeJar</id>
-            <url>https://github.com/nictru/pipeJar/raw/main/bin/pipeJar.jar</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.exbio.pipejar</groupId>
