@@ -327,7 +327,11 @@ public class DistributionTargetGenes extends ExecutableStep<Configs> {
                                     IntStream.range(0, locations.size()).forEach(j -> {
                                         igv.addCommand("goto " + locations.get(j));
                                         igv.addCommand("snapshot " + (i + 1) + "_" + ensgSymbol.get(targetGene) +
-                                                (locations.size() > 1 ? "[" + j + "]" : "") + ".svg");
+                                                (locations.size() > 1 ? "[" + j + "]" : "") +
+                                                ".png"); // TODO: Use .svg ending in order to reduce file size
+                                        // Keep in mind that the vieBox attribute is required, otherwise the image will
+                                        // be cutoff in the report
+
                                     });
                                 }));
 
