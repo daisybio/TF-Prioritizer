@@ -53,7 +53,11 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
         this.ensgSymbol = addInput(ensgSymbol);
         this.biophysicalLogo = addInput(biophysicalLogo);
         this.tfSequence = addInput(tfSequence);
-        this.coOccurrence = addInput(coOccurrence);
+        if (coOccurrence != null) {
+            this.coOccurrence = addInput(coOccurrence);
+        } else {
+            this.coOccurrence = null;
+        }
         OutputFile rankDir = new OutputFile(inputDirectory, "ranks");
         hmDcgFiles.forEach((hm, rankFile) -> this.hmDcgFiles.put(hm, addInput(rankDir, rankFile)));
 

@@ -80,7 +80,7 @@
     ]
   },
   "ChipAtlas": {
-    "enabled": true,
+    "enabled": false,
     "genomeVersion": "mm10",
     "tissueTypes": [
       "breast"
