@@ -27,7 +27,7 @@ The software can be executed using docker. For the following command, only [pyth
 Explanations about the configs can be found in the [config readme](configTemplates/README.md).
 
 ```bash
-curl -s https://raw.githubusercontent.com/biomedbigdata/TF-Prioritizer/pipeJar/docker.py | python3 - -c [config_file] -o [output_dir] -t [threads]
+curl -s https://raw.githubusercontent.com/biomedbigdata/TF-Prioritizer/master/docker.py | python3 - -c [config_file] -o [output_dir] -t [threads]
 ```
 
 Note, that for this approach an internet connection is required. The docker image will be downloaded from the [GitHub
