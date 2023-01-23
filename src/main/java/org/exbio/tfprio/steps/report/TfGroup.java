@@ -64,7 +64,7 @@ public class TfGroup {
 
     public void setIgv(String pairing, String hm, File tgDirectory) {
         File outCurrent = extend(this.outDir, "igv", hm, pairing);
-        Arrays.stream(Objects.requireNonNull(tgDirectory.listFiles(f -> f.getName().endsWith(".png")))).forEach(
+        Arrays.stream(Objects.requireNonNull(tgDirectory.listFiles(f -> f.getName().endsWith(".svg")))).forEach(
                 tgFile -> {
                     String tg = tgFile.getName().substring(0, tgFile.getName().lastIndexOf('.'));
                     File out = new File(outCurrent, tgFile.getName());
