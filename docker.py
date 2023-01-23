@@ -11,7 +11,7 @@ parser.add_argument('-m', type=int, default=10)
 
 args = parser.parse_args()
 
-PACKAGE_URL = "ghcr.io/biomedbigdata/tfprio"
+PACKAGE_URL = "ghcr.io/biomedbigdata/tf-prioritizer"
 
 
 def process_configs(configs: dict) -> dict:
