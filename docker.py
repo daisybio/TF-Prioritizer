@@ -8,10 +8,9 @@ parser.add_argument('-c', type=str)
 parser.add_argument('-t', type=str)
 parser.add_argument('-o', type=str)
 parser.add_argument('-m', type=int, default=10)
+parser.add_argument('-i', type=str, default='ghcr.io/biomedbigdata/tf-prioritizer')
 
 args = parser.parse_args()
-
-PACKAGE_URL = "ghcr.io/biomedbigdata/tf-prioritizer"
 
 
 def process_configs(configs: dict) -> dict:
@@ -29,6 +28,7 @@ def process_configs(configs: dict) -> dict:
     return mounts
 
 
+image = args.i
 config_path = os.path.abspath(args.c)
 threads = args.t
 output = os.path.abspath(args.o)
@@ -52,7 +52,7 @@ internal_command = f"java -Xmx{memory}g -jar /srv/TF-Prioritizer.jar -t {threads
 
 external_command = f"docker run --cpus='{threads}' --user='{os.getuid()}':'{os.getgid()}'" \
                    f" -v '{docker_config_file}:/srv/input/configs.json:ro' {volume_string} -v '{output}:/srv/wd:rw,Z' " \
-                   f"{PACKAGE_URL} {internal_command}"
+                   f"{image} {internal_command}"
 
-os.system("docker image pull " + PACKAGE_URL)
+os.system("docker image pull " + image)
 os.system(external_command)
