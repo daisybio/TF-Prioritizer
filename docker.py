@@ -8,7 +8,7 @@ parser.add_argument('-c', type=str, help='Path to config file')
 parser.add_argument('-t', type=str, help='Thread count')
 parser.add_argument('-o', type=str, help='Output directory')
 parser.add_argument('-m', type=int, default=10, help='Memory limit in GB, default: 10')
-parser.add_argument('-i', type=str, default='ghcr.io/biomedbigdata/tf-prioritizer',
+parser.add_argument('-i', type=str, default='ghcr.io/biomedbigdata/tf-prioritizer:master',
                     help='[Optional] Docker image, only for development purposes')
 
 args = parser.parse_args()
