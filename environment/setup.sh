@@ -54,6 +54,8 @@ unzip "$IGV"/IGV.zip -d "$IGV"
 mv "$IGV"/IGV_2.13.0/* "$IGV"
 rm -rf "$IGV"/IGV_2.13.0 "$IGV"/IGV.zip
 
+echo "-Xmx20G" > "$IGV"/igv.args
+
 mkdir -p "$IGV_CACHE"
 echo "PORT_ENABLED=false" > "$IGV_CACHE"/prefs.properties
 chmod -R 777 "$IGV_CACHE"
