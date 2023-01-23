@@ -14,7 +14,7 @@
   </mat-expansion-panel>
 </mat-accordion>
 <app-data-selector [activeData]="$selectedData" [data]="allData" [maxDepth]="2"></app-data-selector>
-<div class="chart-container">
-  <ngx-charts-bar-horizontal [results]="plotData | async"
+<div [ngStyle]="$style | async" class="chart-container">
+  <ngx-charts-bar-horizontal [results]="$plotData | async"
                              xAxis="true" yAxis="true"></ngx-charts-bar-horizontal>
 </div>

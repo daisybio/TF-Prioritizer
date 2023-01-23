@@ -327,7 +327,7 @@ public class DistributionTargetGenes extends ExecutableStep<Configs> {
                                     IntStream.range(0, locations.size()).forEach(j -> {
                                         igv.addCommand("goto " + locations.get(j));
                                         igv.addCommand("snapshot " + (i + 1) + "_" + ensgSymbol.get(targetGene) +
-                                                (locations.size() > 1 ? "[" + j + "]" : "") + ".png");
+                                                (locations.size() > 1 ? "[" + j + "]" : "") + ".svg");
                                     });
                                 }));
 

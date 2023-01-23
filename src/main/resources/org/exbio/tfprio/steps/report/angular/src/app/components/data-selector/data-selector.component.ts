@@ -58,6 +58,12 @@ export class DataSelectorComponent {
   }
 
   setLevelActive(level: number, active: string) {
+    if (active === null || active === undefined || active === "") {
+      this.actives.next(this.currentActives);
+      return;
+    }
+
+    console.log("setLevelActive", level, active);
     this.currentActives[level] = active;
 
     for (let i = level + 1; i < this.levelExisting.length; i++) {
