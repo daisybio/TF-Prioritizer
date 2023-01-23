@@ -11,10 +11,11 @@ export class RegressionCoefficientsComponent {
   allData = this.dataService.regressionCoefficients;
   $selectedData: Subject<{ [tf: string]: number }> = new Subject<{ [tf: string]: number }>();
   selectedData: { 'name': string, 'value': number }[] = [];
-  plotData: Subject<{ 'name': string, 'value': number }[]> = new Subject<{ 'name': string, 'value': number }[]>();
+  $plotData: Subject<{ 'name': string, 'value': number }[]> = new Subject<{ 'name': string, 'value': number }[]>();
 
   threshold: number = 0.05;
   $threshold: Subject<number> = new Subject<number>();
+  $style: Subject<{}> = new Subject<{}>();
 
   constructor(private dataService: DataManagerService) {
     this.$selectedData.subscribe(data => {
@@ -27,9 +28,15 @@ export class RegressionCoefficientsComponent {
       console.log(threshold);
       this.updatePlotData();
     });
+
+    this.$plotData.subscribe(data => {
+      this.$style.next({
+        'height': data.length * 50 + 30 + 'px'
+      });
+    })
   }
 
   private updatePlotData() {
-    this.plotData.next(this.selectedData.filter(d => d.value > this.threshold || d.value < -this.threshold));
+    this.$plotData.next(this.selectedData.filter(d => d.value > this.threshold || d.value < -this.threshold));
   }
 }

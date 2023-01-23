@@ -42,6 +42,7 @@ import {DataSelectorComponent} from './components/data-selector/data-selector.co
 import {MatSliderModule} from "@angular/material/slider";
 import {MatListModule} from "@angular/material/list";
 import {MatButtonToggleModule} from "@angular/material/button-toggle";
+import {MatIconModule} from "@angular/material/icon";
 
 @NgModule({
   declarations: [
@@ -86,6 +87,7 @@ import {MatButtonToggleModule} from "@angular/material/button-toggle";
     MatListModule,
     HeatMapModule,
     MatButtonToggleModule,
+    MatIconModule,
   ],
   providers: [
     {
