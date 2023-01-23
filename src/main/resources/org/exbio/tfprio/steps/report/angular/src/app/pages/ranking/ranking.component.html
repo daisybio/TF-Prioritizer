@@ -35,9 +35,8 @@
         <mat-panel-description>
           <div class="flex-row" style="margin-left: auto">
             <a [queryParams]="{'tf': tfGroup.symbol}" color="primary" mat-flat-button routerLink="/details">Details</a>
-            <ng-container *ngIf="hmList.length <= 5">
-              <ng-container *ngFor="let hm of hmList">
-                <button [ngClass]="
+            <ng-container *ngFor="let hm of hmList">
+              <button [ngClass]="
           {
           'highest': tfGroup.hmDcg[hm]>.8,
           'high': tfGroup.hmDcg[hm]>.6 && tfGroup.hmDcg[hm]<=.8,
@@ -46,8 +45,7 @@
           'lowest': tfGroup.hmDcg[hm]<=.2 && tfGroup.hmDcg[hm]>=0,
           'unavailable': tfGroup.hmDcg[hm] < 0
           }"
-                        mat-flat-button>{{hm}}</button>
-              </ng-container>
+                      mat-flat-button>{{hm}}</button>
             </ng-container>
           </div>
         </mat-panel-description>

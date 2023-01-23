@@ -307,27 +307,31 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                                 groupingBy(Pair::getKey, mapping(Pair::getValue, toMap(Pair::getKey, Pair::getValue))));
 
                 final JSONArray coOccurrenceJson;
-                try (var reader = new BufferedReader(new FileReader(coOccurrence))) {
-                    String[] header = reader.readLine().split("\t");
-                    List<JSONObject> objects = reader.lines().map(line -> {
-                        String[] split = line.split("\t");
-                        String tf = split[0];
-                        return Pair.of(tf, Arrays.stream(split).skip(1).mapToDouble(Double::parseDouble).toArray());
-                    }).map(pair -> {
-                        double[] values = pair.getValue();
-                        JSONArray series =
-                                new JSONArray(IntStream.range(0, values.length).mapToObj(i -> new JSONObject() {{
-                                    put("name", header[i + 1]);
-                                    put("value", values[i]);
-                                }}).collect(toList()));
+                if (coOccurrence != null) {
+                    try (var reader = new BufferedReader(new FileReader(coOccurrence))) {
+                        String[] header = reader.readLine().split("\t");
+                        List<JSONObject> objects = reader.lines().map(line -> {
+                            String[] split = line.split("\t");
+                            String tf = split[0];
+                            return Pair.of(tf, Arrays.stream(split).skip(1).mapToDouble(Double::parseDouble).toArray());
+                        }).map(pair -> {
+                            double[] values = pair.getValue();
+                            JSONArray series =
+                                    new JSONArray(IntStream.range(0, values.length).mapToObj(i -> new JSONObject() {{
+                                        put("name", header[i + 1]);
+                                        put("value", values[i]);
+                                    }}).collect(toList()));
 
-                        return new JSONObject() {{
-                            put("name", pair.getKey());
-                            put("series", series);
-                        }};
-                    }).collect(toList());
+                            return new JSONObject() {{
+                                put("name", pair.getKey());
+                                put("series", series);
+                            }};
+                        }).collect(toList());
 
-                    coOccurrenceJson = new JSONArray(objects);
+                        coOccurrenceJson = new JSONArray(objects);
+                    }
+                } else {
+                    coOccurrenceJson = new JSONArray();
                 }
 
                 logger.trace("Writing output");
