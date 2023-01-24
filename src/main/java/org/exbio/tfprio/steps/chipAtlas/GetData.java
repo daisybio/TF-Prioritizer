@@ -38,7 +38,7 @@ public class GetData extends ExecutableStep<Configs> {
     private final RequiredConfig<String> genomeVersion = new RequiredConfig<>(configs.chipAtlas.genomeVersion);
 
     public GetData(Configs configs, OutputFile dataList, OutputFile dcgFile) {
-        super(configs, false, dataList);
+        super(configs, false, dataList, dcgFile);
 
         this.dataList = addInput(dataList);
         this.dcgFile = addInput(dcgFile);
