@@ -40,6 +40,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
+          
+      - name: Compile TEPIC
+        run: pushd src/main/resources/org/exbio/tfprio/steps/TEPIC/Code && ./compile_TRAP_install_R_packages.sh && popd
 
       - name: Install pipeJar
         run: ./mvnw org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=lib/pipeJar.jar
