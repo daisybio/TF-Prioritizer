@@ -95,7 +95,7 @@ public class IGV_Headless {
         save();
 
         String command = "java --module-path=" + igvLib.getAbsolutePath() +
-                " -Xmx50g --module=org.igv/org.broad.igv.ui.Main -b " + batchFile.getAbsolutePath() +
+                " -Xmx5g --module=org.igv/org.broad.igv.ui.Main -b " + batchFile.getAbsolutePath() +
                 " --igvDirectory " + igvCacheDirectory.getAbsolutePath();
 
         executeAndWait(command, new HashMap<>() {{

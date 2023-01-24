@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.*;
+import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class GetData extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("chipAtlas");
@@ -30,6 +31,7 @@ public class GetData extends ExecutableStep<Configs> {
             new RequiredConfig<>(configs.chipAtlas.genomeVersionColName);
     private final RequiredConfig<String> antigenClassColName =
             new RequiredConfig<>(configs.chipAtlas.antigenClassColName);
+    private final RequiredConfig<File> igvLib = new RequiredConfig<>(configs.igv.igvLib);
     private final RequiredConfig<String> antigenColName = new RequiredConfig<>(configs.chipAtlas.antigenRegexColName);
     private final RequiredConfig<String> cellTypeClassColName =
             new RequiredConfig<>(configs.chipAtlas.cellTypeClassColName);
@@ -137,6 +139,11 @@ public class GetData extends ExecutableStep<Configs> {
                         }
                     }
                 }
+
+                String indexCommand = "java -Xmx1500m --module-path=" + igvLib.get().getAbsolutePath() +
+                        " --module=org.igv/org.broad.igv.tools.IgvTools index " + bedFile.getAbsolutePath();
+
+                executeAndWait(indexCommand, true);
 
                 return true;
             }));
