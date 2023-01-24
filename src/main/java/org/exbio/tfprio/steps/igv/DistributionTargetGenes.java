@@ -39,7 +39,7 @@ public class DistributionTargetGenes extends ExecutableStep<Configs> {
     private final Map<String, Map<String, InputFile>> groupHmPredictedBindingSitesDirectories = new HashMap<>();
     private final Map<String, Set<InputFile>> groupExperimentalFiles = new HashMap<>();
     private final Map<String, Map<String, InputFile>> groupHmSignalFile = new HashMap<>();
-    private final RequiredConfig<File> igvExecutable = new RequiredConfig<>(configs.igv.igvExecutable);
+    private final RequiredConfig<File> igvLib = new RequiredConfig<>(configs.igv.igvLib);
     private final RequiredConfig<File> igvCacheDirectory = new RequiredConfig<>(configs.igv.igvCacheDirectory);
     private final InputFile chipAtlas;
     private final InputFile ensgSymbolFile;
@@ -307,9 +307,8 @@ public class DistributionTargetGenes extends ExecutableStep<Configs> {
                             add(predictedBindingSites.getRight());
                         }}.stream().filter(Objects::nonNull).filter(File::exists).toList();
 
-                        IGV_Headless igv =
-                                new IGV_Headless(logger, genome.get(), igvExecutable.get(), igvCacheDirectory.get(),
-                                        tfOutputDir);
+                        IGV_Headless igv = new IGV_Headless(logger, genome.get(), igvLib.get(), igvCacheDirectory.get(),
+                                tfOutputDir);
                         igv.createSession(includedFiles, chipAtlasFiles, descriptions);
 
                         igv.addCommand("snapshotDirectory " + tfOutputDir.getAbsolutePath());
