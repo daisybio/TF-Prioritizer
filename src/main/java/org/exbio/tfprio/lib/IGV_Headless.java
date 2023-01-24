@@ -22,7 +22,7 @@ public class IGV_Headless {
     private static Process xServer = null;
     private final StringBuilder commandBuilder = new StringBuilder();
     private final Logger logger;
-    private final File igvExecutable;
+    private final File igvLib;
     private final File igvCacheDirectory;
     private final String genome;
     private final File sessionFile;
@@ -34,11 +34,10 @@ public class IGV_Headless {
      *
      * @param logger the {@link org.exbio.pipejar.pipeline.ExecutableStep} logger
      */
-    public IGV_Headless(Logger logger, String genome, File igvExecutable, File igvCacheDirectory,
-                        File workingDirectory) {
+    public IGV_Headless(Logger logger, String genome, File igvLib, File igvCacheDirectory, File workingDirectory) {
         this.logger = logger;
         this.genome = genome;
-        this.igvExecutable = igvExecutable;
+        this.igvLib = igvLib;
         this.sessionFile = new File(workingDirectory, "session.xml");
         this.batchFile = new File(workingDirectory, "run.bat");
         this.workingDirectory = workingDirectory;
@@ -95,8 +94,9 @@ public class IGV_Headless {
 
         save();
 
-        String command = igvExecutable.getAbsolutePath() + " -b " + batchFile.getAbsolutePath() + " --igvDirectory " +
-                igvCacheDirectory.getAbsolutePath();
+        String command = "java --module-path=" + igvLib.getAbsolutePath() +
+                " -Xmx50g --module=org.igv/org.broad.igv.ui.Main -b " + batchFile.getAbsolutePath() +
+                " --igvDirectory " + igvCacheDirectory.getAbsolutePath();
 
         executeAndWait(command, new HashMap<>() {{
             put("DISPLAY", ":" + xServerNum);
