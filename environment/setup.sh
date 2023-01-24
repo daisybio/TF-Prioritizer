@@ -49,10 +49,10 @@ Rscript "$DIRECTORY"/setup.R
 
 # Install IGV
 mkdir -p "$IGV"
-wget https://data.broadinstitute.org/igv/projects/downloads/2.13/IGV_2.13.0.zip -O "$IGV"/IGV.zip
+wget https://data.broadinstitute.org/igv/projects/downloads/2.15/IGV_2.15.4.zip -O "$IGV"/IGV.zip
 unzip "$IGV"/IGV.zip -d "$IGV"
-mv "$IGV"/IGV_2.13.0/* "$IGV"
-rm -rf "$IGV"/IGV_2.13.0 "$IGV"/IGV.zip
+mv "$IGV"/IGV_2.15.4/* "$IGV"
+rm -rf "$IGV"/IGV_2.15.4 "$IGV"/IGV.zip
 
 mkdir -p "$IGV_CACHE"
 echo "PORT_ENABLED=false" > "$IGV_CACHE"/prefs.properties
