@@ -65,6 +65,12 @@ public class HINT extends ExecutableStep<Configs> {
                             new OutputFile(extend(bamDirectory.get(), group, sampleName + ".bam").getAbsolutePath());
                     OutputFile bamIndex = new OutputFile(bamFile.getAbsolutePath() + ".bai");
 
+                    if (!bamFile.exists()) {
+                        throw new RuntimeException(
+                                "Bam file " + bamFile.getAbsolutePath() + " does not exist. Found files: " +
+                                        Arrays.toString(bamDirectory.get().listFiles()));
+                    }
+
                     InputFile inputBed = addInput(d_hmIn, bedFile);
                     InputFile inputBam = addInput(d_hmIn, bamFile);
                     if (bamIndex.exists()) {
