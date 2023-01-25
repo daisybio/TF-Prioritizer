@@ -82,15 +82,23 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
         FilterEnsgs filterEnsgs = add(new FilterEnsgs(configs));
 
-        MergeCounts mergeCounts = add(new MergeCounts(configs, filterEnsgs.outputFile));
+        Map<String, OutputFile> rawCounts;
+
+        if (configs.inputConfigs.rnaSeq.get().isDirectory()) {
+            MergeCounts mergeCounts = add(new MergeCounts(configs, filterEnsgs.outputFile));
+            rawCounts = mergeCounts.outputFiles;
+        } else {
+            SplitCounts splitCounts = add(new SplitCounts(configs, filterEnsgs.outputFile));
+            rawCounts = splitCounts.outputFiles;
+        }
 
         FetchGeneInfo fetchGeneInfo = add(new FetchGeneInfo(configs, filterEnsgs.cleanFile));
 
         EnsgSymbol ensgSymbol = add(new EnsgSymbol(configs, filterEnsgs.cleanFile));
 
-        CreateBatchFile createBatchFile = add(new CreateBatchFile(configs, mergeCounts.outputFiles));
-        MeanExpression meanCounts = add(new MeanExpression(configs, mergeCounts.outputFiles));
-        CreatePairings createPairings = add(new CreatePairings(configs, mergeCounts.outputFiles));
+        CreateBatchFile createBatchFile = add(new CreateBatchFile(configs, rawCounts));
+        MeanExpression meanCounts = add(new MeanExpression(configs, rawCounts));
+        CreatePairings createPairings = add(new CreatePairings(configs, rawCounts));
 
         CalculateTPM calculateTPM = add(new CalculateTPM(configs, meanCounts.outputFiles, fetchGeneInfo.outputFile));
 
