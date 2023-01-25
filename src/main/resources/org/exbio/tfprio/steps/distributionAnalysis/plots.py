@@ -1,11 +1,12 @@
 import argparse
+import os
+import statistics as sts
+
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 import pandas as pd
 import scipy.stats as scp
 import seaborn as sns
-import statistics as sts
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--backgroundFile', type=str, required=True)
@@ -30,6 +31,9 @@ background.dropna(subset=["TfTgScore"], inplace=True)
 
 background_sum = sum(background["TfTgScore"])
 background_length = len(background)
+if background_length < 1:
+    print("Background file is empty")
+    exit(0)
 background_mean = background_sum / background_length
 background_median = sts.median(background['TfTgScore'])
 background_quantile95 = np.percentile(background["TfTgScore"], 95)
