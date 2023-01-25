@@ -61,8 +61,8 @@ public class HINT extends ExecutableStep<Configs> {
                 sampleFiles.forEach(bedFile -> {
                     String sampleName = trimFile.apply(bedFile);
 
-                    OutputFile bamFile =
-                            new OutputFile(extend(bamDirectory.get(), group, sampleName + ".bam").getAbsolutePath());
+                    OutputFile bamFile = new OutputFile(
+                            extend(bamDirectory.get(), group, hm, sampleName + ".bam").getAbsolutePath());
                     OutputFile bamIndex = new OutputFile(bamFile.getAbsolutePath() + ".bai");
 
                     if (!bamFile.exists()) {
