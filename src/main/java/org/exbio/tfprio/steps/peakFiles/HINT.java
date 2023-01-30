@@ -77,7 +77,7 @@ public class HINT extends ExecutableStep<Configs> {
                         addInput(d_hmIn, bamIndex);
                     }
 
-                    OutputFile outputFile = addOutput(d_hmOut, inputBed.getName());
+                    OutputFile outputFile = addOutput(d_hmOut, trimFile.apply(inputBed) + ".bed");
 
                     outputFiles.computeIfAbsent(group, k -> new HashMap<>()).computeIfAbsent(hm,
                             k -> new HashSet<>()).add(outputFile);
