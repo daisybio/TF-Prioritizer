@@ -21,7 +21,7 @@ public class UpliftENdb extends ExecutableStep<Configs> {
     private final InputFile inputFile;
     private final InputFile script;
 
-    private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(configs.deSeq2.speciesRefGenome);
+    private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(configs.inputConfigs.genome);
 
     public UpliftENdb(Configs configs, OutputFile enDBfile) {
         super(configs, false, enDBfile);
