@@ -1,8 +1,6 @@
-This repository is under development.
-
 # 1. About TF-Prioritizer
 
-This java wrapper gives you a full analysis of nfcore ChIP-seq peak data and nfcore RNA-seq count data. It performs
+This pipeline gives you a full analysis of nfcore chromatine accessibility peak data (ChIP-Seq, ATAC-Seq or DNAse-Seq) and nfcore RNA-seq count data. It performs
 DESeq2, TEPIC and DYNAMITE including all preprocessing and postprocessing steps necessary to transform the data. It also
 gives you plots for deep analysis of the data. The general workflow is sketched in the images below:
 
