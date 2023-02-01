@@ -21,7 +21,7 @@ public class TopKTargetGenes extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final InputFile dcgScoreFile;
     private final Map<InputFile, OutputFile> bridge = new HashMap<>();
-    private final RequiredConfig<Integer> topKTargetGenes = new RequiredConfig<>(configs.plots.topKTargetGenes);
+    private final RequiredConfig<Integer> topKTargetGenes = new RequiredConfig<>(configs.inputConfigs.topTargetGenes);
 
 
     public TopKTargetGenes(Configs configs, OutputFile dcgScoreFile,

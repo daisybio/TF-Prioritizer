@@ -4,7 +4,10 @@ import org.apache.commons.cli.ParseException;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.Workflow;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.steps.Dynamite.*;
+import org.exbio.tfprio.steps.Dynamite.ExtractRegressionCoefficients;
+import org.exbio.tfprio.steps.Dynamite.IntegrateData;
+import org.exbio.tfprio.steps.Dynamite.PrepareForClassification;
+import org.exbio.tfprio.steps.Dynamite.RunDynamite;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipAtlas.CoOccurrenceAnalysis;
@@ -14,7 +17,8 @@ import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
-import org.exbio.tfprio.steps.plots.*;
+import org.exbio.tfprio.steps.plots.GroupStages;
+import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
 import org.exbio.tfprio.steps.report.ReportCompression;
 import org.exbio.tfprio.steps.report.ReportCreation;
 import org.exbio.tfprio.steps.report.ReportPreprocessing;
@@ -47,7 +51,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         Map<String, Map<String, Collection<OutputFile>>> latestPeakFiles = initPeaks.outputFiles;
 
         // perform HINT preprocessing for ATAC-/DNASE-seq input data
-        if (List.of("atac-seq", "dnase-seq").contains(configs.mixOptions.seqType.get())) {
+        if (List.of("atac-seq", "dnase-seq").contains(configs.inputConfigs.seqType.get())) {
             HINT hint = add(new HINT(configs, latestPeakFiles));
             latestPeakFiles = hint.outputFiles;
         }
@@ -142,7 +146,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
         CalculateAffinityRatios calculateAffinityRatios =
                 add(new CalculateAffinityRatios(configs, calculateMeanAffinities.outputFiles));
         OpenRegionsViolinPlots openRegionsViolinPlots = add(new OpenRegionsViolinPlots(configs, tepicFiles));
-        FindAnalyzableTFs findAnalyzableTFs = add(new FindAnalyzableTFs(configs, calculateMeanAffinities.outputFiles));
 
         if (configs.tGene.executable.isSet()) {
             if (!configs.mixOptions.mixMutuallyExclusive.get()) {
@@ -162,20 +165,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
         ExtractRegressionCoefficients extractRegressionCoefficients =
                 add(new ExtractRegressionCoefficients(configs, runDynamite.outputFiles));
 
-        FilterRegressionCoefficients filterRegressionCoefficients =
-                add(new FilterRegressionCoefficients(configs, extractRegressionCoefficients.outputFiles));
-        ThresholdPlots thresholdPlots = add(new ThresholdPlots(configs, filterRegressionCoefficients.outputFiles));
-
-        GroupStages groupStages = add(new GroupStages(configs, filterRegressionCoefficients.outputFiles));
-        PlotGroupedStages plotGroupedStages = add(new PlotGroupedStages(configs, groupStages.outputFiles));
-        AnalyzeGroupLevel analyzeGroupLevel =
-                add(new AnalyzeGroupLevel(configs, calculateTPM.outputFiles, meanCounts.outputFiles,
-                        groupStages.outputFiles, ensgSymbol.outputFile, findAnalyzableTFs.outputFile));
-        AnalyzeHmLevel analyzeHmLevel = add(new AnalyzeHmLevel(configs, analyzeGroupLevel.outputFiles));
-
-        org.exbio.tfprio.steps.plots.TopKTargetGenes topKTargetGenes =
-                add(new org.exbio.tfprio.steps.plots.TopKTargetGenes(configs, groupStages.outputFiles,
-                        calculateMeanAffinities.outputFiles));
+        GroupStages groupStages = add(new GroupStages(configs, extractRegressionCoefficients.outputFiles));
 
         Preprocessing daPreprocessing = add(new Preprocessing(configs, groupStages.outputFiles));
         RunDistributionAnalysis runDistributionAnalysis =

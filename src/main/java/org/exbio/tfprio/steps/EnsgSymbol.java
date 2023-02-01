@@ -22,7 +22,7 @@ import static org.exbio.tfprio.lib.Biomart.query;
 public class EnsgSymbol extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("ensgSymbol.tsv");
     private final InputFile geneIdsFile;
-    private final RequiredConfig<String> species = new RequiredConfig<>(configs.deSeq2.speciesBiomart);
+    private final RequiredConfig<String> species = new RequiredConfig<>(configs.inputConfigs.biomartSpecies);
 
 
     public EnsgSymbol(Configs configs, OutputFile ensgFile) {

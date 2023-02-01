@@ -21,17 +21,16 @@ public class Preprocessing extends ExecutableStep<Configs> {
 
     private final Map<String, Pair<InputFile, InputFile>> inputFiles = new HashMap<>();
 
-    public Preprocessing(Configs configs, Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGrouped) {
-        super(configs, false, hmThresholdGrouped.values().stream().map(
-                map -> map.get(map.keySet().stream().min(Double::compareTo).orElseThrow())).flatMap(
-                maps -> Stream.of(maps.getLeft(), maps.getRight())).toList());
+    public Preprocessing(Configs configs, Map<String, Pair<OutputFile, OutputFile>> hmThresholdGrouped) {
+        super(configs, false, hmThresholdGrouped.values().stream().flatMap(
+                stringOutputFileMap -> Stream.of(stringOutputFileMap.getLeft(),
+                        stringOutputFileMap.getRight())).collect(Collectors.toSet()));
 
-        hmThresholdGrouped.forEach((hm, thresholdMap) -> {
+        hmThresholdGrouped.forEach((hm, outputFiles) -> {
             OutputFile inHm = new OutputFile(inputDirectory, hm);
-            var pair = thresholdMap.get(thresholdMap.keySet().stream().min(Double::compareTo).orElseThrow());
 
-            InputFile same = addInput(inHm, pair.getLeft());
-            InputFile different = addInput(inHm, pair.getRight());
+            InputFile same = addInput(inHm, outputFiles.getLeft());
+            InputFile different = addInput(inHm, outputFiles.getRight());
             inputFiles.put(hm, Pair.of(same, different));
         });
     }

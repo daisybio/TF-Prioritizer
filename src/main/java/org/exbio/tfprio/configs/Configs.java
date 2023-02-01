@@ -11,7 +11,6 @@ public class Configs extends ConfigModuleCollection {
     public final TEPIC tepic = new TEPIC();
     public final DYNAMITE dynamite = new DYNAMITE();
     public final InternalConfigs internalConfigs = new InternalConfigs();
-    public final Plots plots = new Plots();
     public final DistributionAnalysis distributionAnalysis = new DistributionAnalysis();
     public final ChipAtlas chipAtlas = new ChipAtlas();
     public final IGV igv = new IGV();

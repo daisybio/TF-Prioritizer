@@ -19,7 +19,7 @@ import static org.exbio.pipejar.util.FileManagement.makeSureFileExists;
 public class TopKTargetGenes extends ExecutableStep<Configs> {
     public final Map<String, Map<Double, Pair<OutputFile, OutputFile>>> outputFiles = new HashMap<>();
     private final Map<OutputFile, Pair<InputFile, Map<String, InputFile>>> bridge = new HashMap<>();
-    private final RequiredConfig<Integer> topKTargetGenes = new RequiredConfig<>(configs.plots.topKTargetGenes);
+    private final RequiredConfig<Integer> topKTargetGenes = new RequiredConfig<>(configs.inputConfigs.topTargetGenes);
 
     public TopKTargetGenes(Configs configs, Map<String, Map<Double, Pair<OutputFile, OutputFile>>> hmThresholdGrouped,
                            Map<String, Map<String, OutputFile>> groupHmMeanAffinities) {

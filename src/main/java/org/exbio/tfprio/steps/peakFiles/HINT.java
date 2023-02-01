@@ -31,7 +31,7 @@ public class HINT extends ExecutableStep<Configs> {
     public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final String exec = "rgt-hint";
     private final String mode = "footprinting";
-    private final RequiredConfig<String> seqType = new RequiredConfig<>(configs.mixOptions.seqType);
+    private final RequiredConfig<String> seqType = new RequiredConfig<>(configs.inputConfigs.seqType);
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.hint.bam_directory);
     private final RequiredConfig<Boolean> paired = new RequiredConfig<>(configs.hint.paired);
     private final RequiredConfig<String> genome = new RequiredConfig<>(configs.hint.genome);

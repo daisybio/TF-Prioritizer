@@ -17,8 +17,8 @@ import static org.exbio.tfprio.util.Helpers.getDatasetVersion;
 
 public class Uplift extends ExecutableStep<Configs> {
     public final OutputFile outputFile;
-    private final RequiredConfig<String> species = new RequiredConfig<>(configs.deSeq2.speciesBiomart);
-    private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(configs.deSeq2.speciesRefGenome);
+    private final RequiredConfig<String> species = new RequiredConfig<>(configs.inputConfigs.biomartSpecies);
+    private final RequiredConfig<String> speciesRefGenome = new RequiredConfig<>(configs.inputConfigs.genome);
     private final InputFile genePositions;
 
     private final InputFile script;

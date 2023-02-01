@@ -9,22 +9,22 @@
       "L10": "L",
       "p6": "p",
       "p13": "p"
-    }
+    },
+    "genome": "mm10",
+    "biomartSpecies": "mmusculus_gene_ensembl",
+    "seqType": "chip-seq",
+    "topTargetGenes": 30
   },
   "MixOptions": {
-    "biomartDatasetSpecies": "mmusculus_gene_ensembl",
     "blackListPath": "/home/nico/Data/TFPRIO/RawData/05_black_listed_regions/mm10-blacklist.v2.txt",
     "differentialPeakSignals": false,
     "maxSpaceBetweenPeaks": 500,
     "minOccurrence": 0,
     "mixMutuallyExclusive": false,
     "perform": true,
-    "tfBindingSiteSearch": "BETWEEN",
-    "seqType": "chip-seq"
+    "tfBindingSiteSearch": "BETWEEN"
   },
   "DeSeq2": {
-    "speciesBiomart": "mmusculus_gene_ensembl",
-    "speciesRefGenome": "mm10",
     "tpmFilter": null,
     "batches": null,
     "countFilter": 50
@@ -56,7 +56,7 @@
     "entireGeneBody": false,
     "twoBitFile": null,
     "onlyDNasePeaks": "/home/nico/Data/TFPRIO/RawData/04_requiredData/gencode.vM25.annotation.gtf",
-    "inputReferenceGenome": "/home/nico/Data/TFPRIO/RawData/04_requiredData/genome.fa",
+    "referenceGenome": "/home/nico/Data/TFPRIO/RawData/04_requiredData/genome.fa",
     "bedChromatinSignal": null,
     "affinityCutoff": 0.05
   },
@@ -68,27 +68,14 @@
     "alpha": 0.1,
     "randomize": false
   },
-  "Plots": {
-    "topKTargetGenes": 30,
-    "thresholds": [
-      0.1,
-      0.2,
-      0.3,
-      0.4,
-      0.5,
-      0.6
-    ]
-  },
   "ChipAtlas": {
     "enabled": true,
-    "genomeVersion": "mm10",
     "tissueTypes": [
       "breast"
     ]
   },
   "IGV": {
     "experimentalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/04_evaluation/merged/working_dir/00_MIX_OPTION/01_SAMPLE_MIX",
-    "signalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/06_evaluation_tdf",
-    "genome": "mm10"
+    "signalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/06_evaluation_tdf"
   }
 }

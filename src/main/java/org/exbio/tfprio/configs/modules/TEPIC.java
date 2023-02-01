@@ -8,7 +8,7 @@ import java.io.File;
 
 public class TEPIC extends ConfigModule {
     public final ExternalConfig<Boolean> randomize = new ExternalConfig<>(Boolean.class);
-    public final ExternalConfig<File> inputReferenceGenome = new ExternalConfig<>(File.class);
+    public final ExternalConfig<File> referenceGenome = new ExternalConfig<>(File.class);
     public final ExternalConfig<File> PWMs = new ExternalConfig<>(File.class);
     public final ExternalConfig<File> bedChromatinSignal = new ExternalConfig<>(File.class);
     public final ExternalConfig<Integer> columnBedfile = new ExternalConfig<>(Integer.class);

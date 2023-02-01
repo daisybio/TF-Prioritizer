@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 
 public class PreprocessReferenceGenome extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("referenceGenome.fa");
-    private final RequiredConfig<File> referenceGenomeConfig = new RequiredConfig<>(configs.tepic.inputReferenceGenome);
+    private final RequiredConfig<File> referenceGenomeConfig = new RequiredConfig<>(configs.tepic.referenceGenome);
     private final InputFile referenceGenome = addInput(referenceGenomeConfig);
 
     public PreprocessReferenceGenome(Configs configs) {

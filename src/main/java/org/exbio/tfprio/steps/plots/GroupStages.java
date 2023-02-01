@@ -10,28 +10,24 @@ import org.exbio.tfprio.configs.Configs;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 public class GroupStages extends ExecutableStep<Configs> {
-    public final Map<String, Map<Double, Pair<OutputFile, OutputFile>>> outputFiles = new HashMap<>();
+    public final Map<String, Pair<OutputFile, OutputFile>> outputFiles = new HashMap<>();
     // TODO: make this optional
     private final RequiredConfig<Map<String, String>> sameStages =
             new RequiredConfig<>(configs.inputConfigs.sameStages);
-    private final RequiredConfig<List<Double>> thresholds = new RequiredConfig<>(configs.plots.thresholds);
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
     private final Map<InputFile, String> inputFilePairing = new HashMap<>();
 
-    public GroupStages(Configs configs, Map<String, Map<String, Map<Double, OutputFile>>> coefficientFiles) {
-        super(configs, false, coefficientFiles.values().stream().flatMap(x -> x.values().stream()).flatMap(
-                col -> col.values().stream()).toList());
+    public GroupStages(Configs configs, Map<String, Map<String, OutputFile>> coefficientFiles) {
+        super(configs, false, coefficientFiles.values().stream().flatMap(
+                stringOutputFileMap -> stringOutputFileMap.values().stream()).collect(Collectors.toSet()));
 
         coefficientFiles.values().stream().map(Map::keySet).flatMap(Collection::stream).distinct().forEach(hm -> {
             OutputFile hmDir = new OutputFile(outputDirectory, hm);
 
-            thresholds.get().forEach(threshold -> {
-                OutputFile thresholdDir = new OutputFile(hmDir, threshold.toString());
-                outputFiles.computeIfAbsent(hm, s -> new HashMap<>()).put(threshold,
-                        Pair.of(addOutput(thresholdDir, "same.tsv"), addOutput(thresholdDir, "different.tsv")));
-            });
+            outputFiles.put(hm, Pair.of(addOutput(hmDir, "same.tsv"), addOutput(hmDir, "different.tsv")));
         });
 
 
@@ -44,15 +40,11 @@ public class GroupStages extends ExecutableStep<Configs> {
 
             OutputFile inPairing = new OutputFile(inputDirectory, pairing);
 
-            hmMap.forEach((hm, thresholdMap) -> {
-                OutputFile hmDir = new OutputFile(inPairing, hm);
-                thresholdMap.forEach((threshold, input) -> {
-                    InputFile inThreshold = addInput(hmDir, input);
-                    OutputFile outputFile = same ? outputFiles.get(hm).get(threshold).getLeft() :
-                            outputFiles.get(hm).get(threshold).getRight();
-                    bridge.computeIfAbsent(outputFile, s -> new HashSet<>()).add(inThreshold);
-                    inputFilePairing.put(inThreshold, pairing);
-                });
+            hmMap.forEach((hm, input) -> {
+                InputFile inputFile = addInput(inPairing, input);
+                OutputFile outputFile = same ? outputFiles.get(hm).getLeft() : outputFiles.get(hm).getRight();
+                bridge.computeIfAbsent(outputFile, s -> new HashSet<>()).add(inputFile);
+                inputFilePairing.put(inputFile, pairing);
             });
         });
     }

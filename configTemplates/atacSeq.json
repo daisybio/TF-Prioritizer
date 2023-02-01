@@ -7,27 +7,26 @@
     "sameStages": {
       "MCF-7": "MCF7",
       "K562": "K562"
-    }
+    },
+    "genome": "hg38",
+    "biomartSpecies": "hsapiens_gene_ensembl",
+    "seqType": "atac-seq",
+    "topTargetGenes": 30
   },
   "HINT": {
     "bam_directory": "/nfs/data/COM2POSE/ATAC-seq/bams",
-    "paired": true,
-    "genome": "hg38"
+    "paired": true
   },
   "MixOptions": {
-    "biomartDatasetSpecies": "hsapiens_gene_ensembl",
     "blackListPath": "/nfs/data/COM2POSE/TFPRIO_data/05_black_listed_regions/hg38-blacklist.v2.bed",
     "differentialPeakSignals": false,
     "maxSpaceBetweenPeaks": 500,
     "minOccurrence": 0,
     "mixMutuallyExclusive": false,
     "perform": false,
-    "tfBindingSiteSearch": "INSIDE",
-    "seqType": "atac-seq"
+    "tfBindingSiteSearch": "INSIDE"
   },
   "DeSeq2": {
-    "speciesBiomart": "hsapiens_gene_ensembl",
-    "speciesRefGenome": "hg38",
     "tpmFilter": null,
     "batches": null,
     "countFilter": 50
@@ -72,20 +71,8 @@
     "alpha": 0.1,
     "randomize": false
   },
-  "Plots": {
-    "topKTargetGenes": 30,
-    "thresholds": [
-      0.1,
-      0.2,
-      0.3,
-      0.4,
-      0.5,
-      0.6
-    ]
-  },
   "ChipAtlas": {
     "enabled": true,
-    "genomeVersion": "hg38",
     "tissueTypes": [
       "lymphoblast",
       "breast"
