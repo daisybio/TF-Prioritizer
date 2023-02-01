@@ -37,7 +37,7 @@ public class GetData extends ExecutableStep<Configs> {
             new RequiredConfig<>(configs.chipAtlas.cellTypeClassColName);
     private final RequiredConfig<String> urlColName = new RequiredConfig<>(configs.chipAtlas.urlColName);
     private final RequiredConfig<String> thresholdColName = new RequiredConfig<>(configs.chipAtlas.thresholdColName);
-    private final RequiredConfig<String> genomeVersion = new RequiredConfig<>(configs.chipAtlas.genomeVersion);
+    private final RequiredConfig<String> genomeVersion = new RequiredConfig<>(configs.inputConfigs.genome);
 
     public GetData(Configs configs, OutputFile dataList, OutputFile dcgFile) {
         super(configs, false, dataList, dcgFile);

@@ -43,7 +43,7 @@ public class DistributionTargetGenes extends ExecutableStep<Configs> {
     private final RequiredConfig<File> igvCacheDirectory = new RequiredConfig<>(configs.igv.igvCacheDirectory);
     private final InputFile chipAtlas;
     private final InputFile ensgSymbolFile;
-    private final RequiredConfig<String> genome = new RequiredConfig<>(configs.igv.genome);
+    private final RequiredConfig<String> genome = new RequiredConfig<>(configs.inputConfigs.genome);
     private final Map<String, Map<String, InputFile>> groupHmTfTargetGenes = new HashMap<>();
     private final Map<Pair<String, String>, Collection<String>> groupPairingHms;
 

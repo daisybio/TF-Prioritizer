@@ -34,7 +34,7 @@ public class HINT extends ExecutableStep<Configs> {
     private final RequiredConfig<String> seqType = new RequiredConfig<>(configs.inputConfigs.seqType);
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.hint.bam_directory);
     private final RequiredConfig<Boolean> paired = new RequiredConfig<>(configs.hint.paired);
-    private final RequiredConfig<String> genome = new RequiredConfig<>(configs.hint.genome);
+    private final RequiredConfig<String> genome = new RequiredConfig<>(configs.inputConfigs.genome);
     private final Map<OutputFile, Pair<InputFile, InputFile>> bridge = new HashMap<>();
     private final Function<File, String> trimFile = (file) -> {
         String name = file.getName();

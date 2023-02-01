@@ -77,8 +77,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
         }
 
 
-        GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths(configs));
-
         if (configs.mixOptions.mixMutuallyExclusive.get()) {
             MixMutuallyExclusive mixMutuallyExclusive = add(new MixMutuallyExclusive(configs, latestPeakFiles));
             latestPeakFiles = mixMutuallyExclusive.outputFiles;

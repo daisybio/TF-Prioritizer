@@ -20,5 +20,4 @@ public class ChipAtlas extends ConfigModule {
     public final InternalConfig<String> cellTypeClassColName = new InternalConfig<>("cell_type_class");
     public final InternalConfig<String> thresholdColName = new InternalConfig<>("threshold");
     public final InternalConfig<String> urlColName = new InternalConfig<>("file_url");
-    public final ExternalConfig<String> genomeVersion = new ExternalConfig<>(String.class);
 }

@@ -12,5 +12,4 @@ public class IGV extends ConfigModule {
     public final InternalConfig<Integer> windowExtend = new InternalConfig<>(50000);
     public final ExternalConfig<File> experimentalFiles = new ExternalConfig<>(File.class);
     public final ExternalConfig<File> signalFiles = new ExternalConfig<>(File.class);
-    public final ExternalConfig<String> genome = new ExternalConfig<>(String.class);
 }
