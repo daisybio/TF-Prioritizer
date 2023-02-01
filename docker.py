@@ -29,7 +29,7 @@ def process_configs(configs: dict) -> dict:
     return mounts
 
 
-image = args.i if args.i is not None else "nicotru/tf-prioritizer"
+image = args.i if args.i is not None else "nicotru/tf-prioritizer:master"
 config_path = os.path.abspath(args.c)
 threads = args.t
 output = os.path.abspath(args.o)
