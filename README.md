@@ -8,11 +8,11 @@ gives you plots for deep analysis of the data. The general workflow is sketched 
 
 ## Graphical abstract:
 
-![Graphical abstrat](media/graphicalAbstract.png)
+![Graphical abstrat](https://raw.githubusercontent.com/biomedbigdata/TF-Prioritizer/master/media/graphicalAbstract.png)
 
 ## Technical workflow:
 
-![Technical workflow](media/technicalWorkflow.png)
+![Technical workflow](https://github.com/biomedbigdata/TF-Prioritizer/raw/master/media/technicalWorkflow.png)
 
 # 2. License and Citing
 
