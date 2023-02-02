@@ -13,6 +13,8 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.exbio.pipejar.util.FileManagement.makeSureFileExists;
+
 public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
     private final InputFile coOccurringRegions;
@@ -76,6 +78,7 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                             return Pair.of(split[0], new RegionWithPayload<>(chromosome, start, end, affinity));
                         });
                     } catch (IOException e) {
+                        logger.warn("Failed to read file: " + input);
                         throw new UncheckedIOException(e);
                     }
                 }).collect(Collectors.groupingBy(Pair::getKey,
@@ -84,8 +87,11 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                 Map<String, BufferedWriter> tfWriters =
                         tfAffinities.keySet().stream().collect(Collectors.toMap(tf -> tf, tf -> {
                             try {
-                                return new BufferedWriter(new FileWriter(new OutputFile(output, tf + ".tsv")));
+                                File file = new File(output, tf + ".tsv");
+                                makeSureFileExists(file);
+                                return new BufferedWriter(new FileWriter(file));
                             } catch (IOException e) {
+                                logger.warn("Failed to create file: " + output + "/" + tf + ".tsv");
                                 throw new UncheckedIOException(e);
                             }
                         }));
@@ -106,6 +112,7 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                         try {
                             tfWriters.get(tf).write(i + "\t" + averageAffinity + "\n");
                         } catch (IOException e) {
+                            logger.warn("Failed to write to file: " + output + "/" + tf + ".tsv");
                             throw new UncheckedIOException(e);
                         }
                     });
@@ -115,6 +122,7 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                     try {
                         writer.close();
                     } catch (IOException e) {
+                        logger.warn("Failed to close file");
                         throw new UncheckedIOException(e);
                     }
                 });
