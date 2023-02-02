@@ -5,7 +5,6 @@ import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
@@ -14,6 +13,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class CoOccurrenceAnalysis extends ExecutableStep<Configs> {
     public final OutputFile outputFile = addOutput("coOccurrence.tsv");
+    public final OutputFile merged = addOutput("merged.bed");
     private final InputFile inputDirectory;
     private final InputFile mergeScript;
     private final InputFile coOccurrenceScript;
@@ -30,7 +30,6 @@ public class CoOccurrenceAnalysis extends ExecutableStep<Configs> {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {
-                File merged = new File(outputDirectory, "merged.bed");
                 String mergeCommand = "bash " + mergeScript + " " + inputDirectory + " " + merged;
                 executeAndWait(mergeCommand, true);
 

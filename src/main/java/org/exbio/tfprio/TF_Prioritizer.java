@@ -8,6 +8,7 @@ import org.exbio.tfprio.steps.Dynamite.*;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipAtlas.CoOccurrenceAnalysis;
+import org.exbio.tfprio.steps.chipAtlas.CoOccurrenceBindingEnergies;
 import org.exbio.tfprio.steps.chipAtlas.GetData;
 import org.exbio.tfprio.steps.chipAtlas.GetList;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
@@ -200,6 +201,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
             CoOccurrenceAnalysis coOccurrenceAnalysis = add(new CoOccurrenceAnalysis(configs, chipAtlasDirectory));
             coOccurrence = coOccurrenceAnalysis.outputFile;
+
+            CoOccurrenceBindingEnergies coOccurrenceBindingEnergies =
+                    add(new CoOccurrenceBindingEnergies(configs, extractSequences.outputFiles,
+                            coOccurrenceAnalysis.merged));
         }
 
         DistributionTargetGenes distributionTargetGenes =
