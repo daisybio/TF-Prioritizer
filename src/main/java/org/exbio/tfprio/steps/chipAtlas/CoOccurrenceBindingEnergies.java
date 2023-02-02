@@ -32,7 +32,7 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
 
             hmAffinities.forEach((hm, affinityFiles) -> {
                 OutputFile hmInput = new OutputFile(groupInput, hm);
-                OutputFile hmOutput = new OutputFile(groupOutput, hm);
+                OutputFile hmOutput = addOutput(groupOutput, hm);
 
                 Collection<InputFile> inputs =
                         affinityFiles.stream().map(affinityFile -> addInput(hmInput, affinityFile)).toList();
@@ -109,6 +109,14 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                             throw new UncheckedIOException(e);
                         }
                     });
+                });
+
+                tfWriters.values().forEach(writer -> {
+                    try {
+                        writer.close();
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
                 });
 
                 return true;
