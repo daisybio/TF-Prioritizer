@@ -54,6 +54,6 @@ internal_command = f"java -Xmx{memory}g -jar /srv/TF-Prioritizer.jar -t {threads
 external_command = f"docker run --cpus='{threads}' --user='{os.getuid()}':'{os.getgid()}'" \
                    f" -v '{docker_config_file}:/srv/input/configs.json:ro' {volume_string} -v '{output}:/srv/wd:rw,Z' " \
                    f"{image} {internal_command}"
-
-os.system("docker image pull " + image)
+if not args.i:
+    os.system("docker image pull " + image)
 os.system(external_command)
