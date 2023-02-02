@@ -12,4 +12,6 @@ public class DYNAMITE extends ConfigModule {
     public final ExternalConfig<Boolean> performance = new ExternalConfig<>(Boolean.class);
     public final ExternalConfig<Double> alpha = new ExternalConfig<>(Double.class, new PositiveDoubleValidator());
     public final ExternalConfig<Boolean> randomize = new ExternalConfig<>(Boolean.class);
+    public final ExternalConfig<Double> minRegressionCoefficient =
+            new ExternalConfig<>(Double.class, new PositiveDoubleValidator());
 }

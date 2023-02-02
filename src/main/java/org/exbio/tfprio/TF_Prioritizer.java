@@ -4,10 +4,7 @@ import org.apache.commons.cli.ParseException;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
 import org.exbio.pipejar.pipeline.Workflow;
 import org.exbio.tfprio.configs.Configs;
-import org.exbio.tfprio.steps.Dynamite.ExtractRegressionCoefficients;
-import org.exbio.tfprio.steps.Dynamite.IntegrateData;
-import org.exbio.tfprio.steps.Dynamite.PrepareForClassification;
-import org.exbio.tfprio.steps.Dynamite.RunDynamite;
+import org.exbio.tfprio.steps.Dynamite.*;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipAtlas.CoOccurrenceAnalysis;
@@ -162,14 +159,16 @@ public class TF_Prioritizer extends Workflow<Configs> {
         RunDynamite runDynamite = add(new RunDynamite(configs, prepareForClassification.outputFiles));
         ExtractRegressionCoefficients extractRegressionCoefficients =
                 add(new ExtractRegressionCoefficients(configs, runDynamite.outputFiles));
+        FilterRegressionCoefficients filterRegressionCoefficients =
+                add(new FilterRegressionCoefficients(configs, extractRegressionCoefficients.outputFiles));
 
-        GroupStages groupStages = add(new GroupStages(configs, extractRegressionCoefficients.outputFiles));
+        GroupStages groupStages = add(new GroupStages(configs, filterRegressionCoefficients.outputFiles));
 
         Preprocessing daPreprocessing = add(new Preprocessing(configs, groupStages.outputFiles));
         RunDistributionAnalysis runDistributionAnalysis =
                 add(new RunDistributionAnalysis(configs, daPreprocessing.outputFile, ensgSymbol.outputFile,
                         meanCounts.outputFiles, deSeqPostprocessing.outputFiles,
-                        extractRegressionCoefficients.outputFiles, calculateMeanAffinities.outputFiles));
+                        filterRegressionCoefficients.outputFiles, calculateMeanAffinities.outputFiles));
         CreateBackground createBackground = add(new CreateBackground(configs, runDistributionAnalysis.outputFiles));
         CreatePlots createPlots =
                 add(new CreatePlots(configs, runDistributionAnalysis.outputFiles, createBackground.outputFiles));
