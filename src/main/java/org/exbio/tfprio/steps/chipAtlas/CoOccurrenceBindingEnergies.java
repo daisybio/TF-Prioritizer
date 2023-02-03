@@ -61,6 +61,7 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                     regions.stream().flatMap(region -> region.getPayload().stream()).collect(Collectors.toSet());
 
             bridge.forEach((output, inputs) -> add(() -> {
+                logger.trace("Loading affinities");
                 Map<String, TreeSet<RegionWithPayload<Double>>> tfAffinities = inputs.stream().flatMap(input -> {
                     try (var reader = new BufferedReader(new FileReader(input))) {
                         return reader.lines().map(line -> line.split("\t")).filter(
@@ -84,6 +85,7 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                 }).collect(Collectors.groupingBy(Pair::getKey,
                         Collectors.mapping(Pair::getValue, Collectors.toCollection(TreeSet::new))));
 
+                logger.trace("Opening writers");
                 Map<String, BufferedWriter> tfWriters =
                         tfAffinities.keySet().stream().collect(Collectors.toMap(tf -> tf, tf -> {
                             try {
@@ -96,6 +98,7 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                             }
                         }));
 
+                logger.trace("Writing");
                 IntStream.range(0, regions.size()).forEach(i -> {
                     RegionWithPayload<Set<String>> region = regions.get(i);
 
@@ -118,6 +121,7 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                     });
                 });
 
+                logger.trace("Closing writers");
                 tfWriters.values().forEach(writer -> {
                     try {
                         writer.close();
