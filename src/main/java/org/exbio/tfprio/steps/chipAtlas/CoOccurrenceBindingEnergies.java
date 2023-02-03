@@ -106,9 +106,8 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                     regionTfs.forEach(tf -> {
                         TreeSet<RegionWithPayload<Double>> affinities = tfAffinities.get(tf);
 
-                        double averageAffinity =
-                                affinities.subSet(searchRegion, true, searchRegion, true).stream().mapToDouble(
-                                        RegionWithPayload::getPayload).average().orElse(0.0);
+                        double averageAffinity = affinities.stream().filter(r -> r.overlaps(searchRegion)).mapToDouble(
+                                RegionWithPayload::getPayload).average().orElse(0.0);
 
                         try {
                             tfWriters.get(tf).write(i + "\t" + averageAffinity + "\n");
