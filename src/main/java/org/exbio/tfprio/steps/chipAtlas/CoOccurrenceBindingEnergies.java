@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.makeSureFileExists;
+import static org.exbio.pipejar.util.FileManagement.readLines;
 
 public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
     public final Map<String, Map<String, OutputFile>> outputFiles = new HashMap<>();
@@ -64,9 +65,10 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                 logger.trace("Loading affinities");
                 Map<String, TreeSet<RegionWithPayload<Double>>> tfAffinities = inputs.stream().flatMap(input -> {
                     logger.trace("Reading file: " + input);
-                    try (var reader = new BufferedReader(new FileReader(input))) {
-                        logger.trace("Parsing lines");
-                        return reader.lines().filter(line -> !line.isBlank()).map(line -> line.split("\t")).filter(
+                    try {
+                        List<String> lines = readLines(input);
+                        logger.trace("Parsing " + lines.size() + " lines");
+                        return lines.stream().filter(line -> !line.isBlank()).map(line -> line.split("\t")).filter(
                                 split -> transcriptionFactors.contains(split[0])).map(split -> {
                             logger.trace("Parsing line: " + Arrays.toString(split));
                             String region = split[6].substring(1);
