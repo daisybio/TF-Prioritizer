@@ -63,7 +63,9 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
             bridge.forEach((output, inputs) -> add(() -> {
                 logger.trace("Loading affinities");
                 Map<String, TreeSet<RegionWithPayload<Double>>> tfAffinities = inputs.stream().flatMap(input -> {
+                    logger.trace("Reading file: " + input);
                     try (var reader = new BufferedReader(new FileReader(input))) {
+                        logger.trace("Parsing lines");
                         return reader.lines().filter(line -> !line.isBlank()).map(line -> line.split("\t")).filter(
                                 split -> transcriptionFactors.contains(split[0])).map(split -> {
                             logger.trace("Parsing line: " + Arrays.toString(split));
