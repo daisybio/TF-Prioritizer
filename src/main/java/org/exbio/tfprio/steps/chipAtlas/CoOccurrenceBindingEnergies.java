@@ -64,8 +64,9 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                 logger.trace("Loading affinities");
                 Map<String, TreeSet<RegionWithPayload<Double>>> tfAffinities = inputs.stream().flatMap(input -> {
                     try (var reader = new BufferedReader(new FileReader(input))) {
-                        return reader.lines().map(line -> line.split("\t")).filter(
+                        return reader.lines().filter(line -> !line.isBlank()).map(line -> line.split("\t")).filter(
                                 split -> transcriptionFactors.contains(split[0])).map(split -> {
+                            logger.trace("Parsing line: " + Arrays.toString(split));
                             String region = split[6].substring(1);
                             double affinity = Double.parseDouble(split[1]);
 
@@ -75,6 +76,8 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                             String[] posSplit = chromSplit[1].split("-");
                             int start = Integer.parseInt(posSplit[0]);
                             int end = Integer.parseInt(posSplit[1]);
+
+                            logger.trace("Parsed line: " + chromosome + ":" + start + "-" + end + " " + affinity);
 
                             return Pair.of(split[0], new RegionWithPayload<>(chromosome, start, end, affinity));
                         });
