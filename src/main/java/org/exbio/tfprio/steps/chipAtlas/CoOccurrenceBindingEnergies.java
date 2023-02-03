@@ -106,11 +106,16 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                     regionTfs.forEach(tf -> {
                         TreeSet<RegionWithPayload<Double>> affinities = tfAffinities.get(tf);
 
-                        double averageAffinity = affinities.stream().filter(r -> r.overlaps(searchRegion)).mapToDouble(
-                                RegionWithPayload::getPayload).average().orElse(0.0);
+                        OptionalDouble averageAffinity =
+                                affinities.stream().filter(r -> r.overlaps(searchRegion)).mapToDouble(
+                                        RegionWithPayload::getPayload).average();
+
+                        if (averageAffinity.isEmpty()) {
+                            return;
+                        }
 
                         try {
-                            tfWriters.get(tf).write(i + "\t" + averageAffinity + "\n");
+                            tfWriters.get(tf).write(i + "\t" + averageAffinity.getAsDouble() + "\n");
                         } catch (IOException e) {
                             throw new UncheckedIOException(e);
                         }
