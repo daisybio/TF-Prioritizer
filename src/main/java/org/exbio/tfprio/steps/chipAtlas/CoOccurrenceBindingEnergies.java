@@ -62,15 +62,11 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                     regions.stream().flatMap(region -> region.getPayload().stream()).collect(Collectors.toSet());
 
             bridge.forEach((output, inputs) -> add(() -> {
-                logger.trace("Loading affinities");
                 Map<String, TreeSet<RegionWithPayload<Double>>> tfAffinities = inputs.stream().flatMap(input -> {
-                    logger.trace("Reading file: " + input);
                     try {
                         List<String> lines = readLines(input);
-                        logger.trace("Parsing " + lines.size() + " lines");
                         return lines.stream().filter(line -> !line.isBlank()).map(line -> line.split("\t")).filter(
                                 split -> transcriptionFactors.contains(split[0])).map(split -> {
-                            logger.trace("Parsing line: " + Arrays.toString(split));
                             String region = split[6].substring(1);
                             double affinity = Double.parseDouble(split[1]);
 
@@ -81,18 +77,14 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                             int start = Integer.parseInt(posSplit[0]);
                             int end = Integer.parseInt(posSplit[1]);
 
-                            logger.trace("Parsed line: " + chromosome + ":" + start + "-" + end + " " + affinity);
-
                             return Pair.of(split[0], new RegionWithPayload<>(chromosome, start, end, affinity));
                         });
                     } catch (IOException e) {
-                        logger.warn("Failed to read file: " + input);
                         throw new UncheckedIOException(e);
                     }
                 }).collect(Collectors.groupingBy(Pair::getKey,
                         Collectors.mapping(Pair::getValue, Collectors.toCollection(TreeSet::new))));
 
-                logger.trace("Opening writers");
                 Map<String, BufferedWriter> tfWriters =
                         tfAffinities.keySet().stream().collect(Collectors.toMap(tf -> tf, tf -> {
                             try {
@@ -100,12 +92,10 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                                 makeSureFileExists(file);
                                 return new BufferedWriter(new FileWriter(file));
                             } catch (IOException e) {
-                                logger.warn("Failed to create file: " + output + "/" + tf + ".tsv");
                                 throw new UncheckedIOException(e);
                             }
                         }));
 
-                logger.trace("Writing");
                 IntStream.range(0, regions.size()).forEach(i -> {
                     RegionWithPayload<Set<String>> region = regions.get(i);
 
@@ -116,24 +106,22 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                     regionTfs.forEach(tf -> {
                         TreeSet<RegionWithPayload<Double>> affinities = tfAffinities.get(tf);
 
-                        double averageAffinity = affinities.subSet(searchRegion, searchRegion).stream().mapToDouble(
-                                RegionWithPayload::getPayload).average().orElse(0.0);
+                        double averageAffinity =
+                                affinities.subSet(searchRegion, true, searchRegion, true).stream().mapToDouble(
+                                        RegionWithPayload::getPayload).average().orElse(0.0);
 
                         try {
                             tfWriters.get(tf).write(i + "\t" + averageAffinity + "\n");
                         } catch (IOException e) {
-                            logger.warn("Failed to write to file: " + output + "/" + tf + ".tsv");
                             throw new UncheckedIOException(e);
                         }
                     });
                 });
 
-                logger.trace("Closing writers");
                 tfWriters.values().forEach(writer -> {
                     try {
                         writer.close();
                     } catch (IOException e) {
-                        logger.warn("Failed to close file");
                         throw new UncheckedIOException(e);
                     }
                 });
