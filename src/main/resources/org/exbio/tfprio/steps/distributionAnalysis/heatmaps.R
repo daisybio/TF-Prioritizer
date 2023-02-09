@@ -35,5 +35,5 @@ groups <- groups[, "group", drop = FALSE]
 
 write.table(counts, file = args$outCounts, row.names = TRUE, col.names = TRUE, sep = "\t")
 pheatmap(counts, scale = "row", filename = args$heatmap, labels_row = symbols, legend = TRUE, annotation_legend = TRUE,
-         annotation_col = groups, show_colnames = FALSE, show_col_dend = FALSE, show_row_dend = FALSE,
+         annotation_col = groups, show_colnames = TRUE, show_col_dend = FALSE, show_row_dend = FALSE,
          treeheight_row = 0, treeheight_col = 0)
