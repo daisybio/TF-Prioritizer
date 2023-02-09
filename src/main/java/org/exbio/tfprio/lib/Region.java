@@ -4,6 +4,7 @@ package org.exbio.tfprio.lib;
 import org.exbio.tfprio.util.ChromosomeComparator;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a certain region on a certain chromosome.
@@ -148,5 +149,33 @@ public class Region implements Comparable<Region> {
     @Override
     public String toString() {
         return getChromosome() + "\t" + getStart() + "\t" + getEnd();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Region region = (Region) o;
+
+        if (start != region.start) {
+            return false;
+        }
+        if (end != region.end) {
+            return false;
+        }
+        return Objects.equals(chromosome, region.chromosome);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chromosome != null ? chromosome.hashCode() : 0;
+        result = 31 * result + start;
+        result = 31 * result + end;
+        return result;
     }
 }

@@ -11,7 +11,6 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.exbio.pipejar.util.FileManagement.makeSureFileExists;
 import static org.exbio.pipejar.util.FileManagement.readLines;
@@ -47,13 +46,13 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            final List<RegionWithPayload<Set<String>>> regions;
+            final TreeSet<RegionWithPayload<Set<String>>> regions;
             try (var reader = new BufferedReader(new FileReader(coOccurringRegions))) {
                 regions = reader.lines().map(line -> line.split("\t")).map(
                         split -> new RegionWithPayload<Set<String>>(split[0], Integer.parseInt(split[1]),
                                 Integer.parseInt(split[2]),
                                 new HashSet<>(Arrays.asList(split[3].split("\\|"))))).filter(
-                        region -> region.getPayload().size() > 1).sorted().toList();
+                        region -> region.getPayload().size() > 1).collect(Collectors.toCollection(TreeSet::new));
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
@@ -62,31 +61,58 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                     regions.stream().flatMap(region -> region.getPayload().stream()).collect(Collectors.toSet());
 
             bridge.forEach((output, inputs) -> add(() -> {
-                Map<String, TreeSet<RegionWithPayload<Double>>> tfAffinities = inputs.stream().flatMap(input -> {
-                    try {
-                        List<String> lines = readLines(input);
-                        return lines.stream().filter(line -> !line.isBlank()).map(line -> line.split("\t")).filter(
-                                split -> transcriptionFactors.contains(split[0])).map(split -> {
-                            String region = split[6].substring(1);
-                            double affinity = Double.parseDouble(split[1]);
+                TreeSet<RegionWithPayload<Map<String, List<Double>>>> regionTfAffinities =
+                        inputs.stream().flatMap(input -> {
+                            try {
+                                List<String> lines = readLines(input);
+                                return lines.stream().filter(line -> !line.isBlank()).map(
+                                        line -> line.split("\t")).filter(
+                                        split -> transcriptionFactors.contains(split[0])).map(split -> {
+                                    String region = split[6].substring(1);
+                                    double affinity = Double.parseDouble(split[1]);
 
-                            String[] chromSplit = region.split(":");
-                            String chromosome = chromSplit[0];
+                                    String[] chromSplit = region.split(":");
+                                    String chromosome = chromSplit[0];
 
-                            String[] posSplit = chromSplit[1].split("-");
-                            int start = Integer.parseInt(posSplit[0]);
-                            int end = Integer.parseInt(posSplit[1]);
+                                    String[] posSplit = chromSplit[1].split("-");
+                                    int start = Integer.parseInt(posSplit[0]);
+                                    int end = Integer.parseInt(posSplit[1]);
 
-                            return Pair.of(split[0], new RegionWithPayload<>(chromosome, start, end, affinity));
-                        });
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                }).collect(Collectors.groupingBy(Pair::getKey,
-                        Collectors.mapping(Pair::getValue, Collectors.toCollection(TreeSet::new))));
+                                    RegionWithPayload<Set<String>> searchRegion =
+                                            new RegionWithPayload<>(chromosome, start, end, new HashSet<>());
 
-                Map<String, BufferedWriter> tfWriters =
-                        tfAffinities.keySet().stream().collect(Collectors.toMap(tf -> tf, tf -> {
+                                    RegionWithPayload<Set<String>> lower = regions.floor(searchRegion);
+                                    RegionWithPayload<Set<String>> higher = regions.ceiling(searchRegion);
+
+                                    RegionWithPayload<Set<String>> overlap =
+                                            (lower != null && lower.overlaps(searchRegion)) ? lower :
+                                                    (higher != null && higher.overlaps(searchRegion)) ? higher : null;
+
+                                    if (overlap == null) {
+                                        return null;
+                                    }
+
+                                    return Pair.of(overlap, Pair.of(split[0], affinity));
+                                });
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        }).filter(Objects::nonNull).collect(Collectors.groupingBy(Pair::getKey,
+                                Collectors.mapping(Pair::getValue, Collectors.toList()))).entrySet().stream().map(
+                                entry -> {
+                                    RegionWithPayload<Set<String>> region = entry.getKey();
+                                    Map<String, List<Double>> tfAffinities = entry.getValue().stream().collect(
+                                            Collectors.groupingBy(Pair::getKey,
+                                                    Collectors.mapping(Pair::getValue, Collectors.toList())));
+
+                                    return new RegionWithPayload<>(region.getChromosome(), region.getStart(),
+                                            region.getEnd(), tfAffinities);
+                                }).collect(Collectors.toCollection(TreeSet::new));
+
+
+                Map<String, BufferedWriter> tfWriters = regionTfAffinities.stream().flatMap(
+                        region -> region.getPayload().keySet().stream()).distinct().collect(
+                        Collectors.toMap(tf -> tf, tf -> {
                             try {
                                 File file = new File(output, tf + ".tsv");
                                 makeSureFileExists(file);
@@ -96,31 +122,22 @@ public class CoOccurrenceBindingEnergies extends ExecutableStep<Configs> {
                             }
                         }));
 
-                IntStream.range(0, regions.size()).forEach(i -> {
-                    RegionWithPayload<Set<String>> region = regions.get(i);
-
-                    RegionWithPayload<Double> searchRegion =
-                            new RegionWithPayload<>(region.getChromosome(), region.getStart(), region.getEnd(), null);
-
-                    Set<String> regionTfs = region.getPayload();
-                    regionTfs.forEach(tf -> {
-                        TreeSet<RegionWithPayload<Double>> affinities = tfAffinities.get(tf);
-
-                        OptionalDouble averageAffinity =
-                                affinities.stream().filter(r -> r.overlaps(searchRegion)).mapToDouble(
-                                        RegionWithPayload::getPayload).average();
-
-                        if (averageAffinity.isEmpty()) {
-                            return;
-                        }
-
+                int i = 0;
+                for (RegionWithPayload<Map<String, List<Double>>> region : regionTfAffinities) {
+                    Map<String, List<Double>> tfAffinities = region.getPayload();
+                    for (String tf : tfAffinities.keySet()) {
                         try {
-                            tfWriters.get(tf).write(i + "\t" + averageAffinity.getAsDouble() + "\n");
+                            OptionalDouble affinity =
+                                    tfAffinities.get(tf).stream().mapToDouble(Double::doubleValue).average();
+                            if (affinity.isPresent()) {
+                                tfWriters.get(tf).write(i + "\t" + affinity.getAsDouble() + "\n");
+                            }
                         } catch (IOException e) {
                             throw new UncheckedIOException(e);
                         }
-                    });
-                });
+                    }
+                    i++;
+                }
 
                 tfWriters.values().forEach(writer -> {
                     try {
