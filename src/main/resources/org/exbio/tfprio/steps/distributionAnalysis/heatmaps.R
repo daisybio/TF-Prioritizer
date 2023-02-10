@@ -28,6 +28,11 @@ genes <- intersect(genes, rownames(counts))
 # Keep only target gene counts
 counts <- counts[genes,]
 
+if (nrow(counts) < 2) {
+  print("No target genes found")
+  quit(save = "no", status = 0)
+}
+
 symbols <- symbols <- ifelse(ensgSymbol[rownames(counts), 1] == "", rownames(counts), ensgSymbol[rownames(counts), 1])
 
 # Prepare annotation matrix
