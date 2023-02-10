@@ -27,18 +27,19 @@ genes <- intersect(genes, rownames(counts))
 
 # Keep only target gene counts
 counts <- counts[genes,]
-
-if (nrow(counts) < 2) {
-  print("No target genes found")
-  quit(save = "no", status = 0)
-}
-
 symbols <- symbols <- ifelse(ensgSymbol[rownames(counts), 1] == "", rownames(counts), ensgSymbol[rownames(counts), 1])
 
 # Prepare annotation matrix
 groups <- groups[, "group", drop = FALSE]
 
 write.table(counts, file = args$outCounts, row.names = TRUE, col.names = TRUE, sep = "\t")
+
+if (nrow(counts) < 2) {
+  print("No target genes found")
+  quit(save = "no", status = 0)
+}
+
+
 pheatmap(counts, scale = "row", filename = args$heatmap, labels_row = symbols, legend = TRUE, annotation_legend = TRUE,
          annotation_col = groups, show_colnames = TRUE, show_col_dend = FALSE, show_row_dend = FALSE,
          treeheight_row = 0, treeheight_col = 0)
