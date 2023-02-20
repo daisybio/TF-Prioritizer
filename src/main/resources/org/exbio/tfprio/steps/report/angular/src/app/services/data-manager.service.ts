@@ -27,7 +27,7 @@ export class DataManagerService {
   }
 
   get regressionCoefficients() {
-    return this._inputData.regressionCoefficients;
+    return this._inputData.groups.flatMap(group => Object.entries(group.regressionCoefficients));
   }
 
   get coOccurrence() {
@@ -42,6 +42,44 @@ export class DataManagerService {
     return Object.entries(data).map(entry => {
       return {"name": entry[0], "value": entry[1]}
     });
+  }
+
+  public format2DPlotData(data: { [p: string]: { [p: string]: number } }) {
+    return Object.entries(data).map(entry => {
+      return {
+        "name": entry[0],
+        "series": this.formatPlotData(entry[1])
+      }
+    });
+  }
+
+  public getAllRegressionCoefficients() {
+    let data: { [hm: string]: { [pairing: string]: { 'name': string, 'value': number }[] } } = {};
+
+    this.groups.forEach(group => {
+      let name = group.symbol;
+
+      let regressionCoefficients = group.regressionCoefficients;
+
+      Object.keys(regressionCoefficients).forEach(hm => {
+        Object.keys(regressionCoefficients[hm]).forEach(pairing => {
+          if (!data[hm]) {
+            data[hm] = {};
+          }
+
+          if (!data[hm][pairing]) {
+            data[hm][pairing] = [];
+          }
+
+          data[hm][pairing].push({
+            "name": name,
+            "value": regressionCoefficients[hm][pairing]
+          });
+        });
+      });
+    });
+
+    return data;
   }
 
   public getConfigs() {

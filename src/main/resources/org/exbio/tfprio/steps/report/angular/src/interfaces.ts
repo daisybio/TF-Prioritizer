@@ -21,6 +21,11 @@ export interface tfGroup {
   "transcriptionFactors": tf[];
   "biophysicalLogo"?: string;
   "tfSequence": {};
+  "regressionCoefficients": {
+    [hm: string]: {
+      [pairing: string]: number;
+    }
+  }
   "heatmaps": {};
   "igv": {};
   distributionPlots: {};
@@ -38,13 +43,6 @@ export interface dataInterface {
   "configs": {
     [mod: string]: {
       [config: string]: string | number | boolean;
-    }
-  }
-  "regressionCoefficients": {
-    [hm: string]: {
-      [pairing: string]: {
-        [tf: string]: number;
-      }
     }
   }
 

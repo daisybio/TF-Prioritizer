@@ -8,8 +8,9 @@ import {Subject} from "rxjs";
   styleUrls: ['./regression-coefficients.component.scss']
 })
 export class RegressionCoefficientsComponent {
-  allData = this.dataService.regressionCoefficients;
-  $selectedData: Subject<{ [tf: string]: number }> = new Subject<{ [tf: string]: number }>();
+
+  allData = this.dataService.getAllRegressionCoefficients();
+  $selectedData: Subject<{ 'name': string, 'value': number }[]> = new Subject<{ 'name': string, 'value': number }[]>();
   selectedData: { 'name': string, 'value': number }[] = [];
   $plotData: Subject<{ 'name': string, 'value': number }[]> = new Subject<{ 'name': string, 'value': number }[]>();
 
@@ -19,7 +20,7 @@ export class RegressionCoefficientsComponent {
 
   constructor(private dataService: DataManagerService) {
     this.$selectedData.subscribe(data => {
-      this.selectedData = dataService.formatPlotData(data).sort((a, b) => b.value - a.value);
+      this.selectedData = data.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
       this.updatePlotData();
     });
 
@@ -31,7 +32,7 @@ export class RegressionCoefficientsComponent {
 
     this.$plotData.subscribe(data => {
       this.$style.next({
-        'height': data.length * 50 + 30 + 'px'
+        'height': data.length * 20 + 30 + 'px'
       });
     })
   }

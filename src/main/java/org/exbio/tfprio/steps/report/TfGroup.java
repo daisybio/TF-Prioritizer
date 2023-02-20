@@ -21,6 +21,7 @@ public class TfGroup {
     private final Map<String, Map<String, Map<String, String>>> hmPairingTgIgv = new HashMap<>();
     private final Map<String, String> tfSequence = new HashMap<>();
     private final Map<String, String> distributionPlots = new HashMap<>();
+    private final Map<String, Map<String, Double>> hmPairingRegressionCoefficients = new HashMap<>();
 
     private String biophysicalLogo;
 
@@ -112,6 +113,11 @@ public class TfGroup {
             put("heatmaps", hmPairingHeatmap);
             put("igv", hmPairingTgIgv);
             put("distributionPlots", distributionPlots);
+            put("regressionCoefficients", hmPairingRegressionCoefficients);
         }};
+    }
+
+    public void setRegressionCoefficient(String hm, String pairing, Double value) {
+        hmPairingRegressionCoefficients.computeIfAbsent(hm, k -> new HashMap<>()).put(pairing, value);
     }
 }

@@ -245,7 +245,6 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
 
                 File assets = new File(srcDir, "assets");
 
-
                 Map<String, File> tfBiophysical = Arrays.stream(
                         Objects.requireNonNull(biophysicalLogo.listFiles(file -> file.getName().endsWith(".png")))).map(
                         file -> {
@@ -298,27 +297,26 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                     }
                 }));
 
-                Map<String, Map<String, Map<String, Double>>> hmPairingTfRegressionCoefficient =
-                        pairingHmRegressionCoefficients.entrySet().stream().flatMap(pairingHmRegressionCoefficient -> {
-                            String pairing = pairingHmRegressionCoefficient.getKey();
-                            Map<String, InputFile> hmRegressionCoefficients = pairingHmRegressionCoefficient.getValue();
+                pairingHmRegressionCoefficients.entrySet().forEach(pairingHmRegressionCoefficient -> {
+                    String pairing = pairingHmRegressionCoefficient.getKey();
+                    Map<String, InputFile> hmRegressionCoefficients = pairingHmRegressionCoefficient.getValue();
 
-                            return hmRegressionCoefficients.entrySet().stream().map(hmRegressionCoefficient -> {
-                                String hm = hmRegressionCoefficient.getKey();
-                                InputFile regressionCoefficient = hmRegressionCoefficient.getValue();
-                                Map<String, Double> tfRegressionCoefficient;
-                                try {
-                                    tfRegressionCoefficient = readLines(regressionCoefficient).stream().skip(1).map(
-                                            line -> line.split("\t")).collect(
-                                            toMap(split -> split[0], split -> Double.parseDouble(split[1])));
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
+                    hmRegressionCoefficients.entrySet().forEach(hmRegressionCoefficient -> {
+                        String hm = hmRegressionCoefficient.getKey();
+                        InputFile regressionCoefficient = hmRegressionCoefficient.getValue();
 
-                                return Pair.of(hm, Pair.of(pairing, tfRegressionCoefficient));
+                        try {
+                            readLines(regressionCoefficient).stream().skip(1).map(line -> line.split("\t")).map(
+                                    split -> Pair.of(split[0], Double.parseDouble(split[1]))).filter(
+                                    pair -> tfGroupMap.containsKey(pair.getKey())).forEach(pair -> {
+                                TfGroup tfGroup = tfGroupMap.get(pair.getKey());
+                                tfGroup.setRegressionCoefficient(hm, pairing, pair.getValue());
                             });
-                        }).collect(
-                                groupingBy(Pair::getKey, mapping(Pair::getValue, toMap(Pair::getKey, Pair::getValue))));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                });
 
                 final JSONArray coOccurrenceJson;
                 if (coOccurrence != null) {
@@ -432,7 +430,6 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
 
                 JSONObject json = new JSONObject() {{
                     put("groups", groups.stream().map(TfGroup::toJSON).toList());
-                    put("regressionCoefficients", hmPairingTfRegressionCoefficient);
                     put("configs", configs.getConfigsJSONObject(true, true));
                     put("coOccurrence", coOccurrenceJson);
                     put("importantLoci", importantLociObject);

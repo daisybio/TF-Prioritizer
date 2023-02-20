@@ -1,1 +1,8 @@
-<p>regression works!</p>
+<ngx-charts-heat-map [legend]="true"
+                     [max]="1"
+                     [min]="-1"
+                     [results]="$heatmapData | async"
+                     [scheme]="'flame'"
+                     [xAxis]="true"
+                     [yAxis]="true"
+></ngx-charts-heat-map>
