@@ -358,20 +358,23 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                                     patternInDir -> {
                                         File patternOutDir = new File(groupOutDir, patternInDir.getName());
 
-                                        JSONArray tfFiles = new JSONArray(
-                                                Arrays.stream(Objects.requireNonNull(patternInDir.listFiles())).map(
-                                                        inFile -> {
-                                                            File outFile = new File(patternOutDir, inFile.getName());
+                                        JSONObject tfFiles = new JSONObject() {{
+                                            Arrays.stream(Objects.requireNonNull(patternInDir.listFiles())).forEach(
+                                                    inFile -> {
+                                                        File outFile = new File(patternOutDir, inFile.getName());
 
-                                                            try {
-                                                                softLink(outFile, inFile);
-                                                            } catch (IOException e) {
-                                                                throw new RuntimeException(e);
-                                                            }
+                                                        try {
+                                                            softLink(outFile, inFile);
+                                                        } catch (IOException e) {
+                                                            throw new RuntimeException(e);
+                                                        }
 
-                                                            return srcDir.toPath().relativize(
-                                                                    outFile.toPath()).toString();
-                                                        }).toList());
+                                                        put(inFile.getName().substring(0,
+                                                                        inFile.getName().lastIndexOf(".")),
+                                                                srcDir.toPath().relativize(
+                                                                        outFile.toPath()).toString());
+                                                    });
+                                        }};
 
                                         put(patternInDir.getName(), tfFiles);
                                     });
@@ -391,30 +394,36 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                         File upregulatedOutDir = new File(pairingOutDir, "upregulated");
                         File downregulatedOutDir = new File(pairingOutDir, "downregulated");
                         put(pairing, new JSONObject() {{
-                            put("upregulated", new JSONArray(Arrays.stream(upregulatedInDir.listFiles()).map(inFile -> {
-                                File outFile = new File(upregulatedOutDir, inFile.getName());
+                            put("upregulated", new JSONObject() {{
+                                Arrays.stream(Objects.requireNonNull(upregulatedInDir.listFiles())).forEach(inFile -> {
+                                    File outFile = new File(upregulatedOutDir, inFile.getName());
 
-                                try {
-                                    softLink(outFile, inFile);
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                    try {
+                                        softLink(outFile, inFile);
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
 
-                                return srcDir.toPath().relativize(outFile.toPath()).toString();
-                            }).toList()));
+                                    put(inFile.getName().substring(0, inFile.getName().lastIndexOf(".")),
+                                            srcDir.toPath().relativize(outFile.toPath()).toString());
+                                });
+                            }});
 
-                            put("downregulated",
-                                    new JSONArray(Arrays.stream(downregulatedInDir.listFiles()).map(inFile -> {
-                                        File outFile = new File(downregulatedOutDir, inFile.getName());
+                            put("downregulated", new JSONObject() {{
+                                Arrays.stream(Objects.requireNonNull(downregulatedInDir.listFiles())).forEach(
+                                        inFile -> {
+                                            File outFile = new File(downregulatedOutDir, inFile.getName());
 
-                                        try {
-                                            softLink(outFile, inFile);
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
+                                            try {
+                                                softLink(outFile, inFile);
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
 
-                                        return srcDir.toPath().relativize(outFile.toPath()).toString();
-                                    }).toList()));
+                                            put(inFile.getName().substring(0, inFile.getName().lastIndexOf(".")),
+                                                    srcDir.toPath().relativize(outFile.toPath()).toString());
+                                        });
+                            }});
                         }});
                     });
                 }};
