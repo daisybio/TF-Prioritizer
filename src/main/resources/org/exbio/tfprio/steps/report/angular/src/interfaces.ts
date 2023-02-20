@@ -47,5 +47,24 @@ export interface dataInterface {
       }
     }
   }
+
+  "importantLoci": {
+    [group: string]: {
+      [pattern: string]: {
+        [locus: string]: string
+      };
+    }
+  }
+
+  "topLog2fc": {
+    [pairing: string]: {
+      "downregulated": {
+        [gene: string]: string;
+      };
+      "upregulated": {
+        [gene: string]: string;
+      };
+    }
+  }
 }
 

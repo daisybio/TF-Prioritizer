@@ -47,4 +47,12 @@ export class DataManagerService {
   public getConfigs() {
     return this._inputData.configs;
   }
+
+  public getImportantLoci() {
+    return this._inputData.importantLoci;
+  }
+
+  public getTopLog2fc() {
+    return this._inputData.topLog2fc;
+  }
 }

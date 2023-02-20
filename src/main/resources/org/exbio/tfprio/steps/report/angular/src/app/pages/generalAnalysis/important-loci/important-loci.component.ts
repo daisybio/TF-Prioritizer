@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {DataManagerService} from "../../../services/data-manager.service";
 
 @Component({
   selector: 'app-important-loci',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./important-loci.component.scss']
 })
 export class ImportantLociComponent {
+  importantLoci;
 
+  public constructor(dataService: DataManagerService) {
+    this.importantLoci = dataService.getImportantLoci();
+  }
 }
