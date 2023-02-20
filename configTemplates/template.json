@@ -77,6 +77,12 @@
   },
   "IGV": {
     "experimentalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/04_evaluation/merged/working_dir/00_MIX_OPTION/01_SAMPLE_MIX",
-    "signalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/06_evaluation_tdf"
+    "signalFiles": "/home/nico/Data/TFPRIO/RawData/03_ChIPseq_data/06_evaluation_tdf",
+    "importantLoci": [
+      "CSN.*",
+      "SOCS2",
+      "STAT5.*",
+      "WAP"
+    ]
   }
 }

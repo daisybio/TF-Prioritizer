@@ -2,6 +2,7 @@ package org.exbio.tfprio;
 
 import org.apache.commons.cli.ParseException;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
+import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.Workflow;
 import org.exbio.tfprio.configs.Configs;
 import org.exbio.tfprio.steps.Dynamite.*;
@@ -13,6 +14,7 @@ import org.exbio.tfprio.steps.chipAtlas.GetData;
 import org.exbio.tfprio.steps.chipAtlas.GetList;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
+import org.exbio.tfprio.steps.igv.ImportantLoci;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.GroupStages;
@@ -35,6 +37,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
     }
 
     public static void main(String[] args) throws Exception {
+        ExecutableStep.setAcceptAllInputs();
+
         new TF_Prioritizer(args);
     }
 
@@ -212,13 +216,19 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
                         createBindingRegionsBedFiles.outputFiles));
 
+        if (configs.igv.importantLoci.isSet()) {
+            ImportantLoci importantLoci =
+                    add(new ImportantLoci(configs, fetchGeneInfo.outputFile, ensgSymbol.outputFile,
+                            chipAtlasDirectory));
+        }
+
         ReportPreprocessing reportPreprocessing =
                 add(new ReportPreprocessing(configs, ensgSymbol.outputFile, calculateDcgPerHm.outputFiles,
                         deSeq2.outputFiles, meanCounts.outputFiles, calculateTPM.outputFiles,
                         biophysicalLogo.outputFile, jaspar.outputFile, createHeatmaps.outputFiles,
                         distributionTargetGenes.outputFiles, createPlots.plotFiles,
                         extractRegressionCoefficients.outputFiles, coOccurrence));
-        reportPreprocessing.setUnderDevelopment();
+
         ReportCreation reportCreation = add(new ReportCreation(configs, reportPreprocessing.outputFile));
         ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
     }

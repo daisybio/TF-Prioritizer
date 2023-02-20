@@ -328,7 +328,7 @@ public class DistributionTargetGenes extends ExecutableStep<Configs> {
                                         igv.addCommand("snapshot " + (i + 1) + "_" + ensgSymbol.get(targetGene) +
                                                 (locations.size() > 1 ? "[" + j + "]" : "") +
                                                 ".png"); // TODO: Use .svg ending in order to reduce file size
-                                        // Keep in mind that the vieBox attribute is required, otherwise the image will
+                                        // Keep in mind that the viewBox attribute is required, otherwise the image will
                                         // be cutoff in the report
 
                                     });
