@@ -16,5 +16,5 @@
 <app-data-selector [activeData]="$selectedData" [data]="allData" [maxDepth]="2"></app-data-selector>
 <div [ngStyle]="$style | async" class="chart-container" style="max-height: unset">
   <ngx-charts-bar-horizontal [results]="$plotData | async"
-                             xAxis="true" yAxis="true"></ngx-charts-bar-horizontal>
+                             [xScaleMax]="1" [xScaleMin]="-1" xAxis="true" yAxis="true"></ngx-charts-bar-horizontal>
 </div>
