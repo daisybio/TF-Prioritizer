@@ -18,9 +18,13 @@ export class RegressionCoefficientsComponent {
   $threshold: Subject<number> = new Subject<number>();
   $style: Subject<{}> = new Subject<{}>();
 
+  $maxThreshold: Subject<number> = new Subject<number>();
+
   constructor(private dataService: DataManagerService) {
     this.$selectedData.subscribe(data => {
       this.selectedData = data.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+      let fifth = this.selectedData[5].value;
+      this.$maxThreshold.next(fifth ? Math.abs(fifth) - fifth % 0.05 : 0);
       this.updatePlotData();
     });
 
@@ -32,7 +36,7 @@ export class RegressionCoefficientsComponent {
 
     this.$plotData.subscribe(data => {
       this.$style.next({
-        'height': data.length * 20 + 30 + 'px'
+        'height': data.length * 25 + 35 + 'px'
       });
     })
   }
