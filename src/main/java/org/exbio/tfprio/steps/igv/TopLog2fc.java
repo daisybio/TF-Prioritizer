@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,9 +25,10 @@ import java.util.stream.Stream;
 
 import static org.exbio.pipejar.util.FileManagement.readLines;
 
-public class ImportantLoci extends ExecutableStep<Configs> {
-    public final Map<String, OutputFile> outputFiles = new HashMap<>();
-    private final RequiredConfig<List<String>> importantLoci = new RequiredConfig<>(configs.igv.importantLoci);
+public class TopLog2fc extends ExecutableStep<Configs> {
+    public final Map<String, Pair<OutputFile, OutputFile>> outputFiles = new HashMap<>();
+    private final Map<String, InputFile> pairingDeseq2 = new HashMap<>();
+    private final RequiredConfig<Integer> topLog2FoldChange = new RequiredConfig<>(configs.igv.topLog2FoldChange);
     private final InputFile ensgSymbolFile;
     private final RequiredConfig<File> igvLib = new RequiredConfig<>(configs.igv.igvLib);
     private final RequiredConfig<File> igvCacheDirectory = new RequiredConfig<>(configs.igv.igvCacheDirectory);
@@ -41,22 +43,23 @@ public class ImportantLoci extends ExecutableStep<Configs> {
     private final Map<String, Set<InputFile>> groupExperimentalFiles = new HashMap<>();
 
 
-    public ImportantLoci(Configs configs, OutputFile geneLocations, OutputFile ensgSymbol, OutputFile chipAtlas) {
-        super(configs, false, geneLocations, ensgSymbol, chipAtlas);
+    public TopLog2fc(Configs configs, Map<String, OutputFile> pairingDeseq2, OutputFile geneLocations,
+                     OutputFile ensgSymbol, OutputFile chipAtlas) {
+        super(configs, false, pairingDeseq2.values(), geneLocations, ensgSymbol, chipAtlas);
 
         this.ensgSymbolFile = addInput(ensgSymbol);
         this.geneInfo = addInput(geneLocations);
         this.chipAtlas = chipAtlas != null ? addInput(chipAtlas) : null;
 
-        Set<String> groups = new HashSet<>();
+
+        OutputFile deseq2 = new OutputFile(inputDirectory, "deseq2");
+        pairingDeseq2.forEach((pairing, output) -> this.pairingDeseq2.put(pairing, addInput(deseq2, output)));
 
         if (signalFiles.isSet()) {
             OutputFile signalDirectory = new OutputFile(inputDirectory, "signal");
             Arrays.stream(Objects.requireNonNull(signalFiles.get().listFiles(File::isDirectory))).forEach(groupDir -> {
                 String group = groupDir.getName();
                 OutputFile groupSignalDirectory = new OutputFile(signalDirectory, group);
-
-                groups.add(group);
 
                 File[] hmDirs = groupDir.listFiles();
 
@@ -80,8 +83,6 @@ public class ImportantLoci extends ExecutableStep<Configs> {
                         String group = groupDir.getName();
                         OutputFile groupSignalDirectory = new OutputFile(experimentalSignalDirectory, group);
 
-                        groups.add(group);
-
                         File[] tfDirs = groupDir.listFiles();
 
                         if (tfDirs == null) {
@@ -97,11 +98,12 @@ public class ImportantLoci extends ExecutableStep<Configs> {
                     });
         }
 
-        if (groups.isEmpty()) {
-            groups.add("all");
-        }
+        this.pairingDeseq2.keySet().forEach(pairing -> {
+            OutputFile pairingDir = new OutputFile(outputDirectory, pairing);
 
-        groups.forEach(group -> outputFiles.put(group, addOutput(group)));
+            this.outputFiles.put(pairing,
+                    Pair.of(addOutput(pairingDir, "upregulated"), addOutput(pairingDir, "downregulated")));
+        });
     }
 
     @Override
@@ -144,67 +146,83 @@ public class ImportantLoci extends ExecutableStep<Configs> {
                 throw new RuntimeException(e);
             }
 
-            Map<String, Map<String, String>> patternDescriptionLocation =
-                    importantLoci.get().stream().map(locusPattern -> {
-                        Map<String, Set<String>> symbolEnsgs = ensgSymbol.entrySet().stream().filter(
-                                entry -> entry.getValue().matches(locusPattern)).collect(
-                                Collectors.groupingBy(Map.Entry::getValue,
-                                        Collectors.mapping(Map.Entry::getKey, Collectors.toSet())));
+            pairingDeseq2.forEach((pairing, deseq2) -> add(() -> {
+                List<String> sortedGenes = readLines(deseq2).stream().skip(1).map(line -> {
+                    String[] split = line.split("\t");
 
-                        Map<String, String> descriptionLocation = symbolEnsgs.entrySet().stream().flatMap(entry -> {
-                            String symbol = entry.getKey();
-                            Set<String> ensgs = entry.getValue();
+                    return Pair.of(split[0].replace("\"", ""), Double.parseDouble(split[2]));
+                }).sorted(Comparator.comparingDouble(Pair::getRight)).map(Pair::getKey).toList();
 
-                            return ensgs.stream().flatMap(ensg -> {
-                                String description = symbol + (ensgs.size() > 1 ? " (" + ensg + ")" : "");
+                List<String> upregulated = sortedGenes.subList(0, topLog2FoldChange.get()).stream().toList();
+                List<String> downregulated = sortedGenes.subList(sortedGenes.size() - topLog2FoldChange.get(),
+                        sortedGenes.size()).stream().toList();
 
-                                List<String> locations = geneLocations.get(ensg);
+                // Create a Map<String, String> from gene symbol to gene location based on the interesting gene IDs.
+                // If multiple IDs are associated with the same gene symbol, add a counter to the gene symbol.
 
-                                if (locations == null) {
-                                    logger.warn("No location found for " + ensg + " (" + symbol + ")");
-                                    return Stream.empty();
-                                }
+                Function<Collection<String>, Map<String, String>> getGeneSymbolLocations =
+                        input -> input.stream().flatMap(geneID -> {
+                            String symbol = ensgSymbol.getOrDefault(geneID, geneID);
+                            return geneLocations.getOrDefault(geneID, new ArrayList<>()).stream().map(
+                                    location -> Pair.of(symbol, location));
+                        }).collect(Collectors.groupingBy(Pair::getKey,
+                                Collectors.mapping(Pair::getValue, Collectors.toList()))).entrySet().stream().flatMap(
+                                entry -> {
+                                    if (entry.getValue().size() == 1) {
+                                        return Stream.of(Pair.of(entry.getKey(), entry.getValue().get(0)));
+                                    } else {
+                                        return IntStream.range(0, entry.getValue().size()).mapToObj(
+                                                i -> Pair.of(entry.getKey() + "_" + i, entry.getValue().get(i)));
+                                    }
+                                }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
-                                return IntStream.range(0, locations.size()).mapToObj(i -> Pair.of(description +
-                                                (locations.size() > 1 ? " (" + (i + 1) + "/" + locations.size() + ")" : ""),
-                                        locations.get(i)));
-                            });
-                        }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+                Map<String, String> upregulatedGeneSymbolLocations = getGeneSymbolLocations.apply(upregulated);
+                Map<String, String> downregulatedGeneSymbolLocations = getGeneSymbolLocations.apply(downregulated);
 
-                        return Pair.of(locusPattern, descriptionLocation);
-                    }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+                String group1 = pairing.split("_")[0];
+                String group2 = pairing.split("_")[1];
 
-            outputFiles.forEach((group, outputFile) -> add(() -> {
-                Collection<InputFile> experimentalFiles = groupExperimentalFiles.getOrDefault(group, new HashSet<>());
-                Collection<InputFile> signalFiles = groupHmSignalFile.getOrDefault(group, new HashMap<>()).values();
+                Collection<? extends File> group1SignalFiles = groupHmSignalFile.get(group1).values();
+                Collection<? extends File> group2SignalFiles = groupHmSignalFile.get(group2).values();
+
+                Collection<? extends File> group1ExperimentalFiles = groupExperimentalFiles.get(group1);
+                Collection<? extends File> group2ExperimentalFiles = groupExperimentalFiles.get(group2);
+
+                OutputFile upregulatedDir = outputFiles.get(pairing).getLeft();
+                OutputFile downregulatedDir = outputFiles.get(pairing).getRight();
+
+                List<File> allFiles = new ArrayList<>() {{
+                    addAll(group1SignalFiles);
+                    addAll(group1ExperimentalFiles);
+                    addAll(group2SignalFiles);
+                    addAll(group2ExperimentalFiles);
+                }};
                 Function<File, String> removeExtension =
                         file -> file == null ? "" : file.getName().substring(0, file.getName().lastIndexOf('.'));
-                Collection<File> allFiles = new HashSet<>() {{
-                    addAll(experimentalFiles);
-                    addAll(signalFiles);
-                }};
 
                 Map<File, String> descriptions = new HashMap<>(chipAtlasDescriptions) {{
-                    experimentalFiles.forEach(file -> put(file, removeExtension.apply(file) + " (experimental)"));
-                    signalFiles.forEach(file -> put(file, removeExtension.apply(file) + " (signal)"));
+                    group1ExperimentalFiles.forEach(file -> put(file, removeExtension.apply(file) + " (experimental)"));
+                    group1SignalFiles.forEach(file -> put(file, removeExtension.apply(file) + " (signal)"));
+                    group2ExperimentalFiles.forEach(file -> put(file, removeExtension.apply(file) + " (experimental)"));
+                    group2SignalFiles.forEach(file -> put(file, removeExtension.apply(file) + " (signal)"));
                 }};
 
-                IGV_Headless igv =
-                        new IGV_Headless(logger, genome.get(), igvLib.get(), igvCacheDirectory.get(), outputFile);
+                IGV_Headless igv = new IGV_Headless(logger, genome.get(), igvLib.get(), igvCacheDirectory.get(),
+                        upregulatedDir.getParentFile());
 
-                igv.createSession(allFiles.stream().toList(), chipAtlasFiles, descriptions);
+                igv.createSession(allFiles, chipAtlasFiles, descriptions);
 
-                patternDescriptionLocation.forEach((pattern, descriptionLocation) -> {
-                    File patternDirectory = new File(outputFile, pattern);
-                    patternDirectory.mkdir();
+                Consumer<Map<String, String>> takeSnapshots =
+                        geneSymbolLocations -> geneSymbolLocations.forEach((geneSymbol, location) -> {
+                            igv.addCommand("goto " + location);
+                            igv.addCommand("snapshot " + geneSymbol + ".png");
+                        });
 
-                    igv.addCommand("snapshotDirectory " + patternDirectory.getAbsolutePath());
+                igv.addCommand("snapshotDirectory " + upregulatedDir.getAbsolutePath());
+                takeSnapshots.accept(upregulatedGeneSymbolLocations);
 
-                    descriptionLocation.forEach((description, location) -> {
-                        igv.addCommand("goto " + location);
-                        igv.addCommand("snapshot " + description + ".png");
-                    });
-                });
+                igv.addCommand("snapshotDirectory " + downregulatedDir.getAbsolutePath());
+                takeSnapshots.accept(downregulatedGeneSymbolLocations);
 
                 igv.run();
 

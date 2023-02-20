@@ -15,6 +15,7 @@ import org.exbio.tfprio.steps.chipAtlas.GetList;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.igv.ImportantLoci;
+import org.exbio.tfprio.steps.igv.TopLog2fc;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.GroupStages;
@@ -221,6 +222,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
                     add(new ImportantLoci(configs, fetchGeneInfo.outputFile, ensgSymbol.outputFile,
                             chipAtlasDirectory));
         }
+
+        TopLog2fc topLog2fc =
+                add(new TopLog2fc(configs, deSeq2.outputFiles, fetchGeneInfo.outputFile, ensgSymbol.outputFile,
+                        chipAtlasDirectory));
 
         ReportPreprocessing reportPreprocessing =
                 add(new ReportPreprocessing(configs, ensgSymbol.outputFile, calculateDcgPerHm.outputFiles,

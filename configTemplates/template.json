@@ -83,6 +83,7 @@
       "SOCS2",
       "STAT5.*",
       "WAP"
-    ]
+    ],
+    "topLog2FoldChange": 20
   }
 }
