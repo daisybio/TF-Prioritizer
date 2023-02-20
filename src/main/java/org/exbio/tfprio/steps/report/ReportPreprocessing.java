@@ -34,6 +34,8 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
     private final InputFile biophysicalLogo;
     private final InputFile tfSequence;
     private final InputFile coOccurrence;
+    private final Map<String, InputFile> importantLoci = new HashMap<>();
+    private final Map<String, Pair<InputFile, InputFile>> topLog2fc = new HashMap<>();
 
     public ReportPreprocessing(Configs configs, OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
                                Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
@@ -42,7 +44,8 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                                Map<String, Map<String, OutputFile>> pairingHmIgvDir,
                                Map<String, OutputFile> hmDistributionPlots,
                                Map<String, Map<String, OutputFile>> pairingHmRegressionCoefficients,
-                               OutputFile coOccurrence) {
+                               OutputFile coOccurrence, Map<String, OutputFile> importantLoci,
+                               Map<String, Pair<OutputFile, OutputFile>> topLog2fc) {
         super(configs, false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(),
                 groupTpm.values(), List.of(ensgSymbol), hmDistributionPlots.values(),
                 pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
@@ -78,6 +81,17 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                 InputFile input = addInput(pairingDir, hmDir);
                 this.pairingHmHeatmapDir.computeIfAbsent(pairing, k -> new HashMap<>()).put(hm, input);
             });
+        });
+
+        OutputFile importantLociDir = new OutputFile(inputDirectory, "importantLoci");
+        importantLoci.forEach((pairing, importantLociFile) -> this.importantLoci.put(pairing,
+                addInput(importantLociDir, importantLociFile)));
+
+        OutputFile topLog2fcDir = new OutputFile(inputDirectory, "topLog2fc");
+        topLog2fc.forEach((pairing, topLog2fcFiles) -> {
+            OutputFile pairingDir = new OutputFile(topLog2fcDir, pairing);
+            this.topLog2fc.put(pairing, Pair.of(addInput(pairingDir, topLog2fcFiles.getLeft()),
+                    addInput(pairingDir, topLog2fcFiles.getRight())));
         });
 
         OutputFile igvDir = new OutputFile(inputDirectory, "igv");
@@ -334,6 +348,77 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                     coOccurrenceJson = new JSONArray();
                 }
 
+                logger.trace("Reading important loci");
+                File importantLociDir = new File(assets, "importantLoci");
+                JSONObject importantLociObject = new JSONObject() {{
+                    importantLoci.forEach((group, groupInDir) -> {
+                        File groupOutDir = new File(importantLociDir, group);
+                        JSONObject patternFiles = new JSONObject() {{
+                            Arrays.stream(Objects.requireNonNull(groupInDir.listFiles(File::isDirectory))).forEach(
+                                    patternInDir -> {
+                                        File patternOutDir = new File(groupOutDir, patternInDir.getName());
+
+                                        JSONArray tfFiles = new JSONArray(
+                                                Arrays.stream(Objects.requireNonNull(patternInDir.listFiles())).map(
+                                                        inFile -> {
+                                                            File outFile = new File(patternOutDir, inFile.getName());
+
+                                                            try {
+                                                                softLink(outFile, inFile);
+                                                            } catch (IOException e) {
+                                                                throw new RuntimeException(e);
+                                                            }
+
+                                                            return srcDir.toPath().relativize(
+                                                                    outFile.toPath()).toString();
+                                                        }).toList());
+
+                                        put(patternInDir.getName(), tfFiles);
+                                    });
+                        }};
+
+                        put(group, patternFiles);
+                    });
+                }};
+
+                logger.trace("Reading top log2fc");
+                File topLog2fcDir = new File(assets, "topLog2fc");
+                JSONObject topLog2fcObject = new JSONObject() {{
+                    topLog2fc.forEach((pairing, directories) -> {
+                        File pairingOutDir = new File(topLog2fcDir, pairing);
+                        File upregulatedInDir = directories.getLeft();
+                        File downregulatedInDir = directories.getRight();
+                        File upregulatedOutDir = new File(pairingOutDir, "upregulated");
+                        File downregulatedOutDir = new File(pairingOutDir, "downregulated");
+                        put(pairing, new JSONObject() {{
+                            put("upregulated", new JSONArray(Arrays.stream(upregulatedInDir.listFiles()).map(inFile -> {
+                                File outFile = new File(upregulatedOutDir, inFile.getName());
+
+                                try {
+                                    softLink(outFile, inFile);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                                return srcDir.toPath().relativize(outFile.toPath()).toString();
+                            }).toList()));
+
+                            put("downregulated",
+                                    new JSONArray(Arrays.stream(downregulatedInDir.listFiles()).map(inFile -> {
+                                        File outFile = new File(downregulatedOutDir, inFile.getName());
+
+                                        try {
+                                            softLink(outFile, inFile);
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+
+                                        return srcDir.toPath().relativize(outFile.toPath()).toString();
+                                    }).toList()));
+                        }});
+                    });
+                }};
+
                 logger.trace("Writing output");
 
                 JSONObject json = new JSONObject() {{
@@ -341,6 +426,8 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                     put("regressionCoefficients", hmPairingTfRegressionCoefficient);
                     put("configs", configs.getConfigsJSONObject(true, true));
                     put("coOccurrence", coOccurrenceJson);
+                    put("importantLoci", importantLociObject);
+                    put("topLog2fc", topLog2fcObject);
                 }};
 
                 File data = new File(assets, "data.json");

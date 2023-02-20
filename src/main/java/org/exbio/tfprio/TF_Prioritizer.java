@@ -217,10 +217,14 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
                         createBindingRegionsBedFiles.outputFiles));
 
+        Map<String, OutputFile> importantLociFiles;
         if (configs.igv.importantLoci.isSet()) {
             ImportantLoci importantLoci =
                     add(new ImportantLoci(configs, fetchGeneInfo.outputFile, ensgSymbol.outputFile,
                             chipAtlasDirectory));
+            importantLociFiles = importantLoci.outputFiles;
+        } else {
+            importantLociFiles = new HashMap<>();
         }
 
         TopLog2fc topLog2fc =
@@ -232,7 +236,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         deSeq2.outputFiles, meanCounts.outputFiles, calculateTPM.outputFiles,
                         biophysicalLogo.outputFile, jaspar.outputFile, createHeatmaps.outputFiles,
                         distributionTargetGenes.outputFiles, createPlots.plotFiles,
-                        extractRegressionCoefficients.outputFiles, coOccurrence));
+                        extractRegressionCoefficients.outputFiles, coOccurrence, importantLociFiles,
+                        topLog2fc.outputFiles));
 
         ReportCreation reportCreation = add(new ReportCreation(configs, reportPreprocessing.outputFile));
         ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
