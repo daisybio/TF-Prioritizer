@@ -2,7 +2,6 @@ package org.exbio.tfprio;
 
 import org.apache.commons.cli.ParseException;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
-import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.pipejar.pipeline.Workflow;
 import org.exbio.tfprio.configs.Configs;
 import org.exbio.tfprio.steps.Dynamite.*;
@@ -35,8 +34,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
     }
 
     public static void main(String[] args) throws Exception {
-        ExecutableStep.setAcceptAllInputs();
-
         new TF_Prioritizer(args);
     }
 
