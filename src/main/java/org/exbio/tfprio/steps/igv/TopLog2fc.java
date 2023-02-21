@@ -182,8 +182,10 @@ public class TopLog2fc extends ExecutableStep<Configs> {
                 String group1 = pairing.split("_")[0];
                 String group2 = pairing.split("_")[1];
 
-                Collection<? extends File> group1SignalFiles = groupHmSignalFile.get(group1).values();
-                Collection<? extends File> group2SignalFiles = groupHmSignalFile.get(group2).values();
+                Collection<? extends File> group1SignalFiles =
+                        groupHmSignalFile.getOrDefault(group1, new HashMap<>()).values();
+                Collection<? extends File> group2SignalFiles =
+                        groupHmSignalFile.getOrDefault(group2, new HashMap<>()).values();
 
                 Collection<? extends File> group1ExperimentalFiles = groupExperimentalFiles.get(group1);
                 Collection<? extends File> group2ExperimentalFiles = groupExperimentalFiles.get(group2);
