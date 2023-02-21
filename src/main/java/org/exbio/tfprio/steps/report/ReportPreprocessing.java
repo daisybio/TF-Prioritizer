@@ -36,6 +36,7 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
     private final InputFile coOccurrence;
     private final Map<String, InputFile> importantLoci = new HashMap<>();
     private final Map<String, Pair<InputFile, InputFile>> topLog2fc = new HashMap<>();
+    private final InputFile confusionMatrixesDir;
 
     public ReportPreprocessing(Configs configs, OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
                                Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
@@ -45,7 +46,7 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                                Map<String, OutputFile> hmDistributionPlots,
                                Map<String, Map<String, OutputFile>> pairingHmRegressionCoefficients,
                                OutputFile coOccurrence, Map<String, OutputFile> importantLoci,
-                               Map<String, Pair<OutputFile, OutputFile>> topLog2fc) {
+                               Map<String, Pair<OutputFile, OutputFile>> topLog2fc, OutputFile confusionMatrixesDir) {
         super(configs, false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(),
                 groupTpm.values(), List.of(ensgSymbol), hmDistributionPlots.values(),
                 pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
@@ -56,11 +57,9 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
         this.ensgSymbol = addInput(ensgSymbol);
         this.biophysicalLogo = addInput(biophysicalLogo);
         this.tfSequence = addInput(tfSequence);
-        if (coOccurrence != null) {
-            this.coOccurrence = addInput(coOccurrence);
-        } else {
-            this.coOccurrence = null;
-        }
+        this.coOccurrence = coOccurrence != null ? addInput(coOccurrence) : null;
+        this.confusionMatrixesDir = confusionMatrixesDir != null ? addInput(confusionMatrixesDir) : null;
+
         OutputFile rankDir = new OutputFile(inputDirectory, "ranks");
         hmDcgFiles.forEach((hm, rankFile) -> this.hmDcgFiles.put(hm, addInput(rankDir, rankFile)));
 
@@ -296,6 +295,16 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                         tfGroupMap.get(symbol).setDistributionPlot(hm, plotFile);
                     }
                 }));
+
+                Arrays.stream(Objects.requireNonNull(confusionMatrixesDir.listFiles())).map(file -> {
+                    try {
+                        return Pair.of(file.getName().replace(".json", ""), String.join("", readLines(file)));
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }).map(pair -> Pair.of(tfGroupMap.getOrDefault(pair.getKey(), null),
+                        new JSONObject(pair.getValue()))).filter(pair -> pair.getKey() != null).forEach(
+                        pair -> pair.getKey().setConfusionMatrix(pair.getValue()));
 
                 pairingHmRegressionCoefficients.forEach(
                         (pairing, hmRegressionCoefficients) -> hmRegressionCoefficients.forEach(

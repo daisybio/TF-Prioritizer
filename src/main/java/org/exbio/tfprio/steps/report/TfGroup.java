@@ -24,6 +24,7 @@ public class TfGroup {
     private final Map<String, Map<String, Double>> hmPairingRegressionCoefficients = new HashMap<>();
 
     private String biophysicalLogo;
+    private JSONObject confusionMatrix;
 
     public TfGroup(String symbol, Collection<TranscriptionFactor> transcriptionFactors, File srcDir) {
         this.symbol = symbol;
@@ -90,6 +91,10 @@ public class TfGroup {
         distributionPlots.put(hm, base.relativize(out.toPath()).toString());
     }
 
+    public void setConfusionMatrix(JSONObject confusionMatrix) {
+        this.confusionMatrix = confusionMatrix;
+    }
+
 
     public void setRank(String hm, Double rank) {
         hmDcg.put(hm, rank);
@@ -114,6 +119,7 @@ public class TfGroup {
             put("igv", hmPairingTgIgv);
             put("distributionPlots", distributionPlots);
             put("regressionCoefficients", hmPairingRegressionCoefficients);
+            put("confusionMatrix", confusionMatrix);
         }};
     }
 

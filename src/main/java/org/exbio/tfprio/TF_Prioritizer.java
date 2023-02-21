@@ -196,6 +196,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
         OutputFile chipAtlasDirectory = null;
         OutputFile coOccurrence = null;
+        OutputFile confusionMatrixesDir = null;
         if (configs.chipAtlas.enabled.isSet() && configs.chipAtlas.enabled.get()) {
             GetList getList = add(new GetList(configs));
             GetData getData = add(new GetData(configs, getList.outputFile, calculateDcgRank.outputFile));
@@ -211,6 +212,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
             ConfusionMatrixes confusionMatrixes =
                     add(new ConfusionMatrixes(configs, getData.outputFile, getChromosomeLengths.outputFile,
                             createBindingRegionsBedFiles.outputFiles));
+            confusionMatrixesDir = confusionMatrixes.outputFile;
         }
 
         DistributionTargetGenes distributionTargetGenes =
@@ -238,7 +240,8 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         biophysicalLogo.outputFile, jaspar.outputFile, createHeatmaps.outputFiles,
                         distributionTargetGenes.outputFiles, createPlots.plotFiles,
                         extractRegressionCoefficients.outputFiles, coOccurrence, importantLociFiles,
-                        topLog2fc.outputFiles));
+                        topLog2fc.outputFiles, confusionMatrixesDir));
+        reportPreprocessing.setUnderDevelopment();
 
         ReportCreation reportCreation = add(new ReportCreation(configs, reportPreprocessing.outputFile));
         ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
