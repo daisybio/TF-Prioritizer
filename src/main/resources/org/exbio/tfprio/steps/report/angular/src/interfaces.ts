@@ -29,6 +29,12 @@ export interface tfGroup {
   "heatmaps": {};
   "igv": {};
   distributionPlots: {};
+  confusionMatrix?: {
+    truePositives: number;
+    falsePositives: number;
+    trueNegatives: number;
+    falseNegatives: number;
+  }
 }
 
 export interface dataInterface {

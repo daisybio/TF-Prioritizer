@@ -1,1 +1,5 @@
-<p>statistical-evaluation works!</p>
+<h1>Statistical evaluation</h1>
+<div [ngStyle]="$style | async" class="chart-container">
+  <ngx-charts-bar-horizontal-2d [legend]="true" [results]="plotData" [showDataLabel]="true"
+                                [xAxis]="true" [yAxis]="true"></ngx-charts-bar-horizontal-2d>
+</div>

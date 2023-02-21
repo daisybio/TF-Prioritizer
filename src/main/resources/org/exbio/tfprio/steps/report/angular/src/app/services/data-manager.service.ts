@@ -82,6 +82,25 @@ export class DataManagerService {
     return data;
   }
 
+  public getAllConfusionMatrices() {
+    let data: {
+      [tf: string]: {
+        truePositives: number;
+        falsePositives: number;
+        trueNegatives: number;
+        falseNegatives: number;
+      }
+    } = {};
+
+    this.groups.forEach(group => {
+      if (group.confusionMatrix) {
+        data[group.symbol] = group.confusionMatrix;
+      }
+    });
+
+    return data;
+  }
+
   public getConfigs() {
     return this._inputData.configs;
   }
