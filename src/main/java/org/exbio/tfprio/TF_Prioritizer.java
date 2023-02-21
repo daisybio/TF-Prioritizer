@@ -8,10 +8,7 @@ import org.exbio.tfprio.configs.Configs;
 import org.exbio.tfprio.steps.Dynamite.*;
 import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
-import org.exbio.tfprio.steps.chipAtlas.CoOccurrenceAnalysis;
-import org.exbio.tfprio.steps.chipAtlas.CoOccurrenceBindingEnergies;
-import org.exbio.tfprio.steps.chipAtlas.GetData;
-import org.exbio.tfprio.steps.chipAtlas.GetList;
+import org.exbio.tfprio.steps.chipAtlas.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
 import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.igv.ImportantLoci;
@@ -210,6 +207,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
             CoOccurrenceBindingEnergies coOccurrenceBindingEnergies =
                     add(new CoOccurrenceBindingEnergies(configs, extractSequences.outputFiles,
                             coOccurrenceAnalysis.merged));
+            GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths(configs));
+            ConfusionMatrixes confusionMatrixes =
+                    add(new ConfusionMatrixes(configs, getData.outputFile, getChromosomeLengths.outputFile,
+                            createBindingRegionsBedFiles.outputFiles));
         }
 
         DistributionTargetGenes distributionTargetGenes =

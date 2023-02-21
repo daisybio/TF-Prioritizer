@@ -297,26 +297,22 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                     }
                 }));
 
-                pairingHmRegressionCoefficients.entrySet().forEach(pairingHmRegressionCoefficient -> {
-                    String pairing = pairingHmRegressionCoefficient.getKey();
-                    Map<String, InputFile> hmRegressionCoefficients = pairingHmRegressionCoefficient.getValue();
+                pairingHmRegressionCoefficients.forEach(
+                        (pairing, hmRegressionCoefficients) -> hmRegressionCoefficients.forEach(
+                                (hm, regressionCoefficient) -> {
 
-                    hmRegressionCoefficients.entrySet().forEach(hmRegressionCoefficient -> {
-                        String hm = hmRegressionCoefficient.getKey();
-                        InputFile regressionCoefficient = hmRegressionCoefficient.getValue();
-
-                        try {
-                            readLines(regressionCoefficient).stream().skip(1).map(line -> line.split("\t")).map(
-                                    split -> Pair.of(split[0], Double.parseDouble(split[1]))).filter(
-                                    pair -> tfGroupMap.containsKey(pair.getKey())).forEach(pair -> {
-                                TfGroup tfGroup = tfGroupMap.get(pair.getKey());
-                                tfGroup.setRegressionCoefficient(hm, pairing, pair.getValue());
-                            });
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                });
+                                    try {
+                                        readLines(regressionCoefficient).stream().skip(1).map(
+                                                line -> line.split("\t")).map(
+                                                split -> Pair.of(split[0], Double.parseDouble(split[1]))).filter(
+                                                pair -> tfGroupMap.containsKey(pair.getKey())).forEach(pair -> {
+                                            TfGroup tfGroup = tfGroupMap.get(pair.getKey());
+                                            tfGroup.setRegressionCoefficient(hm, pairing, pair.getValue());
+                                        });
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }));
 
                 final JSONArray coOccurrenceJson;
                 if (coOccurrence != null) {
