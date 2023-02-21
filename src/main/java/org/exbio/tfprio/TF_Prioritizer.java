@@ -241,7 +241,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
                         distributionTargetGenes.outputFiles, createPlots.plotFiles,
                         extractRegressionCoefficients.outputFiles, coOccurrence, importantLociFiles,
                         topLog2fc.outputFiles, confusionMatrixesDir));
-        reportPreprocessing.setUnderDevelopment();
 
         ReportCreation reportCreation = add(new ReportCreation(configs, reportPreprocessing.outputFile));
         ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
