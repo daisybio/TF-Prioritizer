@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 import static org.exbio.pipejar.util.FileManagement.*;
@@ -52,7 +53,9 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                 pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
                 pairingHmIgvDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
                 pairingHmRegressionCoefficients.values().stream().flatMap(m -> m.values().stream()).collect(
-                        Collectors.toList()));
+                        Collectors.toList()), importantLoci.values(),
+                topLog2fc.values().stream().flatMap(pair -> Stream.of(pair.getLeft(), pair.getRight())).toList(),
+                confusionMatrixesDir != null ? List.of(confusionMatrixesDir) : List.of());
 
         this.ensgSymbol = addInput(ensgSymbol);
         this.biophysicalLogo = addInput(biophysicalLogo);

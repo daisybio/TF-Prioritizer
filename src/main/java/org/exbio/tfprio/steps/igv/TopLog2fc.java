@@ -147,15 +147,18 @@ public class TopLog2fc extends ExecutableStep<Configs> {
             }
 
             pairingDeseq2.forEach((pairing, deseq2) -> add(() -> {
+                logger.trace("Processing pairing {}", pairing);
                 List<String> sortedGenes = readLines(deseq2).stream().skip(1).map(line -> {
                     String[] split = line.split("\t");
 
                     return Pair.of(split[0].replace("\"", ""), Double.parseDouble(split[2]));
                 }).sorted(Comparator.comparingDouble(Pair::getRight)).map(Pair::getKey).toList();
 
-                List<String> upregulated = sortedGenes.subList(0, topLog2FoldChange.get()).stream().toList();
-                List<String> downregulated = sortedGenes.subList(sortedGenes.size() - topLog2FoldChange.get(),
-                        sortedGenes.size()).stream().toList();
+                logger.trace("Found {} genes", sortedGenes.size());
+
+                List<String> upregulated = sortedGenes.subList(0, topLog2FoldChange.get());
+                List<String> downregulated =
+                        sortedGenes.subList(sortedGenes.size() - topLog2FoldChange.get(), sortedGenes.size());
 
                 // Create a Map<String, String> from gene symbol to gene location based on the interesting gene IDs.
                 // If multiple IDs are associated with the same gene symbol, add a counter to the gene symbol.
@@ -175,6 +178,8 @@ public class TopLog2fc extends ExecutableStep<Configs> {
                                                 i -> Pair.of(entry.getKey() + "_" + i, entry.getValue().get(i)));
                                     }
                                 }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+
+                logger.trace("Getting gene symbol locations");
 
                 Map<String, String> upregulatedGeneSymbolLocations = getGeneSymbolLocations.apply(upregulated);
                 Map<String, String> downregulatedGeneSymbolLocations = getGeneSymbolLocations.apply(downregulated);
