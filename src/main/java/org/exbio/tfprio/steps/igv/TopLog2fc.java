@@ -147,14 +147,11 @@ public class TopLog2fc extends ExecutableStep<Configs> {
             }
 
             pairingDeseq2.forEach((pairing, deseq2) -> add(() -> {
-                logger.trace("Processing pairing {}", pairing);
                 List<String> sortedGenes = readLines(deseq2).stream().skip(1).map(line -> {
                     String[] split = line.split("\t");
 
                     return Pair.of(split[0].replace("\"", ""), Double.parseDouble(split[2]));
                 }).sorted(Comparator.comparingDouble(Pair::getRight)).map(Pair::getKey).toList();
-
-                logger.trace("Found {} genes", sortedGenes.size());
 
                 List<String> upregulated = sortedGenes.subList(0, topLog2FoldChange.get());
                 List<String> downregulated =
@@ -179,8 +176,6 @@ public class TopLog2fc extends ExecutableStep<Configs> {
                                     }
                                 }).collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
-                logger.trace("Getting gene symbol locations");
-
                 Map<String, String> upregulatedGeneSymbolLocations = getGeneSymbolLocations.apply(upregulated);
                 Map<String, String> downregulatedGeneSymbolLocations = getGeneSymbolLocations.apply(downregulated);
 
@@ -192,8 +187,10 @@ public class TopLog2fc extends ExecutableStep<Configs> {
                 Collection<? extends File> group2SignalFiles =
                         groupHmSignalFile.getOrDefault(group2, new HashMap<>()).values();
 
-                Collection<? extends File> group1ExperimentalFiles = groupExperimentalFiles.get(group1);
-                Collection<? extends File> group2ExperimentalFiles = groupExperimentalFiles.get(group2);
+                Collection<? extends File> group1ExperimentalFiles =
+                        groupExperimentalFiles.getOrDefault(group1, new HashSet<>());
+                Collection<? extends File> group2ExperimentalFiles =
+                        groupExperimentalFiles.getOrDefault(group2, new HashSet<>());
 
                 OutputFile upregulatedDir = outputFiles.get(pairing).getLeft();
                 OutputFile downregulatedDir = outputFiles.get(pairing).getRight();
