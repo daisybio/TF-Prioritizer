@@ -35,13 +35,13 @@ public class TranscriptionFactor {
     }
 
     public List<String> getEnsgs() {
-        return ensgs;
+        return ensgs != null ? ensgs : List.of();
     }
 
     public JSONObject toJSON() {
         return new JSONObject() {{
-            put("symbol", symbol);
-            put("ensgs", ensgs);
+            put("symbol", getSymbol());
+            put("ensgs", getEnsgs());
             put("pairingLog2fc", pairingLog2fc);
             put("groupMeanExpression", groupMeanExpression);
             put("groupTpm", groupTpm);
