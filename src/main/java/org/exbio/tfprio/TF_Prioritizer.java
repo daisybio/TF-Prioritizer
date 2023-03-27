@@ -202,9 +202,9 @@ public class TF_Prioritizer extends Workflow<Configs> {
             CoOccurrenceAnalysis coOccurrenceAnalysis = add(new CoOccurrenceAnalysis(configs, chipAtlasDirectory));
             coOccurrence = coOccurrenceAnalysis.outputFile;
 
-            CoOccurrenceBindingEnergies coOccurrenceBindingEnergies =
-                    add(new CoOccurrenceBindingEnergies(configs, extractSequences.outputFiles,
-                            coOccurrenceAnalysis.merged));
+            // CoOccurrenceBindingEnergies coOccurrenceBindingEnergies =
+            //        add(new CoOccurrenceBindingEnergies(configs, extractSequences.outputFiles,
+            //                coOccurrenceAnalysis.merged));
             GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths(configs));
             ConfusionMatrixes confusionMatrixes =
                     add(new ConfusionMatrixes(configs, getData.outputFile, getChromosomeLengths.outputFile,
