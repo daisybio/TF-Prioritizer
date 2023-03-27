@@ -33,6 +33,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
     private final String enhancerHTML = new RequiredConfig<>(configs.enhancerAtlas.enhancerHTMLString).get();
     private final URI enhancerBaseURI = URI.create(new RequiredConfig<>(configs.enhancerAtlas.enhancerBaseURLString).get());
     private final RequiredConfig<String> genome = new RequiredConfig<>(configs.inputConfigs.genome);
+    private final RequiredConfig<Map<String, String>> groups = new RequiredConfig<>(configs.inputConfigs.sameStages);
     private final RequiredConfig<List<String>> tissues = new RequiredConfig<>(configs.chipAtlas.tissueTypes);
 
     private final RequiredConfig<Map<String, String>> genomeToKeyMap = new RequiredConfig<>(configs.enhancerAtlas.genomeToKeyMap);
@@ -51,9 +52,11 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
             add(() -> {
                 // get HTML of enhancerAtlas download page
                 String enhancerHTMLString = IOUtils.toString(new URL(enhancerHTML).openStream(), StandardCharsets.UTF_8);
-                // search for links of organism and tissues
+                // search for links of organism, tissues, and groups
                 String genomeKey = genomeToKeyMap.get().get(genome.get());
-                String tissueKeys = "(" + String.join("|", tissues.get()) + ")";
+                Collection<String> searchKeys = tissues.get();
+                searchKeys.addAll(groups.get().keySet());
+                String tissueKeys = "(" + String.join("|", searchKeys) + ")";
                 Pattern p = Pattern.compile("(" + genomeKey + ".?" + tissueKeys + ".bed)'", Pattern.CASE_INSENSITIVE);
                 Matcher m = p.matcher(enhancerHTMLString);
                 List<String> bedLinks = new ArrayList<>();
