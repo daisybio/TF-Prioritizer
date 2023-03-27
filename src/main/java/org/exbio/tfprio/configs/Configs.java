@@ -15,4 +15,7 @@ public class Configs extends ConfigModuleCollection {
     public final ChipAtlas chipAtlas = new ChipAtlas();
     public final IGV igv = new IGV();
     public final HINT hint = new HINT();
+    public final EnhancerAtlas enhancerAtlas = new EnhancerAtlas();
+    public final EPDNew epdNew = new EPDNew();
+    public final EHMM ehmm = new EHMM();
 }
