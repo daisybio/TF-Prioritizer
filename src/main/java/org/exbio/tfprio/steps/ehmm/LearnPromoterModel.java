@@ -13,7 +13,8 @@ import java.util.concurrent.Callable;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class LearnPromoterModel extends ExecutableStep<Configs> {
-    public final OutputFile outputFile = addOutput("promoterModel.RData");
+    private final OutputFile outputDir = addOutput("out");
+    public final OutputFile outputFile = addOutput(outputDir,"model.RData");
     private final InputFile bedFile;
     private final InputFile bamFile;
 
@@ -41,7 +42,7 @@ public class LearnPromoterModel extends ExecutableStep<Configs> {
                         "-n", nStates.toString(),
                         "-b", nBins.toString(),
                         "-p", pseudoCount.toString(),
-                        "-o", outputFile.getAbsolutePath());
+                        "-o", outputDir.getAbsolutePath());
                 executeAndWait(ehmmCommand, false);
                 return true;
             });
