@@ -9,6 +9,7 @@ import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipAtlas.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
+import org.exbio.tfprio.steps.ehmm.*;
 import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
 import org.exbio.tfprio.steps.igv.ImportantLoci;
 import org.exbio.tfprio.steps.igv.TopLog2fc;
@@ -210,6 +211,32 @@ public class TF_Prioritizer extends Workflow<Configs> {
                     add(new ConfusionMatrixes(configs, getData.outputFile, getChromosomeLengths.outputFile,
                             createBindingRegionsBedFiles.outputFiles));
             confusionMatrixesDir = confusionMatrixes.outputFile;
+
+            // ChipAtlas cell and genome specific background data
+            GetChipData getChipData = add(new GetChipData(configs, getList.outputFile,
+                    latestPeakFiles, getChromosomeLengths.outputFile));
+            // Cell and genome specific enhancers
+            EnhancerAtlas enhancerAtlas = add(new EnhancerAtlas(configs, getChromosomeLengths.outputFile));
+            // Genome specific promoters
+            EPDNew epdNew = add(new EPDNew(configs, getChromosomeLengths.outputFile));
+            // learn background model (excluding promoters and enhancers)
+            LearnBackgroundModel learnBackgroundModel = add(new LearnBackgroundModel(configs, getChipData.outputFile,
+                    getChipData.bamDir, enhancerAtlas.outputFile, epdNew.bedFile));
+            // learn enhancer model
+            LearnEnhancerModel learnEnhancerModel = add(new LearnEnhancerModel(configs,
+                    enhancerAtlas.outputFile, enhancerAtlas.bamDir));
+            // learn promoter model
+            LearnPromoterModel learnPromoterModel = add(new LearnPromoterModel(configs,
+                    epdNew.bedFile, epdNew.bamFile));
+            // combine models and construct final model to apply to input data
+            ConstructModel constructModel = add(new ConstructModel(configs,
+                    learnBackgroundModel.outputFile, learnEnhancerModel.outputFile, learnPromoterModel.outputFile));
+            // collapse input bed files
+            CollapsePeakFiles collapsePeakFiles = add(new CollapsePeakFiles(configs,
+                    latestPeakFiles));
+            // apply input data to constructed model
+            ApplyModel applyModel = add(new ApplyModel(configs,
+                    collapsePeakFiles.outputFiles, getChromosomeLengths.outputFile, constructModel.outputFile));
         }
 
         DistributionTargetGenes distributionTargetGenes =
