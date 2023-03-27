@@ -8,7 +8,7 @@ import java.io.File;
 
 
 public class EHMM extends ConfigModule {
-    public final ExternalConfig<File> bam_directory = new ExternalConfig<>(File.class);
+    public final ExternalConfig<File> bamDirectory = new ExternalConfig<>(File.class);
     public final InternalConfig<Integer> nStates = new InternalConfig<>(10);
     public final InternalConfig<Double> pseudoCount = new InternalConfig<>(1e-6);
     public final InternalConfig<Integer> nBins = new InternalConfig<>(10);

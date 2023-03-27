@@ -17,7 +17,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final Map<String, InputFile> regions = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
-    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bam_directory);
+    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
     private final InputFile applyModelScript;
 
     public ApplyModel(Configs configs, Map<String, OutputFile> regions, OutputFile chromosomeSizes,
