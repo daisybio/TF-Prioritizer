@@ -17,6 +17,10 @@
     </mat-form-field>
   </div>
 </form>
+
+<div #igvDiv>
+</div>
+
 <mat-chip-listbox multiple>
   <div class="flex-row full-width stretch">
     <mat-chip-option (click)="recalculateScores()" (selectionChange)="hmActive.set(hm, !hmActive.get(hm))"
@@ -54,5 +58,3 @@
     </mat-expansion-panel>
   </ng-container>
 </mat-accordion>
-
-
