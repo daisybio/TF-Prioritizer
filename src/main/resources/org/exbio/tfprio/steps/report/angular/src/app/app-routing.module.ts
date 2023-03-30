@@ -1,6 +1,5 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {RankingComponent} from "./pages/ranking/ranking.component";
 import {CoOccurrenceComponent} from "./pages/generalAnalysis/co-occurrence/co-occurrence.component";
 import {
   StatisticalEvaluationComponent
@@ -11,9 +10,10 @@ import {TfDetailsComponent} from "./pages/perTf/tf-details/tf-details.component"
 import {
   RegressionCoefficientsComponent
 } from "./pages/generalAnalysis/regression-coefficients/regression-coefficients.component";
+import {HomeComponent} from "./pages/home/home.component";
 
 const routes: Routes = [
-  {path: '', component: RankingComponent},
+  {path: '', component: HomeComponent},
   {path: 'coOccurrence', component: CoOccurrenceComponent},
   {path: 'statisticalEvaluation', component: StatisticalEvaluationComponent},
   {path: 'parameters', component: ParametersComponent},

@@ -6,7 +6,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatButtonModule} from "@angular/material/button";
 import {RouterOutlet} from "@angular/router";
 import {AppRoutingModule} from './app-routing.module';
-import {RankingComponent} from "./pages/ranking/ranking.component";
+import {TfRankingComponent} from "./pages/home/tf-ranking/tf-ranking.component";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
@@ -41,11 +41,14 @@ import {MatSliderModule} from "@angular/material/slider";
 import {MatListModule} from "@angular/material/list";
 import {MatButtonToggleModule} from "@angular/material/button-toggle";
 import {MatIconModule} from "@angular/material/icon";
+import {IgvComponent} from './components/igv/igv.component';
+import {HomeComponent} from './pages/home/home.component';
+import { TargetGenesComponent } from './pages/home/target-genes/target-genes.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    RankingComponent,
+    TfRankingComponent,
     CoOccurrenceComponent,
     StatisticalEvaluationComponent,
     ParametersComponent,
@@ -58,6 +61,9 @@ import {MatIconModule} from "@angular/material/icon";
     GeneralInformationComponent,
     RegressionCoefficientsComponent,
     DataSelectorComponent,
+    IgvComponent,
+    HomeComponent,
+    TargetGenesComponent,
   ],
   imports: [
     BrowserModule,
