@@ -9,14 +9,10 @@ import org.exbio.tfprio.steps.EnsgSymbol;
 import org.exbio.tfprio.steps.TEPIC.*;
 import org.exbio.tfprio.steps.chipAtlas.*;
 import org.exbio.tfprio.steps.distributionAnalysis.*;
-import org.exbio.tfprio.steps.igv.DistributionTargetGenes;
-import org.exbio.tfprio.steps.igv.ImportantLoci;
-import org.exbio.tfprio.steps.igv.TopLog2fc;
 import org.exbio.tfprio.steps.logos.*;
 import org.exbio.tfprio.steps.peakFiles.*;
 import org.exbio.tfprio.steps.plots.GroupStages;
 import org.exbio.tfprio.steps.plots.OpenRegionsViolinPlots;
-import org.exbio.tfprio.steps.report.ReportCompression;
 import org.exbio.tfprio.steps.report.ReportCreation;
 import org.exbio.tfprio.steps.report.ReportPreprocessing;
 import org.exbio.tfprio.steps.rnaSeq.*;
@@ -212,10 +208,12 @@ public class TF_Prioritizer extends Workflow<Configs> {
             confusionMatrixesDir = confusionMatrixes.outputFile;
         }
 
+        /*
         DistributionTargetGenes distributionTargetGenes =
                 add(new DistributionTargetGenes(configs, ensgSymbol.outputFile, fetchGeneInfo.outputFile,
                         calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
                         createBindingRegionsBedFiles.outputFiles));
+
 
         Map<String, OutputFile> importantLociFiles;
         if (configs.igv.importantLoci.isSet()) {
@@ -227,19 +225,23 @@ public class TF_Prioritizer extends Workflow<Configs> {
             importantLociFiles = new HashMap<>();
         }
 
+
         TopLog2fc topLog2fc =
                 add(new TopLog2fc(configs, deSeq2.outputFiles, fetchGeneInfo.outputFile, ensgSymbol.outputFile,
                         chipAtlasDirectory));
+         */
 
         ReportPreprocessing reportPreprocessing =
                 add(new ReportPreprocessing(configs, ensgSymbol.outputFile, calculateDcgPerHm.outputFiles,
                         deSeq2.outputFiles, meanCounts.outputFiles, calculateTPM.outputFiles,
                         biophysicalLogo.outputFile, jaspar.outputFile, createHeatmaps.outputFiles,
-                        distributionTargetGenes.outputFiles, createPlots.plotFiles,
-                        extractRegressionCoefficients.outputFiles, coOccurrence, importantLociFiles,
-                        topLog2fc.outputFiles, confusionMatrixesDir));
+                        createPlots.plotFiles, extractRegressionCoefficients.outputFiles, coOccurrence,
+                        confusionMatrixesDir));
 
         ReportCreation reportCreation = add(new ReportCreation(configs, reportPreprocessing.outputFile));
-        ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
+
+        reportPreprocessing.setUnderDevelopment();
+        reportCreation.setUnderDevelopment();
+        // ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
     }
 }

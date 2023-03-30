@@ -17,8 +17,6 @@ import {MatTableModule} from "@angular/material/table";
 import {BarChartModule, HeatMapModule} from "@swimlane/ngx-charts";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HashLocationStrategy, LocationStrategy} from "@angular/common";
-import {ImportantLociComponent} from './pages/generalAnalysis/important-loci/important-loci.component';
-import {TopLog2fcComponent} from './pages/generalAnalysis/top-log2fc/top-log2fc.component';
 import {CoOccurrenceComponent} from './pages/generalAnalysis/co-occurrence/co-occurrence.component';
 import {
   StatisticalEvaluationComponent
@@ -48,8 +46,6 @@ import {MatIconModule} from "@angular/material/icon";
   declarations: [
     AppComponent,
     RankingComponent,
-    ImportantLociComponent,
-    TopLog2fcComponent,
     CoOccurrenceComponent,
     StatisticalEvaluationComponent,
     ParametersComponent,

@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 import static org.exbio.pipejar.util.FileManagement.*;
@@ -29,33 +28,25 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
     private final Map<String, InputFile> groupMeanExpression = new HashMap<>();
     private final Map<String, InputFile> groupTpm = new HashMap<>();
     private final Map<String, Map<String, InputFile>> pairingHmHeatmapDir = new HashMap<>();
-    private final Map<String, Map<String, InputFile>> pairingHmIgvDir = new HashMap<>();
     private final Map<String, InputFile> hmDistributionPlots = new HashMap<>();
     private final Map<String, Map<String, InputFile>> pairingHmRegressionCoefficients = new HashMap<>();
     private final InputFile biophysicalLogo;
     private final InputFile tfSequence;
     private final InputFile coOccurrence;
-    private final Map<String, InputFile> importantLoci = new HashMap<>();
-    private final Map<String, Pair<InputFile, InputFile>> topLog2fc = new HashMap<>();
     private final InputFile confusionMatrixesDir;
 
     public ReportPreprocessing(Configs configs, OutputFile ensgSymbol, Map<String, OutputFile> hmDcgFiles,
                                Map<String, OutputFile> deseqResults, Map<String, OutputFile> groupMeanExpression,
                                Map<String, OutputFile> groupTpm, OutputFile biophysicalLogo, OutputFile tfSequence,
                                Map<String, Map<String, OutputFile>> pairingHmHeatmapDir,
-                               Map<String, Map<String, OutputFile>> pairingHmIgvDir,
                                Map<String, OutputFile> hmDistributionPlots,
                                Map<String, Map<String, OutputFile>> pairingHmRegressionCoefficients,
-                               OutputFile coOccurrence, Map<String, OutputFile> importantLoci,
-                               Map<String, Pair<OutputFile, OutputFile>> topLog2fc, OutputFile confusionMatrixesDir) {
+                               OutputFile coOccurrence, OutputFile confusionMatrixesDir) {
         super(configs, false, hmDcgFiles.values(), deseqResults.values(), groupMeanExpression.values(),
                 groupTpm.values(), List.of(ensgSymbol), hmDistributionPlots.values(),
                 pairingHmHeatmapDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
-                pairingHmIgvDir.values().stream().flatMap(m -> m.values().stream()).collect(Collectors.toList()),
                 pairingHmRegressionCoefficients.values().stream().flatMap(m -> m.values().stream()).collect(
-                        Collectors.toList()), importantLoci.values(),
-                topLog2fc.values().stream().flatMap(pair -> Stream.of(pair.getLeft(), pair.getRight())).toList(),
-                confusionMatrixesDir != null ? List.of(confusionMatrixesDir) : List.of());
+                        Collectors.toList()), confusionMatrixesDir != null ? List.of(confusionMatrixesDir) : List.of());
 
         this.ensgSymbol = addInput(ensgSymbol);
         this.biophysicalLogo = addInput(biophysicalLogo);
@@ -82,26 +73,6 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
             hmDirectories.forEach((hm, hmDir) -> {
                 InputFile input = addInput(pairingDir, hmDir);
                 this.pairingHmHeatmapDir.computeIfAbsent(pairing, k -> new HashMap<>()).put(hm, input);
-            });
-        });
-
-        OutputFile importantLociDir = new OutputFile(inputDirectory, "importantLoci");
-        importantLoci.forEach((pairing, importantLociFile) -> this.importantLoci.put(pairing,
-                addInput(importantLociDir, importantLociFile)));
-
-        OutputFile topLog2fcDir = new OutputFile(inputDirectory, "topLog2fc");
-        topLog2fc.forEach((pairing, topLog2fcFiles) -> {
-            OutputFile pairingDir = new OutputFile(topLog2fcDir, pairing);
-            this.topLog2fc.put(pairing, Pair.of(addInput(pairingDir, topLog2fcFiles.getLeft()),
-                    addInput(pairingDir, topLog2fcFiles.getRight())));
-        });
-
-        OutputFile igvDir = new OutputFile(inputDirectory, "igv");
-        pairingHmIgvDir.forEach((pairing, hmDirectories) -> {
-            OutputFile pairingDir = new OutputFile(igvDir, pairing);
-            hmDirectories.forEach((hm, hmDir) -> {
-                InputFile input = addInput(pairingDir, hmDir);
-                this.pairingHmIgvDir.computeIfAbsent(pairing, k -> new HashMap<>()).put(hm, input);
             });
         });
 
@@ -283,14 +254,6 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                             }
                         })));
 
-                pairingHmIgvDir.forEach((pairing, hmIgvDir) -> hmIgvDir.forEach((hm, igvDir) -> Arrays.stream(
-                        Objects.requireNonNull(igvDir.listFiles(File::isDirectory))).forEach(directory -> {
-                    String symbol = directory.getName();
-                    if (tfGroupMap.containsKey(symbol)) {
-                        tfGroupMap.get(symbol).setIgv(pairing, hm, directory);
-                    }
-                })));
-
                 hmDistributionPlots.forEach((hm, distributionPlotDirectory) -> Arrays.stream(Objects.requireNonNull(
                         distributionPlotDirectory.listFiles(f -> f.getName().endsWith(".png")))).forEach(plotFile -> {
                     String symbol = plotFile.getName().replace(".png", "");
@@ -354,94 +317,12 @@ public class ReportPreprocessing extends ExecutableStep<Configs> {
                     coOccurrenceJson = new JSONArray();
                 }
 
-                logger.trace("Reading important loci");
-                File importantLociDir = new File(assets, "importantLoci");
-                JSONObject importantLociObject = new JSONObject() {{
-                    importantLoci.forEach((group, groupInDir) -> {
-                        File groupOutDir = new File(importantLociDir, group);
-                        JSONObject patternFiles = new JSONObject() {{
-                            Arrays.stream(Objects.requireNonNull(groupInDir.listFiles(File::isDirectory))).forEach(
-                                    patternInDir -> {
-                                        File patternOutDir = new File(groupOutDir, patternInDir.getName());
-
-                                        JSONObject tfFiles = new JSONObject() {{
-                                            Arrays.stream(Objects.requireNonNull(patternInDir.listFiles())).forEach(
-                                                    inFile -> {
-                                                        File outFile = new File(patternOutDir, inFile.getName());
-
-                                                        try {
-                                                            softLink(outFile, inFile);
-                                                        } catch (IOException e) {
-                                                            throw new RuntimeException(e);
-                                                        }
-
-                                                        put(inFile.getName().substring(0,
-                                                                        inFile.getName().lastIndexOf(".")),
-                                                                srcDir.toPath().relativize(
-                                                                        outFile.toPath()).toString());
-                                                    });
-                                        }};
-
-                                        put(patternInDir.getName(), tfFiles);
-                                    });
-                        }};
-
-                        put(group, patternFiles);
-                    });
-                }};
-
-                logger.trace("Reading top log2fc");
-                File topLog2fcDir = new File(assets, "topLog2fc");
-                JSONObject topLog2fcObject = new JSONObject() {{
-                    topLog2fc.forEach((pairing, directories) -> {
-                        File pairingOutDir = new File(topLog2fcDir, pairing);
-                        File upregulatedInDir = directories.getLeft();
-                        File downregulatedInDir = directories.getRight();
-                        File upregulatedOutDir = new File(pairingOutDir, "upregulated");
-                        File downregulatedOutDir = new File(pairingOutDir, "downregulated");
-                        put(pairing, new JSONObject() {{
-                            put("upregulated", new JSONObject() {{
-                                Arrays.stream(Objects.requireNonNull(upregulatedInDir.listFiles())).forEach(inFile -> {
-                                    File outFile = new File(upregulatedOutDir, inFile.getName());
-
-                                    try {
-                                        softLink(outFile, inFile);
-                                    } catch (IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-
-                                    put(inFile.getName().substring(0, inFile.getName().lastIndexOf(".")),
-                                            srcDir.toPath().relativize(outFile.toPath()).toString());
-                                });
-                            }});
-
-                            put("downregulated", new JSONObject() {{
-                                Arrays.stream(Objects.requireNonNull(downregulatedInDir.listFiles())).forEach(
-                                        inFile -> {
-                                            File outFile = new File(downregulatedOutDir, inFile.getName());
-
-                                            try {
-                                                softLink(outFile, inFile);
-                                            } catch (IOException e) {
-                                                throw new RuntimeException(e);
-                                            }
-
-                                            put(inFile.getName().substring(0, inFile.getName().lastIndexOf(".")),
-                                                    srcDir.toPath().relativize(outFile.toPath()).toString());
-                                        });
-                            }});
-                        }});
-                    });
-                }};
-
                 logger.trace("Writing output");
 
                 JSONObject json = new JSONObject() {{
                     put("groups", groups.stream().map(TfGroup::toJSON).toList());
                     put("configs", configs.getConfigsJSONObject(true, true));
                     put("coOccurrence", coOccurrenceJson);
-                    put("importantLoci", importantLociObject);
-                    put("topLog2fc", topLog2fcObject);
                 }};
 
                 File data = new File(assets, "data.json");

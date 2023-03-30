@@ -51,24 +51,5 @@ export interface dataInterface {
       [config: string]: string | number | boolean;
     }
   }
-
-  "importantLoci": {
-    [group: string]: {
-      [pattern: string]: {
-        [locus: string]: string
-      };
-    }
-  }
-
-  "topLog2fc": {
-    [pairing: string]: {
-      "downregulated": {
-        [gene: string]: string;
-      };
-      "upregulated": {
-        [gene: string]: string;
-      };
-    }
-  }
 }
 
