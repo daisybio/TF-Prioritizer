@@ -3,47 +3,48 @@ package org.exbio.tfprio.configs.modules;
 import org.exbio.pipejar.configs.ConfigModule;
 import org.exbio.pipejar.configs.ConfigTypes.InputTypes.InternalConfig;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class EnhancerAtlas extends ConfigModule {
     public final InternalConfig<String> enhancerBaseURLString = new InternalConfig<>("http://www.enhanceratlas.org/data/download/enhancer/");
     public final InternalConfig<String> enhancerHTMLString = new InternalConfig<>("http://www.enhanceratlas.org/downloadv2.php");
-    public final InternalConfig<Map<String, String>> enhancerVersionMap = new InternalConfig<>(Map.ofEntries(
-            Map.entry("hs", "hg19"),
-            Map.entry("mm", "mm9"),
-            Map.entry("dr", "danRer10"),
-            Map.entry("dm", "dm3"),
-            Map.entry("ce", "ce10"),
-            Map.entry("rn", "rn5"),
-            Map.entry("sc", "sacCer3"),
-            Map.entry("gg", "galGal4"),
-            Map.entry("ss", "susScr3")
-    ));
-    public final InternalConfig<Map<String, String>>  genomeToKeyMap = new InternalConfig<>(Map.ofEntries(
-            Map.entry("hg38", "hs"),
-            Map.entry("GRCh38", "hs"),
-            Map.entry("hg19", "hs"),
-            Map.entry("GRCh37", "hs"),
-            Map.entry("mm10", "mm"),
-            Map.entry("GRCm38", "mm"),
-            Map.entry("mm9", "mm"),
-            Map.entry("GRCm37", "mm"),
-            Map.entry("zv10", "dr"),
-            Map.entry("danRer10", "dr"),
-            Map.entry("GRCz10", "dr"),
-            Map.entry("zv9", "dr"),
-            Map.entry("GRCz9", "dr"),
-            Map.entry("dm6", "dm"),
-            Map.entry("BDGP6", "dm"),
-            Map.entry("ce10", "ce"),
-            Map.entry("WBcel235", "ce"),
-            Map.entry("rn6", "rn"),
-            Map.entry("Rnor_6.0", "rn"),
-            Map.entry("Galgal4", "gg"),
-            Map.entry("galGal4", "gg"),
-            Map.entry("susScr3", "ss"),
-            Map.entry("Sscrofa10.2", "ss"),
-            Map.entry("sacCer3", "sc"),
-            Map.entry("R64-1-1", "sc")
-    ));
+    public final InternalConfig<Map<String, String>> enhancerVersionMap = new InternalConfig<>(new HashMap<>() {{
+        put("hs", "hg19");
+        put("mm", "mm9");
+        put("dr", "danRer10");
+        put("dm", "dm3");
+        put("ce", "ce10");
+        put("rn", "rn5");
+        put("sc", "sacCer3");
+        put("gg", "galGal4");
+        put("ss", "susScr3");
+    }});
+    public final InternalConfig<Map<String, String>>  genomeToKeyMap = new InternalConfig<>(new HashMap<>() {{
+        put("hg38", "hs");
+        put("GRCh38", "hs");
+        put("hg19", "hs");
+        put("GRCh37", "hs");
+        put("mm10", "mm");
+        put("GRCm38", "mm");
+        put("mm9", "mm");
+        put("GRCm37", "mm");
+        put("zv10", "dr");
+        put("danRer10", "dr");
+        put("GRCz10", "dr");
+        put("zv9", "dr");
+        put("GRCz9", "dr");
+        put("dm6", "dm");
+        put("BDGP6", "dm");
+        put("ce10", "ce");
+        put("WBcel235", "ce");
+        put("rn6", "rn");
+        put("Rnor_6.0", "rn");
+        put("Galgal4", "gg");
+        put("galGal4", "gg");
+        put("susScr3", "ss");
+        put("Sscrofa10.2", "ss");
+        put("sacCer3", "sc");
+        put("R64-1-1", "sc");
+    }});
 }
