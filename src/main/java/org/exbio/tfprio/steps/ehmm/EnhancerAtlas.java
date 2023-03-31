@@ -38,12 +38,13 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
 
     private final RequiredConfig<Map<String, String>> genomeToKeyMap = new RequiredConfig<>(configs.enhancerAtlas.genomeToKeyMap);
     private final RequiredConfig<Map<String, String>> enhancerVersionMap = new RequiredConfig<>(configs.enhancerAtlas.enhancerVersionMap);
-    private final InputFile upliftScript;
+    private final InputFile script;
 
     public EnhancerAtlas(Configs configs, OutputFile chromosomeLengths) {
         super(configs, false, chromosomeLengths);
         this.chromosomeLengths = addInput(chromosomeLengths);
-        this.upliftScript = addInput(getClass().getResourceAsStream("uplift.py"), "uplift.py");
+        // TODO: Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.io.InputStream.readAllBytes()" because "stream" is null
+        script = addInput(getClass().getResourceAsStream("uplift.py"), "uplift.py");
     }
 
     @Override
@@ -79,7 +80,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                     if (!isSameGenome) {
                         logger.info("uplifting enhancer bed file {}", bedFile);
                         try {
-                            executeAndWait("python3 " + upliftScript + " " +
+                            executeAndWait("python3 " + script + " " +
                                     String.join(" ",
                                             bedFile.getAbsolutePath(),
                                             bedFile.getAbsolutePath(),
@@ -89,8 +90,6 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                             throw new RuntimeException("Failed to uplift bed file: " + bedFile);
                         }
                     }
-                    // TODO: filter for entries that feature existing chromosomes (e.g not 21 in mouse)
-                    // TODO: by comparing with chromosome lengths file
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(tissueFile)+".bam");
                     String cmd = String.join(" ",
                             "bedToBam",
