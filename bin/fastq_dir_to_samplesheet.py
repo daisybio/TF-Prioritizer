@@ -1,0 +1,1 @@
+../subworkflows/nf-core/rnaseq/bin/fastq_dir_to_samplesheet.py

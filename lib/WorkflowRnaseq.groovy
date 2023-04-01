@@ -1,0 +1,1 @@
+../subworkflows/nf-core/rnaseq/lib/WorkflowRnaseq.groovy

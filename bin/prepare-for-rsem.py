@@ -1,0 +1,1 @@
+../subworkflows/nf-core/rnaseq/bin/prepare-for-rsem.py
