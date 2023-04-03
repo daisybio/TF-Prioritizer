@@ -23,8 +23,8 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 
 public class EnhancerAtlas extends ExecutableStep<Configs> {
-    public final OutputFile bedDir = addOutput("enhancerAtlasBed");
-    public final OutputFile bamDir = addOutput("enhancerAtlasBam");
+    public final OutputFile bedDir = addOutput("bed");
+    public final OutputFile bamDir = addOutput("bam");
     public final OutputFile outputFile = addOutput("allEnhancers.bed");
     private final InputFile chromosomeLengths;
     private final String enhancerHTML = new RequiredConfig<>(configs.enhancerAtlas.enhancerHTMLString).get();
@@ -99,6 +99,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                             "-g", chromosomeLengths.getAbsolutePath(),
                             ">", bamFile.getAbsolutePath());
                     try {
+                        logger.info("Converting bed to bam");
                         executeAndWait(bedToBam, false);
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to convert bed to bam:\n" + e.getMessage());
@@ -111,6 +112,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                     // replace bam with sorted file
                     Files.move(sortedBamFile.toPath(), bamFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     try {
+                        logger.info("Sorting bam file");
                         executeAndWait(sortBam, false);
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to sort bam file:\n" + e.getMessage());
@@ -119,11 +121,11 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                     String indexBam = String.join(" ",
                             "samtools", "index", bamFile.getAbsolutePath());
                     try {
+                        logger.info("Indexing bam file");
                         executeAndWait(indexBam, false);
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to index bam file:\n" + e.getMessage());
                     }
-                    // merge into one bed file
                     Files.write(Paths.get(outputFile.getAbsolutePath()),
                             (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
                             StandardOpenOption.APPEND);
