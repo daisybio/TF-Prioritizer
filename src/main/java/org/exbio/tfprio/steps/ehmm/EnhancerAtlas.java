@@ -72,7 +72,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                 bedLinks.forEach(bedLink -> {
                     String tissueFile = bedLink.split("/")[1];
                     File bedFile = new File(bedDir, tissueFile);
-                    logger.debug("downloading file: {}", enhancerBaseURI.resolve(bedLink));
+                    logger.info("downloading file: {}", enhancerBaseURI.resolve(bedLink));
                     try{
                         IOUtils.copy(enhancerBaseURI.resolve(bedLink).toURL(), bedFile);
                     } catch (IOException e){
@@ -88,7 +88,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                                             enhancerVersion,
                                             genome.get(), "0", "1", "2"), true);
                         } catch (IOException e) {
-                            throw new RuntimeException("Failed to uplift bed file: " + bedFile);
+                            throw new RuntimeException("Failed to uplift bed file: " + bedFile + "\ninternal error:\n" + e);
                         }
                     }
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(tissueFile)+".bam");
