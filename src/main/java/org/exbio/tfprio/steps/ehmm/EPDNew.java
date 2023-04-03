@@ -40,7 +40,7 @@ public class EPDNew extends ExecutableStep<Configs> {
             add(() -> {
                 String promoterBed = IOUtils.toString(downloadURI.toURL().openStream(), StandardCharsets.UTF_8);
                 Files.writeString(bedFile.toPath(), promoterBed.replace(" ", "\t"));
-                String cmd = String.join(" ", "/bin/bash", "-c",
+                String cmd = String.join(" ", "/bin/sh", "-c",
                         "bedToBam",
                         "-i", bedFile.getAbsolutePath(),
                         "-g", chromosomeLengths.getAbsolutePath(),

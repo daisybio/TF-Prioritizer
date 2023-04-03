@@ -28,7 +28,7 @@ public class GetChipData extends ExecutableStep<Configs> {
     private final InputFile chromosomeLengths;
     private final RequiredConfig<List<String>> tissues = new RequiredConfig<>(configs.chipAtlas.tissueTypes);
     private final RequiredConfig<String> genomeVersion = new RequiredConfig<>(configs.inputConfigs.genome);
-    private String seqType = new RequiredConfig<>(configs.inputConfigs.seqType).get();
+    private final String seqType = new RequiredConfig<>(configs.inputConfigs.seqType).get();
     private final Set<String> histoneModifications;
 
     public GetChipData(Configs configs, OutputFile chipFileList,
@@ -138,7 +138,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                     // replace complex bed with simplified version
                     Files.move(simpleBed.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
-                    String cmd = String.join(" ", "/bin/bash", "-c",
+                    String cmd = String.join(" ", "/bin/sh", "-c",
                             "bedToBam",
                             "-i", bedFile.getAbsolutePath(),
                             "-g", chromosomeLengths.getAbsolutePath(),

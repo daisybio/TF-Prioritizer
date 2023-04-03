@@ -91,7 +91,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                         bedFile = liftedBed;
                     }
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
-                    String cmd = String.join(" ", "/bin/bash", "-c",
+                    String cmd = String.join(" ", "/bin/sh", "-c",
                             "bedToBam",
                             "-i", bedFile.getAbsolutePath(),
                             "-g", chromosomeLengths.getAbsolutePath(),
