@@ -1,6 +1,5 @@
 package org.exbio.tfprio.steps.ehmm;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
@@ -8,11 +7,9 @@ import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,39 +40,14 @@ public class EPDNew extends ExecutableStep<Configs> {
             add(() -> {
                 String promoterBed = IOUtils.toString(downloadURI.toURL().openStream(), StandardCharsets.UTF_8);
                 Files.writeString(bedFile.toPath(), promoterBed.replace(" ", "\t"));
-                String base = FilenameUtils.getBaseName(bedFile.getPath());
-                // create associated bam file
-                OutputFile bamFile = addOutput(base +".bam");
-                String bedToBam = String.join(" ",
+                String cmd = String.join(" ", "/bin/bash", "-c",
                         "bedToBam",
                         "-i", bedFile.getAbsolutePath(),
                         "-g", chromosomeLengths.getAbsolutePath(),
-                        ">", bamFile.getAbsolutePath());
-                try {
-                    executeAndWait(bedToBam, false);
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to convert bed to bam:\n" + e.getMessage());
-                }
-                // sorted bam file
-                OutputFile sortedBamFile = addOutput(base + ".sorted.bam");
-                String sortBam = String.join(" ",
-                        "samtools", "sort", bamFile.getAbsolutePath(),
-                        ">", sortedBamFile.getAbsolutePath());
-                // replace bam with sorted file
-                Files.move(sortedBamFile.toPath(), bamFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                try {
-                    executeAndWait(sortBam, false);
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to sort bam file:\n" + e.getMessage());
-                }
-                // index bam file
-                String indexBam = String.join(" ",
-                        "samtools", "index", bamFile.getAbsolutePath());
-                try {
-                    executeAndWait(indexBam, false);
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to index bam file:\n" + e.getMessage());
-                }
+                        "|", "samtools", "sort", "-",
+                        ">", bamFile.getAbsolutePath(),
+                        ";", "samtools", "index", bamFile.getAbsolutePath());
+                executeAndWait(cmd, false);
                 return true;
             });
         }};

@@ -90,42 +90,15 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                         }
                         bedFile = liftedBed;
                     }
-                    String base = FilenameUtils.getBaseName(bedFile.getPath());
-                    // create associated bam file
-                    OutputFile bamFile = addOutput(bamDir, base +".bam");
-                    String bedToBam = String.join(" ",
+                    OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
+                    String cmd = String.join(" ", "/bin/bash", "-c",
                             "bedToBam",
                             "-i", bedFile.getAbsolutePath(),
                             "-g", chromosomeLengths.getAbsolutePath(),
-                            ">", bamFile.getAbsolutePath());
-                    try {
-                        logger.info("Converting bed to bam");
-                        executeAndWait(bedToBam, false);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to convert bed to bam:\n" + e.getMessage());
-                    }
-                    // sorted bam file
-                    OutputFile sortedBamFile = addOutput(bamDir, base + ".sorted.bam");
-                    String sortBam = String.join(" ",
-                            "samtools", "sort", bamFile.getAbsolutePath(),
-                            ">", sortedBamFile.getAbsolutePath());
-                    // replace bam with sorted file
-                    Files.move(sortedBamFile.toPath(), bamFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    try {
-                        logger.info("Sorting bam file");
-                        executeAndWait(sortBam, false);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to sort bam file:\n" + e.getMessage());
-                    }
-                    // index bam file
-                    String indexBam = String.join(" ",
-                            "samtools", "index", bamFile.getAbsolutePath());
-                    try {
-                        logger.info("Indexing bam file");
-                        executeAndWait(indexBam, false);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to index bam file:\n" + e.getMessage());
-                    }
+                            "|", "samtools", "sort", "-",
+                            ">", bamFile.getAbsolutePath(),
+                            ";", "samtools", "index", bamFile.getAbsolutePath());
+                    executeAndWait(cmd, false);
                     Files.write(Paths.get(outputFile.getAbsolutePath()),
                             (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
                             StandardOpenOption.APPEND);
