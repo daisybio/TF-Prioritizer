@@ -43,7 +43,6 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
     public EnhancerAtlas(Configs configs, OutputFile chromosomeLengths) {
         super(configs, false, chromosomeLengths);
         this.chromosomeLengths = addInput(chromosomeLengths);
-        // TODO: Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.io.InputStream.readAllBytes()" because "stream" is null
         script = addInput(getClass().getResourceAsStream("uplift.py"), "uplift.py");
     }
 
@@ -64,7 +63,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                 // add links that match the given parameters
                 while(m.find()) bedLinks.add(m.group(1));
                 if (bedLinks.size()==0){
-                    throw new RuntimeException("No matching enhancers found in EnhancerAtlas for given organism and cell type");
+                    throw new RuntimeException("No matching enhancers found in EnhancerAtlas for pattern: " + p);
                 }
                 // download beds, uplift to given genome version, create bam files, and merge bed to one
                 String enhancerVersion = enhancerVersionMap.get().get(genomeKey);
