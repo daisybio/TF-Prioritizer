@@ -86,6 +86,7 @@ public class GetChipData extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 logger.trace("Starting to read the ChipAtlas file list");
+                logger.debug("filtering for params: antigenClass: {}, tissues: {}, hms: {}", seqType, tissues, histoneModifications);
                 Stream<ChipListEntry> validEntries = Files.lines(Path.of(chipFileList.getAbsolutePath()))
                         .skip(1)
                         .map(ChipListEntry::new)
