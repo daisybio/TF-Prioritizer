@@ -15,8 +15,9 @@ argv <- parse_args(parser, argv = args)
 cat("loading input data")
 regions <- import(argv$r, format = "bed")
 model <- argv$m
-bamfiles <- list.files(path = argv$m, pattern = "*.bam", full.names = T)
-marks <- sapply(strsplit(file_path_sans_ext(basename(bamfiles)), "_"), "[", 1)
+bamfiles <- list.files(path = argv$b, pattern = "*.bam$", full.names = T, recursive = T)
+files <- sub(argv$b, "", bamfiles)
+marks <- sapply(strsplit(sub("^/", "", files), "/"), "[", 2)
 bamtab <- data.frame(mark = marks, path = bamfiles, check.names = F)
 
 applyModel(regions, model = argv$m, genomeSize = argv$g, bamtab = bamtab, outdir = argv$o)

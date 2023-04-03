@@ -15,6 +15,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 public class ApplyModel extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputDirs = new HashMap<>();
     private final Map<String, InputFile> regions = new HashMap<>();
+    private final Map<String, InputFile> bamDirs = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
@@ -26,9 +27,10 @@ public class ApplyModel extends ExecutableStep<Configs> {
         this.chromosomeSizes = addInput(chromosomeSizes);
         this.constructedModel = addInput(constructedModel);
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
-        // apply model for each group and collapse bed files within
+
         regions.forEach((s, r) -> {
             this.regions.put(s, addInput(r));
+            this.bamDirs.put(s, addInput(new OutputFile(bamDirectory.get(), s)));
             this.outputDirs.put(s, addOutput(s));
         });
     }
@@ -44,7 +46,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
                             "-r", r.getAbsolutePath(),
                             "-g", chromosomeSizes.getParent(),
                             "-m", constructedModel.getAbsolutePath(),
-                            "-b", bamDirectory.get().getAbsolutePath(),
+                            "-b", bamDirs.get(s).getAbsolutePath(),
                             "-o", outputDirs.get(s).getAbsolutePath());
                     executeAndWait(ehmmCommand, false);
                     return true;
