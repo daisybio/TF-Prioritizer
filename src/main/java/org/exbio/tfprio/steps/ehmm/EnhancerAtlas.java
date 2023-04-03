@@ -80,16 +80,18 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                     }
                     if (!isSameGenome) {
                         logger.info("uplifting enhancer bed file {}", bedFile);
+                        File liftedBed = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "lifted.bed");
                         try {
                             executeAndWait("python3 " + script + " " +
                                     String.join(" ",
                                             bedFile.getAbsolutePath(),
-                                            bedFile.getAbsolutePath(),
+                                            liftedBed.getAbsolutePath(),
                                             enhancerVersion,
                                             genome.get(), "0", "1", "2"), true);
                         } catch (IOException e) {
                             throw new RuntimeException("Failed to uplift bed file: " + bedFile + "\ninternal error:\n" + e);
                         }
+                        bedFile = liftedBed;
                     }
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(tissueFile)+".bam");
                     String cmd = String.join(" ",
