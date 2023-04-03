@@ -137,19 +137,38 @@ public class GetChipData extends ExecutableStep<Configs> {
                     }
                     // replace complex bed with simplified version
                     Files.move(simpleBed.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    String base = FilenameUtils.getBaseName(bedFile.getPath());
                     // create associated bam file
-                    OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath())+".bam");
-                    String cmd = String.join(" ",
+                    OutputFile bamFile = addOutput(bamDir, base +".bam");
+                    String bedToBam = String.join(" ",
                             "bedToBam",
                             "-i", bedFile.getAbsolutePath(),
                             "-g", chromosomeLengths.getAbsolutePath(),
-                            "|", "samtools", "sort", "-",
-                            ">", bamFile.getAbsolutePath(),
-                            ";", "samtools", "index", bamFile.getAbsolutePath());
+                            ">", bamFile.getAbsolutePath());
                     try {
-                        executeAndWait(cmd, true);
+                        executeAndWait(bedToBam, false);
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to convert bed to bam:\n" + e.getMessage());
+                    }
+                    // sorted bam file
+                    OutputFile sortedBamFile = addOutput(bamDir, base + ".sorted.bam");
+                    String sortBam = String.join(" ",
+                            "samtools", "sort", bamFile.getAbsolutePath(),
+                            ">", sortedBamFile.getAbsolutePath());
+                    // replace bam with sorted file
+                    Files.move(sortedBamFile.toPath(), bamFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    try {
+                        executeAndWait(sortBam, false);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to sort bam file:\n" + e.getMessage());
+                    }
+                    // index bam file
+                    String indexBam = String.join(" ",
+                            "samtools", "index", bamFile.getAbsolutePath());
+                    try {
+                        executeAndWait(indexBam, false);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to index bam file:\n" + e.getMessage());
                     }
                     // merge to one bed file
                     Files.write(Paths.get(outputFile.getAbsolutePath()),

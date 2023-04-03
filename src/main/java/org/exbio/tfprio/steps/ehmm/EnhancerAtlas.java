@@ -13,10 +13,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
@@ -69,7 +66,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                 // download beds, uplift to given genome version, create bam files, and merge bed to one
                 String enhancerVersion = enhancerVersionMap.get().get(genomeKey);
                 boolean isSameGenome = enhancerVersion.equalsIgnoreCase(genome.get());
-                bedLinks.forEach(bedLink -> {
+                bedLinks.forEach(bedLink -> add(() -> {
                     String tissueFile = bedLink.split("/")[1];
                     File bedFile = new File(bedDir, tissueFile);
                     logger.info("downloading file: {}", enhancerBaseURI.resolve(bedLink));
@@ -93,27 +90,45 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                         }
                         bedFile = liftedBed;
                     }
-                    OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(tissueFile)+".bam");
-                    String cmd = String.join(" ",
+                    String base = FilenameUtils.getBaseName(bedFile.getPath());
+                    // create associated bam file
+                    OutputFile bamFile = addOutput(bamDir, base +".bam");
+                    String bedToBam = String.join(" ",
                             "bedToBam",
                             "-i", bedFile.getAbsolutePath(),
                             "-g", chromosomeLengths.getAbsolutePath(),
-                            "|", "samtools", "sort", "-",
-                            ">", bamFile.getAbsolutePath(),
-                            ";", "samtools", "index", bamFile.getAbsolutePath());
+                            ">", bamFile.getAbsolutePath());
                     try {
-                        executeAndWait(cmd, true);
+                        executeAndWait(bedToBam, false);
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to convert bed to bam:\n" + e.getMessage());
                     }
+                    // sorted bam file
+                    OutputFile sortedBamFile = addOutput(bamDir, base + ".sorted.bam");
+                    String sortBam = String.join(" ",
+                            "samtools", "sort", bamFile.getAbsolutePath(),
+                            ">", sortedBamFile.getAbsolutePath());
+                    // replace bam with sorted file
+                    Files.move(sortedBamFile.toPath(), bamFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     try {
-                        Files.write(Paths.get(outputFile.getAbsolutePath()),
-                                (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
-                                StandardOpenOption.APPEND);
+                        executeAndWait(sortBam, false);
                     } catch (IOException e) {
-                        throw new RuntimeException("Failed to append to file " + bedFile.getAbsolutePath());
+                        throw new RuntimeException("Failed to sort bam file:\n" + e.getMessage());
                     }
-                });
+                    // index bam file
+                    String indexBam = String.join(" ",
+                            "samtools", "index", bamFile.getAbsolutePath());
+                    try {
+                        executeAndWait(indexBam, false);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to index bam file:\n" + e.getMessage());
+                    }
+                    // merge into one bed file
+                    Files.write(Paths.get(outputFile.getAbsolutePath()),
+                            (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
+                            StandardOpenOption.APPEND);
+                    return true;
+                }));
                 return true;
             });
         }};
