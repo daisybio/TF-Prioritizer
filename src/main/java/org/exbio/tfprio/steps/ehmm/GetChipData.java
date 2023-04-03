@@ -41,7 +41,6 @@ public class GetChipData extends ExecutableStep<Configs> {
         if (!this.seqType.equals("chip-seq")) {
             this.histoneModifications = Set.of("ALL");
         } else {
-            this.seqType = "histone";
             this.histoneModifications = peakFiles.values().stream().findFirst().orElseThrow().keySet();
         }
     }
