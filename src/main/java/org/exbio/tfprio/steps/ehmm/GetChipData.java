@@ -86,7 +86,7 @@ public class GetChipData extends ExecutableStep<Configs> {
             add(() -> {
                 logger.trace("Starting to read the ChipAtlas file list");
                 logger.debug("filtering for params: antigenClass: {}, tissues: {}, hms: {}", seqType, tissues, histoneModifications);
-                Stream<ChipListEntry> validEntries = Files.lines(Path.of(chipFileList.getAbsolutePath()))
+                Set<ChipListEntry> validEntries = Files.lines(Path.of(chipFileList.getAbsolutePath()))
                         .skip(1)
                         .map(ChipListEntry::new)
                         .filter(entry -> entry.genomeAssembly.equalsIgnoreCase(genomeVersion.get()))
@@ -94,8 +94,9 @@ public class GetChipData extends ExecutableStep<Configs> {
                         .filter(entry -> tissues.get().stream().
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
                         .filter(entry -> histoneModifications.stream()
-                                .anyMatch(hm -> hm.equalsIgnoreCase(entry.antigen)));
-                int nEntries = validEntries.collect(Collectors.toSet()).size();
+                                .anyMatch(hm -> hm.equalsIgnoreCase(entry.antigen)))
+                        .collect(Collectors.toSet());
+                int nEntries = validEntries.size();
                 if (nEntries > 0) {
                     logger.debug("Found {} matching bed files in ChipAtlas", nEntries);
                 } else {
