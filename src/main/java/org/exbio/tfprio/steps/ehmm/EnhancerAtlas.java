@@ -72,6 +72,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                 bedLinks.forEach(bedLink -> {
                     String tissueFile = bedLink.split("/")[1];
                     File bedFile = new File(bedDir, tissueFile);
+                    logger.debug("downloading file: {}", enhancerBaseURI.resolve(bedLink));
                     try{
                         IOUtils.copy(enhancerBaseURI.resolve(bedLink).toURL(), bedFile);
                     } catch (IOException e){
