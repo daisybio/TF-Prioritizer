@@ -147,7 +147,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                             ">", bamFile.getAbsolutePath(),
                             ";", "samtools", "index", bamFile.getAbsolutePath());
                     try {
-                        executeAndWait(cmd, false);
+                        executeAndWait(cmd, true);
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to convert bed to bam:\n" + e.getMessage());
                     }

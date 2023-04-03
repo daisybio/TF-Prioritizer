@@ -80,7 +80,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                     }
                     if (!isSameGenome) {
                         logger.info("uplifting enhancer bed file {}", bedFile);
-                        File liftedBed = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "lifted.bed");
+                        File liftedBed = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "_lifted.bed");
                         try {
                             executeAndWait("python3 " + script + " " +
                                     String.join(" ",
@@ -102,7 +102,7 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                             ">", bamFile.getAbsolutePath(),
                             ";", "samtools", "index", bamFile.getAbsolutePath());
                     try {
-                        executeAndWait(cmd, false);
+                        executeAndWait(cmd, true);
                     } catch (IOException e) {
                         throw new RuntimeException("Failed to convert bed to bam:\n" + e.getMessage());
                     }
