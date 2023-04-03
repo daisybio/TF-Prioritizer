@@ -63,7 +63,7 @@ public class GetChipData extends ExecutableStep<Configs> {
         public ChipListEntry(String line){
             String[] array = line.split(",");
             if (array.length != 9)
-                throw new RuntimeException("Incorrect number of fields supplied in ChipAtlas file list");
+                throw new RuntimeException("Incorrect number of fields supplied in ChipAtlas file line: " + line);
             this.fileName = array[0];
             this.genomeAssembly = array[1];
             this.antigenClass = this.chooseAntigenClass(array[2]);
