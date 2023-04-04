@@ -9,4 +9,3 @@ scipy==1.9.1
 cython
 setuptools<58.0
 RGT
-samtools

@@ -23,6 +23,7 @@ apt-get update && apt-get install -y \
   python3-pip \
   cmake \
   bedtools \
+  samtools \
   unzip \
   xvfb \
   wget \
@@ -39,8 +40,9 @@ chmod -R 777 $NPM_CACHE
 mkdir -p "$MPLCONFIGDIR"
 chmod -R 777 "$MPLCONFIGDIR"
 
-# RGTDATA=Cache directory for HINT
+# Install python packages, RGTDATA=Cache directory for HINT
 mkdir -p "$RGTDATA"
+python3 -m pip install -r "$DIRECTORY"/python_dependencies.txt
 chmod -R 777 "$RGTDATA"
 
 # Install R packages
