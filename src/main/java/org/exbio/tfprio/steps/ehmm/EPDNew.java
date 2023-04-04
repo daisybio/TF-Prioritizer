@@ -43,7 +43,7 @@ public class EPDNew extends ExecutableStep<Configs> {
                 String promoterBed = IOUtils.toString(downloadURI.toURL().openStream(), StandardCharsets.UTF_8);
                 Files.writeString(bedFile.toPath(), promoterBed
                         .replace(" ", "\t")
-                        .replace("^chr", ""));
+                        .replaceAll("^chr", ""));
                 String cmd = String.join(" ",
                         "bedToBam",
                         "-i", bedFile.getAbsolutePath(),
