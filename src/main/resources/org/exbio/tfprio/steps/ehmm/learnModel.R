@@ -7,9 +7,9 @@ args <- commandArgs(trailingOnly = T)
 parser <- arg_parser("EHMM command line parser", name = "ehmm")
 parser <- add_argument(parser, "-r", help = "Regions of interest")
 parser <- add_argument(parser, "-m", help = "Path to directory containing the bam files of the input data")
-parser <- add_argument(parser, "-n", help = "Number of states")
-parser <- add_argument(parser, "-b", help = "Number of bins", default = 10)
-parser <- add_argument(parser, "-t", help = "Number of threads", default = 1)
+parser <- add_argument(parser, "-n", help = "Number of states", type = "integer")
+parser <- add_argument(parser, "-b", help = "Number of bins", default = 10, type = "integer")
+parser <- add_argument(parser, "-t", help = "Number of threads", default = 1, type = "integer")
 parser <- add_argument(parser, "-p", help = "Pseudocount", default = 1)
 parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 
@@ -51,4 +51,4 @@ report(segments = viterbi_segments, model = segmentation$model,
        rdata = segmentation, outdir = argv$o)
 model <- segmentation$model
 cat("saving essential RData to file\n")
-save(counts, model, regions, file = file.path(argv$o), "model.RData")
+save(counts, model, regions, file = file.path(argv$o, "model.RData"))
