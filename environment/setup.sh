@@ -43,6 +43,8 @@ chmod -R 777 "$MPLCONFIGDIR"
 mkdir -p "$RGTDATA"
 python3 -m pip install -r "$DIRECTORY"/python_dependencies.txt
 chmod -R 777 "$RGTDATA"
+conda env create -n tfprio --quiet -f "$DIRECTORY"/python_dependencies.txt
+conda clean -a
 
 # Install R packages
 Rscript "$DIRECTORY"/setup.R
