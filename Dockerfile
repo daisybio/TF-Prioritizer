@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM continuumio/miniconda3
 
 LABEL org.opencontainers.image.source=https://github.com/biomedbigdata/TF-Prioritizer
 

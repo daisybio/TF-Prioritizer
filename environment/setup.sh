@@ -39,10 +39,10 @@ chmod -R 777 $NPM_CACHE
 mkdir -p "$MPLCONFIGDIR"
 chmod -R 777 "$MPLCONFIGDIR"
 
-# Install python packages, RGTDATA=Cache directory for HINT
+# RGTDATA=Cache directory for HINT
 mkdir -p "$RGTDATA"
-python3 -m pip install -r "$DIRECTORY"/python_dependencies.txt
 chmod -R 777 "$RGTDATA"
+# Install python packages
 conda env create -n tfprio --quiet -f "$DIRECTORY"/python_dependencies.txt
 conda clean -a
 
