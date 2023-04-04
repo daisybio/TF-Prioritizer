@@ -7,7 +7,7 @@ parser <- arg_parser("EHMM command line parser", name = "ehmm")
 parser <- add_argument(parser, "-b", help = "Background model RData")
 parser <- add_argument(parser, "-e", help = "Enhancer model RData")
 parser <- add_argument(parser, "-p", help = "Promoter model RData")
-parser <- add_argument(parser, "-t", help = "Number of threads", default = 1)
+parser <- add_argument(parser, "-t", help = "Number of threads", default = 1, type = "integer")
 parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 
 argv <- parse_args(parser, argv = args)
