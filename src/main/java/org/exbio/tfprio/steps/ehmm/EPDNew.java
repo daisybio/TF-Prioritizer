@@ -41,7 +41,9 @@ public class EPDNew extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 String promoterBed = IOUtils.toString(downloadURI.toURL().openStream(), StandardCharsets.UTF_8);
-                Files.writeString(bedFile.toPath(), promoterBed.replace(" ", "\t"));
+                Files.writeString(bedFile.toPath(), promoterBed
+                        .replace(" ", "\t")
+                        .replace("^chr", ""));
                 String cmd = String.join(" ",
                         "bedToBam",
                         "-i", bedFile.getAbsolutePath(),

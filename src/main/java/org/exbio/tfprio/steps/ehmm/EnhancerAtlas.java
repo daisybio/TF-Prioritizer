@@ -8,8 +8,7 @@ import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -92,6 +91,21 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                         }
                         bedFile = liftedBed;
                     }
+                    File checkChromosomes = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "_noChr.bed");
+                    // simplify aux data column from chipAtlas and remove chr prefix, causes errors in bam creation
+                    try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
+                         BufferedWriter bw = new BufferedWriter(new FileWriter(checkChromosomes))) {
+                        for (String line = br.readLine(); line != null; line = br.readLine()) {
+                            String base = line.startsWith("chr") ? line.substring("chr".length()) : line;
+                            bw.write(base);
+                            bw.newLine();
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Could not remove chr prefix from EnhancerAtlas bed file");
+                    }
+                    // replace bedFile
+                    Files.move(checkChromosomes.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    // create bam files
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
                     String cmd = String.join(" ",
                             "bedToBam",

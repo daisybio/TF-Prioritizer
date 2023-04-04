@@ -130,7 +130,8 @@ public class GetChipData extends ExecutableStep<Configs> {
                     try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
                          BufferedWriter bw = new BufferedWriter(new FileWriter(simpleBed))) {
                         for (String line = br.readLine(); line != null; line = br.readLine()) {
-                            bw.write(line.substring(line.indexOf(";")));
+                            String base = line.startsWith("chr") ? line.substring("chr".length()) : line;
+                            bw.write(base.substring(base.indexOf(";")));
                             bw.newLine();
                         }
                     } catch (IOException e) {
