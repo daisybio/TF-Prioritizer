@@ -45,79 +45,81 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            add(() -> {
-                // get HTML of enhancerAtlas download page
-                String enhancerHTMLString = IOUtils.toString(new URL(enhancerHTML).openStream(), StandardCharsets.UTF_8);
-                // search for links of organism, tissues, and groups
-                String genomeKey = genomeToKeyMap.get().get(genome.get());
-                Collection<String> searchKeys = tissues.get();
-                searchKeys.addAll(groups.get().keySet());
-                String tissueKeys = "(" + String.join("|", searchKeys) + ")";
-                Pattern p = Pattern.compile(".*(" + genomeKey + ".?" + tissueKeys + ".*\\.bed)'", Pattern.CASE_INSENSITIVE);
-                Matcher m = p.matcher(enhancerHTMLString);
-                List<String> bedLinks = new ArrayList<>();
-                // add links that match the given parameters
-                while(m.find()) bedLinks.add(m.group(1));
-                if (bedLinks.size()==0){
-                    throw new RuntimeException("No matching enhancers found in EnhancerAtlas for pattern: " + p
-                    + "(List of available cell lines can be found here: " + enhancerHTML + ")");
-                } else {
-                    logger.debug("Found {} matching files in EnhancerAtlas: {}", bedLinks.size(), bedLinks);
-                }
-                // download beds, uplift to given genome version, create bam files, and merge bed to one
-                String enhancerVersion = enhancerVersionMap.get().get(genomeKey);
-                boolean isSameGenome = enhancerVersion.equalsIgnoreCase(genome.get());
-                bedLinks.forEach(bedLink -> add(() -> {
-                    String tissueFile = bedLink.split("/")[1];
-                    File bedFile = new File(bedDir, tissueFile);
-                    logger.debug("downloading file: {}", enhancerBaseURI.resolve(bedLink));
-                    IOUtils.copy(enhancerBaseURI.resolve(bedLink).toURL(), bedFile);
-                    if (!isSameGenome) {
-                        logger.debug("uplifting enhancer bed file {}", bedFile);
-                        File liftedBed = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "_lifted.bed");
-                        try {
-                            executeAndWait("python3 " + script + " " +
-                                    String.join(" ",
-                                            bedFile.getAbsolutePath(),
-                                            liftedBed.getAbsolutePath(),
-                                            enhancerVersion,
-                                            genome.get(), "0", "1", "2"), true);
-                        } catch (IOException e) {
-                            throw new RuntimeException("Failed to uplift bed file: " + bedFile + "\ninternal error:\n" + e);
-                        }
-                        bedFile = liftedBed;
-                    }
-                    File checkChromosomes = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "_noChr.bed");
-                    // simplify aux data column from chipAtlas and remove chr prefix, causes errors in bam creation
-                    try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
-                         BufferedWriter bw = new BufferedWriter(new FileWriter(checkChromosomes))) {
-                        for (String line = br.readLine(); line != null; line = br.readLine()) {
-                            String base = line.startsWith("chr") ? line.substring("chr".length()) : line;
-                            bw.write(base);
-                            bw.newLine();
-                        }
+            // get HTML of enhancerAtlas download page
+            String enhancerHTMLString;
+            try {
+                enhancerHTMLString = IOUtils.toString(new URL(enhancerHTML).openStream(), StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to fetch EnhancerAtlas download page");
+            }
+            // search for links of organism, tissues, and groups
+            String genomeKey = genomeToKeyMap.get().get(genome.get());
+            Collection<String> searchKeys = tissues.get();
+            searchKeys.addAll(groups.get().keySet());
+            String tissueKeys = "(" + String.join("|", searchKeys) + ")";
+            Pattern p = Pattern.compile(".*(" + genomeKey + ".?" + tissueKeys + ".*\\.bed)'", Pattern.CASE_INSENSITIVE);
+            Matcher m = p.matcher(enhancerHTMLString);
+            List<String> bedLinks = new ArrayList<>();
+            // add links that match the given parameters
+            while(m.find()) bedLinks.add(m.group(1));
+            if (bedLinks.size()==0){
+                throw new RuntimeException("No matching enhancers found in EnhancerAtlas for pattern: " + p
+                + "(List of available cell lines can be found here: " + enhancerHTML + ")");
+            } else {
+                logger.debug("Found {} matching files in EnhancerAtlas: {}", bedLinks.size(), bedLinks);
+            }
+            // download beds, uplift to given genome version, create bam files, and merge bed to one
+            String enhancerVersion = enhancerVersionMap.get().get(genomeKey);
+            boolean isSameGenome = enhancerVersion.equalsIgnoreCase(genome.get());
+            bedLinks.forEach(bedLink -> add(() -> {
+                String tissueFile = bedLink.split("/")[1];
+                File bedFile = new File(bedDir, tissueFile);
+                logger.debug("downloading file: {}", enhancerBaseURI.resolve(bedLink));
+                IOUtils.copy(enhancerBaseURI.resolve(bedLink).toURL(), bedFile);
+                if (!isSameGenome) {
+                    logger.debug("uplifting enhancer bed file {}", bedFile);
+                    File liftedBed = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "_lifted.bed");
+                    try {
+                        executeAndWait("python3 " + script + " " +
+                                String.join(" ",
+                                        bedFile.getAbsolutePath(),
+                                        liftedBed.getAbsolutePath(),
+                                        enhancerVersion,
+                                        genome.get(), "0", "1", "2"), true);
                     } catch (IOException e) {
-                        throw new RuntimeException("Could not remove chr prefix from EnhancerAtlas bed file");
+                        throw new RuntimeException("Failed to uplift bed file: " + bedFile + "\ninternal error:\n" + e);
                     }
-                    // replace bedFile
-                    Files.move(checkChromosomes.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    // create bam files
-                    OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
-                    String cmd = String.join(" ",
-                            "bedToBam",
-                            "-i", bedFile.getAbsolutePath(),
-                            "-g", chromosomeLengths.getAbsolutePath(),
-                            "|", "samtools", "sort", "-",
-                            ">", bamFile.getAbsolutePath(),
-                            ";", "samtools", "index", bamFile.getAbsolutePath());
-                    executeAndWait(List.of("/bin/sh", "-c", cmd), false);
-                    Files.write(Paths.get(outputFile.getAbsolutePath()),
-                            (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
-                            StandardOpenOption.APPEND);
-                    return true;
-                }));
+                    bedFile = liftedBed;
+                }
+                File checkChromosomes = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "_noChr.bed");
+                // simplify aux data column from chipAtlas and remove chr prefix, causes errors in bam creation
+                try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
+                     BufferedWriter bw = new BufferedWriter(new FileWriter(checkChromosomes))) {
+                    for (String line = br.readLine(); line != null; line = br.readLine()) {
+                        String base = line.startsWith("chr") ? line.substring("chr".length()) : line;
+                        bw.write(base);
+                        bw.newLine();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("Could not remove chr prefix from EnhancerAtlas bed file");
+                }
+                // replace bedFile
+                Files.move(checkChromosomes.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                // create bam files
+                OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
+                String cmd = String.join(" ",
+                        "bedToBam",
+                        "-i", bedFile.getAbsolutePath(),
+                        "-g", chromosomeLengths.getAbsolutePath(),
+                        "|", "samtools", "sort", "-",
+                        ">", bamFile.getAbsolutePath(),
+                        ";", "samtools", "index", bamFile.getAbsolutePath());
+                executeAndWait(List.of("/bin/sh", "-c", cmd), false);
+                Files.write(Paths.get(outputFile.getAbsolutePath()),
+                        (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
+                        StandardOpenOption.APPEND);
                 return true;
-            });
+            }));
         }};
     }
 }

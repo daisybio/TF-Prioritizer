@@ -102,7 +102,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                 } else {
                     throw new RuntimeException("No matching bed files found in ChipAtlas for given filters");
                 }
-                validEntries.forEach(entry -> add(() -> {
+                validEntries.forEach(entry -> {
                     File bedFile = addOutput(bedDir, entry.name());
                     int attempt = 1;
                     while (!bedFile.exists()) {
@@ -118,7 +118,6 @@ public class GetChipData extends ExecutableStep<Configs> {
                                 throw new IOException("File too small");
                             }
                         } catch (IOException e) {
-                            deleteFileStructure(bedFile);
                             attempt++;
                             if (attempt > 3) {
                                 throw new RuntimeException("Could not download file " + entry.fileUrl);
@@ -138,7 +137,12 @@ public class GetChipData extends ExecutableStep<Configs> {
                         throw new RuntimeException("ChipAtlas bed file does not exist or cannot be opened.");
                     }
                     // replace complex bed with simplified version
-                    Files.move(simpleBed.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    try {
+                        Files.move(simpleBed.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to replace " + bedFile.getAbsolutePath() +
+                                " with " + simpleBed.getAbsolutePath());
+                    }
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
                     String cmd = String.join(" ",
                             "bedToBam",
@@ -147,12 +151,19 @@ public class GetChipData extends ExecutableStep<Configs> {
                             "|", "samtools", "sort", "-",
                             ">", bamFile.getAbsolutePath(),
                             ";", "samtools", "index", bamFile.getAbsolutePath());
-                    executeAndWait(List.of("/bin/sh", "-c", cmd), false);
-                    Files.write(Paths.get(outputFile.getAbsolutePath()),
-                            (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
-                            StandardOpenOption.APPEND);
-                    return true;
-                }));
+                    try {
+                        executeAndWait(List.of("/bin/sh", "-c", cmd), false);
+                    } catch (IOException e) {
+                        throw new RuntimeException("BedToBam creation failed");
+                    }
+                    try {
+                        Files.write(Paths.get(outputFile.getAbsolutePath()),
+                                (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
+                                StandardOpenOption.APPEND);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Appending to merged bed file failed");
+                    }
+                });
                 return true;
             });
         }};
