@@ -42,9 +42,6 @@ chmod -R 777 "$MPLCONFIGDIR"
 # RGTDATA=Cache directory for HINT
 mkdir -p "$RGTDATA"
 chmod -R 777 "$RGTDATA"
-# Install python packages
-conda env create -n tfprio --quiet -f "$DIRECTORY"/python_dependencies.txt
-conda clean -a
 
 # Install R packages
 Rscript "$DIRECTORY"/setup.R
