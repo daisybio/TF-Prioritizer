@@ -7,11 +7,11 @@ ENV IGV=/srv/dependencies/igv
 ENV IGV_CACHE=/srv/dependencies/igv_cache
 ENV RGTDATA=/srv/dependencies/rgtdata
 ENV MPLCONFIGDIR=/srv/dependencies/matplotlib
-# Install python packages
-RUN conda env create -n tfprio --quiet -f "$DIRECTORY"/python_dependencies.txt && conda clean -a
-ENV PATH /opt/conda/envs/tfprio/bin:$PATH
 
 COPY environment /srv/environment
+# Install python packages with conda
+RUN conda create -n tfprio --quiet -f /srv/environment/python_dependencies.txt && conda clean -a
+ENV PATH /opt/conda/envs/tfprio/bin:$PATH
 RUN chmod u+x /srv/environment/setup.sh && ./srv/environment/setup.sh
 RUN mkdir -p "/srv/temp" && chmod -R 777 "/srv/temp"
 
