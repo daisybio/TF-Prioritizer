@@ -91,14 +91,14 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                         bedFile = liftedBed;
                     }
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
-                    String cmd = String.join(" ", "/bin/sh", "-c",
+                    String cmd = String.join(" ",
                             "bedToBam",
                             "-i", bedFile.getAbsolutePath(),
                             "-g", chromosomeLengths.getAbsolutePath(),
                             "|", "samtools", "sort", "-",
                             ">", bamFile.getAbsolutePath(),
                             ";", "samtools", "index", bamFile.getAbsolutePath());
-                    executeAndWait(cmd, false);
+                    executeAndWait(List.of("/bin/sh", "-c", cmd), false);
                     Files.write(Paths.get(outputFile.getAbsolutePath()),
                             (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
                             StandardOpenOption.APPEND);

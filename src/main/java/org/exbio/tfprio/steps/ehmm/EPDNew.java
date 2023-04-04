@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -40,14 +41,14 @@ public class EPDNew extends ExecutableStep<Configs> {
             add(() -> {
                 String promoterBed = IOUtils.toString(downloadURI.toURL().openStream(), StandardCharsets.UTF_8);
                 Files.writeString(bedFile.toPath(), promoterBed.replace(" ", "\t"));
-                String cmd = String.join(" ", "/bin/sh", "-c",
+                String cmd = String.join(" ",
                         "bedToBam",
                         "-i", bedFile.getAbsolutePath(),
                         "-g", chromosomeLengths.getAbsolutePath(),
                         "|", "samtools", "sort", "-",
                         ">", bamFile.getAbsolutePath(),
                         ";", "samtools", "index", bamFile.getAbsolutePath());
-                executeAndWait(cmd, false);
+                executeAndWait(List.of("/bin/sh", "-c", cmd), false);
                 return true;
             });
         }};
