@@ -14,5 +14,6 @@ RUN mkdir -p "/srv/temp" && chmod -R 777 "/srv/temp"
 
 COPY lib/ehmm-master /srv/dependencies/ehmm-master
 RUN R -e "install.packages('/srv/dependencies/ehmm-master/', repos = NULL, type = 'source')"
+RUN R -e "install.packages('argparser')"
 
 COPY bin/TF-Prioritizer.jar /srv/TF-Prioritizer.jar
