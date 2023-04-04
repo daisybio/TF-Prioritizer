@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 library("DESeq2")
-library("argparse")
+library("argparser")
 library("dplyr")
 
 parser <- ArgumentParser()
