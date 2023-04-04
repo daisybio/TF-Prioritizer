@@ -227,7 +227,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
                     enhancerAtlas.outputFile, enhancerAtlas.bamDir));
             // learn promoter model
             LearnPromoterModel learnPromoterModel = add(new LearnPromoterModel(configs,
-                    epdNew.bedFile, epdNew.bamFile));
+                    epdNew.bedFile, epdNew.bamFile, epdNew.baiFile));
             // combine models and construct final model to apply to input data
             ConstructModel constructModel = add(new ConstructModel(configs,
                     learnBackgroundModel.outputFile, learnEnhancerModel.outputFile, learnPromoterModel.outputFile));

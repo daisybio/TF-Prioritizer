@@ -16,6 +16,7 @@ public class LearnPromoterModel extends ExecutableStep<Configs> {
     private final OutputFile outputDir = addOutput("out");
     public final OutputFile outputFile = addOutput(outputDir,"model.RData");
     private final InputFile bedFile;
+    private final InputFile baiFile;
     private final InputFile bamFile;
 
     private final RequiredConfig<Integer> nStates = new RequiredConfig<>(configs.ehmm.nStates);
@@ -23,10 +24,11 @@ public class LearnPromoterModel extends ExecutableStep<Configs> {
     private final RequiredConfig<Integer> nBins = new RequiredConfig<>(configs.ehmm.nBins);
     private final InputFile learnModelRscript;
 
-    public LearnPromoterModel(Configs configs, OutputFile bedFile, OutputFile bamFile){
+    public LearnPromoterModel(Configs configs, OutputFile bedFile, OutputFile bamFile, OutputFile baiFile){
         super(configs, false, bedFile, bamFile);
         this.bedFile = addInput(bedFile);
         this.bamFile = addInput(bamFile);
+        this.baiFile = addInput(baiFile);
         this.learnModelRscript = addInput(getClass().getResourceAsStream("learnModel.R"), "learnModel.R");
     }
 

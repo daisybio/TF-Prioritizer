@@ -21,6 +21,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 public class EPDNew extends ExecutableStep<Configs> {
     public final OutputFile bedFile = addOutput("promoters.bed");
     public final OutputFile bamFile = addOutput("promoters.bam");
+    public final OutputFile baiFile = addOutput("promoters.bam.bai");
     private final InputFile chromosomeLengths;
     private final URI downloadURI;
 
