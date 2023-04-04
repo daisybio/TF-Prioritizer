@@ -62,6 +62,8 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                 if (bedLinks.size()==0){
                     throw new RuntimeException("No matching enhancers found in EnhancerAtlas for pattern: " + p
                     + "(List of available cell lines can be found here: " + enhancerHTML + ")");
+                } else {
+                    logger.debug("Found {} matching files in EnhancerAtlas: {}", bedLinks.size(), bedLinks);
                 }
                 // download beds, uplift to given genome version, create bam files, and merge bed to one
                 String enhancerVersion = enhancerVersionMap.get().get(genomeKey);

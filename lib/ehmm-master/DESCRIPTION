@@ -1,0 +1,42 @@
+Package: ehmm
+Type: Package
+Title: Enhancer prediction using a supervised hidden Markov model in R
+Version: 1.0
+Date: 2019-04-02
+Author: Tobias Zehnder
+Maintainer: Tobias Zehnder <zehnder@molgen.mpg.de>
+Description: eHMM (enhancer Hidden Markov Model) is a software for
+	genome-wide enhancer prediction based on the state of the chromatin.
+	It uses an updated framework of EpiCSeg (Mammana et al., 2015) which provides
+    tools for extracting count data from BAM files, typlically corresponding
+    to ChIP-seq experiments for histone marks (but other choices are possible)
+    learns a statistical model for the read counts based on a HMM, and provides
+	tools for displaying and analyzing the obtained models and segmentations.
+	eHMM learns an unsupervised background model as well as two foreground models
+	based on training sets for enhancers and promoters, thereby distinguishing
+	between the two. eHMM can also be used with pretrained models.
+	eHMM can be used as an R package or from the command line via Rscript.
+License: GPL-3
+SystemRequirements: C++11
+Depends:
+    R (>= 3.1.0)
+Imports:
+    methods,
+    parallel,
+    RColorBrewer,
+    Rcpp (>= 0.11.3),
+    S4Vectors,
+    IRanges,
+    GenomicRanges,
+    bamsignals,
+    edgeR,
+	rtracklayer,
+	Rsamtools,
+	Matrix,
+	GenomeInfoDb,
+	affyPLM
+LinkingTo: Rcpp
+Suggests:
+    testthat,
+    knitr
+RoxygenNote: 6.0.1
