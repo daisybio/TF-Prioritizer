@@ -70,14 +70,10 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                 bedLinks.forEach(bedLink -> add(() -> {
                     String tissueFile = bedLink.split("/")[1];
                     File bedFile = new File(bedDir, tissueFile);
-                    logger.info("downloading file: {}", enhancerBaseURI.resolve(bedLink));
-                    try{
-                        IOUtils.copy(enhancerBaseURI.resolve(bedLink).toURL(), bedFile);
-                    } catch (IOException e){
-                        throw new RuntimeException("Could not download file " + enhancerBaseURI + "/" + bedLink);
-                    }
+                    logger.debug("downloading file: {}", enhancerBaseURI.resolve(bedLink));
+                    IOUtils.copy(enhancerBaseURI.resolve(bedLink).toURL(), bedFile);
                     if (!isSameGenome) {
-                        logger.info("uplifting enhancer bed file {}", bedFile);
+                        logger.debug("uplifting enhancer bed file {}", bedFile);
                         File liftedBed = new File(bedDir, FilenameUtils.getBaseName(tissueFile) + "_lifted.bed");
                         try {
                             executeAndWait("python3 " + script + " " +
