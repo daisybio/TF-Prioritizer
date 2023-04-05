@@ -57,7 +57,9 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
             Collection<String> searchKeys = tissues.get();
             searchKeys.addAll(groups.get().keySet());
             String tissueKeys = "(" + String.join("|", searchKeys) + ")";
-            Pattern p = Pattern.compile("href.*" + "(" + genomeKey + ".?" + tissueKeys + ".*\\.bed).*onclick", Pattern.CASE_INSENSITIVE);
+            Pattern p = Pattern.compile("href=.?data.?download.?enhancer.?" +
+                            "(" + genomeKey + ".?" + tissueKeys + ".*\\.bed).*onclick",
+                    Pattern.CASE_INSENSITIVE);
             Matcher m = p.matcher(enhancerHTMLString);
             List<String> bedLinks = new ArrayList<>();
             // add links that match the given parameters
