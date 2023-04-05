@@ -21,7 +21,7 @@ parser <- add_argument(parser, "-m", help = "Path to directory containing the ba
 parser <- add_argument(parser, "-n", help = "Number of states", type = "integer")
 parser <- add_argument(parser, "-b", help = "Number of bins", default = 1, type = "integer")
 parser <- add_argument(parser, "-t", help = "Number of threads", default = 1, type = "integer")
-parser <- add_argument(parser, "-p", help = "Pseudocount", default = 1)
+parser <- add_argument(parser, "-p", help = "Pseudocount", default = 1.0, type = "double")
 parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 
 argv <- parse_args(parser, argv = args)
@@ -46,7 +46,7 @@ counts <- getcounts(regions, bamtab, binsize = binsize,
 
 cat("learning model\n")
 segmentation <- segment(counts = counts, regions = regions, 
-                        nstates = nstates, nthreads = nthreads, verbose_kfoots = TRUE, 
+                        nstates = nstates, nthreads = nthreads, verbose_kfoots = T,
                         nbtype = "lognormal")
 cat("producing report\n")
 viterbi_segments <- statesToSegments(segmentation$viterbi, 
