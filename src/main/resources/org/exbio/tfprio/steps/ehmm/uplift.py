@@ -17,7 +17,7 @@ def convert(converter, chromosome, start, end, strand=None):
     if len(first) == 0 or len(second) == 0:
         return None, None
 
-    if first[0][1] - str(second[0][1] > 0:
+    if first[0][1] - second[0][1] > 0:
         return None, None
 
     return str(first[0][1]), str(second[0][1])
