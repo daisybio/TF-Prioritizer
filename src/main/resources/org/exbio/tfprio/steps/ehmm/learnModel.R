@@ -3,12 +3,23 @@ library(rtracklayer)
 library(argparser)
 library(tools)
 
+statesToSegments_helper <- function (regions, states) {
+  .Call("_ehmm_statesToSegments_helper", PACKAGE = "ehmm",
+        regions, states)
+}
+
+statesToSegments <- function (states, regions) {
+  h <- statesToSegments_helper(regions, states)
+  GRanges(seqnames = h$chrs, IRanges(start = h$starts, end = h$ends,
+                                     names = h$states))
+}
+
 args <- commandArgs(trailingOnly = T)
 parser <- arg_parser("EHMM command line parser", name = "ehmm")
 parser <- add_argument(parser, "-r", help = "Regions of interest")
 parser <- add_argument(parser, "-m", help = "Path to directory containing the bam files of the input data")
 parser <- add_argument(parser, "-n", help = "Number of states", type = "integer")
-parser <- add_argument(parser, "-b", help = "Number of bins", default = 10, type = "integer")
+parser <- add_argument(parser, "-b", help = "Number of bins", default = 1, type = "integer")
 parser <- add_argument(parser, "-t", help = "Number of threads", default = 1, type = "integer")
 parser <- add_argument(parser, "-p", help = "Pseudocount", default = 1)
 parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
@@ -16,6 +27,10 @@ parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 argv <- parse_args(parser, argv = args)
 
 regions <- import(argv$r, format = "bed")
+# remove scaffold chromosomes
+regions <- regions[!grepl("_", regions@seqnames)]
+# change M to MT
+regions@seqnames@values <- as.factor(gsub("M", "MT", regions@seqnames@values))
 bamfiles <- list.files(path = argv$m, pattern = "*.bam$", full.names = T)
 marks <- sapply(strsplit(file_path_sans_ext(basename(bamfiles)), "_"), "[", 1)
 bamtab <- data.frame(mark = marks, path = bamfiles, check.names = F)
@@ -23,17 +38,6 @@ nstates = argv$n
 binsize = argv$b
 nthreads = argv$t
 pseudocount = argv$p
-
-statesToSegments_helper <- function (regions, states) {
-  .Call("_ehmm_statesToSegments_helper", PACKAGE = "ehmm", 
-        regions, states)
-}
-
-statesToSegments <- function (states, regions) {
-  h <- statesToSegments_helper(regions, states)
-  GRanges(seqnames = h$chrs, IRanges(start = h$starts, end = h$ends, 
-                                     names = h$states))
-}
 
 bamtab$shift <- sapply(tolower(bamtab$mark), function(m) ifelse(any(sapply(c("atac", "dhs", "dnase", "acc"), 
                                                                            function(s) grepl(s, m))), 0, 75))
