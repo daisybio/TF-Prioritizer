@@ -38,7 +38,7 @@ statesToSegments <- function (states, regions) {
 bamtab$shift <- sapply(tolower(bamtab$mark), function(m) ifelse(any(sapply(c("atac", "dhs", "dnase", "acc"), 
                                                                            function(s) grepl(s, m))), 0, 75))
 counts <- getcounts(regions, bamtab, binsize = binsize, 
-                    nthreads = nthreads) + 1
+                    nthreads = nthreads) + pseudocount
 
 cat("learning model\n")
 segmentation <- segment(counts = counts, regions = regions, 
