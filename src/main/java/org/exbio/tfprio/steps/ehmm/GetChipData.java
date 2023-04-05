@@ -125,12 +125,20 @@ public class GetChipData extends ExecutableStep<Configs> {
                         }
                     }
                     OutputFile simpleBed = new OutputFile(bedDir, "tmp.bed");
-                    // simplify aux data column from chipAtlas, causes errors in bam creation
+                    // simplify data from chipAtlas, causes errors in bam creation
                     try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
                          BufferedWriter bw = new BufferedWriter(new FileWriter(simpleBed))) {
                         for (String line = br.readLine(); line != null; line = br.readLine()) {
-                            String base = line.startsWith("chr") ? line.substring("chr".length()) : line;
-                            bw.write(base.substring(base.indexOf(";")));
+                            String[] tsvData = line.split("\t");
+                            String chr = tsvData[0];
+                            String auxData = tsvData[3];
+                            // remove chr prefix
+                            if (chr.startsWith("chr")) chr = chr.substring("chr".length());
+                            // simplify aux data
+                            auxData = auxData.substring(0, auxData.indexOf(";"));
+                            tsvData[0] = chr;
+                            tsvData[3] = auxData;
+                            bw.write(String.join("\t", tsvData));
                             bw.newLine();
                         }
                     } catch (IOException e) {
