@@ -129,6 +129,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                     // simplify data from chipAtlas, causes errors in bam creation
                     try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
                          BufferedWriter bw = new BufferedWriter(new FileWriter(simpleBed))) {
+                        br.readLine();  // skip header
                         for (String line = br.readLine(); line != null; line = br.readLine()) {
                             String[] tsvData = line.split("\t");
                             String chr = tsvData[0];
