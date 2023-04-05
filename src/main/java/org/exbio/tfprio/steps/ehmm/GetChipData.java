@@ -124,6 +124,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                             }
                         }
                     }
+                    logger.trace("Simplifying ChipAtlas file {}", bedFile.getAbsolutePath());
                     OutputFile simpleBed = new OutputFile(bedDir, "tmp.bed");
                     // simplify data from chipAtlas, causes errors in bam creation
                     try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
@@ -151,6 +152,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                         throw new RuntimeException("Failed to replace " + bedFile.getAbsolutePath() +
                                 " with " + simpleBed.getAbsolutePath());
                     }
+                    logger.trace("Building associated bam file for {}", bedFile.getAbsolutePath());
                     OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
                     String cmd = String.join(" ",
                             "bedToBam",
