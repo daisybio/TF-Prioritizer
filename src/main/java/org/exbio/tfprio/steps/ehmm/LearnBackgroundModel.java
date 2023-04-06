@@ -119,7 +119,7 @@ public class LearnBackgroundModel extends ExecutableStep<Configs> {
                 // build background model
                 String ehmmCommand = String.join(" ","Rscript",
                         learnModelRscript.getAbsolutePath(),
-                        "-r", bedFile.getAbsolutePath(),
+                        "-r", filteredBedFile.getAbsolutePath(),
                         "-m", bamDir.getAbsolutePath(),
                         "-n", nStates.toString(),
                         "-b", nBins.toString(),
