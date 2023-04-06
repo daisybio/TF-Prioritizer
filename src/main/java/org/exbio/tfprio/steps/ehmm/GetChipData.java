@@ -93,6 +93,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
                         .filter(entry -> histoneModifications.stream()
                                 .anyMatch(hm -> hm.equalsIgnoreCase(entry.antigen)))
+                        .filter(entry -> Objects.equals(entry.threshold, "5"))
                         .collect(Collectors.toSet());
                 int nEntries = validEntries.size();
                 if (nEntries > 0) {
@@ -104,7 +105,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                     File bedFile = addOutput(bedDir, entry.name());
                     int attempt = 1;
                     while (!bedFile.exists()) {
-                        logger.debug("Attempt " + attempt + " to download chip atlas bed file: " + bedFile.getName());
+                        logger.debug("Downloading chip atlas bed file: " + bedFile.getName() + "(Attempt: " + attempt + ")");
                         try {
                             makeSureFileExists(bedFile);
                             IOUtils.copy(new URL(entry.fileUrl), bedFile);
