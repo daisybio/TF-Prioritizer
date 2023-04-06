@@ -79,7 +79,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
             MixMutuallyExclusive mixMutuallyExclusive = add(new MixMutuallyExclusive(configs, latestPeakFiles));
             latestPeakFiles = mixMutuallyExclusive.outputFiles;
         }
-
+        /*
         FilterEnsgs filterEnsgs = add(new FilterEnsgs(configs));
 
         Map<String, OutputFile> rawCounts;
@@ -195,8 +195,12 @@ public class TF_Prioritizer extends Workflow<Configs> {
         OutputFile chipAtlasDirectory = null;
         OutputFile coOccurrence = null;
         OutputFile confusionMatrixesDir = null;
+
+         */
         if (configs.chipAtlas.enabled.isSet() && configs.chipAtlas.enabled.get()) {
+
             GetList getList = add(new GetList(configs));
+            /*
             GetData getData = add(new GetData(configs, getList.outputFile, calculateDcgRank.outputFile));
             chipAtlasDirectory = getData.outputFile;
 
@@ -206,11 +210,14 @@ public class TF_Prioritizer extends Workflow<Configs> {
             // CoOccurrenceBindingEnergies coOccurrenceBindingEnergies =
             //        add(new CoOccurrenceBindingEnergies(configs, extractSequences.outputFiles,
             //                coOccurrenceAnalysis.merged));
+            */
             GetChromosomeLengths getChromosomeLengths = add(new GetChromosomeLengths(configs));
+            /*
             ConfusionMatrixes confusionMatrixes =
                     add(new ConfusionMatrixes(configs, getData.outputFile, getChromosomeLengths.outputFile,
                             createBindingRegionsBedFiles.outputFiles));
             confusionMatrixesDir = confusionMatrixes.outputFile;
+             */
 
             // ChipAtlas cell and genome specific background data
             GetChipData getChipData = add(new GetChipData(configs, getList.outputFile,
@@ -238,7 +245,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
             ApplyModel applyModel = add(new ApplyModel(configs,
                     collapsePeakFiles.outputFiles, getChromosomeLengths.outputFile, constructModel.outputFile));
         }
-
+        /*
         DistributionTargetGenes distributionTargetGenes =
                 add(new DistributionTargetGenes(configs, ensgSymbol.outputFile, fetchGeneInfo.outputFile,
                         calculateDcgRank.outputFile, chipAtlasDirectory, daTopKTargetGenes.outputFiles, tepicFiles,
@@ -268,5 +275,6 @@ public class TF_Prioritizer extends Workflow<Configs> {
 
         ReportCreation reportCreation = add(new ReportCreation(configs, reportPreprocessing.outputFile));
         ReportCompression reportCompression = add(new ReportCompression(configs, reportCreation.outputFile));
+         */
     }
 }

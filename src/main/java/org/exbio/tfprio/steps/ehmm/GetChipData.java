@@ -14,9 +14,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static org.exbio.pipejar.util.FileManagement.deleteFileStructure;
 import static org.exbio.pipejar.util.FileManagement.makeSureFileExists;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
