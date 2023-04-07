@@ -1,4 +1,4 @@
-process BATCH_NORMALIZATION {
+process COUNT_PREPROCESSING {
     label "process_medium"
 
     // (Bio)conda packages have intentionally not been pinned to a specific version
@@ -13,10 +13,10 @@ process BATCH_NORMALIZATION {
     path samplesheet
 
     output:
-    path "normalized.tsv"
+    path "preprocessed.tsv"
 
     script:
     """
-    deseq_normalize.R --metadata $samplesheet --input $counts --output normalized.tsv
+    preprocess_counts.R --metadata $samplesheet --input $counts --output preprocessed.tsv
     """
 }

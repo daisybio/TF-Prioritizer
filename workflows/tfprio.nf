@@ -46,7 +46,7 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 */
 
 include { RNASEQ } from '../subworkflows/local/rnaseq'
-include { BATCH_NORMALIZATION } from '../modules/local/batch_normalization'
+include { COUNT_PREPROCESSING } from '../modules/local/count_preprocessing'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -59,7 +59,7 @@ workflow TFPRIO {
         ch_count = RNASEQ.out.counts
     }
 
-    BATCH_NORMALIZATION (ch_count, ch_input)
+    COUNT_PREPROCESSING (ch_count, ch_input)
 }
 
 /*
