@@ -43,7 +43,7 @@ WorkflowMain.initialise(workflow, params, log)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RNASEQ } from '../subworkflows/nf-core/rnaseq/workflows/rnaseq.nf'
+include { RNASEQ } from '../subworkflows/local/rnaseq.nf'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
