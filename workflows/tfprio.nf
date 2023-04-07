@@ -37,13 +37,16 @@ params.salmon_index     = WorkflowMain.getGenomeAttribute(params, 'salmon')
 
 WorkflowMain.initialise(workflow, params, log)
 
+if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOW FOR PIPELINE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RNASEQ } from '../subworkflows/local/rnaseq.nf'
+include { RNASEQ } from '../subworkflows/local/rnaseq'
+include { BATCH_NORMALIZATION } from '../modules/local/batch_normalization'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -51,11 +54,10 @@ include { RNASEQ } from '../subworkflows/local/rnaseq.nf'
 workflow TFPRIO {
     RNASEQ ()
 
-    ch_tpm = RNASEQ.out.tpm
     ch_count = RNASEQ.out.counts
-
-    ch_tpm.view()
     ch_count.view()
+
+    BATCH_NORMALIZATION (ch_count, ch_input)
 }
 
 /*

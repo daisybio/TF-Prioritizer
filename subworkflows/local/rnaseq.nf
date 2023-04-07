@@ -159,8 +159,9 @@ def pass_trimmed_reads = [:]
 def pass_strand_check  = [:]
 
 workflow RNASEQ {
-
+    main:
     ch_versions = Channel.empty()
+    ch_gene_counts                = Channel.empty()
 
     //
     // SUBWORKFLOW: Uncompress and prepare reference genome files
@@ -384,6 +385,7 @@ workflow RNASEQ {
     ch_star_multiqc               = Channel.empty()
     ch_aligner_pca_multiqc        = Channel.empty()
     ch_aligner_clustering_multiqc = Channel.empty()
+
     if (!params.skip_alignment && params.aligner == 'star_salmon') {
         ALIGN_STAR (
             ch_filtered_reads,
@@ -483,6 +485,7 @@ workflow RNASEQ {
             params.salmon_quant_libtype ?: ''
         )
         ch_versions = ch_versions.mix(QUANTIFY_STAR_SALMON.out.versions)
+        ch_gene_counts = QUANTIFY_STAR_SALMON.out.counts_gene_length_scaled
 
         if (!params.skip_qc & !params.skip_deseq2_qc) {
             DESEQ2_QC_STAR_SALMON (
@@ -512,6 +515,8 @@ workflow RNASEQ {
         ch_samtools_idxstats = QUANTIFY_RSEM.out.idxstats
         ch_star_multiqc      = QUANTIFY_RSEM.out.logs
         ch_rsem_multiqc      = QUANTIFY_RSEM.out.stat
+        ch_gene_counts       = QUANTIFY_RSEM.out.merged_counts_gene
+
         if (params.bam_csi_index) {
             ch_genome_bam_index = QUANTIFY_RSEM.out.csi
         }
@@ -797,8 +802,6 @@ workflow RNASEQ {
     ch_salmon_multiqc                   = Channel.empty()
     ch_pseudoaligner_pca_multiqc        = Channel.empty()
     ch_pseudoaligner_clustering_multiqc = Channel.empty()
-    ch_gene_tpm                         = Channel.empty()
-    ch_gene_counts                      = Channel.empty()
 
     if (params.pseudo_aligner == 'salmon') {
         QUANTIFY_SALMON (
@@ -811,8 +814,6 @@ workflow RNASEQ {
         )
         ch_salmon_multiqc = QUANTIFY_SALMON.out.results
         ch_versions = ch_versions.mix(QUANTIFY_SALMON.out.versions)
-        ch_gene_tpm = QUANTIFY_SALMON.out.tpm_gene
-        ch_gene_counts = QUANTIFY_SALMON.out.counts_gene
 
         if (!params.skip_qc & !params.skip_deseq2_qc) {
             DESEQ2_QC_SALMON (
@@ -886,8 +887,7 @@ workflow RNASEQ {
     }
 
     emit:
-        tpm = ch_gene_tpm
-        counts = ch_gene_counts
+    counts = ch_gene_counts
 }
 
 /*
