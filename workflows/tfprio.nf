@@ -52,10 +52,12 @@ include { BATCH_NORMALIZATION } from '../modules/local/batch_normalization'
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
 //
 workflow TFPRIO {
-    RNASEQ ()
-
-    ch_count = RNASEQ.out.counts
-    ch_count.view()
+    if (params.counts) {
+        ch_count = file(params.counts)
+    } else {
+        RNASEQ ()
+        ch_count = RNASEQ.out.counts
+    }
 
     BATCH_NORMALIZATION (ch_count, ch_input)
 }
