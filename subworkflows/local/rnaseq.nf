@@ -797,6 +797,9 @@ workflow RNASEQ {
     ch_salmon_multiqc                   = Channel.empty()
     ch_pseudoaligner_pca_multiqc        = Channel.empty()
     ch_pseudoaligner_clustering_multiqc = Channel.empty()
+    ch_gene_tpm                         = Channel.empty()
+    ch_gene_counts                      = Channel.empty()
+
     if (params.pseudo_aligner == 'salmon') {
         QUANTIFY_SALMON (
             ch_filtered_reads,
@@ -808,6 +811,8 @@ workflow RNASEQ {
         )
         ch_salmon_multiqc = QUANTIFY_SALMON.out.results
         ch_versions = ch_versions.mix(QUANTIFY_SALMON.out.versions)
+        ch_gene_tpm = QUANTIFY_SALMON.out.tpm_gene
+        ch_gene_counts = QUANTIFY_SALMON.out.counts_gene
 
         if (!params.skip_qc & !params.skip_deseq2_qc) {
             DESEQ2_QC_SALMON (
@@ -879,6 +884,10 @@ workflow RNASEQ {
         )
         multiqc_report = MULTIQC.out.report.toList()
     }
+
+    emit:
+        tpm = ch_gene_tpm
+        counts = ch_gene_counts
 }
 
 /*

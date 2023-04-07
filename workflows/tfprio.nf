@@ -50,6 +50,12 @@ include { RNASEQ } from '../subworkflows/local/rnaseq.nf'
 //
 workflow TFPRIO {
     RNASEQ ()
+
+    ch_tpm = RNASEQ.out.tpm
+    ch_count = RNASEQ.out.counts
+
+    ch_tpm.view()
+    ch_count.view()
 }
 
 /*
@@ -63,7 +69,7 @@ workflow TFPRIO {
 // See: https://github.com/nf-core/rnaseq/issues/619
 //
 workflow {
-    NFCORE_RNASEQ ()
+    TFPRIO ()
 }
 
 /*

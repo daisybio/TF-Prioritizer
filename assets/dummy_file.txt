@@ -1,1 +1,0 @@
-../subworkflows/nf-core/rnaseq/assets/dummy_file.txt
