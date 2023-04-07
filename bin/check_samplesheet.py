@@ -1,1 +1,0 @@
-../subworkflows/nf-core/rnaseq/bin/check_samplesheet.py
