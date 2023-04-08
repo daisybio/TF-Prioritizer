@@ -105,7 +105,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                     File bedFile = addOutput(bedDir, entry.name());
                     int attempt = 1;
                     while (!bedFile.exists()) {
-                        logger.debug("Downloading chip atlas bed file: " + bedFile.getName() + "(Attempt: " + attempt + ")");
+                        logger.debug("Downloading chip atlas bed file: " + bedFile.getName() + " (Attempt: " + attempt + ")");
                         try {
                             makeSureFileExists(bedFile);
                             IOUtils.copy(new URL(entry.fileUrl), bedFile);
