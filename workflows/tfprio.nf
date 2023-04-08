@@ -46,7 +46,7 @@ if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = file(params.rnaseq_samp
 */
 
 include { RNASEQ } from '../subworkflows/local/rnaseq'
-// include { CHIPSEQ } from '../subworkflows/local/chipseq'
+include { CHIPSEQ } from '../subworkflows/local/chipseq'
 include { COUNT_PREPROCESSING } from '../modules/local/count_preprocessing'
 
 //

@@ -60,15 +60,8 @@ class WorkflowRnaseq {
             }
         }
 
-        if (!params.rnaseq_skip_alignment) {
-            if (!valid_params['aligners'].contains(params.rnaseq_aligner)) {
-                Nextflow.error("Invalid option: '${params.rnaseq_aligner}'. Valid options for '--aligner': ${valid_params['aligners'].join(', ')}.")
-            }
-        } else {
-            if (!params.rnaseq_pseudo_aligner) {
-                Nextflow.error("--skip_alignment specified without --pseudo_aligner...please specify e.g. --pseudo_aligner ${valid_params['pseudoaligners'][0]}.")
-            }
-            skipAlignmentWarn(log)
+        if (!valid_params['aligners'].contains(params.rnaseq_aligner)) {
+            Nextflow.error("Invalid option: '${params.rnaseq_aligner}'. Valid options for '--aligner': ${valid_params['aligners'].join(', ')}.")
         }
 
         if (params.rnaseq_pseudo_aligner) {
@@ -82,7 +75,7 @@ class WorkflowRnaseq {
         }
 
         // Checks when running --aligner star_rsem
-        if (!params.rnaseq_skip_alignment && params.rnaseq_aligner == 'star_rsem') {
+        if (params.rnaseq_aligner == 'star_rsem') {
             if (params.rnaseq_with_umi) {
                 rsemUmiError(log)
             }
@@ -92,7 +85,7 @@ class WorkflowRnaseq {
         }
 
         // Warn if --additional_fasta provided with aligner index
-        if (!params.rnaseq_skip_alignment && params.additional_fasta) {
+        if (params.additional_fasta) {
             def index = ''
             if (params.rnaseq_aligner == 'star_salmon' && params.star_index) {
                 index = 'star'

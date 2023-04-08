@@ -15,7 +15,7 @@ WorkflowChipseq.initialise(params, log, valid_params)
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [
-    params.input, params.multiqc_config,
+    params.chipseq_samplesheet, params.multiqc_config,
     params.fasta,
     params.gtf, params.gff, params.gene_bed,
     params.bwa_index, params.bowtie2_index, params.chromap_index, params.star_index,
@@ -25,7 +25,7 @@ def checkPathParamList = [
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+if (params.chipseq_samplesheet) { ch_input = file(params.chipseq_samplesheet) } else { exit 1, 'Input samplesheet not specified!' }
 
 // Save AWS IGenomes file containing annotation version
 def anno_readme = params.genomes[ params.genome ]?.readme
@@ -145,7 +145,7 @@ workflow CHIPSEQ {
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
     INPUT_CHECK (
-        file(params.input),
+        file(params.chipseq_samplesheet),
         params.chipseq_seq_center
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)

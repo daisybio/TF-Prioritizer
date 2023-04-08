@@ -34,9 +34,9 @@ class WorkflowChipseq {
             System.exit(1)
         }
 
-        if (params.rnaseq_aligner) {
-            if (!valid_params['aligners'].contains(params.rnaseq_aligner)) {
-                    log.error "Invalid option: '${params.rnaseq_aligner}'. Valid options for '--aligner': ${valid_params['aligners'].join(', ')}."
+        if (params.chipseq_aligner) {
+            if (!valid_params['aligners'].contains(params.chipseq_aligner)) {
+                    log.error "Invalid option: '${params.chipseq_aligner}'. Valid options for '--aligner': ${valid_params['aligners'].join(', ')}."
                     System.exit(1)
             }
         }
