@@ -393,7 +393,7 @@ workflow RNASEQ {
             PREPARE_GENOME.out.gtf,
             params.rnaseq_star_ignore_sjdbgtf,
             '',
-            params.rnaseq_seq_center ?: '',
+            params.seq_center ?: '',
             is_aws_igenome,
             PREPARE_GENOME.out.fasta
         )

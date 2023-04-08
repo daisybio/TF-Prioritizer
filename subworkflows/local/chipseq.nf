@@ -146,7 +146,7 @@ workflow CHIPSEQ {
     //
     INPUT_CHECK (
         file(params.chipseq_samplesheet),
-        params.chipseq_seq_center
+        params.seq_center
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
@@ -438,7 +438,7 @@ workflow CHIPSEQ {
     if (!params.macs_gsize) {
         KHMER_UNIQUEKMERS (
             PREPARE_GENOME.out.fasta,
-            params.read_length
+            params.chipseq_read_length
         )
         ch_macs_gsize = KHMER_UNIQUEKMERS.out.kmers.map { it.text.trim() }
     }

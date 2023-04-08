@@ -29,7 +29,7 @@ class WorkflowChipseq {
             macsGsizeWarn(log)
         }
 
-        if (!params.read_length && !params.macs_gsize) {
+        if (!params.chipseq_read_length && !params.macs_gsize) {
             log.error "Both '--read_length' and '--macs_gsize' not specified! Please specify either to infer MACS2 genome size for peak calling."
             System.exit(1)
         }
