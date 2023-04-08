@@ -39,41 +39,41 @@ class WorkflowRnaseq {
             transcriptsFastaWarn(log)
         }
 
-        if (!params.skip_bbsplit && !params.bbsplit_index && !params.bbsplit_fasta_list) {
+        if (!params.rnaseq_skip_bbsplit && !params.bbsplit_index && !params.rnaseq_bbsplit_fasta_list) {
             Nextflow.error("Please provide either --bbsplit_fasta_list / --bbsplit_index to run BBSplit.")
         }
 
-        if (params.remove_ribo_rna && !params.ribo_database_manifest) {
+        if (params.rnaseq_remove_ribo_rna && !params.rnaseq_ribo_database_manifest) {
             Nextflow.error("Please provide --ribo_database_manifest to remove ribosomal RNA with SortMeRNA.")
         }
 
 
-        if (params.with_umi && !params.skip_umi_extract) {
-            if (!params.umitools_bc_pattern && !params.umitools_bc_pattern2) {
+        if (params.rnaseq_with_umi && !params.rnaseq_skip_umi_extract) {
+            if (!params.rnaseq_umitools_bc_pattern && !params.rnaseq_umitools_bc_pattern2) {
                 Nextflow.error("UMI-tools requires a barcode pattern to extract barcodes from the reads.")
             }
         }
 
-        if (!params.skip_trimming) {
-            if (!valid_params['trimmers'].contains(params.trimmer)) {
-                Nextflow.error("Invalid option: '${params.trimmer}'. Valid options for '--trimmer': ${valid_params['trimmers'].join(', ')}.")
+        if (!params.rnaseq_skip_trimming) {
+            if (!valid_params['trimmers'].contains(params.rnaseq_trimmer)) {
+                Nextflow.error("Invalid option: '${params.rnaseq_trimmer}'. Valid options for '--trimmer': ${valid_params['trimmers'].join(', ')}.")
             }
         }
 
-        if (!params.skip_alignment) {
-            if (!valid_params['aligners'].contains(params.aligner)) {
-                Nextflow.error("Invalid option: '${params.aligner}'. Valid options for '--aligner': ${valid_params['aligners'].join(', ')}.")
+        if (!params.rnaseq_skip_alignment) {
+            if (!valid_params['aligners'].contains(params.rnaseq_aligner)) {
+                Nextflow.error("Invalid option: '${params.rnaseq_aligner}'. Valid options for '--aligner': ${valid_params['aligners'].join(', ')}.")
             }
         } else {
-            if (!params.pseudo_aligner) {
+            if (!params.rnaseq_pseudo_aligner) {
                 Nextflow.error("--skip_alignment specified without --pseudo_aligner...please specify e.g. --pseudo_aligner ${valid_params['pseudoaligners'][0]}.")
             }
             skipAlignmentWarn(log)
         }
 
-        if (params.pseudo_aligner) {
-            if (!valid_params['pseudoaligners'].contains(params.pseudo_aligner)) {
-                Nextflow.error("Invalid option: '${params.pseudo_aligner}'. Valid options for '--pseudo_aligner': ${valid_params['pseudoaligners'].join(', ')}.")
+        if (params.rnaseq_pseudo_aligner) {
+            if (!valid_params['pseudoaligners'].contains(params.rnaseq_pseudo_aligner)) {
+                Nextflow.error("Invalid option: '${params.rnaseq_pseudo_aligner}'. Valid options for '--pseudo_aligner': ${valid_params['pseudoaligners'].join(', ')}.")
             } else {
                 if (!(params.salmon_index || params.transcript_fasta || (params.fasta && (params.gtf || params.gff)))) {
                     Nextflow.error("To use `--pseudo_aligner 'salmon'`, you must provide either --salmon_index or --transcript_fasta or both --fasta and --gtf / --gff.")
@@ -82,8 +82,8 @@ class WorkflowRnaseq {
         }
 
         // Checks when running --aligner star_rsem
-        if (!params.skip_alignment && params.aligner == 'star_rsem') {
-            if (params.with_umi) {
+        if (!params.rnaseq_skip_alignment && params.rnaseq_aligner == 'star_rsem') {
+            if (params.rnaseq_with_umi) {
                 rsemUmiError(log)
             }
             if (params.rsem_index && params.star_index) {
@@ -92,15 +92,15 @@ class WorkflowRnaseq {
         }
 
         // Warn if --additional_fasta provided with aligner index
-        if (!params.skip_alignment && params.additional_fasta) {
+        if (!params.rnaseq_skip_alignment && params.additional_fasta) {
             def index = ''
-            if (params.aligner == 'star_salmon' && params.star_index) {
+            if (params.rnaseq_aligner == 'star_salmon' && params.star_index) {
                 index = 'star'
             }
-            if (params.aligner == 'star_rsem' && params.rsem_index) {
+            if (params.rnaseq_aligner == 'star_rsem' && params.rsem_index) {
                 index = 'rsem'
             }
-            if (params.aligner == 'hisat2' && params.hisat2_index) {
+            if (params.rnaseq_aligner == 'hisat2' && params.hisat2_index) {
                 index = 'hisat2'
             }
             if (index) {
@@ -109,9 +109,9 @@ class WorkflowRnaseq {
         }
 
         // Check which RSeQC modules we are running
-        def rseqc_modules = params.rseqc_modules ? params.rseqc_modules.split(',').collect{ it.trim().toLowerCase() } : []
+        def rseqc_modules = params.rnaseq_rseqc_modules ? params.rnaseq_rseqc_modules.split(',').collect{ it.trim().toLowerCase() } : []
         if ((valid_params['rseqc_modules'] + rseqc_modules).unique().size() != valid_params['rseqc_modules'].size()) {
-            Nextflow.error("Invalid option: ${params.rseqc_modules}. Valid options for '--rseqc_modules': ${valid_params['rseqc_modules'].join(', ')}")
+            Nextflow.error("Invalid option: ${params.rnaseq_rseqc_modules}. Valid options for '--rseqc_modules': ${valid_params['rseqc_modules'].join(', ')}")
         }
     }
 
@@ -208,7 +208,7 @@ class WorkflowRnaseq {
         }
 
         def pass = false
-        if (percent_aligned >= params.min_mapped_reads.toFloat()) {
+        if (percent_aligned >= params.rnaseq_min_mapped_reads.toFloat()) {
             pass = true
         }
         return [ percent_aligned, pass ]

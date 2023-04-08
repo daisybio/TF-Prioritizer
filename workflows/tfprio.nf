@@ -37,7 +37,7 @@ params.salmon_index     = WorkflowMain.getGenomeAttribute(params, 'salmon')
 
 WorkflowMain.initialise(workflow, params, log)
 
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = file(params.rnaseq_samplesheet) } else { exit 1, 'Input samplesheet not specified!' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,20 +46,23 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 */
 
 include { RNASEQ } from '../subworkflows/local/rnaseq'
+// include { CHIPSEQ } from '../subworkflows/local/chipseq'
 include { COUNT_PREPROCESSING } from '../modules/local/count_preprocessing'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
 //
 workflow TFPRIO {
-    if (params.counts) {
-        ch_count = file(params.counts)
+    if (params.rnaseq_counts) {
+        ch_count = file(params.rnaseq_counts)
     } else {
         RNASEQ ()
         ch_count = RNASEQ.out.counts
     }
 
-    COUNT_PREPROCESSING (ch_count, ch_input)
+    //CHIPSEQ ()
+
+    COUNT_PREPROCESSING (ch_count, ch_rnaseq_samplesheet)
 }
 
 /*

@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/tfprio/master/assets/schema_input.json",
-    "title": "nf-core/tfprio pipeline - params.input schema",
-    "description": "Schema for the file provided with params.input",
+    "title": "nf-core/tfprio pipeline - params.rnaseq_samplesheet schema",
+    "description": "Schema for the file provided with params.rnaseq_samplesheet",
     "type": "array",
     "items": {
         "type": "object",
