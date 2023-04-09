@@ -116,7 +116,8 @@ parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 
 argv <- parse_args(parser, argv = args)
 
-regions <- import(argv$r, format = "bed")
+regions <- import(argv$r, format = "bed", colnames = c("chrom", "start", "end", "strand"))
+
 # remove scaffold chromosomes
 regions <- regions[!grepl("_", regions@seqnames)]
 # change M to MT
