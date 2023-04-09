@@ -169,16 +169,16 @@ names(countsList) <- bamtab$mark
 message("pileup done, storing everything in a matrix")
 counts <- t(bind_cols(countsList)) + pseudocount
 
-message("learning model\n")
+message("learning model")
 segmentation <- segment(counts = counts, regions = regions,
                         nstates = nstates, nthreads = nthreads,
                         verbose_kfoots = T,
                         nbtype = "lognormal")
-message("producing report\n")
+message("producing report")
 viterbi_segments <- statesToSegments(segmentation$viterbi,
                                      segmentation$segments)
 report(segments = viterbi_segments, model = segmentation$model,
        rdata = segmentation, outdir = argv$o)
 model <- segmentation$model
-message("saving essential RData to file\n")
+message("saving essential RData to file")
 save(counts, model, regions, file = file.path(argv$o, "model.RData"))
