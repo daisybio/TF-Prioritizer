@@ -109,7 +109,7 @@ parser <- arg_parser("EHMM command line parser", name = "ehmm")
 parser <- add_argument(parser, "-r", help = "Regions of interest")
 parser <- add_argument(parser, "-m", help = "Path to directory containing the bam files of the input data")
 parser <- add_argument(parser, "-n", help = "Number of states", default = 10, type = "integer")
-parser <- add_argument(parser, "-b", help = "Number of bins", default = 1, type = "integer")
+parser <- add_argument(parser, "-b", help = "Size of bins", default = 10, type = "integer")
 parser <- add_argument(parser, "-t", help = "Number of threads", default = 1, type = "integer")
 parser <- add_argument(parser, "-p", help = "Pseudocount", default = 1.0, type = "double")
 parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
@@ -134,16 +134,28 @@ bamtab$shift <- sapply(tolower(bamtab$mark), function(m) ifelse(any(sapply(c("at
 
 
 # generate counts from bam files
-if (!inherits(regions, "GRanges"))
-  stop("regions must be a GRanges object")
-if (length(binsize) != 1 || binsize <= 0)
-  stop("invalid binsize")
-if (any(width(regions)%%binsize != 0))
-  stop("region widths must be multiples of binsize")
 bamtab <- validateBamtab(bamtab)
 npaths <- nrow(bamtab)
 if (npaths == 0)
   stop("no marks provided")
+if (!inherits(regions, "GRanges"))
+  stop("regions must be a GRanges object")
+if (length(binsize) != 1 || binsize <= 0)
+  stop("invalid binsize")
+if (any(width(regions)%%binsize!=0)) {
+  # select invalid regions
+  invalidRegions <- regions[width(regions)%%binsize!=0]
+  message("INFO: ", nrow(invalidRegions), " regions are multiples of the selected bin size ", binsize, ", adjusting regions...")
+  deltaLengths <- width(invalidRegions)%%binsize
+  # pad regions to binsize
+  deltaLengths <- sapply(deltaLengths, function(d) ifelse(d>binsize/2, binsize-d, -d))
+  # replace end points
+  data <- as.data.frame(invalidRegions)
+  data$end <- data$end+deltaLengths
+  data$width <- data$width+deltaLengths
+  data <- makeGRangesFromDataFrame(data, keep.extra.columns = T)
+  regions[width(regions)%%binsize!=0] <- data
+}
 message("getting counts")
 countsList <- safe_mclapply(mc.cores = nthreads, 1:npaths,
                             function(i) {
@@ -157,16 +169,16 @@ names(countsList) <- bamtab$mark
 message("pileup done, storing everything in a matrix")
 counts <- t(bind_cols(countsList)) + pseudocount
 
-message("learning model")
+cat("learning model\n")
 segmentation <- segment(counts = counts, regions = regions,
                         nstates = nstates, nthreads = nthreads,
                         verbose_kfoots = T,
                         nbtype = "lognormal")
-message("producing report")
+cat("producing report\n")
 viterbi_segments <- statesToSegments(segmentation$viterbi,
                                      segmentation$segments)
 report(segments = viterbi_segments, model = segmentation$model,
        rdata = segmentation, outdir = argv$o)
 model <- segmentation$model
-message("saving essential RData to file")
+cat("saving essential RData to file\n")
 save(counts, model, regions, file = file.path(argv$o, "model.RData"))
