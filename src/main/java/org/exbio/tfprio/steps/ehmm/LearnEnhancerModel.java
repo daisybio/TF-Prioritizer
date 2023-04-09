@@ -43,7 +43,7 @@ public class LearnEnhancerModel extends ExecutableStep<Configs> {
                         "-b", nBins.toString(),
                         "-p", pseudoCount.toString(),
                         "-o", outputDir.getAbsolutePath());
-                executeAndWait(ehmmCommand, false);
+                executeAndWait(ehmmCommand, true);
                 return true;
             });
         }};

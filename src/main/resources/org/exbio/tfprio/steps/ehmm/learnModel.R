@@ -115,15 +115,11 @@ parser <- add_argument(parser, "-p", help = "Pseudocount", default = 1.0, type =
 parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 
 argv <- parse_args(parser, argv = args)
-
+# only load necessary bed fields for ehmm
 regions <- import(argv$r, format = "bed")
 regions <- as.data.frame(regions)
 regions <- makeGRangesFromDataFrame(regions)
-
-# remove scaffold chromosomes
-regions <- regions[!grepl("_", regions@seqnames)]
-# change M to MT
-regions@seqnames@values <- as.factor(gsub("M", "MT", regions@seqnames@values))
+# find bam files
 bamfiles <- list.files(path = argv$m, pattern = "*.bam$", full.names = T)
 marks <- sapply(strsplit(file_path_sans_ext(basename(bamfiles)), "_"), "[", 1)
 bamtab <- data.frame(mark = marks, path = bamfiles, check.names = F)
@@ -134,8 +130,6 @@ pseudocount = argv$p
 
 bamtab$shift <- sapply(tolower(bamtab$mark), function(m) ifelse(any(sapply(c("atac", "dhs", "dnase", "acc"),
                                                                            function(s) grepl(s, m))), 0, 75))
-
-
 # generate counts from bam files
 bamtab <- validateBamtab(bamtab)
 npaths <- nrow(bamtab)
@@ -159,6 +153,10 @@ if (any(width(regions)%%binsize!=0)) {
   data <- makeGRangesFromDataFrame(data, keep.extra.columns = T)
   regions[width(regions)%%binsize!=0] <- data
 }
+# remove scaffold chromosomes
+regions <- regions[!grepl("_", regions@seqnames)]
+# change chromosome M to MT
+regions@seqnames@values <- as.factor(gsub("M", "MT", regions@seqnames@values))
 message("getting counts")
 countsList <- safe_mclapply(mc.cores = nthreads, 1:npaths,
                             function(i) {
