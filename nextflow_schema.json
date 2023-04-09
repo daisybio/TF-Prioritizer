@@ -12,7 +12,7 @@
             "description": "Define where the pipeline should find input data and save output data.",
             "required": ["outdir"],
             "properties": {
-                "input": {
+                "rnaseq_samplesheet": {
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/csv",
@@ -20,6 +20,30 @@
                     "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 4 columns, and a header row. See [usage docs](https://nf-co.re/rnaseq/usage#samplesheet-input).",
+                    "fa_icon": "fas fa-file-csv"
+                },
+                "chipseq_samplesheet": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "schema": "assets/schema_input.json",
+                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
+                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 5 columns, and a header row. See [usage docs](https://nf-co.re/chipseq/docs/usage#introduction).",
+                    "fa_icon": "fas fa-file-csv"
+                },
+                "chipseq_fragment_size": {
+                    "type": "integer",
+                    "description": "Estimated fragment size used to extend single-end reads.",
+                    "fa_icon": "fas fa-chart-area",
+                    "default": 200
+                },
+                "rnaseq_counts": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "A count matrix in CSV format. This will be used to skip the whole nf-core/rnaseq pipeline",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -40,71 +64,77 @@
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
                 },
-                "save_merged_fastq": {
+                "rnaseq_save_merged_fastq": {
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
                     "description": "Save FastQ files after merging re-sequenced libraries in the results directory."
+                },
+                "chipseq_read_length": {
+                    "type": "integer",
+                    "description": "Read length used to calculate MACS2 genome size for peak calling if `--macs_gsize` isn't provided.",
+                    "fa_icon": "fas fa-chart-area",
+                    "enum": [50, 75, 100, 150, 200]
                 }
             }
         },
-        "umi_options": {
+        "rnaseq_umi_options": {
             "title": "UMI options",
             "type": "object",
             "description": "Options for processing reads with unique molecular identifiers",
             "default": "",
             "properties": {
-                "with_umi": {
+                "rnaseq_with_umi": {
                     "type": "boolean",
                     "fa_icon": "fas fa-barcode",
                     "description": "Enable UMI-based read deduplication."
                 },
-                "umitools_extract_method": {
+                "rnaseq_umitools_extract_method": {
                     "type": "string",
                     "default": "string",
                     "fa_icon": "fas fa-barcode",
                     "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
                     "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
                 },
-                "skip_umi_extract": {
+                "rnaseq_skip_umi_extract": {
                     "type": "boolean",
                     "fa_icon": "fas fa-compress-alt",
                     "description": "Skip the UMI extraction from the read in case the UMIs have been moved to the headers in advance of the pipeline run."
                 },
-                "umitools_bc_pattern": {
+                "rnaseq_umitools_bc_pattern": {
                     "type": "string",
                     "fa_icon": "fas fa-barcode",
                     "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).",
                     "description": "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
                 },
-                "umitools_bc_pattern2": {
+                "rnaseq_umitools_bc_pattern2": {
                     "type": "string",
                     "fa_icon": "fas fa-barcode",
                     "description": "The UMI barcode pattern to use if the UMI is located in read 2."
                 },
-                "umi_discard_read": {
+                "rnaseq_umi_discard_read": {
                     "type": "integer",
                     "fa_icon": "fas fa-barcode",
                     "description": "After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively."
                 },
-                "umitools_umi_separator": {
+                "rnaseq_umitools_umi_separator": {
                     "type": "string",
                     "fa_icon": "fas fa-star-half-alt",
                     "description": "The character that separates the UMI in the read name. Most likely a colon if you skipped the extraction with UMI-tools and used other software."
                 },
-                "umitools_grouping_method": {
+                "rnaseq_umitools_grouping_method": {
                     "type": "string",
                     "default": "directional",
                     "fa_icon": "far fa-object-ungroup",
                     "description": "Method to use to determine read groups by subsuming those with similar UMIs. All methods start by identifying the reads with the same mapping position, but treat similar yet nonidentical UMIs differently.",
                     "enum": ["unique", "percentile", "cluster", "adjacency", "directional"]
                 },
-                "umitools_dedup_stats": {
+                "rnaseq_umitools_dedup_stats": {
                     "type": "boolean",
                     "fa_icon": "fas fa-barcode",
                     "help_text": "It can be quite time consuming generating these output stats - see [#827](https://github.com/nf-core/rnaseq/issues/827).",
                     "description": "Generate output stats when running \"umi_tools dedup\"."
                 },
-                "save_umi_intermeds": {
+                "rnaseq_save_umi_intermeds": {
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
                     "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
@@ -112,13 +142,13 @@
             },
             "fa_icon": "fas fa-barcode"
         },
-        "read_filtering_options": {
+        "rnaseq_read_filtering_options": {
             "title": "Read filtering options",
             "type": "object",
             "description": "Options for filtering reads prior to alignment",
             "default": "",
             "properties": {
-                "bbsplit_fasta_list": {
+                "rnaseq_bbsplit_fasta_list": {
                     "type": "string",
                     "fa_icon": "fas fa-list-alt",
                     "description": "Path to comma-separated file containing a list of reference genomes to filter reads against with BBSplit. You have to also explicitly set `--skip_bbsplit false` if you want to use BBSplit.",
@@ -130,31 +160,31 @@
                     "description": "Path to directory or tar.gz archive for pre-built BBSplit index.",
                     "help_text": "The BBSplit index will have to be built at least once with this pipeline (see `--save_reference` to save index). It can then be provided via `--bbsplit_index` for future runs."
                 },
-                "save_bbsplit_reads": {
+                "rnaseq_save_bbsplit_reads": {
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
                     "description": "If this option is specified, FastQ files split by reference will be saved in the results directory."
                 },
-                "skip_bbsplit": {
+                "rnaseq_skip_bbsplit": {
                     "type": "boolean",
                     "default": true,
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip BBSplit for removal of non-reference genome reads."
                 },
-                "remove_ribo_rna": {
+                "rnaseq_remove_ribo_rna": {
                     "type": "boolean",
                     "fa_icon": "fas fa-trash-alt",
                     "description": "Enable the removal of reads derived from ribosomal RNA using SortMeRNA.",
                     "help_text": "Any patterns found in the sequences defined by the '--ribo_database_manifest' parameter will be used."
                 },
-                "ribo_database_manifest": {
+                "rnaseq_ribo_database_manifest": {
                     "type": "string",
                     "default": "${projectDir}/subworkflows/nf-core/rnaseq/assets/rrna-db-defaults.txt",
                     "fa_icon": "fas fa-database",
                     "description": "Text file containing paths to fasta files (one per line) that will be used to create the database for SortMeRNA.",
                     "help_text": "By default, [rRNA databases](https://github.com/biocore/sortmerna/tree/master/data/rRNA_databases) defined in the SortMeRNA GitHub repo are used. You can see an example in the pipeline Github repository in `assets/rrna-default-dbs.txt`.\nPlease note that commercial/non-academic entities require [`licensing for SILVA`](https://www.arb-silva.de/silva-license-information) for these default databases."
                 },
-                "save_non_ribo_reads": {
+                "rnaseq_save_non_ribo_reads": {
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
                     "description": "If this option is specified, intermediate FastQ files containing non-rRNA reads will be saved in the results directory."
@@ -257,13 +287,42 @@
                     "fa_icon": "fas fa-bezier-curve",
                     "description": "Path to directory or tar.gz archive for pre-built Salmon index."
                 },
-                "hisat2_build_memory": {
+                "rnaseq_hisat2_build_memory": {
                     "type": "string",
                     "default": "200.GB",
                     "fa_icon": "fas fa-memory",
                     "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
                     "description": "Minimum memory required to use splice sites and exons in the HiSAT2 index build process.",
                     "help_text": "HiSAT2 requires a huge amount of RAM to build a genome index for larger genomes, if including splice sites and exons e.g. the human genome might typically require 200GB. If you specify less than this threshold for the `HISAT2_BUILD` process then the splice sites and exons will be ignored, meaning that the process will require a lot less memory. If you are working with a small genome, set this parameter to a lower value to reduce the threshold for skipping this check. If using a larger genome, consider supplying more memory to the `HISAT2_BUILD` process."
+                },
+                "macs_gsize": {
+                    "type": "number",
+                    "description": "Effective genome size parameter required by MACS2.",
+                    "help_text": "[Effective genome size](https://github.com/taoliu/MACS#-g--gsize) parameter required by MACS2. If using an iGenomes reference these have been provided when `--genome` is set as *GRCh37*, *GRCh38*, *GRCm38*, *WBcel235*, *BDGP6*, *R64-1-1*, *EF2*, *hg38*, *hg19* and *mm10*. For other genomes, if this parameter is not specified then the MACS2 peak-calling and differential analysis will be skipped.",
+                    "fa_icon": "fas fa-arrows-alt-h"
+                },
+                "bwa_index": {
+                    "type": "string",
+                    "description": "Path to directory or tar.gz archive for pre-built BWA index.",
+                    "fa_icon": "fas fa-bezier-curve"
+                },
+                "bowtie2_index": {
+                    "type": "string",
+                    "format": "path",
+                    "fa_icon": "fas fa-bezier-curve",
+                    "description": "Path to directory or tar.gz archive for pre-built Bowtie2 index."
+                },
+                "chromap_index": {
+                    "type": "string",
+                    "format": "path",
+                    "fa_icon": "fas fa-bezier-curve",
+                    "description": "Path to directory or tar.gz archive for pre-built Chromap index."
+                },
+                "blacklist": {
+                    "type": "string",
+                    "description": "Path to blacklist regions in BED format, used for filtering alignments.",
+                    "help_text": "If provided, alignments that overlap with the regions in this file will be filtered out (see [ENCODE blacklists](https://sites.google.com/site/anshulkundaje/projects/blacklists)). The file should be in BED format. Blacklisted regions for *GRCh37*, *GRCh38*, *GRCm38*, *hg19*, *hg38*, *mm10* are bundled with the pipeline in the [`blacklists`](../assets/blacklists/) directory, and as such will be automatically used if any of those genomes are specified with the `--genome` parameter.",
+                    "fa_icon": "fas fa-book-dead"
                 },
                 "gencode": {
                     "type": "boolean",
@@ -320,42 +379,42 @@
                 }
             }
         },
-        "read_trimming_options": {
+        "rnaseq_read_trimming_options": {
             "title": "Read trimming options",
             "type": "object",
             "fa_icon": "fas fa-cut",
             "description": "Options to adjust read trimming criteria.",
             "properties": {
-                "trimmer": {
+                "rnaseq_trimmer": {
                     "type": "string",
                     "default": "trimgalore",
                     "description": "Specifies the trimming tool to use - available options are 'trimgalore' and 'fastp'.",
                     "fa_icon": "fas fa-cut",
                     "enum": ["trimgalore", "fastp"]
                 },
-                "extra_trimgalore_args": {
+                "rnaseq_extra_trimgalore_args": {
                     "type": "string",
                     "description": "Extra arguments to pass to Trim Galore! command in addition to defaults defined by the pipeline.",
                     "fa_icon": "fas fa-plus"
                 },
-                "extra_fastp_args": {
+                "rnaseq_extra_fastp_args": {
                     "type": "string",
                     "description": "Extra arguments to pass to fastp command in addition to defaults defined by the pipeline.",
                     "fa_icon": "fas fa-plus"
                 },
-                "min_trimmed_reads": {
+                "rnaseq_min_trimmed_reads": {
                     "type": "integer",
                     "default": 10000,
                     "fa_icon": "fas fa-hand-paper",
                     "description": "Minimum number of trimmed reads below which samples are removed from further processing. Some downstream steps in the pipeline will fail if this threshold is too low."
                 },
-                "skip_trimming": {
+                "rnaseq_skip_trimming": {
                     "type": "boolean",
                     "description": "Skip the adapter trimming step.",
                     "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data.",
                     "fa_icon": "fas fa-fast-forward"
                 },
-                "save_trimmed": {
+                "rnaseq_save_trimmed": {
                     "type": "boolean",
                     "description": "Save the trimmed FastQ files in the results directory.",
                     "help_text": "By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete.",
@@ -363,42 +422,202 @@
                 }
             }
         },
-        "alignment_options": {
+        "chipseq_adapter_trimming_options": {
+            "title": "Adapter trimming options",
+            "type": "object",
+            "fa_icon": "fas fa-cut",
+            "description": "Options to adjust adapter trimming criteria.",
+            "properties": {
+                "chipseq_clip_r1": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 1 (or single-end reads).",
+                    "fa_icon": "fas fa-cut"
+                },
+                "chipseq_clip_r2": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to remove bp from the 5' end of read 2 (paired-end reads only).",
+                    "fa_icon": "fas fa-cut"
+                },
+                "chipseq_three_prime_clip_r1": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "chipseq_three_prime_clip_r2": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to remove bp from the 3' end of read 2 AFTER adapter/quality trimming has been performed.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "chipseq_trim_nextseq": {
+                    "type": "integer",
+                    "description": "Instructs Trim Galore to apply the --nextseq=X option, to trim based on quality after removing poly-G tails.",
+                    "help_text": "This enables the option Cutadapt `--nextseq-trim=3'CUTOFF` option via Trim Galore, which will set a quality cutoff (that is normally given with -q instead), but qualities of G bases are ignored. This trimming is in common for the NextSeq- and NovaSeq-platforms, where basecalls without any signal are called as high-quality G bases.",
+                    "fa_icon": "fas fa-cut"
+                },
+                "chipseq_skip_trimming": {
+                    "type": "boolean",
+                    "description": "Skip the adapter trimming step.",
+                    "help_text": "Use this if your input FastQ files have already been trimmed outside of the workflow or if you're very confident that there is no adapter contamination in your data.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_save_trimmed": {
+                    "type": "boolean",
+                    "description": "Save the trimmed FastQ files in the results directory.",
+                    "help_text": "By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete.",
+                    "fa_icon": "fas fa-save"
+                }
+            }
+        },
+        "chipseq_peak_calling_options": {
+            "title": "Peak calling options",
+            "type": "object",
+            "fa_icon": "fas fa-chart-area",
+            "description": "Options to adjust peak calling criteria.",
+            "properties": {
+                "chipseq_min_reps_consensus": {
+                    "type": "integer",
+                    "default": 1,
+                    "description": "Number of biological replicates required from a given condition for a peak to contribute to a consensus peak.",
+                    "help_text": "If you are confident you have good reproducibility amongst your replicates then you can increase the value of this parameter to create a 'reproducible' set of consensus peaks. For example, a value of 2 will mean peaks that have been called in at least 2 replicates will contribute to the consensus set of peaks, and as such peaks that are unique to a given replicate will be discarded.",
+                    "fa_icon": "fas fa-sort-numeric-down"
+                },
+                "chipseq_narrow_peak": {
+                    "type": "boolean",
+                    "description": "Run MACS2 in narrowPeak mode.",
+                    "help_text": "MACS2 is run by default with the [`--broad`](https://github.com/taoliu/MACS#--broad) flag. Specify this flag to call peaks in narrowPeak mode.",
+                    "fa_icon": "fas fa-arrows-alt-h"
+                },
+                "fragment_size": {
+                    "type": "integer",
+                    "description": "Estimated fragment size used to extend single-end reads.",
+                    "fa_icon": "fas fa-chart-area",
+                    "default": 200
+                },
+                "chipseq_save_macs_pileup": {
+                    "type": "boolean",
+                    "description": "Instruct MACS2 to create bedGraph files normalised to signal per million reads.",
+                    "fa_icon": "fas fa-save"
+                },
+                "chipseq_skip_peak_qc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip MACS2 peak QC plot generation."
+                },
+                "chipseq_skip_peak_annotation": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip annotation of MACS2 and consensus peaks with HOMER."
+                },
+                "chipseq_skip_consensus_peaks": {
+                    "type": "boolean",
+                    "description": "Skip consensus peak generation, annotation and counting.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_broad_cutoff": {
+                    "type": "number",
+                    "default": 0.1,
+                    "description": "Specifies broad cutoff value for MACS2. Only used when --narrow_peak isnt specified.",
+                    "fa_icon": "fas fa-hand-scissors"
+                },
+                "chipseq_macs_fdr": {
+                    "type": "number",
+                    "description": "Minimum FDR (q-value) cutoff for peak detection, --macs_fdr and --macs_pvalue are mutually exclusive.",
+                    "fa_icon": "fas fa-sort-amount-down"
+                },
+                "chipseq_macs_pvalue": {
+                    "type": "number",
+                    "description": "p-value cutoff for peak detection, --macs_fdr and --macs_pvalue are mutually exclusive. If --macs_pvalue cutoff is set, q-value will not be calculated and reported as -1 in the final .xls file.",
+                    "fa_icon": "fas fa-sort-amount-down"
+                }
+            }
+
+        },
+        "chipseq_alignment_options": {
             "title": "Alignment options",
             "type": "object",
             "fa_icon": "fas fa-map-signs",
             "description": "Options to adjust parameters and filtering criteria for read alignments.",
             "properties": {
-                "aligner": {
+                "chipseq_keep_dups": {
+                    "type": "boolean",
+                    "description": "Duplicate reads are not filtered from alignments.",
+                    "fa_icon": "fas fa-cart-arrow-down"
+                },
+                "chipseq_keep_multi_map": {
+                    "type": "boolean",
+                    "description": "Reads mapping to multiple locations are not filtered from alignments.",
+                    "fa_icon": "fas fa-cart-arrow-down"
+                },
+                "chipseq_bamtools_filter_pe_config": {
+                    "type": "string",
+                    "default": "$projectDir/assets/bamtools_filter_pe.json",
+                    "hidden": true,
+                    "description": "BAMTools JSON file with custom filters for paired-end data.",
+                    "fa_icon": "fas fa-cog"
+                },
+                "chipseq_bamtools_filter_se_config": {
+                    "type": "string",
+                    "default": "$projectDir/assets/bamtools_filter_se.json",
+                    "hidden": true,
+                    "description": "BAMTools JSON file with custom filters for single-end data.",
+                    "fa_icon": "fas fa-cog"
+                },
+                "chipseq_bwa_min_score": {
+                    "type": "integer",
+                    "description": "Don\u2019t output BWA MEM alignments with score lower than this parameter.",
+                    "fa_icon": "fas fa-hand-paper"
+                },
+                "chipseq_aligner": {
+                    "type": "string",
+                    "default": "bwa",
+                    "description": "Specifies the alignment algorithm to use - available options are 'bwa', 'bowtie2' and 'star'.",
+                    "fa_icon": "fas fa-map-signs",
+                    "enum": ["bwa", "bowtie2", "chromap", "star"]
+                },
+                "chipseq_save_align_intermeds": {
+                    "type": "boolean",
+                    "description": "Save the intermediate BAM files from the alignment step.",
+                    "help_text": "By default, intermediate BAM files will not be saved. The final BAM files created after the appropriate filtering step are always saved to limit storage usage. Set this parameter to also save other intermediate BAM files.",
+                    "fa_icon": "fas fa-save"
+                }
+            }
+        },
+        "rnaseq_alignment_options": {
+            "title": "Alignment options",
+            "type": "object",
+            "fa_icon": "fas fa-map-signs",
+            "description": "Options to adjust parameters and filtering criteria for read alignments.",
+            "properties": {
+                "rnaseq_aligner": {
                     "type": "string",
                     "default": "star_salmon",
                     "description": "Specifies the alignment algorithm to use - available options are 'star_salmon', 'star_rsem' and 'hisat2'.",
                     "fa_icon": "fas fa-map-signs",
                     "enum": ["star_salmon", "star_rsem", "hisat2"]
                 },
-                "pseudo_aligner": {
+                "rnaseq_pseudo_aligner": {
                     "type": "string",
                     "description": "Specifies the pseudo aligner to use - available options are 'salmon'. Runs in addition to '--aligner'.",
                     "fa_icon": "fas fa-hamburger",
                     "enum": ["salmon"]
                 },
-                "bam_csi_index": {
+                "rnaseq_bam_csi_index": {
                     "type": "boolean",
                     "description": "Create a CSI index for BAM files instead of the traditional BAI index. This will be required for genomes with larger chromosome sizes.",
                     "fa_icon": "fas fa-sort-alpha-down"
                 },
-                "star_ignore_sjdbgtf": {
+                "rnaseq_star_ignore_sjdbgtf": {
                     "type": "boolean",
                     "fa_icon": "fas fa-ban",
                     "description": "When using pre-built STAR indices do not re-extract and use splice junctions from the GTF file."
                 },
-                "salmon_quant_libtype": {
+                "rnaseq_salmon_quant_libtype": {
                     "type": "string",
                     "fa_icon": "fas fa-fast-forward",
                     "description": " Override Salmon library type inferred based on strandedness defined in meta object.",
                     "help_text": "See [Salmon docs](https://salmon.readthedocs.io/en/latest/library_type.html)."
                 },
-                "min_mapped_reads": {
+                "rnaseq_min_mapped_reads": {
                     "type": "number",
                     "default": 5,
                     "fa_icon": "fas fa-percentage",
@@ -410,17 +629,17 @@
                     "description": "Sequencing center information to be added to read group of BAM files.",
                     "fa_icon": "fas fa-synagogue"
                 },
-                "stringtie_ignore_gtf": {
+                "rnaseq_stringtie_ignore_gtf": {
                     "type": "boolean",
                     "description": "Perform reference-guided de novo assembly of transcripts using StringTie i.e. dont restrict to those in GTF file.",
                     "fa_icon": "fas fa-ban"
                 },
-                "extra_star_align_args": {
+                "rnaseq_extra_star_align_args": {
                     "type": "string",
                     "description": "Extra arguments to pass to STAR alignment command in addition to defaults defined by the pipeline.",
                     "fa_icon": "fas fa-plus"
                 },
-                "extra_salmon_quant_args": {
+                "rnaseq_extra_salmon_quant_args": {
                     "type": "string",
                     "description": "Extra arguments to pass to Salmon quant command in addition to defaults defined by the pipeline.",
                     "fa_icon": "fas fa-plus"
@@ -431,13 +650,13 @@
                     "description": "Where possible, save unaligned reads from either STAR, HISAT2 or Salmon to the results directory.",
                     "help_text": "This may either be in the form of FastQ or BAM files depending on the options available for that particular tool."
                 },
-                "save_align_intermeds": {
+                "rnaseq_save_align_intermeds": {
                     "type": "boolean",
                     "description": "Save the intermediate BAM files from the alignment step.",
                     "help_text": "By default, intermediate BAM files will not be saved. The final BAM files created after the appropriate filtering step are always saved to limit storage usage. Set this parameter to also save other intermediate BAM files.",
                     "fa_icon": "fas fa-save"
                 },
-                "skip_markduplicates": {
+                "rnaseq_skip_markduplicates": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip picard MarkDuplicates step."
@@ -449,77 +668,142 @@
                 }
             }
         },
-        "process_skipping_options": {
+        "rnaseq_process_skipping_options": {
             "title": "Process skipping options",
             "type": "object",
             "fa_icon": "fas fa-fast-forward",
             "description": "Options to skip various steps within the workflow.",
             "properties": {
-                "rseqc_modules": {
+                "rnaseq_rseqc_modules": {
                     "type": "string",
                     "default": "bam_stat,inner_distance,infer_experiment,junction_annotation,junction_saturation,read_distribution,read_duplication",
                     "fa_icon": "fas fa-chart-pie",
                     "description": "Specify the RSeQC modules to run."
                 },
-                "deseq2_vst": {
+                "rnaseq_deseq2_vst": {
                     "type": "boolean",
                     "description": "Use vst transformation instead of rlog with DESeq2.",
                     "help_text": "See [DESeq2 docs](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#data-transformations-and-visualization).",
                     "fa_icon": "fas fa-dolly",
                     "default": true
                 },
-                "skip_bigwig": {
+                "rnaseq_skip_bigwig": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip bigWig file creation."
                 },
-                "skip_stringtie": {
+                "rnaseq_skip_stringtie": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip StringTie."
                 },
-                "skip_fastqc": {
+                "rnaseq_skip_fastqc": {
                     "type": "boolean",
                     "description": "Skip FastQC.",
                     "fa_icon": "fas fa-fast-forward"
                 },
-                "skip_preseq": {
+                "rnaseq_skip_preseq": {
                     "type": "boolean",
                     "description": "Skip Preseq.",
                     "fa_icon": "fas fa-fast-forward",
                     "default": true
                 },
-                "skip_dupradar": {
+                "rnaseq_skip_dupradar": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip dupRadar."
                 },
-                "skip_qualimap": {
+                "rnaseq_skip_qualimap": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip Qualimap."
                 },
-                "skip_rseqc": {
+                "rnaseq_skip_rseqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip RSeQC."
                 },
-                "skip_biotype_qc": {
+                "rnaseq_skip_biotype_qc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip additional featureCounts process for biotype QC."
                 },
-                "skip_deseq2_qc": {
+                "rnaseq_skip_deseq2_qc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip DESeq2 PCA and heatmap plotting."
                 },
-                "skip_multiqc": {
+                "rnaseq_skip_multiqc": {
                     "type": "boolean",
                     "description": "Skip MultiQC.",
                     "fa_icon": "fas fa-fast-forward"
                 },
-                "skip_qc": {
+                "rnaseq_skip_qc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip all QC steps except for MultiQC."
+                }
+            }
+        },
+        "chipseq_process_skipping_options": {
+            "title": "Process skipping options",
+            "type": "object",
+            "fa_icon": "fas fa-fast-forward",
+            "description": "Options to skip various steps within the workflow.",
+            "properties": {
+                "chipseq_skip_fastqc": {
+                    "type": "boolean",
+                    "description": "Skip FastQC.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_skip_picard_metrics": {
+                    "type": "boolean",
+                    "description": "Skip Picard CollectMultipleMetrics.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_skip_preseq": {
+                    "type": "boolean",
+                    "description": "Skip Preseq.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_deseq2_vst": {
+                    "type": "boolean",
+                    "description": "Use vst transformation instead of rlog with DESeq2.",
+                    "help_text": "See [DESeq2 docs](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#data-transformations-and-visualization).",
+                    "fa_icon": "fas fa-dolly",
+                    "default": true
+                },
+                "chipseq_skip_plot_profile": {
+                    "type": "boolean",
+                    "description": "Skip deepTools plotProfile.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_skip_plot_fingerprint": {
+                    "type": "boolean",
+                    "description": "Skip deepTools plotFingerprint.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_skip_spp": {
+                    "type": "boolean",
+                    "description": "Skip Phantompeakqualtools.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_skip_deseq2_qc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip DESeq2 PCA and heatmap plotting."
+                },
+                "skip_igv": {
+                    "type": "boolean",
+                    "description": "Skip IGV.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_skip_multiqc": {
+                    "type": "boolean",
+                    "description": "Skip MultiQC.",
+                    "fa_icon": "fas fa-fast-forward"
+                },
+                "chipseq_skip_qc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip all QC steps except for MultiQC."
@@ -644,6 +928,13 @@
                     "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
                     "hidden": true
                 },
+                "tracedir": {
+                    "type": "string",
+                    "description": "Directory to keep pipeline Nextflow logs and reports.",
+                    "default": "${params.outdir}/pipeline_info",
+                    "fa_icon": "fas fa-cogs",
+                    "hidden": true
+                },
                 "email_on_fail": {
                     "type": "string",
                     "description": "Email address for completion summary, only when pipeline fails.",
@@ -656,6 +947,13 @@
                     "type": "boolean",
                     "description": "Send plain-text email instead of HTML.",
                     "fa_icon": "fas fa-remove-format",
+                    "hidden": true
+                },
+                "chipseq_fingerprint_bins": {
+                    "type": "integer",
+                    "default": 500000,
+                    "description": "Number of genomic bins to use when calculating deepTools fingerprint plot.",
+                    "fa_icon": "fas fa-dumpster",
                     "hidden": true
                 },
                 "max_multiqc_email_size": {
@@ -717,22 +1015,34 @@
             "$ref": "#/definitions/input_output_options"
         },
         {
-            "$ref": "#/definitions/umi_options"
+            "$ref": "#/definitions/rnaseq_umi_options"
         },
         {
-            "$ref": "#/definitions/read_filtering_options"
+            "$ref": "#/definitions/rnaseq_read_filtering_options"
         },
         {
             "$ref": "#/definitions/reference_genome_options"
         },
         {
-            "$ref": "#/definitions/read_trimming_options"
+            "$ref": "#/definitions/rnaseq_read_trimming_options"
         },
         {
-            "$ref": "#/definitions/alignment_options"
+            "$ref": "#/definitions/chipseq_adapter_trimming_options"
         },
         {
-            "$ref": "#/definitions/process_skipping_options"
+            "$ref": "#/definitions/chipseq_peak_calling_options"
+        },
+        {
+            "$ref": "#/definitions/chipseq_alignment_options"
+        },
+        {
+            "$ref": "#/definitions/rnaseq_alignment_options"
+        },
+        {
+            "$ref": "#/definitions/rnaseq_process_skipping_options"
+        },
+        {
+            "$ref": "#/definitions/chipseq_process_skipping_options"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

@@ -34,23 +34,6 @@ params.chromap_index    = WorkflowMain.getGenomeAttribute(params, 'chromap')
 params.blacklist        = WorkflowMain.getGenomeAttribute(params, 'blacklist')
 params.macs_gsize       = WorkflowMain.getMacsGsize(params)
 
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    MODULE PARAMETER VALUES
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-params.hisat2_build_memory = params.rnaseq_hisat2_build_memory
-params.keep_dups = params.chipseq_keep_dups
-params.keep_multi_map = params.chipseq_keep_multi_map
-params.fragment_size = params.chipseq_fragment_size
-params.narrow_peak = params.chipseq_narrow_peak
-params.min_reps_consensus = params.chipseq_min_reps_consensus
-params.clip_r1 = params.chipseq_clip_r1
-params.clip_r2 = params.chipseq_clip_r2
-params.three_prime_clip_r1 = params.chipseq_three_prime_clip_r1
-params.three_prime_clip_r2 = params.chipseq_three_prime_clip_r2
-
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,7 +44,23 @@ params.three_prime_clip_r2 = params.chipseq_three_prime_clip_r2
 WorkflowMain.initialise(workflow, params, log)
 
 if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = file(params.rnaseq_samplesheet) } else { exit 1, 'RNAseq samplesheet not specified!' }
-// if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = file(params.chipseq_samplesheet) } else { exit 1, 'ChIPseq samplesheet not specified!' }
+if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = file(params.chipseq_samplesheet) } else { exit 1, 'ChIPseq samplesheet not specified!' }
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    MODULE PARAMETER VALUES
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+params.hisat2_build_memory = params.rnaseq_hisat2_build_memory
+params.fragment_size = params.chipseq_fragment_size
+params.narrow_peak = params.chipseq_narrow_peak
+params.min_reps_consensus = params.chipseq_min_reps_consensus
+params.clip_r1 = params.chipseq_clip_r1
+params.clip_r2 = params.chipseq_clip_r2
+params.three_prime_clip_r1 = params.chipseq_three_prime_clip_r1
+params.three_prime_clip_r2 = params.chipseq_three_prime_clip_r2
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOW FOR PIPELINE
@@ -69,7 +68,7 @@ if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = file(params.rnaseq_samp
 */
 
 include { RNASEQ } from '../subworkflows/local/rnaseq'
-// include { CHIPSEQ } from '../subworkflows/local/chipseq'
+include { CHIPSEQ } from '../subworkflows/local/chipseq'
 include { COUNT_PREPROCESSING } from '../modules/local/count_preprocessing'
 
 //

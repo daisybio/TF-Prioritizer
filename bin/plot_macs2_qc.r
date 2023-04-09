@@ -1,0 +1,1 @@
+../subworkflows/nf-core/chipseq/bin/plot_macs2_qc.r

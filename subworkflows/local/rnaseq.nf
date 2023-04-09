@@ -105,7 +105,7 @@ include { UMITOOLS_PREPAREFORRSEM as UMITOOLS_PREPAREFORSALMON } from '../nf-cor
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK    } from './input_check'
+include { INPUT_CHECK_RNASEQ    } from './input_check'
 include { PREPARE_GENOME } from '../nf-core/rnaseq/subworkflows/local/prepare_genome'
 include { ALIGN_STAR     } from '../nf-core/rnaseq/subworkflows/local/align_star'
 include { QUANTIFY_RSEM  } from '../nf-core/rnaseq/subworkflows/local/quantify_rsem'
@@ -199,7 +199,7 @@ workflow RNASEQ {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    INPUT_CHECK (
+    INPUT_CHECK_RNASEQ (
         ch_input
     )
     .reads
@@ -217,7 +217,7 @@ workflow RNASEQ {
                 return [ meta, fastq.flatten() ]
     }
     .set { ch_fastq }
-    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    ch_versions = ch_versions.mix(INPUT_CHECK_RNASEQ.out.versions)
 
     //
     // MODULE: Concatenate FastQ files from same sample if required
@@ -891,6 +891,7 @@ workflow RNASEQ {
     emit:
     counts = ch_gene_counts
     bigwig = ch_bigwig
+    versions = ch_versions
 }
 
 /*

@@ -20,7 +20,7 @@ def checkPathParamList = [
     params.gtf, params.gff, params.gene_bed,
     params.bwa_index, params.bowtie2_index, params.chromap_index, params.star_index,
     params.blacklist,
-    params.bamtools_filter_pe_config, params.bamtools_filter_se_config
+    params.chipseq_bamtools_filter_pe_config, params.chipseq_bamtools_filter_se_config
 ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -44,8 +44,8 @@ ch_multiqc_config        = file("$projectDir/subworkflows/nf-core/chipseq/assets
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
 
 // JSON files required by BAMTools for alignment filtering
-ch_bamtools_filter_se_config = file(params.bamtools_filter_se_config, checkIfExists: true)
-ch_bamtools_filter_pe_config = file(params.bamtools_filter_pe_config, checkIfExists: true)
+ch_bamtools_filter_se_config = file(params.chipseq_bamtools_filter_se_config, checkIfExists: true)
+ch_bamtools_filter_pe_config = file(params.chipseq_bamtools_filter_pe_config, checkIfExists: true)
 
 // Header files for MultiQC
 ch_spp_nsc_header           = file("$projectDir/subworkflows/nf-core/chipseq/assets/multiqc/spp_nsc_header.txt", checkIfExists: true)
@@ -63,24 +63,24 @@ ch_deseq2_clustering_header = file("$projectDir/subworkflows/nf-core/chipseq/ass
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { BEDTOOLS_GENOMECOV                  } from '../subworkflows/nf-core/chipseq/modules/local/bedtools_genomecov'
-include { FRIP_SCORE                          } from '../subworkflows/nf-core/chipseq/modules/local/frip_score'
-include { PLOT_MACS2_QC                       } from '../subworkflows/nf-core/chipseq/modules/local/plot_macs2_qc'
-include { PLOT_HOMER_ANNOTATEPEAKS            } from '../subworkflows/nf-core/chipseq/modules/local/plot_homer_annotatepeaks'
-include { MACS2_CONSENSUS                     } from '../subworkflows/nf-core/chipseq/modules/local/macs2_consensus'
-include { ANNOTATE_BOOLEAN_PEAKS              } from '../subworkflows/nf-core/chipseq/modules/local/annotate_boolean_peaks'
-include { DESEQ2_QC                           } from '../subworkflows/nf-core/chipseq/modules/local/deseq2_qc'
-include { IGV                                 } from '../subworkflows/nf-core/chipseq/modules/local/igv'
-include { MULTIQC                             } from '../subworkflows/nf-core/chipseq/modules/local/multiqc'
-include { MULTIQC_CUSTOM_PHANTOMPEAKQUALTOOLS } from '../subworkflows/nf-core/chipseq/modules/local/multiqc_custom_phantompeakqualtools'
-include { MULTIQC_CUSTOM_PEAKS                } from '../subworkflows/nf-core/chipseq/modules/local/multiqc_custom_peaks'
+include { BEDTOOLS_GENOMECOV                  } from '../nf-core/chipseq/modules/local/bedtools_genomecov'
+include { FRIP_SCORE                          } from '../nf-core/chipseq/modules/local/frip_score'
+include { PLOT_MACS2_QC                       } from '../nf-core/chipseq/modules/local/plot_macs2_qc'
+include { PLOT_HOMER_ANNOTATEPEAKS            } from '../nf-core/chipseq/modules/local/plot_homer_annotatepeaks'
+include { MACS2_CONSENSUS                     } from '../nf-core/chipseq/modules/local/macs2_consensus'
+include { ANNOTATE_BOOLEAN_PEAKS              } from '../nf-core/chipseq/modules/local/annotate_boolean_peaks'
+include { DESEQ2_QC                           } from '../nf-core/chipseq/modules/local/deseq2_qc'
+include { IGV                                 } from '../nf-core/chipseq/modules/local/igv'
+include { MULTIQC                             } from '../nf-core/chipseq/modules/local/multiqc'
+include { MULTIQC_CUSTOM_PHANTOMPEAKQUALTOOLS } from '../nf-core/chipseq/modules/local/multiqc_custom_phantompeakqualtools'
+include { MULTIQC_CUSTOM_PEAKS                } from '../nf-core/chipseq/modules/local/multiqc_custom_peaks'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK         } from '../subworkflows/nf-core/chipseq/subworkflows/local/input_check'
-include { PREPARE_GENOME      } from '../subworkflows/nf-core/chipseq/subworkflows/local/prepare_genome'
-include { FILTER_BAM_BAMTOOLS } from '../subworkflows/nf-core/chipseq/subworkflows/local/filter_bam_bamtools'
+include { INPUT_CHECK_CHIPSEQ         } from './input_check'
+include { PREPARE_GENOME      } from '../nf-core/chipseq/subworkflows/local/prepare_genome'
+include { FILTER_BAM_BAMTOOLS } from '../nf-core/chipseq/subworkflows/local/filter_bam_bamtools'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,33 +92,33 @@ include { FILTER_BAM_BAMTOOLS } from '../subworkflows/nf-core/chipseq/subworkflo
 // MODULE: Installed directly from nf-core/modules
 //
 
-include { PICARD_MERGESAMFILES          } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/picard/mergesamfiles/main'
-include { PICARD_COLLECTMULTIPLEMETRICS } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/picard/collectmultiplemetrics/main'
-include { PRESEQ_LCEXTRAP               } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/preseq/lcextrap/main'
-include { PHANTOMPEAKQUALTOOLS          } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/phantompeakqualtools/main'
-include { UCSC_BEDGRAPHTOBIGWIG         } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/ucsc/bedgraphtobigwig/main'
-include { DEEPTOOLS_COMPUTEMATRIX       } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/deeptools/computematrix/main'
-include { DEEPTOOLS_PLOTPROFILE         } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/deeptools/plotprofile/main'
-include { DEEPTOOLS_PLOTHEATMAP         } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/deeptools/plotheatmap/main'
-include { DEEPTOOLS_PLOTFINGERPRINT     } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/deeptools/plotfingerprint/main'
-include { KHMER_UNIQUEKMERS             } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/khmer/uniquekmers/main'
-include { MACS2_CALLPEAK                } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/macs2/callpeak/main'
-include { SUBREAD_FEATURECOUNTS         } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/subread/featurecounts/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS   } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/custom/dumpsoftwareversions/main'
+include { PICARD_MERGESAMFILES          } from '../nf-core/chipseq/modules/nf-core/modules/picard/mergesamfiles/main'
+include { PICARD_COLLECTMULTIPLEMETRICS } from '../nf-core/chipseq/modules/nf-core/modules/picard/collectmultiplemetrics/main'
+include { PRESEQ_LCEXTRAP               } from '../nf-core/chipseq/modules/nf-core/modules/preseq/lcextrap/main'
+include { PHANTOMPEAKQUALTOOLS          } from '../nf-core/chipseq/modules/nf-core/modules/phantompeakqualtools/main'
+include { UCSC_BEDGRAPHTOBIGWIG         } from '../nf-core/chipseq/modules/nf-core/modules/ucsc/bedgraphtobigwig/main'
+include { DEEPTOOLS_COMPUTEMATRIX       } from '../nf-core/chipseq/modules/nf-core/modules/deeptools/computematrix/main'
+include { DEEPTOOLS_PLOTPROFILE         } from '../nf-core/chipseq/modules/nf-core/modules/deeptools/plotprofile/main'
+include { DEEPTOOLS_PLOTHEATMAP         } from '../nf-core/chipseq/modules/nf-core/modules/deeptools/plotheatmap/main'
+include { DEEPTOOLS_PLOTFINGERPRINT     } from '../nf-core/chipseq/modules/nf-core/modules/deeptools/plotfingerprint/main'
+include { KHMER_UNIQUEKMERS             } from '../nf-core/chipseq/modules/nf-core/modules/khmer/uniquekmers/main'
+include { MACS2_CALLPEAK                } from '../nf-core/chipseq/modules/nf-core/modules/macs2/callpeak/main'
+include { SUBREAD_FEATURECOUNTS         } from '../nf-core/chipseq/modules/nf-core/modules/subread/featurecounts/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS   } from '../nf-core/chipseq/modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
-include { HOMER_ANNOTATEPEAKS as HOMER_ANNOTATEPEAKS_MACS2     } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/homer/annotatepeaks/main'
-include { HOMER_ANNOTATEPEAKS as HOMER_ANNOTATEPEAKS_CONSENSUS } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/homer/annotatepeaks/main'
+include { HOMER_ANNOTATEPEAKS as HOMER_ANNOTATEPEAKS_MACS2     } from '../nf-core/chipseq/modules/nf-core/modules/homer/annotatepeaks/main'
+include { HOMER_ANNOTATEPEAKS as HOMER_ANNOTATEPEAKS_CONSENSUS } from '../nf-core/chipseq/modules/nf-core/modules/homer/annotatepeaks/main'
 
 //
 // SUBWORKFLOW: Consisting entirely of nf-core/modules
 //
 
-include { FASTQC_TRIMGALORE      } from '../subworkflows/nf-core/chipseq/subworkflows/nf-core/fastqc_trimgalore'
-include { ALIGN_BWA_MEM          } from '../subworkflows/nf-core/chipseq/subworkflows/nf-core/align_bwa_mem'
-include { ALIGN_BOWTIE2          } from '../subworkflows/nf-core/chipseq/subworkflows/nf-core/align_bowtie2'
-include { ALIGN_CHROMAP          } from '../subworkflows/nf-core/chipseq/subworkflows/nf-core/align_chromap'
-include { ALIGN_STAR             } from '../subworkflows/nf-core/chipseq/subworkflows/nf-core/align_star'
-include { MARK_DUPLICATES_PICARD } from '../subworkflows/nf-core/chipseq/subworkflows/nf-core/mark_duplicates_picard'
+include { FASTQC_TRIMGALORE      } from '../nf-core/chipseq/subworkflows/nf-core/fastqc_trimgalore'
+include { ALIGN_BWA_MEM          } from '../nf-core/chipseq/subworkflows/nf-core/align_bwa_mem'
+include { ALIGN_BOWTIE2          } from '../nf-core/chipseq/subworkflows/nf-core/align_bowtie2'
+include { ALIGN_CHROMAP          } from '../nf-core/chipseq/subworkflows/nf-core/align_chromap'
+include { ALIGN_STAR             } from '../nf-core/chipseq/subworkflows/nf-core/align_star'
+include { MARK_DUPLICATES_PICARD } from '../nf-core/chipseq/subworkflows/nf-core/mark_duplicates_picard'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,17 +144,17 @@ workflow CHIPSEQ {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    INPUT_CHECK (
+    INPUT_CHECK_CHIPSEQ (
         file(params.chipseq_samplesheet),
         params.seq_center
     )
-    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
+    ch_versions = ch_versions.mix(INPUT_CHECK_CHIPSEQ.out.versions)
 
     //
     // SUBWORKFLOW: Read QC and trim adapters
     //
     FASTQC_TRIMGALORE (
-        INPUT_CHECK.out.reads,
+        INPUT_CHECK_CHIPSEQ.out.reads,
         params.skip_fastqc || params.skip_qc,
         params.chipseq_skip_trimming
     )

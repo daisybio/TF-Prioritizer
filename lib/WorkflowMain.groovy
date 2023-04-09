@@ -104,8 +104,8 @@ class WorkflowMain {
         def val = null
         if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
             if (params.genomes[ params.genome ].containsKey('macs_gsize')) {
-                if (params.genomes[ params.genome ][ 'macs_gsize' ].containsKey(params.read_length.toString())) {
-                    val = params.genomes[ params.genome ][ 'macs_gsize' ][ params.read_length.toString() ]
+                if (params.genomes[ params.genome ][ 'macs_gsize' ].containsKey(params.chipseq_read_length.toString())) {
+                    val = params.genomes[ params.genome ][ 'macs_gsize' ][ params.chipseq_read_length.toString() ]
                 }
             }
         }
