@@ -145,7 +145,7 @@ if (length(binsize) != 1 || binsize <= 0)
 if (any(width(regions)%%binsize!=0)) {
   # select invalid regions
   invalidRegions <- regions[width(regions)%%binsize!=0]
-  message("INFO: ", length(invalidRegions), " regions are multiples of the selected bin size ", binsize, ", adjusting regions...")
+  message("INFO: ", length(invalidRegions), " regions are not multiples of the selected bin size ", binsize, ", adjusting...")
   deltaLengths <- width(invalidRegions)%%binsize
   # pad regions to binsize
   deltaLengths <- sapply(deltaLengths, function(d) ifelse(d>binsize/2, binsize-d, -d))
