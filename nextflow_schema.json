@@ -41,9 +41,9 @@
                 "rnaseq_counts": {
                     "type": "string",
                     "format": "file-path",
-                    "mimetype": "text/csv",
-                    "pattern": "^\\S+\\.csv$",
-                    "description": "A count matrix in CSV format. This will be used to skip the whole nf-core/rnaseq pipeline",
+                    "mimetype": "text/tsv",
+                    "pattern": "^\\S+\\.tsv$",
+                    "description": "A count matrix in TSV format. This will be used to skip the whole nf-core/rnaseq pipeline",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {

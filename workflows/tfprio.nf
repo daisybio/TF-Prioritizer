@@ -82,7 +82,7 @@ workflow TFPRIO {
         ch_count = RNASEQ.out.counts
     }
 
-    // CHIPSEQ ()
+    CHIPSEQ ()
 
     COUNT_PREPROCESSING (ch_count, ch_rnaseq_samplesheet)
 }
