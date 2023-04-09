@@ -12,5 +12,5 @@ public class EHMM extends ConfigModule {
     public final InternalConfig<Integer> nStates = new InternalConfig<>(10);
     public final InternalConfig<Double> pseudoCount = new InternalConfig<>(1e-6);
     public final InternalConfig<Integer> nBins = new InternalConfig<>(1);
-    public final InternalConfig<Integer> nThreads = new InternalConfig<>(10);
+    public final InternalConfig<Integer> nThreads = new InternalConfig<>(25);
 }
