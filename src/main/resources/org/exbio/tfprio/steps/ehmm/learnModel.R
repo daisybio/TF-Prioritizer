@@ -116,7 +116,9 @@ parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 
 argv <- parse_args(parser, argv = args)
 
-regions <- import(argv$r, format = "bed", colnames = c("chrom", "start", "end", "strand"))
+regions <- import(argv$r, format = "bed")
+regions <- as.data.frame(regions)
+regions <- makeGRangesFromDataFrame(regions)
 
 # remove scaffold chromosomes
 regions <- regions[!grepl("_", regions@seqnames)]
