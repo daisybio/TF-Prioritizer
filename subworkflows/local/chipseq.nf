@@ -155,7 +155,7 @@ workflow CHIPSEQ {
     //
     FASTQC_TRIMGALORE (
         INPUT_CHECK_CHIPSEQ.out.reads,
-        params.skip_fastqc || params.skip_qc,
+        params.chipseq_skip_fastqc || params.chipseq_skip_qc,
         params.chipseq_skip_trimming
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
@@ -311,7 +311,7 @@ workflow CHIPSEQ {
     // MODULE: Preseq coverage analysis
     //
     ch_preseq_multiqc = Channel.empty()
-    if (!params.skip_preseq) {
+    if (!params.chipseq_skip_preseq) {
         PRESEQ_LCEXTRAP (
             MARK_DUPLICATES_PICARD.out.bam
         )
@@ -323,7 +323,7 @@ workflow CHIPSEQ {
     // MODULE: Picard post alignment QC
     //
     ch_picardcollectmultiplemetrics_multiqc = Channel.empty()
-    if (!params.skip_picard_metrics) {
+    if (!params.chipseq_skip_picard_metrics) {
         PICARD_COLLECTMULTIPLEMETRICS (
             FILTER_BAM_BAMTOOLS.out.bam,
             PREPARE_GENOME.out.fasta,
@@ -369,7 +369,7 @@ workflow CHIPSEQ {
     ch_versions = ch_versions.mix(UCSC_BEDGRAPHTOBIGWIG.out.versions.first())
 
     ch_deeptoolsplotprofile_multiqc = Channel.empty()
-    if (!params.skip_plot_profile) {
+    if (!params.chipseq_skip_plot_profile) {
         //
         // MODULE: deepTools matrix generation for plotting
         //
@@ -418,7 +418,7 @@ workflow CHIPSEQ {
     // MODULE: deepTools plotFingerprint joint QC for IP and control
     //
     ch_deeptoolsplotfingerprint_multiqc = Channel.empty()
-    if (!params.skip_plot_fingerprint) {
+    if (!params.chipseq_skip_plot_fingerprint) {
         DEEPTOOLS_PLOTFINGERPRINT (
             ch_ip_control_bam_bai
         )
@@ -506,7 +506,7 @@ workflow CHIPSEQ {
     ch_custompeaks_frip_multiqc  = MULTIQC_CUSTOM_PEAKS.out.frip
     ch_custompeaks_count_multiqc = MULTIQC_CUSTOM_PEAKS.out.count
 
-    if (!params.skip_peak_annotation) {
+    if (!params.chipseq_skip_peak_annotation) {
         //
         // MODULE: Annotate peaks with MACS2
         //
@@ -517,7 +517,7 @@ workflow CHIPSEQ {
         )
         ch_versions = ch_versions.mix(HOMER_ANNOTATEPEAKS_MACS2.out.versions.first())
 
-        if (!params.skip_peak_qc) {
+        if (!params.chipseq_skip_peak_qc) {
             //
             // MODULE: MACS2 QC plots with R
             //
@@ -546,7 +546,7 @@ workflow CHIPSEQ {
     ch_macs2_consensus_txt_lib   = Channel.empty()
     ch_deseq2_pca_multiqc        = Channel.empty()
     ch_deseq2_clustering_multiqc = Channel.empty()
-    if (!params.skip_consensus_peaks) {
+    if (!params.chipseq_skip_consensus_peaks) {
         // Create channels: [ meta , [ peaks ] ]
             // Where meta = [ id:antibody, multiple_groups:true/false, replicates_exist:true/false ]
         ch_macs2_peaks
@@ -583,7 +583,7 @@ workflow CHIPSEQ {
         ch_macs2_consensus_txt_lib = MACS2_CONSENSUS.out.txt
         ch_versions = ch_versions.mix(MACS2_CONSENSUS.out.versions)
 
-        if (!params.skip_peak_annotation) {
+        if (!params.chipseq_skip_peak_annotation) {
             //
             // MODULE: Annotate consensus peaks
             //
@@ -636,7 +636,7 @@ workflow CHIPSEQ {
         ch_subreadfeaturecounts_multiqc = SUBREAD_FEATURECOUNTS.out.summary
         ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
 
-        if (!params.skip_deseq2_qc) {
+        if (!params.chipseq_skip_deseq2_qc) {
             //
             // MODULE: Generate QC plots with DESeq2
             //
@@ -676,7 +676,7 @@ workflow CHIPSEQ {
     //
     // MODULE: MultiQC
     //
-    if (!params.skip_multiqc) {
+    if (!params.chipseq_skip_multiqc) {
         workflow_summary    = WorkflowChipseq.paramsSummaryMultiqc(workflow, summary_params)
         ch_workflow_summary = Channel.value(workflow_summary)
 

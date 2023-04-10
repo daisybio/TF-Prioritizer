@@ -33,6 +33,7 @@ params.bowtie2_index    = WorkflowMain.getGenomeAttribute(params, 'bowtie2')
 params.chromap_index    = WorkflowMain.getGenomeAttribute(params, 'chromap')
 params.blacklist        = WorkflowMain.getGenomeAttribute(params, 'blacklist')
 params.macs_gsize       = WorkflowMain.getMacsGsize(params)
+params.enable_conda     = false
 
 
 /*
