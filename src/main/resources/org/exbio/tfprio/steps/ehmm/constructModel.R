@@ -145,7 +145,7 @@ combineFgBgModels <- function (model.bg, model.e, model.p) {
   labels <- c(model.e$labels, model.p$labels, model.bg$labels)
   colors <- c(model.e$colors, model.p$colors, model.bg$colors)
   nstates <- sum(model.e$nstates, model.p$nstates, model.bg$nstates)
-  marks <- unique(c(model.bg$marks, model.e$marks, model.p$marks))
+  marks <- model.bg$marks
   E <- c(model.e$emisP, model.p$emisP, model.bg$emisP)
   nEnhancers <- 399124
   nPromoters <- 70292

@@ -19,6 +19,9 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
+    private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
+    private final RequiredConfig<Double> pseudoCounts = new RequiredConfig<>(configs.ehmm.pseudoCount);
+    private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get()*10;
     private final InputFile applyModelScript;
 
     public ApplyModel(Configs configs, Map<String, OutputFile> regions, OutputFile chromosomeSizes,
@@ -40,14 +43,17 @@ public class ApplyModel extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 regions.forEach((s, r) -> add(() -> {
-                    // build promoter model
+                    // apply model to each group
                     String ehmmCommand = String.join(" ","Rscript",
                             applyModelScript.getAbsolutePath(),
                             "-r", r.getAbsolutePath(),
                             "-g", chromosomeSizes.getParent(),
                             "-m", constructedModel.getAbsolutePath(),
                             "-b", bamDirs.get(s).getAbsolutePath(),
-                            "-o", outputDirs.get(s).getAbsolutePath());
+                            "-o", outputDirs.get(s).getAbsolutePath(),
+                            "-s", binSize.toString(),
+                            "-t", nThreads.toString(),
+                            "-p", pseudoCounts.toString());
                     executeAndWait(ehmmCommand, false);
                     return true;
                 }));
