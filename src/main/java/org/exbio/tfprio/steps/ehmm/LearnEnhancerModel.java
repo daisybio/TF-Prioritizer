@@ -14,7 +14,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class LearnEnhancerModel extends ExecutableStep<Configs> {
     private final OutputFile outputDir = addOutput("out");
-    public final OutputFile outputFile = addOutput(outputDir,"model.RData");
+    public final OutputFile outputFile = addOutput(outputDir,"EnhancerModel.RData");
     private final InputFile bedFile;
     private final InputFile bamDir;
 
@@ -39,6 +39,7 @@ public class LearnEnhancerModel extends ExecutableStep<Configs> {
                         learnModelRscript.getAbsolutePath(),
                         "-r", bedFile.getAbsolutePath(),
                         "-m", bamDir.getAbsolutePath(),
+                        "-f", "EnhancerModel",
                         "-n", nStates.toString(),
                         "-b", nBins.toString(),
                         "-p", pseudoCount.toString(),

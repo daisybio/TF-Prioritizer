@@ -18,7 +18,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class LearnBackgroundModel extends ExecutableStep<Configs> {
     private final OutputFile outputDir = addOutput("out");
-    public final OutputFile outputFile = addOutput(outputDir,"model.RData");
+    public final OutputFile outputFile = addOutput(outputDir,"BackgroundModel.RData");
     private final InputFile bedFile;
     private final InputFile enhancers;
     private final InputFile promoters;
@@ -121,6 +121,7 @@ public class LearnBackgroundModel extends ExecutableStep<Configs> {
                         learnModelRscript.getAbsolutePath(),
                         "-r", filteredBedFile.getAbsolutePath(),
                         "-m", bamDir.getAbsolutePath(),
+                        "-f", "BackgroundModel",
                         "-n", nStates.toString(),
                         "-b", nBins.toString(),
                         "-p", pseudoCount.toString(),

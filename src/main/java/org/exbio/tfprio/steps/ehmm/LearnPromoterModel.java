@@ -14,7 +14,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class LearnPromoterModel extends ExecutableStep<Configs> {
     private final OutputFile outputDir = addOutput("out");
-    public final OutputFile outputFile = addOutput(outputDir,"model.RData");
+    public final OutputFile outputFile = addOutput(outputDir,"PromoterModel.RData");
     private final InputFile bedFile;
     private final InputFile baiFile;
     private final InputFile bamFile;
@@ -41,6 +41,7 @@ public class LearnPromoterModel extends ExecutableStep<Configs> {
                         learnModelRscript.getAbsolutePath(),
                         "-r", bedFile.getAbsolutePath(),
                         "-m", bamFile.getParent(),
+                        "-f", "PromoterModel",
                         "-n", nStates.toString(),
                         "-b", nBins.toString(),
                         "-p", pseudoCount.toString(),
