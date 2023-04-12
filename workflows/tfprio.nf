@@ -81,9 +81,12 @@ workflow TFPRIO {
     } else {
         RNASEQ ()
         ch_count = RNASEQ.out.counts
+        ch_bigwig = RNASEQ.out.bigwig
     }
 
     CHIPSEQ ()
+    ch_peaks = CHIPSEQ.out.peaks
+
 
     COUNT_PREPROCESSING (ch_count, ch_rnaseq_samplesheet)
 }

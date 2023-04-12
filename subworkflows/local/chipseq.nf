@@ -724,4 +724,8 @@ workflow CHIPSEQ {
         )
         multiqc_report = MULTIQC.out.report.toList()
     }
+
+    emit:
+    versions = ch_versions
+    peaks = ch_macs2_peaks
 }
