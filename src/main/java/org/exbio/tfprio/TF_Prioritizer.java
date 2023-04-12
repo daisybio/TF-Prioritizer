@@ -226,15 +226,18 @@ public class TF_Prioritizer extends Workflow<Configs> {
             EnhancerAtlas enhancerAtlas = add(new EnhancerAtlas(configs));
             // Genome specific promoters
             EPDNew epdNew = add(new EPDNew(configs));
+            // remove enhancers and promoters from background data and filter for existing enhancers and promoters
+            SplitLearningData splitLearningData = add(new SplitLearningData(configs,
+                    enhancerAtlas.outputFile, epdNew.outputFile, getChipData.outputFile));
             // learn background model (excluding promoters and enhancers)
-            LearnBackgroundModel learnBackgroundModel = add(new LearnBackgroundModel(configs, getChipData.outputFile,
-                    getChipData.bamDir, enhancerAtlas.outputFile, epdNew.bedFile));
+            LearnBackgroundModel learnBackgroundModel = add(new LearnBackgroundModel(configs,
+                    splitLearningData.background, getChipData.bamDir));
             // learn enhancer model
             LearnEnhancerModel learnEnhancerModel = add(new LearnEnhancerModel(configs,
-                    learnBackgroundModel.filteredEnhancers, getChipData.bamDir));
+                    splitLearningData.enhancers, getChipData.bamDir));
             // learn promoter model
             LearnPromoterModel learnPromoterModel = add(new LearnPromoterModel(configs,
-                    learnBackgroundModel.filteredPromoters, getChipData.bamDir));
+                    splitLearningData.promoters, getChipData.bamDir));
             // combine models and construct final model to apply to input data
             ConstructModel constructModel = add(new ConstructModel(configs,
                     learnBackgroundModel.outputFile, learnEnhancerModel.outputFile, learnPromoterModel.outputFile));

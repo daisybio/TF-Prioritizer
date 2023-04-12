@@ -17,11 +17,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 public class LearnBackgroundModel extends ExecutableStep<Configs> {
     private final OutputFile outputDir = addOutput("out");
     public final OutputFile outputFile = addOutput(outputDir,"BackgroundModel.RData");
-    public final OutputFile filteredEnhancers = addOutput("enhancers.bed");
-    public final OutputFile filteredPromoters = addOutput("promoters.bed");
     private final InputFile bedFile;
-    private final InputFile enhancers;
-    private final InputFile promoters;
     private final InputFile bamDir;
 
     private final RequiredConfig<Integer> nStates = new RequiredConfig<>(configs.ehmm.nStates);
@@ -29,12 +25,9 @@ public class LearnBackgroundModel extends ExecutableStep<Configs> {
     private final Integer nBins = new RequiredConfig<>(configs.ehmm.nBins).get()*10;
     private final InputFile learnModelRscript;
 
-    public LearnBackgroundModel(Configs configs, OutputFile bedFile, OutputFile bamDir,
-                                OutputFile enhancers, OutputFile promoters) {
+    public LearnBackgroundModel(Configs configs, OutputFile bedFile, OutputFile bamDir) {
         super(configs, false, bamDir, bedFile);
         this.bedFile = addInput(bedFile);
-        this.enhancers = addInput(enhancers);
-        this.promoters = addInput(promoters);
         this.bamDir = addInput(bamDir);
         this.learnModelRscript = addInput(getClass().getResourceAsStream("learnModel.R"), "learnModel.R");
     }
@@ -93,32 +86,10 @@ public class LearnBackgroundModel extends ExecutableStep<Configs> {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {
-                // read enhancer and promoter bed regions
-                Set<Region> enhancerSet = Files.lines(enhancers.toPath()).map(Region::new).collect(Collectors.toSet());
-                Set<Region> promoterSet = Files.lines(promoters.toPath()).map(Region::new).collect(Collectors.toSet());
-                // read background regions
-                Set<Region> backgroundSet = Files.lines(bedFile.toPath())
-                        .map(Region::new)
-                        .collect(Collectors.toSet());
-                // filter for enhancers and promoters that are present in background
-                enhancerSet.retainAll(backgroundSet);
-                promoterSet.retainAll(backgroundSet);
-                Files.write(filteredEnhancers.toPath(),
-                        (Iterable<String>) enhancerSet.stream().map(Region::toString)::iterator);
-                Files.write(filteredPromoters.toPath(),
-                        (Iterable<String>) promoterSet.stream().map(Region::toString)::iterator);
-                // remove enhancer and promoter regions from background bed
-                Set<Region> blackListRegions = new HashSet<>(enhancerSet);
-                blackListRegions.addAll(promoterSet);
-                backgroundSet.removeAll(blackListRegions);
-                // save filtered bedFile
-                OutputFile filteredBedFile = addOutput("backgroundRegions.bed");
-                Files.write(filteredBedFile.toPath(),
-                        (Iterable<String>) backgroundSet.stream().map(Region::toString)::iterator);
                 // build background model
                 String ehmmCommand = String.join(" ","Rscript",
                         learnModelRscript.getAbsolutePath(),
-                        "-r", filteredBedFile.getAbsolutePath(),
+                        "-r", bedFile.getAbsolutePath(),
                         "-m", bamDir.getAbsolutePath(),
                         "-f", "BackgroundModel",
                         "-n", nStates.toString(),

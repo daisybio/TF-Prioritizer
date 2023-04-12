@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class EPDNew extends ExecutableStep<Configs> {
-    public final OutputFile bedFile = addOutput("promoters.bed");
+    public final OutputFile outputFile = addOutput("promoters.bed");
     private final URI downloadURI;
 
     public EPDNew(Configs configs){
@@ -33,7 +33,7 @@ public class EPDNew extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 String promoterBed = IOUtils.toString(downloadURI.toURL().openStream(), StandardCharsets.UTF_8);
-                Files.writeString(bedFile.toPath(), promoterBed
+                Files.writeString(outputFile.toPath(), promoterBed
                         .replace(" ", "\t")
                         .replace("chr", ""));
                 return true;
