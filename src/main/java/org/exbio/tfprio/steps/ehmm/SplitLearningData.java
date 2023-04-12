@@ -39,7 +39,7 @@ public class SplitLearningData extends ExecutableStep<Configs> {
                 // split learning data to background, enhancer, and promoter regions
                 String ehmmCommand = String.join(" ","Rscript",
                         script.getAbsolutePath(),
-                        "-bg", allBackground.getAbsolutePath(),
+                        "-b", allBackground.getAbsolutePath(),
                         "-e", allEnhancers.getAbsolutePath(),
                         "-p", allPromoters.getAbsolutePath(),
                         "-o", outputDirectory.getAbsolutePath());
