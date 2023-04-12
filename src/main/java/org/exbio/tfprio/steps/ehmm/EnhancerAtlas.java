@@ -104,6 +104,9 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                 }
                 // replace bedFile
                 Files.move(checkChromosomes.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.write(Paths.get(outputFile.getAbsolutePath()),
+                        (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
+                        StandardOpenOption.APPEND);
                 return true;
             }));
         }};
