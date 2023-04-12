@@ -38,7 +38,7 @@ public class GetChipData extends ExecutableStep<Configs> {
 
         // select chromatin accessible state of RNA polymerase II and other
         RequiredConfig<String> chromatinAccess = new RequiredConfig<>(configs.ehmm.chromatinAccessAntigen);
-        Set<String> hist = peakFiles.values().stream().findFirst().orElseThrow().keySet();
+        Set<String> hist = new HashSet<>(peakFiles.values().stream().findFirst().orElseThrow().keySet());
         hist.add(chromatinAccess.get());
         this.histoneModifications = hist;
     }
