@@ -26,7 +26,8 @@ public class GetChipData extends ExecutableStep<Configs> {
     private final InputFile chromosomeLengths;
     private final RequiredConfig<List<String>> tissues = new RequiredConfig<>(configs.chipAtlas.tissueTypes);
     private final RequiredConfig<String> genomeVersion = new RequiredConfig<>(configs.inputConfigs.genome);
-    private final String seqType = new RequiredConfig<>(configs.inputConfigs.seqType).get();
+    private final Set<String> antigenClasses = Set.of(new RequiredConfig<>(configs.ehmm.experiment).get(),
+            new RequiredConfig<>(configs.ehmm.chromatinAccessClass).get());
     private final Set<String> histoneModifications;
 
     public GetChipData(Configs configs, OutputFile chipFileList,
@@ -35,12 +36,11 @@ public class GetChipData extends ExecutableStep<Configs> {
         this.chipFileList = addInput(chipFileList);
         this.chromosomeLengths = addInput(chromosomeLengths);
 
-        // no specific modifications or antigens to filter ChipAtlas for
-        if (!this.seqType.equals("chip-seq")) {
-            this.histoneModifications = Set.of("ALL");
-        } else {
-            this.histoneModifications = peakFiles.values().stream().findFirst().orElseThrow().keySet();
-        }
+        // select chromatin accessible state of RNA polymerase II and other
+        RequiredConfig<String> chromatinAccess = new RequiredConfig<>(configs.ehmm.chromatinAccessAntigen);
+        Set<String> hist = peakFiles.values().stream().findFirst().orElseThrow().keySet();
+        hist.add(chromatinAccess.get());
+        this.histoneModifications = hist;
     }
 
     private static class ChipListEntry {
@@ -83,12 +83,14 @@ public class GetChipData extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 logger.trace("Starting to read the ChipAtlas file list");
-                logger.debug("filtering for params: antigenClass: {}, tissues: {}, hms: {}", seqType, tissues, histoneModifications);
+                logger.debug("filtering for params: antigenClass: {}, tissues: {}, hms: {}",
+                        antigenClasses, tissues, histoneModifications);
                 Set<ChipListEntry> validEntries = Files.lines(Path.of(chipFileList.getAbsolutePath()))
                         .skip(1)
                         .map(ChipListEntry::new)
                         .filter(entry -> entry.genomeAssembly.equalsIgnoreCase(genomeVersion.get()))
-                        .filter(entry -> entry.antigenClass.equalsIgnoreCase(seqType))
+                        .filter(entry -> antigenClasses.stream()
+                                .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.antigenClass)))
                         .filter(entry -> tissues.get().stream().
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
                         .filter(entry -> histoneModifications.stream()

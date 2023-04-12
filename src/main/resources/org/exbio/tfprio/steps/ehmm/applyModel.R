@@ -294,7 +294,7 @@ extractRegions <- function(segmentation, regions, genomeSize, outdir) {
     elms.tiled <- gr[startsWith(gr$name, paste0(label, "_A"))]
     file.create(regionsBedfile)
     export.bed(reduce(elms.tiled), regionsBedfile)
-  }, rdata$score, c("enhancer", "promoter"))
+  }, segmentation$score, c("enhancer", "promoter"))
 }
 
 applyModel <- function (regions, model = NULL, provideModel = FALSE, genomeSize,
@@ -364,7 +364,7 @@ parser <- add_argument(parser, "-t", help = "Number of threads to use", default 
 parser <- add_argument(parser, "-p", help = "Pseudocount", default = 1.0, type = "double")
 
 argv <- parse_args(parser, argv = args)
-cat("loading input data")
+message("loading input data")
 binsize <- argv$s
 nthreads <- argv$t
 pseudocount <- argv$p
@@ -430,11 +430,17 @@ message("pileup done, storing everything in a matrix")
 counts <- t(bindCols(countsList)) + pseudocount
 message("loading model")
 model <- readModel(argv$m)
+model$marks <- toupper(model$marks)
+rownames(counts) <- toupper(rownames(counts))
 commonMarks <- intersect(rownames(counts), model$marks)
-if (length(commonMarks) < length(unique(rownames(counts), model$marks))) {
+if (length(commonMarks) < length(unique(c(rownames(counts), model$marks)))) {
   message("INFO: only using marks that are present in both training and testing set:\n",
           "-> ", paste(commonMarks, collapse = ", "))
-  counts <- counts[commonMarks,]
+  if(nrow(counts)>1) counts <- counts[commonMarks,]
+  model$marks <- commonMarks
+  if (length(model$emisP[[1]]) > length(commonMarks)) {
+    model$emisP <- lapply(model$emisP, lapply, "[", which(commonMarks==model$marks))
+  }
 }
 message("loading genome sizes")
 genomeSizes <- import(argv$g, format = "bed")

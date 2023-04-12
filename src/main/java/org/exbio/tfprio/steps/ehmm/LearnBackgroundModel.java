@@ -7,18 +7,18 @@ import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class LearnBackgroundModel extends ExecutableStep<Configs> {
     private final OutputFile outputDir = addOutput("out");
     public final OutputFile outputFile = addOutput(outputDir,"BackgroundModel.RData");
+    public final OutputFile filteredEnhancers = addOutput("enhancers.bed");
+    public final OutputFile filteredPromoters = addOutput("promoters.bed");
     private final InputFile bedFile;
     private final InputFile enhancers;
     private final InputFile promoters;
@@ -94,23 +94,22 @@ public class LearnBackgroundModel extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 // read enhancer and promoter bed regions
-                Set<Region> blackListRegions = Stream.of(enhancers, promoters)
-                        .map(file -> {
-                            try {
-                                return Files.lines(file.toPath())
-                                        .map(Region::new)
-                                        .collect(Collectors.toSet());
-                            } catch (IOException e) {
-                                throw new RuntimeException("Could not read file: " + file);
-                            }
-                        })
-                        .flatMap(Set::stream)
-                        .collect(Collectors.toSet());
+                Set<Region> enhancerSet = Files.lines(enhancers.toPath()).map(Region::new).collect(Collectors.toSet());
+                Set<Region> promoterSet = Files.lines(promoters.toPath()).map(Region::new).collect(Collectors.toSet());
                 // read background regions
                 Set<Region> backgroundSet = Files.lines(bedFile.toPath())
                         .map(Region::new)
                         .collect(Collectors.toSet());
+                // filter for enhancers and promoters that are present in background
+                enhancerSet.retainAll(backgroundSet);
+                promoterSet.retainAll(backgroundSet);
+                Files.write(filteredEnhancers.toPath(),
+                        (Iterable<String>) enhancerSet.stream().map(Region::toString)::iterator);
+                Files.write(filteredPromoters.toPath(),
+                        (Iterable<String>) promoterSet.stream().map(Region::toString)::iterator);
                 // remove enhancer and promoter regions from background bed
+                Set<Region> blackListRegions = new HashSet<>(enhancerSet);
+                blackListRegions.addAll(promoterSet);
                 backgroundSet.removeAll(blackListRegions);
                 // save filtered bedFile
                 OutputFile filteredBedFile = addOutput("backgroundRegions.bed");

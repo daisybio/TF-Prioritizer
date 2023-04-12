@@ -23,9 +23,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class EnhancerAtlas extends ExecutableStep<Configs> {
     public final OutputFile bedDir = addOutput("bed");
-    public final OutputFile bamDir = addOutput("bam");
     public final OutputFile outputFile = addOutput("allEnhancers.bed");
-    private final InputFile chromosomeLengths;
     private final String enhancerHTML = new RequiredConfig<>(configs.enhancerAtlas.enhancerHTMLString).get();
     private final URI enhancerBaseURI = URI.create(new RequiredConfig<>(configs.enhancerAtlas.enhancerBaseURLString).get());
     private final RequiredConfig<String> genome = new RequiredConfig<>(configs.inputConfigs.genome);
@@ -36,9 +34,8 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
     private final RequiredConfig<Map<String, String>> enhancerVersionMap = new RequiredConfig<>(configs.enhancerAtlas.enhancerVersionMap);
     private final InputFile script;
 
-    public EnhancerAtlas(Configs configs, OutputFile chromosomeLengths) {
-        super(configs, false, chromosomeLengths);
-        this.chromosomeLengths = addInput(chromosomeLengths);
+    public EnhancerAtlas(Configs configs) {
+        super(configs);
         script = addInput(getClass().getResourceAsStream("uplift.py"), "uplift.py");
     }
 
@@ -107,19 +104,6 @@ public class EnhancerAtlas extends ExecutableStep<Configs> {
                 }
                 // replace bedFile
                 Files.move(checkChromosomes.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                // create bam files
-                OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) +".bam");
-                String cmd = String.join(" ",
-                        "bedToBam",
-                        "-i", bedFile.getAbsolutePath(),
-                        "-g", chromosomeLengths.getAbsolutePath(),
-                        "|", "samtools", "sort", "-",
-                        ">", bamFile.getAbsolutePath(),
-                        ";", "samtools", "index", bamFile.getAbsolutePath());
-                executeAndWait(List.of("/bin/sh", "-c", cmd), false);
-                Files.write(Paths.get(outputFile.getAbsolutePath()),
-                        (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
-                        StandardOpenOption.APPEND);
                 return true;
             }));
         }};

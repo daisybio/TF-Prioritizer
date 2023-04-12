@@ -16,19 +16,17 @@ public class LearnPromoterModel extends ExecutableStep<Configs> {
     private final OutputFile outputDir = addOutput("out");
     public final OutputFile outputFile = addOutput(outputDir,"PromoterModel.RData");
     private final InputFile bedFile;
-    private final InputFile baiFile;
-    private final InputFile bamFile;
+    private final InputFile bamDir;
 
     private final RequiredConfig<Integer> nStates = new RequiredConfig<>(configs.ehmm.nStates);
     private final RequiredConfig<Double> pseudoCount = new RequiredConfig<>(configs.ehmm.pseudoCount);
     private final RequiredConfig<Integer> nBins = new RequiredConfig<>(configs.ehmm.nBins);
     private final InputFile learnModelRscript;
 
-    public LearnPromoterModel(Configs configs, OutputFile bedFile, OutputFile bamFile, OutputFile baiFile){
-        super(configs, false, bedFile, bamFile);
+    public LearnPromoterModel(Configs configs, OutputFile bedFile, OutputFile bamDir){
+        super(configs, false, bedFile);
         this.bedFile = addInput(bedFile);
-        this.bamFile = addInput(bamFile);
-        this.baiFile = addInput(baiFile);
+        this.bamDir = addInput(bamDir);
         this.learnModelRscript = addInput(getClass().getResourceAsStream("learnModel.R"), "learnModel.R");
     }
 
@@ -40,7 +38,7 @@ public class LearnPromoterModel extends ExecutableStep<Configs> {
                 String ehmmCommand = String.join(" ","Rscript",
                         learnModelRscript.getAbsolutePath(),
                         "-r", bedFile.getAbsolutePath(),
-                        "-m", bamFile.getParent(),
+                        "-m", bamDir.getParent(),
                         "-f", "PromoterModel",
                         "-n", nStates.toString(),
                         "-b", nBins.toString(),

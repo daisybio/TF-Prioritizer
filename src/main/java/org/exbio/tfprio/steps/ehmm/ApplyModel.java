@@ -24,6 +24,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get()*10;
     private final InputFile applyModelScript;
 
+    // TODO: reorganize inputs, causes errors in execution
     public ApplyModel(Configs configs, Map<String, OutputFile> regions, OutputFile chromosomeSizes,
                       OutputFile constructedModel) {
         super(configs, false, regions.values(), chromosomeSizes, constructedModel);
@@ -41,24 +42,21 @@ public class ApplyModel extends ExecutableStep<Configs> {
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
-            add(() -> {
-                regions.forEach((s, r) -> add(() -> {
-                    // apply model to each group
-                    String ehmmCommand = String.join(" ","Rscript",
-                            applyModelScript.getAbsolutePath(),
-                            "-r", r.getAbsolutePath(),
-                            "-g", chromosomeSizes.getParent(),
-                            "-m", constructedModel.getAbsolutePath(),
-                            "-b", bamDirs.get(s).getAbsolutePath(),
-                            "-o", outputDirs.get(s).getAbsolutePath(),
-                            "-s", binSize.toString(),
-                            "-t", nThreads.toString(),
-                            "-p", pseudoCounts.toString());
-                    executeAndWait(ehmmCommand, false);
-                    return true;
-                }));
+            regions.forEach((s, r) -> add(() -> {
+                // apply model to each group
+                String ehmmCommand = String.join(" ","Rscript",
+                        applyModelScript.getAbsolutePath(),
+                        "-r", r.getAbsolutePath(),
+                        "-g", chromosomeSizes.getParent(),
+                        "-m", constructedModel.getAbsolutePath(),
+                        "-b", bamDirs.get(s).getAbsolutePath(),
+                        "-o", outputDirs.get(s).getAbsolutePath(),
+                        "-s", binSize.toString(),
+                        "-t", nThreads.toString(),
+                        "-p", pseudoCounts.toString());
+                executeAndWait(ehmmCommand, false);
                 return true;
-            });
+            }));
         }};
     }
 }
