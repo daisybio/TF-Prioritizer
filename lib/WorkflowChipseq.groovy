@@ -11,33 +11,36 @@ class WorkflowChipseq {
         genomeExistsError(params, log)
 
 
-        if (!params.fasta) {
-            log.error "Genome fasta file not specified with e.g. '--fasta' or via a detectable config file."
-            System.exit(1)
-        }
+        if (!params.chipseq_peaks)
+        {
+            if (!params.fasta) {
+                log.error "Genome fasta file not specified with e.g. '--fasta' or via a detectable config file."
+                System.exit(1)
+            }
 
-        if (!params.gtf && !params.gff) {
-            log.error "No GTF or GFF3 annotation specified! The pipeline requires at least one of these files."
-            System.exit(1)
-        }
+            if (!params.gtf && !params.gff) {
+                log.error "No GTF or GFF3 annotation specified! The pipeline requires at least one of these files."
+                System.exit(1)
+            }
 
-        if (params.gtf && params.gff) {
-            gtfGffWarn(log)
-        }
+            if (params.gtf && params.gff) {
+                gtfGffWarn(log)
+            }
 
-        if (!params.macs_gsize) {
-            macsGsizeWarn(log)
-        }
+            if (!params.macs_gsize) {
+                macsGsizeWarn(log)
+            }
 
-        if (!params.chipseq_read_length && !params.macs_gsize) {
-            log.error "Both '--read_length' and '--macs_gsize' not specified! Please specify either to infer MACS2 genome size for peak calling."
-            System.exit(1)
-        }
+            if (!params.chipseq_read_length && !params.macs_gsize) {
+                log.error "Both '--read_length' and '--macs_gsize' not specified! Please specify either to infer MACS2 genome size for peak calling."
+                System.exit(1)
+            }
 
-        if (params.chipseq_aligner) {
-            if (!valid_params['aligners'].contains(params.chipseq_aligner)) {
-                    log.error "Invalid option: '${params.chipseq_aligner}'. Valid options for '--aligner': ${valid_params['aligners'].join(', ')}."
-                    System.exit(1)
+            if (params.chipseq_aligner) {
+                if (!valid_params['aligners'].contains(params.chipseq_aligner)) {
+                        log.error "Invalid option: '${params.chipseq_aligner}'. Valid options for '--aligner': ${valid_params['aligners'].join(', ')}."
+                        System.exit(1)
+                }
             }
         }
     }

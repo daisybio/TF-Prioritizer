@@ -45,7 +45,7 @@ params.enable_conda     = false
 WorkflowMain.initialise(workflow, params, log)
 
 if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = file(params.rnaseq_samplesheet) } else { exit 1, 'RNAseq samplesheet not specified!' }
-if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = file(params.chipseq_samplesheet) } else { exit 1, 'ChIPseq samplesheet not specified!' }
+if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = Channel.fromPath(params.chipseq_samplesheet) } else { exit 1, 'ChIPseq samplesheet not specified!' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,11 +84,29 @@ workflow TFPRIO {
         ch_bigwig = RNASEQ.out.bigwig
     }
 
-    CHIPSEQ ()
-    ch_peaks = CHIPSEQ.out.peaks
+    if (params.chipseq_peaks) {
+        ch_peaks = Channel.fromPath(params.chipseq_peaks)
+    } else {
+        CHIPSEQ ()
+        ch_peaks = CHIPSEQ.out.peaks
+    }
+
+    ch_chipseq_annotations = ch_chipseq_samplesheet
+        .splitCsv(header: true, sep: ',')
+        // Remove control samples
+        .filter { it.antibody != '' && it.group != '' }
+        .map { [it.sample, it.antibody, it.group ] }
+        .unique()
+    
+    ch_peaks
+        .map { [it.name, it] }
+        // Remove file ending from name
+        .map { [it[0].replaceAll(/.narrowPeak|.broadPeak|.gappedPeak|.bed|.bed$/,''), it[1]] }
+        .map { [it[0].replaceAll(/_peaks$/, ''), it[1]] }
+        .combine(ch_chipseq_annotations, by: 0)
 
 
-    COUNT_PREPROCESSING (ch_count, ch_rnaseq_samplesheet)
+    // COUNT_PREPROCESSING (ch_count, ch_rnaseq_samplesheet)
 }
 
 /*
