@@ -104,7 +104,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                     throw new RuntimeException("No matching bed files found in ChipAtlas for given filters");
                 }
                 validEntries.forEach(entry -> {
-                    File bedFile = addOutput(bedDir, entry.name());
+                    File bedFile = addOutput(bedDir, entry.name().replace(" ", "_"));
                     int attempt = 1;
                     while (!bedFile.exists()) {
                         logger.debug("Downloading chip atlas bed file: " + bedFile.getName() + " (Attempt: " + attempt + ")");
