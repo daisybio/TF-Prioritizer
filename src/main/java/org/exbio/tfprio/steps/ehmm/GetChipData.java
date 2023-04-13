@@ -84,6 +84,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                         .filter(entry -> tissues.stream().
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
                         .filter(entry -> Objects.equals(entry.threshold, threshold))
+                        .filter(entry -> entry.cellType.equals(""))
                         .collect(Collectors.toSet());
                 int nEntries = validEntries.size();
                 if (nEntries > 0) {
