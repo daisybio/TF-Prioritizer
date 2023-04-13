@@ -80,13 +80,13 @@ public class GetChipData extends ExecutableStep<Configs> {
                         .map(ChipListEntry::new)
                         .filter(entry -> entry.genomeAssembly.equalsIgnoreCase(genomeVersion))
                         .filter(entry -> antigenClasses.stream()
-                                .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.antigenClass) &&
-                                        entry.cellType.equals(cellType)))
+                                .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.antigenClass)))
                         .filter(entry -> tissues.stream().
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
                         .filter(entry -> histoneModifications.stream()
                                 .anyMatch(hm -> hm.equalsIgnoreCase(entry.antigen)))
                         .filter(entry -> Objects.equals(entry.threshold, threshold))
+                        .filter(entry -> !(entry.antigenClass.equals("Histone") && entry.cellType.equals("")))
                         .collect(Collectors.toSet());
                 int nEntries = validEntries.size();
                 if (nEntries > 0) {
