@@ -94,82 +94,79 @@ public class GetChipData extends ExecutableStep<Configs> {
                 } else {
                     throw new RuntimeException("No matching bed files found in ChipAtlas for given filters");
                 }
-                ForkJoinPool threadPool = new ForkJoinPool(nEntries);
-                threadPool.submit(() ->
-                        validEntries.forEach(entry -> {
-                            File bedFile = addOutput(bedDir, entry.name().replace(" ", "_"));
-                            int attempt = 1;
-                            while (!bedFile.exists()) {
-                                logger.debug("Downloading chip atlas bed file: " + bedFile.getName() + " (Attempt: " + attempt + ")");
-                                try {
-                                    makeSureFileExists(bedFile);
-                                    IOUtils.copy(new URL(entry.fileUrl), bedFile);
+                validEntries.parallelStream().parallel().forEach(entry -> {
+                    File bedFile = addOutput(bedDir, entry.name().replace(" ", "_"));
+                    int attempt = 1;
+                    while (!bedFile.exists()) {
+                        logger.debug("Downloading chip atlas bed file: " + bedFile.getName() + " (Attempt: " + attempt + ")");
+                        try {
+                            makeSureFileExists(bedFile);
+                            IOUtils.copy(new URL(entry.fileUrl), bedFile);
 
-                                    long size = Files.size(bedFile.toPath());
+                            long size = Files.size(bedFile.toPath());
 
-                                    if (size < 300) {
-                                        logger.warn("File {} is too small ({} bytes)", bedFile, size);
-                                        throw new IOException("File too small");
-                                    }
-                                } catch (IOException e) {
-                                    attempt++;
-                                    if (attempt > 3) {
-                                        throw new RuntimeException("Could not download file " + entry.fileUrl);
-                                    }
-                                }
+                            if (size < 300) {
+                                logger.warn("File {} is too small ({} bytes)", bedFile, size);
+                                throw new IOException("File too small");
                             }
-                            logger.trace("Simplifying ChipAtlas file {}", bedFile.getAbsolutePath());
-                            OutputFile simpleBed = new OutputFile(bedDir, "tmp.bed");
-                            // simplify data from chipAtlas, causes errors in bam creation
-                            try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
-                                 BufferedWriter bw = new BufferedWriter(new FileWriter(simpleBed))) {
-                                br.readLine();  // skip header
-                                for (String line = br.readLine(); line != null; line = br.readLine()) {
-                                    String[] tsvData = line.split("\t");
-                                    String chr = tsvData[0];
-                                    String auxData = tsvData[3];
-                                    // remove chr prefix
-                                    if (chr.startsWith("chr")) chr = chr.substring("chr".length());
-                                    // simplify aux data
-                                    auxData = auxData.substring(0, auxData.indexOf(";"));
-                                    tsvData[0] = chr;
-                                    tsvData[3] = auxData;
-                                    bw.write(String.join("\t", tsvData));
-                                    bw.newLine();
-                                }
-                            } catch (IOException e) {
-                                throw new RuntimeException("ChipAtlas bed file does not exist or cannot be opened.");
+                        } catch (IOException e) {
+                            attempt++;
+                            if (attempt > 3) {
+                                throw new RuntimeException("Could not download file " + entry.fileUrl);
                             }
-                            // replace complex bed with simplified version
-                            try {
-                                Files.move(simpleBed.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            } catch (IOException e) {
-                                throw new RuntimeException("Failed to replace " + bedFile.getAbsolutePath() +
-                                        " with " + simpleBed.getAbsolutePath());
-                            }
-                            logger.trace("Building associated bam file for {}", bedFile.getAbsolutePath());
-                            OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) + ".bam");
-                            String cmd = String.join(" ",
-                                    "bedToBam",
-                                    "-i", bedFile.getAbsolutePath(),
-                                    "-g", chromosomeLengths.getAbsolutePath(),
-                                    "|", "samtools", "sort", "-",
-                                    ">", bamFile.getAbsolutePath(),
-                                    ";", "samtools", "index", bamFile.getAbsolutePath());
-                            try {
-                                executeAndWait(List.of("/bin/sh", "-c", cmd), false);
-                            } catch (IOException e) {
-                                throw new RuntimeException("BedToBam creation failed");
-                            }
-                            try {
-                                Files.write(Paths.get(outputFile.getAbsolutePath()),
-                                        (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
-                                        StandardOpenOption.APPEND);
-                            } catch (IOException e) {
-                                throw new RuntimeException("Appending to merged bed file failed");
-                            }
-                        }));
-                threadPool.shutdown();
+                        }
+                    }
+                    logger.trace("Simplifying ChipAtlas file {}", bedFile.getAbsolutePath());
+                    OutputFile simpleBed = new OutputFile(bedDir, "tmp.bed");
+                    // simplify data from chipAtlas, causes errors in bam creation
+                    try (BufferedReader br = new BufferedReader(new FileReader(bedFile));
+                         BufferedWriter bw = new BufferedWriter(new FileWriter(simpleBed))) {
+                        br.readLine();  // skip header
+                        for (String line = br.readLine(); line != null; line = br.readLine()) {
+                            String[] tsvData = line.split("\t");
+                            String chr = tsvData[0];
+                            String auxData = tsvData[3];
+                            // remove chr prefix
+                            if (chr.startsWith("chr")) chr = chr.substring("chr".length());
+                            // simplify aux data
+                            auxData = auxData.substring(0, auxData.indexOf(";"));
+                            tsvData[0] = chr;
+                            tsvData[3] = auxData;
+                            bw.write(String.join("\t", tsvData));
+                            bw.newLine();
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("ChipAtlas bed file does not exist or cannot be opened.");
+                    }
+                    // replace complex bed with simplified version
+                    try {
+                        Files.move(simpleBed.toPath(), bedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to replace " + bedFile.getAbsolutePath() +
+                                " with " + simpleBed.getAbsolutePath());
+                    }
+                    logger.trace("Building associated bam file for {}", bedFile.getAbsolutePath());
+                    OutputFile bamFile = addOutput(bamDir, FilenameUtils.getBaseName(bedFile.getPath()) + ".bam");
+                    String cmd = String.join(" ",
+                            "bedToBam",
+                            "-i", bedFile.getAbsolutePath(),
+                            "-g", chromosomeLengths.getAbsolutePath(),
+                            "|", "samtools", "sort", "-",
+                            ">", bamFile.getAbsolutePath(),
+                            ";", "samtools", "index", bamFile.getAbsolutePath());
+                    try {
+                        executeAndWait(List.of("/bin/sh", "-c", cmd), false);
+                    } catch (IOException e) {
+                        throw new RuntimeException("BedToBam creation failed");
+                    }
+                    try {
+                        Files.write(Paths.get(outputFile.getAbsolutePath()),
+                                (Iterable<String>) Files.lines(Path.of(bedFile.getAbsolutePath()))::iterator,
+                                StandardOpenOption.APPEND);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Appending to merged bed file failed");
+                    }
+                });
                 return true;
             });
         }};
