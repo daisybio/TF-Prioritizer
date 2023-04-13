@@ -92,7 +92,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                 int nEntries = validEntries.size();
                 if (nEntries > 0) {
                     logger.debug("Found {} matching bed files in ChipAtlas: {}",
-                            nEntries, validEntries.stream().map(ChipListEntry::name));
+                            nEntries, validEntries.stream().map(ChipListEntry::name).collect(Collectors.toSet()));
                 } else {
                     throw new RuntimeException("No matching bed files found in ChipAtlas for given filters");
                 }
