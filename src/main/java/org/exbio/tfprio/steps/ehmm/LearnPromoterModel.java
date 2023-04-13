@@ -24,7 +24,7 @@ public class LearnPromoterModel extends ExecutableStep<Configs> {
     private final InputFile learnModelRscript;
 
     public LearnPromoterModel(Configs configs, OutputFile bedFile, OutputFile bamDir){
-        super(configs, false, bedFile);
+        super(configs, false, bedFile, bamDir);
         this.bedFile = addInput(bedFile);
         this.bamDir = addInput(bamDir);
         this.learnModelRscript = addInput(getClass().getResourceAsStream("learnModel.R"), "learnModel.R");
