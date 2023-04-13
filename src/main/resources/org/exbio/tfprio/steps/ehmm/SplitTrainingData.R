@@ -3,6 +3,15 @@ library(argparser)
 library(rtracklayer)
 library(GenomicRanges)
 
+filterRegions <- function(regions, w = 2000) {
+  regions <- reduce(regions)
+  message("filter enhancer and promoter regions for a length of < 2 kb")
+  regions <- regions[width(regions) < w]
+  d <- distance(regions[1:(length(regions)-1)], regions[2:length(regions)])
+  message("remove neighboring regions with a pairwise distance of < 2 kb")
+  regions[d >= w | is.na(d)]
+}
+
 args <- commandArgs(trailingOnly = T)
 parser <- arg_parser("Filtering command line parser", name = "ehmm_training_filter")
 parser <- add_argument(parser, "-e", help = "enhancer bed file")
@@ -19,12 +28,10 @@ pRegions <- import(argv$p, format = "bed")
 message("extract enhancer and promoter regions within background regions")
 eAndBg <- findOverlapPairs(bgRegions, eRegions)
 pAndBg <- findOverlapPairs(bgRegions, pRegions)
-eBgRegions <- unique(eAndBg@first)
-eBgRegions <- eBgRegions[width(eBgRegions)<2000]
-pBgRegions <- unique(pAndBg@first)
-pBgRegions <- pBgRegions[width(pBgRegions)<2000]
+eBgRegions <- filterRegions(eAndBg@first)
+pBgRegions <- filterRegions(pAndBg@first)
 message("removing enhancers and promoters from background regions")
-bgRegions <- bgRegions[!names(bgRegions) %in% unique(c(names(eAndBg@first), names(pAndBg@first)))]
+bgRegions <- reduce(bgRegions[!names(bgRegions) %in% unique(c(names(eAndBg@first), names(pAndBg@first)))])
 message("writing filtered bed files")
 export.bed(bgRegions, file.path(argv$o, "background.bed"))
 export.bed(eBgRegions, file.path(argv$o, "enhancers.bed"))
