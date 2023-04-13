@@ -220,8 +220,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
              */
 
             // ChipAtlas cell and genome specific background data
-            GetChipData getChipData = add(new GetChipData(configs, getList.outputFile,
-                    latestPeakFiles, getChromosomeLengths.outputFile));
+            GetChipData getChipData = add(new GetChipData(configs, getList.outputFile, getChromosomeLengths.outputFile));
             // Cell and genome specific enhancers
             EnhancerAtlas enhancerAtlas = add(new EnhancerAtlas(configs));
             // Genome specific promoters

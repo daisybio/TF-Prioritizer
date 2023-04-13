@@ -24,23 +24,17 @@ public class GetChipData extends ExecutableStep<Configs> {
     public final OutputFile bamDir = addOutput("bam");
     private final InputFile chipFileList;
     private final InputFile chromosomeLengths;
-    private final RequiredConfig<List<String>> tissues = new RequiredConfig<>(configs.chipAtlas.tissueTypes);
-    private final RequiredConfig<String> genomeVersion = new RequiredConfig<>(configs.inputConfigs.genome);
-    private final Set<String> antigenClasses = Set.of(new RequiredConfig<>(configs.ehmm.experiment).get(),
-            new RequiredConfig<>(configs.ehmm.chromatinAccessClass).get());
-    private final Set<String> histoneModifications;
+    private final List<String> tissues = new RequiredConfig<>(configs.chipAtlas.tissueTypes).get();
+    private final String genomeVersion = new RequiredConfig<>(configs.inputConfigs.genome).get();
+    private final Set<String> antigenClasses = new RequiredConfig<>(configs.ehmm.antigenClasses).get();
+    private final Set<String> histoneModifications = new RequiredConfig<>(configs.ehmm.antigens).get();
+    private final String threshold = new RequiredConfig<>(configs.ehmm.threshold).get();
+    private final String cellType = new RequiredConfig<>(configs.ehmm.cellTypes).get();
 
-    public GetChipData(Configs configs, OutputFile chipFileList,
-                       Map<String, Map<String, Collection<OutputFile>>> peakFiles, OutputFile chromosomeLengths){
+    public GetChipData(Configs configs, OutputFile chipFileList, OutputFile chromosomeLengths){
         super(configs, false, chipFileList);
         this.chipFileList = addInput(chipFileList);
         this.chromosomeLengths = addInput(chromosomeLengths);
-
-        // select chromatin accessible state of RNA polymerase II and other
-        RequiredConfig<String> chromatinAccess = new RequiredConfig<>(configs.ehmm.chromatinAccessAntigen);
-        Set<String> hist = new HashSet<>(peakFiles.values().stream().findFirst().orElseThrow().keySet());
-        hist.add(chromatinAccess.get());
-        this.histoneModifications = hist;
     }
 
     private static class ChipListEntry {
@@ -83,19 +77,21 @@ public class GetChipData extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 logger.trace("Starting to read the ChipAtlas file list");
-                logger.debug("filtering for params: antigenClass: {}, tissues: {}, hms: {}",
-                        antigenClasses, tissues, histoneModifications);
+                logger.debug("filtering for params: genome: {}, antigenClass: {}, tissues: {}, hms: {}," +
+                                "threshold: {}",
+                        genomeVersion, antigenClasses, tissues, histoneModifications, threshold);
                 Set<ChipListEntry> validEntries = Files.lines(Path.of(chipFileList.getAbsolutePath()))
                         .skip(1)
                         .map(ChipListEntry::new)
-                        .filter(entry -> entry.genomeAssembly.equalsIgnoreCase(genomeVersion.get()))
+                        .filter(entry -> entry.genomeAssembly.equalsIgnoreCase(genomeVersion))
                         .filter(entry -> antigenClasses.stream()
                                 .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.antigenClass)))
-                        .filter(entry -> tissues.get().stream().
+                        .filter(entry -> tissues.stream().
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
                         .filter(entry -> histoneModifications.stream()
                                 .anyMatch(hm -> hm.equalsIgnoreCase(entry.antigen)))
-                        .filter(entry -> Objects.equals(entry.threshold, "5"))
+                        .filter(entry -> Objects.equals(entry.threshold, threshold))
+                        .filter(entry -> entry.cellType.equalsIgnoreCase(cellType))
                         .collect(Collectors.toSet());
                 int nEntries = validEntries.size();
                 if (nEntries > 0) {
