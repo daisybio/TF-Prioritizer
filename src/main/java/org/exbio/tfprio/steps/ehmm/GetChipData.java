@@ -56,7 +56,7 @@ public class GetChipData extends ExecutableStep<Configs> {
             this.cellType = array[5];
             this.threshold = array[6];
             this.fileUrl = array[array.length-1];
-            this.key = this.antigenClass + "_" + this.antigen;
+            this.key = this.antigen.equals("") ? this.antigenClass: this.antigenClass + "_" + this.antigen;
         }
 
         public String name(){
