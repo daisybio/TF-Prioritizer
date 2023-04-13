@@ -2,9 +2,6 @@ library(ehmm)
 library(rtracklayer)
 library(argparser)
 library(tools)
-library(parallel)
-library(dplyr)
-library(bamsignals)
 
 statesToSegments_helper <- function (regions, states) {
   .Call("_ehmm_statesToSegments_helper", PACKAGE = "ehmm",
@@ -17,65 +14,10 @@ statesToSegments <- function (states, regions) {
                                      names = h$states))
 }
 
-validateVmat <- function (vmat)
-{
-  if (!is.matrix(vmat))
-    stop("vmat must be a matrix")
-  if (!is.numeric(vmat))
-    stop("'vmat' must be numeric")
-  if (length(vmat) <= 0)
-    stop("'vmat' must be non-empty")
-}
-
-quantileNormalization <- function (vmat, ref = c("median", "min", "mean"), nthreads = 1)
-{
-  validateVmat(vmat)
-  if (!is.numeric(ref)) {
-    ref <- match.arg(ref)
-    ref <- getRef(vmat, ref, nthreads)
-  }
-  if (length(ref) != nrow(vmat))
-    stop("reference vector has the wrong length")
-  quantileNorm(vmat, ref, nthreads = nthreads)
-}
-
-propagateErrors <- function (l)
-{
-  for (el in l) if (inherits(el, "try-error"))
-    stop(el)
-  l
-}
-
-safe_mclapply <- function (...)
-  propagateErrors(mclapply(...))
-
-colSummary <- function (mat, type, nthreads = 1L)
-{
-  .Call("_ehmm_colSummary", PACKAGE = "ehmm", mat, type, nthreads)
-}
-
-bindCols <- function (vlist, nthreads = 1L)
-{
-  .Call("_ehmm_bindCols", PACKAGE = "ehmm", vlist, nthreads)
-}
-
-defaultRepFun <- function (vmat, normFun = quantileNormalization, nthreads = 1,
-          ...)
-{
-  normFunOpts <- list(...)
-  normFunOpts$vmat <- vmat
-  if ("nthreads" %in% names(formals(normFun))) {
-    normFunOpts[["nthreads"]] <- nthreads
-  }
-  nvmat <- do.call(normFun, normFunOpts)
-  colSummary(t(nvmat), "median", nthreads = nthreads)
-}
-
 bamtabDefaults <- list(75, 0, FALSE)
 names(bamtabDefaults) <- c("shift", "mapq", "pairedend")
 
-validateBamtab <- function (bamtab)
-{
+validateBamtab <- function (bamtab) {
   if (!is.data.frame(bamtab))
     stop("'bamtab' must be a 'data.frame'")
   reqfields <- c("mark", "path")
@@ -159,18 +101,8 @@ if (any(width(regions)%%binsize!=0)) {
 regions <- regions[!grepl("_", regions@seqnames)]
 # change chromosome M to MT
 regions@seqnames@values <- as.factor(gsub("M", "MT", regions@seqnames@values))
-message("getting counts")
-countsList <- safe_mclapply(mc.cores = nthreads, 1:npaths,
-                            function(i) {
-                              b <- bamtab[i, ]
-                              b$pairedend <- ifelse(b$pairedend, "midpoint", "ignore")
-                              bprof <- bamProfile(b$path, regions, binsize = binsize,
-                                                  shift = b$shift, mapq = b$mapq, paired.end = b$pairedend)
-                              unlist(as.list(bprof))
-                            })
-names(countsList) <- bamtab$mark
-message("pileup done, storing everything in a matrix")
-counts <- t(bind_cols(countsList)) + pseudocount
+
+counts <- getcounts(regions, bamtab, binsize = binsize, nthreads = nthreads) + pseudocount
 
 message("learning model")
 segmentation <- segment(counts = counts, regions = regions,
