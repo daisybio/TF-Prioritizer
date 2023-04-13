@@ -22,7 +22,7 @@ public class LearnBackgroundModel extends ExecutableStep<Configs> {
 
     private final RequiredConfig<Integer> nStates = new RequiredConfig<>(configs.ehmm.nStates);
     private final RequiredConfig<Double> pseudoCount = new RequiredConfig<>(configs.ehmm.pseudoCount);
-    private final Integer nBins = new RequiredConfig<>(configs.ehmm.nBins).get()*10;
+    private final Integer nBins = new RequiredConfig<>(configs.ehmm.nBins).get();
     private final InputFile learnModelRscript;
 
     public LearnBackgroundModel(Configs configs, OutputFile bedFile, OutputFile bamDir) {

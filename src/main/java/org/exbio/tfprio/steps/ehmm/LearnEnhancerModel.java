@@ -20,7 +20,7 @@ public class LearnEnhancerModel extends ExecutableStep<Configs> {
 
     private final RequiredConfig<Integer> nStates = new RequiredConfig<>(configs.ehmm.nStates);
     private final RequiredConfig<Double> pseudoCount = new RequiredConfig<>(configs.ehmm.pseudoCount);
-    private final RequiredConfig<Integer> nBins = new RequiredConfig<>(configs.ehmm.nBins);
+    private final Integer nBins = new RequiredConfig<>(configs.ehmm.nBins).get();
     private final InputFile learnModelRscript;
 
     public LearnEnhancerModel(Configs configs, OutputFile bedFile, OutputFile bamDir){

@@ -19,8 +19,10 @@ pRegions <- import(argv$p, format = "bed")
 message("extract enhancer and promoter regions within background regions")
 eAndBg <- findOverlapPairs(bgRegions, eRegions)
 pAndBg <- findOverlapPairs(bgRegions, pRegions)
-eBgRegions <- unique(eAndBg@second)
-pBgRegions <- unique(pAndBg@second)
+eBgRegions <- unique(eAndBg@first)
+eBgRegions <- eBgRegions[width(eBgRegions)<2000]
+pBgRegions <- unique(pAndBg@first)
+pBgRegions <- pBgRegions[width(pBgRegions)<2000]
 message("removing enhancers and promoters from background regions")
 bgRegions <- bgRegions[!names(bgRegions) %in% unique(c(names(eAndBg@first), names(pAndBg@first)))]
 message("writing filtered bed files")
