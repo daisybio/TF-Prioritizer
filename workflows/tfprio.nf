@@ -44,9 +44,6 @@ params.enable_conda     = false
 
 WorkflowMain.initialise(workflow, params, log)
 
-if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = file(params.rnaseq_samplesheet) } else { exit 1, 'RNAseq samplesheet not specified!' }
-if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = Channel.fromPath(params.chipseq_samplesheet) } else { exit 1, 'ChIPseq samplesheet not specified!' }
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     MODULE PARAMETER VALUES
@@ -68,63 +65,15 @@ params.three_prime_clip_r2 = params.chipseq_three_prime_clip_r2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RNASEQ } from '../subworkflows/local/rnaseq'
-include { CHIPSEQ } from '../subworkflows/local/chipseq'
-include { COUNT_PREPROCESSING } from '../modules/local/count_preprocessing'
-include { CREATE_FOOTPRINTS } from '../modules/local/create_footprints'
-include { GUNZIP as GUNZIP_BLACKLIST } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/gunzip/main'
-include { BLACKLIST } from '../modules/local/blacklist'
+include { RNASEQ } from './rnaseq'
+include { PEAK_FILES } from './peak_files'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
 //
 workflow TFPRIO {
-    ch_versions = Channel.empty()
-
-    if (params.rnaseq_counts) {
-        ch_count = file(params.rnaseq_counts)
-    } else {
-        RNASEQ ()
-        ch_count = RNASEQ.out.counts
-        ch_bigwig = RNASEQ.out.bigwig
-        ch_versions = ch_versions.mix(RNASEQ.out.versions)
-    }
-
-    if (params.chipseq_peaks) {
-        ch_peaks = Channel.fromPath(params.chipseq_peaks + '/*')
-    } else {
-        CHIPSEQ ()
-        ch_peaks = CHIPSEQ.out.peaks
-        ch_versions = ch_versions.mix(CHIPSEQ.out.versions)
-    }
-
-    ch_peaks = CREATE_FOOTPRINTS (params.peakBindingSiteSearch, params.maxDistance, ch_peaks).footprints
-        .map { [it.name, it] }
-        .map { [it[0].replaceAll(/_footprints.bed$/,''), it[1]] }
-        .map { [it[0].replaceAll(/_peaks$/, ''), it[1]] }
-
-    ch_chipseq_annotations = ch_chipseq_samplesheet
-        .splitCsv(header: true, sep: ',')
-        // Remove control samples
-        .filter { it.antibody != '' && it.group != '' }
-        .map { [it.sample, it.antibody, it.group ] }
-        .unique()
-    
-    ch_peaks = ch_peaks.combine(ch_chipseq_annotations, by: 0)
-
-    ch_blacklist = Channel.empty()
-    if (params.blacklist) {
-        if (params.blacklist.endsWith('.gz')) {
-            ch_blacklist = GUNZIP_BLACKLIST ( [ [:], params.blacklist ] ).gunzip.map{ it[1] }
-            ch_versions  = ch_versions.mix(GUNZIP_BLACKLIST.out.versions)
-        } else {
-            ch_blacklist = Channel.value(file(params.blacklist))
-        }
-    }
-
-    ch_peaks = BLACKLIST (ch_blacklist, ch_peaks)
-
-    // COUNT_PREPROCESSING (ch_count, ch_rnaseq_samplesheet)
+    RNASEQ ()
+    PEAK_FILES ()
 }
 
 /*

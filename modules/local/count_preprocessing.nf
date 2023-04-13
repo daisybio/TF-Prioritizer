@@ -1,6 +1,4 @@
 process COUNT_PREPROCESSING {
-    label "process_medium"
-
     // (Bio)conda packages have intentionally not been pinned to a specific version
     // This was to avoid the pipeline failing due to package conflicts whilst creating the environment when using -profile conda
     conda "conda-forge::r-base bioconda::bioconductor-deseq2 bioconda::bioconductor-biocparallel bioconda::bioconductor-tximport bioconda::bioconductor-complexheatmap conda-forge::r-optparse conda-forge::r-ggplot2 conda-forge::r-rcolorbrewer conda-forge::r-pheatmap"
