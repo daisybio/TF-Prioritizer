@@ -73,21 +73,20 @@ public class GetChipData extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 logger.trace("Starting to read the ChipAtlas file list");
-                logger.debug("filtering for params: genome: {}, antigenClass: {}, tissues: {}, hms: {}," +
-                                "threshold: {}",
+                logger.debug("filtering for params: genome: {}, antigenClass: {}, tissues: {}, hms: {}, threshold: {}",
                         genomeVersion, antigenClasses, tissues, histoneModifications, threshold);
                 Set<ChipListEntry> validEntries = Files.lines(Path.of(chipFileList.getAbsolutePath()))
                         .skip(1)
                         .map(ChipListEntry::new)
                         .filter(entry -> entry.genomeAssembly.equalsIgnoreCase(genomeVersion))
                         .filter(entry -> antigenClasses.stream()
-                                .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.antigenClass)))
+                                .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.antigenClass) &&
+                                        entry.cellType.equals(cellType)))
                         .filter(entry -> tissues.stream().
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
                         .filter(entry -> histoneModifications.stream()
                                 .anyMatch(hm -> hm.equalsIgnoreCase(entry.antigen)))
                         .filter(entry -> Objects.equals(entry.threshold, threshold))
-                        .filter(entry -> entry.cellType.equalsIgnoreCase(cellType))
                         .collect(Collectors.toSet());
                 int nEntries = validEntries.size();
                 if (nEntries > 0) {
