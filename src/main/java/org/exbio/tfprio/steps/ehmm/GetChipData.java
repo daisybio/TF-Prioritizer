@@ -26,10 +26,8 @@ public class GetChipData extends ExecutableStep<Configs> {
     private final InputFile chromosomeLengths;
     private final List<String> tissues = new RequiredConfig<>(configs.chipAtlas.tissueTypes).get();
     private final String genomeVersion = new RequiredConfig<>(configs.inputConfigs.genome).get();
-    private final Set<String> antigenClasses = new RequiredConfig<>(configs.ehmm.antigenClasses).get();
-    private final Set<String> histoneModifications = new RequiredConfig<>(configs.ehmm.antigens).get();
+    private final Set<String> antigenClassKeys= new RequiredConfig<>(configs.ehmm.antigenClassKeys).get();
     private final String threshold = new RequiredConfig<>(configs.ehmm.threshold).get();
-    private final String cellType = new RequiredConfig<>(configs.ehmm.cellTypes).get();
 
     public GetChipData(Configs configs, OutputFile chipFileList, OutputFile chromosomeLengths){
         super(configs, false, chipFileList);
@@ -46,6 +44,7 @@ public class GetChipData extends ExecutableStep<Configs> {
         public final String cellType;
         public final String threshold;
         public final String fileUrl;
+        public final String key;
 
         public ChipListEntry(String line){
             String[] array = line.split(",");
@@ -57,6 +56,7 @@ public class GetChipData extends ExecutableStep<Configs> {
             this.cellType = array[5];
             this.threshold = array[6];
             this.fileUrl = array[array.length-1];
+            this.key = this.antigenClass + "_" + this.antigen;
         }
 
         public String name(){
@@ -73,20 +73,18 @@ public class GetChipData extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 logger.trace("Starting to read the ChipAtlas file list");
-                logger.debug("filtering for params: genome: {}, antigenClass: {}, tissues: {}, hms: {}, threshold: {}",
-                        genomeVersion, antigenClasses, tissues, histoneModifications, threshold);
+                logger.debug("filtering for params: genome: {}, antigenClassKeys: {}, tissues: {}, threshold: {}",
+                        genomeVersion, antigenClassKeys, tissues, threshold);
                 Set<ChipListEntry> validEntries = Files.lines(Path.of(chipFileList.getAbsolutePath()))
                         .skip(1)
                         .map(ChipListEntry::new)
                         .filter(entry -> entry.genomeAssembly.equalsIgnoreCase(genomeVersion))
-                        .filter(entry -> antigenClasses.stream()
+                        .filter(entry -> antigenClassKeys.stream()
                                 .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.antigenClass)))
                         .filter(entry -> tissues.stream().
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
-                        .filter(entry -> histoneModifications.stream()
-                                .anyMatch(hm -> hm.equalsIgnoreCase(entry.antigen)))
                         .filter(entry -> Objects.equals(entry.threshold, threshold))
-                        .filter(entry -> !(entry.antigenClass.equals("Histone") && entry.cellType.equals("")))
+                        .filter(entry -> entry.cellType.equals(""))
                         .collect(Collectors.toSet());
                 int nEntries = validEntries.size();
                 if (nEntries > 0) {
