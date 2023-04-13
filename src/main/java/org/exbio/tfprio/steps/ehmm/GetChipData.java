@@ -80,7 +80,7 @@ public class GetChipData extends ExecutableStep<Configs> {
                         .map(ChipListEntry::new)
                         .filter(entry -> entry.genomeAssembly.equalsIgnoreCase(genomeVersion))
                         .filter(entry -> antigenClassKeys.stream()
-                                .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.antigenClass)))
+                                .anyMatch(antigenClass -> antigenClass.equalsIgnoreCase(entry.key)))
                         .filter(entry -> tissues.stream().
                                 anyMatch(tissue -> tissue.equalsIgnoreCase(entry.cellTypeClass)))
                         .filter(entry -> Objects.equals(entry.threshold, threshold))
