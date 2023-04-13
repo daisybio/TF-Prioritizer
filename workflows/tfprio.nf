@@ -71,6 +71,7 @@ params.three_prime_clip_r2 = params.chipseq_three_prime_clip_r2
 include { RNASEQ } from '../subworkflows/local/rnaseq'
 include { CHIPSEQ } from '../subworkflows/local/chipseq'
 include { COUNT_PREPROCESSING } from '../modules/local/count_preprocessing'
+include { CREATE_FOOTPRINTS } from '../modules/local/create_footprints'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -85,11 +86,16 @@ workflow TFPRIO {
     }
 
     if (params.chipseq_peaks) {
-        ch_peaks = Channel.fromPath(params.chipseq_peaks)
+        ch_peaks = Channel.fromPath(params.chipseq_peaks + '/*')
     } else {
         CHIPSEQ ()
         ch_peaks = CHIPSEQ.out.peaks
     }
+
+    ch_footprints = CREATE_FOOTPRINTS (params.peakBindingSiteSearch, params.maxDistance, ch_peaks).footprints
+        .map { [it.name, it] }
+        .map { [it[0].replaceAll(/_footprints.bed$/,''), it[1]] }
+        .map { [it[0].replaceAll(/_peaks$/, ''), it[1]] }
 
     ch_chipseq_annotations = ch_chipseq_samplesheet
         .splitCsv(header: true, sep: ',')
@@ -98,12 +104,9 @@ workflow TFPRIO {
         .map { [it.sample, it.antibody, it.group ] }
         .unique()
     
-    ch_peaks
-        .map { [it.name, it] }
-        // Remove file ending from name
-        .map { [it[0].replaceAll(/.narrowPeak|.broadPeak|.gappedPeak|.bed|.bed$/,''), it[1]] }
-        .map { [it[0].replaceAll(/_peaks$/, ''), it[1]] }
+    ch_footprints
         .combine(ch_chipseq_annotations, by: 0)
+        .view { it }
 
 
     // COUNT_PREPROCESSING (ch_count, ch_rnaseq_samplesheet)

@@ -10,10 +10,10 @@ process CREATE_FOOTPRINTS {
     path peakFile
 
     output:
-    path "footprints.bed" into footprints
+    path "*_footprints.bed", emit: footprints
 
     script:
     """
-    
+    footprints.sh $peakFile ${peakFile.baseName}_footprints.bed $searchType $maxDistance
     """
 }
