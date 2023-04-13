@@ -47,15 +47,11 @@ public class GetChipData extends ExecutableStep<Configs> {
         public final String threshold;
         public final String fileUrl;
 
-        private String chooseAntigenClass(String antigen){
-            return antigen.equalsIgnoreCase("Histone") ? "chip-seq": antigen.toLowerCase();
-        }
-
         public ChipListEntry(String line){
             String[] array = line.split(",");
             this.fileName = array[0];
             this.genomeAssembly = array[1];
-            this.antigenClass = this.chooseAntigenClass(array[2]);
+            this.antigenClass = array[2];
             this.antigen = array[3];
             this.cellTypeClass = array[4];
             this.cellType = array[5];
