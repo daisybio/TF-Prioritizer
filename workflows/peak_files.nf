@@ -1,4 +1,4 @@
-if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = Channel.fromPath(params.chipseq_samplesheet) } else { exit 1, 'ChIPseq samplesheet not specified!' }
+if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = Channel.value(file(params.chipseq_samplesheet)) } else { exit 1, 'ChIPseq samplesheet not specified!' }
 
 include { CHIPSEQ } from '../subworkflows/local/chipseq'
 include { CREATE_FOOTPRINTS } from '../modules/local/create_footprints'
