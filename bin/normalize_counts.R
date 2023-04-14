@@ -51,24 +51,4 @@ if (include_batches) {
 print("Running DESeq...")
 dds <- DESeq(dds)
 counts_normalized <- counts(dds)
-write.table(counts_normalized, file = "counts_normalized.tsv", sep = "\t", row.names = TRUE, quote = FALSE)
-
-print("Grouping samples...")
-
-group_df <- data.frame(row.names = rownames(counts_normalized))
-
-# Loop over each unique group
-for (g in unique(metadata_df$group)) {
-  # Subset the count_df to the samples in the current group
-  # Attention: Requires counts_normalized and metadata_df to have the same order
-  group_counts <- counts_normalized[, metadata_df$group == g]
-
-  # Calculate the row means for the current group
-  row_means <- rowMeans(group_counts)
-
-  # Add a new column to group_df with the mean counts for the current group
-  group_df[g] <- row_means
-}
-
-print("Writing output...")
-write.table(group_df, file = opt$output, sep = "\t", row.names = TRUE, quote = FALSE)
+write.table(counts_normalized, file = opt$output, sep = "\t", row.names = TRUE, quote = FALSE)

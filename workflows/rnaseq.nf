@@ -3,7 +3,7 @@ if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = file(params.rnaseq_samp
 include { RNASEQ } from '../subworkflows/local/rnaseq'
 include { COUNT_NORMALIZATION } from '../modules/local/count_preprocessing'
 include { FILTER_COUNTS } from '../modules/local/count_preprocessing'
-
+include { GROUP_COUNTS } from '../modules/local/count_preprocessing'
 
 workflow RNASEQ {
     ch_versions = Channel.empty()
@@ -20,4 +20,5 @@ workflow RNASEQ {
 
     FILTER_COUNTS (ch_count, params.min_count, params.min_tpm)
     COUNT_NORMALIZATION (FILTER_COUNTS.out.count, ch_rnaseq_samplesheet)
+    GROUP_COUNTS (COUNT_NORMALIZATION.out, ch_rnaseq_samplesheet)
 }
