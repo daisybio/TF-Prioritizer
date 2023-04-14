@@ -1,5 +1,6 @@
 process TEPIC {
-    container '$projectDir/assets/tepic'
+    conda "conda-forge::r-base"
+    container "r-base"
 
     input:
     tuple val(sample), path(experimental_bed), val(hm), val(group)
@@ -15,7 +16,9 @@ process TEPIC {
 
     script:
     """
-    TEPIC.sh \
+    tepic/compile_TRAP_install_R_packages.sh
+
+    tepic/TEPIC.sh \
         -b $experimental_bed \
         -a $pwm \
         -g $reference_fasta \
