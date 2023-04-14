@@ -2,9 +2,11 @@ package org.exbio.tfprio.steps.ehmm;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
+import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
@@ -20,6 +22,10 @@ public class SplitLearningData extends ExecutableStep<Configs> {
     private final InputFile allEnhancers;
     private final InputFile allPromoters;
     private final InputFile allBackground;
+    private final RequiredConfig<File> gtfFile = new RequiredConfig<>(configs.inputConfigs.geneAnnotationFile);
+    private final RequiredConfig<Integer> genomicRegionSize = new RequiredConfig<>(configs.ehmm.genomicRegionSize);
+    private final RequiredConfig<Integer> nSamples = new RequiredConfig<>(configs.ehmm.nSamples);
+    private final InputFile gtf;
     private final InputFile script;
 
     public SplitLearningData(Configs configs, OutputFile allEnhancers, OutputFile allPromoters,
@@ -28,6 +34,7 @@ public class SplitLearningData extends ExecutableStep<Configs> {
         this.allEnhancers = addInput(allEnhancers);
         this.allPromoters = addInput(allPromoters);
         this.allBackground = addInput(allBackground);
+        this.gtf = addInput(gtfFile);
         this.script = addInput(getClass().getResourceAsStream("SplitTrainingData.R"), "SplitTrainingData.R");
     }
 
@@ -42,6 +49,9 @@ public class SplitLearningData extends ExecutableStep<Configs> {
                         "-b", allBackground.getAbsolutePath(),
                         "-e", allEnhancers.getAbsolutePath(),
                         "-p", allPromoters.getAbsolutePath(),
+                        "-g", gtf.getAbsolutePath(),
+                        "-n", nSamples.toString(),
+                        "-s", genomicRegionSize.toString(),
                         "-o", outputDirectory.getAbsolutePath());
                 executeAndWait(ehmmCommand, true);
                 return true;

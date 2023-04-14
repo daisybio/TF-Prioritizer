@@ -12,27 +12,68 @@ filterRegions <- function(regions, w = 2000) {
   regions[d >= w | is.na(d)]
 }
 
+randomRanges <- function(regions, n, size) {
+  rRange <- regions[sample(1:length(regions), n)]
+  rShift <- width(rRange)-size
+  rShift <- sapply(rShift, function(shift) sample(0:shift, 1))
+  rRange@ranges@start <- rRange@ranges@start+rShift
+  width(rRange) <- size
+  rRange
+}
+
+generateBackground <- function(gtf, size, n) {
+  gr <- import(gtf, format = "gtf")
+  genic <- gr[gr$type=="gene"]
+  intergenic <- gaps(genic)
+  genic <- genic[width(genic)>=size]
+  intergenic <- intergenic[width(intergenic)>=size]
+  # get random ranges
+  rIntergenic <- randomRanges(intergenic, n*0.9, size)
+  rGenic <- randomRanges(genic, n*0.1, size)
+  bg <- c(rIntergenic, rGenic)
+  # remove chr prefix from seqlevels
+  seqlevels(bg) <- gsub("chr", "", seqlevels(bg))
+  fg <- c(eBgRegions, pBgRegions)
+  message("removing enhancer and promoter regions from background")
+  subsetByOverlaps(fg, bg, invert = T)
+}
+
+sampleRanges <- function(ranges, n) {
+  sort(ranges[sample(1:length(ranges), n)])
+}
+
 args <- commandArgs(trailingOnly = T)
 parser <- arg_parser("Filtering command line parser", name = "ehmm_training_filter")
 parser <- add_argument(parser, "-e", help = "enhancer bed file")
 parser <- add_argument(parser, "-p", help = "promoter bed file")
 parser <- add_argument(parser, "-b", help = "background bed file")
+parser <- add_argument(parser, "-g", help = "path to gtf file")
 parser <- add_argument(parser, "-o", help = "output directory", default = "./")
+parser <- add_argument(parser, "-n", help = "Number of random samples to use for each training set",
+                       default = 300, type = "integer")
+parser <- add_argument(parser, "-s", help = "Size of random genomic regions",
+                       default = 2000, type = "integer")
+parser <- add_argument(parser, "-r", help = "seed",
+                       default = 74726, type = "integer")
 argv <- parse_args(parser, argv = args)
-
-message("load background, enhancer, and promoter regions")
+set.seed(argv$r)
+message("load ChipAtlas, enhancer, and promoter regions")
 bgRegions <- import(argv$b, format = "bed")
 names(bgRegions) <- 1:length(bgRegions)
 eRegions <- import(argv$e, format = "bed")
 pRegions <- import(argv$p, format = "bed")
-message("extract enhancer and promoter regions within background regions")
+message("extract enhancer and promoter regions within ChipAtlas regions")
 eAndBg <- findOverlapPairs(bgRegions, eRegions)
 pAndBg <- findOverlapPairs(bgRegions, pRegions)
 eBgRegions <- filterRegions(eAndBg@first)
 pBgRegions <- filterRegions(pAndBg@first)
-message("removing enhancers and promoters from background regions")
-bgRegions <- reduce(bgRegions[!names(bgRegions) %in% unique(c(names(eAndBg@first), names(pAndBg@first)))])
+message("generating random background data from gft file")
+bgNoCREs <- generateBackground(argv$g, argv$s, argv$n)
+message("selecting ", argv$n, " random samples for each training region")
+bgNoCREs <- sampleRanges(bgNoCREs, argv$n)
+eBgRegions <- sampleRanges(eBgRegions, argv$n)
+pBgRegions <- sampleRanges(pBgRegions, argv$n)
 message("writing filtered bed files")
-export.bed(bgRegions, file.path(argv$o, "background.bed"))
+export.bed(bgNoCREs, file.path(argv$o, "background.bed"))
 export.bed(eBgRegions, file.path(argv$o, "enhancers.bed"))
 export.bed(pBgRegions, file.path(argv$o, "promoters.bed"))
