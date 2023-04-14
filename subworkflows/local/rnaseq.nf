@@ -162,6 +162,7 @@ workflow RNASEQ {
     main:
     ch_versions = Channel.empty()
     ch_gene_counts                = Channel.empty()
+    ch_tpm                        = Channel.empty()
 
     //
     // SUBWORKFLOW: Uncompress and prepare reference genome files
@@ -405,7 +406,7 @@ workflow RNASEQ {
         ch_samtools_idxstats = ALIGN_STAR.out.idxstats
         ch_star_multiqc      = ALIGN_STAR.out.log_final
         if (params.rnaseq_bam_csi_index) {
-            ch_genome_bam_index = ALIGN_STAR.out.csi
+            ch_genome_bam_ich_gene_countsndex = ALIGN_STAR.out.csi
         }
         ch_versions = ch_versions.mix(ALIGN_STAR.out.versions)
 
@@ -485,7 +486,8 @@ workflow RNASEQ {
             params.rnaseq_salmon_quant_libtype ?: ''
         )
         ch_versions = ch_versions.mix(QUANTIFY_STAR_SALMON.out.versions)
-        ch_gene_counts = QUANTIFY_STAR_SALMON.out.counts_gene_length_scaled
+        ch_gene_counts = QUANTIFY_STAR_SALMON.out.counts_gene
+        ch_tpm = QUANTIFY_STAR_SALMON.out.tpm_gene
 
         if (!params.rnaseq_skip_qc & !params.rnaseq_skip_deseq2_qc) {
             DESEQ2_QC_STAR_SALMON (
@@ -516,6 +518,7 @@ workflow RNASEQ {
         ch_star_multiqc      = QUANTIFY_RSEM.out.logs
         ch_rsem_multiqc      = QUANTIFY_RSEM.out.stat
         ch_gene_counts       = QUANTIFY_RSEM.out.merged_counts_gene
+        ch_tpm               = QUANTIFY_RSEM.out.merged_tpm_gene
 
         if (params.rnaseq_bam_csi_index) {
             ch_genome_bam_index = QUANTIFY_RSEM.out.csi
@@ -890,6 +893,7 @@ workflow RNASEQ {
 
     emit:
     counts = ch_gene_counts
+    tpm   = ch_tpm
     bigwig = ch_bigwig
     versions = ch_versions
 }
