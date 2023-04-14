@@ -4,6 +4,7 @@ include { CHIPSEQ } from '../subworkflows/local/chipseq'
 include { CREATE_FOOTPRINTS } from '../modules/local/create_footprints'
 include { GUNZIP as GUNZIP_BLACKLIST } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/gunzip/main'
 include { BLACKLIST } from '../modules/local/blacklist'
+include { TEPIC } from '../modules/local/tepic'
 
 workflow PEAK_FILES {
     ch_versions = Channel.empty()
@@ -45,6 +46,19 @@ workflow PEAK_FILES {
     ch_peaks = BLACKLIST (ch_blacklist, ch_peaks)
 
     // TODO: Mix mutually exclusive
+
+    TEPIC (
+        ch_peaks, 
+        params.tepic_pwm, 
+        params.fasta, 
+        params.tepic_windowSize,
+        params.tepic_loopWindows,
+        params.tepic_exponentialDecay,
+        params.tepic_doNotNormalizePeakLength,
+        params.tepic_maxMinutesPerChromosome,
+        params.tepic_originalDecay,
+        params.tepic_pValue
+        )
 
     emit:
     peaks = ch_peaks
