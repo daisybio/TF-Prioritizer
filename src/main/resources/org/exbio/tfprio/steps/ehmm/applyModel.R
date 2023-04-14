@@ -18,7 +18,11 @@ validateModel <- function (model, strict = FALSE, type = "dep") {
                paste(optArgs, collapse = ", ")))
   nstates <- model$nstates
   nmarks <- NULL
-
+  if (!is.null(model$marks)) {
+    if (anyDuplicated(model$marks))
+      stop("model$marks cannot contain duplicate entries")
+    nmarks <- length(model$marks)
+  }
   if (!is.null(model$emisP)) {
     if (!is.list(model$emisP))
       stop("'model$emissP' must be a list'")
@@ -36,10 +40,8 @@ validateModel <- function (model, strict = FALSE, type = "dep") {
           stop("NAs/NaNs in the emission probabilities not allowed")
         if (is.null(nmarks))
           nmarks <- length(nm$mus)
-        if (length(nm$mus) != nmarks) {
-          print(nm)
+        if (length(nm$mus) != nmarks)
           stop("invalid parameters for the emission probabilities")
-        }
       }
       else {
         needPars <- c("mu", "r", "ps")
@@ -78,14 +80,6 @@ validateModel <- function (model, strict = FALSE, type = "dep") {
   list(nstates = nstates, nmarks = nmarks)
 }
 
-searchOptArg <- function (txt, argname) {
-  matches <- grep(argname, txt, ignore.case = T)
-  if (length(matches) > 1)
-    stop(paste0("expecting zero or one occurrences of the field '",
-                argname, "', found ", length(matches)))
-  matches + 1
-}
-
 parseRows <- function (rows) {
   rowList <- strsplit(rows, "\t")
   rowLens <- sapply(rowList, length)
@@ -95,18 +89,6 @@ parseRows <- function (rows) {
   do.call(rbind, rowList)
 }
 
-
-ifHasField <- function (txt, field, nlines, f) {
-  idx <- searchOptArg(txt, field)
-  if (length(idx) == 1) {
-    lastidx <- idx + nlines - 1
-    if (lastidx > length(txt))
-      stop(paste0("missing lines below the argument '",
-                  field, "'"))
-    f(txt[idx:lastidx])
-  }
-  else NULL
-}
 
 parseNstates <- function (txt) {
   argname <- "nstates"
@@ -118,6 +100,26 @@ parseNstates <- function (txt) {
     stop(paste0("missing line below the argument '", argname,
                 "'"))
   as.integer(txt[matches + 1])
+}
+
+searchOptArg <- function (txt, argname) {
+  matches <- grep(argname, txt, ignore.case = T)
+  if (length(matches) > 1)
+    stop(paste0("expecting zero or one occurrences of the field '",
+                argname, "', found ", length(matches)))
+  matches + 1
+}
+
+ifHasField <- function (txt, field, nlines, f) {
+  idx <- searchOptArg(txt, field)
+  if (length(idx) == 1) {
+    lastidx <- idx + nlines - 1
+    if (lastidx > length(txt))
+      stop(paste0("missing lines below the argument '",
+                  field, "'"))
+    f(txt[idx:lastidx])
+  }
+  else NULL
 }
 
 readModel <- function (path) {
@@ -297,7 +299,7 @@ extractRegions <- function(segmentation, regions, genomeSize, outdir) {
   }, segmentation$score, c("enhancer", "promoter"))
 }
 
-applyModel <- function (regions, model = NULL, provideModel = FALSE, genomeSize,
+applyModelLocal <- function (regions, model = NULL, provideModel = FALSE, genomeSize,
           counts = NULL, bamtab = NULL, outdir = ".", nthreads = 1,
           learnTrans = FALSE, refCounts = NULL) {
   binsize <- 100
@@ -336,7 +338,7 @@ applyModel <- function (regions, model = NULL, provideModel = FALSE, genomeSize,
                                       regions = regions, genomeSize = genomeSize, bamtab = bamtab,
                                       outdir = outdir, nthreads = nthreads)
   }
-  cat("apply model\n")
+  cat("applying model\n")
   segmentation <- segment(counts = counts, regions = regions,
                           model = model, nstates = model$nstates, nthreads = nthreads,
                           verbose_kfoots = TRUE, nbtype = "lognormal", notrain = !learnTrans,
@@ -360,7 +362,7 @@ parser <- add_argument(parser, "-m", help = "Construced model")
 parser <- add_argument(parser, "-b", help = "Path to directory containing the bam files of the input data")
 parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 parser <- add_argument(parser, "-s", help = "BinSize", default = 100, type = "integer")
-parser <- add_argument(parser, "-t", help = "Number of threads to use", default = 25, type = "integer")
+parser <- add_argument(parser, "-t", help = "Number of threads to use", default = 21, type = "integer")
 parser <- add_argument(parser, "-p", help = "Pseudocount", default = 1.0, type = "double")
 
 argv <- parse_args(parser, argv = args)
@@ -438,15 +440,15 @@ if (length(commonMarks) < length(unique(c(rownames(counts), model$marks)))) {
           "-> ", paste(commonMarks, collapse = ", "))
   if(nrow(counts)>1) counts <- counts[commonMarks,]
   model$marks <- commonMarks
-  if (length(model$emisP[[1]]) > length(commonMarks)) {
+  if (length(model$emisP[[1]]$mus) > length(commonMarks)) {
     model$emisP <- lapply(model$emisP, lapply, "[", which(commonMarks==model$marks))
   }
 }
 message("loading genome sizes")
 genomeSizes <- import(argv$g, format = "bed")
 genomeSizes <- setNames(genomeSizes@ranges@start, seqnames(genomeSizes))
-message("applying model")
-applyModel(regions, model = model, genomeSize = genomeSizes,
+
+applyModelLocal(regions, model = model, genomeSize = genomeSizes,
            bamtab = bamtab, counts = counts, nthreads = nthreads,
            outdir = argv$o)
 message("ehmm finished successfully")
