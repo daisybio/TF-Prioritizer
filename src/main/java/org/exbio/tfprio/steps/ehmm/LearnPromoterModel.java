@@ -38,7 +38,7 @@ public class LearnPromoterModel extends ExecutableStep<Configs> {
                 String ehmmCommand = String.join(" ","Rscript",
                         learnModelRscript.getAbsolutePath(),
                         "-r", bedFile.getAbsolutePath(),
-                        "-m", bamDir.getParent(),
+                        "-m", bamDir.getAbsolutePath(),
                         "-f", "PromoterModel",
                         "-n", nStates.toString(),
                         "-b", nBins.toString(),
