@@ -50,6 +50,7 @@ workflow PEAK_FILES {
     TEPIC (
         ch_peaks, 
         params.tepic_pwm, 
+        params.gtf,
         params.fasta, 
         params.tepic_windowSize,
         params.tepic_loopWindows,

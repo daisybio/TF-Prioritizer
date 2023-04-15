@@ -58,7 +58,7 @@ loopList=""
 trap_sequences=""
 
 #Parsing command line
-while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:yluhxzjt:S:" o;
+while getopts "g:b:o:c:p:d:n:a:w:f:m:e:r:v:k:i:q:h:s:l:x:y:u:h:z:j:t:S:" o;
 do
 case $o in
 	g)	genome=$OPTARG;;
