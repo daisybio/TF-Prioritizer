@@ -1,6 +1,7 @@
 process TEPIC {
     conda "bioconda::bedtools conda-forge::gxx conda-forge::r-base conda-forge::r-gplots conda-forge::r-ggplot2 conda-forge::r-glmnet conda-forge::r-doMC conda-forge::r-reshape2 conda-forge::r-gridExtra pandas"
     container "tepic"
+    cpus 4
 
     input:
     tuple val(sample), path(experimental_bed), val(hm), val(group)
@@ -14,6 +15,15 @@ process TEPIC {
     val(maxMinutesPerChromosome)
     val(originalDecay)
     val(pValue)
+
+    output:
+    path("sequences.tsv"), emit: sequences
+    path("regions_to_target_genes.tsv"), emit: regions_to_target_genes
+    path("*_Affinity.txt"), emit: affinity
+    path("*_canidate_binding_regions_Filtered_Regions.bed"), emit: filtered_regions
+    path("*_Decay_Peak_Features_Affinity_Gene_View.txt"), emit: gene_view
+
+    // TODO: Implement missing config parameters
 
     script:
     """
