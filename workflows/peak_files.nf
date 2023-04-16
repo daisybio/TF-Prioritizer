@@ -5,6 +5,7 @@ include { CREATE_FOOTPRINTS } from '../modules/local/create_footprints'
 include { GUNZIP as GUNZIP_BLACKLIST } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/gunzip/main'
 include { BLACKLIST } from '../modules/local/blacklist'
 include { TEPIC } from '../modules/local/tepic'
+include { SEQUENCE_TO_BED } from '../modules/local/sequence_to_bed'
 
 workflow PEAK_FILES {
     ch_versions = Channel.empty()
@@ -60,6 +61,14 @@ workflow PEAK_FILES {
         params.tepic_originalDecay,
         params.tepic_pValue
         )
+
+    ch_sequences = TEPIC.out.sequences
+    ch_regions_to_target_genes = TEPIC.out.regions_to_target_genes
+    ch_affinities = TEPIC.out.affinity
+    ch_filtered_regions = TEPIC.out.filtered_regions
+    ch_gene_view = TEPIC.out.gene_view
+
+    ch_binding_bed = SEQUENCE_TO_BED (ch_sequences)
 
     emit:
     peaks = ch_peaks

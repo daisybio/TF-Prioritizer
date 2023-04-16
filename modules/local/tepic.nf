@@ -17,11 +17,11 @@ process TEPIC {
     val(pValue)
 
     output:
-    path("sequences.tsv"), emit: sequences
-    path("regions_to_target_genes.tsv"), emit: regions_to_target_genes
-    path("*_Affinity.txt"), emit: affinity
-    path("*_canidate_binding_regions_Filtered_Regions.bed"), emit: filtered_regions
-    path("*_Decay_Peak_Features_Affinity_Gene_View.txt"), emit: gene_view
+    tuple val(hm), val(group), path("*_sequences.tsv"), emit: sequences
+    tuple val(sample), val(hm), val(group), path("regions_to_target_genes.tsv"), emit: regions_to_target_genes
+    tuple val(sample), val(hm), val(group), path("*_Affinity.txt"), emit: affinity
+    tuple val(sample), val(hm), val(group), path("*_canidate_binding_regions_Filtered_Regions.bed"), emit: filtered_regions
+    tuple val(sample), val(hm), val(group), path("*_Decay_Peak_Features_Affinity_Gene_View.txt"), emit: gene_view
 
     // TODO: Implement missing config parameters
 
@@ -32,7 +32,7 @@ process TEPIC {
     bash $projectDir/assets/tepic/code/TEPIC.sh \
         -b $experimental_bed \
         -o $sample \
-        -S sequences.tsv \
+        -S ${sample}_sequences.tsv \
         -g $reference_fasta \
         -a $gtf \
         -p $pwm \
