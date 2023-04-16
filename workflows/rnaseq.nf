@@ -31,6 +31,5 @@ workflow RNASEQ {
         .filter { it[0] < it[1] }
 
     DESEQ2 (COUNT_NORMALIZATION.out, ch_rnaseq_samplesheet, ch_pairings)
-        .view()
     // GROUP_COUNTS (COUNT_NORMALIZATION.out, ch_rnaseq_samplesheet)
 }

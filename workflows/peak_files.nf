@@ -6,6 +6,8 @@ include { GUNZIP as GUNZIP_BLACKLIST } from '../subworkflows/nf-core/chipseq/mod
 include { BLACKLIST } from '../modules/local/blacklist'
 include { TEPIC } from '../modules/local/tepic'
 include { SEQUENCE_TO_BED } from '../modules/local/sequence_to_bed'
+include { MERGE_BINDING_BED } from '../modules/local/merge_binding_bed'
+include { MEAN_AFFINITIES } from '../modules/local/affinities'
 
 workflow PEAK_FILES {
     ch_versions = Channel.empty()
@@ -51,7 +53,7 @@ workflow PEAK_FILES {
     TEPIC (
         ch_peaks, 
         params.tepic_pwm, 
-        params.gtf,
+        params.tepic_gtf,
         params.fasta, 
         params.tepic_windowSize,
         params.tepic_loopWindows,
@@ -63,12 +65,17 @@ workflow PEAK_FILES {
         )
 
     ch_sequences = TEPIC.out.sequences
-    ch_regions_to_target_genes = TEPIC.out.regions_to_target_genes
-    ch_affinities = TEPIC.out.affinity
+    ch_affinities = TEPIC.out.affinities.groupTuple(by: [0, 1])
     ch_filtered_regions = TEPIC.out.filtered_regions
-    ch_gene_view = TEPIC.out.gene_view
 
-    ch_binding_bed = SEQUENCE_TO_BED (ch_sequences)
+    ch_binding_bed_grouped = SEQUENCE_TO_BED (ch_sequences, Channel.value(params.tepic_affinityCutOff))
+        .transpose(by: 2)
+        .map { [it[0], it[1], it[2].name.replaceAll(/_sorted\.bed$/, ''), it[2]] }
+        .groupTuple(by: [0, 1, 2])
+
+    MERGE_BINDING_BED (ch_binding_bed_grouped)
+
+    MEAN_AFFINITIES (ch_affinities)
 
     emit:
     peaks = ch_peaks
