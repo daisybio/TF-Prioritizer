@@ -16,10 +16,9 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 public class ApplyModel extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputDirs = new HashMap<>();
     private final Map<String, InputFile> regions = new HashMap<>();
-    private final Map<String, InputFile> bamDirs = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
-    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
+    private final InputFile bamDirectory;
     private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
     private final RequiredConfig<Double> pseudoCounts = new RequiredConfig<>(configs.ehmm.pseudoCount);
     private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get();
@@ -30,13 +29,12 @@ public class ApplyModel extends ExecutableStep<Configs> {
         super(configs, false, regions.values(), chromosomeSizes, constructedModel);
         this.chromosomeSizes = addInput(chromosomeSizes);
         this.constructedModel = addInput(constructedModel);
+        this.bamDirectory = addInput(new OutputFile(new RequiredConfig<>(configs.ehmm.bamDirectory).get().getAbsolutePath()));
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
 
         regions.forEach((s, r) -> {
             OutputFile groupDir = new OutputFile(inputDirectory, s);
             this.regions.put(s, addInput(groupDir, r));
-            this.bamDirs.put(s, addInput(groupDir, new OutputFile(
-                    extend(bamDirectory.get(), s).getAbsolutePath())));
             this.outputDirs.put(s, addOutput(s));
         });
     }
@@ -45,7 +43,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             regions.forEach((s, r) -> add(() -> {
-                File bamDir = extend(bamDirectory.get(), s);
+                File bamDir = extend(bamDirectory, s);
                 // apply model to each group
                 String ehmmCommand = String.join(" ","Rscript",
                         applyModelScript.getAbsolutePath(),
