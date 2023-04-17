@@ -198,6 +198,12 @@ combineFgBgModels <- function (model.bg, model.e, model.p) {
   states.n2.p <- which(startsWith(labels, "P_N2"))
   states.bg <- which(startsWith(labels, "bg"))
   A <- as.matrix(bdiag(model.e$transP, model.p$transP, model.bg$transP))
+  # solve NaN issue
+  problem <- A[is.nan(rowSums(A))]
+  rest <- 1-sum(problem, na.rm = T)
+  problem[is.nan(problem)] <- rest/length(problem[is.nan(problem)])
+  A[is.nan(rowSums(A))] <- problem
+
   A[states.bg, states.n1.e] <- enhancerFreq/(length(states.bg) *
                                                length(states.n1.e))
   A[states.bg, states.n1.p] <- promoterFreq/(length(states.bg) *
@@ -327,6 +333,6 @@ cat("constructing combined model...\n")
 nthreads = argv$t
 
 model <- constructModelLocal(model.bg = bgModel, model.e = eModel, model.p = pModel,
-               counts.e = eCounts, counts.p = pCounts,
-               regions.e = eRegions, regions.p = pRegions,
-               nthreads = nthreads, outdir = argv$o)
+                             counts.e = eCounts, counts.p = pCounts,
+                             regions.e = eRegions, regions.p = pRegions,
+                             nthreads = nthreads, outdir = argv$o)
