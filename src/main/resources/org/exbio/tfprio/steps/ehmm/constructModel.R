@@ -1,6 +1,7 @@
 library(ehmm)
 library(rtracklayer)
 library(argparser)
+library(RColorBrewer)
 
 rowsToStr <- function (mat) {
   apply(mat, 1, paste, collapse = "\t")
