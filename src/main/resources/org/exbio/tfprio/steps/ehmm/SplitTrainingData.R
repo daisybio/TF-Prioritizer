@@ -13,7 +13,8 @@ filterRegions <- function(regions, w = 2000) {
 }
 
 randomRanges <- function(regions, n, size) {
-  rRange <- regions[sample(1:length(regions), n)]
+  if(!is.null(size)) rRange <- regions[sample(1:length(regions), n)]
+  else rRange <- regions
   rShift <- width(rRange)-size
   rShift <- sapply(rShift, function(shift) sample(0:shift, 1))
   rRange@ranges@start <- rRange@ranges@start+rShift
@@ -21,7 +22,7 @@ randomRanges <- function(regions, n, size) {
   rRange
 }
 
-generateBackground <- function(gtf, size, n) {
+generateBackground <- function(gtf, e, p, size, n) {
   gr <- import(gtf, format = "gtf")
   genic <- gr[gr$type=="gene"]
   intergenic <- gaps(genic)
@@ -31,14 +32,16 @@ generateBackground <- function(gtf, size, n) {
   rIntergenic <- randomRanges(intergenic, n*0.9, size)
   rGenic <- randomRanges(genic, n*0.1, size)
   bg <- c(rIntergenic, rGenic)
+  bg$score[is.na(bg$score)] <- 666
   # remove chr prefix from seqlevels
   seqlevels(bg) <- gsub("chr", "", seqlevels(bg))
-  fg <- c(eBgRegions, pBgRegions)
+  fg <- reduce(c(e, p))
   message("removing enhancer and promoter regions from background")
-  subsetByOverlaps(fg, bg, invert = T)
+  subsetByOverlaps(bg, fg, invert = T)
 }
 
 sampleRanges <- function(ranges, n) {
+  if(n > length(ranges)) return(sort(ranges))
   sort(ranges[sample(1:length(ranges), n)])
 }
 
@@ -68,7 +71,7 @@ pAndBg <- findOverlapPairs(bgRegions, pRegions)
 eBgRegions <- filterRegions(eAndBg@first)
 pBgRegions <- filterRegions(pAndBg@first)
 message("generating random background data from gft file")
-bgNoCREs <- generateBackground(argv$g, argv$s, argv$n)
+bgNoCREs <- generateBackground(argv$g, eBgRegions, pBgRegions, argv$s, argv$n)
 message("selecting ", argv$n, " random samples for each training region")
 bgNoCREs <- sampleRanges(bgNoCREs, argv$n)
 eBgRegions <- sampleRanges(eBgRegions, argv$n)
