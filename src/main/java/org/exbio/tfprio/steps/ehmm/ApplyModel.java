@@ -21,7 +21,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
     private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
     private final RequiredConfig<Double> pseudoCounts = new RequiredConfig<>(configs.ehmm.pseudoCount);
-    private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get()*10;
+    private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get();
     private final InputFile applyModelScript;
 
     public ApplyModel(Configs configs, Map<String, OutputFile> regions, OutputFile chromosomeSizes,
