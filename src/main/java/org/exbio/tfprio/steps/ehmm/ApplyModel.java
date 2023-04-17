@@ -45,13 +45,14 @@ public class ApplyModel extends ExecutableStep<Configs> {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             regions.forEach((s, r) -> add(() -> {
+                File bamDir = extend(bamDirectory.get(), s);
                 // apply model to each group
                 String ehmmCommand = String.join(" ","Rscript",
                         applyModelScript.getAbsolutePath(),
                         "-r", r.getAbsolutePath(),
                         "-g", chromosomeSizes.getAbsolutePath(),
                         "-m", constructedModel.getAbsolutePath(),
-                        "-b", bamDirs.get(s).getAbsolutePath(),
+                        "-b", bamDir.getAbsolutePath(),
                         "-o", outputDirs.get(s).getAbsolutePath(),
                         "-s", binSize.toString(),
                         "-t", nThreads.toString(),
