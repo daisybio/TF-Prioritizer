@@ -22,7 +22,7 @@ randomRanges <- function(regions, n, size) {
   rRange
 }
 
-generateBackground <- function(gtf, e, p, size, n) {
+generateBackground <- function(gtf, e, p, size, n=100000) {
   gr <- import(gtf, format = "gtf")
   genic <- gr[gr$type=="gene"]
   intergenic <- gaps(genic)
@@ -71,7 +71,7 @@ pAndBg <- findOverlapPairs(bgRegions, pRegions)
 eBgRegions <- filterRegions(eAndBg@first)
 pBgRegions <- filterRegions(pAndBg@first)
 message("generating random background data from gft file")
-bgNoCREs <- generateBackground(argv$g, eBgRegions, pBgRegions, argv$s, argv$n)
+bgNoCREs <- generateBackground(argv$g, eBgRegions, pBgRegions, argv$s)
 export.bed(bgNoCREs, file.path(argv$o, "all_background.bed"))
 export.bed(eBgRegions, file.path(argv$o, "all_enhancers.bed"))
 export.bed(pBgRegions, file.path(argv$o, "all_promoters.bed"))
