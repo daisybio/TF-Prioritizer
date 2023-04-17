@@ -9,7 +9,7 @@ filterRegions <- function(regions, w = 2000) {
   regions <- regions[width(regions) < w]
   d <- distance(regions[1:(length(regions)-1)], regions[2:length(regions)])
   message("remove neighboring regions with a pairwise distance of < 2 kb")
-  reduce(regions[d >= w | is.na(d)])
+  regions[d >= w | is.na(d)]
 }
 
 randomRanges <- function(regions, n, size) {
@@ -42,7 +42,7 @@ generateBackground <- function(gtf, e, p, size, n) {
 
 sampleRanges <- function(ranges, n) {
   if(n > length(ranges)) return(sort(ranges))
-  sort(ranges[sample(1:length(ranges), n)])
+  reduce(sort(ranges[sample(1:length(ranges), n)]))
 }
 
 args <- commandArgs(trailingOnly = T)

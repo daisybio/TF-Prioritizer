@@ -246,7 +246,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
             // apply input data to constructed model
             ApplyModel applyModel = add(new ApplyModel(configs,
                     collapsePeakFiles.outputFiles, getChromosomeLengths.outputFile, constructModel.outputFile));
-            // CombinePredictions combinePredictions = add(new CombinePredictions(configs, applyModel.outputDirs));
+            CombinePredictions combinePredictions = add(new CombinePredictions(configs, applyModel.outputDirs));
         }
         /*
         DistributionTargetGenes distributionTargetGenes =
