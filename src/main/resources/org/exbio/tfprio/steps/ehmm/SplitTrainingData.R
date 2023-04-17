@@ -13,7 +13,7 @@ filterRegions <- function(regions, w = 2000) {
 }
 
 randomRanges <- function(regions, n, size) {
-  if(!is.null(n)|n>length(regions)) rRange <- regions[sample(1:length(regions), n)]
+  if(!is.null(n) & n<=length(regions)) rRange <- regions[sample(1:length(regions), n)]
   else rRange <- regions
   rShift <- width(rRange)-size
   rShift <- sapply(rShift, function(shift) sample(0:shift, 1))
