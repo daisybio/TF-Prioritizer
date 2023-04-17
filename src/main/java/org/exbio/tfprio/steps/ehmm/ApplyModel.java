@@ -33,9 +33,9 @@ public class ApplyModel extends ExecutableStep<Configs> {
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
 
         regions.forEach((s, r) -> {
-            OutputFile groupDir = new OutputFile(s);
-            this.regions.put(s, addInput(groupDir, new OutputFile(r.getAbsolutePath())));
-            this.bamDirs.put(s, addInput(groupDir, new OutputFile(new File(bamDirectory.get().getAbsolutePath()), s)));
+            OutputFile groupDir = new OutputFile(inputDirectory, s);
+            this.regions.put(s, addInput(groupDir, r));
+            this.bamDirs.put(s, addInput(groupDir, new OutputFile(bamDirectory.get(), s)));
             this.outputDirs.put(s, addOutput(s));
         });
     }
