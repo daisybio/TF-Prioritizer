@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class ApplyModel extends ExecutableStep<Configs> {
+    public final OutputFile parentOut = outputDirectory;
     public final Map<String, OutputFile> outputDirs = new HashMap<>();
     private final Map<String, InputFile> regions = new HashMap<>();
     private final Map<String, InputFile> bamDirs = new HashMap<>();

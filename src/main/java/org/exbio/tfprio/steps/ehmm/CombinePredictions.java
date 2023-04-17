@@ -6,27 +6,35 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.concurrent.Callable;
+
+import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class CombinePredictions extends ExecutableStep<Configs> {
     public final OutputFile promoters = addOutput("predictedPromoters.bed");
     public final OutputFile enhancers = addOutput("predictedEnhancers.bed");
-    private final Map<String, InputFile> predictionDirs = new HashMap<>();
+    private final InputFile predictionDir;
     private final InputFile script;
 
-    public CombinePredictions(Configs configs, Map<String, OutputFile> predictionDirs) {
-        super(configs, false, predictionDirs.values());
-        predictionDirs.forEach((cre, dir) -> {
-            this.predictionDirs.put(cre, addInput(dir));
-        });
+    public CombinePredictions(Configs configs, OutputFile predictionParentDir) {
+        super(configs, false, predictionParentDir);
+        predictionDir = addInput(predictionParentDir);
         this.script = addInput(getClass().getResourceAsStream("combinePredictions.R"), "combinePredictions.R");
     }
 
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
-        return null;
+        return new HashSet<>() {{
+            add(() -> {
+                String cmd = String.join(" ","Rscript",
+                        script.getAbsolutePath(),
+                        "-d", predictionDir.getAbsolutePath(),
+                        "-o", outputDirectory.getAbsolutePath());
+                executeAndWait(cmd, false);
+                return true;
+            });
+        }};
     }
 }
