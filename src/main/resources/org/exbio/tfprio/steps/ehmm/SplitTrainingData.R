@@ -9,7 +9,7 @@ filterRegions <- function(regions, w = 2000) {
   regions <- regions[width(regions) < w]
   d <- distance(regions[1:(length(regions)-1)], regions[2:length(regions)])
   message("remove neighboring regions with a pairwise distance of < 2 kb")
-  regions[d >= w | is.na(d)]
+  reduce(regions[d >= w | is.na(d)])
 }
 
 randomRanges <- function(regions, n, size) {
