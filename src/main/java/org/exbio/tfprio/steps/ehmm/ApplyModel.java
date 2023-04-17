@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+import static org.exbio.pipejar.util.FileManagement.extend;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class ApplyModel extends ExecutableStep<Configs> {
@@ -34,7 +35,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
         regions.forEach((s, r) -> {
             OutputFile groupDir = new OutputFile(inputDirectory, s);
             this.regions.put(s, addInput(groupDir, r));
-            this.bamDirs.put(s, addInput(groupDir, new OutputFile(bamDirectory.get(), s)));
+            this.bamDirs.put(s, addInput(groupDir, new OutputFile(extend(bamDirectory.get(), s).getAbsolutePath())));
             this.outputDirs.put(s, addOutput(s));
         });
     }
