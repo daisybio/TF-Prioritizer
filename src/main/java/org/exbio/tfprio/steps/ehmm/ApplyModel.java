@@ -16,6 +16,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 public class ApplyModel extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputDirs = new HashMap<>();
     private final Map<String, InputFile> regions = new HashMap<>();
+    private final Map<String, InputFile> bamDirs = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
@@ -34,6 +35,8 @@ public class ApplyModel extends ExecutableStep<Configs> {
         regions.forEach((s, r) -> {
             OutputFile groupDir = new OutputFile(inputDirectory, s);
             this.regions.put(s, addInput(groupDir, r));
+            this.bamDirs.put(s, addInput(new OutputFile(
+                    extend(bamDirectory.get(), s).getAbsolutePath())));
             this.outputDirs.put(s, addOutput(s));
         });
     }
@@ -42,14 +45,13 @@ public class ApplyModel extends ExecutableStep<Configs> {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             regions.forEach((s, r) -> add(() -> {
-                OutputFile bamDir = new OutputFile(extend(bamDirectory.get()), s);
                 // apply model to each group
                 String ehmmCommand = String.join(" ","Rscript",
                         applyModelScript.getAbsolutePath(),
                         "-r", r.getAbsolutePath(),
-                        "-g", chromosomeSizes.getParent(),
+                        "-g", chromosomeSizes.getAbsolutePath(),
                         "-m", constructedModel.getAbsolutePath(),
-                        "-b", bamDir.getAbsolutePath(),
+                        "-b", bamDirs.get(s).getAbsolutePath(),
                         "-o", outputDirs.get(s).getAbsolutePath(),
                         "-s", binSize.toString(),
                         "-t", nThreads.toString(),
