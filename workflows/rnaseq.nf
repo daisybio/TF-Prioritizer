@@ -31,5 +31,8 @@ workflow RNASEQ {
         .filter { it[0] < it[1] }
 
     DESEQ2 (COUNT_NORMALIZATION.out, ch_rnaseq_samplesheet, ch_pairings)
-    // GROUP_COUNTS (COUNT_NORMALIZATION.out, ch_rnaseq_samplesheet)
+    
+    emit:
+    deseq2 = DESEQ2.out
+    versions = ch_versions
 }

@@ -72,8 +72,14 @@ include { PEAK_FILES } from './peak_files'
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
 //
 workflow TFPRIO {
+    ch_versions = Channel.empty()
+
     RNASEQ ()
     PEAK_FILES ()
+
+    ch_versions = ch_versions.mix(RNASEQ.out.versions, PEAK_FILES.out.versions)
+    ch_affinity_ratios = PEAK_FILES.out.affinity_ratios
+    ch_deseq2 = RNASEQ.out.deseq2
 }
 
 /*

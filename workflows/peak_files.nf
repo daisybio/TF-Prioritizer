@@ -96,6 +96,6 @@ workflow PEAK_FILES {
     AFFINITY_RATIOS (ch_pairings)
 
     emit:
-    peaks = ch_peaks
+    affinity_ratios = AFFINITY_RATIOS.out
     versions = ch_versions
 }
