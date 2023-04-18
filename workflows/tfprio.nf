@@ -65,8 +65,8 @@ params.three_prime_clip_r2 = params.chipseq_three_prime_clip_r2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RNASEQ } from './rnaseq'
-include { PEAK_FILES } from './peak_files'
+include { RNASEQ } from '../subworkflows/local/rnaseq'
+include { PEAK_FILES } from '../subworkflows/local/peak_files'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline

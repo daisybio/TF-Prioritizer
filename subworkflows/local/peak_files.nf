@@ -1,16 +1,16 @@
 if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = Channel.value(file(params.chipseq_samplesheet)) } else { exit 1, 'ChIPseq samplesheet not specified!' }
 
-include { CHIPSEQ } from '../subworkflows/local/chipseq'
-include { CREATE_FOOTPRINTS } from '../modules/local/create_footprints'
-include { GUNZIP as GUNZIP_BLACKLIST } from '../subworkflows/nf-core/chipseq/modules/nf-core/modules/gunzip/main'
-include { BLACKLIST } from '../modules/local/blacklist'
-include { TEPIC } from '../modules/local/tepic'
-include { SEQUENCE_TO_BED } from '../modules/local/sequence_to_bed'
-include { MERGE_BINDING_BED } from '../modules/local/merge_binding_bed'
-include { MEAN_AFFINITIES } from '../modules/local/affinities'
-include { AFFINITY_RATIOS } from '../modules/local/affinities'
-include { MIX_SAMPLES } from '../modules/local/mix_samples'
-include { CLEAN_BED } from '../modules/local/clean_bed'
+include { CHIPSEQ } from './nf-core_chipseq'
+include { CREATE_FOOTPRINTS } from '../../modules/local/peaks/create_footprints'
+include { GUNZIP as GUNZIP_BLACKLIST } from '../nf-core/chipseq/modules/nf-core/modules/gunzip/main'
+include { BLACKLIST } from '../../modules/local/peaks/blacklist'
+include { TEPIC } from '../../modules/local/peaks/tepic'
+include { SEQUENCE_TO_BED } from '../../modules/local/peaks/sequence_to_bed'
+include { MERGE_BINDING_BED } from '../../modules/local/peaks/merge_binding_bed'
+include { MEAN_AFFINITIES } from '../../modules/local/peaks/affinities'
+include { AFFINITY_RATIOS } from '../../modules/local/peaks/affinities'
+include { MIX_SAMPLES } from '../../modules/local/peaks/mix_samples'
+include { CLEAN_BED } from '../../modules/local/peaks/clean_bed'
 
 workflow PEAK_FILES {
     ch_versions = Channel.empty()
