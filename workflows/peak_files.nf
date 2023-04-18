@@ -8,6 +8,9 @@ include { TEPIC } from '../modules/local/tepic'
 include { SEQUENCE_TO_BED } from '../modules/local/sequence_to_bed'
 include { MERGE_BINDING_BED } from '../modules/local/merge_binding_bed'
 include { MEAN_AFFINITIES } from '../modules/local/affinities'
+include { AFFINITY_RATIOS } from '../modules/local/affinities'
+include { MIX_SAMPLES } from '../modules/local/mix_samples'
+include { CLEAN_BED } from '../modules/local/clean_bed'
 
 workflow PEAK_FILES {
     ch_versions = Channel.empty()
@@ -20,12 +23,10 @@ workflow PEAK_FILES {
         ch_versions = ch_versions.mix(CHIPSEQ.out.versions)
     }
 
-    // TODO: Mix samples
+    ch_peaks = ch_peaks
+        .map { [it.name.replaceAll(/\.bed|\.broadPeak|\.narrowPeak$/, ''), it] }
 
-    ch_peaks = CREATE_FOOTPRINTS (params.peakBindingSiteSearch, params.maxDistance, ch_peaks).footprints
-        .map { [it.name, it] }
-        .map { [it[0].replaceAll(/_footprints.bed$/,''), it[1]] }
-        .map { [it[0].replaceAll(/_peaks$/, ''), it[1]] }
+    ch_peaks = CLEAN_BED (ch_peaks)
 
     ch_chipseq_annotations = ch_chipseq_samplesheet
         .splitCsv(header: true, sep: ',')
@@ -35,6 +36,18 @@ workflow PEAK_FILES {
         .unique()
     
     ch_peaks = ch_peaks.combine(ch_chipseq_annotations, by: 0)
+        .map { [it[2], it[3], it[0], it[1]] } // [hm, group, sample, file]
+
+    if (params.mix_samples) {
+        ch_peaks = MIX_SAMPLES (
+            Channel.value(params.min_occurrence),
+            ch_peaks
+                .map { [it[0], it[1], it[3]]}
+                .groupTuple(by: [0, 1])
+        )
+    }
+
+    ch_peaks = CREATE_FOOTPRINTS (params.peakBindingSiteSearch, params.maxDistance, ch_peaks).footprints
 
     ch_blacklist = Channel.empty()
     if (params.blacklist) {
@@ -58,9 +71,9 @@ workflow PEAK_FILES {
         params.tepic_windowSize,
         params.tepic_loopWindows,
         params.tepic_exponentialDecay,
-        params.tepic_doNotNormalizePeakLength,
+        params.tepic_normalizePeakLength,
         params.tepic_maxMinutesPerChromosome,
-        params.tepic_originalDecay,
+        params.tepic_originalScaling,
         params.tepic_pValue
         )
 
@@ -75,7 +88,12 @@ workflow PEAK_FILES {
 
     MERGE_BINDING_BED (ch_binding_bed_grouped)
 
-    MEAN_AFFINITIES (ch_affinities)
+    ch_affinities = MEAN_AFFINITIES (ch_affinities)
+
+    ch_pairings = ch_affinities.combine(ch_affinities, by: 0)
+        .filter { it[1] < it[3] }
+
+    AFFINITY_RATIOS (ch_pairings)
 
     emit:
     peaks = ch_peaks

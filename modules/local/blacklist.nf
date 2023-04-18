@@ -6,10 +6,10 @@ process BLACKLIST {
 
     input:
     path blacklist
-    tuple val(sample), path(peakFile), val(hm), val(group)
+    tuple val(hm), val(group), val(sample), path(peakFile)
 
     output:
-    tuple val(sample), path("${peakFile.baseName}_blacklist-filtered.bed"), val(hm), val(group)
+    tuple val(hm), val(group), val(sample), path("${peakFile.baseName}_blacklist-filtered.bed")
 
     script:
     """

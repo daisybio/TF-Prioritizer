@@ -25,11 +25,23 @@ if (is.null(opt$input) || is.null(opt$output)) {
 # Read all input files into a list
 dfs <- lapply(opt$input, read.delim)
 
-# Merge all data frames by common columns
-merged <- Reduce(function(x, y) merge(x, y, all = TRUE), dfs)
+# Check if all data frames have the same dimensions
+if (!all(sapply(dfs, function(df) all.equal(dim(df), dim(dfs[[1]]))))) {
+    stop("The input files must have the same dimensions.")
+}
+
+# Check if all data frames have the same row names
+if (!all(sapply(dfs, function(df) all.equal(rownames(df), rownames(dfs[[1]]))))) {
+    stop("The input files must have the same row names.")
+}
+
+# Check if all data frames have the same column names
+if (!all(sapply(dfs, function(df) all.equal(colnames(df), colnames(dfs[[1]]))))) {
+    stop("The input files must have the same column names.")
+}
 
 # Calculate the mean of each cell
-means <- apply(merged, c(1, 2), mean, na.rm = TRUE)
+means <- Reduce("+", dfs) / length(dfs)
 
 # Write the means to a file
-write.table(means, opt$output, sep = "\t", row.names = FALSE)
+write.table(means, file = opt$output, sep = "\t", row.names = FALSE)

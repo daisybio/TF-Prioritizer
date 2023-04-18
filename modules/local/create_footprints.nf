@@ -7,13 +7,13 @@ process CREATE_FOOTPRINTS {
     input:
     val searchType
     val maxDistance
-    path peakFile
+    tuple val(hm), val(group), val(sample), path(peakFile)
 
     output:
-    path "*_footprints.bed", emit: footprints
+    tuple val(hm), val(group), val(sample), path("*_footprints.bed"), emit: footprints
 
     script:
     """
-    footprints.sh $peakFile ${peakFile.baseName}_footprints.bed $searchType $maxDistance
+    footprints.sh $peakFile ${peakFile.baseName}_footprints.bed $searchType $maxDistance && [ -s ${peakFile.baseName}_footprints.bed ]
     """
 }
