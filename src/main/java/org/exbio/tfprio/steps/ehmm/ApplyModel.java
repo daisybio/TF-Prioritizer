@@ -18,7 +18,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final Map<String, InputFile> regions = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
-    private final RequiredConfig<File> bamDirectoryPath = new RequiredConfig<>(configs.ehmm.bamDirectory);
+    private final RequiredConfig<File> inputBamDir = new RequiredConfig<>(configs.ehmm.bamDirectory);
     private final InputFile bamDirectory;
     private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
     private final RequiredConfig<Double> pseudoCounts = new RequiredConfig<>(configs.ehmm.pseudoCount);
@@ -30,32 +30,13 @@ public class ApplyModel extends ExecutableStep<Configs> {
         super(configs, false, regions.values(), chromosomeSizes, constructedModel);
         this.chromosomeSizes = addInput(chromosomeSizes);
         this.constructedModel = addInput(constructedModel);
-        this.bamDirectory = addInput(new OutputFile(bamDirectoryPath.get().getAbsolutePath()));
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
-
+        this.bamDirectory = addInput(inputBamDir);
         regions.forEach((s, r) -> {
             OutputFile groupDir = new OutputFile(inputDirectory, s);
             this.regions.put(s, addInput(groupDir, r));
             this.outputDirs.put(s, addOutput(s));
         });
-        Arrays.stream(Objects.requireNonNull(this.bamDirectoryPath.get().listFiles()))
-                .filter(File::isDirectory)
-                .forEach(sDir -> {
-                    OutputFile groupIn = new OutputFile(inputDirectory, sDir.getName());
-                    Arrays.stream(Objects.requireNonNull(sDir.listFiles()))
-                            .filter(File::isDirectory)
-                            .forEach(hmDir -> {
-                                OutputFile hmIn = new OutputFile(groupIn, hmDir.getName());
-                                Arrays.stream(Objects.requireNonNull(hmDir.listFiles()))
-                                        .filter(f -> f.toPath().endsWith(".bam"))
-                                        .forEach(f -> {
-                                            OutputFile bamFile = new OutputFile(f.getAbsolutePath());
-                                            OutputFile baiFile = new OutputFile(bamFile.getAbsolutePath()+".bai");
-                                            addInput(hmIn, bamFile);
-                                            if (baiFile.exists()) addInput(hmIn, baiFile);
-                                        });
-                            });
-                });
     }
 
     @Override
