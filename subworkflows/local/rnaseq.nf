@@ -5,7 +5,8 @@ include { COUNT_NORMALIZATION } from '../../modules/local/counts/count_preproces
 include { FILTER_COUNTS } from '../../modules/local/counts/count_preprocessing'
 include { GROUP_COUNTS } from '../../modules/local/counts/count_preprocessing'
 include { DESEQ2 } from '../../modules/local/counts/deseq'
-include { ENSG_MAP_CREATION } from '../../modules/local/counts/ensg_map_creation'
+include { ENSG_MAP_CREATION } from '../../modules/local/counts/ensg_mapping'
+include { ENSG_MAPPING } from '../../modules/local/counts/ensg_mapping'
 
 workflow RNASEQ {
     ch_versions = Channel.empty()
@@ -20,10 +21,11 @@ workflow RNASEQ {
         ch_tpm = RNASEQ.out.tpm
     }
 
-    ENSG_MAP_CREATION (ch_count, Channel.value(params.taxonomy))
+    ch_map = ENSG_MAP_CREATION (ch_count, Channel.value(params.taxonomy))
 
     FILTER_COUNTS (ch_count, params.min_count, params.min_tpm)
     COUNT_NORMALIZATION (FILTER_COUNTS.out.count, ch_rnaseq_samplesheet)
+    ENSG_MAPPING (COUNT_NORMALIZATION.out, ch_map)
 
     ch_groups = ch_rnaseq_samplesheet
         .splitCsv(header: true, sep: ',')
@@ -33,7 +35,7 @@ workflow RNASEQ {
     ch_pairings = ch_groups.combine(ch_groups)
         .filter { it[0] < it[1] }
 
-    DESEQ2 (COUNT_NORMALIZATION.out, ch_rnaseq_samplesheet, ch_pairings)
+    DESEQ2 (ENSG_MAPPING.out, ch_rnaseq_samplesheet, ch_pairings)
     
     emit:
     deseq2 = DESEQ2.out

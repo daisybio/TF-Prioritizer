@@ -1,30 +1,28 @@
 #!/usr/bin/env python3
 
 import pandas as pd
-import mygene
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="input file")
+parser.add_argument("--map", help="Map file")
 parser.add_argument("--output", help="output file")
-parser.add_argument("--taxonomy", help="species taxonomy as found in https://docs.mygene.info/en/latest/doc/data.html#species")
 
 args = parser.parse_args()
 
-df = pd.read_csv(args.input, sep="\t", header=None)
+df_counts = pd.read_csv(args.input, sep="\t", index_col=0)
+df_map = pd.read_csv(args.map, sep="\t", header=None, index_col=0)
 
-symbols = df[0].tolist()
-mg = mygene.MyGeneInfo()
-res = mg.querymany(symbols, scopes="symbol", fields="ensembl.gene", species=args.taxonomy, as_dataframe=True)
+original_size = len(df_counts.index)
 
-mapping = res["ensembl.gene"]
-notna = mapping.dropna()
+# Create intersection of genes
+ensg_dict = df_map.to_dict()[1]
 
-found_percentage = len(notna) / len(mapping)
+df_counts["ENSG"] = df_counts.index.map(lambda x: ensg_dict[x] if x in ensg_dict else x)
 
-if found_percentage < 0.5:
-    print("WARNING: Only {0:.2f}% of genes were found".format(found_percentage * 100))
-else:
-    print("Found {0:.2f}% of genes".format(found_percentage * 100))
+# Put ENSG column first
+cols = df_counts.columns.tolist()
+cols = cols[-1:] + cols[:-1]
+df_counts = df_counts[cols]
 
-notna.to_csv(args.output, sep="\t", header=False)
+df_counts.to_csv(args.output, sep="\t", index=False)
