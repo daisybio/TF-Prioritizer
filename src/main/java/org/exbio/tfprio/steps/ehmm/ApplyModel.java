@@ -10,15 +10,16 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+import static org.exbio.pipejar.util.FileManagement.extend;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class ApplyModel extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputDirs = new HashMap<>();
     private final Map<String, InputFile> regions = new HashMap<>();
-    private final Map<String, InputFile> bamDirs = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
-    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
+    private final RequiredConfig<File> bamDirectoryPath = new RequiredConfig<>(configs.ehmm.bamDirectory);
+    private final InputFile bamDirectory;
     private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
     private final RequiredConfig<Double> pseudoCounts = new RequiredConfig<>(configs.ehmm.pseudoCount);
     private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get();
@@ -29,6 +30,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
         super(configs, false, regions.values(), chromosomeSizes, constructedModel);
         this.chromosomeSizes = addInput(chromosomeSizes);
         this.constructedModel = addInput(constructedModel);
+        this.bamDirectory = addInput(new OutputFile(bamDirectoryPath.get().getAbsolutePath()));
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
 
         regions.forEach((s, r) -> {
@@ -36,14 +38,13 @@ public class ApplyModel extends ExecutableStep<Configs> {
             this.regions.put(s, addInput(groupDir, r));
             this.outputDirs.put(s, addOutput(s));
         });
-        Arrays.stream(Objects.requireNonNull(this.bamDirectory.get().listFiles()))
+        Arrays.stream(Objects.requireNonNull(this.bamDirectoryPath.get().listFiles()))
                 .filter(File::isDirectory)
                 .forEach(sDir -> {
                     OutputFile groupIn = new OutputFile(inputDirectory, sDir.getName());
                     Arrays.stream(Objects.requireNonNull(sDir.listFiles()))
                             .filter(File::isDirectory)
                             .forEach(hmDir -> {
-                                bamDirs.put(sDir.getName(), addInput(new OutputFile(hmDir.getAbsolutePath())));
                                 OutputFile hmIn = new OutputFile(groupIn, hmDir.getName());
                                 Arrays.stream(Objects.requireNonNull(hmDir.listFiles()))
                                         .filter(f -> f.toPath().endsWith(".bam"))
@@ -61,13 +62,14 @@ public class ApplyModel extends ExecutableStep<Configs> {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             regions.forEach((s, r) -> add(() -> {
+                File bamFile = new File(extend(bamDirectory, s).getAbsolutePath());
                 // apply model to each group
                 String ehmmCommand = String.join(" ","Rscript",
                         applyModelScript.getAbsolutePath(),
                         "-r", r.getAbsolutePath(),
                         "-g", chromosomeSizes.getAbsolutePath(),
                         "-m", constructedModel.getAbsolutePath(),
-                        "-b", bamDirs.get(s).getAbsolutePath(),
+                        "-b", bamFile.getAbsolutePath(),
                         "-o", outputDirs.get(s).getAbsolutePath(),
                         "-s", binSize.toString(),
                         "-t", nThreads.toString(),
