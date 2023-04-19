@@ -5,6 +5,7 @@ include { COUNT_NORMALIZATION } from '../../modules/local/counts/count_preproces
 include { FILTER_COUNTS } from '../../modules/local/counts/count_preprocessing'
 include { GROUP_COUNTS } from '../../modules/local/counts/count_preprocessing'
 include { DESEQ2 } from '../../modules/local/counts/deseq'
+include { ENSG_MAP_CREATION } from '../../modules/local/counts/ensg_map_creation'
 
 workflow RNASEQ {
     ch_versions = Channel.empty()
@@ -18,6 +19,8 @@ workflow RNASEQ {
         ch_versions = ch_versions.mix(RNASEQ.out.versions)
         ch_tpm = RNASEQ.out.tpm
     }
+
+    ENSG_MAP_CREATION (ch_count, Channel.value(params.taxonomy))
 
     FILTER_COUNTS (ch_count, params.min_count, params.min_tpm)
     COUNT_NORMALIZATION (FILTER_COUNTS.out.count, ch_rnaseq_samplesheet)
