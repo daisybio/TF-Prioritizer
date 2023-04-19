@@ -36,8 +36,9 @@ public class ApplyModel extends ExecutableStep<Configs> {
                         .SimpleEntry<>(e.getKey(), addInput(e.getValue())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
+        OutputFile regionDir = new OutputFile(inputDirectory, "regions");
         regions.forEach((s, r) -> {
-            OutputFile groupDir = new OutputFile(inputDirectory, s);
+            OutputFile groupDir = new OutputFile(regionDir, s);
             this.regions.put(s, addInput(groupDir, r));
             this.outputDirs.put(s, addOutput(s));
         });
