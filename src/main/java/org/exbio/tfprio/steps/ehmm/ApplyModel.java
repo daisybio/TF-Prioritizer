@@ -18,7 +18,8 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final Map<String, InputFile> regions = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
-    private final InputFile bamDirectory;
+    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
+    private final OutputFile inputBamParent = new OutputFile(inputDirectory,"bamBase");
     private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
     private final RequiredConfig<Double> pseudoCounts = new RequiredConfig<>(configs.ehmm.pseudoCount);
     private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get();
@@ -29,7 +30,6 @@ public class ApplyModel extends ExecutableStep<Configs> {
         super(configs, false, regions.values(), chromosomeSizes, constructedModel);
         this.chromosomeSizes = addInput(chromosomeSizes);
         this.constructedModel = addInput(constructedModel);
-        this.bamDirectory = addInput(new OutputFile(new RequiredConfig<>(configs.ehmm.bamDirectory).get().getAbsolutePath()));
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
 
         regions.forEach((s, r) -> {
@@ -38,20 +38,25 @@ public class ApplyModel extends ExecutableStep<Configs> {
             this.outputDirs.put(s, addOutput(s));
         });
         // add bam and bai files as inputs
-        Arrays.stream(Objects.requireNonNull(bamDirectory.listFiles()))
-                .forEach(group -> Arrays.stream(Objects.requireNonNull(bamDirectory.listFiles()))
-                        .filter(f -> f.toString().endsWith(".bam"))
-                        .forEach(b -> {
-                            addInput(new OutputFile(b.getAbsolutePath()));
-                            addInput(new OutputFile(b.getAbsolutePath()+".bai"));
-                        }));
+        Arrays.stream(Objects.requireNonNull(bamDirectory.get().listFiles()))
+                .forEach(group -> {
+                    OutputFile groupIn = new OutputFile(inputBamParent, group.getName());
+                    Arrays.stream(Objects.requireNonNull(group.listFiles()))
+                            .filter(f -> f.toString().endsWith(".bam"))
+                            .forEach(b -> {
+                                OutputFile bamFile = new OutputFile(b.getAbsolutePath());
+                                OutputFile bamBaiFile = new OutputFile(b.getAbsolutePath()+".bai");
+                                addInput(groupIn, bamFile);
+                                if (bamBaiFile.exists()) addInput(groupIn, bamBaiFile);
+                            });
+                });
     }
 
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             regions.forEach((s, r) -> add(() -> {
-                File bamDir = extend(bamDirectory, s);
+                File bamDir = extend(inputBamParent, s);
                 // apply model to each group
                 String ehmmCommand = String.join(" ","Rscript",
                         applyModelScript.getAbsolutePath(),
