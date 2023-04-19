@@ -295,7 +295,7 @@ extractRegions <- function(segmentation, regions, genomeSize, outdir) {
                               elmName)
     elms.tiled <- gr[startsWith(gr$name, paste0(label, "_A"))]
     file.create(regionsBedfile)
-    export.bed(reduce(elms.tiled), regionsBedfile)
+    export.bed(elms.tiled, regionsBedfile)
   }, segmentation$score, c("enhancer", "promoter"))
 }
 
