@@ -39,6 +39,24 @@ public class ApplyModel extends ExecutableStep<Configs> {
                     extend(bamDirectory.get(), s).getAbsolutePath())));
             this.outputDirs.put(s, addOutput(s));
         });
+        Arrays.stream(Objects.requireNonNull(this.bamDirectory.get().listFiles()))
+                .filter(File::isDirectory)
+                .forEach(sDir -> {
+                    OutputFile groupIn = new OutputFile(inputDirectory, sDir.getName());
+                    Arrays.stream(Objects.requireNonNull(sDir.listFiles()))
+                            .filter(File::isDirectory)
+                            .forEach(hmDir -> {
+                                    OutputFile hmIn = new OutputFile(groupIn, hmDir.getName());
+                                    Arrays.stream(Objects.requireNonNull(hmDir.listFiles()))
+                                            .filter(f -> f.toPath().endsWith(".bam"))
+                                            .forEach(f -> {
+                                                OutputFile bamFile = new OutputFile(f.getAbsolutePath());
+                                                OutputFile baiFile = new OutputFile(bamFile.getAbsolutePath()+".bai");
+                                                addInput(hmIn, bamFile);
+                                                if (baiFile.exists()) addInput(hmIn, baiFile);
+                                            });
+                            });
+                });
     }
 
     @Override
