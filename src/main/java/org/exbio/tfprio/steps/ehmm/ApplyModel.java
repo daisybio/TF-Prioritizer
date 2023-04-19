@@ -16,6 +16,7 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 public class ApplyModel extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputDirs = new HashMap<>();
     private final Map<String, InputFile> regions = new HashMap<>();
+    private final Map<String, InputFile> bamDirs = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
@@ -38,9 +39,10 @@ public class ApplyModel extends ExecutableStep<Configs> {
             this.outputDirs.put(s, addOutput(s));
         });
         // add bam and bai files as inputs
+        InputFile bamBase = addInput(inputBamParent);
         Arrays.stream(Objects.requireNonNull(bamDirectory.get().listFiles()))
                 .forEach(group -> {
-                    OutputFile groupIn = new OutputFile(inputBamParent, group.getName());
+                    OutputFile groupIn = new OutputFile(bamBase, group.getName());
                     Arrays.stream(Objects.requireNonNull(group.listFiles()))
                             .filter(f -> f.toString().endsWith(".bam"))
                             .forEach(b -> {
