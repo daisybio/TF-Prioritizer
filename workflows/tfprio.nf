@@ -69,6 +69,8 @@ include { RNASEQ } from '../subworkflows/local/rnaseq'
 include { PEAK_FILES } from '../subworkflows/local/peak_files'
 include { INTEGRATE_DATA } from '../modules/local/dynamite'
 include { PREPARE_FOR_CLASSIFICATION } from '../modules/local/dynamite'
+include { DYNAMITE } from '../modules/local/dynamite'
+include { DYNAMITE_FILTER } from '../modules/local/dynamite'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -89,6 +91,19 @@ workflow TFPRIO {
     
     INTEGRATE_DATA (ch_integration)
     PREPARE_FOR_CLASSIFICATION (INTEGRATE_DATA.out)
+    DYNAMITE (
+        PREPARE_FOR_CLASSIFICATION.out,
+        Channel.value(params.dynamite_ofolds),
+        Channel.value(params.dynamite_ifolds),
+        Channel.value(params.dynamite_alpha),
+        Channel.value(params.dynamite_randomize)
+    )
+
+    DYNAMITE_FILTER (
+        DYNAMITE.out,
+        Channel.value(params.dynamite_min_regression)
+    )
+
 }
 
 /*
