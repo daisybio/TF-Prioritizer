@@ -37,6 +37,14 @@ public class ApplyModel extends ExecutableStep<Configs> {
             this.regions.put(s, addInput(groupDir, r));
             this.outputDirs.put(s, addOutput(s));
         });
+        // add bam and bai files as inputs
+        Arrays.stream(Objects.requireNonNull(bamDirectory.listFiles()))
+                .forEach(group -> Arrays.stream(Objects.requireNonNull(bamDirectory.listFiles()))
+                        .filter(f -> f.toString().endsWith(".bam"))
+                        .forEach(b -> {
+                            addInput(new OutputFile(b.getAbsolutePath()));
+                            addInput(new OutputFile(b.getAbsolutePath()+".bai"));
+                        }));
     }
 
     @Override
