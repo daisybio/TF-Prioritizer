@@ -36,22 +36,10 @@ public class ApplyModel extends ExecutableStep<Configs> {
         regions.forEach((s, r) -> {
             OutputFile groupDir = new OutputFile(inputDirectory, s);
             this.regions.put(s, addInput(groupDir, r));
+            this.bamDirs.put(s, addInput(groupDir, new OutputFile(
+                    extend(bamDirectory.get(), s).getAbsolutePath())));
             this.outputDirs.put(s, addOutput(s));
         });
-        // add bam and bai files as inputs
-        InputFile bamBase = addInput(inputBamParent);
-        Arrays.stream(Objects.requireNonNull(bamDirectory.get().listFiles()))
-                .forEach(group -> {
-                    OutputFile groupIn = new OutputFile(bamBase, group.getName());
-                    Arrays.stream(Objects.requireNonNull(group.listFiles()))
-                            .filter(f -> f.toString().endsWith(".bam"))
-                            .forEach(b -> {
-                                OutputFile bamFile = new OutputFile(b.getAbsolutePath());
-                                OutputFile bamBaiFile = new OutputFile(b.getAbsolutePath()+".bai");
-                                addInput(groupIn, bamFile);
-                                if (bamBaiFile.exists()) addInput(groupIn, bamBaiFile);
-                            });
-                });
     }
 
     @Override
