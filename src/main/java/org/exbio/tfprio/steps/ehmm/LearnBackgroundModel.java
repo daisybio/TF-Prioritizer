@@ -32,56 +32,6 @@ public class LearnBackgroundModel extends ExecutableStep<Configs> {
         this.learnModelRscript = addInput(getClass().getResourceAsStream("learnModel.R"), "learnModel.R");
     }
 
-    private static class Region implements Comparable<Region>{
-        String chr;
-        long start;
-        long stop;
-        char strand;
-        String label;
-        String score;
-
-        public Region(String bedLine){
-            String[] split = bedLine.split("\t");
-            this.chr = split[0];
-            this.start = Long.parseLong(split[1]);
-            this.stop = Long.parseLong(split[2]);
-            this.label = split[3];
-            this.score = split.length < 5 ? "666": split[4];
-            this.strand = split.length < 6 ? '*': split[5].charAt(0);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this.getClass() != obj.getClass()) return false;
-            if (this == obj) return true;
-            Region other = (Region) obj;
-            return this.chr.equals(other.chr) &&
-                    this.start == other.start &&
-                    this.stop == other.stop;
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder()
-                    .append(this.chr)
-                    .append(this.start)
-                    .append(this.stop)
-                    .toHashCode();
-        }
-
-        @Override
-        public int compareTo(Region o) {
-            return this.chr.compareTo(o.chr)*10+(int) (this.start - o.start);
-        }
-
-        @Override
-        public String toString(){
-            return String.join("\t",
-                    this.chr, String.valueOf(this.start), String.valueOf(this.stop),
-                    this.label, this.score, String.valueOf(this.strand));
-        }
-    }
-
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
