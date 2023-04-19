@@ -67,6 +67,7 @@ params.three_prime_clip_r2 = params.chipseq_three_prime_clip_r2
 
 include { RNASEQ } from '../subworkflows/local/rnaseq'
 include { PEAK_FILES } from '../subworkflows/local/peak_files'
+include { INTEGRATE_DATA } from '../modules/local/dynamite'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -79,7 +80,13 @@ workflow TFPRIO {
 
     ch_versions = ch_versions.mix(RNASEQ.out.versions, PEAK_FILES.out.versions)
     ch_affinity_ratios = PEAK_FILES.out.affinity_ratios
-    ch_deseq2 = RNASEQ.out.deseq2
+        .map { [it[1], it[2], it[0], it[3]] }
+    ch_diff_expression = RNASEQ.out.deseq2
+
+    ch_integration = ch_affinity_ratios
+        .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, affinityRatios, diffExpression
+    
+    INTEGRATE_DATA (ch_integration)
 }
 
 /*

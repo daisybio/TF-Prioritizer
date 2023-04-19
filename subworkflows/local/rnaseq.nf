@@ -40,4 +40,5 @@ workflow RNASEQ {
     emit:
     deseq2 = DESEQ2.out
     versions = ch_versions
+    ensg_map = ch_map
 }
