@@ -27,8 +27,8 @@ public class ApplyModel extends ExecutableStep<Configs> {
 
     public ApplyModel(Configs configs, Map<String, OutputFile> regions, OutputFile chromosomeSizes,
                       OutputFile constructedModel, Map<String, OutputFile> bamDirs) {
-        super(configs, false, Stream.of(regions, bamDirs).map(Map::values)
-                .map(f -> (OutputFile) f).collect(Collectors.toSet()), chromosomeSizes, constructedModel);
+        super(configs, false, Stream.of(regions, bamDirs)
+                .flatMap(m -> m.values().stream()).collect(Collectors.toSet()), chromosomeSizes, constructedModel);
         this.chromosomeSizes = addInput(chromosomeSizes);
         this.constructedModel = addInput(constructedModel);
         this.bamDirs = bamDirs.entrySet().stream()
