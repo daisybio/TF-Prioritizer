@@ -18,7 +18,7 @@ import static org.exbio.pipejar.util.FileManagement.extend;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 /**
- * HINT tool calculates footprints in ATAQ-seq data
+ * HINT tool calculates footprints in ATAC-seq data
  * Input:
  * - .narrowPeaks processed by MACS2
  * - .bam files
