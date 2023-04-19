@@ -20,7 +20,6 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
-    private final OutputFile inputBamParent = new OutputFile(inputDirectory,"bamBase");
     private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
     private final RequiredConfig<Double> pseudoCounts = new RequiredConfig<>(configs.ehmm.pseudoCount);
     private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get();
@@ -46,14 +45,13 @@ public class ApplyModel extends ExecutableStep<Configs> {
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             regions.forEach((s, r) -> add(() -> {
-                File bamDir = extend(inputBamParent, s);
                 // apply model to each group
                 String ehmmCommand = String.join(" ","Rscript",
                         applyModelScript.getAbsolutePath(),
                         "-r", r.getAbsolutePath(),
                         "-g", chromosomeSizes.getAbsolutePath(),
                         "-m", constructedModel.getAbsolutePath(),
-                        "-b", bamDir.getAbsolutePath(),
+                        "-b", bamDirs.get(s).getAbsolutePath(),
                         "-o", outputDirs.get(s).getAbsolutePath(),
                         "-s", binSize.toString(),
                         "-t", nThreads.toString(),
