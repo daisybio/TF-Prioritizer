@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
 import static org.exbio.pipejar.util.FileManagement.softLink;
 
 public class InitBamFiles extends ExecutableStep<Configs> {
-    public final Map<String, Map<String, Collection<OutputFile>>> outputFiles = new HashMap<>();
-    public final Map<String, OutputFile> outputDirs = new HashMap<>();
+    public final Map<OutputFile, Map<OutputFile, Collection<OutputFile>>> outputFiles = new HashMap<>();
     private final RequiredConfig<File> inputBamDir = new RequiredConfig<>(configs.ehmm.bamDirectory);
     private final Map<File, OutputFile> bridge = new HashMap<>();
     
@@ -23,11 +22,8 @@ public class InitBamFiles extends ExecutableStep<Configs> {
         super(configs);
         InputFile inputBamDirectory = addInput(inputBamDir);
         Arrays.stream(Objects.requireNonNull(inputBamDirectory.listFiles())).filter(File::isDirectory).forEach(d_group -> {
-            String group = d_group.getName();
             OutputFile d_groupOut = new OutputFile(outputDirectory, d_group.getName());
-            outputDirs.put(group, d_groupOut);
             Arrays.stream(Objects.requireNonNull(d_group.listFiles())).filter(File::isDirectory).forEach(d_hm -> {
-                String hm = d_hm.getName();
                 OutputFile d_hmOut = new OutputFile(d_groupOut, d_hm.getName());
                 List<File> bamFiles = Arrays.stream(Objects.requireNonNull(d_hm.listFiles()))
                         .filter(File::exists).filter(f -> f.getAbsolutePath().endsWith(".bam"))
@@ -35,7 +31,7 @@ public class InitBamFiles extends ExecutableStep<Configs> {
                 bamFiles.forEach(f_sample -> {
                     OutputFile f_sampleOut = addOutput(d_hmOut, f_sample.getName());
                     bridge.put(f_sample, f_sampleOut);
-                    outputFiles.computeIfAbsent(group, k -> new HashMap<>()).computeIfAbsent(hm,
+                    outputFiles.computeIfAbsent(d_groupOut, k -> new HashMap<>()).computeIfAbsent(d_hmOut,
                             k -> new HashSet<>()).add(f_sampleOut);
                 });
             });

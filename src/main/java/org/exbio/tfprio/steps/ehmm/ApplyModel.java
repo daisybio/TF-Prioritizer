@@ -26,14 +26,15 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final InputFile applyModelScript;
 
     public ApplyModel(Configs configs, Map<String, OutputFile> regions, OutputFile chromosomeSizes,
-                      OutputFile constructedModel, Map<String, OutputFile> bamDirs) {
-        super(configs, false, Stream.of(regions, bamDirs)
-                .flatMap(m -> m.values().stream()).collect(Collectors.toSet()), chromosomeSizes, constructedModel);
+                      OutputFile constructedModel, Map<OutputFile, Map<OutputFile, Collection<OutputFile>>> bamFiles) {
+        super(configs, false, Stream.concat(regions.values().stream(), bamFiles.values().stream()
+                .flatMap(d -> d.values().stream()).flatMap(Collection::stream)).collect(Collectors.toSet()),
+                chromosomeSizes, constructedModel);
         this.chromosomeSizes = addInput(chromosomeSizes);
         this.constructedModel = addInput(constructedModel);
-        this.bamDirs = bamDirs.entrySet().stream()
-                .map(e -> new AbstractMap
-                        .SimpleEntry<>(e.getKey(), addInput(e.getValue())))
+        this.bamDirs = bamFiles.keySet().stream()
+                .map(outputFileCollectionMap -> new AbstractMap
+                        .SimpleEntry<>(outputFileCollectionMap.getName(), addInput(outputFileCollectionMap)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
         OutputFile regionDir = new OutputFile(inputDirectory, "regions");
