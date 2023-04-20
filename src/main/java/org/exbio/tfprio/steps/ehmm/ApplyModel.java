@@ -9,9 +9,8 @@ import org.exbio.tfprio.configs.Configs;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static org.exbio.pipejar.util.FileManagement.extend;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class ApplyModel extends ExecutableStep<Configs> {
@@ -19,28 +18,28 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final Map<String, InputFile> regions = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
-    private final Map<String, InputFile> bamDirs;
+    private final Map<String, InputFile> bamDirs = new HashMap<>();
+
+    private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
     private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
     private final RequiredConfig<Double> pseudoCounts = new RequiredConfig<>(configs.ehmm.pseudoCount);
     private final Integer binSize = new RequiredConfig<>(configs.ehmm.nBins).get();
     private final InputFile applyModelScript;
 
     public ApplyModel(Configs configs, Map<String, OutputFile> regions, OutputFile chromosomeSizes,
-                      OutputFile constructedModel, Map<OutputFile, Map<OutputFile, Collection<OutputFile>>> bamFiles) {
-        super(configs, false, Stream.concat(regions.values().stream(), bamFiles.values().stream()
-                .flatMap(d -> d.values().stream()).flatMap(Collection::stream)).collect(Collectors.toSet()),
-                chromosomeSizes, constructedModel);
+                      OutputFile constructedModel) {
+        super(configs, false, regions.values().stream().toList(), chromosomeSizes, constructedModel);
         this.chromosomeSizes = addInput(chromosomeSizes);
         this.constructedModel = addInput(constructedModel);
-        this.bamDirs = bamFiles.keySet().stream()
-                .map(outputFileCollectionMap -> new AbstractMap
-                        .SimpleEntry<>(outputFileCollectionMap.getName(), addInput(outputFileCollectionMap)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
         OutputFile regionDir = new OutputFile(inputDirectory, "regions");
+        OutputFile bamBaseDir = new OutputFile(inputDirectory, "bams");
         regions.forEach((s, r) -> {
             OutputFile groupDir = new OutputFile(regionDir, s);
             this.regions.put(s, addInput(groupDir, r));
+            OutputFile bamGroupDir = new OutputFile(bamBaseDir, s);
+            OutputFile bamDir = new OutputFile(extend(bamDirectory.get(), s).getAbsolutePath());
+            this.bamDirs.put(s, addInput(bamGroupDir, bamDir));
             this.outputDirs.put(s, addOutput(s));
         });
     }

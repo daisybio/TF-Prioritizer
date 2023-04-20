@@ -243,11 +243,10 @@ public class TF_Prioritizer extends Workflow<Configs> {
             // collapse input bed files
             CollapsePeakFiles collapsePeakFiles = add(new CollapsePeakFiles(configs,
                     latestPeakFiles));
-            InitBamFiles initBamFiles = add(new InitBamFiles(configs));
             // apply input data to constructed model
             ApplyModel applyModel = add(new ApplyModel(configs,
                     collapsePeakFiles.outputFiles, getChromosomeLengths.outputFile,
-                    constructModel.outputFile, initBamFiles.outputFiles));
+                    constructModel.outputFile));
             // CombinePredictions combinePredictions = add(new CombinePredictions(configs, applyModel.outputDirs));
         }
         /*
