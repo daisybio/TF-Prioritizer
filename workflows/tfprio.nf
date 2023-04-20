@@ -71,6 +71,7 @@ include { INTEGRATE_DATA } from '../modules/local/dynamite'
 include { PREPARE_FOR_CLASSIFICATION } from '../modules/local/dynamite'
 include { DYNAMITE } from '../modules/local/dynamite'
 include { DYNAMITE_FILTER } from '../modules/local/dynamite'
+// include { GROUP_STAGES } from '../modules/local/distributionAnalysis/group_stages'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -104,6 +105,24 @@ workflow TFPRIO {
         Channel.value(params.dynamite_min_regression)
     )
 
+    ch_stages = Channel.value(file(params.stages))
+        .splitCsv(header: false, sep: '\t')
+
+    ch_coefficients = DYNAMITE_FILTER.out
+        // But group2 first
+        .map { [it[1], it[0], it[2], it[3]] }
+        // Get stage of group2
+        .combine(ch_stages, by: 0)
+        // But group1 first again
+        .map { [it[1], it[0], it[2], it[3], it[4]] }
+        // Get stage of group1
+        .combine(ch_stages, by: 0)
+        // Check if stages are equal, remove groups
+        .map { [it[2], it[4] == it[5], it[3]] }
+        .groupTuple(by: [0, 1])
+        .view()
+
+    // GROUP_STAGES (ch_coefficients)
 }
 
 /*
