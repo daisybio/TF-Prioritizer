@@ -11,6 +11,7 @@ include { MEAN_AFFINITIES } from '../../modules/local/peaks/affinities'
 include { AFFINITY_RATIOS } from '../../modules/local/peaks/affinities'
 include { MIX_SAMPLES } from '../../modules/local/peaks/mix_samples'
 include { CLEAN_BED } from '../../modules/local/peaks/clean_bed'
+include { REMOVE_MATRIX_ANNOTATIONS } from '../../modules/local/peaks/affinities'
 
 workflow PEAK_FILES {
     ch_versions = Channel.empty()
@@ -87,6 +88,8 @@ workflow PEAK_FILES {
         .groupTuple(by: [0, 1, 2])
 
     MERGE_BINDING_BED (ch_binding_bed_grouped)
+
+    ch_affinities = REMOVE_MATRIX_ANNOTATIONS (ch_affinities)
 
     ch_affinities = MEAN_AFFINITIES (ch_affinities)
 

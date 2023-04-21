@@ -71,7 +71,7 @@ include { INTEGRATE_DATA } from '../modules/local/dynamite'
 include { PREPARE_FOR_CLASSIFICATION } from '../modules/local/dynamite'
 include { DYNAMITE } from '../modules/local/dynamite'
 include { DYNAMITE_FILTER } from '../modules/local/dynamite'
-// include { GROUP_STAGES } from '../modules/local/distributionAnalysis/group_stages'
+include { GROUP_STAGES } from '../modules/local/distributionAnalysis/group_stages'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -120,9 +120,8 @@ workflow TFPRIO {
         // Check if stages are equal, remove groups
         .map { [it[2], it[4] == it[5], it[3]] }
         .groupTuple(by: [0, 1])
-        .view()
 
-    // GROUP_STAGES (ch_coefficients)
+    GROUP_STAGES (ch_coefficients).collect(flat: false).view()
 }
 
 /*

@@ -1,3 +1,19 @@
+process REMOVE_MATRIX_ANNOTATIONS {
+    conda 'pandas'
+    container 'tfprio-python'
+
+    input:
+        tuple val(hm), val(group), path(affinities)
+    
+    output:
+        tuple val(hm), val(group), path("${hm}_${group}_affinities.txt")
+
+    script:
+    """
+    remove_matrix_annotations.py --input ${affinities} --output ${hm}_${group}_affinities.txt
+    """
+}
+
 process MEAN_AFFINITIES {
     conda "conda-forge::r-base bioconda::bioconductor-deseq2 bioconda::bioconductor-biocparallel bioconda::bioconductor-tximport bioconda::bioconductor-complexheatmap conda-forge::r-optparse conda-forge::r-ggplot2 conda-forge::r-rcolorbrewer conda-forge::r-pheatmap"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
