@@ -71,7 +71,7 @@ include { INTEGRATE_DATA } from '../modules/local/dynamite'
 include { PREPARE_FOR_CLASSIFICATION } from '../modules/local/dynamite'
 include { DYNAMITE } from '../modules/local/dynamite'
 include { DYNAMITE_FILTER } from '../modules/local/dynamite'
-include { GROUP_STAGES } from '../modules/local/distributionAnalysis/group_stages'
+include { TFTG_SCORE } from '../modules/local/tftg_scores'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -85,7 +85,9 @@ workflow TFPRIO {
     ch_versions = ch_versions.mix(RNASEQ.out.versions, PEAK_FILES.out.versions)
     ch_affinity_ratios = PEAK_FILES.out.affinity_ratios
         .map { [it[1], it[2], it[0], it[3]] }
-    ch_diff_expression = RNASEQ.out.deseq2
+    ch_affinity_sums = PEAK_FILES.out.affinity_sums
+        .map { [it[1], it[2], it[0], it[3]] }
+    ch_diff_expression = RNASEQ.out.deseq2 // group1, group2, deseq2-file
 
     ch_integration = ch_affinity_ratios
         .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, affinityRatios, diffExpression
@@ -105,23 +107,14 @@ workflow TFPRIO {
         Channel.value(params.dynamite_min_regression)
     )
 
-    ch_stages = Channel.value(file(params.stages))
-        .splitCsv(header: false, sep: '\t')
-
     ch_coefficients = DYNAMITE_FILTER.out
-        // But group2 first
-        .map { [it[1], it[0], it[2], it[3]] }
-        // Get stage of group2
-        .combine(ch_stages, by: 0)
-        // But group1 first again
-        .map { [it[1], it[0], it[2], it[3], it[4]] }
-        // Get stage of group1
-        .combine(ch_stages, by: 0)
-        // Check if stages are equal, remove groups
-        .map { [it[2], it[4] == it[5], it[3]] }
-        .groupTuple(by: [0, 1])
 
-    GROUP_STAGES (ch_coefficients).collect(flat: false).view()
+    ch_tftg = ch_coefficients
+        .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, coefficients, diffExpression
+        .combine(ch_affinity_sums, by: [0, 1, 2]) // group1, group2, hm, coefficients, diffExpression, affinitySums
+    
+    TFTG_SCORE (ch_tftg)
+        .view()
 }
 
 /*

@@ -9,6 +9,7 @@ include { SEQUENCE_TO_BED } from '../../modules/local/peaks/sequence_to_bed'
 include { MERGE_BINDING_BED } from '../../modules/local/peaks/merge_binding_bed'
 include { MEAN_AFFINITIES } from '../../modules/local/peaks/affinities'
 include { AFFINITY_RATIOS } from '../../modules/local/peaks/affinities'
+include { AFFINITY_SUMS } from '../../modules/local/peaks/affinities'
 include { MIX_SAMPLES } from '../../modules/local/peaks/mix_samples'
 include { CLEAN_BED } from '../../modules/local/peaks/clean_bed'
 include { REMOVE_MATRIX_ANNOTATIONS } from '../../modules/local/peaks/affinities'
@@ -97,8 +98,10 @@ workflow PEAK_FILES {
         .filter { it[1] < it[3] }
 
     AFFINITY_RATIOS (ch_pairings)
+    AFFINITY_SUMS (ch_pairings)
 
     emit:
     affinity_ratios = AFFINITY_RATIOS.out
+    affinity_sums = AFFINITY_SUMS.out
     versions = ch_versions
 }
