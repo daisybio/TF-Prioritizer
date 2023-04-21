@@ -71,7 +71,8 @@ include { INTEGRATE_DATA } from '../modules/local/dynamite'
 include { PREPARE_FOR_CLASSIFICATION } from '../modules/local/dynamite'
 include { DYNAMITE } from '../modules/local/dynamite'
 include { DYNAMITE_FILTER } from '../modules/local/dynamite'
-include { TFTG_SCORE } from '../modules/local/tftg_scores'
+include { TFTG_SCORE } from '../modules/local/distributionAnalysis/tftg_scores'
+include { MANN_WHITNEY_U } from '../modules/local/distributionAnalysis/mann_whitney_u'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -113,8 +114,9 @@ workflow TFPRIO {
         .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, coefficients, diffExpression
         .combine(ch_affinity_sums, by: [0, 1, 2]) // group1, group2, hm, coefficients, diffExpression, affinitySums
     
-    TFTG_SCORE (ch_tftg)
-        .view()
+    TFTG_SCORE (ch_tftg) // group1, group2, hm, tftgScore
+
+    MANN_WHITNEY_U (TFTG_SCORE.out)
 }
 
 /*

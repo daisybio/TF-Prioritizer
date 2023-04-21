@@ -18,12 +18,22 @@ coefficients = pd.read_csv(args.coefficients, sep='\t', index_col=0)
 # Restructure the affinities df so that its row names match the log2fc df index
 genes = list(set(log2fc.index).intersection(set(affinities.index)))
 genes.sort()
+
+if len(genes) == 0:
+    print("No genes found")
+    exit(1)
+
 affinities = affinities.loc[genes]
 log2fc = log2fc.loc[genes]
 
 # Restructure the affinities df so that its column names match the coefficients df index
 tfs = list(set(affinities.columns).intersection(set(coefficients.index)))
 tfs.sort()
+
+if len(tfs) == 0:
+    print("No TFs found")
+    exit(1)
+
 affinities = affinities[tfs]
 coefficients = coefficients.loc[tfs]
 
@@ -34,6 +44,11 @@ result = affinities.mul(abs(log2fc["log2FoldChange"]), axis=0)
 
 ## Multiply the result by the coefficients
 result = result.mul(abs(coefficients["value"]), axis=1)
+
+# Make sure results are not empty
+if result.empty:
+    print("No results found")
+    exit(1)
 
 # Save the result
 result.to_csv(args.output, sep='\t')
