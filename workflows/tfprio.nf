@@ -72,7 +72,7 @@ include { PREPARE_FOR_CLASSIFICATION } from '../modules/local/dynamite'
 include { DYNAMITE } from '../modules/local/dynamite'
 include { DYNAMITE_FILTER } from '../modules/local/dynamite'
 include { TFTG_SCORE } from '../modules/local/distributionAnalysis/tftg_scores'
-include { MANN_WHITNEY_U } from '../modules/local/distributionAnalysis/mann_whitney_u'
+include { RANKING } from '../modules/local/distributionAnalysis/ranking'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -116,7 +116,7 @@ workflow TFPRIO {
     
     TFTG_SCORE (ch_tftg) // group1, group2, hm, tftgScore
 
-    MANN_WHITNEY_U (TFTG_SCORE.out)
+    RANKING (TFTG_SCORE.out)
 }
 
 /*

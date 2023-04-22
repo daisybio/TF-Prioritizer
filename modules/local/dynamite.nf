@@ -77,6 +77,6 @@ process DYNAMITE_FILTER {
 
     script:
         """
-        awk -v min_regression=$min_regression 'BEGIN{OFS="\t"} NR==1 || ((\$2 >= min_regression || -\$2 >= min_regression ) && \$1 != "Peak_Length")' $regression_coefficients > ${group1}:${group2}_${hm}_dynamite_filtered.tsv
+        awk -v min_regression=$min_regression 'BEGIN{OFS="\t"} NR==1 || ((\$2 >= min_regression || -\$2 >= min_regression ) && \$1 != "Peak_Length" && \$1 != "Peak_Counts")' $regression_coefficients > ${group1}:${group2}_${hm}_dynamite_filtered.tsv
         """
 }

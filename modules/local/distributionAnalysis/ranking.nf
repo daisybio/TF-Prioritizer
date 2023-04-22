@@ -1,5 +1,5 @@
-process MANN_WHITNEY_U {
-    conda "pandas matplotlib numpy scipy"
+process RANKING {
+    conda "pandas scipy"
     container "tfprio-python"
 
     input:
@@ -9,6 +9,6 @@ process MANN_WHITNEY_U {
         tuple val(group1), val(group2), val(hm), path("${group1}:${group2}_${hm}.tsv")
     script:
         """
-        mann_whitney_u.py --input $tftg_scores --output ${group1}:${group2}_${hm}.tsv
+        ranking.py --input $tftg_scores --output ${group1}:${group2}_${hm}.tsv
         """
 }

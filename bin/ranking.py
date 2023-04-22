@@ -11,7 +11,7 @@ parser.add_argument('-o', '--output', help='Output file', required=True)
 
 args = parser.parse_args()
 
-df = pd.read_csv(args.input, sep='\t', header=0, index_col=0).T.head(5)
+df = pd.read_csv(args.input, sep='\t', header=0, index_col=0).T
 
 # Drop all columns which contain exclusively NA values
 df = df.dropna(axis=1, how='all')
@@ -36,5 +36,9 @@ df = df[['sum', 'mean', 'q95', 'q99', 'median', 'p-value']]
 df = df[(df['median'] > background_median) & (df['p-value'] < 0.01)]
 
 df.sort_values(by=['median'], ascending=False, inplace=True)
-df.reset_index(inplace=True, drop=True)
+
+length = len(df.index)
+df['rank'] = range(1, length + 1)
+df['dcg'] = 1 - (df['rank'] - 1) / length
+
 df.to_csv(args.output, sep='\t')
