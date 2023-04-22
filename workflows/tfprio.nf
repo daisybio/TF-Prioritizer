@@ -111,9 +111,7 @@ workflow TFPRIO {
         Channel.value(params.dynamite_min_regression)
     )
 
-    ch_coefficients = DYNAMITE_FILTER.out
-
-    ch_tftg = ch_coefficients
+    ch_tftg = DYNAMITE_FILTER.out
         .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, coefficients, diffExpression
         .combine(ch_affinity_sums, by: [0, 1, 2]) // group1, group2, hm, coefficients, diffExpression, affinitySums
     
@@ -126,6 +124,7 @@ workflow TFPRIO {
 
     TOP_TARGET_GENES (
         COLLECT_TFS.out,
+        Channel.value(params.top_target_genes),
         ch_affinity_sums
     ) // group1, group2, hm, topTargetGenes
 

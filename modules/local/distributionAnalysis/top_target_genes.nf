@@ -4,6 +4,7 @@ process TOP_TARGET_GENES {
 
     input:
         path(tfs)
+        val(top)
         tuple val(group1), val(group2), val(hm), path(affinities)
 
     output:
@@ -11,6 +12,6 @@ process TOP_TARGET_GENES {
 
     script:
         """
-        top_target_genes.py -t $tfs -a $affinities -o ${group1}:${group2}_${hm}_ttg.tsv
+        top_target_genes.py -k $top -t $tfs -a $affinities -o ${group1}:${group2}_${hm}_ttg.tsv
         """
 }
