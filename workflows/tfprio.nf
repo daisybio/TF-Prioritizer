@@ -75,6 +75,7 @@ include { TFTG_SCORE } from '../modules/local/distributionAnalysis/tftg_scores'
 include { RANKING } from '../modules/local/distributionAnalysis/ranking'
 include { COLLECT_TFS } from '../modules/local/distributionAnalysis/collect_tfs'
 include { TOP_TARGET_GENES } from '../modules/local/distributionAnalysis/top_target_genes'
+include { BIOPHYSICAL_MODELS } from '../modules/local/biophysical_models'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -121,11 +122,16 @@ workflow TFPRIO {
 
     COLLECT_TFS (
         RANKING.out.map { it[3] } .collect()
-    )
+    ) // tfs
 
     TOP_TARGET_GENES (
         COLLECT_TFS.out,
         ch_affinity_sums
+    ) // group1, group2, hm, topTargetGenes
+
+    BIOPHYSICAL_MODELS (
+        COLLECT_TFS.out,
+        Channel.value(params.tepic_pwm)
     )
 }
 
