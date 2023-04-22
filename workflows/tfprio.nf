@@ -73,6 +73,8 @@ include { DYNAMITE } from '../modules/local/dynamite'
 include { DYNAMITE_FILTER } from '../modules/local/dynamite'
 include { TFTG_SCORE } from '../modules/local/distributionAnalysis/tftg_scores'
 include { RANKING } from '../modules/local/distributionAnalysis/ranking'
+include { COLLECT_TFS } from '../modules/local/distributionAnalysis/collect_tfs'
+include { TOP_TARGET_GENES } from '../modules/local/distributionAnalysis/top_target_genes'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -85,9 +87,9 @@ workflow TFPRIO {
 
     ch_versions = ch_versions.mix(RNASEQ.out.versions, PEAK_FILES.out.versions)
     ch_affinity_ratios = PEAK_FILES.out.affinity_ratios
-        .map { [it[1], it[2], it[0], it[3]] }
+        .map { [it[1], it[2], it[0], it[3]] } // group1, group2, hm, affinityRatios
     ch_affinity_sums = PEAK_FILES.out.affinity_sums
-        .map { [it[1], it[2], it[0], it[3]] }
+        .map { [it[1], it[2], it[0], it[3]] } // group1, group2, hm, affinitySums
     ch_diff_expression = RNASEQ.out.deseq2 // group1, group2, deseq2-file
 
     ch_integration = ch_affinity_ratios
@@ -115,8 +117,16 @@ workflow TFPRIO {
         .combine(ch_affinity_sums, by: [0, 1, 2]) // group1, group2, hm, coefficients, diffExpression, affinitySums
     
     TFTG_SCORE (ch_tftg) // group1, group2, hm, tftgScore
+    RANKING (TFTG_SCORE.out) // group1, group2, hm, ranking
 
-    RANKING (TFTG_SCORE.out)
+    COLLECT_TFS (
+        RANKING.out.map { it[3] } .collect()
+    )
+
+    TOP_TARGET_GENES (
+        COLLECT_TFS.out,
+        ch_affinity_sums
+    )
 }
 
 /*
