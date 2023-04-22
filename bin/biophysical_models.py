@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description='Extract the biophysical models')
 
-parser.add_argument('-t', '--tfs', dest='tfs', type=str, help='TFs file', required=True)
+parser.add_argument('-t', '--tfs', dest='tfs', type=argparse.FileType(), help='TFs file', required=True)
 parser.add_argument('-p', '--pwms', dest='pwms', type=argparse.FileType(), help='PWMs file', required=True)
 
 args = parser.parse_args()
 
 # Read list of TFs
-tfs = pd.read_csv(args.tfs, sep='\t', index_col=0).index.tolist()
+tfs = args.tfs.read().splitlines()
 
 blocks: List[str] = [block for block in args.pwms.read().split('>') if not block.startswith('#')]
 

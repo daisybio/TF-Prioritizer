@@ -1,5 +1,5 @@
 process BIOPHYSICAL_MODELS {
-    conda "python"
+    conda "python logomaker matplotlib"
     container "tfprio-python"
 
     input:

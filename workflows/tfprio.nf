@@ -77,6 +77,7 @@ include { COLLECT_TFS } from '../modules/local/distributionAnalysis/collect_tfs'
 include { TOP_TARGET_GENES } from '../modules/local/distributionAnalysis/top_target_genes'
 include { BIOPHYSICAL_MODELS } from '../modules/local/biophysical_models'
 include { HEATMAPS } from '../modules/local/distributionAnalysis/heatmaps'
+include { TF_SEQUENCE } from '../modules/local/tf_sequence'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -132,12 +133,14 @@ workflow TFPRIO {
         ch_counts
     ) // group1, group2, hm, topTargetGenes
 
-    HEATMAPS (
+    ch_heatmaps = HEATMAPS (
         TOP_TARGET_GENES.out,
         ch_counts,
         ch_rnaseq_samplesheet,
         RNASEQ.out.ensg_map
-    )
+    )   .transpose()
+        .map { [it[0], it[1], it[2], it[3].name.replaceFirst(/^\w+:\w+_\w+_/, '').replaceFirst(/\.png$/, '') , it[3]] }
+        // group1, group2, hm, tf, heatmap
 
     BIOPHYSICAL_MODELS (
         COLLECT_TFS.out,
@@ -149,6 +152,11 @@ workflow TFPRIO {
 
     ch_biophysical = ch_bio_logos
         .combine(ch_bio_models, by: 0) // tf, logo, model
+
+    TF_SEQUENCE (COLLECT_TFS.out)
+        .flatten()
+        .map { [it.name.replaceAll(/_.*/, ''), it] }
+        .groupTuple(by: 0) // tf, [logos]
 }
 
 /*
