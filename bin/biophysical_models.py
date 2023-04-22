@@ -28,8 +28,7 @@ for block in blocks:
     # Create dataframe from block content
     df = pd.DataFrame([line.split() for line in lines[1:]], columns=['A', 'C', 'G', 'T']).apply(pd.to_numeric)
 
-    df.index = range(1, len(df) + 1)
-    df.to_csv(tf + '.pwm', sep='\t')
+    df.to_csv(tf + '.pwm', sep='\t', index=False)
 
     # Create logo
     logo = logomaker.Logo(df, color_scheme='classic')

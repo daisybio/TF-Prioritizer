@@ -133,6 +133,14 @@ workflow TFPRIO {
         COLLECT_TFS.out,
         Channel.value(params.tepic_pwm)
     )
+
+    ch_bio_logos = BIOPHYSICAL_MODELS.out.plots.flatten().map { [it.name.replaceAll(/.png$/, ''), it] }
+    ch_bio_models = BIOPHYSICAL_MODELS.out.pwms.flatten().map { [it.name.replaceAll(/.pwm$/, ''), it] }
+
+    ch_biophysical = ch_bio_logos
+        .combine(ch_bio_models, by: 0) // tf, logo, model
+
+    ch_biophysical.view()
 }
 
 /*
