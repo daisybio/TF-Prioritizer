@@ -76,6 +76,7 @@ include { RANKING } from '../modules/local/distributionAnalysis/ranking'
 include { COLLECT_TFS } from '../modules/local/distributionAnalysis/collect_tfs'
 include { TOP_TARGET_GENES } from '../modules/local/distributionAnalysis/top_target_genes'
 include { BIOPHYSICAL_MODELS } from '../modules/local/biophysical_models'
+include { HEATMAPS } from '../modules/local/distributionAnalysis/heatmaps'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -92,6 +93,8 @@ workflow TFPRIO {
     ch_affinity_sums = PEAK_FILES.out.affinity_sums
         .map { [it[1], it[2], it[0], it[3]] } // group1, group2, hm, affinitySums
     ch_diff_expression = RNASEQ.out.deseq2 // group1, group2, deseq2-file
+    ch_counts = RNASEQ.out.count // group1, group2, counts-file
+    ch_rnaseq_samplesheet = RNASEQ.out.samplesheet // samplesheet-file
 
     ch_integration = ch_affinity_ratios
         .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, affinityRatios, diffExpression
@@ -125,8 +128,16 @@ workflow TFPRIO {
     TOP_TARGET_GENES (
         COLLECT_TFS.out,
         Channel.value(params.top_target_genes),
-        ch_affinity_sums
+        ch_affinity_sums,
+        ch_counts
     ) // group1, group2, hm, topTargetGenes
+
+    HEATMAPS (
+        TOP_TARGET_GENES.out,
+        ch_counts,
+        ch_rnaseq_samplesheet,
+        RNASEQ.out.ensg_map
+    )
 
     BIOPHYSICAL_MODELS (
         COLLECT_TFS.out,
@@ -138,8 +149,6 @@ workflow TFPRIO {
 
     ch_biophysical = ch_bio_logos
         .combine(ch_bio_models, by: 0) // tf, logo, model
-
-    ch_biophysical.view()
 }
 
 /*

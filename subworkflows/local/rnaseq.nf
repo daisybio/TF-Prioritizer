@@ -41,4 +41,6 @@ workflow RNASEQ {
     deseq2 = DESEQ2.out
     versions = ch_versions
     ensg_map = ch_map
+    count = ENSG_MAPPING.out
+    samplesheet = ch_rnaseq_samplesheet
 }
