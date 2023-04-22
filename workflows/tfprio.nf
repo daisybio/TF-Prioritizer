@@ -153,10 +153,13 @@ workflow TFPRIO {
     ch_biophysical = ch_bio_logos
         .combine(ch_bio_models, by: 0) // tf, logo, model
 
-    TF_SEQUENCE (COLLECT_TFS.out)
+    ch_jaspar = TF_SEQUENCE (COLLECT_TFS.out)
         .flatten()
         .map { [it.name.replaceAll(/_.*/, ''), it] }
         .groupTuple(by: 0) // tf, [logos]
+
+    ch_logos = ch_biophysical
+        .combine(ch_jaspar, by: 0) // tf, biophysical_logo, model, [jaspar_logos]
 }
 
 /*
