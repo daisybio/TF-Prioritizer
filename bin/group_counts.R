@@ -46,5 +46,10 @@ for (g in unique(metadata_df$group)) {
     group_df[g] <- row_means
 }
 
+group_df$gene <- rownames(group_df)
+
+# Put gene column first
+group_df <- group_df[, c(ncol(group_df), 1:(ncol(group_df) - 1))]
+
 print("Writing output...")
-write.table(group_df, file = opt$output, sep = "\t", row.names = TRUE, quote = FALSE)
+write.table(group_df, file = opt$output, sep = "\t", row.names = FALSE, quote = FALSE)

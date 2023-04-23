@@ -94,6 +94,8 @@ workflow TFPRIO {
     ch_affinity_sums = PEAK_FILES.out.affinity_sums
         .map { [it[1], it[2], it[0], it[3]] } // group1, group2, hm, affinitySums
     ch_diff_expression = RNASEQ.out.deseq2 // group1, group2, deseq2-file
+    ch_counts_per_sample = RNASEQ.out.count_per_sample // group1, group2, counts-file
+    ch_tpm = RNASEQ.out.tpm // group1, group2, tpm-file
     ch_counts = RNASEQ.out.count // group1, group2, counts-file
     ch_rnaseq_samplesheet = RNASEQ.out.samplesheet // samplesheet-file
 
@@ -130,16 +132,18 @@ workflow TFPRIO {
         COLLECT_TFS.out,
         Channel.value(params.top_target_genes),
         ch_affinity_sums,
-        ch_counts
+        ch_counts_per_sample
     ) // group1, group2, hm, topTargetGenes
 
     ch_heatmaps = HEATMAPS (
         TOP_TARGET_GENES.out,
-        ch_counts,
+        ch_counts_per_sample,
         ch_rnaseq_samplesheet,
         RNASEQ.out.ensg_map
     )   .transpose()
         .map { [it[0], it[1], it[2], it[3].name.replaceFirst(/^\w+:\w+_\w+_/, '').replaceFirst(/\.png$/, '') , it[3]] }
+        .map { [it[3], [it[0], it[1], it[2], it[4]]] }
+        .groupTuple(by: 0)
         // group1, group2, hm, tf, heatmap
 
     BIOPHYSICAL_MODELS (
@@ -151,7 +155,7 @@ workflow TFPRIO {
     ch_bio_models = BIOPHYSICAL_MODELS.out.pwms.flatten().map { [it.name.replaceAll(/.pwm$/, ''), it] }
 
     ch_biophysical = ch_bio_logos
-        .combine(ch_bio_models, by: 0) // tf, logo, model
+        .join(ch_bio_models, by: 0) // tf, logo, model
 
     ch_jaspar = TF_SEQUENCE (COLLECT_TFS.out)
         .flatten()
@@ -159,7 +163,41 @@ workflow TFPRIO {
         .groupTuple(by: 0) // tf, [logos]
 
     ch_logos = ch_biophysical
-        .combine(ch_jaspar, by: 0) // tf, biophysical_logo, model, [jaspar_logos]
+        .join(ch_jaspar, by: 0) // tf, biophysical_logo, model, [jaspar_logos]
+
+    ch_map = RNASEQ.out.ensg_map.splitCsv(header: false, sep: '\t')
+        .map { [it[0].toUpperCase(), it[1]]} // SYMBOL, ENSG
+
+    ch_logos = ch_logos
+        .join(ch_map, by: 0) // tf, biophysical_logo, model, [jaspar_logos], ensg
+
+    ensgs = ch_logos
+        .map { it[4] }
+        .collect()
+
+    ch_plots = ch_logos
+        .join(ch_heatmaps, by: 0) // tf, biophysical_logo, model, [jaspar_logos], ensg, [heatmaps]
+        .map { [it[4], it[0], it[1], it[2], it[3], it[5] ] } // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps]
+
+    ch_diff_expression_values = ch_diff_expression
+        .map { [it[0], it[1], it[2].splitCsv(header: ['geneID', 'baseMean', 'log2fc', 'lfcSE', 'stat', 'pValue', 'pAdj'], sep: ' ', skip: 1)] }
+        .map { [it[2]['geneID'], it[0], it[1], it[2]['log2fc']]}
+        .transpose(by: [0, 3])
+        .map { [it[0], [it[1], it[2], it[3]]] }
+        .groupTuple(by: 0)
+
+    ch_tpm_values = ch_tpm.splitCsv(header: true, sep: '\t')
+        .map { map_to_tuple(it) }
+
+    ch_count_values = ch_counts.splitCsv(header: true, sep: '\t')
+        .map { map_to_tuple(it) }
+
+    ch_tf_data = ch_plots
+        .join(ch_diff_expression_values, by: 0) // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps], [diffExpression]
+        .join(ch_tpm_values, by: 0) // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps], [diffExpression], [tpm]
+        .join(ch_count_values, by: 0) // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps], [diffExpression], [tpm], [counts]
+
+    ch_tf_data.view()
 }
 
 /*
@@ -174,6 +212,13 @@ workflow TFPRIO {
 //
 workflow {
     TFPRIO ()
+}
+
+def map_to_tuple(map) {
+    // Map has keys: gene, a lot of samples
+    // We want to map to: gene, [sample, count]
+
+    return [map['gene'], map.findAll { it.key != 'gene' }.collect { [it.key, it.value] }]
 }
 
 /*

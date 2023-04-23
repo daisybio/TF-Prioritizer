@@ -3,10 +3,12 @@ if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = Channel.value(file(para
 include { RNASEQ } from './nf-core_rnaseq'
 include { COUNT_NORMALIZATION } from '../../modules/local/counts/count_preprocessing'
 include { FILTER_COUNTS } from '../../modules/local/counts/count_preprocessing'
-include { GROUP_COUNTS } from '../../modules/local/counts/count_preprocessing'
 include { DESEQ2 } from '../../modules/local/counts/deseq'
 include { ENSG_MAP_CREATION } from '../../modules/local/counts/ensg_mapping'
-include { ENSG_MAPPING } from '../../modules/local/counts/ensg_mapping'
+include { ENSG_MAPPING as COUNTS_ENSG_MAPPING } from '../../modules/local/counts/ensg_mapping'
+include { ENSG_MAPPING as TPM_ENSG_MAPPING } from '../../modules/local/counts/ensg_mapping'
+include { GROUP_COUNTS as COUNT_GROUP } from '../../modules/local/counts/count_preprocessing'
+include { GROUP_COUNTS as TPM_GROUP } from '../../modules/local/counts/count_preprocessing'
 
 workflow RNASEQ {
     ch_versions = Channel.empty()
@@ -18,14 +20,14 @@ workflow RNASEQ {
         ch_count = RNASEQ.out.counts
         ch_bigwig = RNASEQ.out.bigwig
         ch_versions = ch_versions.mix(RNASEQ.out.versions)
-        ch_tpm = RNASEQ.out.tpm
     }
 
     ch_map = ENSG_MAP_CREATION (ch_count, Channel.value(params.taxonomy))
 
     FILTER_COUNTS (ch_count, params.min_count, params.min_tpm)
     COUNT_NORMALIZATION (FILTER_COUNTS.out.count, ch_rnaseq_samplesheet)
-    ENSG_MAPPING (COUNT_NORMALIZATION.out, ch_map)
+    COUNTS_ENSG_MAPPING (COUNT_NORMALIZATION.out, ch_map)
+    TPM_ENSG_MAPPING (FILTER_COUNTS.out.tpm, ch_map)
 
     ch_groups = ch_rnaseq_samplesheet
         .splitCsv(header: true, sep: ',')
@@ -35,12 +37,17 @@ workflow RNASEQ {
     ch_pairings = ch_groups.combine(ch_groups)
         .filter { it[0] < it[1] }
 
-    DESEQ2 (ENSG_MAPPING.out, ch_rnaseq_samplesheet, ch_pairings)
+    DESEQ2 (COUNTS_ENSG_MAPPING.out, ch_rnaseq_samplesheet, ch_pairings)
+
+    COUNT_GROUP (COUNTS_ENSG_MAPPING.out, ch_rnaseq_samplesheet)
+    TPM_GROUP (TPM_ENSG_MAPPING.out, ch_rnaseq_samplesheet)
     
     emit:
     deseq2 = DESEQ2.out
     versions = ch_versions
     ensg_map = ch_map
-    count = ENSG_MAPPING.out
+    count = COUNT_GROUP.out
+    count_per_sample = COUNTS_ENSG_MAPPING.out
+    tpm = TPM_GROUP.out
     samplesheet = ch_rnaseq_samplesheet
 }
