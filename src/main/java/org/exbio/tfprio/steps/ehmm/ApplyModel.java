@@ -19,7 +19,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
     private final Map<String, InputFile> regions = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
-    private final Map<String, InputFile> bamDirs = new HashMap<>();
+    private final Map<String, OutputFile> bamDirs = new HashMap<>();
 
     private final RequiredConfig<File> bamDirectory = new RequiredConfig<>(configs.ehmm.bamDirectory);
     private final RequiredConfig<Integer> nThreads = new RequiredConfig<>(configs.ehmm.nThreads);
@@ -40,6 +40,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
             OutputFile groupDir = new OutputFile(regionDir, s);
             this.regions.put(s, addInput(groupDir, r));
             OutputFile bamGroupDir = new OutputFile(bamBaseDir, s);
+            this.bamDirs.put(s, bamGroupDir);
             OutputFile bamDir = new OutputFile(extend(bamDirectory.get(), s).getAbsolutePath());
             // add all bam files as inputs
             Stream.of(Objects.requireNonNull(bamDir.listFiles()))
@@ -48,7 +49,6 @@ public class ApplyModel extends ExecutableStep<Configs> {
                             .filter(File::exists)
                             .forEach(f -> addInput(new OutputFile(extend(bamGroupDir, f.getName()).getAbsolutePath()),
                                     new OutputFile(f.getAbsolutePath()))));
-            this.bamDirs.put(s, addInput(bamGroupDir, bamDir));
             this.outputDirs.put(s, addOutput(outDir, s));
         });
     }
