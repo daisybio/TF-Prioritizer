@@ -78,6 +78,7 @@ include { TOP_TARGET_GENES } from '../modules/local/distributionAnalysis/top_tar
 include { BIOPHYSICAL_MODELS } from '../modules/local/biophysical_models'
 include { HEATMAPS } from '../modules/local/distributionAnalysis/heatmaps'
 include { TF_SEQUENCE } from '../modules/local/tf_sequence'
+include { COLLECT_EXPRESSION } from '../modules/local/collect_expression'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -179,24 +180,16 @@ workflow TFPRIO {
         .join(ch_heatmaps, by: 0) // tf, biophysical_logo, model, [jaspar_logos], ensg, [heatmaps]
         .map { [it[4], it[0], it[1], it[2], it[3], it[5] ] } // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps]
 
-    ch_diff_expression_values = ch_diff_expression
-        .map { [it[0], it[1], it[2].splitCsv(header: ['geneID', 'baseMean', 'log2fc', 'lfcSE', 'stat', 'pValue', 'pAdj'], sep: ' ', skip: 1)] }
-        .map { [it[2]['geneID'], it[0], it[1], it[2]['log2fc']]}
-        .transpose(by: [0, 3])
-        .map { [it[0], [it[1], it[2], it[3]]] }
-        .groupTuple(by: 0)
-
-    ch_tpm_values = ch_tpm.splitCsv(header: true, sep: '\t')
-        .map { map_to_tuple(it) }
-
-    ch_count_values = ch_counts.splitCsv(header: true, sep: '\t')
-        .map { map_to_tuple(it) }
+    COLLECT_EXPRESSION (
+        ch_tpm,
+        RNASEQ.out.deseq2_grouped,
+        ch_counts,
+        ensgs
+    )
 
     ch_tf_data = ch_plots
-        .join(ch_diff_expression_values, by: 0) // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps], [diffExpression]
-        .join(ch_tpm_values, by: 0) // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps], [diffExpression], [tpm]
-        .join(ch_count_values, by: 0) // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps], [diffExpression], [tpm], [counts]
-
+        .join(COLLECT_EXPRESSION.out.flatten().map { [it.name.replaceAll(/.json$/, ''), it] }, by: 0) // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps], expression
+        
     ch_tf_data.view()
 }
 

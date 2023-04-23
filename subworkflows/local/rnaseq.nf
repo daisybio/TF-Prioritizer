@@ -9,6 +9,7 @@ include { ENSG_MAPPING as COUNTS_ENSG_MAPPING } from '../../modules/local/counts
 include { ENSG_MAPPING as TPM_ENSG_MAPPING } from '../../modules/local/counts/ensg_mapping'
 include { GROUP_COUNTS as COUNT_GROUP } from '../../modules/local/counts/count_preprocessing'
 include { GROUP_COUNTS as TPM_GROUP } from '../../modules/local/counts/count_preprocessing'
+include { DESEQ2_GROUP } from '../../modules/local/counts/deseq'
 
 workflow RNASEQ {
     ch_versions = Channel.empty()
@@ -37,15 +38,20 @@ workflow RNASEQ {
     ch_pairings = ch_groups.combine(ch_groups)
         .filter { it[0] < it[1] }
 
-    DESEQ2 (COUNTS_ENSG_MAPPING.out, ch_rnaseq_samplesheet, ch_pairings)
+    DESEQ2 (COUNTS_ENSG_MAPPING.out, ch_rnaseq_samplesheet, ch_pairings) // group1, group2, deseq-file
 
     COUNT_GROUP (COUNTS_ENSG_MAPPING.out, ch_rnaseq_samplesheet)
     TPM_GROUP (TPM_ENSG_MAPPING.out, ch_rnaseq_samplesheet)
+    DESEQ2_GROUP ( DESEQ2.out
+                       .map { it[2] }
+                       .collect()
+                 )
     
     emit:
     deseq2 = DESEQ2.out
     versions = ch_versions
     ensg_map = ch_map
+    deseq2_grouped = DESEQ2_GROUP.out
     count = COUNT_GROUP.out
     count_per_sample = COUNTS_ENSG_MAPPING.out
     tpm = TPM_GROUP.out

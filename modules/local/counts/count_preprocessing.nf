@@ -51,10 +51,10 @@ process GROUP_COUNTS {
     path samplesheet
 
     output:
-    path "grouped.tsv"
+    path "${task.process}.tsv"
 
     script:
     """
-    group_counts.R --metadata $samplesheet --input $counts --output grouped.tsv
+    group_counts.R --metadata $samplesheet --input $counts --output ${task.process}.tsv
     """
 }

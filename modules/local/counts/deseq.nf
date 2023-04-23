@@ -17,3 +17,19 @@ process DESEQ2 {
     deseq.R --metadata $samplesheet --input $counts --group1 $group1 --group2 $group2
     """
 }
+
+process DESEQ2_GROUP {
+    conda "pandas"
+    container "tfprio-python"
+
+    input:
+        path(files)
+
+    output:
+        path("deseq_combined.tsv")
+
+    script:
+        """
+        deseq2_group.py -d $files -o deseq_combined.tsv
+        """
+}
