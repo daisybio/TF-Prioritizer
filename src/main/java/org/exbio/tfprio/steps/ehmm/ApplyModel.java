@@ -47,7 +47,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
                     .filter(File::isDirectory)
                     .forEach(hm -> Arrays.stream(Objects.requireNonNull(hm.listFiles()))
                             .filter(File::exists)
-                            .forEach(f -> addInput(new OutputFile(extend(bamGroupDir, f.getName()).getAbsolutePath()),
+                            .forEach(f -> addInput(new OutputFile(extend(bamGroupDir, hm.getName()).getAbsolutePath()),
                                     new OutputFile(f.getAbsolutePath()))));
             this.outputDirs.put(s, addOutput(outDir, s));
         });
