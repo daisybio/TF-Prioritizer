@@ -14,5 +14,5 @@ enhancerFiles <- list.files(argv$d, pattern = "enhancerRegions.bed", recursive =
 promoterRegions <- sort(do.call(c, lapply(promoterFiles, import, format = "bed")))
 enhancerRegions <- sort(do.call(c, lapply(enhancerFiles, import, format = "bed")))
 # write files to output
-export(promoterRegions, file.path(argv$o, "predictedPromoters.bed"), format = "bed")
-export(enhancerRegions, file.path(argv$o, "predictedEnhancers.bed"), format = "bed")
+export(reduce(promoterRegions), file.path(argv$o, "predictedPromoters.bed"), format = "bed")
+export(reduce(enhancerRegions), file.path(argv$o, "predictedEnhancers.bed"), format = "bed")
