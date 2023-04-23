@@ -42,7 +42,7 @@ generateBackground <- function(gtf, e, p, size, n=100000) {
 
 sampleRanges <- function(ranges, n) {
   if(n > length(ranges)) return(sort(ranges))
-  sort(ranges[sample(1:length(ranges), n)])
+  reduce(sort(ranges[sample(1:length(ranges), n)]))
 }
 
 args <- commandArgs(trailingOnly = T)
