@@ -15,9 +15,12 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class SplitLearningData extends ExecutableStep<Configs> {
     private final OutputFile outputDirectory = addOutput("out");
-    public final OutputFile enhancers = addOutput(outputDirectory, "enhancers.bed");
-    public final OutputFile promoters = addOutput(outputDirectory, "promoters.bed");
-    public final OutputFile background = addOutput(outputDirectory, "background.bed");
+    public final OutputFile trainEnhancers = addOutput(outputDirectory, "trainEnhancers.bed");
+    public final OutputFile trainPromoters = addOutput(outputDirectory, "trainPromoters.bed");
+    public final OutputFile trainBackground = addOutput(outputDirectory, "trainBackground.bed");
+    public final OutputFile testEnhancers = addOutput(outputDirectory, "testEnhancers.bed");
+    public final OutputFile testPromoters = addOutput(outputDirectory, "testPromoters.bed");
+    public final OutputFile testBackground = addOutput(outputDirectory, "testBackground.bed");
 
     private final InputFile allEnhancers;
     private final InputFile allPromoters;

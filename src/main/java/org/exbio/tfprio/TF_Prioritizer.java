@@ -230,13 +230,13 @@ public class TF_Prioritizer extends Workflow<Configs> {
                     enhancerAtlas.outputFile, epdNew.outputFile, getChipData.outputFile));
             // learn background model (excluding promoters and enhancers)
             LearnBackgroundModel learnBackgroundModel = add(new LearnBackgroundModel(configs,
-                    splitLearningData.background, getChipData.bamDir));
+                    splitLearningData.trainBackground, getChipData.bamDir));
             // learn enhancer model
             LearnEnhancerModel learnEnhancerModel = add(new LearnEnhancerModel(configs,
-                    splitLearningData.enhancers, getChipData.bamDir));
+                    splitLearningData.trainEnhancers, getChipData.bamDir));
             // learn promoter model
             LearnPromoterModel learnPromoterModel = add(new LearnPromoterModel(configs,
-                    splitLearningData.promoters, getChipData.bamDir));
+                    splitLearningData.trainPromoters, getChipData.bamDir));
             // combine models and construct final model to apply to input data
             ConstructModel constructModel = add(new ConstructModel(configs,
                     learnBackgroundModel.outputFile, learnEnhancerModel.outputFile, learnPromoterModel.outputFile));
@@ -247,7 +247,7 @@ public class TF_Prioritizer extends Workflow<Configs> {
             ApplyModel applyModel = add(new ApplyModel(configs,
                     collapsePeakFiles.outputFiles, getChromosomeLengths.outputFile,
                     constructModel.outputFile));
-            // CombinePredictions combinePredictions = add(new CombinePredictions(configs, applyModel.outputDirs));
+            CombinePredictions combinePredictions = add(new CombinePredictions(configs, applyModel.outputDirs));
         }
         /*
         DistributionTargetGenes distributionTargetGenes =
