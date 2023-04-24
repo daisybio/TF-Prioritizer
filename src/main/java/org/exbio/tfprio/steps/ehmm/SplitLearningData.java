@@ -55,7 +55,7 @@ public class SplitLearningData extends ExecutableStep<Configs> {
                         "-e", allEnhancers.getAbsolutePath(),
                         "-p", allPromoters.getAbsolutePath(),
                         "-g", gtf.getAbsolutePath(),
-                        "-n", trainSplit.toString(),
+                        "-t", trainSplit.toString(),
                         "-s", genomicRegionSize.toString(),
                         "-o", outputDirectory.getAbsolutePath());
                 executeAndWait(ehmmCommand, true);
