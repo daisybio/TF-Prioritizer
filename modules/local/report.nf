@@ -1,12 +1,20 @@
 process REPORT {
+    container 'tfprio-angular'
+
     input:
         path(data)
     
     output:
-        path("report")
+        path("tfprio_report")
 
     script:
         """
-        cp $projectDir/assets/report report
+        cp -r $projectDir/assets/report report
+        cd report
+
+        npm install
+        ng build --output-path ../tfprio_report
+
+        cp $projectDir/bin/serve_report.sh ../tfprio_report
         """
 }
