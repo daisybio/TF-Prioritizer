@@ -24,7 +24,7 @@ process COLLECT_TF_DATA {
         tuple val(symbol), path(biophysical_logo), path(model), path(jaspar_logos), val(ensg), path(heatmaps)
 
     output:
-        tuple val(symbol), path("$symbol"), path("${symbol}.json")
+        tuple path("$symbol"), path("${symbol}.json")
 
     script:
         """
@@ -66,5 +66,32 @@ process COLLECT_RANKS {
     script:
         """
         collect_ranks.py -r ${ranks.join(' ')} -o ranks.json
+        """
+}
+
+process COLLECT {
+    conda "pandas"
+    container "tfprio-python"
+
+    input:
+        path(gene_expression)
+        path(ranks)
+        path(tf_files)
+
+    output:
+        path("data")
+
+    script:
+        """
+        mkdir -p data
+
+        ln -s ../$ranks data/ranks.json
+        ln -s ../$gene_expression data/gene_expression
+
+        mkdir -p data/tfs
+        
+        for tf in $tf_files; do
+            ln -s ../../\$tf data/tfs
+        done
         """
 }
