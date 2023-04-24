@@ -1,0 +1,17 @@
+<mat-chip-listbox (change)="$activeAssays.next($event.value)" multiple>
+  <mat-chip-option *ngFor="let assay of exisingAssays"
+                   color="primary" selected>{{assay}}</mat-chip-option>
+</mat-chip-listbox>
+<mat-chip-listbox (change)="$activePairings.next($event.value)" multiple>
+  <mat-chip-option *ngFor="let pairing of exisingPairings" selected>
+    {{pairing}}
+  </mat-chip-option>
+</mat-chip-listbox>
+
+<mat-accordion>
+  <mat-expansion-panel *ngFor="let tf of ($ranking | async)">
+    <mat-expansion-panel-header>
+      <h1>{{tf.name}}</h1>
+    </mat-expansion-panel-header>
+  </mat-expansion-panel>
+</mat-accordion>
