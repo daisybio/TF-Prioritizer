@@ -81,6 +81,7 @@ include { TF_SEQUENCE } from '../modules/local/tf_sequence'
 include { COLLECT_EXPRESSION } from '../modules/local/collect'
 include { COLLECT_TF_DATA } from '../modules/local/collect'
 include { COLLECT_HEATMAPS } from '../modules/local/collect'
+include { COLLECT_RANKS } from '../modules/local/collect'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -190,6 +191,10 @@ workflow TFPRIO {
 
     COLLECT_TF_DATA(
         ch_plots
+    )
+
+    COLLECT_RANKS (
+        RANKING.out.map { it[3] } .collect()
     )
 }
 

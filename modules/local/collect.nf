@@ -18,7 +18,7 @@ process COLLECT_EXPRESSION {
 }
 
 process COLLECT_TF_DATA {
-    container 'ubuntu:22.04'
+    container "tfprio-python"
 
     input:
         tuple val(symbol), path(biophysical_logo), path(model), path(jaspar_logos), val(ensg), path(heatmaps)
@@ -50,5 +50,21 @@ process COLLECT_HEATMAPS {
     script:
         """
         link_heatmaps.sh . .
+        """
+}
+
+process COLLECT_RANKS {
+    conda "pandas"
+    container "tfprio-python"
+
+    input:
+        path(ranks)
+    
+    output:
+        path("ranks.json")
+    
+    script:
+        """
+        collect_ranks.py -r ${ranks.join(' ')} -o ranks.json
         """
 }
