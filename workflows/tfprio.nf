@@ -78,7 +78,9 @@ include { TOP_TARGET_GENES } from '../modules/local/distributionAnalysis/top_tar
 include { BIOPHYSICAL_MODELS } from '../modules/local/biophysical_models'
 include { HEATMAPS } from '../modules/local/distributionAnalysis/heatmaps'
 include { TF_SEQUENCE } from '../modules/local/tf_sequence'
-include { COLLECT_EXPRESSION } from '../modules/local/collect_expression'
+include { COLLECT_EXPRESSION } from '../modules/local/collect'
+include { COLLECT_TF_DATA } from '../modules/local/collect'
+include { COLLECT_HEATMAPS } from '../modules/local/collect'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -136,16 +138,17 @@ workflow TFPRIO {
         ch_counts_per_sample
     ) // group1, group2, hm, topTargetGenes
 
-    ch_heatmaps = HEATMAPS (
-        TOP_TARGET_GENES.out,
-        ch_counts_per_sample,
-        ch_rnaseq_samplesheet,
-        RNASEQ.out.ensg_map
-    )   .transpose()
-        .map { [it[0], it[1], it[2], it[3].name.replaceFirst(/^\w+:\w+_\w+_/, '').replaceFirst(/\.png$/, '') , it[3]] }
-        .map { [it[3], [it[0], it[1], it[2], it[4]]] }
-        .groupTuple(by: 0)
-        // group1, group2, hm, tf, heatmap
+    ch_heatmaps = COLLECT_HEATMAPS (
+        HEATMAPS (
+            TOP_TARGET_GENES.out,
+            ch_counts_per_sample,
+            ch_rnaseq_samplesheet,
+            RNASEQ.out.ensg_map
+        )   .transpose() // group1, group2, hm, heatmap
+            .map { it[3] }
+            .collect()
+    )   .flatten()
+        .map { [it.name.replaceAll(/_heatmaps$/, ''), it] }
 
     BIOPHYSICAL_MODELS (
         COLLECT_TFS.out,
@@ -160,25 +163,23 @@ workflow TFPRIO {
 
     ch_jaspar = TF_SEQUENCE (COLLECT_TFS.out)
         .flatten()
-        .map { [it.name.replaceAll(/_.*/, ''), it] }
-        .groupTuple(by: 0) // tf, [logos]
+        .map { [it.name.replaceAll(/_jaspar$/, ''), it] }
 
     ch_logos = ch_biophysical
-        .join(ch_jaspar, by: 0) // tf, biophysical_logo, model, [jaspar_logos]
+        .join(ch_jaspar, by: 0) // tf, biophysical_logo, model, jaspar_logos
 
     ch_map = RNASEQ.out.ensg_map.splitCsv(header: false, sep: '\t')
         .map { [it[0].toUpperCase(), it[1]]} // SYMBOL, ENSG
 
     ch_logos = ch_logos
-        .join(ch_map, by: 0) // tf, biophysical_logo, model, [jaspar_logos], ensg
+        .join(ch_map, by: 0) // tf, biophysical_logo, model, jaspar_logos, ensg
 
     ensgs = ch_logos
         .map { it[4] }
         .collect()
 
     ch_plots = ch_logos
-        .join(ch_heatmaps, by: 0) // tf, biophysical_logo, model, [jaspar_logos], ensg, [heatmaps]
-        .map { [it[4], it[0], it[1], it[2], it[3], it[5] ] } // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps]
+        .join(ch_heatmaps, by: 0) // tf, biophysical_logo, model, jaspar_logos, ensg, heatmaps
 
     COLLECT_EXPRESSION (
         ch_tpm,
@@ -187,10 +188,9 @@ workflow TFPRIO {
         ensgs
     )
 
-    ch_tf_data = ch_plots
-        .join(COLLECT_EXPRESSION.out.flatten().map { [it.name.replaceAll(/.json$/, ''), it] }, by: 0) // ensg, tf, biophysical_logo, model, [jaspar_logos], [heatmaps], expression
-        
-    ch_tf_data.view()
+    COLLECT_TF_DATA(
+        ch_plots
+    )
 }
 
 /*

@@ -6,7 +6,7 @@ process TF_SEQUENCE {
         path(tfs)
 
     output:
-        path("*.svg")
+        path("*_jaspar")
     
     script:
         """

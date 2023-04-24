@@ -3,6 +3,7 @@
 import pandas as pd
 import argparse
 import json
+import os
 
 parser = argparse.ArgumentParser(description='Find expression data of the transcription factors')
 
@@ -10,8 +11,13 @@ parser.add_argument('-t', '--tpm', dest='tpm', type=str, help='TPM file', requir
 parser.add_argument('-c', '--counts', dest='counts', type=str, help='Counts file', default=None)
 parser.add_argument('-d', '--deseq', dest='deseq', type=str, help='DESeq file', default=None)
 parser.add_argument('-e', '--ensgs', dest='ensgs', type=str, help='ENSG IDs to process', required=True, nargs='+')
+parser.add_argument('-o', '--output', dest='output', type=str, help='Output directory', required=True)
 
 args = parser.parse_args()
+
+# Create output directory if it doesn't exist
+if not os.path.exists(args.output):
+    os.makedirs(args.output)
 
 # Read inputs
 tpm = pd.read_csv(args.tpm, sep='\t', index_col=0)
@@ -42,5 +48,5 @@ for ensg in ensgs:
         'Counts': combined.loc[ensg, 'Counts'].to_dict(),
         'DESeq': combined.loc[ensg, 'DESeq'].to_dict()
     }
-    with open(ensg + '.json', 'w') as f:
+    with open(args.output + '/' + ensg + '.json', 'w+') as f:
         json.dump(ensg_dict, f, indent=4)

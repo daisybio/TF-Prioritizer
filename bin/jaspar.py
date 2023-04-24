@@ -2,6 +2,7 @@
 
 import argparse
 import requests
+import os
 
 DATA_URL = 'https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_redundant_pfms_jaspar.txt'
 LOGO_URL = 'https://jaspar.genereg.net/static/logos/all/svg/'
@@ -26,9 +27,10 @@ for entry in entries:
     if tf not in tfs:
         continue
 
-    name = tf + '_' + matrix_id
+    file_name = f"{tf}_jaspar/{matrix_id}.svg"
+    os.makedirs(os.path.dirname(file_name), exist_ok=True)
 
     current_url = LOGO_URL + matrix_id + '.svg'
 
-    with open(name + '.svg', 'wb') as f:
+    with open(file_name, 'wb') as f:
         f.write(requests.get(current_url).content)
