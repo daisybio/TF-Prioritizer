@@ -18,9 +18,11 @@ public class SplitLearningData extends ExecutableStep<Configs> {
     public final OutputFile trainEnhancers = addOutput(outputDirectory, "trainEnhancers.bed");
     public final OutputFile trainPromoters = addOutput(outputDirectory, "trainPromoters.bed");
     public final OutputFile trainBackground = addOutput(outputDirectory, "trainBackground.bed");
+    /*
     public final OutputFile testEnhancers = addOutput(outputDirectory, "testEnhancers.bed");
     public final OutputFile testPromoters = addOutput(outputDirectory, "testPromoters.bed");
     public final OutputFile testBackground = addOutput(outputDirectory, "testBackground.bed");
+     */
 
     private final InputFile allEnhancers;
     private final InputFile allPromoters;
