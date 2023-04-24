@@ -27,7 +27,7 @@ public class SplitLearningData extends ExecutableStep<Configs> {
     private final InputFile allBackground;
     private final RequiredConfig<File> gtfFile = new RequiredConfig<>(configs.inputConfigs.geneAnnotationFile);
     private final RequiredConfig<Integer> genomicRegionSize = new RequiredConfig<>(configs.ehmm.genomicRegionSize);
-    private final RequiredConfig<Integer> nSamples = new RequiredConfig<>(configs.ehmm.nSamples);
+    private final RequiredConfig<Double> trainSplit = new RequiredConfig<>(configs.ehmm.trainSplit);
     private final InputFile gtf;
     private final InputFile script;
 
@@ -53,7 +53,7 @@ public class SplitLearningData extends ExecutableStep<Configs> {
                         "-e", allEnhancers.getAbsolutePath(),
                         "-p", allPromoters.getAbsolutePath(),
                         "-g", gtf.getAbsolutePath(),
-                        "-n", nSamples.toString(),
+                        "-n", trainSplit.toString(),
                         "-s", genomicRegionSize.toString(),
                         "-o", outputDirectory.getAbsolutePath());
                 executeAndWait(ehmmCommand, true);
