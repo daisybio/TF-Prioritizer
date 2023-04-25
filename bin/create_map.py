@@ -6,25 +6,49 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="input file")
+parser.add_argument("--gtf", help="gtf file")
 parser.add_argument("--output", help="output file")
-parser.add_argument("--taxonomy", help="species taxonomy as found in https://docs.mygene.info/en/latest/doc/data.html#species")
 
 args = parser.parse_args()
 
-df = pd.read_csv(args.input, sep="\t", header=None)
+# Proccess gtf file 
+gtf_mapping = pd.read_csv('/nfs/data/COM2POSE/reference_data/gencode.vM25.annotation.gtf', sep='\t', header=None, comment='#')
+gtf_mapping = gtf_mapping[gtf_mapping[2] == 'gene']
+## Split the 9th column by semicolon into distinct columns
+gtf_mapping = gtf_mapping[8].str.split(';', expand=True)[[0, 2]]
+gtf_mapping.columns = ['gene_id', 'gene_name']
+gtf_mapping["gene_id"] = gtf_mapping["gene_id"].str.lstrip('gene_id ').str.strip('"')
+gtf_mapping["gene_name"] = gtf_mapping["gene_name"].str.lstrip('gene_name ').str.strip('"')
+gtf_mapping.index = gtf_mapping["gene_name"]
+gtf_mapping.drop("gene_name", axis=1, inplace=True)
+gtf_mapping["gene_id"] = gtf_mapping["gene_id"].str.split('.', expand=True)[0]
 
-symbols = df[0].tolist()
+## Group by index, select first gene id
+gtf_mapping = gtf_mapping.groupby(level=0).first()
+
+# Read input file
+
+symbols = pd.read_csv(args.input, sep="\t", header=None)[0].tolist()
+
+# Remove all symbols which are already in the gtf file
+symbols = [s for s in symbols if s not in gtf_mapping.index]
+
 mg = mygene.MyGeneInfo()
-res = mg.querymany(symbols, scopes="symbol", fields="ensembl.gene", species=args.taxonomy, as_dataframe=True)
+res = mg.querymany(symbols, scopes="symbol", fields="ensembl.gene", as_dataframe=True)
 
-mapping = res["ensembl.gene"]
-notna = mapping.dropna()
 
-found_percentage = len(notna) / len(mapping)
+notna = res[["ensembl.gene"]].dropna()
+notna.columns = ["gene_id"]
 
-if found_percentage < 0.5:
-    print("WARNING: Only {0:.2f}% of genes were found".format(found_percentage * 100))
-else:
-    print("Found {0:.2f}% of genes".format(found_percentage * 100))
+notna = notna[notna["gene_id"].str.startswith("ENSMUSG")]
 
-notna.to_csv(args.output, sep="\t", header=False)
+# Concatenate the two mappings into a single series
+mapping = pd.concat([gtf_mapping["gene_id"], notna["gene_id"]])
+
+# Sort by index
+mapping = mapping.sort_index()
+
+# Remove duplicate indices
+mapping = mapping[~mapping.index.duplicated(keep='first')]
+
+mapping.to_csv(args.output, sep="\t", header=False)

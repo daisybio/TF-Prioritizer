@@ -162,27 +162,31 @@ workflow TFPRIO {
     ch_bio_models = BIOPHYSICAL_MODELS.out.pwms.flatten().map { [it.name.replaceAll(/.pwm$/, ''), it] }
 
     ch_biophysical = ch_bio_logos
-        .join(ch_bio_models, by: 0) // tf, logo, model
+        .combine(ch_bio_models, by: 0) // tf, logo, model
 
     ch_jaspar = TF_SEQUENCE (COLLECT_TFS.out)
         .flatten()
         .map { [it.name.replaceAll(/_jaspar$/, ''), it] }
 
     ch_logos = ch_biophysical
-        .join(ch_jaspar, by: 0) // tf, biophysical_logo, model, jaspar_logos
+        .combine(ch_jaspar, by: 0) // tf, biophysical_logo, model, jaspar_logos
 
     ch_map = RNASEQ.out.ensg_map.splitCsv(header: false, sep: '\t')
         .map { [it[0].toUpperCase(), it[1]]} // SYMBOL, ENSG
 
     ch_logos = ch_logos
-        .join(ch_map, by: 0) // tf, biophysical_logo, model, jaspar_logos, ensg
+        .combine(ch_map, by: 0) // tf, biophysical_logo, model, jaspar_logos, ensg
+        // Keep only entries with a biophysical logo
+        .filter { it[1] != null }
 
     ensgs = ch_logos
         .map { it[4] }
         .collect()
 
     ch_plots = ch_logos
-        .join(ch_heatmaps, by: 0) // tf, biophysical_logo, model, jaspar_logos, ensg, heatmaps
+        .combine(ch_heatmaps, by: 0) // tf, biophysical_logo, model, jaspar_logos, ensg, heatmaps
+
+    ch_plots.view()
 
     COLLECT_EXPRESSION (
         ch_tpm,

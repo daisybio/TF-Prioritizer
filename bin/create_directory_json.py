@@ -34,7 +34,7 @@ def create_json_representation(recursive_directory):
             clean_name = clean_name.replace(os.path.basename(recursive_directory), '')
             clean_name = clean_name.replace(directory, '')
             clean_name = clean_name.strip('_')
-            data[clean_name] = filename
+            data[clean_name] = "./assets/data/tfs/" + filepath
 
     # Return the data as a JSON string
     return data

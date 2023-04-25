@@ -18,11 +18,12 @@ original_size = len(df_counts.index)
 # Create intersection of genes
 ensg_dict = df_map.to_dict()[1]
 
-df_counts["ENSG"] = df_counts.index.map(lambda x: ensg_dict[x] if x in ensg_dict else x)
+df_counts.index = df_counts.index.map(lambda x: ensg_dict[x] if x in ensg_dict else x)
 
-# Put ENSG column first
-cols = df_counts.columns.tolist()
-cols = cols[-1:] + cols[:-1]
-df_counts = df_counts[cols]
+# Group by ENSG, sum counts
+df_counts = df_counts.groupby(df_counts.index).sum()
 
-df_counts.to_csv(args.output, sep="\t", index=False)
+# Crash if there are duplicates in ENSG
+assert len(df_counts.index) == len(set(df_counts.index))
+
+df_counts.to_csv(args.output, sep="\t", index=True)

@@ -4,7 +4,7 @@ process ENSG_MAP_CREATION {
 
     input:
     path(count_file)
-    val(taxonomy)
+    path(gtf_file)
 
     output:
     path("map.tsv")
@@ -12,7 +12,7 @@ process ENSG_MAP_CREATION {
     script:
     """
     cut -f 1 ${count_file} | sed '1d' | sort -u > names.txt
-    create_map.py --input names.txt --taxonomy $taxonomy --output map.tsv
+    create_map.py --input names.txt --gtf $gtf_file --output map.tsv
     """
 }
 

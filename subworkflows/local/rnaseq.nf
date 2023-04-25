@@ -23,7 +23,7 @@ workflow RNASEQ {
         ch_versions = ch_versions.mix(RNASEQ.out.versions)
     }
 
-    ch_map = ENSG_MAP_CREATION (ch_count, Channel.value(params.taxonomy))
+    ch_map = ENSG_MAP_CREATION (ch_count, Channel.value(file(params.tepic_gtf)))
 
     FILTER_COUNTS (ch_count, params.min_count, params.min_tpm)
     COUNT_NORMALIZATION (FILTER_COUNTS.out.count, ch_rnaseq_samplesheet)
