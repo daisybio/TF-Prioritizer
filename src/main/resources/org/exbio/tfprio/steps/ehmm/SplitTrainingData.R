@@ -40,20 +40,20 @@ generateBackground <- function(gtf, e, p, size, n=100000) {
   subsetByOverlaps(bg, fg, invert = T)
 }
 
-splitRanges <- function(ranges, trainSplit) {
+splitRanges <- function(ranges, trainSplit, nSamples) {
   N <- length(ranges)
-  nTrain <- N*trainSplit
+  if(nSamples == -1) {
+    message("splitting data by a factor of ", trainSplit, " for training")
+    nTrain <- N*trainSplit
+  } else {
+    message("Randomly selecting ", nSamples, " regions for training")
+    nTrain <- nSamples
+  }
   nTest <- N-nTrain
   R <- 1:N
   trainIdx <- sample(R, nTrain)
   testIdx <- R[-trainIdx]
   list(train=reduce(sort(ranges[trainIdx])), test=reduce(sort(ranges[testIdx])))
-}
-
-sampleRanges <- function(ranges, n) {
-  N <- length(ranges)
-  if (n > N) return(reduce(sort(ranges)))
-  return(reduce(sort(ranges[sample(1:N, n)])))
 }
 
 args <- commandArgs(trailingOnly = T)
@@ -88,17 +88,9 @@ bgNoCREs <- generateBackground(argv$g, eBgRegions, pBgRegions, argv$s)
 export.bed(bgNoCREs, file.path(argv$o, "all_background.bed"))
 export.bed(eBgRegions, file.path(argv$o, "all_enhancers.bed"))
 export.bed(pBgRegions, file.path(argv$o, "all_promoters.bed"))
-if (argv$samples > 0) {
-  message("randomly selecting ", argv$samples, "regions as training regions")
-  bgNoCREs <- sampleRanges(bgNoCREs, argv$samples)
-  eBgRegions <- sampleRanges(eBgRegions, argv$samples)
-  pBgRegions <- sampleRanges(pBgRegions, argv$samples)
-} else {
-  message("selecting ratio of", argv$t, " random samples as training regions, using rest for testing")
-  bgNoCREs <- splitRanges(bgNoCREs, argv$t)
-  eBgRegions <- splitRanges(eBgRegions, argv$t)
-  pBgRegions <- splitRanges(pBgRegions, argv$t)
-}
+bgNoCREs <- splitRanges(bgNoCREs, argv$t, argv$samples)
+eBgRegions <- splitRanges(eBgRegions, argv$t, argv$samples)
+pBgRegions <- splitRanges(pBgRegions, argv$t, argv$samples)
 message("writing filtered train bed files")
 export.bed(bgNoCREs$train, file.path(argv$o, "trainBackground.bed"))
 export.bed(eBgRegions$train, file.path(argv$o, "trainEnhancers.bed"))
