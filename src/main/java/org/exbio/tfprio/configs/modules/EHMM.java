@@ -20,6 +20,7 @@ public class EHMM extends ConfigModule {
         final Double max = 1.0;
         @Override
         public boolean validateSingle(InputConfig<Double> inputConfig) {
+            if (inputConfig.get() == null) return true;
             return min < inputConfig.get() && inputConfig.get() < max;
         }
         @Override
