@@ -65,7 +65,7 @@ parser <- add_argument(parser, "-g", help = "path to gtf file")
 parser <- add_argument(parser, "-o", help = "output directory", default = "./")
 parser <- add_argument(parser, "-t", help = "Percent of data to use for training",
                        default = 0.8, type = "double")
-parser <- add_argument(parser, "-samples", help = "Fixed number of samples to consider for each training set",
+parser <- add_argument(parser, "-f", help = "Fixed number of samples to consider for each training set",
                       default = -1, type = "integer")
 parser <- add_argument(parser, "-s", help = "Size of random genomic regions",
                        default = 2000, type = "integer")
@@ -88,9 +88,9 @@ bgNoCREs <- generateBackground(argv$g, eBgRegions, pBgRegions, argv$s)
 export.bed(bgNoCREs, file.path(argv$o, "all_background.bed"))
 export.bed(eBgRegions, file.path(argv$o, "all_enhancers.bed"))
 export.bed(pBgRegions, file.path(argv$o, "all_promoters.bed"))
-bgNoCREs <- splitRanges(bgNoCREs, argv$t, argv$samples)
-eBgRegions <- splitRanges(eBgRegions, argv$t, argv$samples)
-pBgRegions <- splitRanges(pBgRegions, argv$t, argv$samples)
+bgNoCREs <- splitRanges(bgNoCREs, argv$t, argv$f)
+eBgRegions <- splitRanges(eBgRegions, argv$t, argv$f)
+pBgRegions <- splitRanges(pBgRegions, argv$t, argv$f)
 message("writing filtered train bed files")
 export.bed(bgNoCREs$train, file.path(argv$o, "trainBackground.bed"))
 export.bed(eBgRegions$train, file.path(argv$o, "trainEnhancers.bed"))
