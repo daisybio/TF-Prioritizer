@@ -58,8 +58,14 @@ public class SplitLearningData extends ExecutableStep<Configs> {
                         "-g", gtf.getAbsolutePath(),
                         "-s", genomicRegionSize.toString(),
                         "-o", outputDirectory.getAbsolutePath()));
-                if (trainSplit.isSet()) ehmmCommand.add("-t " + trainSplit);
-                if (nSamples.isSet()) ehmmCommand.add("-f " + nSamples);
+                if (trainSplit.isSet()) {
+                    ehmmCommand.add("-t");
+                    ehmmCommand.add(trainSplit.toString());
+                }
+                if (nSamples.isSet()) {
+                    ehmmCommand.add("-f");
+                    ehmmCommand.add(nSamples.toString());
+                }
                 executeAndWait(ehmmCommand, true);
                 return true;
             });
