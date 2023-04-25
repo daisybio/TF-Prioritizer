@@ -50,6 +50,12 @@ splitRanges <- function(ranges, trainSplit) {
   list(train=reduce(sort(ranges[trainIdx])), test=reduce(sort(ranges[testIdx])))
 }
 
+sampleRanges <- function(ranges, n) {
+  N <- length(ranges)
+  if (n > N) return(reduce(sort(ranges)))
+  return(reduce(sort(ranges[sample(1:N, n)])))
+}
+
 args <- commandArgs(trailingOnly = T)
 parser <- arg_parser("Filtering command line parser", name = "ehmm_training_filter")
 parser <- add_argument(parser, "-e", help = "enhancer bed file")
@@ -58,7 +64,9 @@ parser <- add_argument(parser, "-b", help = "background bed file")
 parser <- add_argument(parser, "-g", help = "path to gtf file")
 parser <- add_argument(parser, "-o", help = "output directory", default = "./")
 parser <- add_argument(parser, "-t", help = "Percent of data to use for training",
-                       default = 0.8, type = "integer")
+                       default = 0.8, type = "double")
+parser <- add_argument(parser, "-samples", help = "Fixed number of samples to consider for each training set",
+                      default = -1, type = "integer")
 parser <- add_argument(parser, "-s", help = "Size of random genomic regions",
                        default = 2000, type = "integer")
 parser <- add_argument(parser, "-r", help = "seed",
@@ -80,10 +88,17 @@ bgNoCREs <- generateBackground(argv$g, eBgRegions, pBgRegions, argv$s)
 export.bed(bgNoCREs, file.path(argv$o, "all_background.bed"))
 export.bed(eBgRegions, file.path(argv$o, "all_enhancers.bed"))
 export.bed(pBgRegions, file.path(argv$o, "all_promoters.bed"))
-message("selecting ratio of", argv$t, " random samples as training regions, using rest for testing")
-bgNoCREs <- splitRanges(bgNoCREs, argv$t)
-eBgRegions <- splitRanges(eBgRegions, argv$t)
-pBgRegions <- splitRanges(pBgRegions, argv$t)
+if (argv$samples > 0) {
+  message("randomly selecting ", argv$samples, "regions as training regions")
+  bgNoCREs <- sampleRanges(bgNoCREs, argv$samples)
+  eBgRegions <- sampleRanges(eBgRegions, argv$samples)
+  pBgRegions <- sampleRanges(pBgRegions, argv$samples)
+} else {
+  message("selecting ratio of", argv$t, " random samples as training regions, using rest for testing")
+  bgNoCREs <- splitRanges(bgNoCREs, argv$t)
+  eBgRegions <- splitRanges(eBgRegions, argv$t)
+  pBgRegions <- splitRanges(pBgRegions, argv$t)
+}
 message("writing filtered train bed files")
 export.bed(bgNoCREs$train, file.path(argv$o, "trainBackground.bed"))
 export.bed(eBgRegions$train, file.path(argv$o, "trainEnhancers.bed"))

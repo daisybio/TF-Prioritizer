@@ -2,6 +2,7 @@ package org.exbio.tfprio.steps.ehmm;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
+import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.OptionalConfig;
 import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
@@ -29,7 +30,8 @@ public class SplitLearningData extends ExecutableStep<Configs> {
     private final InputFile allBackground;
     private final RequiredConfig<File> gtfFile = new RequiredConfig<>(configs.inputConfigs.geneAnnotationFile);
     private final RequiredConfig<Integer> genomicRegionSize = new RequiredConfig<>(configs.ehmm.genomicRegionSize);
-    private final RequiredConfig<Double> trainSplit = new RequiredConfig<>(configs.ehmm.trainSplit);
+    private final OptionalConfig<Double> trainSplit = new OptionalConfig<>(configs.ehmm.trainSplit, false);
+    private final OptionalConfig<Integer> nSamples = new OptionalConfig<>(configs.ehmm.nSamples, false);
     private final InputFile gtf;
     private final InputFile script;
 
@@ -55,9 +57,10 @@ public class SplitLearningData extends ExecutableStep<Configs> {
                         "-e", allEnhancers.getAbsolutePath(),
                         "-p", allPromoters.getAbsolutePath(),
                         "-g", gtf.getAbsolutePath(),
-                        "-t", trainSplit.toString(),
                         "-s", genomicRegionSize.toString(),
-                        "-o", outputDirectory.getAbsolutePath());
+                        "-o", outputDirectory.getAbsolutePath(),
+                        trainSplit.isSet() ? "-t " + trainSplit : "",
+                        nSamples.isSet() ? "-samples " + nSamples : "");
                 executeAndWait(ehmmCommand, true);
                 return true;
             });
