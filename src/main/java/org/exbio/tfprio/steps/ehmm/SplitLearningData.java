@@ -8,8 +8,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
@@ -51,16 +50,16 @@ public class SplitLearningData extends ExecutableStep<Configs> {
         return new HashSet<>() {{
             add(() -> {
                 // split learning data to background, enhancer, and promoter regions
-                String ehmmCommand = String.join(" ","Rscript",
+                List<String> ehmmCommand = new ArrayList<>(List.of("Rscript",
                         script.getAbsolutePath(),
                         "-b", allBackground.getAbsolutePath(),
                         "-e", allEnhancers.getAbsolutePath(),
                         "-p", allPromoters.getAbsolutePath(),
                         "-g", gtf.getAbsolutePath(),
                         "-s", genomicRegionSize.toString(),
-                        "-o", outputDirectory.getAbsolutePath(),
-                        trainSplit.isSet() ? "-t " + trainSplit : "",
-                        nSamples.isSet() ? "-samples " + nSamples : "");
+                        "-o", outputDirectory.getAbsolutePath()));
+                if (trainSplit.isSet()) ehmmCommand.add("-t " + trainSplit);
+                if (nSamples.isSet()) ehmmCommand.add("-samples " + nSamples);
                 executeAndWait(ehmmCommand, true);
                 return true;
             });
