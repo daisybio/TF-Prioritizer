@@ -27,4 +27,10 @@
       </mat-expansion-panel>
     </mat-accordion>
   </mat-expansion-panel>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <h2>Differential expression of top target genes</h2>
+    </mat-expansion-panel-header>
+    <app-image-selector [data]="tfData.heatmaps"></app-image-selector>
+  </mat-expansion-panel>
 </mat-accordion>
