@@ -13,7 +13,11 @@ import {ImageSelectorComponent} from "./components/image-selector/image-selector
 import {DataSelectorComponent} from "./components/data-selector/data-selector.component";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatSelectModule} from "@angular/material/select";
-import { GeneExpressionComponent } from './components/gene-expression/gene-expression.component';
+import {GeneExpressionComponent} from './components/gene-expression/gene-expression.component';
+import {
+  ExpressionVisualizationComponent
+} from './components/expression-visualization/expression-visualization.component';
+import {BarChartModule} from "@swimlane/ngx-charts";
 
 @NgModule({
   declarations: [
@@ -22,7 +26,8 @@ import { GeneExpressionComponent } from './components/gene-expression/gene-expre
     TfDataComponent,
     ImageSelectorComponent,
     DataSelectorComponent,
-    GeneExpressionComponent
+    GeneExpressionComponent,
+    ExpressionVisualizationComponent
   ],
   imports: [
     BrowserModule,
@@ -32,7 +37,8 @@ import { GeneExpressionComponent } from './components/gene-expression/gene-expre
     BrowserAnimationsModule,
     NgOptimizedImage,
     MatFormFieldModule,
-    MatSelectModule
+    MatSelectModule,
+    BarChartModule
   ],
   providers: [],
   bootstrap: [AppComponent]

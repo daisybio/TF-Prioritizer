@@ -1,0 +1,3 @@
+<ng-container *ngIf="$formattedData | async; let data">
+  <ngx-charts-bar-horizontal [results]="data" [showDataLabel]="true" [yAxis]="true"></ngx-charts-bar-horizontal>
+</ng-container>

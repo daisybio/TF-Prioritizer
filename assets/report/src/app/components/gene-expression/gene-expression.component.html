@@ -2,7 +2,19 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <h3>TPM</h3>
-      <p>{{expressionData.TPM}}</p>
     </mat-expansion-panel-header>
+    <app-expression-visualization [data]="expressionData.TPM"></app-expression-visualization>
+  </mat-expansion-panel>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <h3>Normalized counts</h3>
+    </mat-expansion-panel-header>
+    <app-expression-visualization [data]="expressionData.Counts"></app-expression-visualization>
+  </mat-expansion-panel>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <h3>Log2 fold changes</h3>
+    </mat-expansion-panel-header>
+    <app-expression-visualization [data]="expressionData.DESeq"></app-expression-visualization>
   </mat-expansion-panel>
 </mat-accordion>
