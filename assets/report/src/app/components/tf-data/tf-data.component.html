@@ -1,0 +1,30 @@
+<div class="flex-row">
+  <h2>Gene ID:</h2>
+  <p>{{ tfData.ensg }}</p>
+</div>
+<mat-accordion multi>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <h2>Gene Expression</h2>
+    </mat-expansion-panel-header>
+  </mat-expansion-panel>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <h2>Logos</h2>
+    </mat-expansion-panel-header>
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <h2>Biophysical logo (from TEPIC PWMs)</h2>
+        </mat-expansion-panel-header>
+        <img alt="Biophysical logo" src="{{tfData.biophysical_logo}}">
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <h2>TF Sequence (from JASPAR)</h2>
+        </mat-expansion-panel-header>
+        <app-image-selector [data]="tfData.jaspar_logos"></app-image-selector>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-expansion-panel>
+</mat-accordion>

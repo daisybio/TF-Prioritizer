@@ -1,9 +1,11 @@
-import {dcg, ranking} from "../../interfaces";
+import {dcg, ranking, tfData} from "../../interfaces";
+import {DataService} from "../services/data.service";
 
 export class TranscriptionFactor {
   private dcgs: dcg = {};
+  private tfData: tfData | undefined;
 
-  constructor(private _name: string, ranking: ranking) {
+  constructor(private _name: string, ranking: ranking, private dataService: DataService) {
     for (let assay of Object.keys(ranking).filter(val => val != 'default')) {
       for (let pairing of Object.keys(ranking[assay])) {
         let ranked = ranking[assay][pairing];
@@ -51,5 +53,17 @@ export class TranscriptionFactor {
     }
 
     return sum;
+  }
+
+  getTfData() {
+    return this.tfData;
+  }
+
+  async fetchData() {
+    if (this.tfData) {
+      return;
+    }
+
+    this.tfData = await this.dataService.getTfData(this.name);
   }
 }

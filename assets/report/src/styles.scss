@@ -1,1 +1,34 @@
 @import "theme";
+
+.full-width {
+  width: 100%
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: available;
+  gap: 10px;
+  align-items: center;
+  margin: 10px;
+}
+
+img {
+  max-width: 100%;
+}
+.stretch > * {
+  flex: 1 1 auto;
+}
+
+mat-chip-option {
+  max-width: 100%;
+}
+
+.mat-mdc-chip-action {
+  width: 100%;
+}
+
+.mdc-evolution-chip__graphic {
+  flex: unset !important;
+}

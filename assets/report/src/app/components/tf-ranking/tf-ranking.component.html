@@ -1,17 +1,31 @@
 <mat-chip-listbox (change)="$activeAssays.next($event.value)" multiple>
-  <mat-chip-option *ngFor="let assay of exisingAssays"
-                   color="primary" selected>{{assay}}</mat-chip-option>
+  <div class="flex-row full-width stretch">
+    <mat-chip-option *ngFor="let assay of exisingAssays"
+                     color="primary" selected>{{assay}}</mat-chip-option>
+  </div>
 </mat-chip-listbox>
 <mat-chip-listbox (change)="$activePairings.next($event.value)" multiple>
-  <mat-chip-option *ngFor="let pairing of exisingPairings" selected>
-    {{pairing}}
-  </mat-chip-option>
+  <div class="flex-row full-width stretch">
+    <mat-chip-option *ngFor="let pairing of exisingPairings" selected>
+      {{pairing}}
+    </mat-chip-option>
+  </div>
 </mat-chip-listbox>
 
-<mat-accordion>
-  <mat-expansion-panel *ngFor="let tf of ($ranking | async)">
+<mat-accordion multi>
+  <mat-expansion-panel #tfPanel (click)="tf.fetchData()" *ngFor="let tf of ($ranking | async); let i = index">
     <mat-expansion-panel-header>
-      <h1>{{tf.name}}</h1>
+      <div class="flex-row">
+        <h1 style="min-width: 50px; text-align: right">{{i + 1}}.</h1>
+        <h1>{{tf.name}}</h1>
+      </div>
     </mat-expansion-panel-header>
+
+    <ng-container *ngIf="tfPanel.expanded">
+      <ng-container *ngIf="tf.getTfData(); let tfData">
+        <app-tf-data [tfData]="tfData"></app-tf-data>
+      </ng-container>
+    </ng-container>
+
   </mat-expansion-panel>
 </mat-accordion>

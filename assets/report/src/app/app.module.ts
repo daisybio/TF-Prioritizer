@@ -7,18 +7,30 @@ import {TfRankingComponent} from './components/tf-ranking/tf-ranking.component';
 import {HttpClientModule} from "@angular/common/http";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatExpansionModule} from "@angular/material/expansion";
+import {TfDataComponent} from './components/tf-data/tf-data.component';
+import {NgOptimizedImage} from "@angular/common";
+import {ImageSelectorComponent} from "./components/image-selector/image-selector.component";
+import {DataSelectorComponent} from "./components/data-selector/data-selector.component";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatSelectModule} from "@angular/material/select";
 
 @NgModule({
   declarations: [
     AppComponent,
-    TfRankingComponent
+    TfRankingComponent,
+    TfDataComponent,
+    ImageSelectorComponent,
+    DataSelectorComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     MatChipsModule,
     MatExpansionModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    NgOptimizedImage,
+    MatFormFieldModule,
+    MatSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]

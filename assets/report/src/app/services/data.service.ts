@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {ranking} from "../../interfaces";
+import {ranking, tfData} from "../../interfaces";
 import * as ranks from 'src/assets/data/ranks.json';
 import {TranscriptionFactor} from "../classes/transcription-factor";
 
@@ -30,7 +30,7 @@ export class DataService {
     }
 
     for (let tfName of allTfNames) {
-      this.transcriptionFactors.add(new TranscriptionFactor(tfName, this.ranking));
+      this.transcriptionFactors.add(new TranscriptionFactor(tfName, this.ranking, this));
     }
   }
 
@@ -54,5 +54,10 @@ export class DataService {
     }
 
     return Array.from(pairings).sort();
+  }
+
+  async getTfData(tfName: string): Promise<tfData | undefined> {
+    console.log(`Fetching data for ${tfName}...`);
+    return await this.httpClient.get<tfData>(`./assets/data/tfs/${tfName}.json`).toPromise();
   }
 }
