@@ -7,10 +7,8 @@ import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.RequiredConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
-import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
