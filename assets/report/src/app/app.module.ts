@@ -13,6 +13,7 @@ import {ImageSelectorComponent} from "./components/image-selector/image-selector
 import {DataSelectorComponent} from "./components/data-selector/data-selector.component";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatSelectModule} from "@angular/material/select";
+import { GeneExpressionComponent } from './components/gene-expression/gene-expression.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import {MatSelectModule} from "@angular/material/select";
     TfRankingComponent,
     TfDataComponent,
     ImageSelectorComponent,
-    DataSelectorComponent
+    DataSelectorComponent,
+    GeneExpressionComponent
   ],
   imports: [
     BrowserModule,

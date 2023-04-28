@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {tfData} from "../../../interfaces";
+import {expressionData, tfData} from "../../../interfaces";
+import {DataService} from "../../services/data.service";
 
 @Component({
   selector: 'app-tf-data',
@@ -8,4 +9,13 @@ import {tfData} from "../../../interfaces";
 })
 export class TfDataComponent {
   @Input() tfData!: tfData;
+
+  $expressionData: Promise<expressionData | undefined> | undefined;
+
+  constructor(private dataService: DataService) {
+  }
+
+  ngAfterViewInit(): void {
+    this.$expressionData = this.dataService.getExpressionData(this.tfData.ensg);
+  }
 }

@@ -24,3 +24,15 @@ export interface tfData {
   name: string,
   ensg: string
 }
+
+export interface expressionData {
+  "TPM": {
+    [condition: string]: number
+  }
+  "Counts": {
+    [condition: string]: number
+  }
+  "DESeq": {
+    [condition_pairing: string]: number
+  }
+}

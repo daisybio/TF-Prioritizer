@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {ranking, tfData} from "../../interfaces";
+import {expressionData, ranking, tfData} from "../../interfaces";
 import * as ranks from 'src/assets/data/ranks.json';
 import {TranscriptionFactor} from "../classes/transcription-factor";
 
@@ -59,5 +59,10 @@ export class DataService {
   async getTfData(tfName: string): Promise<tfData | undefined> {
     console.log(`Fetching data for ${tfName}...`);
     return await this.httpClient.get<tfData>(`./assets/data/tfs/${tfName}.json`).toPromise();
+  }
+
+  async getExpressionData(geneID: string): Promise<expressionData | undefined> {
+    console.log(`Fetching expression data for ${geneID}...`);
+    return await this.httpClient.get<expressionData>(`./assets/data/gene_expression/${geneID}.json`).toPromise();
   }
 }

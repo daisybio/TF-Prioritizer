@@ -7,6 +7,10 @@
     <mat-expansion-panel-header>
       <h2>Gene Expression</h2>
     </mat-expansion-panel-header>
+    <ng-container *ngIf="$expressionData | async; let expressionData">
+      <app-gene-expression [expressionData]="expressionData"></app-gene-expression>
+    </ng-container>
+
   </mat-expansion-panel>
   <mat-expansion-panel>
     <mat-expansion-panel-header>
