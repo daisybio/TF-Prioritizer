@@ -4,7 +4,7 @@ library(rtracklayer)
 library(GenomicRanges)
 
 filterRegions <- function(regions, w = 2000) {
-  regions <- reduce(regions)
+  # regions <- reduce(regions)
   message("filter enhancer and promoter regions for a length of < 2 kb")
   regions <- regions[width(regions) < w]
   d <- distance(regions[1:(length(regions)-1)], regions[2:length(regions)])
