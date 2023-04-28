@@ -380,7 +380,7 @@ if (length(levelsToDrop) > 0)
 # load bam files
 bamfiles <- list.files(path = argv$b, pattern = "*.bam$", full.names = T, recursive = T)
 marks <- basename(dirname(bamfiles))
-marks[grep("ALL|RNA|ATC|POL|DNASE|ATAC", marks, ignore.case = T)] <- "acc"
+marks[grep("ALL|RNA|ATC|DNASE|ATAC", marks, ignore.case = T)] <- "acc"
 bamtab <- data.frame(mark = marks, path = bamfiles, check.names = F)
 bamtab$shift <- sapply(tolower(bamtab$mark), function(m) ifelse(any(sapply(c("atac", "dhs", "dnase", "acc"),
                                                                            function(s) grepl(s, m))), 0, 75))
