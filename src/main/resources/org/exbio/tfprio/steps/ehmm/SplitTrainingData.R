@@ -48,8 +48,11 @@ splitRanges <- function(ranges, trainSplit, nSamples) {
   } else {
     message("Randomly selecting ", nSamples, " regions for training")
     nTrain <- nSamples
+    if (nTrain > N) {
+        message("info: number of random samples is larger than available set of regions, selecting all but one")
+        nTrain <- N-1
+    }
   }
-  nTest <- N-nTrain
   R <- 1:N
   trainIdx <- sample(R, nTrain)
   testIdx <- R[-trainIdx]
