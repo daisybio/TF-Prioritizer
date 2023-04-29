@@ -6,6 +6,7 @@ import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -13,8 +14,8 @@ import java.util.concurrent.Callable;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class CombinePredictions extends ExecutableStep<Configs> {
-    public final OutputFile promoters = addOutput("predictedPromoters.bed");
-    public final OutputFile enhancers = addOutput("predictedEnhancers.bed");
+    public final Map<String, OutputFile> outputFiles = new HashMap<>();
+    public final Map<String, OutputFile> stats = new HashMap<>();
     private final InputFile predictionDir;
     private final InputFile script;
 
@@ -22,6 +23,8 @@ public class CombinePredictions extends ExecutableStep<Configs> {
         super(configs, false, predictionParentDir.values());
         predictionDir = addInput(new OutputFile(predictionParentDir.values().iterator().next().getParent()));
         this.script = addInput(getClass().getResourceAsStream("combinePredictions.R"), "combinePredictions.R");
+        this.outputFiles.put("enhancers", addOutput("predictedEnhancers.bed"));
+        this.outputFiles.put("promoters", addOutput("predictedPromoters.bed"));
     }
 
 

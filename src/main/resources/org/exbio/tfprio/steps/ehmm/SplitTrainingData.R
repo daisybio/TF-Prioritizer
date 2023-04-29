@@ -45,6 +45,7 @@ splitRanges <- function(ranges, trainSplit, nSamples) {
   if(nSamples == -1) {
     message("splitting data by a factor of ", trainSplit, " for training")
     nTrain <- N*trainSplit
+    message("-> selecting ", nTrain, " samples for training")
   } else {
     message("Randomly selecting ", nSamples, " regions for training")
     nTrain <- nSamples

@@ -19,5 +19,5 @@ promoterRegions <- promoterRegions[promoterRegions$score >= argv$t]
 enhancerRegions <- enhancerRegions[enhancerRegions$score >= argv$t]
 message("predicted ", length(promoterRegions), " promoters and ", length(enhancerRegions), " enhancers.")
 # write files to output
-export(promoterRegions, file.path(argv$o, "predictedPromoters.bed"), format = "bed")
-export(enhancerRegions, file.path(argv$o, "predictedEnhancers.bed"), format = "bed")
+export(reduce(promoterRegions), file.path(argv$o, "predictedPromoters.bed"), format = "bed")
+export(reduce(enhancerRegions), file.path(argv$o, "predictedEnhancers.bed"), format = "bed")
