@@ -15,7 +15,8 @@ import static org.exbio.pipejar.util.FileManagement.extend;
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 
 public class ApplyModel extends ExecutableStep<Configs> {
-    public final Map<String, OutputFile> outputDirs = new HashMap<>();
+    public final OutputFile outputDir = addOutput("out");
+    private final Map<String, OutputFile> outputDirs = new HashMap<>();
     private final Map<String, InputFile> regions = new HashMap<>();
     private final InputFile chromosomeSizes;
     private final InputFile constructedModel;
@@ -35,7 +36,6 @@ public class ApplyModel extends ExecutableStep<Configs> {
         this.applyModelScript = addInput(getClass().getResourceAsStream("applyModel.R"), "applyModel.R");
         OutputFile regionDir = new OutputFile(inputDirectory, "regions");
         OutputFile bamBaseDir = new OutputFile(inputDirectory, "bams");
-        OutputFile outDir = addOutput("out");
         regions.forEach((s, r) -> {
             OutputFile groupDir = new OutputFile(regionDir, s);
             this.regions.put(s, addInput(groupDir, r));
@@ -48,7 +48,7 @@ public class ApplyModel extends ExecutableStep<Configs> {
                     .forEach(hm -> Arrays.stream(Objects.requireNonNull(hm.listFiles()))
                             .forEach(f -> addInput(new OutputFile(extend(bamGroupDir, hm.getName()).getAbsolutePath()),
                                     new OutputFile(f.getAbsolutePath()))));
-            this.outputDirs.put(s, addOutput(outDir, s));
+            this.outputDirs.put(s, addOutput(outputDir, s));
         });
     }
 

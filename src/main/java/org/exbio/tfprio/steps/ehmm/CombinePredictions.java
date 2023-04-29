@@ -19,9 +19,9 @@ public class CombinePredictions extends ExecutableStep<Configs> {
     private final InputFile predictionDir;
     private final InputFile script;
 
-    public CombinePredictions(Configs configs, Map<String, OutputFile> predictionParentDir) {
-        super(configs, false, predictionParentDir.values());
-        predictionDir = addInput(new OutputFile(predictionParentDir.values().iterator().next().getParent()));
+    public CombinePredictions(Configs configs, OutputFile predictionParentDir) {
+        super(configs, false, predictionParentDir);
+        predictionDir = addInput(predictionParentDir);
         this.script = addInput(getClass().getResourceAsStream("combinePredictions.R"), "combinePredictions.R");
         this.outputFiles.put("enhancers", addOutput("predictedEnhancers.bed"));
         this.outputFiles.put("promoters", addOutput("predictedPromoters.bed"));
