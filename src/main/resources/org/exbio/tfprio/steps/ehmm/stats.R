@@ -33,7 +33,6 @@ parser <- add_argument(parser, "--r_enhancers", help = "reference enhancers bed 
 parser <- add_argument(parser, "--p_promoters", help = "predicted promoters bed file")
 parser <- add_argument(parser, "--r_promoters", help = "reference promoters bed file")
 parser <- add_argument(parser, "-i", help = "input collapsed peak bed dir")
-parser <- add_argument(parser, "-o", help = "output file", default = "./")
 argv <- parse_args(parser, argv = args)
 
 predicted_enhancers <- reduce(import(argv$p_enhancers, format = "bed"))
@@ -50,4 +49,4 @@ promoters_stats <- t(data.frame(round(stats(predicted_promoters, reference_promo
 d <- rbind(enhancers_stats, promoters_stats)
 d$type <- c("enhancers", "promoters")
 
-write.table(d, file.path(argv$o, "Statistics.tsv"), row.names = F, quote = F)
+write.table(d, "Statistics.tsv", row.names = F, quote = F)
