@@ -75,15 +75,18 @@ parser <- add_argument(parser, "-s", help = "Size of random genomic regions",
                        default = 2000, type = "integer")
 parser <- add_argument(parser, "-r", help = "seed",
                        default = 74726, type = "integer")
+parser <- add_argument(parser, "-q", help = "top quantile of scores to include regions from (1-4)",
+                      default = 2, type = "integer")
 argv <- parse_args(parser, argv = args)
 set.seed(argv$r)
 message("load ChipAtlas, enhancer, and promoter regions")
 bgRegions <- import(argv$b, format = "bed")
 names(bgRegions) <- 1:length(bgRegions)
 eRegions <- import(argv$e, format = "bed")
-message("filtering EnhancerAtlas predictions for scores above mean")
+message("filtering EnhancerAtlas predictions for scores above, ", argv$q, "quantile")
 eRegions$name <- as.numeric(eRegions$name)
-eRegions <- eRegions[eRegions$name >= mean(eRegions$name)]
+qs <- quantile(eRegions$name)
+eRegions <- eRegions[eRegions$name >= qs[argv$q]]
 pRegions <- import(argv$p, format = "bed")
 message("extract enhancer and promoter regions within ChipAtlas regions")
 eAndBg <- findOverlapPairs(bgRegions, eRegions)

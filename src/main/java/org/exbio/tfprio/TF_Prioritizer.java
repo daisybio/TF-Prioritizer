@@ -248,6 +248,9 @@ public class TF_Prioritizer extends Workflow<Configs> {
                     collapsePeakFiles.outputFiles, getChromosomeLengths.outputFile,
                     constructModel.outputFile));
             CombinePredictions combinePredictions = add(new CombinePredictions(configs, applyModel.outputDir));
+            // Add statistics
+            Statistics statistics = add(new Statistics(configs, combinePredictions.outputFiles,
+                    collapsePeakFiles.outputDir, enhancerAtlas.outputFile, epdNew.outputFile));
         }
         /*
         DistributionTargetGenes distributionTargetGenes =

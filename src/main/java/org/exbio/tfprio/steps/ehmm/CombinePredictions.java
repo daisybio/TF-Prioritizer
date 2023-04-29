@@ -2,13 +2,11 @@ package org.exbio.tfprio.steps.ehmm;
 
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.InputFile;
 import org.exbio.pipejar.configs.ConfigTypes.FileTypes.OutputFile;
+import org.exbio.pipejar.configs.ConfigTypes.UsageTypes.OptionalConfig;
 import org.exbio.pipejar.pipeline.ExecutableStep;
 import org.exbio.tfprio.configs.Configs;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
@@ -16,6 +14,8 @@ import static org.exbio.pipejar.util.ScriptExecution.executeAndWait;
 public class CombinePredictions extends ExecutableStep<Configs> {
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     public final Map<String, OutputFile> stats = new HashMap<>();
+
+    private final OptionalConfig<Double> score = new OptionalConfig<>(configs.ehmm.score, false);
     private final InputFile predictionDir;
     private final InputFile script;
 
@@ -27,15 +27,18 @@ public class CombinePredictions extends ExecutableStep<Configs> {
         this.outputFiles.put("promoters", addOutput("predictedPromoters.bed"));
     }
 
-
     @Override
     protected Collection<Callable<Boolean>> getCallables() {
         return new HashSet<>() {{
             add(() -> {
-                String cmd = String.join(" ","Rscript",
+                List<String> cmd = new ArrayList<>(List.of("Rscript",
                         script.getAbsolutePath(),
                         "-d", predictionDir.getAbsolutePath(),
-                        "-o", outputDirectory.getAbsolutePath());
+                        "-o", outputDirectory.getAbsolutePath()));
+                if (score.isSet()) {
+                    cmd.add("-t");
+                    cmd.add(score.toString());
+                }
                 executeAndWait(cmd, false);
                 return true;
             });

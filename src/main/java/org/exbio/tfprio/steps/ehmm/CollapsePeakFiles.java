@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 
 public class CollapsePeakFiles extends ExecutableStep<Configs> {
+    public final OutputFile outputDir = addOutput("out");
     public final Map<String, OutputFile> outputFiles = new HashMap<>();
     private final Map<OutputFile, Collection<InputFile>> bridge = new HashMap<>();
 
@@ -25,7 +26,7 @@ public class CollapsePeakFiles extends ExecutableStep<Configs> {
                 stringCollectionMap -> stringCollectionMap.values().stream()).flatMap(Collection::stream).collect(
                 Collectors.toSet()));
         peakFiles.forEach((group, hmMap) -> {
-            OutputFile dir = addOutput(group);
+            OutputFile dir = addOutput(outputDir, group);
             OutputFile out = addOutput(dir, "collapsedPeaks.bed");
             outputFiles.put(group, out);
             // ignore hm groups and collapse all bed files to a list

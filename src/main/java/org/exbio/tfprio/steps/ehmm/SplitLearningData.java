@@ -18,11 +18,6 @@ public class SplitLearningData extends ExecutableStep<Configs> {
     public final OutputFile trainEnhancers = addOutput(outputDirectory, "trainEnhancers.bed");
     public final OutputFile trainPromoters = addOutput(outputDirectory, "trainPromoters.bed");
     public final OutputFile trainBackground = addOutput(outputDirectory, "trainBackground.bed");
-    /*
-    public final OutputFile testEnhancers = addOutput(outputDirectory, "testEnhancers.bed");
-    public final OutputFile testPromoters = addOutput(outputDirectory, "testPromoters.bed");
-    public final OutputFile testBackground = addOutput(outputDirectory, "testBackground.bed");
-     */
 
     private final InputFile allEnhancers;
     private final InputFile allPromoters;
@@ -31,6 +26,7 @@ public class SplitLearningData extends ExecutableStep<Configs> {
     private final RequiredConfig<Integer> genomicRegionSize = new RequiredConfig<>(configs.ehmm.genomicRegionSize);
     private final OptionalConfig<Double> trainSplit = new OptionalConfig<>(configs.ehmm.trainSplit, false);
     private final OptionalConfig<Integer> nSamples = new OptionalConfig<>(configs.ehmm.nSamples, false);
+    private final OptionalConfig<Integer> topQuantile = new OptionalConfig<>(configs.ehmm.topQuantile, false);
     private final InputFile gtf;
     private final InputFile script;
 
@@ -65,6 +61,10 @@ public class SplitLearningData extends ExecutableStep<Configs> {
                 if (nSamples.isSet()) {
                     ehmmCommand.add("-f");
                     ehmmCommand.add(nSamples.toString());
+                }
+                if (topQuantile.isSet()) {
+                    ehmmCommand.add("-q");
+                    ehmmCommand.add(topQuantile.toString());
                 }
                 executeAndWait(ehmmCommand, true);
                 return true;
