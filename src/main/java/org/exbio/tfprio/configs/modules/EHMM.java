@@ -14,7 +14,7 @@ import java.util.Set;
 public class EHMM extends ConfigModule {
     public final ExternalConfig<File> bamDirectory = new ExternalConfig<>(File.class);
     public final ExternalConfig<Integer> nStates = new ExternalConfig<>(Integer.class, new IntegerRangeValidator(3, 12));
-    public final ExternalConfig<Integer> nSamples = new ExternalConfig<>(Integer.class, new IntegerRangeValidator(100, 10000));
+    public final ExternalConfig<Integer> nSamples = new ExternalConfig<>(Integer.class, new IntegerRangeValidator(100, 100000));
     public final ExternalConfig<Double> trainSplit = new ExternalConfig<>(Double.class, new SingleValidator<>() {
         final Double min = 0.0;
         final Double max = 1.0;
