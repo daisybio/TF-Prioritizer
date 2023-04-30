@@ -8,13 +8,10 @@ parser = argparse.ArgumentParser(description='Create directory json representati
 
 parser.add_argument('-d', '--directory', dest='directory', help='Directory', required=True)
 parser.add_argument('-o', '--output', dest='output', help='Output file', required=True)
-parser.add_argument('-e', '--ensg', dest='ensg', help='Ensembl gene', required=True)
-
 args = parser.parse_args()
 
 directory = args.directory
 output = args.output
-ensg = args.ensg
 
 def create_json_representation(recursive_directory):
     data = {}
@@ -43,7 +40,6 @@ def create_json_representation(recursive_directory):
 directory_json = create_json_representation(directory)
 
 directory_json['name'] = os.path.basename(directory)
-directory_json['ensg'] = ensg
 
 # Write the JSON string to a file
 with open(output, 'w') as f:

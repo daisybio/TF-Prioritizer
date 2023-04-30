@@ -21,7 +21,7 @@ process COLLECT_TF_DATA {
     container "tfprio-python"
 
     input:
-        tuple val(symbol), path(biophysical_logo), path(model), path(jaspar_logos), val(ensg), path(heatmaps)
+        tuple val(symbol), path(biophysical_logo), path(model), path(jaspar_logos), path(heatmaps)
 
     output:
         tuple path("$symbol"), path("${symbol}.json")
@@ -34,7 +34,7 @@ process COLLECT_TF_DATA {
         ln -s ../$jaspar_logos $symbol/jaspar_logos
         ln -s ../$heatmaps $symbol/heatmaps
 
-        create_directory_json.py -d $symbol -e $ensg -o ${symbol}.json
+        create_directory_json.py -d $symbol -o ${symbol}.json
         """
 }
 
@@ -77,6 +77,8 @@ process COLLECT {
         path(gene_expression)
         path(ranks)
         path(tf_files)
+        path(groups_tf_map)
+        path(symbol_ensg_map)
 
     output:
         path("data")
@@ -87,6 +89,8 @@ process COLLECT {
 
         ln -s ../$ranks data/ranks.json
         ln -s ../$gene_expression data/gene_expression
+        ln -s ../$groups_tf_map data/groups.json
+        ln -s ../$symbol_ensg_map data/symbols.json
 
         mkdir -p data/tfs
         

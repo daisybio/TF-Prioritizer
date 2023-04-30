@@ -84,6 +84,7 @@ include { COLLECT_HEATMAPS } from '../modules/local/collect'
 include { COLLECT_RANKS } from '../modules/local/collect'
 include { COLLECT } from '../modules/local/collect'
 include { REPORT } from '../modules/local/report'
+include { SYMBOL_ENSG } from '../modules/local/symbol_ensg'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -118,12 +119,12 @@ workflow TFPRIO {
         Channel.value(params.dynamite_randomize)
     )
 
-    DYNAMITE_FILTER (
+    ch_dynamite = DYNAMITE_FILTER (
         DYNAMITE.out,
         Channel.value(params.dynamite_min_regression)
     )
 
-    ch_tftg = DYNAMITE_FILTER.out
+    ch_tftg = ch_dynamite
         .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, coefficients, diffExpression
         .combine(ch_affinity_sums, by: [0, 1, 2]) // group1, group2, hm, coefficients, diffExpression, affinitySums
     
@@ -135,7 +136,7 @@ workflow TFPRIO {
     ) // tfs
 
     TOP_TARGET_GENES (
-        COLLECT_TFS.out,
+        COLLECT_TFS.out.groups,
         Channel.value(params.top_target_genes),
         ch_affinity_sums,
         ch_counts_per_sample
@@ -154,7 +155,7 @@ workflow TFPRIO {
         .map { [it.name.replaceAll(/_heatmaps$/, ''), it] }
 
     BIOPHYSICAL_MODELS (
-        COLLECT_TFS.out,
+        COLLECT_TFS.out.groups,
         Channel.value(params.tepic_pwm)
     )
 
@@ -164,7 +165,7 @@ workflow TFPRIO {
     ch_biophysical = ch_bio_logos
         .combine(ch_bio_models, by: 0) // tf, logo, model
 
-    ch_jaspar = TF_SEQUENCE (COLLECT_TFS.out)
+    ch_jaspar = TF_SEQUENCE (COLLECT_TFS.out.tfs)
         .flatten()
         .map { [it.name.replaceAll(/_jaspar$/, ''), it] }
 
@@ -172,21 +173,22 @@ workflow TFPRIO {
         .combine(ch_jaspar, by: 0) // tf, biophysical_logo, model, jaspar_logos
 
     ch_map = RNASEQ.out.ensg_map.splitCsv(header: false, sep: '\t')
-        .map { [it[0].toUpperCase(), it[1]]} // SYMBOL, ENSG
+        .map { [it[0].toUpperCase().replaceAll(/-/, '.'), it[1]]} // SYMBOL, ENSG
 
-    ch_logos = ch_logos
-        .combine(ch_map, by: 0) // tf, biophysical_logo, model, jaspar_logos, ensg
-        // Keep only entries with a biophysical logo
-        .filter { it[1] != null }
+    ch_tf_ensg = COLLECT_TFS.out.tfs
+        .splitCsv(header: false)
+        .map { it[0] }
+        .combine(ch_map, by: 0) // tf, ensg
+        
+    tf_ensg_map = ch_tf_ensg
+        .collectFile(name: "tf_map.tsv", storeDir: "${params.outdir}/results", newLine: true) { it.join('\t')}
 
-    ensgs = ch_logos
-        .map { it[4] }
+    ensgs = ch_tf_ensg
+        .map { it[1] }
         .collect()
 
     ch_plots = ch_logos
-        .combine(ch_heatmaps, by: 0) // tf, biophysical_logo, model, jaspar_logos, ensg, heatmaps
-
-    ch_plots.view()
+        .combine(ch_heatmaps, by: 0) // tf, biophysical_logo, model, jaspar_logos, heatmaps
 
     COLLECT_EXPRESSION (
         ch_tpm,
@@ -206,7 +208,9 @@ workflow TFPRIO {
     COLLECT (
         COLLECT_EXPRESSION.out,
         COLLECT_RANKS.out,
-        COLLECT_TF_DATA.out.flatten().collect()
+        COLLECT_TF_DATA.out.flatten().collect(),
+        COLLECT_TFS.out.groups_tf_map,
+        SYMBOL_ENSG(tf_ensg_map)
     )
 
     REPORT ( COLLECT.out )
