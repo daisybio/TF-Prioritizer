@@ -8,8 +8,11 @@ process BED_TO_BAM {
        tuple val(meta), path(bed)
        path(chrom_sizes)
 
+    output:
+        tuple val(meta), path("${meta.id}.bam")
+
     script:
     """
-    bedtools bedtobam -i ${bed} -g ${chrom_sizes} > ${meta.tf}_${meta.tissue}.bam
+    bedtools bedtobam -i ${bed} -g ${chrom_sizes} > ${meta.id}.bam
     """
 }

@@ -33,7 +33,7 @@ process FETCH_BED {
         tuple val(meta), val(url)
 
     output:
-        tuple val(meta), path("${meta.tf}_${meta.tissue}.bed")
+        tuple val(meta), path("${meta.id}.bed")
 
     script:
         """
@@ -42,7 +42,7 @@ process FETCH_BED {
         import requests
 
         r = requests.get('${url}')
-        with open('${meta.tf}_${meta.tissue}.bed', 'w') as f:
+        with open('${meta.id}.bed', 'w') as f:
             f.write(r.text)
         """
 }
