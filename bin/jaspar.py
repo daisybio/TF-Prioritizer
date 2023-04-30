@@ -22,7 +22,7 @@ entries = [entry[1:].split() for entry in content.splitlines() if entry.startswi
 
 for entry in entries:
     matrix_id = entry[0]
-    tf = entry[1].upper()
+    tf = entry[1].upper().replace('::', '..')
 
     if tf not in tfs:
         continue

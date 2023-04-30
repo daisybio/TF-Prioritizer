@@ -6,7 +6,7 @@ process COLLECT_TFS {
 
     output:
         path('tf_groups.txt'), emit: groups
-        path('tf_groups.json'), emit: groups_tf_map
+        path('tf_groups.json'), emit: groups_tfs_map
         path('tfs.txt'), emit: tfs
 
     script:

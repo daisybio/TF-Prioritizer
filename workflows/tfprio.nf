@@ -67,24 +67,11 @@ params.three_prime_clip_r2 = params.chipseq_three_prime_clip_r2
 
 include { RNASEQ } from '../subworkflows/local/rnaseq'
 include { PEAK_FILES } from '../subworkflows/local/peak_files'
-include { INTEGRATE_DATA } from '../modules/local/dynamite'
-include { PREPARE_FOR_CLASSIFICATION } from '../modules/local/dynamite'
-include { DYNAMITE } from '../modules/local/dynamite'
-include { DYNAMITE_FILTER } from '../modules/local/dynamite'
-include { TFTG_SCORE } from '../modules/local/distributionAnalysis/tftg_scores'
-include { RANKING } from '../modules/local/distributionAnalysis/ranking'
-include { COLLECT_TFS } from '../modules/local/distributionAnalysis/collect_tfs'
-include { TOP_TARGET_GENES } from '../modules/local/distributionAnalysis/top_target_genes'
-include { BIOPHYSICAL_MODELS } from '../modules/local/biophysical_models'
-include { HEATMAPS } from '../modules/local/distributionAnalysis/heatmaps'
-include { TF_SEQUENCE } from '../modules/local/tf_sequence'
 include { COLLECT_EXPRESSION } from '../modules/local/collect'
-include { COLLECT_TF_DATA } from '../modules/local/collect'
-include { COLLECT_HEATMAPS } from '../modules/local/collect'
-include { COLLECT_RANKS } from '../modules/local/collect'
-include { COLLECT } from '../modules/local/collect'
-include { REPORT } from '../modules/local/report'
-include { SYMBOL_ENSG } from '../modules/local/symbol_ensg'
+include { REPORT } from '../subworkflows/local/report'
+include { DYNAMITE } from '../subworkflows/local/dynamite'
+include { RANKING } from '../subworkflows/local/ranking'
+include { PREPARE_TFGROUPS } from '../subworkflows/local/report'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -106,114 +93,50 @@ workflow TFPRIO {
     ch_counts = RNASEQ.out.count // group1, group2, counts-file
     ch_rnaseq_samplesheet = RNASEQ.out.samplesheet // samplesheet-file
 
-    ch_integration = ch_affinity_ratios
-        .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, affinityRatios, diffExpression
-    
-    INTEGRATE_DATA (ch_integration)
-    PREPARE_FOR_CLASSIFICATION (INTEGRATE_DATA.out)
-    DYNAMITE (
-        PREPARE_FOR_CLASSIFICATION.out,
-        Channel.value(params.dynamite_ofolds),
-        Channel.value(params.dynamite_ifolds),
-        Channel.value(params.dynamite_alpha),
-        Channel.value(params.dynamite_randomize)
-    )
-
-    ch_dynamite = DYNAMITE_FILTER (
-        DYNAMITE.out,
-        Channel.value(params.dynamite_min_regression)
-    )
-
-    ch_tftg = ch_dynamite
-        .combine(ch_diff_expression, by: [0, 1]) // group1, group2, hm, coefficients, diffExpression
-        .combine(ch_affinity_sums, by: [0, 1, 2]) // group1, group2, hm, coefficients, diffExpression, affinitySums
-    
-    TFTG_SCORE (ch_tftg) // group1, group2, hm, tftgScore
-    RANKING (TFTG_SCORE.out) // group1, group2, hm, ranking
-
-    COLLECT_TFS (
-        RANKING.out.map { it[3] } .collect()
-    ) // tfs
-
-    TOP_TARGET_GENES (
-        COLLECT_TFS.out.groups,
-        Channel.value(params.top_target_genes),
-        ch_affinity_sums,
-        ch_counts_per_sample
-    ) // group1, group2, hm, topTargetGenes
-
-    ch_heatmaps = COLLECT_HEATMAPS (
-        HEATMAPS (
-            TOP_TARGET_GENES.out,
-            ch_counts_per_sample,
-            ch_rnaseq_samplesheet,
-            RNASEQ.out.ensg_map
-        )   .transpose() // group1, group2, hm, heatmap
-            .map { it[3] }
-            .collect()
-    )   .flatten()
-        .map { [it.name.replaceAll(/_heatmaps$/, ''), it] }
-
-    BIOPHYSICAL_MODELS (
-        COLLECT_TFS.out.groups,
-        Channel.value(params.tepic_pwm)
-    )
-
-    ch_bio_logos = BIOPHYSICAL_MODELS.out.plots.flatten().map { [it.name.replaceAll(/.png$/, ''), it] }
-    ch_bio_models = BIOPHYSICAL_MODELS.out.pwms.flatten().map { [it.name.replaceAll(/.pwm$/, ''), it] }
-
-    ch_biophysical = ch_bio_logos
-        .combine(ch_bio_models, by: 0) // tf, logo, model
-
-    ch_jaspar = TF_SEQUENCE (COLLECT_TFS.out.tfs)
-        .flatten()
-        .map { [it.name.replaceAll(/_jaspar$/, ''), it] }
-
-    ch_logos = ch_biophysical
-        .combine(ch_jaspar, by: 0) // tf, biophysical_logo, model, jaspar_logos
-
     ch_map = RNASEQ.out.ensg_map.splitCsv(header: false, sep: '\t')
         .map { [it[0].toUpperCase().replaceAll(/-/, '.'), it[1]]} // SYMBOL, ENSG
 
-    ch_tf_ensg = COLLECT_TFS.out.tfs
-        .splitCsv(header: false)
-        .map { it[0] }
-        .combine(ch_map, by: 0) // tf, ensg
-        
-    tf_ensg_map = ch_tf_ensg
-        .collectFile(name: "tf_map.tsv", storeDir: "${params.outdir}/results", newLine: true) { it.join('\t')}
+    DYNAMITE (
+        ch_affinity_ratios,
+        ch_diff_expression,
+        Channel.value(params.dynamite_ofolds),
+        Channel.value(params.dynamite_ifolds),
+        Channel.value(params.dynamite_alpha),
+        Channel.value(params.dynamite_randomize),
+        Channel.value(params.dynamite_min_regression)
+    )
 
-    ensgs = ch_tf_ensg
-        .map { it[1] }
-        .collect()
+    RANKING (
+        DYNAMITE.out,
+        ch_diff_expression,
+        ch_affinity_sums,
+        ch_map
+    )
 
-    ch_plots = ch_logos
-        .combine(ch_heatmaps, by: 0) // tf, biophysical_logo, model, jaspar_logos, heatmaps
+    PREPARE_TFGROUPS (
+        RANKING.out.groups,
+        Channel.value(params.top_target_genes),
+        ch_affinity_sums,
+        ch_counts_per_sample,
+        ch_rnaseq_samplesheet,
+        Channel.value(params.tepic_pwm),
+        RNASEQ.out.ensg_map
+    )
 
     COLLECT_EXPRESSION (
         ch_tpm,
         RNASEQ.out.deseq2_grouped,
         ch_counts,
-        ensgs
+        RANKING.out.ensgs
     )
 
-    COLLECT_TF_DATA(
-        ch_plots
-    )
-
-    COLLECT_RANKS (
-        RANKING.out.map { it[3] } .collect()
-    )
-
-    COLLECT (
+    REPORT (
         COLLECT_EXPRESSION.out,
-        COLLECT_RANKS.out,
-        COLLECT_TF_DATA.out.flatten().collect(),
-        COLLECT_TFS.out.groups_tf_map,
-        SYMBOL_ENSG(tf_ensg_map)
+        RANKING.out.ranks,
+        PREPARE_TFGROUPS.out.flatten().collect(),
+        RANKING.out.group_tfs_map,
+        RANKING.out.tf_ensg_map
     )
-
-    REPORT ( COLLECT.out )
 }
 
 /*
@@ -228,13 +151,6 @@ workflow TFPRIO {
 //
 workflow {
     TFPRIO ()
-}
-
-def map_to_tuple(map) {
-    // Map has keys: gene, a lot of samples
-    // We want to map to: gene, [sample, count]
-
-    return [map['gene'], map.findAll { it.key != 'gene' }.collect { [it.key, it.value] }]
 }
 
 /*
