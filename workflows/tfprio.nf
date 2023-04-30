@@ -146,12 +146,12 @@ workflow TFPRIO {
         )
 
 
-        /*
         EHMM(
             ch_chipatlas,
-            CHROMOSOME_LENGTHS.out
+            CHROMOSOME_LENGTHS.out,
+            Channel.value(params.chipatlas_genome),
+            Channel.value(params.chipatlas_tissue_types)
         )
-        */
     }
 
     /*REPORT (
