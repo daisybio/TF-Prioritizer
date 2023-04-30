@@ -72,8 +72,9 @@ include { REPORT } from '../subworkflows/local/report'
 include { DYNAMITE } from '../subworkflows/local/dynamite'
 include { RANKING } from '../subworkflows/local/ranking'
 include { PREPARE_TFGROUPS } from '../subworkflows/local/report'
-include { CHIP_ATLAS } from '../modules/local/chip_atlas'
+include { CHIP_ATLAS } from '../subworkflows/local/chipatlas'
 include { CHROMOSOME_LENGTHS } from '../modules/local/chromosome_lengths'
+include { EHMM } from '../subworkflows/local/ehmm'
 
 //
 // WORKFLOW: Run main nf-core/rnaseq analysis pipeline
@@ -134,13 +135,23 @@ workflow TFPRIO {
 
     if (params.chipatlas_tissue_types != null)
     { 
-        CHIP_ATLAS(
+        CHROMOSOME_LENGTHS(Channel.value(params.biomart_species))
+
+        ch_chipatlas = CHIP_ATLAS(
             Channel.value(params.chipatlas_tissue_types),
             RANKING.out.tfs.splitCsv(header: false).map{ it[0].toLowerCase() }.collect(),
-            Channel.value(params.chipatlas_genome)
+            Channel.value(params.chipatlas_genome),
+            Channel.value(params.chipatlas_threshold),
+            CHROMOSOME_LENGTHS.out
         )
 
-        CHROMOSOME_LENGTHS(Channel.value(params.biomart_species))
+
+        /*
+        EHMM(
+            ch_chipatlas,
+            CHROMOSOME_LENGTHS.out
+        )
+        */
     }
 
     /*REPORT (

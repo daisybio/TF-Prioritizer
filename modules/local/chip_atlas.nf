@@ -1,13 +1,14 @@
-process CHIP_ATLAS {
+process FETCH_LINKS {
     container 'tfprio-python'
 
     input:
         val(tissue_types)
         val(tfs)
         val(genome)
+        val(threshold)
 
     output:
-        path('*.bed')
+        path('links.tsv')
 
     script:
         """
@@ -16,6 +17,32 @@ process CHIP_ATLAS {
             unzip overview.zip
         fi
 
-        chipatlas.py -l chip_atlas_file_list.csv -t ${tissue_types.join(' ')} -f ${tfs.join(' ')} -g ${genome}
+        chipatlas_links.py -l chip_atlas_file_list.csv \\
+            -t ${tissue_types.join(' ')} \\
+            -f ${tfs.join(' ')} \\
+            -g ${genome} \\
+            -s ${threshold} \\
+            -o links.tsv
+        """
+}
+
+process FETCH_BED {
+    container 'tfprio-python'
+
+    input:
+        tuple val(meta), val(url)
+
+    output:
+        tuple val(meta), path("${meta.tf}_${meta.tissue}.bed")
+
+    script:
+        """
+        #!/usr/bin/env python
+
+        import requests
+
+        r = requests.get('${url}')
+        with open('${meta.tf}_${meta.tissue}.bed', 'w') as f:
+            f.write(r.text)
         """
 }
