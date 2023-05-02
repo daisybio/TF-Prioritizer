@@ -11,6 +11,7 @@ include { LEARN_MODEL as LEARN_PROMOTER_MODEL } from "../../modules/local/ehmm/l
 include { REMOVE_CHR_PREFIX as REMOVE_EH_CHR_PREFIX } from "../../modules/local/remove_chr_prefix"
 include { REMOVE_CHR_PREFIX as REMOVE_EPDNEW_CHR_PREFIX } from "../../modules/local/remove_chr_prefix"
 include { CONSTRUCT_MODEL } from "../../modules/local/ehmm/construct_model"
+include { CONCATENATE as CONCATENATE_PEAKS } from "../../modules/local/concatenate"
 
 workflow EHMM {
     take:
@@ -18,6 +19,7 @@ workflow EHMM {
         ch_chromosome_lengths // chromosome-lengths-file
         genome
         tissues
+        ch_peaks // assay, condition, sample, peak-file
 
     main:
         SCRAPE_EH_ATLAS (tissues, genome)
@@ -36,11 +38,11 @@ workflow EHMM {
         )
 
         CONCATENATE_EH_ATLAS (
-            ch_beds.map { it[1] }.collect()
+            ch_beds.map { it[1] }.collect() .map { [['id': 'eh_atlas', 'ext': 'bed'], it]}
         )
 
         CONCATENATE_CHIP_ATLAS (
-            ch_chipatlas.map { it[1] }.collect()
+            ch_chipatlas.map { it[1] }.collect() .map { [['id': 'chip_atlas', 'ext': 'bed'], it]}
         )
 
         epd_new = EPD_NEW(genome)
@@ -50,8 +52,8 @@ workflow EHMM {
         )
 
         SPLIT_DATASETS (
-            CONCATENATE_CHIP_ATLAS.out,
-            CONCATENATE_EH_ATLAS.out,
+            CONCATENATE_CHIP_ATLAS.out.map { it[1] },
+            CONCATENATE_EH_ATLAS.out.map { it[1] },
             epd_new.map { it[1] },
             Channel.value(params.tepic_gtf),
             Channel.value(params.ehmm_genomic_region_size),
@@ -95,5 +97,9 @@ workflow EHMM {
             LEARN_BACKGROUND_MODEL.out.rdata,
             LEARN_ENHANCER_MODEL.out.rdata,
             LEARN_PROMOTER_MODEL.out.rdata
+        )
+
+        CONCATENATE_PEAKS (
+            ch_peaks.map { [it[1], it[3]]} .groupTuple(by: 0).map { [['id': it[0], 'ext': 'bed'], it[1]] }
         )
 }

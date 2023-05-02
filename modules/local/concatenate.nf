@@ -2,14 +2,13 @@ process CONCATENATE {
     container 'ubuntu'
 
     input:
-        path(files)
+        tuple val(meta), path(files)
 
     output:
-        path("*concatenated.txt")
+        tuple val(meta), path("${meta.id}_concatenated.${meta.ext}")
 
     script:
-    def prefix = task.ext.prefix + "_" ?: ""
         """
-        cat ${files} > ${prefix}concatenated.txt
+        cat ${files} > ${meta.id}_concatenated.${meta.ext}
         """
 }

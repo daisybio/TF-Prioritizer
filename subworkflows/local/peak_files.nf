@@ -104,4 +104,5 @@ workflow PEAK_FILES {
     affinity_ratios = AFFINITY_RATIOS.out
     affinity_sums = AFFINITY_SUMS.out
     versions = ch_versions
+    peaks = ch_peaks
 }

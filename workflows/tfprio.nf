@@ -95,6 +95,7 @@ workflow TFPRIO {
     ch_tpm = RNASEQ.out.tpm // group1, group2, tpm-file
     ch_counts = RNASEQ.out.count // group1, group2, counts-file
     ch_rnaseq_samplesheet = RNASEQ.out.samplesheet // samplesheet-file
+    ch_peaks = PEAK_FILES.out.peaks
 
     ch_map = RNASEQ.out.ensg_map.splitCsv(header: false, sep: '\t')
         .map { [it[0].toUpperCase().replaceAll(/-/, '.'), it[1]]} // SYMBOL, ENSG
@@ -149,7 +150,8 @@ workflow TFPRIO {
             ch_chipatlas,
             chr_lengths,
             Channel.value(params.chipatlas_genome),
-            Channel.value(params.chipatlas_tissue_types)
+            Channel.value(params.chipatlas_tissue_types),
+            ch_peaks
         )
     }
 
