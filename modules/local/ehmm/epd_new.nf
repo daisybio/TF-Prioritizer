@@ -5,7 +5,7 @@ process EPD_NEW {
         val(genome)
 
     output:
-        path('epd_new.bed')
+        tuple val(genome), path('epd_new.bed')
 
     script:
         """

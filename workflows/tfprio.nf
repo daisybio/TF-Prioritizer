@@ -135,20 +135,19 @@ workflow TFPRIO {
 
     if (params.chipatlas_tissue_types != null)
     { 
-        CHROMOSOME_LENGTHS(Channel.value(params.biomart_species))
+        chr_lengths = CHROMOSOME_LENGTHS(Channel.value(params.biomart_species))
 
         ch_chipatlas = CHIP_ATLAS(
             Channel.value(params.chipatlas_tissue_types),
             RANKING.out.tfs.splitCsv(header: false).map{ it[0].toLowerCase() }.collect(),
             Channel.value(params.chipatlas_genome),
             Channel.value(params.chipatlas_threshold),
-            CHROMOSOME_LENGTHS.out
+            chr_lengths
         )
-
 
         EHMM(
             ch_chipatlas,
-            CHROMOSOME_LENGTHS.out,
+            chr_lengths,
             Channel.value(params.chipatlas_genome),
             Channel.value(params.chipatlas_tissue_types)
         )

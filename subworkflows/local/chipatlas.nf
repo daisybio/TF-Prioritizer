@@ -3,6 +3,7 @@ include { FETCH_BED } from '../../modules/local/chip_atlas'
 include { BED_TO_BAM } from '../../modules/local/bed_to_bam'
 include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort'
 include { SAMTOOLS_INDEX } from '../../modules/nf-core/samtools/index'
+include { REMOVE_CHR_PREFIX } from '../../modules/local/remove_chr_prefix'
 
 workflow CHIP_ATLAS {
     take:
@@ -19,13 +20,15 @@ workflow CHIP_ATLAS {
 
         FETCH_BED(ch_links)
 
-        BED_TO_BAM(FETCH_BED.out, ch_chromosome_lengths)
+        REMOVE_CHR_PREFIX(FETCH_BED.out)
+
+        BED_TO_BAM(REMOVE_CHR_PREFIX.out, ch_chromosome_lengths)
 
         SAMTOOLS_SORT(BED_TO_BAM.out)
 
         SAMTOOLS_INDEX(SAMTOOLS_SORT.out.bam)
 
-        ch_collected = FETCH_BED.out
+        ch_collected = REMOVE_CHR_PREFIX.out
             .combine(SAMTOOLS_SORT.out.bam, by: 0)
             .combine(SAMTOOLS_INDEX.out.bai, by: 0)
 
