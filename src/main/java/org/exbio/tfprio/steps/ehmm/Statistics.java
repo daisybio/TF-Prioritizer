@@ -46,7 +46,7 @@ public class Statistics extends ExecutableStep<Configs> {
                         "--p_promoters", promoterPrediction.getAbsolutePath(),
                         "--r_promoters", promoterReference.getAbsolutePath(),
                         "-i", collapsedPeakParents.getAbsolutePath(),
-                        "-o", outputDirectory.getParent()));
+                        "-o", outputFile.getAbsolutePath()));
                 executeAndWait(cmd, false);
                 return true;
             });
