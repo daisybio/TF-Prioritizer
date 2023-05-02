@@ -1,4 +1,6 @@
 process SPLIT_DATASETS {
+    label 'process_high_memory'
+
     container 'tfprio-r'
 
     input:
@@ -13,7 +15,12 @@ process SPLIT_DATASETS {
         val(sample_size)
 
     output:
-        path('test.txt')
+        path('testBackground.bed'), emit: testBackground
+        path('testEnhancers.bed'), emit: testEnhancers
+        path('testPromoters.bed'), emit: testPromoters
+        path('trainBackground.bed'), emit: trainBackground
+        path('trainEnhancers.bed'), emit: trainEnhancers
+        path('trainPromoters.bed'), emit: trainPromoters
     
     script:
         """
@@ -22,7 +29,7 @@ process SPLIT_DATASETS {
             -e ${enhancers} \\
             -p ${promoters} \\
             -g ${gtf} \\
-            -o test \\
+            -o . \\
             -f ${sample_size} \\
             -s ${genomic_region_size} \\
             -r ${random_seed} \\

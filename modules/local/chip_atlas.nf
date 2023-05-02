@@ -37,12 +37,6 @@ process FETCH_BED {
 
     script:
         """
-        #!/usr/bin/env python
-
-        import requests
-
-        r = requests.get('${url}')
-        with open('${meta.id}.bed', 'w') as f:
-            f.write(r.text)
+        download_chipatlas.py -u ${url} -o ${meta.id}.bed
         """
 }
