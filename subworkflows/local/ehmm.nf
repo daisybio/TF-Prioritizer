@@ -10,6 +10,7 @@ include { LEARN_MODEL as LEARN_ENHANCER_MODEL } from "../../modules/local/ehmm/l
 include { LEARN_MODEL as LEARN_PROMOTER_MODEL } from "../../modules/local/ehmm/learn_model"
 include { REMOVE_CHR_PREFIX as REMOVE_EH_CHR_PREFIX } from "../../modules/local/remove_chr_prefix"
 include { REMOVE_CHR_PREFIX as REMOVE_EPDNEW_CHR_PREFIX } from "../../modules/local/remove_chr_prefix"
+include { CONSTRUCT_MODEL } from "../../modules/local/ehmm/construct_model"
 
 workflow EHMM {
     take:
@@ -88,5 +89,11 @@ workflow EHMM {
             Channel.value(params.ehmm_n_states),
             Channel.value(params.ehmm_n_bins),
             Channel.value(params.ehmm_pseudocount),
+        )
+
+        CONSTRUCT_MODEL (
+            LEARN_BACKGROUND_MODEL.out.rdata,
+            LEARN_ENHANCER_MODEL.out.rdata,
+            LEARN_PROMOTER_MODEL.out.rdata
         )
 }

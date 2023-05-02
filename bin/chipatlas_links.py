@@ -10,33 +10,37 @@ parser = argparse.ArgumentParser(description='Fetch binding data of the transcri
 parser.add_argument('-l', '--list', dest='list', type=str, help='List file', required=True)
 parser.add_argument('-g', '--genome', dest='genome', type=str, help='Genome', required=True)
 parser.add_argument('-t', '--tissues', dest='tissues', type=str, help='Tissues to process', required=True, nargs='+')
-parser.add_argument('-f', '--tfs', dest='tfs', type=str, help='TFs to process', required=True, nargs='+')
+parser.add_argument('-a', '--antigenes', dest='antigenes', type=str, help='Antigenes to process', required=True, nargs='+')
 parser.add_argument('-s', '--threshold', dest='threshold', type=int, help='Threshold', required=True)
 parser.add_argument('-o', '--output', dest='output', type=str, help='Output file', required=True)
 
 args = parser.parse_args()
 
 df = pd.read_csv(args.list, index_col=0)
+for col in df.columns:
+        if col == 'threshold':
+                continue
+        df[col] = df[col].fillna('')
+        df[col] = df[col].astype(str)
 
 tissues = [tissue.lower() for tissue in args.tissues]
-tfs = [tf.upper() for tf in args.tfs]
+antigenes = args.antigenes
 
 df['cell_type_class'] = df['cell_type_class'].str.lower()
-df['antigen'] = df['antigen'].str.upper()
+df['key'] = df['antigen_class'] + '_' + df['antigen']
+df['key'] = df['key'].str.rstrip('_')
 
 df = df[(df['genome_assembly'] == args.genome) & 
         (df['cell_type_class'].isin(tissues)) & 
-        (df['antigen'].isin(tfs)) & 
+        (df['key'].isin(antigenes)) & 
+        (df['cell_type'] == '') &
         (df['threshold'] == args.threshold)]
 
-# Group by antigen, keep only the row with minimum threshold
-df.index = df['antigen']
+# Replace antigen with ALL if it is empty
+df['antigen'] = df['antigen'].apply(lambda x: 'ALL' if x == '' else x)
 
-df = df[['cell_type_class', 'file_url']]
+df['id'] = df['antigen'] + "_" + str(args.threshold) + "_" + df['cell_type_class'] + "_" + df['antigen_class']
 
-# Rename columns
-df.columns = ['tissue', 'url']
-# Set index name
-df.index.name = 'tf'
+df = df[['file_url', 'id']]
 
-df.to_csv(args.output, sep='\t', index=True, header=True)
+df.to_csv(args.output, sep='\t', index=False, header=True)

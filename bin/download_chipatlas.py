@@ -14,6 +14,10 @@ args = parser.parse_args()
 text = requests.get(args.url).text.splitlines()[1:]
 text = [line.split('\t') for line in text]
 
+if not text:
+    print('No data found')
+    exit(0)
+
 df = pd.DataFrame(text)
 df[3] = df[3].apply(lambda x: x[0:x.find(';')])
 

@@ -14,9 +14,9 @@ workflow CHIP_ATLAS {
         ch_chromosome_lengths
     
     main:
-        ch_links = FETCH_LINKS(tissue_types, tfs, genome, threshold)
+        ch_links = FETCH_LINKS(tissue_types, Channel.value(params.ehmm_antigens), genome, threshold)
             .splitCsv(header: true, sep: '\t')
-            .map { [it + ["id": it.tf + '_' + it.tissue], it.url ]}
+            .map { [it, it.file_url ]}
 
         FETCH_BED(ch_links)
 

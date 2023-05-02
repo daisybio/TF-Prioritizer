@@ -3,7 +3,7 @@ process FETCH_LINKS {
 
     input:
         val(tissue_types)
-        val(tfs)
+        val(antigenes)
         val(genome)
         val(threshold)
 
@@ -19,7 +19,7 @@ process FETCH_LINKS {
 
         chipatlas_links.py -l chip_atlas_file_list.csv \\
             -t ${tissue_types.join(' ')} \\
-            -f ${tfs.join(' ')} \\
+            -a ${antigenes.join(' ')} \\
             -g ${genome} \\
             -s ${threshold} \\
             -o links.tsv
@@ -33,7 +33,7 @@ process FETCH_BED {
         tuple val(meta), val(url)
 
     output:
-        tuple val(meta), path("${meta.id}.bed")
+        tuple val(meta), path("${meta.id}.bed"), optional: true
 
     script:
         """
