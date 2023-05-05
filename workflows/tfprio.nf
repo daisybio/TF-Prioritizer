@@ -155,13 +155,13 @@ workflow TFPRIO {
         )
     }
 
-    /*REPORT (
+    REPORT (
         COLLECT_EXPRESSION.out,
         RANKING.out.ranks,
         PREPARE_TFGROUPS.out.flatten().collect(),
         RANKING.out.group_tfs_map,
         RANKING.out.tf_ensg_map
-    )*/
+    )
 }
 
 /*

@@ -17,11 +17,11 @@ process COLLECT_EXPRESSION {
         """
 }
 
-process COLLECT_TF_DATA {
+process COLLECT_TFGROUP_DATA {
     container "tfprio-python"
 
     input:
-        tuple val(symbol), path(biophysical_logo), path(model), path(jaspar_logos), path(heatmaps)
+        tuple val(symbol), file(jaspar_logos), file(biophysical_logo), file(model), file(heatmaps)
 
     output:
         tuple path("$symbol"), path("${symbol}.json")
@@ -29,10 +29,22 @@ process COLLECT_TF_DATA {
     script:
         """
         mkdir -p $symbol
-        ln -s ../$biophysical_logo $symbol/biophysical_logo.png
-        ln -s ../$model $symbol/model.pwm
-        ln -s ../$jaspar_logos $symbol/jaspar_logos
-        ln -s ../$heatmaps $symbol/heatmaps
+
+        if [ -s $biophysical_logo ]; then
+            ln -fs ../$biophysical_logo $symbol/biophysical_logo.png
+        fi
+
+        if [ -s $model ]; then
+            ln -fs ../$model $symbol/model.pwm
+        fi
+
+        if [ -s $jaspar_logos ]; then
+            ln -fs ../$jaspar_logos $symbol/jaspar_logos
+        fi
+
+        if [ -s $heatmaps ]; then
+            ln -fs ../$heatmaps $symbol/heatmaps
+        fi
 
         create_directory_json.py -d $symbol -o ${symbol}.json
         """
@@ -72,6 +84,7 @@ process COLLECT_RANKS {
 process COLLECT {
     conda "pandas"
     container "tfprio-python"
+    publishDir "${params.outdir}/reportData", mode: 'symlink'
 
     input:
         path(gene_expression)
@@ -92,10 +105,10 @@ process COLLECT {
         ln -s ../$groups_tf_map data/groups.json
         ln -s ../$symbol_ensg_map data/symbols.json
 
-        mkdir -p data/tfs
+        mkdir -p data/tf-groups
         
         for tf in $tf_files; do
-            ln -s ../../\$tf data/tfs
+            ln -s ../../\$tf data/tf-groups
         done
         """
 }

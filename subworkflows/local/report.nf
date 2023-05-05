@@ -1,4 +1,4 @@
-include { COLLECT_TF_DATA } from '../../modules/local/collect'
+include { COLLECT_TFGROUP_DATA } from '../../modules/local/collect'
 include { TOP_TARGET_GENES } from '../../modules/local/distributionAnalysis/top_target_genes'
 include { BIOPHYSICAL_MODELS } from '../../modules/local/biophysical_models'
 include { HEATMAPS } from '../../modules/local/distributionAnalysis/heatmaps'
@@ -9,7 +9,7 @@ include { COLLECT } from '../../modules/local/collect'
 
 workflow PREPARE_TFGROUPS {
     take:
-        ch_tfgroups // tf-group
+        ch_tfgroups_file // tf-group
         top_target_genes // value
         ch_affinity_sums
         ch_counts_per_sample
@@ -19,7 +19,7 @@ workflow PREPARE_TFGROUPS {
 
     main:
         TOP_TARGET_GENES (
-            ch_tfgroups,
+            ch_tfgroups_file,
             top_target_genes,
             ch_affinity_sums,
             ch_counts_per_sample
@@ -38,37 +38,36 @@ workflow PREPARE_TFGROUPS {
             .map { [it.name.replaceAll(/_heatmaps$/, ''), it] }
 
         BIOPHYSICAL_MODELS (
-            ch_tfgroups,
+            ch_tfgroups_file,
             pwm_file
         )
 
         ch_bio_logos = BIOPHYSICAL_MODELS.out.plots.flatten().map { [it.name.replaceAll(/.png$/, ''), it] }
         ch_bio_models = BIOPHYSICAL_MODELS.out.pwms.flatten().map { [it.name.replaceAll(/.pwm$/, ''), it] }
 
-        ch_jaspar = TF_SEQUENCE (ch_tfgroups)
+        ch_tfgroups = ch_tfgroups_file.splitCsv(header: false).map { it[0] }
+
+        ch_jaspar = TF_SEQUENCE (ch_tfgroups_file)
             .flatten()
             .map { [it.name.replaceAll(/_jaspar$/, ''), it] }
 
-        ch_biophysical = ch_bio_logos
-            .combine(ch_bio_models, by: 0) // tf-group, logo, model
+        ch_combined = ch_tfgroups
+            .join(ch_jaspar, by: 0, remainder: true) // tf-group, jaspar_logos
+            .join(ch_bio_logos, by: 0, remainder: true) // tf-group, jaspar_logos, biophysical_logo
+            .join(ch_bio_models, by: 0, remainder: true) // tf-group, jaspar_logos, biophysical_logo, model
+            .join(ch_heatmaps, by: 0, remainder: true) // tf-group, jaspar_logos, biophysical_logo, model, heatmaps
 
-        ch_logos = ch_biophysical
-            .combine(ch_jaspar, by: 0) // tf-group, biophysical_logo, model, jaspar_logos
-
-        ch_plots = ch_logos
-            .combine(ch_heatmaps, by: 0) // tf-group, biophysical_logo, model, jaspar_logos, heatmaps
-
-        COLLECT_TF_DATA(ch_plots)
+        COLLECT_TFGROUP_DATA(ch_combined)
 
     emit:
-        COLLECT_TF_DATA.out
+        COLLECT_TFGROUP_DATA.out
 }
 
 workflow REPORT {
     take:
         ch_expression
         ch_ranks
-        ch_tfgroups
+        ch_tfgroups_file
         ch_groups_tf_map
         ch_tf_ensg_map
 
@@ -76,7 +75,7 @@ workflow REPORT {
         COLLECT (
             ch_expression,
             ch_ranks,
-            ch_tfgroups,
+            ch_tfgroups_file,
             ch_groups_tf_map,
             ch_tf_ensg_map
         )

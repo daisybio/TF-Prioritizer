@@ -12,6 +12,7 @@ include { REMOVE_CHR_PREFIX as REMOVE_EH_CHR_PREFIX } from "../../modules/local/
 include { REMOVE_CHR_PREFIX as REMOVE_EPDNEW_CHR_PREFIX } from "../../modules/local/remove_chr_prefix"
 include { CONSTRUCT_MODEL } from "../../modules/local/ehmm/construct_model"
 include { CONCATENATE as CONCATENATE_PEAKS } from "../../modules/local/concatenate"
+include { APPLY_MODEL } from "../../modules/local/ehmm/apply_model"
 
 workflow EHMM {
     take:
