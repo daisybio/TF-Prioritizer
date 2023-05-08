@@ -105,7 +105,7 @@ pBgRegions <- filterRegions(pAndBg@first)
 
 if (argv$chip_bg) {
   message("generating random background data from ChIP-Atlas regions")
-  bgNoCREs <- getBackground(bgRegions, eBgRegions, pBgRegions, argv$s)
+  bgNoCREs <- getBackground(bgRegions, eBgRegions, pBgRegions)
 } else {
   message("generating random background data from gft file")
   bgNoCREs <- generateBackground(argv$g, eBgRegions, pBgRegions, argv$s)
