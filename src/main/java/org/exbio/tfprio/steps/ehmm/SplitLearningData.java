@@ -27,6 +27,7 @@ public class SplitLearningData extends ExecutableStep<Configs> {
     private final OptionalConfig<Double> trainSplit = new OptionalConfig<>(configs.ehmm.trainSplit, false);
     private final OptionalConfig<Integer> nSamples = new OptionalConfig<>(configs.ehmm.nSamples, false);
     private final OptionalConfig<Integer> topQuantile = new OptionalConfig<>(configs.ehmm.topQuantile, false);
+    private final OptionalConfig<Boolean> chipBG = new OptionalConfig<>(configs.ehmm.chipBG, false);
     private final InputFile gtf;
     private final InputFile script;
 
@@ -65,6 +66,9 @@ public class SplitLearningData extends ExecutableStep<Configs> {
                 if (topQuantile.isSet()) {
                     ehmmCommand.add("-q");
                     ehmmCommand.add(topQuantile.toString());
+                }
+                if (chipBG.get()) {
+                    ehmmCommand.add("--chip_bg");
                 }
                 executeAndWait(ehmmCommand, true);
                 return true;

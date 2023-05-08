@@ -40,6 +40,14 @@ generateBackground <- function(gtf, e, p, size, n=100000) {
   subsetByOverlaps(bg, fg, invert = T)
 }
 
+getBackground <- function(chip, e, p) {
+  fg <- reduce(c(e, p))
+  message("removing enhancer and promoter regions from ChIP-Atlas regions")
+  chip <- filterRegions(chip)
+  subsetByOverlaps(chip, fg, invert = T)
+}
+
+
 splitRanges <- function(ranges, trainSplit, nSamples) {
   N <- length(ranges)
   if(nSamples == -1) {
@@ -76,7 +84,8 @@ parser <- add_argument(parser, "-s", help = "Size of random genomic regions",
 parser <- add_argument(parser, "-r", help = "seed",
                        default = 74726, type = "integer")
 parser <- add_argument(parser, "-q", help = "top quantile of scores to include regions from (1-4)",
-                      default = 2, type = "integer")
+                      default = 1, type = "integer")
+parser <- add_argument(parser, "--chip_bg", help = "Flag to generate background from ChIP-Atlas data", flag = T)
 argv <- parse_args(parser, argv = args)
 set.seed(argv$r)
 message("load ChipAtlas, enhancer, and promoter regions")
@@ -89,23 +98,29 @@ qs <- quantile(eRegions$name)
 eRegions <- eRegions[eRegions$name >= qs[argv$q]]
 pRegions <- import(argv$p, format = "bed")
 message("extract enhancer and promoter regions within ChipAtlas regions")
-eRegions <- findOverlapPairs(bgRegions, eRegions)
-pRegions <- findOverlapPairs(bgRegions, pRegions)
-eRegions <- filterRegions(eRegions@first)
-pRegions <- filterRegions(pRegions@first)
-message("generating random background data from gft file")
-bgNoCREs <- generateBackground(argv$g, eRegions, pRegions, argv$s)
+eAndBg <- findOverlapPairs(bgRegions, eRegions)
+pAndBg <- findOverlapPairs(bgRegions, pRegions)
+eBgRegions <- filterRegions(eAndBg@first)
+pBgRegions <- filterRegions(pAndBg@first)
+
+if (argv$chip_bg) {
+  message("generating random background data from ChIP-Atlas regions")
+  bgNoCREs <- getBackground(bgRegions, eBgRegions, pBgRegions, argv$s)
+} else {
+  message("generating random background data from gft file")
+  bgNoCREs <- generateBackground(argv$g, eBgRegions, pBgRegions, argv$s)
+}
 export.bed(bgNoCREs, file.path(argv$o, "all_background.bed"))
-export.bed(eRegions, file.path(argv$o, "all_enhancers.bed"))
-export.bed(pRegions, file.path(argv$o, "all_promoters.bed"))
+export.bed(eBgRegions, file.path(argv$o, "all_enhancers.bed"))
+export.bed(pBgRegions, file.path(argv$o, "all_promoters.bed"))
 bgNoCREs <- splitRanges(bgNoCREs, argv$t, argv$f)
-eRegions <- splitRanges(eRegions, argv$t, argv$f)
-pRegions <- splitRanges(pRegions, argv$t, argv$f)
+eBgRegions <- splitRanges(eBgRegions, argv$t, argv$f)
+pBgRegions <- splitRanges(pBgRegions, argv$t, argv$f)
 message("writing filtered train bed files")
 export.bed(bgNoCREs$train, file.path(argv$o, "trainBackground.bed"))
-export.bed(eRegions$train, file.path(argv$o, "trainEnhancers.bed"))
-export.bed(pRegions$train, file.path(argv$o, "trainPromoters.bed"))
+export.bed(eBgRegions$train, file.path(argv$o, "trainEnhancers.bed"))
+export.bed(pBgRegions$train, file.path(argv$o, "trainPromoters.bed"))
 message("writing filtered test bed files")
 export.bed(bgNoCREs$test, file.path(argv$o, "testBackground.bed"))
-export.bed(eRegions$test, file.path(argv$o, "testEnhancers.bed"))
-export.bed(pRegions$test, file.path(argv$o, "testPromoters.bed"))
+export.bed(eBgRegions$test, file.path(argv$o, "testEnhancers.bed"))
+export.bed(pBgRegions$test, file.path(argv$o, "testPromoters.bed"))

@@ -39,6 +39,7 @@ public class EHMM extends ConfigModule {
     public final ExternalConfig<Integer> topQuantile =
             new ExternalConfig<>(Integer.class, new IntegerRangeValidator(1, 4));
     public final ExternalConfig<Double> score = new ExternalConfig<>(Double.class, new DoubleValidator(0d, 1d));
+    public final ExternalConfig<Boolean> chipBG = new ExternalConfig<>(Boolean.class);
     // Internal configs
     public final InternalConfig<Double> pseudoCount = new InternalConfig<>(1.0);
     public final InternalConfig<Set<String>> antigenClassKeys = new InternalConfig<>(
