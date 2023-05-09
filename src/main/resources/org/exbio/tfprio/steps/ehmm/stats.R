@@ -35,4 +35,4 @@ s_e <- stats(predicted_enhancers, reference_enhancers, peaks)
 s_p <- stats(predicted_promoters, reference_promoters, peaks)
 d <- data.frame(enhancers=s_e$byClass, promoters=s_p$byClass)
 
-write.table(d, argv$o, row.names = F, quote = F)
+write.table(d, argv$o, quote = F)
