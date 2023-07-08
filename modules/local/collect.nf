@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+
 process COLLECT_EXPRESSION {
     conda "pandas"
     container "tfprio-python"
@@ -84,7 +86,7 @@ process COLLECT_RANKS {
 process COLLECT {
     conda "pandas"
     container "tfprio-python"
-    publishDir "${params.outdir}/reportData", mode: 'symlink'
+    publishDir "${params.outdir}/reportData", mode: 'copy'
 
     input:
         path(gene_expression)
@@ -106,6 +108,8 @@ process COLLECT {
         ln -s ../$symbol_ensg_map data/symbols.json
 
         mkdir -p data/tf-groups
+
+        echo '${JsonOutput.toJson(params)}' > data/params.json
         
         for tf in $tf_files; do
             ln -s ../../\$tf data/tf-groups

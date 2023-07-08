@@ -12,7 +12,7 @@ parser.add_argument("--output", help="output file")
 args = parser.parse_args()
 
 # Proccess gtf file 
-gtf_mapping = pd.read_csv('/nfs/data/COM2POSE/reference_data/gencode.vM25.annotation.gtf', sep='\t', header=None, comment='#')
+gtf_mapping = pd.read_csv(args.gtf, sep='\t', header=None, comment='#')
 gtf_mapping = gtf_mapping[gtf_mapping[2] == 'gene']
 ## Split the 9th column by semicolon into distinct columns
 gtf_mapping = gtf_mapping[8].str.split(';', expand=True)[[0, 2]]
