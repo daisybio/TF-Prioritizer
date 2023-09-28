@@ -47,6 +47,49 @@
                 }
             }
         },
+        "tepic_options": {
+            "title": "TEPIC options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "TEPIC parameters.",
+            "properties": {
+                "tepic_window_size": {
+                    "type": "integer",
+                    "description": "Size of the window for the TEPIC analysis.",
+                    "default": 50000
+                },
+                "tepic_loop_windows": {
+                    "type": "integer",
+                    "description": "Number of windows to be used for the TEPIC analysis.",
+                    "default": 5000
+                },
+                "tepic_exponential_decay": {
+                    "type": "boolean",
+                    "description": "Exponential decay parameter for the TEPIC analysis.",
+                    "default": true
+                },
+                "tepic_normalize_peak_length": {
+                    "type": "boolean",
+                    "description": "Normalize peak length parameter for the TEPIC analysis.",
+                    "default": true
+                },
+                "tepic_max_minutes_per_chr": {
+                    "type": "integer",
+                    "description": "Maximum minutes per chromosome for the TEPIC analysis.",
+                    "default": 3
+                },
+                "tepic_original_scaling": {
+                    "type": "boolean",
+                    "description": "Original scaling parameter for the TEPIC analysis.",
+                    "default": false
+                },
+                "tepic_p_value": {
+                    "type": "number",
+                    "description": "P-value for the TEPIC analysis.",
+                    "default": 0.05
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -270,6 +313,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/tepic_options"
         },
         {
             "$ref": "#/definitions/reference_genome_options"

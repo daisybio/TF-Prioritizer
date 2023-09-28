@@ -57,14 +57,15 @@ workflow PEAKS {
 
         TEPIC (
             ch_peaks,
+            params.pwm,
             params.gtf,
             params.fasta,
             params.tepic_window_size,
             params.tepic_loop_windows,
             params.tepic_exponential_decay,
             params.tepic_normalize_peak_length,
-            params.tepic_max_minutes_per_chromosome,
-            params.tepic_origignal_scaling,
+            params.tepic_max_minutes_per_chr,
+            params.tepic_original_scaling,
             params.tepic_p_value
         )
 }
