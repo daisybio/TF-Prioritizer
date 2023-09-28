@@ -1,6 +1,11 @@
 include { CLEAN_BED } from "../../modules/local/clean_bed"
-include { BEDTOOLS_SORT } from "../../modules/nf-core/bedtools/sort/main"
+include { BEDTOOLS_SORT as SORT_PEAKS } from "../../modules/nf-core/bedtools/sort/main"
+include { BEDTOOLS_SORT as SORT_FOOTPRINTS } from "../../modules/nf-core/bedtools/sort/main"
 include { MERGE_PEAKS } from "./merge_peaks"
+include { BEDTOOLS_CLOSEST } from "../../modules/nf-core/bedtools/closest/main"
+include { GAWK as FILTER_CLOSEST } from "../../modules/nf-core/gawk/main"
+include { CAT_CAT } from "../../modules/nf-core/cat/cat/main"
+include { BEDTOOLS_MERGE } from "../../modules/nf-core/bedtools/merge/main"
 
 workflow PEAKS {
     take:
@@ -10,6 +15,34 @@ workflow PEAKS {
         CLEAN_BED(ch_peaks)
 
         ch_sorted = params.merge_peaks ? 
-                        MERGE_PEAKS(CLEAN_BED.out).peaks : 
-                        BEDTOOLS_SORT(CLEAN_BED.out, []).out.sorted
+                        MERGE_PEAKS(CLEAN_BED.out)    .peaks : 
+                        SORT_PEAKS (CLEAN_BED.out, []).out.sorted
+
+        BEDTOOLS_CLOSEST(ch_sorted.map{ meta, bed_file -> 
+            copy_name = ".temp/" + bed_file.getName() + ".copy"
+            bed_file.mklink(copy_name, overwrite: true)
+            copy_file = file(copy_name)
+            return [meta, bed_file, copy_file]
+        }, [])
+        
+        FILTER_CLOSEST(BEDTOOLS_CLOSEST.out.output, [])
+
+        if (params.peak_search_type == "incl_between") {
+            ch_joined = FILTER_CLOSEST.out.output
+                .map{ meta, bed_file -> [meta.state, meta.antibody, bed_file]}
+                .join(
+                    ch_sorted.map{ meta, bed_file -> [meta.state, meta.antibody, bed_file]},
+                    by: [0, 1]
+                ).map{
+                    state, antibody, closest, bed_file -> 
+                        [[id: state + "_" + antibody, state: state, antibody: antibody], [bed_file, closest]]
+                }
+
+            CAT_CAT(ch_joined)
+            SORT_FOOTPRINTS(CAT_CAT.out.file_out, [])
+            BEDTOOLS_MERGE(SORT_FOOTPRINTS.out.sorted)
+            ch_footprints = BEDTOOLS_MERGE.out.bed
+        } else {
+            ch_footprints = FILTER_CLOSEST.out.output
+        }
 }
