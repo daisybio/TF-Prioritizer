@@ -1,6 +1,5 @@
 if (params.chipseq_samplesheet) { ch_chipseq_samplesheet = Channel.value(file(params.chipseq_samplesheet)) } else { exit 1, 'ChIPseq samplesheet not specified!' }
 
-include { CHIPSEQ } from './nf-core_chipseq'
 include { CREATE_FOOTPRINTS } from '../../modules/local/peaks/create_footprints'
 include { GUNZIP as GUNZIP_BLACKLIST } from '../nf-core/chipseq/modules/nf-core/modules/gunzip/main'
 include { BLACKLIST } from '../../modules/local/peaks/blacklist'
@@ -17,13 +16,7 @@ include { REMOVE_MATRIX_ANNOTATIONS } from '../../modules/local/peaks/affinities
 workflow PEAK_FILES {
     ch_versions = Channel.empty()
 
-    if (params.chipseq_peaks) {
-        ch_peaks = Channel.fromPath(params.chipseq_peaks + '/*')
-    } else {
-        CHIPSEQ ()
-        ch_peaks = CHIPSEQ.out.peaks
-        ch_versions = ch_versions.mix(CHIPSEQ.out.versions)
-    }
+    ch_peaks = Channel.fromPath(params.chipseq_peaks + '/*')
 
     ch_peaks = ch_peaks
         .map { [it.name.replaceAll(/\.bed|\.broadPeak|\.narrowPeak$/, ''), it] }

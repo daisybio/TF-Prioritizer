@@ -1,6 +1,5 @@
 if (params.rnaseq_samplesheet) { ch_rnaseq_samplesheet = Channel.value(file(params.rnaseq_samplesheet)) } else { exit 1, 'RNAseq samplesheet not specified!' }
 
-include { RNASEQ } from './nf-core_rnaseq'
 include { COUNT_NORMALIZATION } from '../../modules/local/counts/count_preprocessing'
 include { FILTER_COUNTS } from '../../modules/local/counts/count_preprocessing'
 include { DESEQ2 } from '../../modules/local/counts/deseq'
@@ -14,14 +13,7 @@ include { DESEQ2_GROUP } from '../../modules/local/counts/deseq'
 workflow RNASEQ {
     ch_versions = Channel.empty()
 
-    if (params.rnaseq_counts) {
-        ch_count = file(params.rnaseq_counts)
-    } else {
-        RNASEQ ()
-        ch_count = RNASEQ.out.counts
-        ch_bigwig = RNASEQ.out.bigwig
-        ch_versions = ch_versions.mix(RNASEQ.out.versions)
-    }
+    ch_count = file(params.rnaseq_counts)
 
     ch_map = ENSG_MAP_CREATION (ch_count, Channel.value(file(params.tepic_gtf)))
 

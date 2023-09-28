@@ -1,9 +1,0 @@
-[submodule "subworkflows/nf-core/atacseq"]
-	path = subworkflows/nf-core/atacseq
-	url = git@github.com:nf-core/atacseq.git
-[submodule "subworkflows/nf-core/rnaseq"]
-	path = subworkflows/nf-core/rnaseq
-	url = git@github.com:nf-core/rnaseq.git
-[submodule "subworkflows/nf-core/chipseq"]
-	path = subworkflows/nf-core/chipseq
-	url = git@github.com:nf-core/chipseq.git
