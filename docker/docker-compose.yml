@@ -1,0 +1,13 @@
+services:
+  python:
+    build: 
+      context: python
+    image: bigdatainbiomedicine/tfprio-python
+  r:
+    build: 
+      context: r
+    image: bigdatainbiomedicine/tfprio-r
+  angular:
+    build: 
+      context: angular
+    image: bigdatainbiomedicine/tfprio-angular
