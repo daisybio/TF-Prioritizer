@@ -44,9 +44,12 @@ class WorkflowMain {
         // Check AWS batch settings
         NfcoreTemplate.awsBatch(workflow, params)
 
-        // Check input has been provided
-        if (!params.input) {
-            Nextflow.error("Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'")
+        if (!params.rnaseq_counts) {
+            Nextflow.error("Please provide RNAseq counts to the pipeline e.g. '--rnaseq_counts counts.tsv'")
+        }
+
+        if (!params.peaks_samplesheet) {
+            Nextflow.error("Please provide a peaks samplesheet to the pipeline e.g. '--peaks_samplesheet peaks.tsv'")
         }
     }
     //
