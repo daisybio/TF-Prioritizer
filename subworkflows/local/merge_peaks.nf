@@ -1,7 +1,7 @@
 include { CAT_CAT } from '../../modules/nf-core/cat/cat/main'
 include { BEDTOOLS_SORT } from '../../modules/nf-core/bedtools/sort/main'
 include { BEDTOOLS_MERGE } from '../../modules/nf-core/bedtools/merge/main'
-include { GAWK } from '../../modules/nf-core/gaw/main'
+include { GAWK } from '../../modules/nf-core/gawk/main'
 include { CLEAN_BED } from '../../modules/local/clean_bed'
 
 workflow MERGE_PEAKS {
@@ -16,8 +16,8 @@ workflow MERGE_PEAKS {
         CAT_CAT(ch_grouped)
         BEDTOOLS_SORT(CAT_CAT.out.file_out, [])
         BEDTOOLS_MERGE(BEDTOOLS_SORT.out.sorted)
-        BIOAWK(BEDTOOLS_MERGE.out.bed)
-        CLEAN_BED{BIOAWK.out.output}
+        GAWK(BEDTOOLS_MERGE.out.bed, [])
+        CLEAN_BED{GAWK.out.output}
 
     emit:
         peaks = CLEAN_BED.out

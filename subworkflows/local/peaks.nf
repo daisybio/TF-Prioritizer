@@ -9,9 +9,7 @@ workflow PEAKS {
     main:
         CLEAN_BED(ch_peaks)
 
-        if (params.merge_peaks) {
-            MERGE_PEAKS(CLEAN_BED.out)
-        } else {
-            BEDTOOLS_SORT(CLEAN_BED.out, []).out.sorted
-        }
+        ch_sorted = params.merge_peaks ? 
+                        MERGE_PEAKS(CLEAN_BED.out).peaks : 
+                        BEDTOOLS_SORT(CLEAN_BED.out, []).out.sorted
 }
