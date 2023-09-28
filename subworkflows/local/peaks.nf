@@ -1,6 +1,6 @@
 include { CLEAN_BED } from "../../modules/local/clean_bed"
 include { BEDTOOLS_SORT } from "../../modules/nf-core/bedtools/sort/main"
-include { MIX_PEAKS} from "./mix_peaks"
+include { MERGE_PEAKS } from "./merge_peaks"
 
 workflow PEAKS {
     take:
@@ -9,8 +9,8 @@ workflow PEAKS {
     main:
         CLEAN_BED(ch_peaks)
 
-        if (params.mix_peaks) {
-            MIX_PEAKS(CLEAN_BED.out)
+        if (params.merge_peaks) {
+            MERGE_PEAKS(CLEAN_BED.out)
         } else {
             BEDTOOLS_SORT(CLEAN_BED.out, []).out.sorted
         }
