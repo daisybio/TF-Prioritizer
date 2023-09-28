@@ -6,6 +6,7 @@ include { BEDTOOLS_CLOSEST } from "../../modules/nf-core/bedtools/closest/main"
 include { GAWK as FILTER_CLOSEST } from "../../modules/nf-core/gawk/main"
 include { CAT_CAT } from "../../modules/nf-core/cat/cat/main"
 include { BEDTOOLS_MERGE } from "../../modules/nf-core/bedtools/merge/main"
+include { BEDTOOLS_SUBTRACT } from "../../modules/nf-core/bedtools/subtract/main"
 
 workflow PEAKS {
     take:
@@ -44,5 +45,12 @@ workflow PEAKS {
             ch_footprints = BEDTOOLS_MERGE.out.bed
         } else {
             ch_footprints = FILTER_CLOSEST.out.output
+        }
+
+        if (params.blacklist) {
+            BEDTOOLS_SUBTRACT(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
+            ch_blacklisted = BEDTOOLS_SUBTRACT.out.bed
+        } else {
+            ch_blacklisted = ch_footprints
         }
 }
