@@ -20,33 +20,39 @@ workflow PEAKS {
                         MERGE_PEAKS(CLEAN_BED.out)    .peaks : 
                         SORT_PEAKS (CLEAN_BED.out, []).out.sorted
 
-        BEDTOOLS_CLOSEST(ch_sorted.map{ meta, bed_file -> 
-            copy_name = ".temp/" + bed_file.getName() + ".copy"
-            bed_file.mklink(copy_name, overwrite: true)
-            copy_file = file(copy_name)
-            return [meta, bed_file, copy_file]
-        }, [])
-        
-        FILTER_CLOSEST(BEDTOOLS_CLOSEST.out.output, [])
-
-        if (params.peak_search_type == "incl_between") {
-            ch_joined = FILTER_CLOSEST.out.output
-                .map{ meta, bed_file -> [meta.state, meta.antibody, bed_file]}
-                .join(
-                    ch_sorted.map{ meta, bed_file -> [meta.state, meta.antibody, bed_file]},
-                    by: [0, 1]
-                ).map{
-                    state, antibody, closest, bed_file -> 
-                        [[id: state + "_" + antibody, state: state, antibody: antibody], [bed_file, closest]]
-                }
-
-            CAT_CAT(ch_joined)
-            SORT_FOOTPRINTS(CAT_CAT.out.file_out, [])
-            BEDTOOLS_MERGE(SORT_FOOTPRINTS.out.sorted)
-            ch_footprints = BEDTOOLS_MERGE.out.bed
+        if (params.peak_search_type == "inside") {
+            ch_footprints = ch_sorted
         } else {
-            ch_footprints = FILTER_CLOSEST.out.output
+            BEDTOOLS_CLOSEST(ch_sorted.map{ meta, bed_file -> 
+                copy_name = ".temp/" + bed_file.getName() + ".copy"
+                bed_file.mklink(copy_name, overwrite: true)
+                copy_file = file(copy_name)
+                return [meta, bed_file, copy_file]
+            }, [])
+        
+            FILTER_CLOSEST(BEDTOOLS_CLOSEST.out.output, [])
+
+            if (params.peak_search_type == "incl_between") {
+                ch_joined = FILTER_CLOSEST.out.output
+                    .map{ meta, bed_file -> [meta.state, meta.antibody, bed_file]}
+                    .join(
+                        ch_sorted.map{ meta, bed_file -> [meta.state, meta.antibody, bed_file]},
+                        by: [0, 1]
+                    ).map{
+                        state, antibody, closest, bed_file -> 
+                            [[id: state + "_" + antibody, state: state, antibody: antibody], [bed_file, closest]]
+                    }
+
+                CAT_CAT(ch_joined)
+                SORT_FOOTPRINTS(CAT_CAT.out.file_out, [])
+                BEDTOOLS_MERGE(SORT_FOOTPRINTS.out.sorted)
+                ch_footprints = BEDTOOLS_MERGE.out.bed
+            } else {
+                ch_footprints = FILTER_CLOSEST.out.output
+            }
         }
+
+   
 
         if (params.blacklist) {
             BEDTOOLS_SUBTRACT(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
@@ -55,6 +61,7 @@ workflow PEAKS {
             ch_blacklisted = ch_footprints
         }
 
+        /*
         TEPIC (
             ch_peaks,
             params.pwm,
@@ -68,4 +75,5 @@ workflow PEAKS {
             params.tepic_original_scaling,
             params.tepic_p_value
         )
+        */
 }

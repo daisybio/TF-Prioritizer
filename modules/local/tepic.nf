@@ -3,7 +3,7 @@ process TEPIC {
     label 'process_medium'
 
     conda "bioconda::bedtools conda-forge::gxx conda-forge::r-base conda-forge::r-gplots conda-forge::r-ggplot2 conda-forge::r-glmnet conda-forge::r-doMC conda-forge::r-reshape2 conda-forge::r-gridExtra pandas"
-    container "bigdatainbiomedicine/inspect-tepic"
+    container "registry.hub.docker.com/bigdatainbiomedicine/inspect-tepic"
 
     input:
     tuple val(meta), path(experimental_bed)
@@ -31,7 +31,7 @@ process TEPIC {
 
     bash $projectDir/lib/tepic/code/TEPIC.sh \
         -b $experimental_bed \
-        -o $sample \
+        -o ${meta.id} \
         -S ${meta.id}_sequences.tsv \
         -g $reference_fasta \
         -a $gtf \
