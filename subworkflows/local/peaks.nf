@@ -7,6 +7,7 @@ include { GAWK as FILTER_CLOSEST } from "../../modules/nf-core/gawk/main"
 include { CAT_CAT } from "../../modules/nf-core/cat/cat/main"
 include { BEDTOOLS_MERGE } from "../../modules/nf-core/bedtools/merge/main"
 include { BEDTOOLS_SUBTRACT } from "../../modules/nf-core/bedtools/subtract/main"
+include { TEPIC } from "../../modules/local/tepic"
 
 workflow PEAKS {
     take:
@@ -53,4 +54,17 @@ workflow PEAKS {
         } else {
             ch_blacklisted = ch_footprints
         }
+
+        TEPIC (
+            ch_peaks,
+            params.gtf,
+            params.fasta,
+            params.tepic_window_size,
+            params.tepic_loop_windows,
+            params.tepic_exponential_decay,
+            params.tepic_normalize_peak_length,
+            params.tepic_max_minutes_per_chromosome,
+            params.tepic_origignal_scaling,
+            params.tepic_p_value
+        )
 }

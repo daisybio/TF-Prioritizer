@@ -1,0 +1,5 @@
+services:
+  tepic:
+    build: 
+      context: tepic
+    image: bigdatainbiomedicine/inspect-tepic
