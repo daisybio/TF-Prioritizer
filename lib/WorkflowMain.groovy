@@ -48,7 +48,7 @@ class WorkflowMain {
             Nextflow.error("Please provide RNAseq counts to the pipeline e.g. '--rnaseq_counts counts.tsv'")
         }
 
-        if (!params.peaks_samplesheet) {
+        if (!params.input) {
             Nextflow.error("Please provide a peaks samplesheet to the pipeline e.g. '--peaks_samplesheet peaks.tsv'")
         }
     }
