@@ -25,6 +25,7 @@ WorkflowInspect.initialise(params, log)
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 
+include { PEAKS } from '../subworkflows/local/peaks'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,6 +37,7 @@ WorkflowInspect.initialise(params, log)
 // MODULE: Installed directly from nf-core/modules
 //
 
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,14 +45,23 @@ WorkflowInspect.initialise(params, log)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// Info required for completion email and summary
-def multiqc_report = []
-
 workflow INSPECT {
 
     ch_versions = Channel.empty()
 
-    
+    ch_peaks = Channel.fromPath(params.input).splitCsv(header: true).map {
+        entry -> 
+            checked_file = file(entry.file, checkIfExists: true); 
+            return [[id: checked_file.baseName, state: entry.state, antibody: entry.antibody], checked_file]
+    }
+
+    PEAKS(ch_peaks)
+
+    ch_counts = Channel.fromPath(params.rnaseq_counts)
+
+
+
+    CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)
 }
 
 /*
