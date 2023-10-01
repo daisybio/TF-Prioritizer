@@ -39,9 +39,10 @@ process TEPIC {
         -p $pwm \
         -w $windowSize \
         -s $loopWindows \
-        -l ${!normalizePeakLength} \
+        ${!normalizePeakLength ? '-l' : ''} \
         -i $maxMinutesPerChromosome \
         -v $pValue \
-        -c $task.cpus
+        -c $task.cpus \
+        -j
     """
 }
