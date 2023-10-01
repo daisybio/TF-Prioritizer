@@ -8,6 +8,10 @@ include { CAT_CAT as MERGE_ORIGINAL } from "../../modules/nf-core/cat/cat/main"
 include { BEDTOOLS_MERGE } from "../../modules/nf-core/bedtools/merge/main"
 include { BEDTOOLS_SUBTRACT as SUBTRACT_BLACKLIST } from "../../modules/nf-core/bedtools/subtract/main"
 include { TEPIC } from "../../modules/local/tepic"
+include { GAWK as FILTER_SEQUENCES } from "../../modules/nf-core/gawk/main"
+include { GAWK as BEDIFY_SEQUENCES } from "../../modules/nf-core/gawk/main"
+include { BEDTOOLS_SORT as SORT_SEQUENCES } from "../../modules/nf-core/bedtools/sort/main"
+include { BEDTOOLS_MERGE as MERGE_BINDING_SITES } from "../../modules/nf-core/bedtools/merge/main"
 
 workflow PEAKS {
     take:
@@ -74,4 +78,14 @@ workflow PEAKS {
             params.tepic_original_scaling,
             params.tepic_p_value
         )
+
+        ch_sequences = TEPIC.out.sequences
+        ch_affinities = TEPIC.out.affinities.groupTuple(by: [0, 1])
+        ch_filtered_regions = TEPIC.out.filtered_regions
+
+        FILTER_SEQUENCES(ch_sequences, [])
+        BEDIFY_SEQUENCES(FILTER_SEQUENCES.out.output, [])
+        SORT_SEQUENCES(BEDIFY_SEQUENCES.out.output, [])
+
+        //MERGE_BINDING_SITES(SORT_SEQUENCES.out.output)
 }
