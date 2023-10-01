@@ -1,12 +1,12 @@
-include { CLEAN_BED } from "../../modules/local/clean_bed"
 include { BEDTOOLS_SORT as SORT_PEAKS } from "../../modules/nf-core/bedtools/sort/main"
 include { BEDTOOLS_SORT as SORT_FOOTPRINTS } from "../../modules/nf-core/bedtools/sort/main"
 include { MERGE_PEAKS } from "./merge_peaks"
 include { BEDTOOLS_CLOSEST } from "../../modules/nf-core/bedtools/closest/main"
 include { GAWK as FILTER_CLOSEST } from "../../modules/nf-core/gawk/main"
-include { CAT_CAT } from "../../modules/nf-core/cat/cat/main"
+include { GAWK as CLEAN_BED_ANNOTATE_SAMPLES } from "../../modules/nf-core/gawk/main"
+include { CAT_CAT as MERGE_ORIGINAL } from "../../modules/nf-core/cat/cat/main"
 include { BEDTOOLS_MERGE } from "../../modules/nf-core/bedtools/merge/main"
-include { BEDTOOLS_SUBTRACT } from "../../modules/nf-core/bedtools/subtract/main"
+include { BEDTOOLS_SUBTRACT as SUBTRACT_BLACKLIST } from "../../modules/nf-core/bedtools/subtract/main"
 include { TEPIC } from "../../modules/local/tepic"
 
 workflow PEAKS {
@@ -14,11 +14,11 @@ workflow PEAKS {
         ch_peaks
     
     main:
-        CLEAN_BED(ch_peaks)
+        CLEAN_BED_ANNOTATE_SAMPLES(ch_peaks, [])
 
         ch_sorted = params.merge_peaks ? 
-                        MERGE_PEAKS(CLEAN_BED.out)    .peaks : 
-                        SORT_PEAKS (CLEAN_BED.out, []).out.sorted
+                        MERGE_PEAKS(CLEAN_BED_ANNOTATE_SAMPLES.out.output)    .peaks : 
+                        SORT_PEAKS (CLEAN_BED_ANNOTATE_SAMPLES.out.output, []).out.sorted
 
         if (params.peak_search_type == "inside") {
             ch_footprints = ch_sorted
@@ -43,8 +43,8 @@ workflow PEAKS {
                             [[id: state + "_" + antibody, state: state, antibody: antibody], [bed_file, closest]]
                     }
 
-                CAT_CAT(ch_joined)
-                SORT_FOOTPRINTS(CAT_CAT.out.file_out, [])
+                MERGE_ORIGINAL(ch_joined)
+                SORT_FOOTPRINTS(MERGE_ORIGINAL.out.file_out, [])
                 BEDTOOLS_MERGE(SORT_FOOTPRINTS.out.sorted)
                 ch_footprints = BEDTOOLS_MERGE.out.bed
             } else {
@@ -55,15 +55,14 @@ workflow PEAKS {
    
 
         if (params.blacklist) {
-            BEDTOOLS_SUBTRACT(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
-            ch_blacklisted = BEDTOOLS_SUBTRACT.out.bed
+            SUBTRACT_BLACKLIST(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
+            ch_blacklisted = SUBTRACT_BLACKLIST.out.bed
         } else {
             ch_blacklisted = ch_footprints
         }
 
-        /*
         TEPIC (
-            ch_peaks,
+            ch_blacklisted,
             params.pwm,
             params.gtf,
             params.fasta,
@@ -75,5 +74,4 @@ workflow PEAKS {
             params.tepic_original_scaling,
             params.tepic_p_value
         )
-        */
 }
