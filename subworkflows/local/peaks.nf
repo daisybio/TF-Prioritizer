@@ -7,11 +7,17 @@ include { GAWK as CLEAN_BED_ANNOTATE_SAMPLES } from "../../modules/nf-core/gawk/
 include { CAT_CAT as MERGE_ORIGINAL } from "../../modules/nf-core/cat/cat/main"
 include { BEDTOOLS_MERGE } from "../../modules/nf-core/bedtools/merge/main"
 include { BEDTOOLS_SUBTRACT as SUBTRACT_BLACKLIST } from "../../modules/nf-core/bedtools/subtract/main"
-include { TEPIC } from "../../modules/local/tepic"
+include { TEPIC } from "../../modules/local/tepic/tepic"
 include { GAWK as FILTER_SEQUENCES } from "../../modules/nf-core/gawk/main"
 include { GAWK as BEDIFY_SEQUENCES } from "../../modules/nf-core/gawk/main"
 include { BEDTOOLS_SORT as SORT_SEQUENCES } from "../../modules/nf-core/bedtools/sort/main"
 include { BEDTOOLS_MERGE as MERGE_BINDING_SITES } from "../../modules/nf-core/bedtools/merge/main"
+include { CSVTK_SPLIT as SPLIT_SEQUENCES } from "../../modules/nf-core/csvtk/split/main"
+include { REMOVE_VERSION_ANNOTATIONS } from "../../modules/local/tepic/remove_version_annotations"
+include { COMBINE_TABLES as AFFINITY_MEAN } from "../../modules/local/combine_tables"
+include { COMBINE_TABLES as AFFINITY_SUM } from "../../modules/local/combine_tables"
+include { COMBINE_TABLES as AFFINITY_RATIO } from "../../modules/local/combine_tables"
+
 
 workflow PEAKS {
     take:
@@ -80,12 +86,70 @@ workflow PEAKS {
         )
 
         ch_sequences = TEPIC.out.sequences
-        ch_affinities = TEPIC.out.affinities.groupTuple(by: [0, 1])
+        ch_affinities = TEPIC.out.affinities
         ch_filtered_regions = TEPIC.out.filtered_regions
 
         FILTER_SEQUENCES(ch_sequences, [])
         BEDIFY_SEQUENCES(FILTER_SEQUENCES.out.output, [])
-        SORT_SEQUENCES(BEDIFY_SEQUENCES.out.output, [])
+        SPLIT_SEQUENCES(BEDIFY_SEQUENCES.out.output, "tsv", "tsv")
+        SORT_SEQUENCES(
+            SPLIT_SEQUENCES.out.split_csv
+                .transpose()
+                .map{ meta, csv_file -> 
+                    prefix = meta.id + ".bedified-"
+                    tf = csv_file.baseName.substring(prefix.size())
+                    return [meta + [id: meta.id + "_" + tf, tf: tf], csv_file]
+                },
+            []
+        )
 
-        //MERGE_BINDING_SITES(SORT_SEQUENCES.out.output)
+        REMOVE_VERSION_ANNOTATIONS(ch_affinities)
+
+        if (params.merge_peaks)
+        {
+            ch_merged_sequences = SORT_SEQUENCES.out.sorted
+            ch_mean_affinities = REMOVE_VERSION_ANNOTATIONS.out
+        } else {
+            MERGE_BINDING_SITES(
+                SORT_SEQUENCES.out.sorted.groupTuple()
+            )
+
+            ch_merged_sequences = MERGE_BINDING_SITES.out.bed
+
+            AFFINITY_MEAN(
+                REMOVE_VERSION_ANNOTATIONS.out.groupTuple(),
+                "mean"
+            )
+            ch_mean_affinities = AFFINITY_MEAN.out
+        }
+
+        ch_affinity_antibody = ch_mean_affinities
+            .map{ meta, affinity_file -> [meta, meta.antibody, affinity_file]}
+
+        ch_affinity_pairings = ch_affinity_antibody
+            .combine(
+                ch_affinity_antibody,
+                by: 1
+            )
+            .filter{
+                antibody, meta1, affinites1, meta2, affinites2 -> 
+                    meta1.state < meta2.state
+            }
+            .map{
+                antibody, meta1, affinites1, meta2, affinites2 -> 
+                    [[  id: meta1.state + ":" + meta2.state + "_" + antibody, 
+                        state1: meta1.state, 
+                        state2: meta2.state, 
+                        antibody: antibody
+                    ],
+                    [affinites1, affinites2]]
+            }
+
+        AFFINITY_RATIO(ch_affinity_pairings, "ratio")
+        AFFINITY_SUM(ch_affinity_pairings, "sum")
+
+    emit:
+        affinity_ratio = AFFINITY_RATIO.out
+        affinity_sum = AFFINITY_SUM.out
+        peaks = ch_blacklisted
 }
