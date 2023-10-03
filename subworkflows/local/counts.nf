@@ -2,6 +2,7 @@ include { CREATE_ANNDATA } from "../../modules/local/counts/create_anndata"
 include { FILTER_ANNDATA } from "../../modules/local/counts/filter_anndata"
 include { FETCH_SYMBOL_MAP } from "../../modules/local/counts/fetch_symbol_map"
 include { USE_SYMBOL_MAP } from "../../modules/local/counts/use_symbol_map"
+include { NORMALIZE } from "../../modules/local/counts/normalize"
 
 workflow COUNTS {
     take:

@@ -65,7 +65,7 @@ workflow INSPECT {
 
     // PEAKS(ch_peaks)
 
-    ch_counts = Channel.value(file(params.rnaseq_counts, checkIfExists: true))
+    ch_counts = Channel.value(params.rnaseq_counts)
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
     COUNTS(ch_counts, ch_design)

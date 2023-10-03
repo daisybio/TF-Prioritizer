@@ -23,9 +23,7 @@ process FETCH_SYMBOL_MAP {
         with open("${genes}") as f:
             genes = f.read().splitlines()
 
-        genes_filtered = [gene for gene in genes if gene.startswith("ENSG")]
-
-        print(genes_filtered)
+        genes_filtered = [gene for gene in genes if gene.startswith("ENS")]
 
         mg = mg.MyGeneInfo()
         res = mg.querymany(genes_filtered, scopes='ensembl.gene', fields='symbol', species="${tax_id}")

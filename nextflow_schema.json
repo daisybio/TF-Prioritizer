@@ -24,13 +24,8 @@
                 },
                 "rnaseq_counts": {
                     "type": "string",
-                    "format": "file-path",
                     "exists": true,
-                    "mimetype": "text/tsv",
-                    "pattern": "^\\S+\\.tsv$",
-                    "description": "Path to tab-separated file containing RNA-seq counts.",
-                    "help_text": "You will need to create a file with RNA-seq counts before running the pipeline. Use this parameter to specify its location.",
-                    "fa_icon": "fas fa-file-csv"
+                    "description": "Path to tab-separated file containing RNA-seq counts or to a directory containing such files."
                 },
                 "outdir": {
                     "type": "string",
