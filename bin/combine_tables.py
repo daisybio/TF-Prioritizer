@@ -17,14 +17,12 @@ if not args.input or not args.output:
 # Read all input files into a list of dataframes
 dfs = [pd.read_csv(file, sep='\t', index_col=0) for file in args.input]
 
-index_intersection = dfs[0].index
+index_union = dfs[0].index
 for df in dfs[1:]:
-    index_intersection = index_intersection.intersection(df.index)
+    index_union = index_union.union(df.index)
 
-print(len(index_intersection))
-
-# Filter all dataframes to only contain rows that are present in all dataframes
-dfs = [df.loc[index_intersection] for df in dfs]
+# Add NA values for missing rows
+dfs = [df.reindex(index_union) for df in dfs]
 
 # Check if all dataframes have the same dimensions
 if not all(df.shape == dfs[0].shape for df in dfs):

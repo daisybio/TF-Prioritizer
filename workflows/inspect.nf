@@ -52,7 +52,14 @@ workflow INSPECT {
     ch_peaks = Channel.fromPath(params.input).splitCsv(header: true).map {
         entry -> 
             checked_file = file(entry.file, checkIfExists: true); 
-            return [[id: checked_file.baseName, state: entry.state, antibody: entry.antibody], checked_file]
+            return [
+                        [
+                            id: entry.state + "_" + entry.antibody + "_" + checked_file.baseName, 
+                            state: entry.state, 
+                            antibody: entry.antibody
+                        ], 
+                        checked_file
+                    ]
     }
 
     PEAKS(ch_peaks)

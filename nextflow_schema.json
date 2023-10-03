@@ -47,6 +47,18 @@
                 }
             }
         },
+        "inspect_options": {
+            "title": "INSPECT options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "properties": {
+                "merge_peaks": {
+                    "type": "boolean",
+                    "description": "Merge peaks matching states and antibodies.",
+                    "default": true
+                }
+            }
+        },
         "tepic_options": {
             "title": "TEPIC options",
             "type": "object",

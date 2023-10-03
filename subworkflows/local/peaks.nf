@@ -26,9 +26,12 @@ workflow PEAKS {
     main:
         CLEAN_BED_ANNOTATE_SAMPLES(ch_peaks, [])
 
-        ch_sorted = params.merge_peaks ? 
-                        MERGE_PEAKS(CLEAN_BED_ANNOTATE_SAMPLES.out.output)    .peaks : 
-                        SORT_PEAKS (CLEAN_BED_ANNOTATE_SAMPLES.out.output, []).out.sorted
+        if (params.merge_peaks) {
+            ch_sorted = MERGE_PEAKS(CLEAN_BED_ANNOTATE_SAMPLES.out.output).peaks
+        } else {
+            SORT_PEAKS (CLEAN_BED_ANNOTATE_SAMPLES.out.output, [])
+            ch_sorted = SORT_PEAKS.out.sorted
+        }
 
         if (params.peak_search_type == "inside") {
             ch_footprints = ch_sorted
@@ -44,13 +47,10 @@ workflow PEAKS {
 
             if (params.peak_search_type == "incl_between") {
                 ch_joined = FILTER_CLOSEST.out.output
-                    .map{ meta, bed_file -> [meta.state, meta.antibody, bed_file]}
-                    .join(
-                        ch_sorted.map{ meta, bed_file -> [meta.state, meta.antibody, bed_file]},
-                        by: [0, 1]
-                    ).map{
-                        state, antibody, closest, bed_file -> 
-                            [[id: state + "_" + antibody, state: state, antibody: antibody], [bed_file, closest]]
+                    .join(ch_sorted)
+                    .map {
+                        meta, closest, bed_file -> 
+                            [meta, [closest, bed_file]]
                     }
 
                 MERGE_ORIGINAL(ch_joined)
@@ -111,13 +111,36 @@ workflow PEAKS {
             ch_mean_affinities = REMOVE_VERSION_ANNOTATIONS.out
         } else {
             MERGE_BINDING_SITES(
-                SORT_SEQUENCES.out.sorted.groupTuple()
+                SORT_SEQUENCES.out.sorted
+                    .map{ meta, binding_sites -> 
+                            [
+                                [
+                                    id: meta.state + "_" + meta.antibody,
+                                    state: meta.state,
+                                    antibody: meta.antibody
+                                ], 
+                                binding_sites
+                            ]
+                        }
+                    .groupTuple(),
             )
 
             ch_merged_sequences = MERGE_BINDING_SITES.out.bed
 
             AFFINITY_MEAN(
-                REMOVE_VERSION_ANNOTATIONS.out.groupTuple(),
+                REMOVE_VERSION_ANNOTATIONS.out
+                    .map{ meta, affinity_file -> 
+                            [
+                                [
+                                    id: meta.state + "_" + meta.antibody,
+                                    state: meta.state,
+                                    antibody: meta.antibody
+                                ], 
+                                affinity_file
+                            ]
+                        }
+                    .groupTuple(),
+
                 "mean"
             )
             ch_mean_affinities = AFFINITY_MEAN.out
