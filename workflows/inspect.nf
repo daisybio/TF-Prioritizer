@@ -26,6 +26,7 @@ WorkflowInspect.initialise(params, log)
 //
 
 include { PEAKS } from '../subworkflows/local/peaks'
+include { COUNTS } from '../subworkflows/local/counts'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,11 +63,12 @@ workflow INSPECT {
                     ]
     }
 
-    PEAKS(ch_peaks)
+    // PEAKS(ch_peaks)
 
-    ch_counts = Channel.fromPath(params.rnaseq_counts)
+    ch_counts = Channel.value(file(params.rnaseq_counts, checkIfExists: true))
+    ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
-
+    COUNTS(ch_counts, ch_design)
 
     CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)
 }
