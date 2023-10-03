@@ -12,7 +12,7 @@ process CREATE_ANNDATA {
         val(index_col)
 
     output:
-        tuple val(meta), path("*.h5ad"), emit: create_anndata
+        tuple val(meta), path("*.h5ad"), emit: anndata
         tuple val(meta), path("genes.txt"), emit: genes
 
     script:

@@ -21,6 +21,7 @@ adata = ad.AnnData(X=counts.T, obs=metadata)
 
 # Add TPMs as a layer
 adata.layers["TPM"] = counts.T.div(counts.T.sum(axis=1), axis=0) * 1e6
+adata.layers["raw_counts"] = counts.T
 
 # Save anndata object
 adata.write(args.output)

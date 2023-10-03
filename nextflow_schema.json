@@ -56,6 +56,16 @@
                     "type": "boolean",
                     "description": "Merge peaks matching states and antibodies.",
                     "default": true
+                },
+                "min_count": {
+                    "type": "integer",
+                    "description": "Minimum number of total counts for a gene.",
+                    "default": 50
+                },
+                "min_tpm": {
+                    "type": "number",
+                    "description": "Minimum total TPM for a gene.",
+                    "default": 0
                 }
             }
         },
