@@ -5,10 +5,10 @@ import anndata as ad
 import argparse
 import os
 
-parser = argparse.ArgumentParser(description="Create anndata object from count matrix and metadata")
+parser = argparse.ArgumentParser(description="Create dataframe from count matrix and metadata")
 parser.add_argument("--counts", type=str, help="Path to counts")
 parser.add_argument("--metadata", type=str, help="Path to metadata")
-parser.add_argument("--output", type=str, help="Path to output anndata object")
+parser.add_argument("--output", type=str, help="Path to output file")
 parser.add_argument("--index_col", type=str, help="Column to use as index in counts")
 args = parser.parse_args()
 
@@ -43,14 +43,5 @@ else:
                 # Set dtype to int
                 counts[sample_name] = counts[sample_name].astype(int)
 
-# Create anndata object, rows are genes, cols are samples, values are raw counts
-adata = ad.AnnData(X=counts.T, obs=metadata)
-
-# Add TPMs as a layer
-adata.layers["TPM"] = counts.T.div(counts.T.sum(axis=1), axis=0) * 1e6
-adata.layers["raw_counts"] = counts.T
-
-# Save anndata object
-adata.write(args.output)
-
-adata.var.index.to_series().to_csv("genes.txt", index=False, header=False)
+counts.to_csv(args.output, sep="\t")
+counts.index.to_series().to_csv("genes.txt", index=False, header=False)

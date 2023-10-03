@@ -62,13 +62,18 @@ workflow INSPECT {
                         checked_file
                     ]
     }
+    ch_states = ch_peaks.map{meta, file -> meta.state}.toSortedList().flatten().unique()
+
+    ch_state_pairs = ch_states  .combine(ch_states)
+                                .filter{state1, state2 -> state1 < state2}
+
 
     // PEAKS(ch_peaks)
 
     ch_counts = Channel.value(params.rnaseq_counts)
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
-    COUNTS(ch_counts, ch_design)
+    COUNTS(ch_counts, ch_design, ch_state_pairs)
 
     CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)
 }

@@ -8,25 +8,28 @@ process USE_SYMBOL_MAP {
         'biocontainers/scanpy:1.7.2--pyhdfd78af_0' }"
 
     input:
-        tuple val(meta), path(anndata)
+        tuple val(meta), path(dataframe)
         tuple val(meta2), path(symbol_map)
 
     output:
-        tuple val(meta), path("*.symbols.h5ad")
+        tuple val(meta), path("*.symbols.tsv")
 
     script:
     """
         #!/usr/bin/env python3
-        import anndata as ad
+        import pandas as pd
         import json
 
-        adata = ad.read_h5ad("${anndata}")
+        df = pd.read_csv("${dataframe}", sep="\\t", index_col=0)
 
         with open("${symbol_map}") as f:
             symbol_map = json.load(f)
         
-        adata.var.index = [symbol_map.get(gene, gene) for gene in adata.var.index]
+        df = df.rename(columns=symbol_map)
 
-        adata.write_h5ad("${meta.id}.symbols.h5ad")
+        # Merge rows with the same gene symbol
+        df = df.groupby(df.columns, axis=1).mean()
+
+        df.to_csv("${meta.id}.symbols.tsv", sep="\\t")
     """
 }

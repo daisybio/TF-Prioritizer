@@ -9,14 +9,29 @@ process CREATE_ANNDATA {
 
     input:
         tuple val(meta), path(counts), path(design)
-        val(index_col)
 
     output:
-        tuple val(meta), path("*.h5ad"), emit: anndata
-        tuple val(meta), path("genes.txt"), emit: genes
+        tuple val(meta), path("*.h5ad")
 
     script:
     """
-        create_anndata.py --counts ${counts} --metadata ${design} --output ${meta.id}.h5ad --index_col ${index_col}
+        #!/usr/bin/env python
+
+        import anndata as ad
+        import pandas as pd
+
+        counts = pd.read_csv("counts.symbols.tsv", index_col=0, sep="	")
+        design = pd.read_csv("counts_design.csv", index_col=0)
+
+        # Create anndata object
+        adata = ad.AnnData(X=counts.T.values, obs=design)
+        adata.var.index = counts.index
+
+        # Add TPMs as a layer
+        adata.layers["TPM"] = counts.T.div(counts.T.sum(axis=1), axis=0) * 1e6
+        adata.layers["raw_counts"] = counts.T.values
+
+        # Save anndata object
+        adata.write("counts.h5ad")
     """
 }
