@@ -1,5 +1,5 @@
 include { TFTG_SCORE } from '../../modules/local/ranking/TFTG'
-// include { RANKING as CREATE_RANKING } from '../../modules/local/distributionAnalysis/ranking'
+include { RANKING as CREATE_RANKING } from '../../modules/local/ranking/ranking'
 // include { COLLECT_TFS } from '../../modules/local/distributionAnalysis/collect_tfs'
 // include { SYMBOL_ENSG } from '../../modules/local/symbol_ensg'
 // include { COLLECT_RANKS } from '../../modules/local/collect'
@@ -11,9 +11,8 @@ workflow RANKING {
 
     main:
         TFTG_SCORE (ch_affinitySum_deseq_dynamite)
+        CREATE_RANKING (TFTG_SCORE.out)
         /*
-        CREATE_RANKING (TFTG_SCORE.out) // group1, group2, hm, ranking
-
         COLLECT_TFS (
             CREATE_RANKING.out.map { it[3] } .collect()
         ) // tfs
