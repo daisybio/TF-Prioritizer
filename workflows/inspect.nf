@@ -27,6 +27,7 @@ WorkflowInspect.initialise(params, log)
 
 include { PEAKS } from '../subworkflows/local/peaks'
 include { COUNTS } from '../subworkflows/local/counts'
+include { DYNAMITE } from '../subworkflows/local/dynamite'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,12 +69,28 @@ workflow INSPECT {
                                 .filter{state1, state2 -> state1 < state2}
 
 
-    // PEAKS(ch_peaks)
+    PEAKS(ch_peaks)
 
     ch_counts = Channel.value(params.rnaseq_counts)
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
-    COUNTS(ch_counts, ch_design, ch_state_pairs)
+    COUNTS(ch_counts, ch_design)
+    ch_dynamite = PEAKS.out.affinity_ratio.map{
+        meta, file -> [meta.state1, meta.state2, meta, file]
+    }.combine(COUNTS.out.deseq2.map{
+        meta, file -> [meta.state1, meta.state2, meta, file]
+    }, by: [0, 1]).map{
+        state1, state2, meta1, affinity_ratio, meta2, deseq2 -> [meta1, affinity_ratio, deseq2]
+    }
+
+    DYNAMITE(
+        ch_dynamite,
+        params.dynamite_ofolds,
+        params.dynamite_ifolds,
+        params.dynamite_alpha,
+        params.dynamite_randomize,
+        params.dynamite_min_regression
+    )
 
     CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)
 }

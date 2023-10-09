@@ -107,6 +107,39 @@
                 }
             }
         },
+        "dynamite_options": {
+            "title": "DYNAMITE options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "DYNAMITE parameters.",
+            "properties": {
+                "dynamite_ofolds": {
+                    "type": "integer",
+                    "description": "Number of outer folds for the DYNAMITE analysis.",
+                    "default": 3
+                },
+                "dynamite_ifolds": {
+                    "type": "integer",
+                    "description": "Number of inner folds for the DYNAMITE analysis.",
+                    "default": 6
+                },
+                "dynamite_alpha": {
+                    "type": "number",
+                    "description": "Alpha parameter for the DYNAMITE analysis.",
+                    "default": 0.1
+                },
+                "dynamite_randomize": {
+                    "type": "boolean",
+                    "description": "Randomize parameter for the DYNAMITE analysis.",
+                    "default": false
+                },
+                "dynamite_min_regression": {
+                    "type": "number",
+                    "description": "Minimum regression parameter for the DYNAMITE analysis.",
+                    "default": 0.1
+                }
+            }
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",

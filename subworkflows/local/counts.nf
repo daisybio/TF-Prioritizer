@@ -10,7 +10,6 @@ workflow COUNTS {
     take:
         ch_counts
         ch_design
-        ch_pairings
 
     main:
         CREATE_DATAFRAME(
@@ -39,14 +38,17 @@ workflow COUNTS {
         )
 
         DESEQ2(
-            FILTER_ANNDATA.out.collect()
+            FILTER_ANNDATA.out
         )
 
-        ch_deseq2_stats = DESEQ2.out.map{ meta, stats_file -> 
-                base = stats_file.baseName[0].split(":")
+        ch_deseq2_stats = DESEQ2.out.transpose().map{ meta, stats_file -> 
+                base = stats_file.baseName.split(":")
                 state1 = base[0]
                 state2 = base[1]
                 [[id: state1 + ":" + state2, state1: state1, state2: state2], stats_file]
             }
-        
+    
+    emit:
+        deseq2 = ch_deseq2_stats
+        adata = FILTER_ANNDATA.out.collect()
 }
