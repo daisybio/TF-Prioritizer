@@ -18,6 +18,7 @@ process INTEGRATE_DATA {
         python3 $projectDir/lib/tepic/DYNAMITE/Scripts/integrateData.py \\
             $affinity_ratios \\
             $diff_expression \\
-            "${meta.id}_integrated.tsv"
+            "${meta.id}_integrated.tsv" \\
+            --expressionC 2
         """
 }

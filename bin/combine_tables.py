@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import numpy as np
 import pandas as pd
 
 # Define the command-line arguments
@@ -17,12 +18,20 @@ if not args.input or not args.output:
 # Read all input files into a list of dataframes
 dfs = [pd.read_csv(file, sep='\t', index_col=0) for file in args.input]
 
-index_union = dfs[0].index
-for df in dfs[1:]:
-    index_union = index_union.union(df.index)
+if args.method == "sum":
+    index_union = dfs[0].index
+    for df in dfs[1:]:
+        index_union = index_union.union(df.index)
 
-# Add NA values for missing rows
-dfs = [df.reindex(index_union) for df in dfs]
+    # Add NA values for missing rows
+    dfs = [df.reindex(index_union) for df in dfs]
+else:
+    index_intersection = dfs[0].index
+    for df in dfs[1:]:
+        index_intersection = index_intersection.intersection(df.index)
+    
+    # Filter rows that are not present in all dataframes
+    dfs = [df.loc[index_intersection] for df in dfs]
 
 # Check if all dataframes have the same dimensions
 if not all(df.shape == dfs[0].shape for df in dfs):
@@ -45,6 +54,9 @@ elif args.method == "ratio":
     if len(dfs) != 2:
         raise ValueError("The ratio method requires exactly two input files.")
     result = dfs[0] / dfs[1]
+
+    # Drop rows with NA or inf values
+    result = result.replace([np.inf, -np.inf], np.nan).dropna()
 
 # Write the result to a file
 result.to_csv(args.output, sep='\t', index=True, quoting=0)

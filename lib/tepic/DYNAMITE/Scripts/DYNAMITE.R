@@ -166,7 +166,6 @@ for(Sample in FileList){
       index<-index+1
       subM[[index]]<-M[which(M[,Response_Variable_location]==j),]
     }
-    print(subM)
     mSize=min(sapply(subM,dim)[1,])
     for (l in 1:length(subM)){
       rndselect=sample(x=nrow(subM[[l]]),size=mSize)

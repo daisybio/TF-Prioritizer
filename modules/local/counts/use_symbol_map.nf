@@ -25,10 +25,10 @@ process USE_SYMBOL_MAP {
         with open("${symbol_map}") as f:
             symbol_map = json.load(f)
         
-        df = df.rename(columns=symbol_map)
+        df = df.rename(index=symbol_map)
 
         # Merge rows with the same gene symbol
-        df = df.groupby(df.columns, axis=1).mean()
+        df = df.groupby(df.index).mean().round(0).astype(int)
 
         df.to_csv("${meta.id}.symbols.tsv", sep="\\t")
     """
