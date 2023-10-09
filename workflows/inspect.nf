@@ -88,8 +88,7 @@ workflow INSPECT {
         params.dynamite_ofolds,
         params.dynamite_ifolds,
         params.dynamite_alpha,
-        params.dynamite_randomize,
-        params.dynamite_min_regression
+        params.dynamite_randomize
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)

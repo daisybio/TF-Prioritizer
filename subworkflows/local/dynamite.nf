@@ -1,7 +1,7 @@
 include { INTEGRATE_DATA } from             '../../modules/local/dynamite/integrate'
 include { PREPARE_FOR_CLASSIFICATION } from '../../modules/local/dynamite/prepare_for_classification'
 include { DYNAMITE as RUN_DYNAMITE } from                   '../../modules/local/dynamite/dynamite'
-//include { DYNAMITE_FILTER } from '../../modules/local/dynamite'
+include { GAWK as FILTER } from '../../modules/nf-core/gawk/main'
 
 workflow DYNAMITE {
     take:
@@ -10,7 +10,6 @@ workflow DYNAMITE {
         ifolds
         alpha
         randomize
-        min_regression
 
     main:
         INTEGRATE_DATA (ch_data)
@@ -21,12 +20,12 @@ workflow DYNAMITE {
             ofolds, ifolds, alpha, randomize
         )
 
-        /*
-        ch_dynamite = DYNAMITE_FILTER (
+        
+        FILTER (
             RUN_DYNAMITE.out,
-            min_regression
+            []
         )
 
     emit:
-        ch_dynamite*/
+        FILTER.out.output
 }
