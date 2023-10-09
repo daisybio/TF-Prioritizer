@@ -28,6 +28,7 @@ WorkflowInspect.initialise(params, log)
 include { PEAKS } from '../subworkflows/local/peaks'
 include { COUNTS } from '../subworkflows/local/counts'
 include { DYNAMITE } from '../subworkflows/local/dynamite'
+include { RANKING } from '../subworkflows/local/ranking'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,7 +76,8 @@ workflow INSPECT {
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
     COUNTS(ch_counts, ch_design)
-    ch_dynamite = PEAKS.out.affinity_ratio.map{
+
+    ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]
     }.combine(COUNTS.out.deseq2.map{
         meta, file -> [meta.state1, meta.state2, meta, file]
@@ -84,11 +86,27 @@ workflow INSPECT {
     }
 
     DYNAMITE(
-        ch_dynamite,
+        ch_affinityRatio_deseq,
         params.dynamite_ofolds,
         params.dynamite_ifolds,
         params.dynamite_alpha,
         params.dynamite_randomize
+    )
+
+    ch_affinitySum_deseq_dynamite = PEAKS.out.affinity_sum.map{
+        meta, file -> [meta.state1, meta.state2, meta.antibody, meta, file]
+    }.combine(COUNTS.out.deseq2.map{
+            meta, file -> [meta.state1, meta.state2, meta, file]
+        }, by: [0, 1]).map{
+            state1, state2, antibody, meta1, affinity_sum, meta2, deseq2 -> [state1, state2, antibody, meta1, affinity_sum, deseq2]
+    }.combine(DYNAMITE.out.map{
+            meta, file -> [meta.state1, meta.state2, meta.antibody, meta, file]
+        }, by: [0, 1, 2]).map{
+            state1, state2, antibody, meta1, affinity_sum, deseq2, meta2, dynamite -> [meta1, affinity_sum, deseq2, dynamite]
+    }
+
+    RANKING (
+        ch_affinitySum_deseq_dynamite
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)
