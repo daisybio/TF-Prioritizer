@@ -29,6 +29,7 @@ include { PEAKS } from '../subworkflows/local/peaks'
 include { COUNTS } from '../subworkflows/local/counts'
 include { DYNAMITE } from '../subworkflows/local/dynamite'
 include { RANKING } from '../subworkflows/local/ranking'
+include { CHIP_ATLAS } from '../subworkflows/local/chip_atlas'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,6 +77,8 @@ workflow INSPECT {
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
     COUNTS(ch_counts, ch_design)
+
+    CHIP_ATLAS()
 
     ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]
