@@ -81,6 +81,7 @@ workflow INSPECT {
 
     CHIP_ATLAS()
     EH_ATLAS(params.genome, params.tax_id)
+    promoters = file(params.promoters)
 
     ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]

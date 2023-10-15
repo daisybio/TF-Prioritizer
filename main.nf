@@ -22,6 +22,7 @@ params.gtf       = WorkflowMain.getGenomeAttribute(params, 'gtf')
 params.blacklist = WorkflowMain.getGenomeAttribute(params, 'blacklist')
 params.pwm       = WorkflowMain.getGenomeAttribute(params, 'pwm')
 params.tax_id    = WorkflowMain.getGenomeAttribute(params, 'tax_id')
+params.promoters = WorkflowMain.getGenomeAttribute(params, 'promoters')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

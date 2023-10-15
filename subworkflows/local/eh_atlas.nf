@@ -48,4 +48,7 @@ workflow EH_ATLAS {
             .first()
 
         LIFTOVER(ch_eh_atlas, eh_atlas_version, target_genome)
+
+    emit:
+        bed = LIFTOVER.out
 }
