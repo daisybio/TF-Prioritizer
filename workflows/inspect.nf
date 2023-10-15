@@ -30,6 +30,7 @@ include { COUNTS } from '../subworkflows/local/counts'
 include { DYNAMITE } from '../subworkflows/local/dynamite'
 include { RANKING } from '../subworkflows/local/ranking'
 include { CHIP_ATLAS } from '../subworkflows/local/chip_atlas'
+include { EH_ATLAS } from '../subworkflows/local/eh_atlas'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,6 +80,7 @@ workflow INSPECT {
     COUNTS(ch_counts, ch_design)
 
     CHIP_ATLAS()
+    EH_ATLAS(params.genome, params.tax_id)
 
     ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]

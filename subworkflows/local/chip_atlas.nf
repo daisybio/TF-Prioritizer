@@ -14,7 +14,7 @@ workflow CHIP_ATLAS {
 
         ch_all = ch_entries
             .filter{ it['antigen'] == "" && it['cell_type'] == "" }
-            .map{ it['file_url']}
+            .map{ file(it['file_url']) }
             .first()
 
     emit:
