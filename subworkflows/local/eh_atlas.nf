@@ -1,4 +1,5 @@
 include { UNTAR } from "../../modules/local/eh_atlas/untar"
+include { LIFTOVER } from "../../modules/local/liftover"
 
 def get_eh_atlas_genome(tax_id) {
     return [
@@ -44,7 +45,7 @@ workflow EH_ATLAS {
         ch_eh_atlas = UNTAR.out.transpose()
             .map{ meta, bed_file -> [[id: bed_file.simpleName], bed_file]}
             .filter{ meta, bed_file -> meta.id == eh_atlas_genome }
-            .collect()
+            .first()
 
-        ch_eh_atlas.view()
+        LIFTOVER(ch_eh_atlas, eh_atlas_version, target_genome)
 }
