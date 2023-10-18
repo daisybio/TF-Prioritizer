@@ -8,7 +8,7 @@ include { CAT_CAT as MERGE_ORIGINAL } from "../../modules/nf-core/cat/cat/main"
 include { BEDTOOLS_MERGE } from "../../modules/nf-core/bedtools/merge/main"
 include { BEDTOOLS_SUBTRACT as SUBTRACT_BLACKLIST } from "../../modules/nf-core/bedtools/subtract/main"
 include { STARE } from "../../modules/local/tepic/stare"
-include { REMOVE_VERSION_ANNOTATIONS } from "../../modules/local/tepic/remove_version_annotations"
+include { MERGE_IDENTICAL } from "../../modules/local/tepic/merge_identical"
 include { COMBINE_TABLES as AFFINITY_MEAN } from "../../modules/local/combine_tables"
 include { COMBINE_TABLES as AFFINITY_SUM } from "../../modules/local/combine_tables"
 include { COMBINE_TABLES as AFFINITY_RATIO } from "../../modules/local/combine_tables"
@@ -17,6 +17,7 @@ include { COMBINE_TABLES as AFFINITY_RATIO } from "../../modules/local/combine_t
 workflow PEAKS {
     take:
         ch_peaks
+        annotation_map
     
     main:
         CLEAN_BED_ANNOTATE_SAMPLES(ch_peaks, [])
@@ -78,14 +79,14 @@ workflow PEAKS {
 
         ch_affinities = STARE.out.affinities
 
-        REMOVE_VERSION_ANNOTATIONS(ch_affinities)
+        MERGE_IDENTICAL(ch_affinities, annotation_map)
 
         if (params.merge_peaks)
         {
-            ch_mean_affinities = REMOVE_VERSION_ANNOTATIONS.out
+            ch_mean_affinities = MERGE_IDENTICAL.out
         } else {
             AFFINITY_MEAN(
-                REMOVE_VERSION_ANNOTATIONS.out
+                MERGE_IDENTICAL.out
                     .map{ meta, affinity_file -> 
                             [
                                 [

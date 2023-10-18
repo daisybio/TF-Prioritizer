@@ -44,6 +44,7 @@ include { EHMM } from '../subworkflows/local/ehmm'
 //
 
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main.nf'
+include { ATLASGENEANNOTATIONMANIPULATION_GTF2FEATUREANNOTATION as MAP_GTF } from '../modules/nf-core/atlasgeneannotationmanipulation/gtf2featureannotation/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,8 +73,12 @@ workflow INSPECT {
     ch_state_pairs = ch_states  .combine(ch_states)
                                 .filter{state1, state2 -> state1 < state2}
 
+    MAP_GTF (
+        [[id:"gtf"], params.gtf],
+        [[], []]
+    )
 
-    PEAKS(ch_peaks)
+    PEAKS(ch_peaks, MAP_GTF.out.feature_annotation)
 
     ch_counts = Channel.value(params.rnaseq_counts)
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))

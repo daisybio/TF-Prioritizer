@@ -1,4 +1,4 @@
-process REMOVE_VERSION_ANNOTATIONS {
+process MERGE_IDENTICAL {
     tag "$meta.id"
     label 'process_single'
 
@@ -9,6 +9,7 @@ process REMOVE_VERSION_ANNOTATIONS {
 
     input:
         tuple val(meta), path(affinities)
+        tuple val(meta2), path(mapping)
     
     output:
         tuple val(meta), path("*.${extension}")
@@ -17,6 +18,6 @@ process REMOVE_VERSION_ANNOTATIONS {
         prefix = task.ext.prefix ?: "${meta.id}"
         extension = task.ext.extension ?: "tsv"
         """
-            remove_version_annotations.py --input ${affinities} --output ${prefix}.${extension}
+        merge_identical.py --input ${affinities} --mapping ${mapping} --output ${prefix}.${extension}
         """
 }
