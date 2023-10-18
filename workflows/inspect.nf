@@ -31,6 +31,7 @@ include { DYNAMITE } from '../subworkflows/local/dynamite'
 include { RANKING } from '../subworkflows/local/ranking'
 include { CHIP_ATLAS } from '../subworkflows/local/chip_atlas'
 include { EH_ATLAS } from '../subworkflows/local/eh_atlas'
+include { EHMM } from '../subworkflows/local/ehmm'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -82,6 +83,19 @@ workflow INSPECT {
     CHIP_ATLAS()
     EH_ATLAS(params.genome, params.tax_id)
     promoters = file(params.promoters)
+
+    /*EHMM(
+        CHIP_ATLAS.out.all,
+        EH_ATLAS.out.bed,
+        promoters,
+        params.gtf,
+
+        params.ehmm_genomic_region_size,
+        params.ehmm_train_split,
+        params.ehmm_random_seed,
+        params.ehmm_top_quantile,
+        params.ehmm_n_samples
+    )*/
 
     ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]

@@ -3,3 +3,7 @@ services:
     build: 
       context: tepic
     image: bigdatainbiomedicine/inspect-tepic
+  r:
+    build: 
+      context: r
+    image: bigdatainbiomedicine/inspect-r
