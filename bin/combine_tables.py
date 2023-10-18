@@ -53,9 +53,13 @@ elif args.method == "sum":
 elif args.method == "ratio":
     if len(dfs) != 2:
         raise ValueError("The ratio method requires exactly two input files.")
+    
+    # Replace 0 values with minimal non-zero value
+    dfs[1] = dfs[1].replace(0, dfs[1][dfs[1] > 0].min())
+
     result = dfs[0] / dfs[1]
 
-    # Drop rows with NA or inf values
+    # Drop rows with NA or inf values (requirement for DYNAMITE)
     result = result.replace([np.inf, -np.inf], np.nan).dropna()
 
 # Write the result to a file
