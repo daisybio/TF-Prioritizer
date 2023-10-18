@@ -7,12 +7,7 @@ include { GAWK as CLEAN_BED_ANNOTATE_SAMPLES } from "../../modules/nf-core/gawk/
 include { CAT_CAT as MERGE_ORIGINAL } from "../../modules/nf-core/cat/cat/main"
 include { BEDTOOLS_MERGE } from "../../modules/nf-core/bedtools/merge/main"
 include { BEDTOOLS_SUBTRACT as SUBTRACT_BLACKLIST } from "../../modules/nf-core/bedtools/subtract/main"
-include { TEPIC } from "../../modules/local/tepic/tepic"
-include { GAWK as FILTER_SEQUENCES } from "../../modules/nf-core/gawk/main"
-include { GAWK as BEDIFY_SEQUENCES } from "../../modules/nf-core/gawk/main"
-include { BEDTOOLS_SORT as SORT_SEQUENCES } from "../../modules/nf-core/bedtools/sort/main"
-include { BEDTOOLS_MERGE as MERGE_BINDING_SITES } from "../../modules/nf-core/bedtools/merge/main"
-include { CSVTK_SPLIT as SPLIT_SEQUENCES } from "../../modules/nf-core/csvtk/split/main"
+include { STARE } from "../../modules/local/tepic/stare"
 include { REMOVE_VERSION_ANNOTATIONS } from "../../modules/local/tepic/remove_version_annotations"
 include { COMBINE_TABLES as AFFINITY_MEAN } from "../../modules/local/combine_tables"
 include { COMBINE_TABLES as AFFINITY_SUM } from "../../modules/local/combine_tables"
@@ -71,62 +66,24 @@ workflow PEAKS {
             ch_blacklisted = ch_footprints
         }
 
-        TEPIC (
-            ch_blacklisted,
+        STARE (
+            ch_footprints,
             params.pwm,
             params.gtf,
             params.fasta,
-            params.tepic_window_size,
-            params.tepic_loop_windows,
-            params.tepic_exponential_decay,
-            params.tepic_normalize_peak_length,
-            params.tepic_max_minutes_per_chr,
-            params.tepic_original_scaling,
-            params.tepic_p_value
+            params.stare_window_size,
+            params.blacklist,
+            params.stare_decay
         )
 
-        ch_sequences = TEPIC.out.sequences
-        ch_affinities = TEPIC.out.affinities
-        ch_filtered_regions = TEPIC.out.filtered_regions
-
-        FILTER_SEQUENCES(ch_sequences, [])
-        BEDIFY_SEQUENCES(FILTER_SEQUENCES.out.output, [])
-        SPLIT_SEQUENCES(BEDIFY_SEQUENCES.out.output, "tsv", "tsv")
-        SORT_SEQUENCES(
-            SPLIT_SEQUENCES.out.split_csv
-                .transpose()
-                .map{ meta, csv_file -> 
-                    prefix = meta.id + ".bedified-"
-                    tf = csv_file.baseName.substring(prefix.size())
-                    return [meta + [id: meta.id + "_" + tf, tf: tf], csv_file]
-                },
-            []
-        )
+        ch_affinities = STARE.out.affinities
 
         REMOVE_VERSION_ANNOTATIONS(ch_affinities)
 
         if (params.merge_peaks)
         {
-            ch_merged_sequences = SORT_SEQUENCES.out.sorted
             ch_mean_affinities = REMOVE_VERSION_ANNOTATIONS.out
         } else {
-            MERGE_BINDING_SITES(
-                SORT_SEQUENCES.out.sorted
-                    .map{ meta, binding_sites -> 
-                            [
-                                [
-                                    id: meta.state + "_" + meta.antibody,
-                                    state: meta.state,
-                                    antibody: meta.antibody
-                                ], 
-                                binding_sites
-                            ]
-                        }
-                    .groupTuple(),
-            )
-
-            ch_merged_sequences = MERGE_BINDING_SITES.out.bed
-
             AFFINITY_MEAN(
                 REMOVE_VERSION_ANNOTATIONS.out
                     .map{ meta, affinity_file -> 
@@ -140,7 +97,6 @@ workflow PEAKS {
                             ]
                         }
                     .groupTuple(),
-
                 "mean"
             )
             ch_mean_affinities = AFFINITY_MEAN.out

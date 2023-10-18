@@ -9,7 +9,7 @@ process DOWNLOAD {
 
 
     output:
-        tuple path("chip_atlas_file_list.csv")
+        path("chip_atlas_file_list.csv")
     
     script:
     """
