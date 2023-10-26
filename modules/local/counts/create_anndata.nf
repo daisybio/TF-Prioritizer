@@ -20,8 +20,8 @@ process CREATE_ANNDATA {
         import anndata as ad
         import pandas as pd
 
-        counts = pd.read_csv("counts.symbols.tsv", index_col=0, sep="	")
-        design = pd.read_csv("counts_design.csv", index_col=0)
+        counts = pd.read_csv("$counts", index_col=0, sep="\\t")
+        design = pd.read_csv("$design", index_col=0)
 
         # Create anndata object
         adata = ad.AnnData(X=counts.T.values, obs=design)
