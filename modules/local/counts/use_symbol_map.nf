@@ -21,9 +21,10 @@ process USE_SYMBOL_MAP {
         import json
 
         df = pd.read_csv("${dataframe}", sep="\\t", index_col=0)
+        df_mapping = pd.read_csv("${symbol_map}", sep="\\t", index_col=0)
 
-        with open("${symbol_map}") as f:
-            symbol_map = json.load(f)
+        # Convert the symbol map to a dictionary
+        symbol_map = df_mapping.to_dict()["gene_name"]
         
         df = df.rename(index=symbol_map)
 

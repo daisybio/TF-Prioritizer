@@ -80,16 +80,17 @@ workflow INSPECT {
 
     PEAKS(ch_peaks, MAP_GTF.out.feature_annotation)
 
-    ch_counts = Channel.value(params.rnaseq_counts)
+    ch_counts = Channel.value(file(params.rnaseq_counts, checkIfExists: true))
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
-    COUNTS(ch_counts, ch_design)
+    COUNTS(ch_counts, ch_design, MAP_GTF.out.feature_annotation)
 
+    /*
     CHIP_ATLAS()
     EH_ATLAS(params.genome, params.tax_id)
     promoters = file(params.promoters)
 
-    /*EHMM(
+    EHMM(
         CHIP_ATLAS.out.all,
         EH_ATLAS.out.bed,
         promoters,
@@ -100,7 +101,8 @@ workflow INSPECT {
         params.ehmm_random_seed,
         params.ehmm_top_quantile,
         params.ehmm_n_samples
-    )*/
+    )
+    */
 
     ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]

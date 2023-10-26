@@ -10,21 +10,19 @@ workflow COUNTS {
     take:
         ch_counts
         ch_design
+        annotation_map
 
     main:
+        ch_extra_counts = ch_design.splitCsv(header:true).filter{it["file"]}.map{it["file"]}.collect()
+
         CREATE_DATAFRAME(
             ch_counts.combine(ch_design).map{counts, design -> [[id: "counts"], counts, design]},
-            "gene_id"
-        )
-
-        FETCH_SYMBOL_MAP(
-            CREATE_DATAFRAME.out.genes,
-            params.tax_id
+            ch_extra_counts
         )
 
         USE_SYMBOL_MAP(
             CREATE_DATAFRAME.out.dataframe,
-            FETCH_SYMBOL_MAP.out
+            annotation_map
         )
 
         CREATE_ANNDATA(
