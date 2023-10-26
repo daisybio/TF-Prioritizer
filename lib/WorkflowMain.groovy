@@ -44,12 +44,12 @@ class WorkflowMain {
         // Check AWS batch settings
         NfcoreTemplate.awsBatch(workflow, params)
 
-        if (!params.rnaseq_counts) {
-            Nextflow.error("Please provide RNAseq counts to the pipeline e.g. '--rnaseq_counts counts.tsv'")
+        if (!params.rnaseq_design) {
+            Nextflow.error("Please provide RNAseq samplesheet to the pipeline e.g. '--rnaseq_design design.csv'")
         }
 
         if (!params.input) {
-            Nextflow.error("Please provide a peaks samplesheet to the pipeline e.g. '--peaks_samplesheet peaks.tsv'")
+            Nextflow.error("Please provide a peaks samplesheet to the pipeline e.g. '--peaks_samplesheet peaks.csv'")
         }
     }
     //
