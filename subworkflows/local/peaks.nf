@@ -12,7 +12,7 @@ include { MERGE_IDENTICAL } from "../../modules/local/stare/merge_identical"
 include { COMBINE_TABLES as AFFINITY_MEAN } from "../../modules/local/combine_tables"
 include { COMBINE_TABLES as AFFINITY_SUM } from "../../modules/local/combine_tables"
 include { COMBINE_TABLES as AFFINITY_RATIO } from "../../modules/local/combine_tables"
-
+include { COPY } from "../../modules/local/copy"
 
 workflow PEAKS {
     take:
@@ -32,12 +32,11 @@ workflow PEAKS {
         if (params.peak_search_type == "inside") {
             ch_footprints = ch_sorted
         } else {
-            BEDTOOLS_CLOSEST(ch_sorted.map{ meta, bed_file -> 
-                copy_name = ".temp/" + bed_file.getName() + ".copy"
-                bed_file.mklink(copy_name, overwrite: true)
-                copy_file = file(copy_name)
-                return [meta, bed_file, copy_file]
-            }, [])
+            COPY(ch_sorted.map{ meta, bed_file -> 
+                    return [meta, bed_file, bed_file.name + ".copy"]
+                })
+
+            BEDTOOLS_CLOSEST(COPY.out, [])
         
             FILTER_CLOSEST(BEDTOOLS_CLOSEST.out.output, [])
 
