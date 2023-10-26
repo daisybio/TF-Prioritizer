@@ -9,7 +9,7 @@ process CREATE_DATAFRAME {
 
     input:
         tuple val(meta), path(counts), path(design)
-        val(index_col)
+        path(extra_counts)
 
     output:
         tuple val(meta), path("*.clean.tsv"), emit: dataframe
@@ -17,6 +17,6 @@ process CREATE_DATAFRAME {
 
     script:
     """
-        create_df.py --counts ${counts} --metadata ${design} --output ${meta.id}.clean.tsv --index_col ${index_col}
+        create_df.py --counts ${counts} --metadata ${design} --output ${meta.id}.clean.tsv
     """
 }
