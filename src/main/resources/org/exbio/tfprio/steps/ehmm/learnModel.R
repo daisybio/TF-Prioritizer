@@ -3,49 +3,6 @@ library(rtracklayer)
 library(argparser)
 library(tools)
 
-statesToSegments_helper <- function (regions, states) {
-  .Call("_ehmm_statesToSegments_helper", PACKAGE = "ehmm",
-        regions, states)
-}
-
-statesToSegments <- function (states, regions) {
-  h <- statesToSegments_helper(regions, states)
-  GRanges(seqnames = h$chrs, IRanges(start = h$starts, end = h$ends,
-                                     names = h$states))
-}
-
-bamtabDefaults <- list(75, 0, FALSE)
-names(bamtabDefaults) <- c("shift", "mapq", "pairedend")
-
-validateBamtab <- function (bamtab) {
-  if (!is.data.frame(bamtab))
-    stop("'bamtab' must be a 'data.frame'")
-  reqfields <- c("mark", "path")
-  optfields <- "shift"
-  if (!all(reqfields %in% names(bamtab)))
-    stop("missing required fields")
-  if (!all(names(bamtab) %in% c(reqfields, optfields)))
-    stop("invalid fields")
-  for (n in names(bamtabDefaults)) {
-    if (!n %in% names(bamtab)) {
-      bamtab[[n]] <- rep(bamtabDefaults[[n]], nrow(bamtab))
-    }
-  }
-  if (!is.character(bamtab$path))
-    stop("invalid path specification")
-  if (any(!file.exists(bamtab$path)))
-    stop("BAM file does not exist")
-  if (!is.numeric(bamtab$mapq) || any(bamtab$mapq < 0 | bamtab$mapq >
-                                      255)) {
-    stop("invalid 'mapq'")
-  }
-  if (!is.numeric(bamtab$shift))
-    stop("invalid 'shift'")
-  if (!is.logical(bamtab$pairedend))
-    stop("invalid 'pairedend'")
-  bamtab
-}
-
 args <- commandArgs(trailingOnly = T)
 parser <- arg_parser("EHMM command line parser", name = "ehmm")
 parser <- add_argument(parser, "-r", help = "Regions of interest")
