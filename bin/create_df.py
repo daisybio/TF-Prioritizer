@@ -16,40 +16,19 @@ metadata = pd.read_csv(args.metadata, index_col=0, header=0)
 if not os.path.exists(args.counts):
     raise Exception("Counts input does not exist")
 
-if os.path.isfile(args.counts):
-    # Use only cols which are in the index of metadata
-    counts = pd.read_csv(args.counts, index_col=0, sep="\t", header=None)
+if not os.path.isfile(args.counts):
+    raise Exception("Counts input is not a file")
 
-    # If counts has no columns, add index name
-    if len(counts.columns) == 0:
-        counts.index.name = "gene_id"
-    else:
-        # Set first row as column names
-        counts.columns = counts.iloc[0]
-        # Remove first row
-        counts = counts.iloc[1:]
+counts = pd.read_csv(args.counts, index_col=0, sep="\t", header=None)
+
+# If counts has no columns, add index name
+if len(counts.columns) == 0:
+    counts.index.name = "gene_id"
 else:
-    counts = pd.DataFrame(columns=metadata.index)
-    for sub_name in os.listdir(args.counts):
-        sub_path = os.path.join(args.counts, sub_name)
-
-        if os.path.isfile(sub_path):
-            with open(sub_path, "r") as f:
-                counts.index = f.read().splitlines()
-        else:
-            for count_file in os.listdir(sub_path):
-                sample_name = count_file.split(".")[0]
-
-                if sample_name not in metadata.index:
-                    print(f"Sample {sample_name} not in metadata, skipping")
-                    continue
-
-                sample_path = os.path.join(sub_path, count_file)
-                with open(sample_path, "r") as f:
-                    counts[sample_name] = f.read().splitlines()
-
-                # Set dtype to int
-                counts[sample_name] = counts[sample_name].astype(int)
+    # Set first row as column names
+    counts.columns = counts.iloc[0]
+    # Remove first row
+    counts = counts.iloc[1:]
 
 for index, row in metadata.iterrows():
     if row["file"]:
