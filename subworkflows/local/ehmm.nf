@@ -2,7 +2,7 @@ include { SPLIT_DATASETS } from "../../modules/local/ehmm/split_datasets"
 include { LEARN_MODEL as LEARN_BACKGROUND_MODEL } from "../../modules/local/ehmm/learn_model"
 include { LEARN_MODEL as LEARN_ENHANCER_MODEL } from "../../modules/local/ehmm/learn_model"
 include { LEARN_MODEL as LEARN_PROMOTER_MODEL } from "../../modules/local/ehmm/learn_model"
-
+include { CONSTRUCT_MODEL } from "../../modules/local/ehmm/construct_model"
 
 workflow EHMM {
     take:
@@ -62,5 +62,11 @@ workflow EHMM {
             n_states,
             n_bins,
             pseudocount,
+        )
+
+        CONSTRUCT_MODEL (
+            LEARN_BACKGROUND_MODEL.out.rdata,
+            LEARN_ENHANCER_MODEL.out.rdata,
+            LEARN_PROMOTER_MODEL.out.rdata
         )
 }

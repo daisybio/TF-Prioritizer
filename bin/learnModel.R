@@ -72,8 +72,6 @@ regions <- regions[!grepl("_", regions@seqnames)]
 # change chromosome M to MT
 regions@seqnames@values <- as.factor(gsub("M", "MT", regions@seqnames@values))
 
-print(regions)
-
 counts <- getcounts(regions, bamtab, binsize = binsize, nthreads = nthreads) + pseudocount
 
 message("learning model")
