@@ -1,9 +1,15 @@
 include { DOWNLOAD } from "../../modules/local/chip_atlas/download"
 include { FILTER } from "../../modules/local/chip_atlas/filter"
-
 include { GAWK as CLEAN_ALL } from "../../modules/nf-core/gawk"
+include { BEDTOOLS_BEDTOBAM } from "../../modules/local/bedtools/bedtobam/main"
+include { SAMTOOLS_SORT } from '../../modules/nf-core/samtools/sort/main'
+include { SAMTOOLS_INDEX } from '../../modules/nf-core/samtools/index/main'
+include { GAWK as REMOVE_CHR } from "../../modules/nf-core/gawk"
 
 workflow CHIP_ATLAS {
+    take:
+        fai
+
     main:
         DOWNLOAD()
         FILTER(
@@ -21,7 +27,14 @@ workflow CHIP_ATLAS {
             .map(it -> [[id: "chip_atlas_all"], it])
 
         CLEAN_ALL(ch_all, [])
+        REMOVE_CHR(CLEAN_ALL.out.output, [])
+
+        BEDTOOLS_BEDTOBAM(REMOVE_CHR.out.output, fai)
+        SAMTOOLS_SORT(BEDTOOLS_BEDTOBAM.out.bam)
+        SAMTOOLS_INDEX(SAMTOOLS_SORT.out.bam)
 
     emit:
-        all = CLEAN_ALL.out.output
+        all = REMOVE_CHR.out.output
+        all_bam = SAMTOOLS_SORT.out.bam
+        all_bai = SAMTOOLS_INDEX.out.bai
 }

@@ -44,7 +44,11 @@ include { EH_ATLAS } from '../subworkflows/local/eh_atlas'
 
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main.nf'
 include { ATLASGENEANNOTATIONMANIPULATION_GTF2FEATUREANNOTATION as MAP_GTF } from '../modules/nf-core/atlasgeneannotationmanipulation/gtf2featureannotation/main.nf'
-include { GAWK as CLEAN_PROMOTERS } from '../modules/nf-core/gawk/main'
+include { GAWK as REMOVE_CHR } from '../modules/nf-core/gawk/main'
+include { GAWK as REMOVE_CHR_FAIDX } from '../modules/nf-core/gawk/main'
+include { GAWK as CLEAN_BED } from '../modules/nf-core/gawk/main'
+include { GAWK as CHR_M } from '../modules/nf-core/gawk/main'
+include { SAMTOOLS_FAIDX } from '../modules/nf-core/samtools/faidx/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,17 +82,27 @@ workflow INSPECT {
         [[], []]
     )
 
-    CHIP_ATLAS()
-    EH_ATLAS(params.genome, params.tax_id, params.enhancer_atlas_tissues)
+    SAMTOOLS_FAIDX (
+        [[id:"genome"], params.fasta],
+        [[], []]
+    )
 
-    CLEAN_PROMOTERS([[id:"promoters"], params.promoters], [])
+    REMOVE_CHR_FAIDX(SAMTOOLS_FAIDX.out.fai, [])
+    CHR_M(REMOVE_CHR_FAIDX.out.output, [])
+
+    CHIP_ATLAS(CHR_M.out.output)
+    EH_ATLAS(params.genome, params.tax_id, params.enhancer_atlas_tissues)
+    CLEAN_BED([[id:"promoters"], params.promoters], [])
+    REMOVE_CHR(CLEAN_BED.out.output, [])
 
     PEAKS(
         ch_peaks,
         MAP_GTF.out.feature_annotation,
         CHIP_ATLAS.out.all,
+        CHIP_ATLAS.out.all_bam,
+        CHIP_ATLAS.out.all_bai,
         EH_ATLAS.out.bed,
-        CLEAN_PROMOTERS.out.output
+        REMOVE_CHR.out.output
     )
 
     ch_counts = Channel.value(file(params.rnaseq_counts, checkIfExists: true))

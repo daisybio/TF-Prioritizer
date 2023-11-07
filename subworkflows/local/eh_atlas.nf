@@ -1,6 +1,7 @@
 include { FETCH_LINKS } from "../../modules/local/eh_atlas/fetch_links"
 include { LIFTOVER } from "../../modules/local/liftover"
 include { CAT_CAT } from "../../modules/nf-core/cat/cat/main"
+include { GAWK as REMOVE_CHR } from "../../modules/nf-core/gawk/main"
 
 def get_eh_atlas_genome(tax_id) {
     return [
@@ -50,6 +51,8 @@ workflow EH_ATLAS {
 
         CAT_CAT(LIFTOVER.out.map{it[1]}.collect().map{[[id: "enhancers"], it]})
 
+        REMOVE_CHR(CAT_CAT.out.file_out, [])
+
     emit:
-        bed = CAT_CAT.out.file_out
+        bed = REMOVE_CHR.out.output
 }

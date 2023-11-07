@@ -21,8 +21,11 @@ workflow PEAKS {
         ch_peaks
         annotation_map
 
-        ch_chip_atlas
-        ch_eh_atlas
+        ch_background
+        ch_background_bam
+        ch_background_bai
+
+        ch_enhancers
         ch_promoters
 
     main:
@@ -64,8 +67,11 @@ workflow PEAKS {
         }
 
         EHMM(
-            ch_chip_atlas,
-            ch_eh_atlas,
+            ch_background,
+            ch_background_bam,
+            ch_background_bai,
+
+            ch_enhancers,
             ch_promoters,
             params.gtf,
 
@@ -73,8 +79,12 @@ workflow PEAKS {
             params.ehmm_train_split,
             params.ehmm_random_seed,
             params.ehmm_top_quantile,
-            params.ehmm_n_samples
+            params.ehmm_n_samples,
+            params.ehmm_n_states,
+            params.ehmm_n_bins,
+            params.ehmm_pseudocount
         )
+        /**
 
         if (params.blacklist) {
             SUBTRACT_BLACKLIST(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
@@ -148,4 +158,5 @@ workflow PEAKS {
         affinity_ratio = AFFINITY_RATIO.out
         affinity_sum = AFFINITY_SUM.out
         peaks = ch_blacklisted
+    */
 }
