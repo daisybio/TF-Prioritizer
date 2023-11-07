@@ -1,4 +1,4 @@
-include { UNTAR } from "../../modules/local/eh_atlas/untar"
+include { FETCH_LINKS } from "../../modules/local/eh_atlas/fetch_links"
 include { LIFTOVER } from "../../modules/local/liftover"
 
 def get_eh_atlas_genome(tax_id) {
@@ -35,20 +35,13 @@ workflow EH_ATLAS {
         tax_id
 
     main:
-        tarball = file("http://www.enhanceratlas.org/data/download/species_enh_bed.tar.gz")
-
-        UNTAR([[id: 'eh_atlas'], tarball])
-
         eh_atlas_genome = get_eh_atlas_genome(tax_id)
         eh_atlas_version = get_eh_atlas_version(eh_atlas_genome)
 
-        ch_eh_atlas = UNTAR.out.transpose()
-            .map{ meta, bed_file -> [[id: bed_file.simpleName], bed_file]}
-            .filter{ meta, bed_file -> meta.id == eh_atlas_genome }
-            .first()
+        FETCH_LINKS(eh_atlas_genome)
 
-        LIFTOVER(ch_eh_atlas, eh_atlas_version, target_genome)
+        // LIFTOVER(ch_eh_atlas, eh_atlas_version, target_genome)
 
-    emit:
-        bed = LIFTOVER.out
+    //emit:
+        //bed = LIFTOVER.out
 }
