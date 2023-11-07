@@ -35,11 +35,11 @@ process FETCH_LINKS {
     link_objects = soup.find_all('a', href=re.compile(link_regex))
     links = [link.get('href') for link in link_objects]
 
-    tf_link = {os.path.splitext(os.path.basename(link))[0]: BED_BASE_URL + link for link in links}
+    tissue_link = {os.path.splitext(os.path.basename(link))[0]: BED_BASE_URL + link for link in links}
 
-    df = pd.DataFrame.from_dict(tf_link, orient='index', columns=['link'])
+    df = pd.DataFrame.from_dict(tissue_link, orient='index', columns=['url'])
 
-    df.index.name = 'tf'
+    df.index.name = 'tissue'
 
     df.to_csv("eh_atlas.tsv", sep='\\t')
     """

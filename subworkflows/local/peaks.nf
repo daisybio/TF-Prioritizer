@@ -13,12 +13,18 @@ include { COMBINE_TABLES as AFFINITY_MEAN } from "../../modules/local/combine_ta
 include { COMBINE_TABLES as AFFINITY_SUM } from "../../modules/local/combine_tables"
 include { COMBINE_TABLES as AFFINITY_RATIO } from "../../modules/local/combine_tables"
 include { COPY } from "../../modules/local/copy"
+include { EHMM } from './ehmm'
+
 
 workflow PEAKS {
     take:
         ch_peaks
         annotation_map
-    
+
+        ch_chip_atlas
+        ch_eh_atlas
+        ch_promoters
+
     main:
         CLEAN_BED_ANNOTATE_SAMPLES(ch_peaks, [])
 
@@ -32,19 +38,19 @@ workflow PEAKS {
         if (params.peak_search_type == "inside") {
             ch_footprints = ch_sorted
         } else {
-            COPY(ch_sorted.map{ meta, bed_file -> 
+            COPY(ch_sorted.map{ meta, bed_file ->
                     return [meta, bed_file, bed_file.name + ".copy"]
                 })
 
             BEDTOOLS_CLOSEST(COPY.out, [])
-        
+
             FILTER_CLOSEST(BEDTOOLS_CLOSEST.out.output, [])
 
             if (params.peak_search_type == "incl_between") {
                 ch_joined = FILTER_CLOSEST.out.output
                     .join(ch_sorted)
                     .map {
-                        meta, closest, bed_file -> 
+                        meta, closest, bed_file ->
                             [meta, [closest, bed_file]]
                     }
 
@@ -57,7 +63,18 @@ workflow PEAKS {
             }
         }
 
-   
+        EHMM(
+            ch_chip_atlas,
+            ch_eh_atlas,
+            ch_promoters,
+            params.gtf,
+
+            params.ehmm_genomic_region_size,
+            params.ehmm_train_split,
+            params.ehmm_random_seed,
+            params.ehmm_top_quantile,
+            params.ehmm_n_samples
+        )
 
         if (params.blacklist) {
             SUBTRACT_BLACKLIST(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
@@ -86,13 +103,13 @@ workflow PEAKS {
         } else {
             AFFINITY_MEAN(
                 MERGE_IDENTICAL.out
-                    .map{ meta, affinity_file -> 
+                    .map{ meta, affinity_file ->
                             [
                                 [
                                     id: meta.state + "_" + meta.antibody,
                                     state: meta.state,
                                     antibody: meta.antibody
-                                ], 
+                                ],
                                 affinity_file
                             ]
                         }
@@ -111,14 +128,14 @@ workflow PEAKS {
                 by: 1
             )
             .filter{
-                antibody, meta1, affinites1, meta2, affinites2 -> 
+                antibody, meta1, affinites1, meta2, affinites2 ->
                     meta1.state < meta2.state
             }
             .map{
-                antibody, meta1, affinites1, meta2, affinites2 -> 
-                    [[  id: meta1.state + ":" + meta2.state + "_" + antibody, 
-                        state1: meta1.state, 
-                        state2: meta2.state, 
+                antibody, meta1, affinites1, meta2, affinites2 ->
+                    [[  id: meta1.state + ":" + meta2.state + "_" + antibody,
+                        state1: meta1.state,
+                        state2: meta2.state,
                         antibody: antibody
                     ],
                     [affinites1, affinites2]]

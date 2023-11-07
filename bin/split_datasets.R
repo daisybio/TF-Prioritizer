@@ -44,17 +44,17 @@ generateBackground <- function(gtf, e, p, size, n=100000) {
 
 splitRanges <- function(ranges, trainSplit, nSamples) {
   N <- length(ranges)
-  if(nSamples == -1) {
-    message("splitting data by a factor of ", trainSplit, " for training")
-    nTrain <- N*trainSplit
-    message("-> selecting ", nTrain, " samples for training")
-  } else {
+  if (nSamples > 0) {
     message("Randomly selecting ", nSamples, " regions for training")
     nTrain <- nSamples
     if (nTrain > N) {
         message("info: number of random samples is larger than available set of regions, selecting all but one")
         nTrain <- N-1
     }
+  } else {
+    message("splitting data by a factor of ", trainSplit, " for training")
+    nTrain <- N*trainSplit
+    message("-> selecting ", nTrain, " samples for training")
   }
   R <- 1:N
   trainIdx <- sample(R, nTrain)
@@ -72,7 +72,7 @@ parser <- add_argument(parser, "-o", help = "output directory", default = "./")
 parser <- add_argument(parser, "-t", help = "Percent of data to use for training",
                        default = 0.8, type = "double")
 parser <- add_argument(parser, "-f", help = "Fixed number of samples to consider for each training set",
-                      default = -1, type = "integer")
+                      default = 0, type = "integer")
 parser <- add_argument(parser, "-s", help = "Size of random genomic regions",
                        default = 2000, type = "integer")
 parser <- add_argument(parser, "-r", help = "seed",
@@ -81,21 +81,23 @@ parser <- add_argument(parser, "-q", help = "top quantile of scores to include r
                       default = 2, type = "integer")
 argv <- parse_args(parser, argv = args)
 set.seed(argv$r)
-message("load ChipAtlas, enhancer, and promoter regions")
+message("Loading promoter regions")
+message(argv$p)
+pRegions <- import(argv$p, format = "bed")
+message("Loading background regions")
 bgRegions <- import(argv$b, format = "bed")
-names(bgRegions) <- 1:length(bgRegions)
+message("Loading enhancer regions")
 eRegions <- import(argv$e, format = "bed")
-message("filtering EnhancerAtlas predictions for scores above, ", argv$q, "quantile")
 eRegions$name <- as.numeric(eRegions$name)
+message("Filtering EnhancerAtlas predictions for scores above ", argv$q, ". quantile")
 qs <- quantile(eRegions$name)
 eRegions <- eRegions[eRegions$name >= qs[argv$q]]
-pRegions <- import(argv$p, format = "bed")
 message("extract enhancer and promoter regions within ChipAtlas regions")
 eRegions <- findOverlapPairs(bgRegions, eRegions)
 pRegions <- findOverlapPairs(bgRegions, pRegions)
 eRegions <- filterRegions(eRegions@first)
 pRegions <- filterRegions(pRegions@first)
-message("generating random background data from gft file")
+message("generating random background data from gtf file")
 bgNoCREs <- generateBackground(argv$g, eRegions, pRegions, argv$s)
 export.bed(bgNoCREs, file.path(argv$o, "all_background.bed"))
 export.bed(eRegions, file.path(argv$o, "all_enhancers.bed"))

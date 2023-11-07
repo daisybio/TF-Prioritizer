@@ -1,12 +1,13 @@
 process SPLIT_DATASETS {
+    tag "${meta.id}"
     label 'process_high_memory'
 
-    container 'registry.hub.docker.com/bigdatainbiomedicine/inspect-r'
-    
+    container 'registry.hub.docker.com/bigdatainbiomedicine/inspect-ehmm:latest'
+
     input:
-        path(background)
-        path(enhancers)
-        path(promoters)
+        tuple val(meta), path(background)
+        tuple val(meta2), path(enhancers)
+        tuple val(meta3), path(promoters)
         path(gtf)
         val(genomic_region_size)
         val(train_split)
@@ -21,7 +22,7 @@ process SPLIT_DATASETS {
         path('trainBackground.bed'), emit: trainBackground
         path('trainEnhancers.bed'), emit: trainEnhancers
         path('trainPromoters.bed'), emit: trainPromoters
-    
+
     script:
         """
         split_datasets.R \\

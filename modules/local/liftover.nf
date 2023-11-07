@@ -8,10 +8,10 @@ process LIFTOVER {
         tuple val(meta), path(input)
         val current_genome
         val target_genome
-    
+
     output:
-        path("lifted_${input.name}")
-    
+        tuple val(meta), path("lifted_${input.name}")
+
     script:
         """
         #!/usr/bin/env python

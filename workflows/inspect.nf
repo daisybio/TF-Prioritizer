@@ -31,7 +31,6 @@ include { DYNAMITE } from '../subworkflows/local/dynamite'
 include { RANKING } from '../subworkflows/local/ranking'
 include { CHIP_ATLAS } from '../subworkflows/local/chip_atlas'
 include { EH_ATLAS } from '../subworkflows/local/eh_atlas'
-include { EHMM } from '../subworkflows/local/ehmm'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,6 +44,7 @@ include { EHMM } from '../subworkflows/local/ehmm'
 
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main.nf'
 include { ATLASGENEANNOTATIONMANIPULATION_GTF2FEATUREANNOTATION as MAP_GTF } from '../modules/nf-core/atlasgeneannotationmanipulation/gtf2featureannotation/main.nf'
+include { GAWK as CLEAN_PROMOTERS } from '../modules/nf-core/gawk/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,14 +57,14 @@ workflow INSPECT {
     ch_versions = Channel.empty()
 
     ch_peaks = Channel.fromPath(params.input).splitCsv(header: true).map {
-        entry -> 
-            checked_file = file(entry.file, checkIfExists: true); 
+        entry ->
+            checked_file = file(entry.file, checkIfExists: true);
             return [
                         [
-                            id: entry.state + "_" + entry.antibody + "_" + checked_file.baseName, 
-                            state: entry.state, 
+                            id: entry.state + "_" + entry.antibody + "_" + checked_file.baseName,
+                            state: entry.state,
                             antibody: entry.antibody
-                        ], 
+                        ],
                         checked_file
                     ]
     }
@@ -78,31 +78,26 @@ workflow INSPECT {
         [[], []]
     )
 
-    PEAKS(ch_peaks, MAP_GTF.out.feature_annotation)
+    CHIP_ATLAS()
+    EH_ATLAS(params.genome, params.tax_id, params.enhancer_atlas_tissues)
+
+    CLEAN_PROMOTERS([[id:"promoters"], params.promoters], [])
+
+    PEAKS(
+        ch_peaks,
+        MAP_GTF.out.feature_annotation,
+        CHIP_ATLAS.out.all,
+        EH_ATLAS.out.bed,
+        CLEAN_PROMOTERS.out.output
+    )
 
     ch_counts = Channel.value(file(params.rnaseq_counts, checkIfExists: true))
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
     COUNTS(ch_counts, ch_design, MAP_GTF.out.feature_annotation)
 
+
     /*
-    CHIP_ATLAS()
-    EH_ATLAS(params.genome, params.tax_id)
-    promoters = file(params.promoters)
-
-    EHMM(
-        CHIP_ATLAS.out.all,
-        EH_ATLAS.out.bed,
-        promoters,
-        params.gtf,
-
-        params.ehmm_genomic_region_size,
-        params.ehmm_train_split,
-        params.ehmm_random_seed,
-        params.ehmm_top_quantile,
-        params.ehmm_n_samples
-    )
-    */
 
     ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]
@@ -137,6 +132,7 @@ workflow INSPECT {
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)
+    */
 }
 
 /*
