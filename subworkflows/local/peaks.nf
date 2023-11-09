@@ -22,8 +22,6 @@ workflow PEAKS {
         annotation_map
 
         ch_background
-        ch_background_bam
-        ch_background_bai
 
         ch_enhancers
         ch_promoters
@@ -68,9 +66,6 @@ workflow PEAKS {
 
         EHMM(
             ch_background,
-            ch_background_bam,
-            ch_background_bai,
-
             ch_enhancers,
             ch_promoters,
             params.gtf,

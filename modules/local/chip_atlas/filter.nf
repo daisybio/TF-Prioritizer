@@ -27,18 +27,20 @@ process FILTER {
         df = pd.read_csv("${sheet}")
 
         # Filter by genome assembly
-        df = df[((df["genome_assembly"] == "${genome}") & (df["antigen_class"] == "TFs and others") & (df["cell_type_class"].isin(cell_types)))]
+        df = df[((df["genome_assembly"] == "mm10") & (df["cell_type_class"].isin(cell_types)) & (df["cell_type"].isna()))]
 
-        df = df[["antigen", "cell_type_class", "cell_type", "threshold", "file_url"]]
+        df = df[["antigen", "antigen_class", "cell_type_class", "threshold", "file_url"]]
+        df["threshold"] = df["threshold"].fillna(0)
         df = df.fillna("")
 
         # Group by antigen, cell type class, cell type
         # Keep entry with lowest threshold
         df = df.sort_values("threshold")
-        df = df.groupby(["antigen", "cell_type_class", "cell_type"], as_index=False).first().reset_index()
+        df = df.groupby(["antigen", "antigen_class", "cell_type_class"], as_index=False).first().reset_index()
 
         # Remove threshold column
-        df = df[["antigen", "cell_type_class", "cell_type", "file_url"]]
+        df.drop("threshold", axis=1, inplace=True)
+        df.drop("index", axis=1, inplace=True)
 
         df.to_csv("data.tsv", sep="\\t", index=False)
     """

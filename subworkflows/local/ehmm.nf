@@ -6,9 +6,7 @@ include { CONSTRUCT_MODEL } from "../../modules/local/ehmm/construct_model"
 
 workflow EHMM {
     take:
-        background_bed
-        background_bam
-        background_bai
+        background
 
         enhancers_bed
         promoters_bed
@@ -26,7 +24,7 @@ workflow EHMM {
 
     main:
         SPLIT_DATASETS(
-            background_bed,
+            background.map{ it[1] }.collect(),
             enhancers_bed,
             promoters_bed,
             gtf,
@@ -39,8 +37,8 @@ workflow EHMM {
 
         LEARN_BACKGROUND_MODEL (
             SPLIT_DATASETS.out.trainBackground.map{[[id: "train_background", model: "background"], it]},
-            background_bam,
-            background_bai,
+            background.map{ it[2] }.collect(),
+            background.map{ it[3] }.collect(),
             n_states,
             n_bins,
             pseudocount,
@@ -48,8 +46,8 @@ workflow EHMM {
 
         LEARN_ENHANCER_MODEL (
             SPLIT_DATASETS.out.trainEnhancers.map{[[id: "train_enhancers", model: "enhancer"], it]},
-            background_bam,
-            background_bai,
+            background.map{ it[2] }.collect(),
+            background.map{ it[3] }.collect(),
             n_states,
             n_bins,
             pseudocount,
@@ -57,8 +55,8 @@ workflow EHMM {
 
         LEARN_PROMOTER_MODEL (
             SPLIT_DATASETS.out.trainPromoters.map{[[id: "train_promoters", model: "promoter"], it]},
-            background_bam,
-            background_bai,
+            background.map{ it[2] }.collect(),
+            background.map{ it[3] }.collect(),
             n_states,
             n_bins,
             pseudocount,
