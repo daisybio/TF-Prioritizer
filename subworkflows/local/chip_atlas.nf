@@ -26,7 +26,7 @@ workflow CHIP_ATLAS {
         ch_ehmm_prep = ch_entries
             .map{
                 [antigen_key: (it['antigen_class'] + "_" + it['antigen']).strip("_")] + it
-            }   
+            }
             .filter{ antigens.contains(it['antigen_key'])}
             .map{ [[id: it['antigen_key']], file(it['file_url'])] }
 

@@ -3,6 +3,7 @@ include { LEARN_MODEL as LEARN_BACKGROUND_MODEL } from "../../modules/local/ehmm
 include { LEARN_MODEL as LEARN_ENHANCER_MODEL } from "../../modules/local/ehmm/learn_model"
 include { LEARN_MODEL as LEARN_PROMOTER_MODEL } from "../../modules/local/ehmm/learn_model"
 include { CONSTRUCT_MODEL } from "../../modules/local/ehmm/construct_model"
+include { CAT_CAT as CAT_BACKGROUND } from "../../modules/nf-core/cat/cat/main"
 
 workflow EHMM {
     take:
@@ -23,8 +24,12 @@ workflow EHMM {
         pseudocount
 
     main:
+        CAT_BACKGROUND(
+            background.map{ it[1] }.collect().map { [[id: 'background'], it] }
+        )
+
         SPLIT_DATASETS(
-            background.map{ it[1] }.collect(),
+            CAT_BACKGROUND.out.file_out,
             enhancers_bed,
             promoters_bed,
             gtf,
@@ -36,27 +41,27 @@ workflow EHMM {
         )
 
         LEARN_BACKGROUND_MODEL (
-            SPLIT_DATASETS.out.trainBackground.map{[[id: "train_background", model: "background"], it]},
-            background.map{ it[2] }.collect(),
-            background.map{ it[3] }.collect(),
+            SPLIT_DATASETS.out.trainBackground.map{[[id: "train_background", model: "BackgroundModel"], it]},
+            background.map{ it[2] }.collect().map{ [[id: "background_bam"], it]},
+            background.map{ it[3] }.collect().map{ [[id: "background_bai"], it]},
             n_states,
             n_bins,
             pseudocount,
         )
 
         LEARN_ENHANCER_MODEL (
-            SPLIT_DATASETS.out.trainEnhancers.map{[[id: "train_enhancers", model: "enhancer"], it]},
-            background.map{ it[2] }.collect(),
-            background.map{ it[3] }.collect(),
+            SPLIT_DATASETS.out.trainEnhancers.map{[[id: "train_enhancers", model: "EnhancerModel"], it]},
+            background.map{ it[2] }.collect().map{ [[id: "background_bam"], it]},
+            background.map{ it[3] }.collect().map{ [[id: "background_bai"], it]},
             n_states,
             n_bins,
             pseudocount,
         )
 
         LEARN_PROMOTER_MODEL (
-            SPLIT_DATASETS.out.trainPromoters.map{[[id: "train_promoters", model: "promoter"], it]},
-            background.map{ it[2] }.collect(),
-            background.map{ it[3] }.collect(),
+            SPLIT_DATASETS.out.trainPromoters.map{[[id: "train_promoters", model: "PromoterModel"], it]},
+            background.map{ it[2] }.collect().map{ [[id: "background_bam"], it]},
+            background.map{ it[3] }.collect().map{ [[id: "background_bai"], it]},
             n_states,
             n_bins,
             pseudocount,

@@ -5,8 +5,8 @@ process LEARN_MODEL {
 
     input:
         tuple val(meta), path(bed_file)
-        tuple val(meta2), path(bam_files)
-        tuple val(meta3), path(bai_files)
+        tuple val(meta2), path(bam_files, stageAs: 'bam_files/')
+        tuple val(meta3), path(bai_files, stageAs: 'bam_files/')
         val(n_states)
         val(n_bins)
         val(pseudocount)
@@ -17,17 +17,8 @@ process LEARN_MODEL {
 
     script:
         """
-        mkdir -p bam_files
-        for file in ${bam_files}; do
-            ln -fs ../\$file bam_files/\$file
-        done
-
-        for file in ${bai_files}; do
-            ln -fs ../\$file bam_files/\$file
-        done
-
         mkdir -p ${meta.model}
 
-        learnModel.R -r ${bed_file} -m bam_files -n ${n_states} -b ${n_bins} -p ${pseudocount} -f ${meta.model} -o ${meta.model}
+        learnModel.R -r ${bed_file} -m bam_files -n ${n_states} -b ${n_bins} -p ${pseudocount} -f ${meta.model} -o ${meta.model} -t ${task.cpus}
         """
 }

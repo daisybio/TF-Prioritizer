@@ -174,7 +174,7 @@ selectStates <- function (model) {
   k27ac <- sapply(model$emisP, function(emis) emis$mu[mark.k27ac])
   k4me1 <- sapply(model$emisP, function(emis) emis$mu[mark.k4me1])
   k4me3 <- sapply(model$emisP, function(emis) emis$mu[mark.k4me3])
-  acc <- order(atac/k27ac, decreasing = T)[1:2]
+    acc <- order(atac/k27ac, decreasing = T)[1:2]
   methyl.ratio <- order(k4me1/k4me3, decreasing = T)
   nuc.e <- methyl.ratio[!(methyl.ratio %in% acc)][1:2]
   nuc.p <- rev(methyl.ratio[!(methyl.ratio %in% acc)])[1:2]
@@ -315,25 +315,31 @@ parser <- add_argument(parser, "-t", help = "Number of threads", default = 21, t
 parser <- add_argument(parser, "-o", help = "Output directory", default = "./")
 
 argv <- parse_args(parser, argv = args)
-cat("loading models and counts...\n")
+print("Loading background model")
 load(argv$b)
 bgModel <- model
 bgCounts <- counts
 bgRegions <- regions
+
+print("Loading promoter model")
+load(argv$p)
+pModel <- model
+pCounts <- counts
+pRegions <- regions
+
+print("Selecting promoter states")
+pStates <- selectStates(pModel)
+
+print("Loading enhancer model")
 load(argv$e)
 eModel <- model
 eCounts <- counts
 eRegions <- regions
 
-print(eModel)
+print("Selecting enhancer states")
 eStates <- selectStates(eModel)
 
-load(argv$p)
-pModel <- model
-pCounts <- counts
-pRegions <- regions
-pStates <- selectStates(pModel)
-cat("constructing combined model...\n")
+print("Constructing combined model...\n")
 nthreads = argv$t
 
 model <- constructModelLocal(model.bg = bgModel, model.e = eModel, model.p = pModel,
