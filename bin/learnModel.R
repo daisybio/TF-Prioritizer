@@ -5,17 +5,6 @@ library(rtracklayer)
 library(argparser)
 library(tools)
 
-statesToSegments_helper <- function (regions, states) {
-  .Call("_ehmm_statesToSegments_helper", PACKAGE = "ehmm",
-        regions, states)
-}
-
-statesToSegments <- function (states, regions) {
-  h <- statesToSegments_helper(regions, states)
-  GRanges(seqnames = h$chrs, IRanges(start = h$starts, end = h$ends,
-                                     names = h$states))
-}
-
 args <- commandArgs(trailingOnly = T)
 parser <- arg_parser("EHMM command line parser", name = "ehmm")
 parser <- add_argument(parser, "-r", help = "Regions of interest")

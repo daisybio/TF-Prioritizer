@@ -49,6 +49,7 @@ include { GAWK as REMOVE_CHR_FAIDX } from '../modules/nf-core/gawk/main'
 include { GAWK as CLEAN_BED } from '../modules/nf-core/gawk/main'
 include { GAWK as CHR_M } from '../modules/nf-core/gawk/main'
 include { SAMTOOLS_FAIDX } from '../modules/nf-core/samtools/faidx/main'
+include { GAWK as CLEAN_INDEX } from '../modules/nf-core/gawk/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,6 +90,7 @@ workflow INSPECT {
 
     REMOVE_CHR_FAIDX(SAMTOOLS_FAIDX.out.fai, [])
     CHR_M(REMOVE_CHR_FAIDX.out.output, [])
+    CLEAN_INDEX(CHR_M.out.output, [])
 
     CHIP_ATLAS(CHR_M.out.output, params.ehmm_antigens)
     EH_ATLAS(params.genome, params.tax_id, params.enhancer_atlas_tissues)
@@ -100,7 +102,8 @@ workflow INSPECT {
         MAP_GTF.out.feature_annotation,
         CHIP_ATLAS.out.ehmm,
         EH_ATLAS.out.bed,
-        REMOVE_CHR.out.output
+        REMOVE_CHR.out.output,
+        CLEAN_INDEX.out.output,
     )
 
     ch_counts = Channel.value(file(params.rnaseq_counts, checkIfExists: true))

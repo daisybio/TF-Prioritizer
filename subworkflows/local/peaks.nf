@@ -14,7 +14,7 @@ include { COMBINE_TABLES as AFFINITY_SUM } from "../../modules/local/combine_tab
 include { COMBINE_TABLES as AFFINITY_RATIO } from "../../modules/local/combine_tables"
 include { COPY } from "../../modules/local/copy"
 include { EHMM } from './ehmm'
-
+include { GAWK as REMOVE_CHR } from "../../modules/nf-core/gawk/main"
 
 workflow PEAKS {
     take:
@@ -25,6 +25,8 @@ workflow PEAKS {
 
         ch_enhancers
         ch_promoters
+
+        ch_index
 
     main:
         CLEAN_BED_ANNOTATE_SAMPLES(ch_peaks, [])
@@ -64,11 +66,16 @@ workflow PEAKS {
             }
         }
 
+        REMOVE_CHR(ch_footprints, [])
+        ch_footprints_nochr = REMOVE_CHR.out.output
+
         EHMM(
             ch_background,
             ch_enhancers,
             ch_promoters,
+            ch_footprints_nochr,
             params.gtf,
+            ch_index,
 
             params.ehmm_genomic_region_size,
             params.ehmm_train_split,

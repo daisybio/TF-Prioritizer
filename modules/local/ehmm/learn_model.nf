@@ -5,8 +5,7 @@ process LEARN_MODEL {
 
     input:
         tuple val(meta), path(bed_file)
-        tuple val(meta2), path(bam_files, stageAs: 'bam_files/')
-        tuple val(meta3), path(bai_files, stageAs: 'bam_files/')
+        path(bam_bai_files, stageAs: 'bam_files/')
         val(n_states)
         val(n_bins)
         val(pseudocount)
