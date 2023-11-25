@@ -92,7 +92,6 @@ workflow PEAKS {
             params.ehmm_n_bins,
             params.ehmm_pseudocount
         )
-        /**
 
         if (params.blacklist) {
             SUBTRACT_BLACKLIST(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
@@ -166,5 +165,4 @@ workflow PEAKS {
         affinity_ratio = AFFINITY_RATIO.out
         affinity_sum = AFFINITY_SUM.out
         peaks = ch_blacklisted
-    */
 }

@@ -111,9 +111,6 @@ workflow INSPECT {
 
     COUNTS(ch_counts, ch_design, MAP_GTF.out.feature_annotation)
 
-
-    /*
-
     ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]
     }.combine(COUNTS.out.deseq2.map{
@@ -147,7 +144,6 @@ workflow INSPECT {
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)
-    */
 }
 
 /*
