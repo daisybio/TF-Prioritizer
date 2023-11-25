@@ -30,7 +30,8 @@ else:
     for df in dfs[1:]:
         index_intersection = index_intersection.intersection(df.index)
     
-    # Filter rows that are not present in all dataframes
+    print(f"Number of rows in intersection: {len(index_intersection)}")
+    # Keep row indices which are available in all dataframes
     dfs = [df.loc[index_intersection] for df in dfs]
 
 # Check if all dataframes have the same dimensions
@@ -54,13 +55,17 @@ elif args.method == "ratio":
     if len(dfs) != 2:
         raise ValueError("The ratio method requires exactly two input files.")
     
-    # Replace 0 values with minimal non-zero value
-    dfs[1] = dfs[1].replace(0, dfs[1][dfs[1] > 0].min())
+    # Replace 0 values with minimal existing float value
+    dfs[1] = dfs[1].replace(0, np.finfo(float).eps)
 
     result = dfs[0] / dfs[1]
 
+    print(f"Number of rows before dropping NA or inf values: {len(result)}")
+
     # Drop rows with NA or inf values (requirement for DYNAMITE)
     result = result.replace([np.inf, -np.inf], np.nan).dropna()
+
+    print(f"Number of rows after dropping NA or inf values: {len(result)}")
 
 # Write the result to a file
 result.to_csv(args.output, sep='\t', index=True, quoting=0)
