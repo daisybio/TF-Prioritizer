@@ -101,5 +101,21 @@ workflow EHMM {
         )
 
         ch_enhancers = APPLY_MODEL.out.enhancers
+                        .map{meta, regions -> [[id: meta["state"] + "_enhancers", 
+                                                state: meta["state"], 
+                                                antibody: "enhancers"], regions]}
+                        .filter{meta, regions -> regions.size() > 0}
         ch_promoters = APPLY_MODEL.out.promoters
+                        .map{meta, regions -> [[id: meta["state"] + "_promoters", 
+                                                state: meta["state"], 
+                                                antibody: "promoters"], regions]}
+                        .filter{meta, regions -> regions.size() > 0}
+        ch_all = ch_enhancers.mix(ch_promoters)
+
+        ch_all.view()
+    
+    emit:
+        enhancers = ch_enhancers
+        promoters = ch_promoters
+        all = ch_all
 }

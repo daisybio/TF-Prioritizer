@@ -17,7 +17,8 @@ process MERGE_IDENTICAL {
     script:
         prefix = task.ext.prefix ?: "${meta.id}"
         extension = task.ext.extension ?: "tsv"
+        mapping_str = mapping ? "--mapping ${mapping}" : ""
         """
-        merge_identical.py --input ${affinities} --mapping ${mapping} --output ${prefix}.${extension}
+        merge_identical.py --input ${affinities} ${mapping_str} --output ${prefix}.${extension}
         """
 }

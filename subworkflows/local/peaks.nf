@@ -69,29 +69,35 @@ workflow PEAKS {
         REMOVE_CHR(ch_footprints, [])
         ch_footprints_nochr = REMOVE_CHR.out.output
 
-        ch_bams = Channel.value(file(params.bam_design))
+        if (params.bam_design) {
+            ch_bams = Channel.value(file(params.bam_design))
                                 .splitCsv(header: true)
-                                .map{ row -> [[id: row["state"] + "_" + row["assay"], state: row["state"], assay: row["assay"]], file(row["directory"])]}
+                                .map{ row -> [[ id: row["state"] + "_" + row["assay"], 
+                                                state: row["state"], 
+                                                assay: row["assay"]], 
+                                                file(row["directory"])]}
+            EHMM(
+                ch_background,
+                ch_enhancers,
+                ch_promoters,
+                ch_footprints_nochr,
+                ch_bams,
 
-        EHMM(
-            ch_background,
-            ch_enhancers,
-            ch_promoters,
-            ch_footprints_nochr,
-            ch_bams,
+                params.gtf,
+                ch_index,
 
-            params.gtf,
-            ch_index,
+                params.ehmm_genomic_region_size,
+                params.ehmm_train_split,
+                params.ehmm_random_seed,
+                params.ehmm_top_quantile,
+                params.ehmm_n_samples,
+                params.ehmm_n_states,
+                params.ehmm_n_bins,
+                params.ehmm_pseudocount
+            )
 
-            params.ehmm_genomic_region_size,
-            params.ehmm_train_split,
-            params.ehmm_random_seed,
-            params.ehmm_top_quantile,
-            params.ehmm_n_samples,
-            params.ehmm_n_states,
-            params.ehmm_n_bins,
-            params.ehmm_pseudocount
-        )
+            ch_footprints = EHMM.out.all
+        }
 
         if (params.blacklist) {
             SUBTRACT_BLACKLIST(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
@@ -112,7 +118,7 @@ workflow PEAKS {
 
         ch_affinities = STARE.out.affinities
 
-        MERGE_IDENTICAL(ch_affinities, annotation_map)
+        MERGE_IDENTICAL(ch_affinities, [[], []])
 
         if (params.merge_peaks)
         {
