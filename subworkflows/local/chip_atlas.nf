@@ -28,7 +28,9 @@ workflow CHIP_ATLAS {
                 [antigen_key: (it['antigen_class'] + "_" + it['antigen']).strip("_")] + it
             }
             .filter{ antigens.contains(it['antigen_key'])}
-            .map{ [[id: it['antigen_key']], file(it['file_url'])] }
+            .map{ [[id: it['antigen_key'].replace("Histone_", "")], file(it['file_url'])] }
+        
+        ch_ehmm_prep.view()
 
         CLEAN_ALL(ch_ehmm_prep, [])
         REMOVE_CHR(CLEAN_ALL.out.output, [])

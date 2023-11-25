@@ -6,6 +6,7 @@ include { CONSTRUCT_MODEL } from "../../modules/local/ehmm/construct_model"
 include { APPLY_MODEL } from "../../modules/local/ehmm/apply_model"
 include { CAT_CAT as CAT_BACKGROUND } from "../../modules/nf-core/cat/cat/main"
 include { CAT_CAT as MERGE_ASSAYS } from "../../modules/nf-core/cat/cat/main"
+include { COPY as RENAME_BAMS } from "../../modules/local/copy"
 
 workflow EHMM {
     take:
@@ -13,6 +14,7 @@ workflow EHMM {
         enhancers_bed
         promoters_bed
         peaks
+        bams
 
         gtf
         index
@@ -77,15 +79,27 @@ workflow EHMM {
         )
 
         MERGE_ASSAYS (
-            peaks.map{[[id: it[0]["state"]], it[1]]}.groupTuple()
+            peaks.map{meta, file_ -> [[id: meta["state"], state: meta["state"]], file_]}.groupTuple()
         )
 
+        RENAME_BAMS (
+            bams.map{meta, original -> [meta, original, meta["assay"]]}
+        )
+
+        ch_bams = RENAME_BAMS.out
+                    .map{ meta, original, directory_ -> [[id: meta["state"], state: meta["state"]], directory_]}
+                    .groupTuple()
+
+        ch_combined = MERGE_ASSAYS.out.file_out.join(ch_bams)
+
         APPLY_MODEL (
-            MERGE_ASSAYS.out.file_out,
-            ch_bam_bai,
+            ch_combined,
             CONSTRUCT_MODEL.out.model,
             index,
             n_bins,
             pseudocount
         )
+
+        ch_enhancers = APPLY_MODEL.out.enhancers
+        ch_promoters = APPLY_MODEL.out.promoters
 }

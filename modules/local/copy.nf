@@ -13,7 +13,12 @@ process COPY {
         tuple val(meta), path(original), path(copy_name)
     
     script:
-    """
-    ln -s ${original} ${copy_name}
-    """
+    if (! (original.name == copy_name))
+        """
+        ln -s ${original} ${copy_name}
+        """
+    else
+        """
+        echo "No need to copy ${original} to ${copy_name}"
+        """
 }

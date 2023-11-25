@@ -24,7 +24,7 @@ regions <- makeGRangesFromDataFrame(regions)
 # find bam files
 bamfiles <- list.files(path = argv$m, pattern = "*.bam$", full.names = T)
 marks <- sapply(strsplit(file_path_sans_ext(basename(bamfiles)), "\\."), "[", 1)
-marks[grep("ALL|RNA|ATC|POL", marks, ignore.case = T)] <- "acc"
+marks[grep("ALL|RNA|ATC|POL|DNASE|ATAC", marks, ignore.case = T)] <- "acc"
 bamtab <- data.frame(mark = marks, path = bamfiles, check.names = F)
 nstates = argv$n
 binsize = argv$b

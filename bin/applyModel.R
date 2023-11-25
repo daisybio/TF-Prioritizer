@@ -33,10 +33,19 @@ levelsToDrop <- unique(unlist(lapply(c("Un", "M", "random",
 if (length(levelsToDrop) > 0)
   GenomeInfoDb::seqlevels(regions, pruning.mode="coarse") <- GenomeInfoDb::seqlevels(regions)[-levelsToDrop]
 # load bam files
-bamfiles <- list.files(path = argv$b, pattern = "*.bam$", full.names = T, recursive = T)
-marks <- sapply(strsplit(file_path_sans_ext(basename(bamfiles)), "\\."), "[", 1)
+
+bamdirectories <- list.dirs(path = argv$b, full.names = T, recursive = F)
+bamfiles <- list.files(path = bamdirectories, pattern = "*.bam$", full.names = T, recursive = T)
+
+# Map bamfiles to bamdirectories that they are part of. The file name is irrelevant
+marks <- unlist(lapply(bamfiles, function(x) {
+  for(i in seq_along(bamdirectories)){
+    if(grepl(bamdirectories[i], x)){
+      return(basename(bamdirectories[i]))
+    }
+  }
+}))
 marks[grep("ALL|RNA|ATC|DNASE|ATAC", marks, ignore.case = T)] <- "acc"
-print(marks)
 bamtab <- data.frame(mark = marks, path = bamfiles, check.names = F)
 bamtab$shift <- sapply(tolower(bamtab$mark), function(m) ifelse(any(sapply(c("atac", "dhs", "dnase", "acc"),
                                                                            function(s) grepl(s, m))), 0, 75))
@@ -91,6 +100,8 @@ message("loading model")
 model <- readModel(argv$m)
 model$marks <- toupper(model$marks)
 rownames(counts) <- toupper(rownames(counts))
+print(model$marks)
+print(rownames(counts))
 commonMarks <- intersect(rownames(counts), model$marks)
 if (length(commonMarks) < length(unique(c(rownames(counts), model$marks)))) {
   message("INFO: only using marks that are present in both training and testing set:\n",

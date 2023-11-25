@@ -69,11 +69,17 @@ workflow PEAKS {
         REMOVE_CHR(ch_footprints, [])
         ch_footprints_nochr = REMOVE_CHR.out.output
 
+        ch_bams = Channel.value(file(params.bam_design))
+                                .splitCsv(header: true)
+                                .map{ row -> [[id: row["state"] + "_" + row["assay"], state: row["state"], assay: row["assay"]], file(row["directory"])]}
+
         EHMM(
             ch_background,
             ch_enhancers,
             ch_promoters,
             ch_footprints_nochr,
+            ch_bams,
+
             params.gtf,
             ch_index,
 
