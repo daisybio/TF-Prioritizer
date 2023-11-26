@@ -50,6 +50,7 @@ include { GAWK as CLEAN_BED } from '../modules/nf-core/gawk/main'
 include { GAWK as CHR_M } from '../modules/nf-core/gawk/main'
 include { SAMTOOLS_FAIDX } from '../modules/nf-core/samtools/faidx/main'
 include { GAWK as CLEAN_INDEX } from '../modules/nf-core/gawk/main'
+include { GAWK as REMOVE_GENE_VERSIONS } from '../modules/nf-core/gawk/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,6 +84,10 @@ workflow INSPECT {
         [[], []]
     )
 
+    REMOVE_GENE_VERSIONS(MAP_GTF.out.feature_annotation, [])
+
+    ch_gene_map = REMOVE_GENE_VERSIONS.out.output
+
     SAMTOOLS_FAIDX (
         [[id:"genome"], params.fasta],
         [[], []]
@@ -99,7 +104,7 @@ workflow INSPECT {
 
     PEAKS(
         ch_peaks,
-        MAP_GTF.out.feature_annotation,
+        ch_gene_map,
         CHIP_ATLAS.out.ehmm,
         EH_ATLAS.out.bed,
         REMOVE_CHR.out.output,
@@ -109,7 +114,7 @@ workflow INSPECT {
     ch_counts = Channel.value(file(params.rnaseq_counts, checkIfExists: true))
     ch_design = Channel.value(file(params.rnaseq_design, checkIfExists: true))
 
-    COUNTS(ch_counts, ch_design, MAP_GTF.out.feature_annotation)
+    COUNTS(ch_counts, ch_design, ch_gene_map)
 
     ch_affinityRatio_deseq = PEAKS.out.affinity_ratio.map{
         meta, file -> [meta.state1, meta.state2, meta, file]

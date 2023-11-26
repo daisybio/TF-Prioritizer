@@ -118,7 +118,7 @@ workflow PEAKS {
 
         ch_affinities = STARE.out.affinities
 
-        MERGE_IDENTICAL(ch_affinities, [[], []])
+        MERGE_IDENTICAL(ch_affinities, annotation_map)
 
         if (params.merge_peaks)
         {

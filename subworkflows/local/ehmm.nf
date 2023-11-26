@@ -7,6 +7,7 @@ include { APPLY_MODEL } from "../../modules/local/ehmm/apply_model"
 include { CAT_CAT as CAT_BACKGROUND } from "../../modules/nf-core/cat/cat/main"
 include { CAT_CAT as MERGE_ASSAYS } from "../../modules/nf-core/cat/cat/main"
 include { COPY as RENAME_BAMS } from "../../modules/local/copy"
+include { CAT_CAT as MERGE_PROMOTERS_ENHANCERS } from "../../modules/nf-core/cat/cat/main"
 
 workflow EHMM {
     take:
@@ -110,9 +111,20 @@ workflow EHMM {
                                                 state: meta["state"], 
                                                 antibody: "promoters"], regions]}
                         .filter{meta, regions -> regions.size() > 0}
-        ch_all = ch_enhancers.mix(ch_promoters)
 
-        ch_all.view()
+        /*
+        MERGE_PROMOTERS_ENHANCERS (
+            ch_enhancers.map{meta, regions -> [[id: meta["state"]], regions]}.mix(
+                ch_promoters.map{meta, regions -> [[id: meta["state"]], regions]}
+            ).groupTuple()
+        )
+
+        ch_all = MERGE_PROMOTERS_ENHANCERS.out.file_out.map{meta, regions -> [[id: meta["id"] + "_all", 
+                                                                                state: meta["id"], 
+                                                                                antibody: "regulatoryElements"], regions]}
+        */
+
+        ch_all = ch_enhancers.mix(ch_promoters)
     
     emit:
         enhancers = ch_enhancers

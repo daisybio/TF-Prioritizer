@@ -27,7 +27,7 @@ process FILTER {
         df = pd.read_csv("${sheet}")
 
         # Filter by genome assembly
-        df = df[((df["genome_assembly"] == "mm10") & (df["cell_type_class"].isin(cell_types)) & (df["cell_type"].isna()))]
+        df = df[((df["genome_assembly"] == "$genome") & (df["cell_type_class"].isin(cell_types)) & (df["cell_type"].isna()))]
 
         df = df[["antigen", "antigen_class", "cell_type_class", "threshold", "file_url"]]
         df["threshold"] = df["threshold"].fillna(0)

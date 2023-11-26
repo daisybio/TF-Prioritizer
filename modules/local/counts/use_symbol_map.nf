@@ -22,11 +22,8 @@ process USE_SYMBOL_MAP {
 
         df = pd.read_csv("${dataframe}", sep="\\t", index_col=0)
         df_mapping = pd.read_csv("${symbol_map}", sep="\\t", index_col=0)
-
-        # Convert the symbol map to a dictionary
-        symbol_map = df_mapping.to_dict()["gene_name"]
         
-        df = df.rename(index=symbol_map)
+        df = df.rename(index=df_mapping["gene_name"])
 
         # Merge rows with the same gene symbol
         df = df.groupby(df.index).mean().round(0).astype(int)
