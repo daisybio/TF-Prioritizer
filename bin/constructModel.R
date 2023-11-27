@@ -42,7 +42,7 @@ eStates <- selectStates(eModel)
 print("Constructing combined model...\n")
 nthreads = argv$t
 
-constructModelInspect(model.bg = bgModel, model.e = eModel, model.p = pModel,
+constructModel(model.bg = bgModel, model.e = eModel, model.p = pModel,
                              counts.e = eCounts, counts.p = pCounts,
                              regions.e = eRegions, regions.p = pRegions,
                              nthreads = nthreads, outdir = argv$o)

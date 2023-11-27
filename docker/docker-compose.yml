@@ -11,3 +11,7 @@ services:
     build:
       context: python
     image: bigdatainbiomedicine/inspect-python
+  ehmm:
+    build:
+      context: ehmm
+    image: bigdatainbiomedicine/inspect-ehmm

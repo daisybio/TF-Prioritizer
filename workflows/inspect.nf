@@ -94,10 +94,10 @@ workflow INSPECT {
     )
 
     REMOVE_CHR_FAIDX(SAMTOOLS_FAIDX.out.fai, [])
-    CHR_M(REMOVE_CHR_FAIDX.out.output, [])
-    CLEAN_INDEX(CHR_M.out.output, [])
+    // CHR_M(REMOVE_CHR_FAIDX.out.output, [])
+    CLEAN_INDEX(REMOVE_CHR_FAIDX.out.output, [])
 
-    CHIP_ATLAS(CHR_M.out.output, params.ehmm_antigens)
+    CHIP_ATLAS(REMOVE_CHR_FAIDX.out.output, params.ehmm_antigens)
     EH_ATLAS(params.genome, params.tax_id, params.enhancer_atlas_tissues)
     CLEAN_BED([[id:"promoters"], params.promoters], [])
     REMOVE_CHR(CLEAN_BED.out.output, [])

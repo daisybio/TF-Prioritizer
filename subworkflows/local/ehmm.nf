@@ -47,7 +47,8 @@ workflow EHMM {
             n_samples
         )
 
-        ch_bam_bai = background.map{ [it[2], it[3]] }.flatten().collect()
+        ch_bam_bai = background.map{ meta, bed, bam, bai -> [meta["id"], bam, bai]}
+                               .reduce([[], [], []]){ acc, curr -> [acc[0] + [curr[0]], acc[1] + [curr[1]], acc[2] + [curr[2]]]}
 
         LEARN_BACKGROUND_MODEL (
             SPLIT_DATASETS.out.trainBackground.map{[[id: "train_background", model: "BackgroundModel"], it]},
@@ -74,9 +75,9 @@ workflow EHMM {
         )
 
         CONSTRUCT_MODEL (
-            LEARN_BACKGROUND_MODEL.out.rdata,
-            LEARN_ENHANCER_MODEL.out.rdata,
-            LEARN_PROMOTER_MODEL.out.rdata
+            LEARN_BACKGROUND_MODEL.out.model,
+            LEARN_ENHANCER_MODEL.out.model,
+            LEARN_PROMOTER_MODEL.out.model
         )
 
         MERGE_ASSAYS (

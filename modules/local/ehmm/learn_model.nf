@@ -5,19 +5,23 @@ process LEARN_MODEL {
 
     input:
         tuple val(meta), path(bed_file)
-        path(bam_bai_files, stageAs: 'bam_files/')
+        tuple val(marks), path(bam_files, stageAs: "bams/"), path(bai_files, stageAs: "bams/")
         val(n_states)
         val(n_bins)
         val(pseudocount)
 
     output:
-        path("${meta.model}/${meta.model}.RData"), emit: rdata
-        path("${meta.model}"), emit: directory
+        tuple path("${meta.model}/model.txt"), path("${meta.model}/countmatrix.txt"), path("${meta.model}/segmentation.bed"), emit: model
 
     script:
+        marks_string = ""
+        for (int i = 0; i < marks.size(); i++) {
+            marks_string += " --mark ${marks[i]}:${bam_files[i]} "
+        }
+
         """
         mkdir -p ${meta.model}
 
-        learnModel.R -r ${bed_file} -m bam_files -n ${n_states} -b ${n_bins} -p ${pseudocount} -f ${meta.model} -o ${meta.model} -t ${task.cpus}
+        ehmm learnModel ${marks_string} --regions ${bed_file} --nstates ${n_states} --pseudoCount ${pseudocount} --outdir ${meta.model} --nthreads ${task.cpus}
         """
 }
