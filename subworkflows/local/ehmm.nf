@@ -6,8 +6,18 @@ include { CONSTRUCT_MODEL } from "../../modules/local/ehmm/construct_model"
 include { APPLY_MODEL } from "../../modules/local/ehmm/apply_model"
 include { CAT_CAT as CAT_BACKGROUND } from "../../modules/nf-core/cat/cat/main"
 include { CAT_CAT as MERGE_ASSAYS } from "../../modules/nf-core/cat/cat/main"
-include { COPY as RENAME_BAMS } from "../../modules/local/copy"
 include { CAT_CAT as MERGE_PROMOTERS_ENHANCERS } from "../../modules/nf-core/cat/cat/main"
+
+// Groovy function mapping a directory to a list of files in it with a matching extension
+def directory_to_files(dir, ext) {
+    def files = []
+    dir.eachFileRecurse () { file ->
+        if (file.name.endsWith(ext)) {
+            files.add(file)
+        }
+    }
+    return files
+}
 
 workflow EHMM {
     take:
@@ -84,22 +94,21 @@ workflow EHMM {
             peaks.map{meta, file_ -> [[id: meta["state"], state: meta["state"]], file_]}.groupTuple()
         )
 
-        RENAME_BAMS (
-            bams.map{meta, original -> [meta, original, meta["assay"]]}
-        )
+        ch_bams = bams.map{ meta, directory -> [meta["state"], meta["assay"], directory]}
+                      .map{ state, assay, directory -> [state, assay, directory_to_files(directory, ".bam"), directory_to_files(directory, ".bai")]}
+                      .transpose(by: [2, 3])
+                      .groupTuple()
+                      .map{ state, assays, bams, bais -> [[id: state, state: state], assays, bams, bais]}
 
-        ch_bams = RENAME_BAMS.out
-                    .map{ meta, original, directory_ -> [[id: meta["state"], state: meta["state"]], directory_]}
-                    .groupTuple()
-
-        ch_combined = MERGE_ASSAYS.out.file_out.join(ch_bams)
+        ch_combined = MERGE_ASSAYS.out.file_out .map{meta, bed -> [meta["state"], bed]}
+                                                .join(ch_bams.map{meta, assays, bams, bais -> [meta["state"], assays, bams, bais]})
+                                                .map{state, bed, assays, bams, bais -> [[id: state], bed, assays, bams, bais]}
 
         APPLY_MODEL (
             ch_combined,
             CONSTRUCT_MODEL.out.model,
             index,
-            n_bins,
-            pseudocount
+            n_bins
         )
 
         ch_enhancers = APPLY_MODEL.out.enhancers

@@ -76,6 +76,7 @@ workflow PEAKS {
                                                 state: row["state"], 
                                                 assay: row["assay"]], 
                                                 file(row["directory"])]}
+
             EHMM(
                 ch_background,
                 ch_enhancers,
