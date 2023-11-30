@@ -10,7 +10,7 @@ process CONSTRUCT_MODEL {
 
     output:
         path('model'), emit: model_dir
-        path('model/model.txt'), emit: model
+        path('model/model.RData'), emit: model
 
     script:
         """
