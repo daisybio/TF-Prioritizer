@@ -4,9 +4,9 @@ process CONSTRUCT_MODEL {
     container 'registry.hub.docker.com/bigdatainbiomedicine/inspect-ehmm'
 
     input:
-        tuple path(background_model, stageAs: 'background.model'), path(background_counts, stageAs: 'background.counts'), path(background_bed, stageAs: 'background.bed')
-        tuple path(enhancer_model, stageAs: 'enhancers.model'), path(enhancers_counts, stageAs: 'enhancers.counts'), path(enhancers_bed, stageAs: 'enhancers.bed')
-        tuple path(promoter_model, stageAs: 'promoters.model'), path(promoters_counts, stageAs: 'promoters.counts'), path(promoters_bed, stageAs: 'promoters.bed')
+        path(background_model, stageAs: 'background.RData')
+        path(enhancer_model, stageAs: 'enhancers.RData')
+        path(promoter_model, stageAs: 'promoters.RData')
 
     output:
         path('model'), emit: model_dir
@@ -17,13 +17,9 @@ process CONSTRUCT_MODEL {
         mkdir -p model
 
         ehmm constructModel \\
-            --model.e ${enhancer_model} \\
-            --counts.e ${enhancers_counts} \\
-            --regions.e ${enhancers_bed} \\
-            --model.p ${promoter_model} \\
-            --counts.p ${promoters_counts} \\
-            --regions.p ${promoters_bed} \\
-            --model.bg ${background_model} \\
+            --enhancers ${enhancer_model} \\
+            --promoters ${promoter_model} \\
+            --background ${background_model} \\
             --nthreads ${task.cpus} \\
             --outdir model
         """

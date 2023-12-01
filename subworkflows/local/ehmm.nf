@@ -112,13 +112,13 @@ workflow EHMM {
         )
 
         ch_enhancers = APPLY_MODEL.out.enhancers
-                        .map{meta, regions -> [[id: meta["state"] + "_enhancers", 
-                                                state: meta["state"], 
+                        .map{meta, regions -> [[id: meta["id"] + "_enhancers", 
+                                                state: meta["id"], 
                                                 antibody: "enhancers"], regions]}
                         .filter{meta, regions -> regions.size() > 0}
         ch_promoters = APPLY_MODEL.out.promoters
-                        .map{meta, regions -> [[id: meta["state"] + "_promoters", 
-                                                state: meta["state"], 
+                        .map{meta, regions -> [[id: meta["id"] + "_promoters", 
+                                                state: meta["id"], 
                                                 antibody: "promoters"], regions]}
                         .filter{meta, regions -> regions.size() > 0}
 

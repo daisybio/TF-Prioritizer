@@ -11,7 +11,7 @@ process LEARN_MODEL {
         val(pseudocount)
 
     output:
-        tuple path("${meta.model}/model.txt"), path("${meta.model}/countmatrix.txt"), path("${meta.model}/segmentation.bed"), emit: model
+        path("${meta.model}/model.RData"), emit: model
 
     script:
         marks_string = ""
