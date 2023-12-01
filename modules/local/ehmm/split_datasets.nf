@@ -2,7 +2,7 @@ process SPLIT_DATASETS {
     tag "split_datasets"
     label 'process_high_memory'
 
-    container 'registry.hub.docker.com/bigdatainbiomedicine/inspect-ehmm'
+    container 'registry.hub.docker.com/bigdatainbiomedicine/inspect-r'
 
     input:
         tuple val(meta), path(background)

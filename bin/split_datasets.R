@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 
-library(ehmm)
 library(argparser)
 library(rtracklayer)
 library(GenomicRanges)
