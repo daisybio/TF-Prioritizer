@@ -12,4 +12,9 @@ process MAKE_CELLMARKFILETABLE {
     """
     make_cellmarkfiletable.py --input_dir $bamDirectory --output cellmarkfiletable.txt
     """
+
+    stub:
+	"""
+	touch cellmarkfiletable.txt
+	"""
 }

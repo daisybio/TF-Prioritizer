@@ -12,5 +12,10 @@ process REFORMAT_BAM {
     """
     reformat_bam.sh $bamFileIn ${bamFileIn.baseName}_reformatted.bam
     """
+
+	stub:
+	"""
+	touch ${bamFileIn.baseName}_reformatted.bam
+	"""
 }
 
