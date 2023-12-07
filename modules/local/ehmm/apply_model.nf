@@ -6,6 +6,7 @@ process APPLY_MODEL {
   input:
     tuple val(meta), path(bed), val(marks), path(bam_files, stageAs: "bams/"), path(bai_files, stageAs: "bams/")
     path(model)
+    path(refCounts)
     tuple val(meta2), path(index)
     val(binSize)
 
@@ -22,6 +23,7 @@ process APPLY_MODEL {
     ehmm applyModel --regions ${bed} \\
                   --genomeSize ${index} \\
                   --model ${model} \\
+                  --refCounts ${refCounts} \\
                   ${marks_string} \\
                   --nthreads ${task.cpus} \\
                   --binsize ${binSize}

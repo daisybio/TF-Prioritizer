@@ -63,6 +63,7 @@ workflow EHMM {
         LEARN_BACKGROUND_MODEL (
             SPLIT_DATASETS.out.trainBackground.map{[[id: "train_background", model: "BackgroundModel"], it]},
             ch_bam_bai,
+            index,
             n_states,
             n_bins,
             pseudocount,
@@ -71,6 +72,7 @@ workflow EHMM {
         LEARN_ENHANCER_MODEL (
             SPLIT_DATASETS.out.trainEnhancers.map{[[id: "train_enhancers", model: "EnhancerModel"], it]},
             ch_bam_bai,
+            index,
             n_states,
             n_bins,
             pseudocount,
@@ -79,6 +81,7 @@ workflow EHMM {
         LEARN_PROMOTER_MODEL (
             SPLIT_DATASETS.out.trainPromoters.map{[[id: "train_promoters", model: "PromoterModel"], it]},
             ch_bam_bai,
+            index,
             n_states,
             n_bins,
             pseudocount,
@@ -107,6 +110,7 @@ workflow EHMM {
         APPLY_MODEL (
             ch_combined,
             CONSTRUCT_MODEL.out.model,
+            LEARN_BACKGROUND_MODEL.out.refCounts,
             index,
             n_bins
         )
