@@ -1,6 +1,6 @@
 process LEARN_MODEL {
 
-	//TODO: Check if java container needed
+	container "docker://openjdk:17.0.1-jdk"
 
     input:
     path binarized_bams

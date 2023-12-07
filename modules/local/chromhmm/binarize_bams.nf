@@ -1,6 +1,6 @@
 process BINARIZE_BAMS {
 
-	//TODO: Check if java container needed
+	container "docker://openjdk:17.0.1-jdk"
 
     input:
     path cellmarkfiletable
