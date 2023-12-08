@@ -1,5 +1,6 @@
 process LEARN_MODEL {
 
+	label "process_high"
 	container "docker://openjdk:17.0.1-jdk"
 
     input:

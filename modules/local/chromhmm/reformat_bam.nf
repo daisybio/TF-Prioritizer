@@ -1,5 +1,6 @@
 process REFORMAT_BAM {
 
+    label "process_medium"
     container "registry.hub.docker.com/staphb/samtools"
 
     input:

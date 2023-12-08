@@ -1,5 +1,6 @@
 process BINARIZE_BAMS {
 
+	label "process_high"
 	container "docker://openjdk:17.0.1-jdk"
 
     input:

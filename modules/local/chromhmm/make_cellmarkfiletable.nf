@@ -1,5 +1,6 @@
 process MAKE_CELLMARKFILETABLE {
 
+    label "process_single"
     container "quay.io/biocontainers/pandas:1.4.3"
 
     input:
