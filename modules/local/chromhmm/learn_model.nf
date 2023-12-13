@@ -15,7 +15,7 @@ process LEARN_MODEL {
     """
 	// Organism (PLACEHOLDER) only needed for downstream analysis of ChromHMM and therefore not supplied
 
-	java -jar ${projectDir}/assets/ChromHMM.jar LearnModel \
+	java -jar ChromHMM.jar LearnModel \
         -p $task.cpus \
 		$binarized_bams \
 		ChromHMM_output \

@@ -13,7 +13,7 @@ process BINARIZE_BAMS {
 
     script:
     """
-	java -jar ${projectDir}/assets/ChromHMM.jar BinarizeBam \
+	java -jar ChromHMM.jar BinarizeBam \
 		$chromsizes \
 		reformatted_bams \
 		$cellmarkfiletable \
