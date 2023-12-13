@@ -11,7 +11,7 @@ workflow CHROMHMM {
 	take:
 		raw_bams
 		chromhmm_states // default to 10
-		organism // mm10
+		chromsizes
 
 
 	main:
@@ -23,9 +23,9 @@ workflow CHROMHMM {
 
     	INDEX_BAM(REFORMAT_BAM.out)
 
-    	BINARIZE_BAMS(MAKE_CELLMARKFILETABLE.out, INDEX_BAM.out.bai.collect(), organism)
+    	BINARIZE_BAMS(MAKE_CELLMARKFILETABLE.out, INDEX_BAM.out.bai.collect(), chromsizes)
 
-    	LEARN_MODEL(BINARIZE_BAMS.out, chromhmm_states, organism)
+    	LEARN_MODEL(BINARIZE_BAMS.out, chromhmm_states)
 
 		ch_emission_bed = LEARN_MODEL.out.emissions.combine(LEARN_MODEL.out.beds.flatten())
 

@@ -17,12 +17,13 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-params.fasta     = WorkflowMain.getGenomeAttribute(params, 'fasta')
-params.gtf       = WorkflowMain.getGenomeAttribute(params, 'gtf')
-params.blacklist = WorkflowMain.getGenomeAttribute(params, 'blacklist')
-params.pwm       = WorkflowMain.getGenomeAttribute(params, 'pwm')
-params.tax_id    = WorkflowMain.getGenomeAttribute(params, 'tax_id')
-params.promoters = WorkflowMain.getGenomeAttribute(params, 'promoters')
+params.fasta        = WorkflowMain.getGenomeAttribute(params, 'fasta')
+params.gtf          = WorkflowMain.getGenomeAttribute(params, 'gtf')
+params.blacklist    = WorkflowMain.getGenomeAttribute(params, 'blacklist')
+params.pwm          = WorkflowMain.getGenomeAttribute(params, 'pwm')
+params.tax_id       = WorkflowMain.getGenomeAttribute(params, 'tax_id')
+params.promoters    = WorkflowMain.getGenomeAttribute(params, 'promoters')
+params.chromsizes   = WorkflowMain.getGenomeAttribute(params, 'chromsizes')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

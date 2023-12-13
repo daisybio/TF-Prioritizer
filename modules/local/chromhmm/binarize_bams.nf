@@ -6,7 +6,7 @@ process BINARIZE_BAMS {
     input:
     path cellmarkfiletable
     path bams, stageAs: "reformatted_bams/*"
-	val organism
+	path chromsizes
 
     output:
     path "binarized_bams"
@@ -14,7 +14,7 @@ process BINARIZE_BAMS {
     script:
     """
 	java -jar ${projectDir}/assets/ChromHMM.jar BinarizeBam \
-		${projectDir}/assets/CHROMSIZES/"${organism}".txt \
+		$chromsizes \
 		reformatted_bams \
 		$cellmarkfiletable \
 		binarized_bams

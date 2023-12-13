@@ -6,7 +6,6 @@ process LEARN_MODEL {
     input:
     path binarized_bams
     val states
-    val organism
 
     output:
     path "ChromHMM_output/emissions_${states}.txt", emit: emissions
@@ -14,14 +13,14 @@ process LEARN_MODEL {
 
     script:
     """
-    //TODO: Check for parameters for the number of states (default 10) and organism
+	// Organism (PLACEHOLDER) only needed for downstream analysis of ChromHMM and therefore not supplied
 
 	java -jar ${projectDir}/assets/ChromHMM.jar LearnModel \
         -p $task.cpus \
 		$binarized_bams \
 		ChromHMM_output \
 		$states \
-		$organism
+		PLACEHOLDER
     """
 
     stub:
