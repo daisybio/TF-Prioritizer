@@ -23,7 +23,7 @@ workflow CHROMHMM {
 
     	INDEX_BAM(REFORMAT_BAM.out)
 
-    	BINARIZE_BAMS(MAKE_CELLMARKFILETABLE.out, INDEX_BAM.out.bai.collect(), chromsizes)
+    	BINARIZE_BAMS(INDEX_BAM.out.bai.collect(), MAKE_CELLMARKFILETABLE.out, chromsizes)
 
     	LEARN_MODEL(BINARIZE_BAMS.out, chromhmm_states)
 

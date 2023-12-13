@@ -4,12 +4,12 @@ process BINARIZE_BAMS {
 	container "docker://openjdk:17.0.1-jdk"
 
     input:
-    path cellmarkfiletable
-    path bams, stageAs: "reformatted_bams/*"
+    tuple val(meta), path(bams, stageAs: "reformatted_bams/")
+	path cellmarkfiletable
 	path chromsizes
 
     output:
-    path "binarized_bams"
+    tuple val(meta), path("binarized_bams")
 
     script:
     """
@@ -18,7 +18,6 @@ process BINARIZE_BAMS {
 		reformatted_bams \
 		$cellmarkfiletable \
 		binarized_bams
-    
 	"""
 
 	stub:

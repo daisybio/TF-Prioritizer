@@ -4,10 +4,10 @@ process REFORMAT_BAM {
     container "registry.hub.docker.com/staphb/samtools"
 
     input:
-    path bamFileIn
+    tuple val(meta), path(bamFileIn)
 
     output:
-    path "${bamFileIn.baseName}_reformatted.bam"
+    tuple val(meta), path("${bamFileIn.baseName}_reformatted.bam")
 
     script:
     """

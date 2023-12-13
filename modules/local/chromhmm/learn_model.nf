@@ -4,12 +4,12 @@ process LEARN_MODEL {
 	container "docker://openjdk:17.0.1-jdk"
 
     input:
-    path binarized_bams
+    tuple val(meta), path(binarized_bams)
     val states
 
     output:
-    path "ChromHMM_output/emissions_${states}.txt", emit: emissions
-	path "ChromHMM_output/*_${states}_dense.bed", emit: beds
+    tuple val(meta), path("ChromHMM_output/emissions_${states}.txt"), emit: emissions
+	tuple val(meta), path("ChromHMM_output/*_${states}_dense.bed"), emit: beds
 
     script:
     """
