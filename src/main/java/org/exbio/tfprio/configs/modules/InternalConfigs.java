@@ -17,8 +17,8 @@ public class InternalConfigs extends ConfigModule {
     }});
 
     public final InternalConfig<String> jasparURL = new InternalConfig<>(
-            "https://jaspar.genereg.net/download/data/2022/CORE/JASPAR2022_CORE_redundant_pfms_jaspar.txt");
+            "https://jaspar.elixir.no/download/data/2024/CORE/JASPAR2024_CORE_non-redundant_pfms_jaspar.txt");
 
     public final InternalConfig<String> jasparLogoUrl =
-            new InternalConfig<>("https://jaspar.genereg.net/static/logos/all/svg/");
+            new InternalConfig<>("https://jaspar.elixir.no/static/logos/all/svg/");
 }
