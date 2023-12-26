@@ -1,22 +1,22 @@
 process LEARN_MODEL {
 
 	label "process_high"
-	container "docker://openjdk:17.0.1-jdk"
+	container "registry.hub.docker.com/leonhafner/openjdk:17"
 
     input:
-    tuple val(meta), path(binarized_bams)
+    path binarized_bams
     val states
 
     output:
-    tuple val(meta), path("ChromHMM_output/emissions_${states}.txt"), emit: emissions
-	tuple val(meta), path("ChromHMM_output/*_${states}_dense.bed"), emit: beds
+    path "ChromHMM_output/emissions_${states}.txt", emit: emissions
+	path "ChromHMM_output/*_${states}_dense.bed", emit: beds
 
     script:
     """
-	// Organism (PLACEHOLDER) only needed for downstream analysis of ChromHMM and therefore not supplied
+	# Organism (PLACEHOLDER) only needed for downstream analysis of ChromHMM and therefore not supplied
 
-	java -jar ChromHMM.jar LearnModel \
-        -p $task.cpus \
+	ChromHMM.jar LearnModel \
+    	-p $task.cpus \
 		$binarized_bams \
 		ChromHMM_output \
 		$states \

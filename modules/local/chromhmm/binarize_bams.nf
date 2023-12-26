@@ -1,19 +1,20 @@
 process BINARIZE_BAMS {
 
 	label "process_high"
-	container "docker://openjdk:17.0.1-jdk"
+	container "registry.hub.docker.com/leonhafner/openjdk:17"
 
     input:
-    tuple val(meta), path(bams, stageAs: "reformatted_bams/")
+    path bams, stageAs: "reformatted_bams/*"
+	path bais, stageAs: "reformatted_bams/*"
 	path cellmarkfiletable
 	path chromsizes
 
     output:
-    tuple val(meta), path("binarized_bams")
+    path "binarized_bams"
 
     script:
     """
-	java -jar ChromHMM.jar BinarizeBam \
+	ChromHMM.jar BinarizeBam \
 		$chromsizes \
 		reformatted_bams \
 		$cellmarkfiletable \

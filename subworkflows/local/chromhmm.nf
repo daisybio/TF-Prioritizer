@@ -10,24 +10,26 @@ include { GET_OUTPUT } from "../../modules/local/chromhmm/get_output"
 workflow CHROMHMM {
 	take:
 		raw_bams
-		chromhmm_states // default to 10
+		chromhmm_states
 		chromsizes
 
 
-	main:
-		ch_bams_raw = Channel.fromPath("${raw_bams}/*/*.bam")
+	main:		
+    	MAKE_CELLMARKFILETABLE(Channel.fromPath(params.bam_design2))
 
-    	MAKE_CELLMARKFILETABLE("${raw_bams}")
-
-    	REFORMAT_BAM(ch_bams_raw)
-
+    	REFORMAT_BAM(raw_bams)
+		
     	INDEX_BAM(REFORMAT_BAM.out)
-
-    	BINARIZE_BAMS(INDEX_BAM.out.bai.collect(), MAKE_CELLMARKFILETABLE.out, chromsizes)
-
+		
+		// map() is used to remove metadata
+    	BINARIZE_BAMS(REFORMAT_BAM.out.map(entry -> entry[1]).collect(), INDEX_BAM.out.bai.map(entry -> entry[1]).collect(), MAKE_CELLMARKFILETABLE.out, chromsizes)
+		
     	LEARN_MODEL(BINARIZE_BAMS.out, chromhmm_states)
-
+		
 		ch_emission_bed = LEARN_MODEL.out.emissions.combine(LEARN_MODEL.out.beds.flatten())
 
 		GET_OUTPUT(ch_emission_bed)
+	
+	emit:
+		enhancers = GET_OUTPUT.out
 }

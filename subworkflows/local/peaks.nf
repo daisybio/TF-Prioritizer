@@ -15,6 +15,7 @@ include { COMBINE_TABLES as AFFINITY_RATIO } from "../../modules/local/combine_t
 include { COPY } from "../../modules/local/copy"
 include { EHMM } from './ehmm'
 include { GAWK as REMOVE_CHR } from "../../modules/nf-core/gawk/main"
+include { CHROMHMM } from "./chromhmm"
 
 workflow PEAKS {
     take:
@@ -99,7 +100,41 @@ workflow PEAKS {
 
             ch_footprints = EHMM.out.all
         }
+        
+        if (params.bam_design2) {
+            // Parse design file
+            ch_bams = Channel.value(file(params.bam_design2))
+                                .splitCsv(header: ["state", "assay", "bam", "control"], sep: '\t')
+                                .map{
+                                    row -> [
+                                        [
+                                            id: row["state"] + "_" + row["assay"],
+                                            state: row["state"],
+                                            assay: row["assay"],
+                                        ],
+                                        [
+                                            file(row["bam"]), file(row["control"])
+                                        ],
+                                    ]
+                                }
+                                .multiMap{
+                                    row -> 
+                                        normal_bams:
+                                            [row[0], row[1][0]]
+                                        control_bams:
+                                            [row[0], row[1][1]]
+                                }
+        // Reunite channels with unique controls
+        ch_bams = ch_bams.normal_bams.mix(ch_bams.control_bams.unique{ it[1] })
 
+        CHROMHMM(
+            ch_bams,
+            params.chromhmm_states,
+            params.chromsizes
+        )
+        
+        }
+        
         if (params.blacklist) {
             SUBTRACT_BLACKLIST(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
             ch_blacklisted = SUBTRACT_BLACKLIST.out.bed
