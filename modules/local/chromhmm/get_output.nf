@@ -4,10 +4,10 @@ process GET_OUTPUT {
     container "quay.io/biocontainers/pandas:1.4.3"
 
     input:
-    tuple path(emissions), path(bed)
+    tuple val(meta), path(emissions), path(bed)
 
     output:
-	path "enhancers_${bed.baseName.split('_')[0]}.bed"
+	tuple val(meta), path("enhancers_${bed.baseName.split('_')[0]}.bed")
 
 	script:
 	"""

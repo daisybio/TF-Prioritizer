@@ -26,7 +26,8 @@ workflow CHROMHMM {
 		
     	LEARN_MODEL(BINARIZE_BAMS.out, chromhmm_states)
 		
-		ch_emission_bed = LEARN_MODEL.out.emissions.combine(LEARN_MODEL.out.beds.flatten())
+		// Add meta [state: {state}] to channel
+		ch_emission_bed = LEARN_MODEL.out.emissions.combine(LEARN_MODEL.out.beds.flatten()).map{item -> [[state: item[1].baseName.split("_")[0]], item[0], item[1]]}
 
 		GET_OUTPUT(ch_emission_bed)
 	

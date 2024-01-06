@@ -16,6 +16,7 @@ include { COPY } from "../../modules/local/copy"
 include { EHMM } from './ehmm'
 include { GAWK as REMOVE_CHR } from "../../modules/nf-core/gawk/main"
 include { CHROMHMM } from "./chromhmm"
+include { ROSE } from "./rose"
 
 workflow PEAKS {
     take:
@@ -133,6 +134,11 @@ workflow PEAKS {
             params.chromsizes
         )
         
+        ROSE(
+            CHROMHMM.out,
+            params.ucsc_file
+        )
+
         }
         
         if (params.blacklist) {
