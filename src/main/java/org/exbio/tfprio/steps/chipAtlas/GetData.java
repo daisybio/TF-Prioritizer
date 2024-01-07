@@ -84,9 +84,9 @@ public class GetData extends ExecutableStep<Configs> {
                         pair -> pair.getValue()[colNameIndex.get(antigenClassColName)].equals("TFs and others")).filter(
                         split -> tissueTypes.get().stream().anyMatch(tissueType -> tissueType.equalsIgnoreCase(
                                 split.getValue()[colNameIndex.get(cellTypeClassColName)]))).map(pair -> {
-                    String tf = pair.getValue()[colNameIndex.get(antigenColName)].toUpperCase();
-                    int threshold = Integer.parseInt(pair.getValue()[colNameIndex.get(thresholdColName)]);
                     String[] trueSplit = pair.getKey().split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    String tf = trueSplit[colNameIndex.get(antigenColName)].toUpperCase();
+                    int threshold = Integer.parseInt(trueSplit[colNameIndex.get(thresholdColName)]);
                     String url = trueSplit[colNameIndex.get(urlColName)];
                     return Pair.of(tf, Pair.of(threshold, url));
                 }).collect(Collectors.groupingBy(Pair::getKey,
