@@ -20,4 +20,9 @@ process RUN_ROSE {
     -s 12500 \
     -t 2500
     """
+
+    stub:
+    """
+    touch "${gff.baseName}_STITCHED.gff"
+    """
 }
