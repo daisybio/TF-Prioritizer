@@ -71,6 +71,7 @@ workflow PEAKS {
         REMOVE_CHR(ch_footprints, [])
         ch_footprints_nochr = REMOVE_CHR.out.output
 
+        /*
         if (params.bam_design) {
             ch_bams = Channel.value(file(params.bam_design))
                                 .splitCsv(header: true)
@@ -101,7 +102,8 @@ workflow PEAKS {
 
             ch_footprints = EHMM.out.all
         }
-        
+        */
+
         if (params.bam_design2) {
             // Parse design file
             ch_bams = Channel.value(file(params.bam_design2))
@@ -138,6 +140,13 @@ workflow PEAKS {
             CHROMHMM.out,
             params.ucsc_file
         )
+
+        // Adapt process output to previous design of ch_footprints
+        ch_footprints = ROSE.out
+            .map{meta, bed -> 
+                meta = meta + [id: meta.state + "_enhancers", antibody: "enhancers"]
+                [meta, bed]
+            }
 
         }
         
