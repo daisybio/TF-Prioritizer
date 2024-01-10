@@ -9,10 +9,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -51,12 +48,25 @@ public class CheckChromosomes extends ExecutableStep<Configs> {
                 try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
                      BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
                     for (String line; (line = reader.readLine()) != null; ) {
-                        // Remove initial "chr" from chromosome names
-                        if (!line.startsWith("chr")) {
-                            writer.write(line);
-                        } else {
-                            writer.write(line.substring("chr".length()));
+                        String[] fields = line.split("\t");
+                        String chromosome = fields[0];
+                        String[] rest = Arrays.copyOfRange(fields, 1, fields.length);
+
+                        // Remove "chr" prefix
+                        if (chromosome.startsWith("chr")) {
+                            chromosome = chromosome.substring("chr".length());
                         }
+
+                        chromosome = chromosome.toUpperCase();
+
+                        // Skip everything but numeric, X, Y, MT and M chromosomes
+                        if (!chromosome.matches("^(\\d+|X|Y|MT|M)$")) {
+                            continue;
+                        }
+
+                        String correctedLine = chromosome + "\t" + String.join("\t", rest);
+                        writer.write(correctedLine);
+                        
                         writer.newLine();
                     }
                 }
