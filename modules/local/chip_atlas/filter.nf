@@ -17,7 +17,7 @@ process FILTER {
 
     script:
     """
-        #!/usr/bin/env python
+        #!/usr/bin/env python3
 
         import pandas as pd
         import argparse

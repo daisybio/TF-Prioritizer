@@ -15,7 +15,7 @@ process COLLECT_TFS {
     
     script:
     """
-    #!/usr/bin/env python
+    #!/usr/bin/env python3
 
     import json
 
