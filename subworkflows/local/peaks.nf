@@ -135,16 +135,23 @@ workflow PEAKS {
             params.chromhmm_states,
             params.chromsizes
         )
+
+        // Add id field to meta object for use in nf-core modules
+        ch_chromhmm_enhancers = CHROMHMM.out
+            .map{meta, path ->
+                meta = meta + [id: meta.state + "_enhancers"]
+                [meta, path]
+            }
         
         ROSE(
-            CHROMHMM.out,
+            ch_chromhmm_enhancers,
             params.ucsc_file
         )
 
         // Adapt process output to previous design of ch_footprints
         ch_footprints = ROSE.out
             .map{meta, bed -> 
-                meta = meta + [id: meta.state + "_enhancers", antibody: "enhancers"]
+                meta = meta + [antibody: "enhancers"]
                 [meta, bed]
             }
 
