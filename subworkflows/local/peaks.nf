@@ -139,7 +139,7 @@ workflow PEAKS {
         // Add id field to meta object for use in nf-core modules
         ch_chromhmm_enhancers = CHROMHMM.out
             .map{meta, path ->
-                meta = meta + [id: meta.state + "_enhancers"]
+                meta = meta + [id: "enhancers_" + meta.state]
                 [meta, path]
             }
         
