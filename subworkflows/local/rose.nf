@@ -1,5 +1,5 @@
 include { GAWK as BED_TO_GFF } from "../../modules/nf-core/gawk/main"
-include { REFORMAT_GFF } from "../../modules/local/rose/reformat_gff"
+include { GAWK as REFORMAT_GFF } from "../../modules/nf-core/gawk/main"
 include { RUN_ROSE } from "../../modules/local/rose/run_rose"
 include { GAWK as ROSE_OUTPUT_TO_BED } from "../../modules/nf-core/gawk/main"
 
@@ -11,9 +11,9 @@ workflow ROSE {
     main:
         BED_TO_GFF(input_bed, [])
 
-        REFORMAT_GFF(BED_TO_GFF.out.output)
+        REFORMAT_GFF(BED_TO_GFF.out.output, [])
 
-        RUN_ROSE(REFORMAT_GFF.out, ucsc_file)
+        RUN_ROSE(REFORMAT_GFF.out.output, ucsc_file)
 
         ROSE_OUTPUT_TO_BED(RUN_ROSE.out, [])
 
