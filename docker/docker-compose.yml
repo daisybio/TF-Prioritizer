@@ -15,3 +15,7 @@ services:
     build:
       context: ehmm
     image: bigdatainbiomedicine/inspect-ehmm
+  chromhmm:
+    build:
+      context: chromhmm
+    image: leonhafner/openjdk:17

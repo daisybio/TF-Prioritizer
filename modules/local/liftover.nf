@@ -14,7 +14,7 @@ process LIFTOVER {
 
     script:
         """
-        #!/usr/bin/env python
+        #!/usr/bin/env python3
 
         from easyliftover import liftover_path
 

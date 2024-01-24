@@ -15,6 +15,8 @@ include { COMBINE_TABLES as AFFINITY_RATIO } from "../../modules/local/combine_t
 include { COPY } from "../../modules/local/copy"
 include { EHMM } from './ehmm'
 include { GAWK as REMOVE_CHR } from "../../modules/nf-core/gawk/main"
+include { CHROMHMM } from "./chromhmm"
+include { ROSE } from "./rose"
 
 workflow PEAKS {
     take:
@@ -69,6 +71,7 @@ workflow PEAKS {
         REMOVE_CHR(ch_footprints, [])
         ch_footprints_nochr = REMOVE_CHR.out.output
 
+        /*
         if (params.bam_design) {
             ch_bams = Channel.value(file(params.bam_design))
                                 .splitCsv(header: true)
@@ -99,7 +102,61 @@ workflow PEAKS {
 
             ch_footprints = EHMM.out.all
         }
+        */
 
+        if (params.bam_design2) {
+            // Parse design file
+            ch_bams = Channel.value(file(params.bam_design2))
+                                .splitCsv(header: ["state", "assay", "bam", "control"], sep: '\t')
+                                .map{
+                                    row -> [
+                                        [
+                                            id: row["state"] + "_" + row["assay"],
+                                            state: row["state"],
+                                            assay: row["assay"],
+                                        ],
+                                        [
+                                            file(row["bam"]), file(row["control"])
+                                        ],
+                                    ]
+                                }
+                                .multiMap{
+                                    row -> 
+                                        normal_bams:
+                                            [row[0], row[1][0]]
+                                        control_bams:
+                                            [row[0], row[1][1]]
+                                }
+        // Reunite channels with unique controls
+        ch_bams = ch_bams.normal_bams.mix(ch_bams.control_bams.unique{ it[1] })
+
+        CHROMHMM(
+            ch_bams,
+            params.chromhmm_states,
+            params.chromsizes
+        )
+
+        // Add id field to meta object for use in nf-core modules
+        ch_chromhmm_enhancers = CHROMHMM.out
+            .map{meta, path ->
+                meta = meta + [id: "enhancers_" + meta.state]
+                [meta, path]
+            }
+        
+        ROSE(
+            ch_chromhmm_enhancers,
+            params.ucsc_file
+        )
+
+        // Adapt process output to previous design of ch_footprints
+        ch_footprints = ROSE.out
+            .map{meta, bed -> 
+                meta = meta + [antibody: "enhancers"]
+                [meta, bed]
+            }
+
+        }
+        
         if (params.blacklist) {
             SUBTRACT_BLACKLIST(ch_footprints.map{ meta, bed_file -> [meta, bed_file, params.blacklist]})
             ch_blacklisted = SUBTRACT_BLACKLIST.out.bed

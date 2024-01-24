@@ -15,7 +15,7 @@ process CREATE_ANNDATA {
 
     script:
     """
-        #!/usr/bin/env python
+        #!/usr/bin/env python3
 
         import anndata as ad
         import pandas as pd
