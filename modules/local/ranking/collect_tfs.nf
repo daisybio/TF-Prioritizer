@@ -14,6 +14,10 @@ process COLLECT_TFS {
         path("tfs_sorted.txt"), emit: tfs
     
     script:
+    // Case that rankings contains only a single element
+    if (!(rankings instanceof List)) {
+        rankings = [rankings]
+    }
     """
     #!/usr/bin/env python3
 
