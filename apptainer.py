@@ -53,7 +53,7 @@ volume_string = ' '.join([f'-B {v}:{k}:ro' for k, v in mounts.items()])
 
 internal_command = f"java -Xmx{memory}g -jar /srv/TF-Prioritizer.jar -t {threads} -o /srv/wd -c /srv/input/configs.json"
 
-external_command = f"apptainer run " \
+external_command = f"apptainer run --no-mount tmp --writable-tmpfs" \
                    f" -B {docker_config_file}:/srv/input/configs.json:ro {volume_string} -B {output}:/srv/wd:rw " \
                    f"docker://{image} {internal_command}"
 
