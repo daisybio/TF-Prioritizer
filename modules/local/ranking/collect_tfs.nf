@@ -28,6 +28,8 @@ process COLLECT_TFS {
 
     for path in paths:
         with open(path) as f:
+            # Skip header
+            next(f)
             for line in f:
                 tfgroup = line.strip().split("\\t")[0]
                 tfs = tfgroup.split("..")
