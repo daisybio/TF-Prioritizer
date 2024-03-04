@@ -13,6 +13,9 @@ args = parser.parse_args()
 
 df = pd.read_csv(args.input, sep="\t", index_col=0)
 
+# Remove additional metrics produced by STARE and keep only gene-TF affinities
+df = df.drop(columns=["NumPeaks", "AvgPeakDistance", "AvgPeakSize"])
+
 # Some column title are structured like "MEIS1(MA0498.1)" in this case we
 # want to remove the annotation in parenthesis and keep only the TF name
 # while calculating the mean of the expression values.

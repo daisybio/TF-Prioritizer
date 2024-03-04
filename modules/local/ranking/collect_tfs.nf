@@ -14,6 +14,10 @@ process COLLECT_TFS {
         path("tfs_sorted.txt"), emit: tfs
     
     script:
+    // Case that rankings contains only a single element
+    if (!(rankings instanceof List)) {
+        rankings = [rankings]
+    }
     """
     #!/usr/bin/env python3
 
@@ -24,6 +28,8 @@ process COLLECT_TFS {
 
     for path in paths:
         with open(path) as f:
+            # Skip header
+            next(f)
             for line in f:
                 tfgroup = line.strip().split("\\t")[0]
                 tfs = tfgroup.split("..")
