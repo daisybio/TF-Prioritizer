@@ -12,10 +12,11 @@ workflow FIMO {
 	take:
 		tfs_sorted
         enhancer_regions
+		pwm
 
 	main:
 
-		JASPAR_MAPPING(tfs_sorted)
+		JASPAR_MAPPING(tfs_sorted, pwm)
 
 		JASPAR_DOWNLOAD()
 

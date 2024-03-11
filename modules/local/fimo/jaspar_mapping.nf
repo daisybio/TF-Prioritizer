@@ -5,6 +5,7 @@ process JASPAR_MAPPING {
     
     input:
         path(tfs_sorted)
+        path(pwm)
 
     output:
         path("tfs_jaspar_ids.txt")
@@ -17,22 +18,20 @@ process JASPAR_MAPPING {
         from urllib.request import urlopen
 
         path_tfs_sorted = "${tfs_sorted}"
+        path_pwm = "${pwm}"
 
         # Read differential expressed TFs
         with open(path_tfs_sorted, 'r') as f:
             tfs_sorted = f.read().split("\\n")
 
-        # Get mapping file 1
-        fetch1 = urlopen("https://raw.githubusercontent.com/SchulzLab/STARE/main/PWMs/2.2/Jaspar_Hocomoco_Kellis_human_PSEMs.txt")
-        mapping1 = [tuple(line[1:].split("\\t")[:2]) for line in fetch1.read().decode('utf-8').split('\\n') if line.startswith('>')]
-
-        # Get mapping file 2
-        fetch2 = urlopen("https://raw.githubusercontent.com/SchulzLab/STARE/main/PWMs/2.2/Jaspar_Hocomoco_Kellis_mouse_PSEMs.txt")
-        mapping2 = [tuple(line[1:].split("\\t")[:2]) for line in fetch2.read().decode('utf-8').split('\\n') if line.startswith('>')]
+        # Get mapping file
+        with open(path_pwm, 'r') as f:
+            file = f.read()
+        mapping = [tuple(line[1:].split("\\t")[:2]) for line in file.split('\\n') if line.startswith('>')]
 
         # Create mapping dict from mapping files
         symbol_to_id = defaultdict(set)
-        for jaspar_id, symbol in mapping1 + mapping2:
+        for jaspar_id, symbol in mapping:
             symbol_to_id[symbol].add(jaspar_id)
 
         # Cast defaultdict to dict

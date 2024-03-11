@@ -151,7 +151,8 @@ workflow INSPECT {
 
     FIMO(
         RANKING.out.tfs,
-        PEAKS.out.stitched_enhancers
+        PEAKS.out.stitched_enhancers,
+        params.pwm
     )
 
     CUSTOM_DUMPSOFTWAREVERSIONS(ch_versions)
