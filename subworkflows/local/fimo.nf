@@ -6,6 +6,7 @@ include { BEDTOOLS_SORT as SORT_REGIONS } from "../../modules/nf-core/bedtools/s
 include { BEDTOOLS_MERGE as MERGE_REGIONS } from "../../modules/nf-core/bedtools/merge/main"
 include { BEDTOOLS_GETFASTA as EXTRACT_SEQUENCE } from "../../modules/nf-core/bedtools/getfasta/main"
 include { RUN_FIMO } from "../../modules/local/fimo/run_fimo"
+include { COMBINE_RESULTS } from "../../modules/local/fimo/combine_results"
 
 
 workflow FIMO {
@@ -41,6 +42,19 @@ workflow FIMO {
 
 		EXTRACT_SEQUENCE(ch_bed, params.fasta)
 
-		RUN_FIMO(FILTER_MOTIFS.out, EXTRACT_SEQUENCE.out.fasta)
-		RUN_FIMO.out.view()
+		ch_filtered_motifs = FILTER_MOTIFS.out
+			.flatten()
+			.map{file -> [[motif: file.baseName], file]}
+		
+		RUN_FIMO(ch_filtered_motifs, EXTRACT_SEQUENCE.out.fasta)
+		
+		ch_combine_results = RUN_FIMO.out
+			.map{meta, path -> path}
+			.collect()
+		
+		COMBINE_RESULTS(ch_combine_results)
+
+	emit:
+		tsv = COMBINE_RESULTS.out.tsv
+		gff = COMBINE_RESULTS.out.gff
 }
